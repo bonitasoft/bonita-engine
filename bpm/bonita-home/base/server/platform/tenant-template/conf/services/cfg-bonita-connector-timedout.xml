@@ -5,7 +5,8 @@
 		<constructor-arg name="queueCapacity" value="10" />
 		<constructor-arg name="corePoolSize" value="5" />
 		<constructor-arg name="loggerService" ref="technicalLoggerService" />
-		<constructor-arg name="timeout" value="10000" />
+		<!-- timeout in seconds, default = 5 minutes -->
+		<constructor-arg name="timeout" value="300" />
 		<constructor-arg name="maximumPoolSize" value="100" />
 		<constructor-arg name="keepAliveTimeSeconds" value="100" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />

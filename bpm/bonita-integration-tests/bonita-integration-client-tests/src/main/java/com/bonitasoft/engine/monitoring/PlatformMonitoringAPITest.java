@@ -1,5 +1,11 @@
 package com.bonitasoft.engine.monitoring;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -12,12 +18,6 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -138,7 +138,7 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
     @Test
     public void isSchedulerStartedTest() throws Exception {
         // TODO how to improve that?
-        assertTrue(getPlatformMonitoringAPI().isSchedulerStarted());
+        assertTrue("The scheduler should be started", getPlatformMonitoringAPI().isSchedulerStarted());
     }
 
     @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Transaction", "Active" }, story = "Get number of active transactions.")
@@ -182,7 +182,7 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
     @Test
     public void getTotalSwapSpaceSize() throws Exception {
         if (getPlatformMonitoringAPI().isOptionalMonitoringInformationAvailable()) {
-            assertTrue(getPlatformMonitoringAPI().getTotalSwapSpaceSize() > 0);
+            assertTrue(getPlatformMonitoringAPI().getTotalSwapSpaceSize() >= 0);
         } else {
             try {
                 getPlatformMonitoringAPI().getTotalSwapSpaceSize();

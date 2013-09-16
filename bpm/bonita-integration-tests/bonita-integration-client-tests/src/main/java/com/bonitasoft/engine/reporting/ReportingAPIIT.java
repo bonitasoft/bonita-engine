@@ -34,7 +34,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
     @Before
     public void setUp() throws BonitaException {
         login();
-        getIdentityAPI().createUser("matti", "bpm");
+        getIdentityAPI().createUser("matti", "bpm", "Matti", "Mäkelä");
     }
 
     @After
@@ -51,14 +51,14 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
     @Test
     public void reportUsers() throws BonitaException {
-        final String csvUsers = getReportingAPI().selectList("SELECT userName, enabled FROM user_");
-        assertTrue(("USERNAME,ENABLED" + lineSeparator + "matti,true" + lineSeparator).equalsIgnoreCase(csvUsers));
+        final String csvUsers = getReportingAPI().selectList("SELECT userName, lastname FROM user_");
+        assertEquals("USERNAME,LASTNAME" + lineSeparator + "matti,Mäkelä" + lineSeparator, csvUsers);
     }
 
     @Test
     public void reportUsersusingAlias() throws BonitaException {
-        final String csvUsers = getReportingAPI().selectList("SELECT userName AS name, enabled FROM user_");
-        assertTrue(("NAME,ENABLED" + lineSeparator + "matti,true" + lineSeparator).equalsIgnoreCase(csvUsers));
+        final String csvUsers = getReportingAPI().selectList("SELECT userName AS name, lastname FROM user_");
+        assertEquals("NAME,LASTNAME" + lineSeparator + "matti,Mäkelä" + lineSeparator, csvUsers);
     }
 
     @Test

@@ -81,7 +81,7 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="documentMappingService" ref="documentMappingService" />
 		<constructor-arg name="commentService" ref="commentService" />
-		<constructor-arg name="saCommentBuilder" ref="saCommentBuilder" />		
+		<constructor-arg name="commentBuilders" ref="commentBuilders" />		
 		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="userFilterService" ref="userFilterService" />
@@ -137,7 +137,7 @@
 			</map>
 		</constructor-arg>
 		<constructor-arg name="processDocumentService" ref="processDocumentService" />
-		<constructor-arg name="documentBuilder" ref="processDocumentBuilder" />
+		<constructor-arg name="processDocumentBuilders" ref="processDocumentBuilders" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
@@ -146,6 +146,7 @@
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="operationBuilders" ref="sOperationBuilders"/>
 		<constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
 	</bean>
 	
 	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">

@@ -68,8 +68,6 @@ public class ClusterTests extends CommonAPISPTest {
         logout();
         // init the context here
         changeToNode2();
-        login();
-        logout();
         PlatformSession platformSession = loginPlatform();
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         platformAPI.startNode();
@@ -94,7 +92,7 @@ public class ClusterTests extends CommonAPISPTest {
         changeApis();
     }
 
-    private void setConnectionPort(String port) throws Exception {
+    private void setConnectionPort(final String port) throws Exception {
         Map<String, String> parameters = new HashMap<String, String>(2);
         parameters.put("server.url", "http://localhost:" + port);
         parameters.put("application.name", "bonita");

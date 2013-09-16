@@ -11,6 +11,7 @@ package com.bonitasoft.engine.api.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.monitoring.GcInfo;
@@ -183,7 +184,11 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
         final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
-        return platformMonitoringService.isSchedulerStarted();
+        try {
+            return platformMonitoringService.isSchedulerStarted();
+        } catch (SBonitaException e) {
+            throw new MonitoringException("Cannot determine if the scheduler is started", e);
+        }
     }
 
     @Override

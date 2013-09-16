@@ -50,7 +50,7 @@
 	<bean id="documentOperationExecutorStrategy" class="org.bonitasoft.engine.operation.DocumentOperationExecutorStrategy">
 		<constructor-arg name="processDocumentService" ref="processDocumentService" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
-		<constructor-arg name="processDocumentBuilder" ref="processDocumentBuilder" />
+		<constructor-arg name="processDocumentBuilders" ref="processDocumentBuilders" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 	</bean>

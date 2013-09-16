@@ -311,6 +311,18 @@
 			</exclusions>
 		</dependency>
 
+		<!-- Incident -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.incident</groupId>
+			<artifactId>bonita-incident-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.incident</groupId>
+			<artifactId>bonita-incident-log</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
@@ -903,6 +915,9 @@
 									<include>org.bonitasoft.engine.external.identity.mapping:bonita-external-identity-mapping-impl-hibernate</include>
 									<!-- Home Server -->
 									<include>org.bonitasoft.engine.core:bonita-home-server</include>
+									<!-- Incident -->
+									<include>org.bonitasoft.engine.incident:bonita-incident-api</include>
+									<include>org.bonitasoft.engine.incident:bonita-incident-log</include>
 									<!-- Identity -->
 									<include>org.bonitasoft.engine.identity:bonita-identity-model</include>
 									<include>org.bonitasoft.engine.identity:bonita-identity-model-impl</include>

@@ -2,15 +2,15 @@ package com.bonitasoft.services.monitoring;
 
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 
-public class TenantMonitoringServiceWithoutCacheIntegrationTest extends TenantMonitoringServiceTest {
+public class TenantMonitoringServiceIntegrationTest extends TenantMonitoringServiceTest {
 
     private static TenantMonitoringService monitoringService;
 
     static {
-        monitoringService = getServicesBuilder().buildTenantMonitoringService(false);
+        monitoringService = getServicesBuilder().buildTenantMonitoringService();
     }
 
-    public TenantMonitoringServiceWithoutCacheIntegrationTest() throws Exception {
+    public TenantMonitoringServiceIntegrationTest() throws Exception {
         super();
     }
 

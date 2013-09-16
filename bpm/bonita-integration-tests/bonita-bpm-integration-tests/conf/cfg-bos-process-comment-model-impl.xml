@@ -3,8 +3,6 @@
 
 	<bean id="commentBuilders" class="org.bonitasoft.engine.core.process.comment.model.builder.impl.SCommentBuildersImpl" />
 
-	<bean id="saCommentBuilder" class="org.bonitasoft.engine.core.process.comment.model.archive.builder.impl.SACommentBuilderImpl" />
-	
 	<bean id="db-bos-process-comment-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/core/process/comment/model/impl/db/${db.vendor}-initTables.sql" />

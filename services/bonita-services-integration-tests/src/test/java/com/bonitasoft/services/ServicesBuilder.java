@@ -52,12 +52,8 @@ public class ServicesBuilder extends org.bonitasoft.engine.ServicesBuilder {
         return getAccessor().getInstanceOf(SJvmMXBean.class);
     }
 
-    public TenantMonitoringService buildTenantMonitoringService(final boolean useCache) {
-        if (useCache) {
-            return getAccessor().getInstanceOf("monitoringServiceWithCache", TenantMonitoringService.class);
-        } else {
-            return getAccessor().getInstanceOf("monitoringService", TenantMonitoringService.class);
-        }
+    public TenantMonitoringService buildTenantMonitoringService() {
+        return getAccessor().getInstanceOf("monitoringService", TenantMonitoringService.class);
     }
 
     public PlatformMonitoringService buildPlatformMonitoringService() {

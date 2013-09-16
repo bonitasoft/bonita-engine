@@ -73,13 +73,14 @@ public class TaskStatus implements Serializable {
 	public String getMessage() {
 		StringBuilder stb = new StringBuilder();
 		if (error) {
-			stb.append("Error refreshing classloader on node");
+			stb.append("Error refreshing");
 		} else {
-			stb.append("Refreshed classloader on node");
+			stb.append("Refreshed");
 			
 		}
+        stb.append(" classloader on node ");
 		stb.append(node);
-		stb.append(" classloader is ");
+		stb.append(" . The classloader is ");
 		if (isLocal) {
 			stb.append(type);
 			stb.append(" with id ");
@@ -87,11 +88,11 @@ public class TaskStatus implements Serializable {
 		} else {
 			stb.append("global");
 		}
-		stb.append(" took ");
+		stb.append(". It took ");
 		stb.append(completionTime);
 		stb.append(" ms");
 		if (error) {
-			stb.append(", error is ");
+			stb.append(", the error is ");
 			stb.append(throwable.getMessage());
 		}
 		return stb.toString();
