@@ -343,6 +343,7 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -896,29 +897,16 @@ public class ProcessAPIImpl implements ProcessAPI {
                 }
 
                 final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
-		 // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
+                final boolean isFirstState = flowNodeInstance.getStateId() == 0;
+                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                 processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), starterId, session.getId());
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    final StringBuilder stb = new StringBuilder();
-                    stb.append("The user <");
-                    stb.append(session.getUserName());
-                    if (starterId != session.getUserId()) {
-                        stb.append("> acting as delegate of user with id <");
-                        stb.append(starterId);
-               
-            }
-                    stb.append("> has performed the task [display name: <");
-                    stb.append(flowNodeInstance.getDisplayName());
-                    stb.append(">, id: <");
-                    stb.append(flowNodeInstance.getId());
-                    stb.append(">, process instance: <");
-                    stb.append(flowNodeInstance.getParentProcessInstanceId());
-                    stb.append(">, process definition: <");
-                    stb.append(flowNodeInstance.getProcessDefinitionId());
-                    stb.append(">]");
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
+                    String message = LogMessageBuilder.builUserActionPrefix(session, starterId) + "has performed the task"
+                            + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, message);
                 }
             }
+
         };
 
         try {
@@ -4136,8 +4124,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SProcessDocumentBuilders documentBuilders = tenantAccessor.getProcessDocumentBuilders();
         final long author = getUserIdFromSession();
         try {
-            final SProcessDocument document = attachDocument(processInstanceId, documentName, fileName, mimeType, url, processDocumentService, documentBuilders,
-                    author);
+            final SProcessDocument document = attachDocument(processInstanceId, documentName, fileName, mimeType, url, processDocumentService,
+                    documentBuilders, author);
             return ModelConvertor.toDocument(document);
         } catch (final SBonitaException sbe) {
             throw new DocumentAttachmentException(sbe);
@@ -5353,17 +5341,17 @@ public class ProcessAPIImpl implements ProcessAPI {
                 if (stateId == 0/* initializing */|| stateId == 1/* started */) {
                     // the evaluation date is either now (initializing) or the start date if available
                     long evaluationDate = stateId == 0 ? System.currentTimeMillis() : processInstance.getStartDate();
-                return evaluateExpressionsInstanceLevelAndArchived(expressions, processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE,
+                    return evaluateExpressionsInstanceLevelAndArchived(expressions, processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE,
                             processInstance.getProcessDefinitionId(), evaluationDate);
                 }
             } catch (final SProcessInstanceNotFoundException spinfe) {
                 // get it in the archive
             }
-                final ArchivedProcessInstance archiveProcessInstance = getStartedArchivedProcessInstance(processInstanceId);
-                final Map<String, Serializable> evaluateExpressionInArchiveProcessInstance = evaluateExpressionsInstanceLevelAndArchived(expressions,
-                        processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE, archiveProcessInstance.getProcessDefinitionId(), archiveProcessInstance
-                                .getStartDate().getTime());
-                return evaluateExpressionInArchiveProcessInstance;
+            final ArchivedProcessInstance archiveProcessInstance = getStartedArchivedProcessInstance(processInstanceId);
+            final Map<String, Serializable> evaluateExpressionInArchiveProcessInstance = evaluateExpressionsInstanceLevelAndArchived(expressions,
+                    processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE, archiveProcessInstance.getProcessDefinitionId(), archiveProcessInstance.getStartDate()
+                            .getTime());
+            return evaluateExpressionInArchiveProcessInstance;
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e);
         }
@@ -5491,7 +5479,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             return searchArchivedProcessInstances.getResult().getResult().get(0);
         } catch (final IndexOutOfBoundsException e) {
             throw new SAProcessInstanceNotFoundException(processInstanceId, ProcessInstanceState.STARTED.name());
-    }
+        }
 
     }
 

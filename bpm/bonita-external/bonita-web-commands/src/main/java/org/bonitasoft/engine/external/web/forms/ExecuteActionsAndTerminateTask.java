@@ -30,6 +30,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
@@ -127,22 +128,12 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
             final SSession session = getSession();
             final long userId = session.getUserId();
             final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
-	    // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
+    	    final boolean isFirstState = flowNodeInstance.getStateId() == 0;
+    	    // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
             processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, processDefinitionId, userId, userId);
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                final StringBuilder stb = new StringBuilder();
-                stb.append("The user <");
-                stb.append(session.getUserName());
-                stb.append("> has performed the task [display name: <");
-                stb.append(flowNodeInstance.getDisplayName());
-                stb.append(">, id: <");
-                stb.append(flowNodeInstance.getId());
-                stb.append(">, process instance: <");
-                stb.append(flowNodeInstance.getParentProcessInstanceId());
-                stb.append(">, process definition: <");
-                stb.append(processDefinitionId);
-                stb.append(">]");
-                logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
+                final String message = "The user <" + session.getUserName() + "has performed the task" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                logger.log(getClass(), TechnicalLogSeverity.INFO, message);
             }
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);

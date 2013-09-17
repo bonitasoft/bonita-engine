@@ -64,6 +64,8 @@ import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * @author Baptiste Mesta
@@ -206,6 +208,24 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
             bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE,
                     expressionContext, expressionResolverService, dataInstanceService, sDataInstanceBuilders);
             dataInstanceService.createDataContainer(messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE.name());
+            TechnicalLoggerService logger = bpmInstancesCreator.getLogger();
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                StringBuilder stb = new StringBuilder();
+                stb.append("Initialized variables for message instance [name: <");
+                stb.append(messageInstance.getMessageName());
+                stb.append(">, id: <");
+                stb.append(messageInstance.getId());
+                stb.append(">, flow node: <");
+                stb.append(messageInstance.getFlowNodeName());
+                stb.append(">, target flow node: <");
+                stb.append(messageInstance.getTargetFlowNode());
+                stb.append(">, target process: <");
+                stb.append(messageInstance.getTargetProcess());
+                stb.append(">, process definition: <");
+                stb.append(messageInstance.getProcessDefinitionId());
+                stb.append(">]");
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
+            }
         }
     }
 

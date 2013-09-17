@@ -109,8 +109,18 @@ public class UserFilterServiceImpl implements UserFilterService {
         }
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Executed userFilter <" + sUserFilterDefinition.getName() + "> with userFilter id <"
-                    + sUserFilterDefinition.getUserFilterId() + ">, and version <" + sUserFilterDefinition.getVersion() + ">");
+            StringBuilder stb = new StringBuilder();
+            stb.append("Executed userFilter [name: <");
+            stb.append(sUserFilterDefinition.getName());
+            stb.append(">, user filter id: <");
+            stb.append(sUserFilterDefinition.getUserFilterId());
+            stb.append(">, version: <");
+            stb.append(sUserFilterDefinition.getVersion());
+            stb.append(">] on flow node instance with id: <");
+            stb.append(expressionContext.getContainerId());
+            stb.append(">");
+            
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
         }
         return filterResult;
     }

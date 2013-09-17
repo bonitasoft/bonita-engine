@@ -136,8 +136,25 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             throw new SActivityCreationException(e);
         }
         if (getLogger().isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                    "Created " + activityInstance.getType().getValue() + " <" + activityInstance.getName() + "> with id <" + activityInstance.getId() + ">");
+            StringBuilder stb = new StringBuilder();
+            stb.append("Created ");
+            stb.append(activityInstance.getType().getValue());
+            stb.append(" <");
+            stb.append(activityInstance.getName());
+            stb.append("> with id <");
+            stb.append(activityInstance.getId());
+            if (activityInstance.getParentActivityInstanceId() > 0) {
+                stb.append(">, parent activity instance: <");
+                stb.append(activityInstance.getParentActivityInstanceId());
+            }
+            stb.append(">, parent process instance: <");
+            stb.append(activityInstance.getParentProcessInstanceId());
+            stb.append(">, root process instance: <");
+            stb.append(activityInstance.getRootProcessInstanceId());
+            stb.append(">, process definition: <");
+            stb.append(activityInstance.getProcessDefinitionId());
+            stb.append(">");
+            getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
         }
     }
 

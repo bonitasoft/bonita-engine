@@ -122,13 +122,19 @@ public class OperationServiceImpl implements OperationService {
                 updates.put(operation.getLeftOperand(), operationExecutorStrategy);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                if (dataContainerType != null) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Executed operation on " + dataContainerType + " <" + dataContainerId + "> : "
-                            + operation.getLeftOperand().getName() + " " + operation.getOperator() + " " + operationValue);
-                } else {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Executed operation " + " <" + dataContainerId + "> : "
-                            + operation.getLeftOperand().getName() + " " + operation.getOperator() + " " + operationValue);
-                }
+                StringBuilder stb = new StringBuilder();
+                stb.append("Executed operation on container [id: '");
+                stb.append(dataContainerId);
+                stb.append("', type: '");
+                stb.append(dataContainerType);
+                stb.append("']. Operation: [left operand: '");
+                stb.append(operation.getLeftOperand().getName());
+                stb.append("', operator: '");
+                stb.append(operation.getOperator());
+                stb.append("', operation value: '");
+                stb.append(operationValue);
+                stb.append("']");
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
             }
         }
         for (final Entry<SLeftOperand, OperationExecutorStrategy> update : updates.entrySet()) {
