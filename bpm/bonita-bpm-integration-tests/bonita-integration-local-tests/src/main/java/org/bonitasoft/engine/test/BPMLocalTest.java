@@ -397,10 +397,20 @@ public class BPMLocalTest extends CommonAPILocalTest {
         File file = new File(tenantFolder + File.separatorChar + "INCIDENT.log");
         String content = org.bonitasoft.engine.io.IOUtil.read(file);
         assertTrue("File content is: " + content, content.contains("An incident occurred: MyJob"));
-        assertTrue("File content is: " + content, content.contains("Procedure to recover: The recovery procedure"));
         assertTrue("File content is: " + content, content.contains("an unexpected exception"));
         assertTrue("File content is: " + content, content.contains("unable to handle failure"));
-
+        try {
+            assertTrue("File content is: " + content, content.contains("Procedure to recover: The recovery procedure"));
+        } catch (AssertionError ass) {
+            // fail something to flush the logs:
+            new FailureHandlingBonitaWork(new FailingWork());
+            workService.executeWork(runnable);
+            Thread.sleep(100);
+            content = org.bonitasoft.engine.io.IOUtil.read(file);
+            System.err.println("Reading again from file:" + file.getPath());
+            assertTrue("File content is: " + content, content.contains("Procedure to recover: The recovery procedure"));
+            System.err.println("Log flushing problem, please fix the test");
+        }
     }
 
     private ProcessDefinition deployAndEnableProcessWithOneHumanTask(final String processName, final String actorName, final String userTaskName)

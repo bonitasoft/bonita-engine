@@ -126,7 +126,7 @@ public class GetUpdatedVariableValuesForProcessInstanceTest extends CommonAPITes
         commandParameters.put("OPERATIONS_LIST_KEY", (Serializable) operations);
         commandParameters.put("OPERATIONS_INPUT_KEY", (Serializable) contexts);
         commandParameters.put("CURRENT_VARIABLE_VALUES_MAP_KEY", (Serializable) currentVariables);
-        commandParameters.put("PROCESS_INSTANCE_ID_KEY", activityInstanceId);
+        commandParameters.put("PROCESS_INSTANCE_ID_KEY", pi.getId());
         @SuppressWarnings("unchecked")
         final Map<String, Serializable> updatedVariable = (Map<String, Serializable>) getCommandAPI().execute(commandName, commandParameters);
         // check and do assert:

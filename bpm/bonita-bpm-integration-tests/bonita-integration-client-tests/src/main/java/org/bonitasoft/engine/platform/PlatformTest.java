@@ -42,12 +42,10 @@ public class PlatformTest {
     public static void beforeClass() throws BonitaException {
         session = APITestUtil.loginPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        APITestUtil.initializeAndStartPlatformWithDefaultTenant(platformAPI, false);
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
-        APITestUtil.stopAndCleanPlatformAndTenant(platformAPI, false);
         APITestUtil.logoutPlatform(session);
     }
 

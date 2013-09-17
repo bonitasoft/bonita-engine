@@ -80,7 +80,6 @@ import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -550,7 +549,6 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     @Test
-    @Ignore("Created bug : ENGINE-594")
     public void documentsAreDeletedWhenProcessIsDeleted() throws Exception {
         final ProcessInstance pi = ensureAProcessInstanceIsStartedWithDocumentAttached(user, "test", "test.txt");
         disableAndDeleteProcess(pi.getProcessDefinitionId());
@@ -712,6 +710,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final ProcessInstance pi2 = ensureAProcessInstanceIsStartedWithDocumentAttached(user);
         final Document beforeUpdate = getAttachmentWithoutItsContent(pi2);
         final Document doc = buildDocument(beforeUpdate.getName());
+        // attach new document to generate archive of the previous one:
         getProcessAPI().attachNewDocumentVersion(pi2.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
                 "contentOfTheDoc".getBytes());
         final Document afterUpdate = getAttachmentWithoutItsContent(pi2);

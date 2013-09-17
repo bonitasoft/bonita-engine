@@ -19,11 +19,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-        BPMLocalSuiteTests.class,
-        BPMRemoteTests.class,
-        APIMethodTest.class
-})
+@SuiteClasses({ 
+    BPMLocalSuiteTests.class,
+    BPMRemoteTests.class,
+    APIMethodTest.class })
 public class LocalIntegrationTests {
 
     private static final String TMP_BONITA_HOME = "target/eclipse-bonita-home";
@@ -34,11 +33,24 @@ public class LocalIntegrationTests {
 
     @BeforeClass
     public static void beforeClass() throws BonitaException, IOException {
-        System.err.println("=================== LocalIntegrationTests.beforeClass()");
+        System.err.println("=================== LocalIntegrationTests setup");
+
         setupBonitaHome();
         setupSpringContext();
 
         APITestUtil.createPlatformStructure();
+        APITestUtil.initializeAndStartPlatformWithDefaultTenant(true);
+    }
+
+    @AfterClass
+    public static void afterClass() throws BonitaException, IOException {
+        System.err.println("=================== LocalIntegrationTests teardown");
+
+        APITestUtil.stopAndCleanPlatformAndTenant(true);
+        APITestUtil.deletePlatformStructure();
+
+        closeSpringContext();
+        cleanBonitaHome();
     }
 
     private static void setupBonitaHome() throws IOException {
@@ -55,16 +67,6 @@ public class LocalIntegrationTests {
         if (System.getProperties().toString().contains("org.eclipse.osgi")) {
             FileUtils.deleteDirectory(new File(TMP_BONITA_HOME));
         }
-    }
-
-    @AfterClass
-    public static void afterClass() throws BonitaException, IOException {
-        System.err.println("=================== LocalIntegrationTests.afterClass()");
-
-        APITestUtil.deletePlatformStructure();
-
-        closeSpringContext();
-        cleanBonitaHome();
     }
 
     private static void setupSpringContext() {

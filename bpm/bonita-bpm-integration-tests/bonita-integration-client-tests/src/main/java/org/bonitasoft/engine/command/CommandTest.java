@@ -32,7 +32,6 @@ public class CommandTest extends CommonAPITest {
     @Before
     public void before() throws Exception {
         login();
-        getCommandAPI().unregisterAll();
     }
 
     @After
@@ -199,22 +198,22 @@ public class CommandTest extends CommonAPITest {
     public void getCommandsWithCommandCriterion() throws BonitaException {
         try {
             getCommandAPI().addDependency("commands", "jar".getBytes());
-            getCommandAPI().register("command2", "command description", "implementation");
-            getCommandAPI().register("command3", "command description", "implementation");
-            getCommandAPI().register("command1", "command description", "implementation");
+            getCommandAPI().register("aaaCommand2", "command description", "implementation");
+            getCommandAPI().register("aaaCommand3", "command description", "implementation");
+            getCommandAPI().register("aaaCommand1", "command description", "implementation");
 
             final List<CommandDescriptor> commandsPage1 = getCommandAPI().getAllCommands(0, 2, CommandCriterion.NAME_ASC);
             assertEquals(2, commandsPage1.size());
-            assertEquals("command1", commandsPage1.get(0).getName());
-            assertEquals("command2", commandsPage1.get(1).getName());
+            assertEquals("aaaCommand1", commandsPage1.get(0).getName());
+            assertEquals("aaaCommand2", commandsPage1.get(1).getName());
 
-            final List<CommandDescriptor> commandsPage2 = getCommandAPI().getAllCommands(2, 10, CommandCriterion.NAME_ASC);
+            final List<CommandDescriptor> commandsPage2 = getCommandAPI().getAllCommands(2, 1, CommandCriterion.NAME_ASC);
             assertEquals(1, commandsPage2.size());
-            assertEquals("command3", commandsPage2.get(0).getName());
+            assertEquals("aaaCommand3", commandsPage2.get(0).getName());
         } finally {
-            getCommandAPI().unregister("command2");
-            getCommandAPI().unregister("command3");
-            getCommandAPI().unregister("command1");
+            getCommandAPI().unregister("aaaCommand2");
+            getCommandAPI().unregister("aaaCommand3");
+            getCommandAPI().unregister("aaaCommand1");
             getCommandAPI().removeDependency("commands");
         }
     }
@@ -257,75 +256,82 @@ public class CommandTest extends CommonAPITest {
 
     @Test
     public void searchCommands() throws BonitaException {
-        getCommandAPI().addDependency("commands", "jar".getBytes());
-        final CommandDescriptor command1 = getCommandAPI().register("command1", "SearchCommands description1", "implementation");
-        final CommandDescriptor command2 = getCommandAPI().register("command2", "GetCommands description2", "implementation");
-        final CommandDescriptor command3 = getCommandAPI().register("command3", "GetCommands description3", "implementation");
-        // search paging with order ASC
-        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 2);
-        builder.sort(CommandSearchDescriptor.NAME, Order.ASC);
         final CommandAPI commandAPI = getCommandAPI();
-        SearchResult<CommandDescriptor> searchCommands = commandAPI.searchCommands(builder.done());
-        assertNotNull(searchCommands);
-        assertEquals(3, searchCommands.getCount());
-        List<CommandDescriptor> commands = searchCommands.getResult();
-        assertEquals(2, commands.size());
-        assertEquals(command1, commands.get(0));
-        assertEquals(command2, commands.get(1));
+        commandAPI.addDependency("commands", "jar".getBytes());
+        final CommandDescriptor command1 = commandAPI.register("testCommand1", "SearchCommands description1", "implementation");
+        final CommandDescriptor command2 = commandAPI.register("testCommand2", "GetCommands description2", "implementation");
+        final CommandDescriptor command3 = commandAPI.register("testCommand3", "GetCommands description3", "implementation");
+        try {
+            // search paging with order ASC
+            SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 2);
+            builder.searchTerm("testCommand");
+            builder.sort(CommandSearchDescriptor.NAME, Order.ASC);
+            SearchResult<CommandDescriptor> searchCommands = commandAPI.searchCommands(builder.done());
+            assertNotNull(searchCommands);
+            assertEquals(3, searchCommands.getCount());
+            List<CommandDescriptor> commands = searchCommands.getResult();
+            assertEquals(2, commands.size());
+            assertEquals(command1, commands.get(0));
+            assertEquals(command2, commands.get(1));
 
-        builder = new SearchOptionsBuilder(2, 2);
-        builder.sort(CommandSearchDescriptor.NAME, Order.ASC);
-        searchCommands = commandAPI.searchCommands(builder.done());
-        assertNotNull(searchCommands);
-        assertEquals(3, searchCommands.getCount());
-        commands = searchCommands.getResult();
-        assertEquals(1, commands.size());
-        assertEquals(command3, commands.get(0));
+            builder = new SearchOptionsBuilder(2, 2);
+            builder.searchTerm("testCommand");
+            builder.sort(CommandSearchDescriptor.NAME, Order.ASC);
+            searchCommands = commandAPI.searchCommands(builder.done());
+            assertNotNull(searchCommands);
+            assertEquals(3, searchCommands.getCount());
+            commands = searchCommands.getResult();
+            assertEquals(1, commands.size());
+            assertEquals(command3, commands.get(0));
 
-        builder = new SearchOptionsBuilder(3, 2);
-        builder.sort(CommandSearchDescriptor.NAME, Order.ASC);
-        searchCommands = commandAPI.searchCommands(builder.done());
-        assertEquals(0, searchCommands.getResult().size());
+            builder = new SearchOptionsBuilder(3, 2);
+            builder.searchTerm("testCommand");
+            builder.sort(CommandSearchDescriptor.NAME, Order.ASC);
+            searchCommands = commandAPI.searchCommands(builder.done());
+            assertEquals(0, searchCommands.getResult().size());
 
-        // test Desc
-        builder = new SearchOptionsBuilder(0, 2);
-        builder.sort(CommandSearchDescriptor.NAME, Order.DESC);
-        searchCommands = commandAPI.searchCommands(builder.done());
-        assertNotNull(searchCommands);
-        assertEquals(3, searchCommands.getCount());
-        commands = searchCommands.getResult();
-        assertEquals(2, commands.size());
-        assertEquals(command3, commands.get(0));
-        assertEquals(command2, commands.get(1));
+            // test Desc
+            builder = new SearchOptionsBuilder(0, 2);
+            builder.searchTerm("testCommand");
+            builder.sort(CommandSearchDescriptor.NAME, Order.DESC);
+            searchCommands = commandAPI.searchCommands(builder.done());
+            assertNotNull(searchCommands);
+            assertEquals(3, searchCommands.getCount());
+            commands = searchCommands.getResult();
+            assertEquals(2, commands.size());
+            assertEquals(command3, commands.get(0));
+            assertEquals(command2, commands.get(1));
 
-        // test search with filter
-        builder = new SearchOptionsBuilder(0, 10);
-        builder.filter(CommandSearchDescriptor.NAME, "command1");
-        searchCommands = commandAPI.searchCommands(builder.done());
-        assertNotNull(searchCommands);
-        assertEquals(1, searchCommands.getCount());
-        commands = searchCommands.getResult();
-        assertEquals(1, commands.size());
-        assertEquals(command1, commands.get(0));
+            // test search with filter
+            builder = new SearchOptionsBuilder(0, 10);
+            builder.filter(CommandSearchDescriptor.NAME, "testCommand1");
+            searchCommands = commandAPI.searchCommands(builder.done());
+            assertNotNull(searchCommands);
+            assertEquals(1, searchCommands.getCount());
+            commands = searchCommands.getResult();
+            assertEquals(1, commands.size());
+            assertEquals(command1, commands.get(0));
 
-        // test search with term
-        builder = new SearchOptionsBuilder(0, 10);
-        builder.searchTerm("command");
-        builder.sort(CommandSearchDescriptor.NAME, Order.ASC);
-        searchCommands = commandAPI.searchCommands(builder.done());
-        assertNotNull(searchCommands);
-        assertEquals(3, searchCommands.getCount());
-        commands = searchCommands.getResult();
-        assertEquals(3, commands.size());
-        assertEquals(command1, commands.get(0));
-        assertEquals(command2, commands.get(1));
-        assertEquals(command3, commands.get(2));
+            // test search with term
+            builder = new SearchOptionsBuilder(0, 10);
+            builder.searchTerm("testCommand");
+            builder.sort(CommandSearchDescriptor.NAME, Order.ASC);
+            searchCommands = commandAPI.searchCommands(builder.done());
+            assertNotNull(searchCommands);
+            assertEquals(3, searchCommands.getCount());
+            commands = searchCommands.getResult();
+            assertEquals(3, commands.size());
+            assertEquals(command1, commands.get(0));
+            assertEquals(command2, commands.get(1));
+            assertEquals(command3, commands.get(2));
 
-        // Clean Commands
-        getCommandAPI().unregister("command1");
-        getCommandAPI().unregister("command2");
-        getCommandAPI().unregister("command3");
-        getCommandAPI().removeDependency("commands");
+        } finally {
+            // Clean Commands
+            commandAPI.unregister("testCommand1");
+            commandAPI.unregister("testCommand2");
+            commandAPI.unregister("testCommand3");
+            commandAPI.removeDependency("commands");
+        }
     }
 
     @Cover(classes = { SearchOptionsBuilder.class, CommandAPI.class }, concept = BPMNConcept.OTHERS, keywords = { "SearchCommands", "Apostrophe" }, jira = "ENGINE-366")
