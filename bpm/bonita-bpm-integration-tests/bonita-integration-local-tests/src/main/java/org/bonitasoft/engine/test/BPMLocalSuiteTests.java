@@ -1,11 +1,13 @@
 package org.bonitasoft.engine.test;
 
+import org.bonitasoft.engine.BonitaSuiteRunner;
+import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.TestsInitializer;
 import org.bonitasoft.engine.event.LocalTimerEventTest;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(Suite.class)
+@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         BPMLocalTest.class,
         ConnectorExecutionsTestsLocal.class,
@@ -15,6 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DataInstanceIntegrationLocalTest.class,
         GatewayExecutionLocalTest.class
 })
+@Initializer(TestsInitializer.class)
 public class BPMLocalSuiteTests {
 
 }
