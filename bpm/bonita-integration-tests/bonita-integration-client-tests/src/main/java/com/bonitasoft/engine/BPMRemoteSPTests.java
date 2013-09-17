@@ -1,7 +1,8 @@
 package com.bonitasoft.engine;
 
+import org.bonitasoft.engine.BonitaSuiteRunner;
+import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.MultiInstanceTest;
@@ -16,7 +17,7 @@ import com.bonitasoft.engine.profile.ProfileTests;
 import com.bonitasoft.engine.reporting.ReportingAPIIT;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
 
-@RunWith(Suite.class)
+@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         // SPIdentityTests.class, // slow execution test suite only
         // SPProcessManagementTest.class, // slow execution test suite only
@@ -33,6 +34,7 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         PlatformMonitoringAPITest.class,
         TenantTest.class
 })
+@Initializer(TestsInitializerSP.class)
 public class BPMRemoteSPTests {
 
 }
