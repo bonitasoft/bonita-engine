@@ -49,7 +49,10 @@ public class AssignmentOperationExecutorStrategy extends UpdateOperationExecutor
     @Override
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
-        checkReturnType(value, operation, expressionContext);
+        // do not check if value is external, see ENGINE-1739
+        if (!operation.getLeftOperand().isExternal()) {
+            checkReturnType(value, operation, expressionContext);
+        }
         // no processing on the value, just return it
         return value;
     }
@@ -60,7 +63,7 @@ public class AssignmentOperationExecutorStrategy extends UpdateOperationExecutor
             final String name = operation.getLeftOperand().getName();
             final Object object = expressionContext.getInputValues().get(name);
             /*
-             * if the object is null (data is not initialised) the return type is not checked
+             * if the object is null (data is not initialized) the return type is not checked
              * but the data instance service should throw an exception
              */
             if (object != null) {
