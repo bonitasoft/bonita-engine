@@ -19,8 +19,10 @@ import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -36,7 +38,6 @@ import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
-import org.quartz.JobListener;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
@@ -64,18 +65,20 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     private QuartzScheduler quartzScheduler;
 
-    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final JobListener jobListener,
+    private final AbstractJobListener jobListener;
+
+    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final AbstractJobListener jobListener,
             final ReadSessionAccessor sessionAccessor, final TransactionService transactionService, final boolean useOptimization) throws SchedulerException {
         this.sessionAccessor = sessionAccessor;
         this.transactionService = transactionService;
         this.useOptimization = useOptimization;
         this.schedulerFactory = schedulerFactory;
-        final Scheduler scheduler = this.schedulerFactory.getScheduler();
-        scheduler.getListenerManager().addJobListener(jobListener);
+        this.jobListener = jobListener;
     }
 
     @Override
-    public void schedule(final long jobId, final long tenantId, final String jobName, final Trigger trigger, final boolean disallowConcurrentExecution) throws SSchedulerException {
+    public void schedule(final long jobId, final long tenantId, final String jobName, final Trigger trigger, final boolean disallowConcurrentExecution)
+            throws SSchedulerException {
         try {
             checkSchedulerState();
             final JobDetail jobDetail = getJobDetail(jobId, tenantId, jobName, disallowConcurrentExecution);
@@ -118,12 +121,12 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     private JobDetail getJobDetail(final long jobId, final long tenantId, final String jobName, final boolean disallowConcurrentExecution) {
-    	Class<? extends QuartzJob> clazz = null;
-    	if (disallowConcurrentExecution) {
-    		clazz = NonConcurrentQuartzJob.class;
-    	} else {
-    		clazz = ConcurrentQuartzJob.class;
-    	}
+        Class<? extends QuartzJob> clazz = null;
+        if (disallowConcurrentExecution) {
+            clazz = NonConcurrentQuartzJob.class;
+        } else {
+            clazz = ConcurrentQuartzJob.class;
+        }
         final JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobName, String.valueOf(tenantId)).build();
         jobDetail.getJobDataMap().put("tenantId", tenantId);
         jobDetail.getJobDataMap().put("jobId", jobId);
@@ -138,6 +141,27 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             final JobDetail jobDetail = getJobDetail(jobId, tenantId, jobName, disallowConcurrentExecution);
             scheduler.addJob(jobDetail, true);
             scheduler.triggerJob(jobDetail.getKey());
+        } catch (final Exception e) {
+            throw new SSchedulerException(e);
+        }
+    }
+
+    @Override
+    public void executeAgain(final long jobId, final long tenantId, final String jobName, final boolean disallowConcurrentExecution) throws SSchedulerException {
+        try {
+            final JobDetail jobDetail2 = scheduler.getJobDetail(new JobKey(jobName, String.valueOf(tenantId)));
+            final org.quartz.Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity("OneShotTrigger" + UUID.randomUUID().getLeastSignificantBits(), String.valueOf(tenantId))
+                    .forJob(jobName, String.valueOf(tenantId)).startNow().build();
+            if (jobDetail2 == null) {
+                final JobDetail jobDetail = getJobDetail(jobId, tenantId, jobName, disallowConcurrentExecution);
+                scheduler.scheduleJob(jobDetail, trigger);
+            } else {
+                scheduler.scheduleJob(trigger);
+            }
+            if (useOptimization) {
+                transactionService.registerBonitaSynchronization(new NotifyQuartzOfNewTrigger(System.currentTimeMillis(), quartzScheduler));
+            }
         } catch (final Exception e) {
             throw new SSchedulerException(e);
         }
@@ -191,6 +215,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             }
             scheduler = schedulerFactory.getScheduler();
             scheduler.start();
+            scheduler.getListenerManager().addJobListener(jobListener);
 
             try {
                 if (useOptimization) {
@@ -198,7 +223,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                     quartzSchedulerField.setAccessible(true);
                     quartzScheduler = (QuartzScheduler) quartzSchedulerField.get(scheduler);
                 }
-            } catch (Throwable t) {
+            } catch (final Throwable t) {
                 // this is an optimization, we do not want it to make the system failing
                 t.printStackTrace();
             }
@@ -363,10 +388,29 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public void setBOSSchedulerService(final SchedulerServiceImpl schedulerService) {
         schedulerFactory.setBOSSchedulerService(schedulerService);
+        jobListener.setBOSSchedulerService(schedulerService);
     }
 
     private long getTenantIdFromSession() throws TenantIdNotSetException {
         return sessionAccessor.getTenantId();
+    }
+
+    @Override
+    public boolean isStillScheduled(final long tenantId, final String jobName) throws SSchedulerException {
+        boolean stillScheduled = false;
+        try {
+            final List<? extends org.quartz.Trigger> triggers = scheduler.getTriggersOfJob(new JobKey(jobName, String.valueOf(tenantId)));
+            final Iterator<? extends org.quartz.Trigger> iterator = triggers.iterator();
+            while (!stillScheduled && iterator.hasNext()) {
+                final org.quartz.Trigger trigger = iterator.next();
+                if (trigger.getNextFireTime() != null) {
+                    stillScheduled = true;
+                }
+            }
+            return stillScheduled;
+        } catch (final org.quartz.SchedulerException e) {
+            throw new SSchedulerException(e);
+        }
     }
 
 }

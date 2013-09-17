@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * @author Matthieu Chaffotte
  */
-public class UnixCronTrigger extends OneShotTrigger implements CronTrigger {
+public class UnixCronTrigger extends OneExecutionTrigger implements CronTrigger {
 
     private final String expression;
 

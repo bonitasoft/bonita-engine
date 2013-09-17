@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * @author Matthieu Chaffotte
  */
-public class OneShotTrigger implements Trigger {
+public class OneExecutionTrigger implements Trigger {
 
     private final String name;
 
@@ -13,7 +13,7 @@ public class OneShotTrigger implements Trigger {
 
     private final int priority;
 
-    public OneShotTrigger(final String name, final Date startDate, final int priority) {
+    public OneExecutionTrigger(final String name, final Date startDate, final int priority) {
         this.name = name;
         this.startDate = startDate;
         this.priority = priority;

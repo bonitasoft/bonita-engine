@@ -19,6 +19,7 @@ import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationT
 import org.bonitasoft.engine.profile.ProfileServiceTest;
 import org.bonitasoft.engine.queriablelogger.QueriableLoggerServiceTest;
 import org.bonitasoft.engine.recorder.RecorderTest;
+import org.bonitasoft.engine.scheduler.impl.JobTest;
 import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorTest;
 import org.bonitasoft.engine.scheduler.impl.SchedulerAndQueriableLogTest;
 import org.bonitasoft.engine.session.PlatformSessionServiceTest;
@@ -54,6 +55,7 @@ import org.junit.runners.Suite.SuiteClasses;
         RecorderTest.class,
         SchedulerAndQueriableLogTest.class,
         QuartzSchedulerExecutorTest.class,
+        JobTest.class,
         CommandServiceIntegrationTest.class,
         // DocumentServiceTest.class,
         PlatformCommandServiceIntegrationTest.class,

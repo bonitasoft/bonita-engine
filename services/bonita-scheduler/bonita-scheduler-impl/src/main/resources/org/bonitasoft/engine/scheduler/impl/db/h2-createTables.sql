@@ -23,8 +23,9 @@ CREATE TABLE job_log (
   retryNumber BIGINT,
   lastUpdateDate BIGINT,
   lastMessage LONGVARCHAR,
-  PRIMARY KEY (tenantid, id, jobDescriptorId)
+  UNIQUE (tenantId, jobDescriptorId),
+  PRIMARY KEY (tenantid, id)
 );
 
-ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id);
-ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id);
+ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE;

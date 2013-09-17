@@ -3,12 +3,6 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false">
 
-	<query name="getSJobParameterImplByJobId">
-		SELECT jp
-		FROM org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl AS jp
-		WHERE jp.jobDescriptorId = :jobDescriptorId
-	</query>
-
 	<!-- Job Descriptor -->
 	<query name="getNumberOfSJobDescriptor">
 		SELECT COUNT(jd)

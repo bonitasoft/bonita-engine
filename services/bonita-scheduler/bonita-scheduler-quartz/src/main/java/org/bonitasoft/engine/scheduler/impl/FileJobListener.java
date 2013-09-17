@@ -29,16 +29,13 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
-import org.quartz.JobListener;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 
 /**
- * 
  * @author Celine Souchet
- * 
  */
-public class FileJobListener implements JobListener {
+public class FileJobListener extends AbstractJobListener {
 
     private static final String jobToBeFiredMessage = "Job FIRED : group=''{1}'', name=''{0}'', class=''{5}'', datas=''{6}'', triggerGroup=''{4}'', triggerName=''{3}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}''";
 
@@ -77,10 +74,8 @@ public class FileJobListener implements JobListener {
         final JobKey jobKey = jobDetail.getKey();
         final String jobType = getJobType(context.getJobInstance());
 
-        Object[] args = {
-                jobKey.getName(), jobKey.getGroup(), new java.util.Date(), triggerKey.getName(), triggerKey.getGroup(), jobType,
-                getJobDataValueAndType(jobDetail), trigger.getPreviousFireTime(), trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount())
-        };
+        final Object[] args = { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), triggerKey.getName(), triggerKey.getGroup(), jobType,
+                getJobDataValueAndType(jobDetail), trigger.getPreviousFireTime(), trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount()) };
         logger.log(this.getClass(), TechnicalLogSeverity.INFO, MessageFormat.format(jobToBeFiredMessage, args));
     }
 
@@ -96,10 +91,8 @@ public class FileJobListener implements JobListener {
         final JobKey jobKey = jobDetail.getKey();
         final String jobType = getJobType(context.getJobInstance());
 
-        Object[] args = {
-                jobKey.getName(), jobKey.getGroup(), new java.util.Date(), triggerKey.getName(), triggerKey.getGroup(), jobType,
-                trigger.getPreviousFireTime(), trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount())
-        };
+        final Object[] args = { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), triggerKey.getName(), triggerKey.getGroup(), jobType,
+                trigger.getPreviousFireTime(), trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount()) };
         logger.log(this.getClass(), TechnicalLogSeverity.INFO, MessageFormat.format(jobWasVetoedMessage, args));
     }
 
@@ -116,22 +109,18 @@ public class FileJobListener implements JobListener {
                 return;
             }
 
-            final Object[] args = new Object[] {
-                    jobKey.getName(), jobKey.getGroup(), new java.util.Date(), jobException.getMessage(), jobType,
-                    getJobDataValueAndType(jobDetail), triggerKey.getName(), triggerKey.getGroup(), trigger.getPreviousFireTime(),
-                    trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount())
-            };
+            final Object[] args = new Object[] { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), jobException.getMessage(), jobType,
+                    getJobDataValueAndType(jobDetail), triggerKey.getName(), triggerKey.getGroup(), trigger.getPreviousFireTime(), trigger.getNextFireTime(),
+                    Integer.valueOf(context.getRefireCount()) };
             logger.log(this.getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format(jobFailedMessage, args), jobException);
         } else {
             if (!info) {
                 return;
             }
 
-            final Object[] args = new Object[] {
-                    jobKey.getName(), jobKey.getGroup(), new java.util.Date(), String.valueOf(context.getResult()), jobType,
-                    getJobDataValueAndType(jobDetail), triggerKey.getName(), triggerKey.getGroup(), trigger.getPreviousFireTime(),
-                    trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount())
-            };
+            final Object[] args = new Object[] { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), String.valueOf(context.getResult()), jobType,
+                    getJobDataValueAndType(jobDetail), triggerKey.getName(), triggerKey.getGroup(), trigger.getPreviousFireTime(), trigger.getNextFireTime(),
+                    Integer.valueOf(context.getRefireCount()) };
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, MessageFormat.format(jobSuccessMessage, args));
         }
     }

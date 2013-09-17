@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * @author Matthieu Chaffotte
  */
-public class RepeatXTimesTrigger extends OneShotTrigger implements RepeatTrigger {
+public class RepeatXTimesTrigger extends OneExecutionTrigger implements RepeatTrigger {
 
     private final int count;
 

@@ -57,4 +57,8 @@ public interface SchedulerExecutor {
 
     void schedule(long jobId, long tenantId, String jobName, Trigger trigger, boolean disallowConcurrentExecution) throws SSchedulerException;
 
+    boolean isStillScheduled(long tenantId, String jobName) throws SSchedulerException;
+
+    void executeAgain(long jobId, long tenantId, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
+
 }
