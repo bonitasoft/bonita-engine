@@ -61,7 +61,9 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
         SDataInstance sDataInstance;
         try {
             sDataInstance = dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType);
-            checkReturnType(sDataInstance.getClassName(), expressionResult, operation.getRightOperand().getName());
+            if (!operation.getLeftOperand().isExternal()) {
+                checkReturnType(sDataInstance.getClassName(), expressionResult, operation.getRightOperand().getName());
+            }
 
             final EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(expressionResult);
             dataInstanceService.updateDataInstance(sDataInstance, updateDescriptor);
