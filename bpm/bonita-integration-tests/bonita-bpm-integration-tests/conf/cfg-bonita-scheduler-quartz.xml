@@ -21,7 +21,9 @@
     </constructor-arg>
   </bean>
 
-	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener" />
+	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
+		<constructor-arg name="jobService" ref="jobService" />
+	</bean>
 
 	<bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor">
 		<constructor-arg name="schedulerFactory" ref="quartzSchedulerFactory" />
