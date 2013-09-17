@@ -42,6 +42,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.bonitasoft.engine.APITestSPUtil;
+import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
@@ -74,13 +75,14 @@ public class SPPlatformTest {
     public static void beforeClass() throws Exception {
         session = APITestSPUtil.loginPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
-        APITestUtil.initializeAndStartPlatformWithDefaultTenant(platformAPI, false);
         createTenants(); // create tenants in before class because this actions takes a lot of time
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
-        APITestUtil.stopAndCleanPlatformAndTenant(platformAPI, false);
+        platformAPI.deleteTenant(tenantId1);
+        platformAPI.deleteTenant(tenantId2);
+        platformAPI.deleteTenant(tenantId3);
         APITestUtil.logoutPlatform(session);
     }
 
@@ -94,14 +96,10 @@ public class SPPlatformTest {
     @Before
     public void setUp() throws Exception {
         if (!platformAPI.isPlatformCreated()) {
-            platformAPI.createAndInitializePlatform();
-            platformAPI.startNode();
+            platformAPI.createPlatform();
+            SPBPMTestUtil.createEnvironmentWithDefaultTenant();
             createTenants();
         }
-    }
-
-    private void deleteATenant(final long tenantId) throws BonitaException {
-        platformAPI.deleteTenant(tenantId);
     }
 
     private long createATenant(final String tenantName) throws BonitaException {

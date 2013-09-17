@@ -68,12 +68,6 @@ public class TenantTest {
     public static void beforeClass() throws BonitaException {
         platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         logAsPlatformAdmin();
-        try {
-            platformAPI.initializePlatform();
-        } catch (final CreationException e) {
-            // Platform already created
-        }
-        platformAPI.startNode();
         createTenant();
     }
 
@@ -91,8 +85,6 @@ public class TenantTest {
     @AfterClass
     public static void afterClass() throws BonitaException {
         deleteTenant();
-        platformAPI.stopNode();
-        platformAPI.cleanPlatform();
         platformLoginAPI.logout(session);
     }
 
