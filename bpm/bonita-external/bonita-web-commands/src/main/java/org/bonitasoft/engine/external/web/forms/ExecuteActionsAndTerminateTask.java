@@ -132,7 +132,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
     	    // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
             processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, processDefinitionId, userId, userId);
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                final String message = "The user <" + session.getUserName() + "has performed the task" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                final String message = "The user <" + session.getUserName() + "> has performed the task" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
                 logger.log(getClass(), TechnicalLogSeverity.INFO, message);
             }
         } catch (final SBonitaException e) {
