@@ -28,7 +28,7 @@
 		SELECT COUNT(docmapping)
 		FROM org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl AS docmapping,
 			 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS p
-		WHERE docmapping.processInstanceId = p.id
+		WHERE docmapping.processInstanceId = p.sourceObjectId
 		AND p.processDefinitionId IN (
 			SELECT supervisor.processDefId
 			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
@@ -52,7 +52,7 @@
 		SELECT docmapping
 		FROM org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl AS docmapping,
 			 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS p
-		WHERE docmapping.processInstanceId = p.id
+		WHERE docmapping.processInstanceId = p.sourceObjectId
 		AND p.processDefinitionId IN (
 			SELECT supervisor.processDefId
 			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
