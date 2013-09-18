@@ -71,6 +71,9 @@ public class TestsInitializer {
     private static void setupBonitaHome() throws IOException {
         if (System.getProperties().toString().contains("org.eclipse.osgi")) {
             final String bonitaHome = System.getProperty(BONITA_HOME);
+            if (bonitaHome == null) {
+                throw new IllegalStateException("variable 'bonita.home' must be set");
+            }
             final File destDir = new File(TMP_BONITA_HOME);
             FileUtils.deleteDirectory(destDir);
             FileUtils.copyDirectory(new File(bonitaHome), destDir);
