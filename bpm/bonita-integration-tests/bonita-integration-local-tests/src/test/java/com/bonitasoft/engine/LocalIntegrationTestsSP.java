@@ -56,12 +56,15 @@ public class LocalIntegrationTestsSP {
             APITestSPUtil.createPlatformStructure();
         }
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
+
+        SPBPMTestUtil.createEnvironmentWithDefaultTenant();
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
         System.err.println("=================== LocalIntegrationTestsSP.afterClass()");
 
+        SPBPMTestUtil.destroyPlatformAndTenants();
         APITestSPUtil.deletePlatformStructure();
         closeSpringContext();
     }

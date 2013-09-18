@@ -15,8 +15,6 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -31,16 +29,6 @@ import com.bonitasoft.engine.platform.Tenant;
 public abstract class CommonAPISPTest extends APITestSPUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPISPTest.class);
-
-    @BeforeClass
-    public static void beforeClass() throws BonitaException {
-        SPBPMTestUtil.createEnvironmentWithDefaultTenant();
-    }
-
-    @AfterClass
-    public static void afterClass() throws BonitaException {
-        SPBPMTestUtil.destroyPlatformAndTenants();
-    }
 
     @Rule
     public TestRule testWatcher = new TestWatcher() {
@@ -57,7 +45,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
                 clean();
             } catch (final Exception be) {
                 LOGGER.error("Unable to clean db", be);
-            }finally {
+            } finally {
                 LOGGER.info("-----------------------------------------------------------------------------------------------");
             }
         }
