@@ -12,8 +12,6 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -24,16 +22,6 @@ import org.slf4j.LoggerFactory;
 public abstract class CommonAPITest extends APITestUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPITest.class);
-
-    @BeforeClass
-    public static void beforeClass() throws BonitaException {
-        APITestUtil.initializeAndStartPlatformWithDefaultTenant(true);
-    }
-
-    @AfterClass
-    public static void afterClass() throws BonitaException {
-        APITestUtil.stopAndCleanPlatformAndTenant(true);
-    }
 
     @Rule
     public TestRule testWatcher = new TestWatcher() {
