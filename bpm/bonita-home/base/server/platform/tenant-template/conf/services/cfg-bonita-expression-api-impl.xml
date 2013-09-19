@@ -10,13 +10,13 @@
 	<bean id="expressionExecutorStrategyProvider" class="org.bonitasoft.engine.expression.ExpressionExecutorStrategyProvider">
 		<property name="expressionExecutors">
 			<list>
-				<ref bean="ConstantExpressionExecutorStrategy" />
-				<ref bean="GroovyScriptExpressionExecutorStrategy" />
-				<ref bean="InputExpressionExecutorStrategy" />
+				<ref bean="constantExpressionExecutorStrategy" />
+				<ref bean="groovyScriptExpressionExecutorStrategy" />
+				<ref bean="inputExpressionExecutorStrategy" />
 				<ref bean="dataExpressionExecutorStrategy" />
 				<ref bean="patternExpressionExecutorStrategy" />
 				<ref bean="documentReferenceExpressionExecutorStrategy" />
-				<ref bean="EngineConstantExpressionExecutorStrategy" />
+				<ref bean="engineConstantExpressionExecutorStrategy" />
 				<ref bean="listExpressionExecutorStrategy" />
 				<ref bean="conditionExpressionExecutorStrategy" />
 				<ref bean="javaMethodCallExpressionExecutorStrategy" />
@@ -25,20 +25,20 @@
 		</property>
 	</bean>
 
-	<bean id="ConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy" />
+	<bean id="constantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy" />
 
-	<bean id="GroovyScriptExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy" >
+	<bean id="groovyScriptExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.GroovyScriptExpressionExecutorCacheStrategy" >
 		<constructor-arg name="cacheService" ref="cacheService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 	</bean>
 
-	<bean id="InputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />
+	<bean id="inputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.InputExpressionExecutorStrategy" />
 
 	<bean id="patternExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.PatternExpressionExecutorStrategy" />
 
 	<bean id="xPathReadExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.XPathReadExpressionExecutorStrategy" />
 
-	<bean id="EngineConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy" >
+	<bean id="engineConstantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy" >
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="sessionService" ref="sessionService" />
