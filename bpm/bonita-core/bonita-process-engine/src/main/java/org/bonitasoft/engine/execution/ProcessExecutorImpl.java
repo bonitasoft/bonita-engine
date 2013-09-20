@@ -611,7 +611,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     protected boolean initialize(final long userId, final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance,
-            final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
+            SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
             throws SProcessInstanceCreationException {
         try {
@@ -620,6 +620,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             createDocuments(sProcessDefinition, sProcessInstance, userId);
             if (connectors != null) {
                 executeConnectors(sProcessDefinition, sProcessInstance, connectors);
+            }
+            if (expressionContext == null) {
+                expressionContext = new SExpressionContext();
             }
             executeOperations(operations, context, expressionContext, sProcessInstance);
 
