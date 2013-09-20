@@ -693,6 +693,11 @@
 			<artifactId>bonita-synchro-register</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.synchro</groupId>
+			<artifactId>bonita-synchro-jms</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Transaction -->
 		<dependency>
