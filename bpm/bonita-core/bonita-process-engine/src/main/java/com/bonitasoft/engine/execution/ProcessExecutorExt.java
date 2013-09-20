@@ -98,7 +98,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
 
     @Override
     protected boolean initialize(final long userId, final SProcessDefinition sDefinition, final SProcessInstance sInstance,
-            final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
+            SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
             throws SProcessInstanceCreationException {
         try {
@@ -113,7 +113,10 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             if (connectors != null) {
                 executeConnectors(sDefinition, sInstance, connectors);
             }
-            executeOperations(operations, context, sInstance);
+            if (expressionContext == null) {
+                expressionContext = new SExpressionContext();
+            }
+            executeOperations(operations, context, expressionContext, sInstance);
 
             // Create connectors
             bpmInstancesCreator.createConnectorInstances(sInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);

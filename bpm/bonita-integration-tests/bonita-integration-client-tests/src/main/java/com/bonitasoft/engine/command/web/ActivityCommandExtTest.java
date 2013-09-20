@@ -132,6 +132,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         designProcessDefinition.addUserTask("step2", delivery);
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
+        designProcessDefinition.addIntegerData(dataName, null);
         processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, delivery, businessUser.getId());
     }
 
@@ -255,6 +256,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final long processInstanceId = (Long) getCommandAPI().execute(COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT, parameters);
 
         assertEquals(resContent, getProcessAPI().getProcessDataInstance("text", processInstanceId).getValue());
+        assertEquals(2, getProcessAPI().getProcessDataInstance(dataName, processInstanceId).getValue());
 
         assertNotNull("User task step1 don't exist.", waitForUserTask("step1", processInstanceId, 12000));
         HumanTaskInstance userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC)
