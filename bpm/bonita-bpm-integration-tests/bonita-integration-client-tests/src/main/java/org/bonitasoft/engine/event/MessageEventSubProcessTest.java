@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.event;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -29,12 +31,14 @@ import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -42,8 +46,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Baptiste Mesta
@@ -116,6 +118,47 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         buildSubProcess(builder, true, correlations);
         final DesignProcessDefinition processDefinition = builder.done();
         return deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
+    }
+
+    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-1841", story = "transmit data to start message event of eventsubprocess")
+    @Test
+    public void messageEventSubProcessTransmitData() throws Exception {
+        // create a process with a user step and an event subprocess that start with a start message event having an operation updating the data
+        ProcessDefinitionBuilder receiveProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
+        receiveProcessBuilder.addActor(ACTOR_NAME);
+        receiveProcessBuilder.addShortTextData("aData", new ExpressionBuilder().createConstantStringExpression("defaultValue"));
+        receiveProcessBuilder.addUserTask("waitHere", ACTOR_NAME);
+        SubProcessDefinitionBuilder subProcessBuilder = receiveProcessBuilder.addSubProcess("startWithMessage", true).getSubProcessBuilder();
+        subProcessBuilder.addUserTask("stepInSubProcess", ACTOR_NAME);
+        subProcessBuilder
+                .addStartEvent("start")
+                .addMessageEventTrigger("msg")
+                .addOperation(
+                        new OperationBuilder().createSetDataOperation("aData", new ExpressionBuilder().createDataExpression("msgData", String.class.getName())));
+        subProcessBuilder.addTransition("start", "stepInSubProcess");
+        ProcessDefinition receiveProcess = deployAndEnableWithActor(receiveProcessBuilder.done(), ACTOR_NAME, john);
+
+        // create an other process that send a message
+        ProcessDefinitionBuilder sendProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("SendMsgProcess", "1.0");
+        ThrowMessageEventTriggerBuilder addMessageEventTrigger = sendProcessBuilder.addIntermediateThrowEvent("send").addMessageEventTrigger("msg",
+                new ExpressionBuilder().createConstantStringExpression("ProcessWithEventSubProcess"));
+        addMessageEventTrigger.addMessageContentExpression(new ExpressionBuilder().createConstantStringExpression("msgData"),
+                new ExpressionBuilder().createGroovyScriptExpression("msgVariable", "\"message variable OK\"", String.class.getName()));
+        sendProcessBuilder.addStartEvent("start");
+        sendProcessBuilder.addTransition("start", "send");
+        ProcessDefinition sendProcess = deployAndEnableProcess(sendProcessBuilder.done());
+
+        getProcessAPI().startProcess(receiveProcess.getId());
+        waitForUserTask("waitHere");
+
+        getProcessAPI().startProcess(sendProcess.getId());
+        ActivityInstance stepInSubProcess = waitForUserTask("stepInSubProcess");
+
+        // data should be transmit from the message
+        assertEquals("message variable OK", getProcessAPI().getActivityDataInstance("aData", stepInSubProcess.getId()).getValue());
+
+        disableAndDeleteProcess(sendProcess, receiveProcess);
+
     }
 
     private ProcessDefinitionBuilder buildParentProcess(final boolean withDatas) throws InvalidExpressionException {

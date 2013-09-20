@@ -52,7 +52,6 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -454,13 +453,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     && !(SFlowNodeType.SUB_PROCESS.equals(sFlowNodeDefinition.getType()) && ((SSubProcessDefinition) sFlowNodeDefinition).isTriggeredByEvent())
                     && !SFlowNodeType.BOUNDARY_EVENT.equals(sFlowNodeDefinition.getType())
                     && (
+                    // FIXME Should accept all intermediate/end event also, see Business Process Model and Notation, v2.0 page 239
                     // When call start in API, run only event elements without trigger, or other elements
-                    (targetSFlowNodeDefinitionId == -1 && ((sFlowNodeDefinition instanceof SEventDefinition && ((SEventDefinition) sFlowNodeDefinition)
+                    targetSFlowNodeDefinitionId == -1 && (sFlowNodeDefinition instanceof SEventDefinition && ((SEventDefinition) sFlowNodeDefinition)
                             .getEventTriggers()
-                            .isEmpty()) || !(sFlowNodeDefinition instanceof SEventDefinition)))
-                    // When call start by event triggers, run only the target of trigger
-                    // The starterId equals 0, when start process in work (See InstantiateProcessWork)
-                    || (targetSFlowNodeDefinitionId != -1 && sFlowNodeDefinition.getId() == targetSFlowNodeDefinitionId))) {
+                            .isEmpty() || !(sFlowNodeDefinition instanceof SEventDefinition))
+                            // When call start by event triggers, run only the target of trigger
+                            // The starterId equals 0, when start process in work (See InstantiateProcessWork)
+                            || targetSFlowNodeDefinitionId != -1 && sFlowNodeDefinition.getId() == targetSFlowNodeDefinitionId)) {
                 // do not start event sub process (not in the flow)
                 filteredSFlowNodeDefinitions.add(sFlowNodeDefinition);
             }
@@ -681,18 +681,16 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         rootProcessInstanceId, parentProcessInstanceId, false, 0, stateCategory, -1, tokenRefId);
     }
 
-    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SProcessInstance sInstance)
+    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext,
+            final SProcessInstance sInstance)
             throws SBonitaException {
         if (operations != null && !operations.isEmpty()) {
             // Execute operation
             final long processInstanceId = sInstance.getId();
             for (final SOperation operation : operations) {
-                if (!SOperatorType.ASSIGNMENT.equals(operation.getType())) {
-                    final SExpressionContext sExpressionContext = new SExpressionContext();
-                    // TODO operations can be evaluated in batch here
-                    sExpressionContext.setInputValues(context);
-                    operationService.execute(operation, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(), sExpressionContext);
-                }
+                // TODO operations can be evaluated in batch here
+                expressionContext.setInputValues(context);
+                operationService.execute(operation, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(), expressionContext);
             }
         }
     }
@@ -708,7 +706,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             if (connectors != null) {
                 executeConnectors(sDefinition, sInstance, connectors);
             }
-            executeOperations(operations, context, sInstance);
+            executeOperations(operations, context, expressionContext, sInstance);
 
             // Create connectors
             bpmInstancesCreator.createConnectorInstances(sInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
