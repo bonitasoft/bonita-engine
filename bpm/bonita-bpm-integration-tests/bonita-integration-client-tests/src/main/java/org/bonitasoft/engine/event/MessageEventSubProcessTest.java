@@ -144,8 +144,6 @@ public class MessageEventSubProcessTest extends EventsAPITest {
                 new ExpressionBuilder().createConstantStringExpression("ProcessWithEventSubProcess"));
         addMessageEventTrigger.addMessageContentExpression(new ExpressionBuilder().createConstantStringExpression("msgData"),
                 new ExpressionBuilder().createGroovyScriptExpression("msgVariable", "\"message variable OK\"", String.class.getName()));
-        sendProcessBuilder.addStartEvent("start");
-        sendProcessBuilder.addTransition("start", "send");
         ProcessDefinition sendProcess = deployAndEnableProcess(sendProcessBuilder.done());
 
         getProcessAPI().startProcess(receiveProcess.getId());

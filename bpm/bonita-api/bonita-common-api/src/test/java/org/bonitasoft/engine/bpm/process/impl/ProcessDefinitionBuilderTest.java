@@ -616,8 +616,8 @@ public class ProcessDefinitionBuilderTest {
     }
 
     @Cover(classes = { CatchMessageEventTriggerDefinitionBuilder.class }, concept = BPMNConcept.EVENTS, keywords = { "Message", "Intermediate catch event" }, jira = "ENGINE-1652")
-    @Test(expected = InvalidProcessDefinitionException.class)
-    public void cannotStartOnIntermediateCatchEventMessage() throws Exception {
+    @Test
+    public void canStartOnIntermediateCatchEventMessage() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
         processBuilder.createNewInstance("processName", "1.0");
         processBuilder.addIntermediateCatchEvent("name").addMessageEventTrigger("messageName");

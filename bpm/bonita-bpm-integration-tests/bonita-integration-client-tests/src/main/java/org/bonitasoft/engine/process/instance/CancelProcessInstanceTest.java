@@ -112,18 +112,14 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         disableAndDeleteProcess(targetProcessDef);
     }
 
-    private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType, final Expression timerValue, final String step1Name,
-            final String step2Name) throws BonitaException {
+    private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType, final Expression timerValue,
+            final String stepName) throws BonitaException {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0");
-        processDefinitionBuilder.addStartEvent("start");
-        processDefinitionBuilder.addAutomaticTask(step1Name);
         processDefinitionBuilder.addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue);
-        processDefinitionBuilder.addAutomaticTask(step2Name);
+        processDefinitionBuilder.addAutomaticTask(stepName);
         processDefinitionBuilder.addEndEvent("end");
-        processDefinitionBuilder.addTransition("start", step1Name);
-        processDefinitionBuilder.addTransition(step1Name, "intermediateCatchEvent");
-        processDefinitionBuilder.addTransition("intermediateCatchEvent", step2Name);
-        processDefinitionBuilder.addTransition(step2Name, "end");
+        processDefinitionBuilder.addTransition("intermediateCatchEvent", stepName);
+        processDefinitionBuilder.addTransition(stepName, "end");
 
         final ProcessDefinition definition = deployAndEnableProcess(processDefinitionBuilder.getProcess());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
@@ -133,12 +129,10 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void cancelProcessInstanceWithTimerIntermediateCatchEvent() throws Exception {
-        final String step1Name = "step1";
-        final String step2Name = "step2";
         final int timerTrigger = 2000; // the timer intermediate catch event will wait 2
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(timerTrigger);
         // seconds
-        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEvent(TimerType.DURATION, timerExpression, step1Name, step2Name);
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEvent(TimerType.DURATION, timerExpression, "step");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForEventInWaitingState(processInstance, "intermediateCatchEvent");
@@ -158,7 +152,7 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         // searchOptionsBuilder.done());
         // assertEquals(1, searchArchivedFlowNodeInstances.getCount());
 
-        checkWasntExecuted(processInstance, step2Name);
+        checkWasntExecuted(processInstance, "step");
 
         disableAndDeleteProcess(definition);
     }
