@@ -32,7 +32,6 @@ import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
-import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.SendTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
@@ -214,15 +213,6 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateStartEvents(flowElementContainer, isRootContainer);
         validateEndEvents(flowElementContainer);
         validateBoundaryEvents(flowElementContainer);
-        validateIntermediateCatchEvents(flowElementContainer);
-    }
-
-    private void validateIntermediateCatchEvents(final FlowElementContainerDefinition flowElementContainer) {
-        for (final IntermediateCatchEventDefinition intermediateCatchEventDefinition : flowElementContainer.getIntermediateCatchEvents()) {
-            if (intermediateCatchEventDefinition.getIncomingTransitions().isEmpty()) {
-                designErrors.add("An intermediate catch event must have incoming transitions: " + intermediateCatchEventDefinition);
-            }
-        }
     }
 
     private void validateEndEvents(final FlowElementContainerDefinition processContainer) {

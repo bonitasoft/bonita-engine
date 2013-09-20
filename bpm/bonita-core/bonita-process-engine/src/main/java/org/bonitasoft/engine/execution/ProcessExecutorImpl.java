@@ -60,7 +60,7 @@ import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
@@ -399,24 +399,27 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final Set<SFlowNodeDefinition> sFlowNodeDefinitions = processContainer.getFlowNodes();
         final List<SFlowNodeDefinition> filteredSFlowNodeDefinitions = new ArrayList<SFlowNodeDefinition>();
         for (final SFlowNodeDefinition sFlowNodeDefinition : sFlowNodeDefinitions) {
-            if (sFlowNodeDefinition.getIncomingTransitions().isEmpty()
-                    && !(SFlowNodeType.SUB_PROCESS.equals(sFlowNodeDefinition.getType()) && ((SSubProcessDefinition) sFlowNodeDefinition).isTriggeredByEvent())
-                    && !SFlowNodeType.BOUNDARY_EVENT.equals(sFlowNodeDefinition.getType())
-                    && (
-                    // FIXME Should accept all intermediate/end event also, see Business Process Model and Notation, v2.0 page 239
-                    // When call start in API, run only event elements without trigger, or other elements
-                    targetSFlowNodeDefinitionId == -1
-                            && (sFlowNodeDefinition instanceof SEventDefinition && ((SEventDefinition) sFlowNodeDefinition).getEventTriggers().isEmpty() || !(sFlowNodeDefinition instanceof SEventDefinition))
-                            .getEventTriggers()
-                            .isEmpty() || !(sFlowNodeDefinition instanceof SEventDefinition))
-                            // When call start by event triggers, run only the target of trigger
-                            // The starterId equals 0, when start process in work (See InstantiateProcessWork)
-                            || targetSFlowNodeDefinitionId != -1 && sFlowNodeDefinition.getId() == targetSFlowNodeDefinitionId)) {
+            if (isAStartNode(targetSFlowNodeDefinitionId, sFlowNodeDefinition)) {
                 // do not start event sub process (not in the flow)
                 filteredSFlowNodeDefinitions.add(sFlowNodeDefinition);
             }
         }
         return filteredSFlowNodeDefinitions;
+    }
+    private boolean isAStartNode(final long targetSFlowNodeDefinitionId, final SFlowNodeDefinition sFlowNodeDefinition) {
+        if (targetSFlowNodeDefinitionId != -1) {
+            // When call start by event triggers, run only the target of trigger
+            // The starterId equals 0, when start process in work (See InstantiateProcessWork)
+            return sFlowNodeDefinition.getId() == targetSFlowNodeDefinitionId;
+        }
+        // Not started by an event: start all elements that are start point and are not triggered by an event
+        return sFlowNodeDefinition.getIncomingTransitions().isEmpty()
+                && !(SFlowNodeType.SUB_PROCESS.equals(sFlowNodeDefinition.getType()) && ((SSubProcessDefinition) sFlowNodeDefinition).isTriggeredByEvent())
+                && !SFlowNodeType.BOUNDARY_EVENT.equals(sFlowNodeDefinition.getType())
+                // is not a start event or if it is, is not triggered by an event
+                && (!SFlowNodeType.START_EVENT.equals(sFlowNodeDefinition.getType()) || ((SStartEventDefinition) sFlowNodeDefinition)
+                        .getEventTriggers()
+                        .isEmpty());
     }
 
     private List<SFlowNodeDefinition> getStartNodes(final SProcessDefinition definition, final long flowNodeDefinitionId, final long targetSFlowNodeDefinitionId) {
@@ -455,12 +458,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return false;
     }
 
-    private void initializeFirstExecutableElements(final SProcessInstance sProcessInstance, final SProcessDefinition sProcessDefinition,
+    private  List<SFlowNodeInstance> initializeFirstExecutableElements(final SProcessInstance sProcessInstance, final SProcessDefinition sProcessDefinition,
             final long flowNodeDefinitionId, final long targetSFlowNodeDefinitionId) {
         try {
             List<SFlowNodeDefinition> flownNodeDefinitions;
             if (flowNodeDefinitionId == -1) {
-                flownNodeDefinitions = getStartNodes(sProcessDefinition, targetSFlowNodeDefinitionId);// FIXME replace by the real search
+                flownNodeDefinitions = getStartNodes(sProcessDefinition, targetSFlowNodeDefinitionId);
             } else {
                 flownNodeDefinitions = getStartNodes(sProcessDefinition, flowNodeDefinitionId, targetSFlowNodeDefinitionId);
             }
@@ -468,7 +471,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             if (rootProcessInstanceId <= 0) {
                 rootProcessInstanceId = sProcessInstance.getId();
             }
-            bpmInstancesCreator.createFlowNodeInstances(sProcessDefinition.getId(), rootProcessInstanceId, sProcessInstance.getId(), flownNodeDefinitions,
+            return bpmInstancesCreator.createFlowNodeInstances(sProcessDefinition.getId(), rootProcessInstanceId, sProcessInstance.getId(), flownNodeDefinitions,
                     rootProcessInstanceId, sProcessInstance.getId(), SStateCategory.NORMAL, sProcessDefinition.getId());
         } catch (final SBonitaException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
@@ -1134,9 +1137,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     @Override
     public SProcessInstance startElements(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long subProcessDefinitionId,
             final long targetSFlowNodeDefinitionId) throws SProcessInstanceCreationException, SFlowNodeExecutionException, SFlowNodeReadException {
-        initializeFirstExecutableElements(sProcessInstance, sDefinition, subProcessDefinitionId, targetSFlowNodeDefinitionId);
+        List<SFlowNodeInstance> flowNodeInstances = initializeFirstExecutableElements(sProcessInstance, sDefinition, subProcessDefinitionId, targetSFlowNodeDefinitionId);
         // process is initialized and now the engine trigger jobs to execute other activities, give the hand back
-        final List<SFlowNodeInstance> flowNodeInstances = activityInstanceService.getActiveFlowNodes(sProcessInstance.getId());
         ProcessInstanceState state;
         final int size = flowNodeInstances.size();
         if (size == 0) {
