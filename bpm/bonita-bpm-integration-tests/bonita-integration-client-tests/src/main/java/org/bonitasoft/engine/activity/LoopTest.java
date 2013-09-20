@@ -1,9 +1,17 @@
 package org.bonitasoft.engine.activity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.ProcessManagementAPI;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedLoopActivityInstance;
@@ -19,13 +27,12 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Matthieu Chaffotte
@@ -97,6 +104,32 @@ public class LoopTest extends CommonAPITest {
         pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "expression context", "flownode container hierarchy" }, jira = "ENGINE-1848")
+    public void evaluateExpressionsOnLoopUserTask() throws Exception {
+        final String actorName = "Golf Players";
+
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("evaluateExpressionsOnLoopUserTask", "1.0");
+        builder.addActor(actorName).addDescription("For Golf players only");
+        String activityName = "launch";
+        builder.addStartEvent("dummy");
+        builder.addUserTask(activityName, actorName).addLoop(false, new ExpressionBuilder().createConstantBooleanExpression(true));
+        builder.addTransition("dummy", activityName);
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), actorName, john);
+        try {
+            ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+            ActivityInstance userTask = waitForUserTask(activityName, processInstance.getId());
+
+            Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
+            expressions.put(new ExpressionBuilder().createConstantBooleanExpression(true), new HashMap<String, Serializable>(0));
+            getProcessAPI().evaluateExpressionsOnActivityInstance(userTask.getId(), expressions);
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+        }
     }
 
     @Test

@@ -16,8 +16,11 @@ package org.bonitasoft.engine.event;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -142,6 +145,29 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         builder.addTransition("step2", PARENT_END);
         final DesignProcessDefinition processDefinition = builder.done();
         return deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
+    }
+
+    @Test
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "expression context", "flownode container hierarchy" }, jira = "ENGINE-1848")
+    public void evaluateExpressionsOnLoopUserTaskInSupProcess() throws Exception {
+        final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, true);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+        waitForUserTask(PARENT_STEP, processInstance);
+        checkNumberOfWaitingEvents(SUB_PROCESS_START, 1);
+
+        // send signal to start event sub process
+        getProcessAPI().sendSignal(SIGNAL_NAME);
+
+        waitForFlowNode(processInstance.getId(), TestStates.getExecutingState(), SUB_PROCESS_NAME, false, 10000);
+        final ActivityInstance subStep = waitForUserTask(SUB_STEP, processInstance);
+
+        Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
+        String dataName = "content";
+        expressions.put(new ExpressionBuilder().createDataExpression(dataName, String.class.getName()), new HashMap<String, Serializable>(0));
+        Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStep.getId(), expressions);
+        assertEquals("childActivityVar", expressionResults.get(dataName));
+
+        disableAndDeleteProcess(process.getId());
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal" }, jira = "ENGINE-536")

@@ -42,6 +42,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.EndEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.IntermediateCatchEventDefinitionBuilder;
@@ -954,6 +955,45 @@ public class CallActivityTest extends CommonAPITest {
             disableAndDeleteProcess(callingProcessDefinition);
             disableAndDeleteProcess(targetProcessDefinition);
         }
+    }
+
+    @Test
+    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "container hierarchy" }, jira = "ENGINE-1899")
+    public void getProcessDefinitionIdFromActivityInstanceId() throws Exception {
+        // check that real root process definition is retrieved (taken from parent process instance)
+
+        // Build target process
+        final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
+        targetProcessDefBuilder.addActor(ACTOR_NAME);
+        targetProcessDefBuilder.addStartEvent("tStart");
+        targetProcessDefBuilder.addUserTask("tStep1", ACTOR_NAME);
+        targetProcessDefBuilder.addEndEvent("tEnd");
+        targetProcessDefBuilder.addTransition("tStart", "tStep1");
+        targetProcessDefBuilder.addTransition("tStep1", "tEnd");
+        final ProcessDefinition targetProcessDefinition = deployAndEnableWithActor(targetProcessDefBuilder.done(), ACTOR_NAME, cebolinha);
+
+        // Build and start calling process
+        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("targetProcess");
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+        final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("callingProcess", PROCESS_VERSION);
+        processDefBuilder.addActor(ACTOR_NAME);
+        processDefBuilder.addStartEvent("start");
+        processDefBuilder.addCallActivity("callActivity", targetProcessNameExpr, targetProcessVersionExpr)
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayName")).addDescription("callActivityDescription")
+                .addDisplayDescription(new ExpressionBuilder().createConstantStringExpression("callActivityDisplayDescription"));
+        processDefBuilder.addEndEvent("end");
+        processDefBuilder.addTransition("start", "callActivity");
+        processDefBuilder.addTransition("callActivity", "end");
+        final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
+
+        ActivityInstance userTask = waitForUserTask("tStep1", callingProcessInstance.getId());
+
+        long processDefinitionId = getProcessAPI().getProcessDefinitionIdFromActivityInstanceId(userTask.getId());
+        assertEquals(targetProcessDefinition.getId(), processDefinitionId);
+
+        disableAndDeleteProcess(callingProcessDefinition);
+        disableAndDeleteProcess(targetProcessDefinition);
     }
 
     @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Engine constant" }, jira = "ENGINE-1009")
