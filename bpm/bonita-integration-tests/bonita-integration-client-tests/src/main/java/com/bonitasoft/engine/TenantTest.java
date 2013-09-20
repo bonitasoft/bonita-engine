@@ -15,6 +15,10 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -22,12 +26,16 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.platform.PlatformLoginException;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.WaitUntil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,7 +44,10 @@ import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
+import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
@@ -121,6 +132,45 @@ public class TenantTest {
             platformAPI.activateTenant(tenantId);
         }
 
+    }
+
+    @Test
+    public void testTimerNotDeletedWhenTenantIsDeactivated() throws Exception {
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+        APISession apiSession = loginAPI.login(tenantId, userName, password);
+        ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(apiSession);
+        ProcessDefinitionBuilderExt processDefinitionBuilderExt = new ProcessDefinitionBuilderExt();
+        processDefinitionBuilderExt.createNewInstance("aProcess", "1.0");
+
+        processDefinitionBuilderExt.addStartEvent("start").addTimerEventTriggerDefinition(TimerType.CYCLE,
+                new ExpressionBuilder().createConstantStringExpression("* * * * * ?"));
+        processDefinitionBuilderExt.addAutomaticTask("auto").addShortTextData(
+                "data",
+                new ExpressionBuilder().createGroovyScriptExpression("script", "System.out.println(\"Executed process!!!!!!!\");return \"test\";",
+                        String.class.getName()));
+        processDefinitionBuilderExt.addTransition("start", "auto");
+        final ProcessDefinition deploy = processAPI.deploy(new BusinessArchiveBuilder().createNewBusinessArchive()
+                .setProcessDefinition(processDefinitionBuilderExt.done()).done());
+        processAPI.enableProcess(deploy.getId());
+        loginAPI.logout(apiSession);
+        logAsPlatformAdmin();
+        platformAPI.deactiveTenant(tenantId);
+        platformAPI.activateTenant(tenantId);
+        apiSession = loginAPI.login(tenantId, userName, password);
+        processAPI = TenantAPIAccessor.getProcessAPI(apiSession);
+        final ProcessAPI fprocessAPI = processAPI;
+        // the timer should have created at least 1 instance after the activate
+        new WaitUntil(100, 20000) {
+
+            @Override
+            protected boolean check() throws Exception {
+                SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
+                searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.PROCESS_DEFINITION_ID, deploy.getId());
+                SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances = fprocessAPI.searchArchivedProcessInstances(searchOptionsBuilder.done());
+                return searchArchivedProcessInstances.getCount() > 1;
+            }
+        }.waitUntil();
+        processAPI.disableAndDelete(deploy.getId());
     }
 
     @Test
