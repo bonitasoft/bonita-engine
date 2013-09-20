@@ -16,6 +16,7 @@
 		<module>bonita-synchro-service</module>
 		<module>bonita-synchro-service-impl</module>
 		<module>bonita-synchro-register</module>
+		<module>bonita-synchro-jms</module>
 	</modules>
 	<groupId>org.bonitasoft.engine.synchro</groupId>
 </project>
