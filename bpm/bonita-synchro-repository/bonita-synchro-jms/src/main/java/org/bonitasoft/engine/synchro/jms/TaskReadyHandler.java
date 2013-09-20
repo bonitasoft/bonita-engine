@@ -44,7 +44,7 @@ public class TaskReadyHandler extends AbstractUpdateHandler {
     		final SFlowNodeInstance fni = (SFlowNodeInstance) event.getObject();
     		boolean interested = !fni.isStateExecuting();
     		interested &= fni.getStateId() == 4;
-    		interested &= fni.getType() == SFlowNodeType.USER_TASK || fni.getType() == SFlowNodeType.MANUAL_TASK;
+    		interested &= (fni.getType() == SFlowNodeType.USER_TASK || fni.getType() == SFlowNodeType.MANUAL_TASK);
     		return interested;
     	}
     	return false;
