@@ -2777,7 +2777,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final boolean txOpened = transactionExecutor.openTransaction();
             try {
                 final SActivityInstance activity = activityInstanceService.getActivityInstance(activityInstanceId);
-                return processInstanceService.getProcessInstance(activity.getRootContainerId()).getProcessDefinitionId();
+                return processInstanceService.getProcessInstance(activity.getParentProcessInstanceId()).getProcessDefinitionId();
             } catch (final SBonitaException e) {
                 throw new ProcessDefinitionNotFoundException(e);
             } finally {
@@ -5569,8 +5569,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
             final ArchivedProcessInstance archiveProcessInstance = getStartedArchivedProcessInstance(processInstanceId);
             final Map<String, Serializable> evaluateExpressionInArchiveProcessInstance = evaluateExpressionsInstanceLevelAndArchived(expressions,
-                    processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE, archiveProcessInstance.getProcessDefinitionId(), archiveProcessInstance
-                            .getStartDate().getTime());
+                    processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE, archiveProcessInstance.getProcessDefinitionId(), archiveProcessInstance.getStartDate()
+                            .getTime());
             return evaluateExpressionInArchiveProcessInstance;
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e);
@@ -5657,7 +5657,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
             try {
                 final ActivityInstance activityInstance = getActivityInstance(activityInstanceId);
-                final ProcessInstance processInstance = getProcessInstance(activityInstance.getParentContainerId());
+                final ProcessInstance processInstance = getProcessInstance(activityInstance.getParentProcessInstanceId());
 
                 return evaluateExpressionsInstanceLevel(expressions, activityInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE,
                         processInstance.getProcessDefinitionId());
