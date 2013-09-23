@@ -26,7 +26,7 @@ import org.bonitasoft.engine.events.model.SEvent;
 public class ProcessInstanceFinishedHandler extends AbstractUpdateHandler {
 
     private static final long serialVersionUID = 1L;
-
+    
     public ProcessInstanceFinishedHandler(final long tenantId, final JMSProducer jmsProducer) {
         super(tenantId, jmsProducer);
     }
@@ -40,7 +40,12 @@ public class ProcessInstanceFinishedHandler extends AbstractUpdateHandler {
     @Override
     public boolean isInterested(final SEvent event) {
         final Object object = event.getObject();
-        return (object instanceof SProcessInstance) && ((SProcessInstance)object).getStateId() == ProcessInstanceState.COMPLETED.getId();
+        if (object instanceof SProcessInstance) {
+    		final SProcessInstance pi = (SProcessInstance) event.getObject();
+    		boolean result = pi.getStateId() == ProcessInstanceState.COMPLETED.getId();
+    		return result;
+        }
+        return false;
     }
 
 }
