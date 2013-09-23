@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.EndEventInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ActivationState;
@@ -23,8 +24,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import ch.qos.logback.core.joran.event.EndEvent;
 
 public class EndEventTest extends CommonAPITest {
 
@@ -143,7 +142,7 @@ public class EndEventTest extends CommonAPITest {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = EndEvent.class, concept = BPMNConcept.EVENTS, keywords = { "terminate", "branch" }, jira = "ENGINE-236", story = "terminate end event abort all active activity and does not trigger new one")
+    @Cover(classes = EndEventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "terminate", "branch" }, jira = "ENGINE-236", story = "terminate end event abort all active activity and does not trigger new one")
     @Test
     public void terminateEndEvendWithNotFinishedBranch2() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
