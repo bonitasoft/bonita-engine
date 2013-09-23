@@ -15,6 +15,8 @@ package org.bonitasoft.engine.synchro.jms;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.events.model.SEvent;
@@ -36,6 +38,8 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
     private final long tenantId;
 
     private final JMSProducer jmsProducer;
+    
+    private final Map<Class<?>, Method> getIdMethods = Collections.synchronizedMap(new HashMap<Class<?>, Method>());
     
     public AbstractUpdateHandler(final long tenantId, final JMSProducer jmsProducer) {
         super();
@@ -72,7 +76,13 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
         Object object = null;
         try {
             object = sEvent.getObject();
-            final Method method = object.getClass().getMethod("getId");
+            final Class<?> clazz = object.getClass();
+            Method method = null;
+            if (getIdMethods.containsKey(clazz)) {
+            	method = getIdMethods.get(clazz);
+            } else {
+            	method = clazz.getMethod("getId");	
+            }
             final Object invoke = method.invoke(object);
             id = (Long) invoke;
         } catch (final Throwable e) {
