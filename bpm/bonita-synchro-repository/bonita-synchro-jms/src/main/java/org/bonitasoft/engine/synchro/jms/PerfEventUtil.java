@@ -37,7 +37,7 @@ public class PerfEventUtil {
     private static final String ID = "id";
 
     public static Map<String, Serializable> getProcessInstanceFinishedEvent(final long processInstanceId) {
-        final HashMap<String, Serializable> map = new HashMap<String, Serializable>(4);
+        final HashMap<String, Serializable> map = new HashMap<String, Serializable>(3);
         map.put(TYPE, PROCESS);
         map.put(ID, processInstanceId);
         map.put(STATE_ID, 6);
@@ -45,7 +45,7 @@ public class PerfEventUtil {
     }
 
     public static Map<String, Serializable> getReadyTaskEvent(final long processInstanceId, final String taskName) {
-        final HashMap<String, Serializable> map = new HashMap<String, Serializable>(5);
+        final HashMap<String, Serializable> map = new HashMap<String, Serializable>(4);
         map.put(TYPE, FLOW_NODE);
         map.put(ID, processInstanceId);
         map.put(NAME, taskName);
