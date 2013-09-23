@@ -39,7 +39,7 @@ public class SessionServiceImpl implements SessionService {
 
     private long sessionDuration = DEFAULT_SESSION_DURATION;
 
-    private final SSessionBuilders sessionModelBuilder;
+    private final SSessionBuilders sessionModelBuilders;
 
     private final SessionProvider sessionProvider;
 
@@ -52,7 +52,7 @@ public class SessionServiceImpl implements SessionService {
     public SessionServiceImpl(final SessionProvider sessionProvider, final SSessionBuilders sessionModelBuilder, final PlatformService platformService,
             final String applicationName,
             final TechnicalLoggerService logger) {
-        this.sessionModelBuilder = sessionModelBuilder;
+        this.sessionModelBuilders = sessionModelBuilder;
         this.sessionProvider = sessionProvider;
         this.platformService = platformService;
         this.applicationName = applicationName;
@@ -70,7 +70,7 @@ public class SessionServiceImpl implements SessionService {
         final long duration = getSessionDuration();
         final String platformVersion = getPlatformVersion();
 
-        final SSession session = sessionModelBuilder.getSessionBuilder()
+        final SSession session = sessionModelBuilders.getSessionBuilder()
                 .createNewInstance(id, tenantId, duration, userName, platformVersion, applicationName, userId).technicalUser(isTechnicalUser).done();
         sessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -84,8 +84,6 @@ public class SessionServiceImpl implements SessionService {
             final SPlatform platform = platformService.getPlatform();
             return platform.getVersion();
         } catch (final SPlatformNotFoundException e) {
-            e.printStackTrace();
-
             throw new SSessionException("Unable to retrieve the platform");
         }
     }
@@ -127,7 +125,7 @@ public class SessionServiceImpl implements SessionService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getSession"));
         }
-        return sessionModelBuilder.getSessionBuilder().copy(session);
+        return sessionModelBuilders.getSessionBuilder().copy(session);
     }
 
     @Override
@@ -180,7 +178,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void deleteSessionsOfTenant(long tenantId) {
+    public void deleteSessionsOfTenant(final long tenantId) {
         sessionProvider.deleteSessionsOfTenant(tenantId);
     }
 
