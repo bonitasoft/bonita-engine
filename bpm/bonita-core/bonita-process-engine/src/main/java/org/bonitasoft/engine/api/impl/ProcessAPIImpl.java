@@ -3327,7 +3327,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * execute the connector and return connector output if there is no operation or operation output if there is operation
-     *
+     * 
      * @param operations
      * @param operationInputValues
      */
@@ -4115,7 +4115,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SProcessDocumentBuilders documentBuilders = tenantAccessor.getProcessDocumentBuilders();
         final long author = getUserIdFromSession();
         try {
-            final SProcessDocument document = attachDocument(processInstanceId, documentName, fileName, mimeType, url, processDocumentService, documentBuilders,
+            final SProcessDocument document = attachDocument(processInstanceId, documentName, fileName, mimeType, url, processDocumentService,
+                    documentBuilders,
                     author);
             return ModelConvertor.toDocument(document);
         } catch (final SBonitaException sbe) {
