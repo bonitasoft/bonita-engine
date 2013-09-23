@@ -5549,9 +5549,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionExecutor transactionExecutor = tenantAccessor.getTransactionExecutor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        boolean txOpened = false;
         try {
-            final boolean txOpened = transactionExecutor.openTransaction();
-
+            txOpened = transactionExecutor.openTransaction();
             try {
                 SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
                 // if it exists and is initializing or started
@@ -5564,8 +5564,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                 }
             } catch (final SProcessInstanceNotFoundException spinfe) {
                 // get it in the archive
-            } finally {
-                transactionExecutor.completeTransaction(txOpened);
             }
             final ArchivedProcessInstance archiveProcessInstance = getStartedArchivedProcessInstance(processInstanceId);
             final Map<String, Serializable> evaluateExpressionInArchiveProcessInstance = evaluateExpressionsInstanceLevelAndArchived(expressions,
@@ -5574,6 +5572,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             return evaluateExpressionInArchiveProcessInstance;
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e);
+        } finally {
+            try {
+                transactionExecutor.completeTransaction(txOpened);
+            } catch (STransactionException e) {
+                throw new ExpressionEvaluationException(e);
+            }
         }
     }
 
