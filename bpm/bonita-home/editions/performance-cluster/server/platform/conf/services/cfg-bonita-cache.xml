@@ -1,6 +1,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+	<bean id="localCacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
+	</bean>
+
 	<bean id="distributedCacheService" class="com.bonitasoft.engine.cache.impl.ClusteredCacheService">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
@@ -14,19 +20,19 @@
 		<constructor-arg name="localOnlyCaches">
 			<list>
 				<value>GROOVY_SCRIPT_CACHE_NAME</value>
+				<value>_PROCESSDEF</value>
+				<value>MIGRATION_PLAN_CACHE_NAME</value>
+				<value>USER_FILTER</value>
 			</list>
 		</constructor-arg>
 	</bean>
 	
-	<bean id="platformCacheService" class="com.bonitasoft.engine.cache.impl.PlatformClusteredCacheService">
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance" />
-	</bean>
-
-	<bean id="localCacheService" class="org.bonitasoft.engine.cache.ehcache.EhCacheCacheService">
-		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
-	</bean>
+    <!-- Platform -->
+ 
+    <bean id="platformCacheService" class="org.bonitasoft.engine.cache.ehcache.PlatformEhCacheCacheService">
+        <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
+    </bean>
 
 </beans>
