@@ -4,18 +4,18 @@ import org.bonitasoft.engine.session.model.SSession;
 
 public interface SessionProvider {
 
-    public abstract void updateSession(SSession session) throws SSessionNotFoundException;
+    void updateSession(SSession session) throws SSessionNotFoundException;
 
-    public abstract void cleanInvalidSessions();
+    void cleanInvalidSessions();
 
-    public abstract void removeSessions();
+    void removeSessions();
 
-    public abstract SSession getSession(final long sessionId) throws SSessionNotFoundException;
+    SSession getSession(final long sessionId) throws SSessionNotFoundException;
 
-    public abstract void removeSession(final long sessionId) throws SSessionNotFoundException;
+    void removeSession(final long sessionId) throws SSessionNotFoundException;
 
-    public abstract void addSession(final SSession session) throws SSessionAlreadyExistsException, SSessionAlreadyExistsException;
+    void addSession(final SSession session) throws SSessionAlreadyExistsException, SSessionAlreadyExistsException;
 
-    public abstract void deleteSessionsOfTenant(long tenantId);
+    void deleteSessionsOfTenant(long tenantId);
 
 }

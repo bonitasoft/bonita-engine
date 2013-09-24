@@ -185,19 +185,19 @@ public class ConnectorServiceImpl implements ConnectorService {
             final String version) throws CacheException {
         SConnectorImplementationDescriptor descriptor;
         try {
-            descriptor = (SConnectorImplementationDescriptor) cacheService.get(CONNECTOR_CACHE_NAME,
-                    getConnectorImplementationNameInCache(rootDefinitionId, connectorId, version));
+            String key = buildConnectorImplementationKey(rootDefinitionId, connectorId, version);
+
+            descriptor = (SConnectorImplementationDescriptor) cacheService.get(CONNECTOR_CACHE_NAME, key);
             if (descriptor == null) {
                 try {
-                    // cache value not exists, reload connector to insure the cache stores all connectors for current process
+                    // No value in cache : reload connector to ensure the cache stores all connectors for the current process
                     loadConnectors(rootDefinitionId, Long.parseLong(tenantId));
                 } catch (final NumberFormatException e1) {
                     throw new CacheException(e1);
                 } catch (final SConnectorException e1) {
                     throw new CacheException(e1);
                 }
-                descriptor = (SConnectorImplementationDescriptor) cacheService.get(CONNECTOR_CACHE_NAME,
-                        getConnectorImplementationNameInCache(rootDefinitionId, connectorId, version));
+                descriptor = (SConnectorImplementationDescriptor) cacheService.get(CONNECTOR_CACHE_NAME, key);
             }
         } catch (final CacheException e) {
             throw e;
@@ -206,16 +206,12 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private void storeImplementation(final long processDefinitionId, final SConnectorImplementationDescriptor connectorImplementation) throws CacheException {
-        cacheService.store(
-                CONNECTOR_CACHE_NAME,
-                getConnectorImplementationNameInCache(processDefinitionId, connectorImplementation.getDefinitionId(),
-                        connectorImplementation.getDefinitionVersion()), connectorImplementation);
+        String key = buildConnectorImplementationKey(processDefinitionId, connectorImplementation.getDefinitionId(), connectorImplementation.getDefinitionVersion());
+        cacheService.store(CONNECTOR_CACHE_NAME, key, connectorImplementation);
     }
 
-    private String getConnectorImplementationNameInCache(final long rootDefinitionId, final String connectorId, final String version) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(rootDefinitionId).append(':').append(connectorId).append('-').append(version);
-        return builder.toString();
+    private String buildConnectorImplementationKey(final long rootDefinitionId, final String connectorId, final String version) {
+        return String.format("%d:%s-%s",  rootDefinitionId, connectorId, version);
     }
 
     @Override
@@ -322,11 +318,11 @@ public class ConnectorServiceImpl implements ConnectorService {
                         SConnectorImplementationDescriptor connectorImplementation;
                         try {
                             final Object objectFromXML = parser.getObjectFromXML(file);
-                            connectorImplementation = (SConnectorImplementationDescriptor) objectFromXML;
-                            if (connectorImplementation == null) {
+                            if (objectFromXML == null) {
                                 throw new SConnectorException("Can not parse ConnectorImplementation XML. The file name is " + name);
                             }
                             // check dependencies in the bar
+                            connectorImplementation = (SConnectorImplementationDescriptor) objectFromXML;
                             storeImplementation(processDefinitionId, connectorImplementation);
                         } catch (final IOException e) {
                             throw new SConnectorException("Can not load ConnectorImplementation XML. The file name is " + name, e);
@@ -556,7 +552,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     private void reLoadConnectors(final SProcessDefinition sProcessDefinition, final long tenantId, final String connectorId, final String connectorVersion)
             throws SConnectorException {
-        final String connectorKey = getConnectorImplementationNameInCache(sProcessDefinition.getId(), connectorId, connectorVersion);
+        final String connectorKey = buildConnectorImplementationKey(sProcessDefinition.getId(), connectorId, connectorVersion);
         try {
             cacheService.remove(CONNECTOR_CACHE_NAME, connectorKey);
             // re_load connectors
@@ -666,7 +662,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             final String connectorVersion, final long tenantId) throws SConnectorException {
         SConnectorImplementationDescriptor connectorImplementationDescriptor;
         try {
-            final String connectorImplementationNameInCache = getConnectorImplementationNameInCache(processDefinitionId, connectorId, connectorVersion);
+            final String connectorImplementationNameInCache = buildConnectorImplementationKey(processDefinitionId, connectorId, connectorVersion);
             connectorImplementationDescriptor = (SConnectorImplementationDescriptor) cacheService.get(CONNECTOR_CACHE_NAME, connectorImplementationNameInCache);
             if (connectorImplementationDescriptor == null) {
                 /*
