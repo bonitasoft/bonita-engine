@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
@@ -20,7 +21,7 @@ import org.bonitasoft.engine.cache.CacheService;
 /**
  * Delegate cache request to local or distributed cache services
  * if the cache name is contains in the list localOnlyCaches the call is delegated to local cache, else it is delegated to the distributed cache
- * 
+ *
  * @author Baptiste Mesta
  */
 public class DelegatingCacheService implements CacheService {
@@ -31,7 +32,7 @@ public class DelegatingCacheService implements CacheService {
 
     private final HashSet<String> localOnlyCaches;
 
-    public DelegatingCacheService(final CacheService localCache, final CacheService distributedCache, final List<String> localOnlyCaches) {
+    public DelegatingCacheService(final CacheService localCache, final CacheService distributedCache, final Set<String> localOnlyCaches) {
         this.localOnlyCaches = new HashSet<String>(localOnlyCaches);
         this.localCache = localCache;
         this.distributedCache = distributedCache;
@@ -61,7 +62,7 @@ public class DelegatingCacheService implements CacheService {
     }
 
     @Override
-    public List<?> getKeys(final String cacheName) throws CacheException {
+    public List<Object> getKeys(final String cacheName) throws CacheException {
         return getCacheServiceFor(cacheName).getKeys(cacheName);
     }
 

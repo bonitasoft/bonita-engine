@@ -21,8 +21,10 @@ import org.bonitasoft.engine.cache.CacheConfigurations;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapConfig.EvictionPolicy;
+import com.hazelcast.config.MapConfig.InMemoryFormat;
 import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
+import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
@@ -35,25 +37,45 @@ public class BonitaHazelcastInstanceFactory {
 
     public static synchronized HazelcastInstance newHazelcastInstance(final Config config, final CacheConfigurations cacheConfigurations) {
         if (hazelCastInstance == null) {
-            final List<CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
-            for (final CacheConfiguration cache : configurations) {
-                final CacheConfiguration cacheConfiguration = cache;
-                // use wildcard because name of caches are: "<tenant id>_<cache name>"
-                final MapConfig mapConfig = new MapConfig("*" + cache.getName());
-                mapConfig.setTimeToLiveSeconds(cacheConfiguration.isEternal() ? 0 : new Long(cacheConfiguration.getTimeToLiveSeconds()).intValue());
-                final MaxSizeConfig maxSizeConfig = new MaxSizeConfig();
-                maxSizeConfig.setMaxSizePolicy(MaxSizePolicy.PER_PARTITION);
-                maxSizeConfig.setSize(cacheConfiguration.getMaxElementsInMemory());
-                mapConfig.setMaxSizeConfig(maxSizeConfig);
-                // can be: NONE (no eviction), LRU (Least Recently Used), LFU (Least Frequently Used). NONE is the default
-                mapConfig.setEvictionPolicy(EvictionPolicy.valueOf(cacheConfiguration.getEvictionPolicy()));
-                config.addMapConfig(mapConfig);
-            }
+            initializeCacheConfigurations(config, cacheConfigurations);
             // set classloader to null in order to use the context classloader instead
             config.setClassLoader(null);
             hazelCastInstance = Hazelcast.newHazelcastInstance(config);
         }
         return hazelCastInstance;
+    }
+
+    /**
+     * @param config
+     * @param cacheConfigurations
+     */
+    private static void initializeCacheConfigurations(final Config config, final CacheConfigurations cacheConfigurations) {
+        final List<CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
+        for (final CacheConfiguration cacheConfiguration : configurations) {
+            // use wildcard because name of caches are: "<tenant id>_<cache name>"
+            final MapConfig mapConfig = new MapConfig("*" + cacheConfiguration.getName());
+
+            mapConfig.setTimeToLiveSeconds(cacheConfiguration.isEternal() ? 0 : new Long(cacheConfiguration.getTimeToLiveSeconds()).intValue());
+
+            final MaxSizeConfig maxSizeConfig = new MaxSizeConfig();
+            maxSizeConfig.setMaxSizePolicy(MaxSizePolicy.PER_PARTITION);
+            maxSizeConfig.setSize(cacheConfiguration.getMaxElementsInMemory());
+            mapConfig.setMaxSizeConfig(maxSizeConfig);
+
+            if (cacheConfiguration.isReadIntensive()) {
+                NearCacheConfig nearCacheConfig = new NearCacheConfig();
+                nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+                nearCacheConfig.setName("nearCacheConfig-" + cacheConfiguration.getName());
+                mapConfig.setNearCacheConfig(nearCacheConfig);
+            }
+
+            // can be: NONE (no eviction), LRU (Least Recently Used), LFU (Least Frequently Used). NONE is the default
+            mapConfig.setEvictionPolicy(EvictionPolicy.valueOf(cacheConfiguration.getEvictionPolicy()));
+
+            // What about the isMemoryOnly ?
+
+            config.addMapConfig(mapConfig);
+        }
     }
 
     public static synchronized HazelcastInstance getInstance() {

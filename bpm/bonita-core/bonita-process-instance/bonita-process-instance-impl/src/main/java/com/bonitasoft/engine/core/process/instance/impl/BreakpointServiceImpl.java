@@ -35,7 +35,6 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
@@ -195,8 +194,6 @@ public class BreakpointServiceImpl implements BreakpointService {
                 active = (Boolean) this.cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE);
             }
             return active == null ? false : active;
-        } catch (final TenantIdNotSetException e) {
-            throw new SBonitaReadException("unable to get tenantId", e);
         } catch (final CacheException e) {
             throw new SBonitaReadException("unable to read from cache", e);
         }
@@ -204,10 +201,9 @@ public class BreakpointServiceImpl implements BreakpointService {
 
     /**
      * @throws CacheException
-     * @throws TenantIdNotSetException
      * @throws SBonitaReadException
      */
-    private synchronized void synchronizeBreakpoints() throws CacheException, TenantIdNotSetException, SBonitaReadException {
+    private synchronized void synchronizeBreakpoints() throws CacheException, SBonitaReadException {
         if (!this.isBreakpointsSynched || this.cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE) == null) {// double synchronization check
             this.cacheService.clear(BREAKPOINTS);
             long nbOfBreakpoints = getNumberOfBreakpoints();
@@ -218,7 +214,7 @@ public class BreakpointServiceImpl implements BreakpointService {
                 nbOfBreakpoints -= BATCH_SIZE;
                 index += BATCH_SIZE;
                 for (final SBreakpoint breakpoint : breakpoints) {
-                    addBreakpointInCache(BREAKPOINTS, breakpoint);
+                    addBreakpointInCache(breakpoint);
                 }
             }
             this.cacheService.store(BREAKPOINTS, BREAKPOINTS_ACTIVE, active);
@@ -244,17 +240,18 @@ public class BreakpointServiceImpl implements BreakpointService {
         return this.persistenceRead.selectList(elements);
     }
 
-    private void addBreakpointInCache(final String cacheName, final SBreakpoint breakpoint) throws CacheException {
+    private void addBreakpointInCache(final SBreakpoint breakpoint) throws CacheException {
+        final String breakpointKey;
         if (breakpoint.isInstanceScope()) {
-            this.cacheService.store(cacheName, getBreakpointKey(INSTANCE_KEY, breakpoint.getInstanceId(), breakpoint.getElementName(), breakpoint.getStateId()),
-                    breakpoint);
+            breakpointKey = buildBreakpointKey(INSTANCE_KEY, breakpoint.getInstanceId(), breakpoint.getElementName(), breakpoint.getStateId());
         } else {
-            this.cacheService.store(cacheName, getBreakpointKey(DEFINITION_KEY, breakpoint.getDefinitionId(), breakpoint.getElementName(), breakpoint.getStateId()),
-                    breakpoint);
+            breakpointKey = buildBreakpointKey(DEFINITION_KEY, breakpoint.getDefinitionId(), breakpoint.getElementName(), breakpoint.getStateId());
         }
+
+        this.cacheService.store(BREAKPOINTS, breakpointKey, breakpoint);
     }
 
-    private String getBreakpointKey(final String key, final long id, final String elementName, final int stateId) {
+    private static String buildBreakpointKey(final String key, final long id, final String elementName, final int stateId) {
         return key + id + elementName + '%' + stateId;
     }
 
@@ -266,13 +263,11 @@ public class BreakpointServiceImpl implements BreakpointService {
                 synchronizeBreakpoints();
             }
             // FIXME do not use cache? breakpoints might go out of cache...
-            SBreakpoint breakpoint = (SBreakpoint) this.cacheService.get(BREAKPOINTS, getBreakpointKey(INSTANCE_KEY, instanceId, elementName, stateId));
+            SBreakpoint breakpoint = (SBreakpoint) this.cacheService.get(BREAKPOINTS, buildBreakpointKey(INSTANCE_KEY, instanceId, elementName, stateId));
             if (breakpoint == null) {
-                breakpoint = (SBreakpoint) this.cacheService.get(BREAKPOINTS, getBreakpointKey(DEFINITION_KEY, definitionId, elementName, stateId));
+                breakpoint = (SBreakpoint) this.cacheService.get(BREAKPOINTS, buildBreakpointKey(DEFINITION_KEY, definitionId, elementName, stateId));
             }
             return breakpoint;
-        } catch (final TenantIdNotSetException e) {
-            throw new SBonitaReadException("unable to get tenantId", e);
         } catch (final CacheException e) {
             throw new SBonitaReadException("unable to read ", e);
         }

@@ -69,11 +69,11 @@ public final class SessionProviderClustered implements SessionProvider {
 
     @Override
     public void updateSession(final SSession session) throws SSessionNotFoundException {
-        final long id = session.getId();
-        if (!sessions.containsKey(id)) {
-            throw new SSessionNotFoundException("No session found with id \"" + id + "\"");
+        final long sessionId = session.getId();
+        if (!sessions.containsKey(sessionId)) {
+            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
         }
-        sessions.put(id, session);
+        sessions.put(sessionId, session);
     }
 
     @Override
