@@ -21,8 +21,10 @@ import org.bonitasoft.engine.cache.CacheConfigurations;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapConfig.EvictionPolicy;
+import com.hazelcast.config.MapConfig.InMemoryFormat;
 import com.hazelcast.config.MaxSizeConfig;
 import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
+import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
@@ -59,6 +61,13 @@ public class BonitaHazelcastInstanceFactory {
             maxSizeConfig.setMaxSizePolicy(MaxSizePolicy.PER_PARTITION);
             maxSizeConfig.setSize(cacheConfiguration.getMaxElementsInMemory());
             mapConfig.setMaxSizeConfig(maxSizeConfig);
+
+            if (cacheConfiguration.isReadIntensive()) {
+                NearCacheConfig nearCacheConfig = new NearCacheConfig();
+                nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+                nearCacheConfig.setName("nearCacheConfig-" + cacheConfiguration.getName());
+                mapConfig.setNearCacheConfig(nearCacheConfig);
+            }
 
             // can be: NONE (no eviction), LRU (Least Recently Used), LFU (Least Frequently Used). NONE is the default
             mapConfig.setEvictionPolicy(EvictionPolicy.valueOf(cacheConfiguration.getEvictionPolicy()));
