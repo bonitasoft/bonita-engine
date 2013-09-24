@@ -59,7 +59,7 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
     }
 
     @Override
-    protected boolean containsHandlerFor(String key) {
+    protected boolean containsHandlerFor(final String key) {
         return multimapHandlers.containsKey(key);
     }
 
@@ -82,14 +82,14 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
     }
 
     @Override
-    protected void addHandlerFor(String eventType, SHandler<SEvent> handler) {
+    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) {
         if (!multimapHandlers.containsEntry(eventType, handler)) {
             multimapHandlers.put(eventType, handler);
         }
     }
 
     @Override
-    protected void removeHandlerInAllType(SHandler<SEvent> handler) {
+    protected void removeHandlerInAllType(final SHandler<SEvent> handler) {
         Set<Entry<String, SHandler<SEvent>>> entrySet = multimapHandlers.entrySet();
         for (Entry<String, SHandler<SEvent>> entry : entrySet) {
             if (handler.equals(entry.getValue())) {
