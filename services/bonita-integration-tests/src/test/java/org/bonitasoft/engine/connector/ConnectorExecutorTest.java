@@ -77,6 +77,16 @@ public class ConnectorExecutorTest {
             @Override
             public void deleteSessionId() {
             }
+            
+            @Override
+            public void deleteTenantId() {
+                
+            }
+            
+            @Override
+            public void setTenantId(long tenantId) {
+                
+            }
         });
     }
 
