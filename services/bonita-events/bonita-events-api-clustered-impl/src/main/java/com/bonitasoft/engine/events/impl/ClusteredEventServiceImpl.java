@@ -14,10 +14,7 @@
 package com.bonitasoft.engine.events.impl;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
@@ -26,12 +23,15 @@ import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MapConfig.InMemoryFormat;
+import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.MultiMap;
 
 public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
-    private final MultiMap<String, SHandler<SEvent>> multimapHandlers;
+    private final Map<String, Set<SHandler<SEvent>>> eventHandlers;
 
     public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
             final HazelcastInstance hazelcastInstance) throws HandlerRegistrationException {
@@ -47,7 +47,14 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
             final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance)
             throws HandlerRegistrationException {
         super(eventBuilders, handlers, logger);
-        multimapHandlers = hazelcastInstance.getMultiMap("EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix);
+        // --- Hard coded configuration for Hazelcast
+        Config config = hazelcastInstance.getConfig();
+        MapConfig mapConfig = new MapConfig("*" + "EVENT_SERVICE_HANDLERS-");
+        NearCacheConfig nearCacheConfig = new NearCacheConfig();
+        nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+        config.addMapConfig(mapConfig);
+        // ---
+        eventHandlers = hazelcastInstance.getMap("EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix);
 
         // Create a Map that is shared across the cluster.
         registeredHandlers = null;
@@ -59,41 +66,31 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
     }
 
     @Override
-    protected boolean containsHandlerFor(final String key) {
-        return multimapHandlers.containsKey(key);
+    protected boolean containsHandlerFor(final String eventType) {
+        return eventHandlers.containsKey(eventType);
     }
 
     @Override
     protected Collection<SHandler<SEvent>> getHandlersFor(final String eventType) {
-        return multimapHandlers.get(eventType);
-    }
-
-    @Override
-    public Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers() {
-        Set<Entry<String, SHandler<SEvent>>> entrySet = multimapHandlers.entrySet();
-        HashMap<String, Set<SHandler<SEvent>>> hashMap = new HashMap<String, Set<SHandler<SEvent>>>();
-        for (Entry<String, SHandler<SEvent>> entry : entrySet) {
-            if (!hashMap.containsKey(entry.getKey())) {
-                hashMap.put(entry.getKey(), new HashSet<SHandler<SEvent>>());
-            }
-            hashMap.get(entry.getKey()).add(entry.getValue());
-        }
-        return hashMap;
+        return eventHandlers.get(eventType);
     }
 
     @Override
     protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) {
-        if (!multimapHandlers.containsEntry(eventType, handler)) {
-            multimapHandlers.put(eventType, handler);
+        if (!eventHandlers.containsKey(eventType)) {
+            Set<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
+            handlers.add(handler);
         }
     }
 
     @Override
     protected void removeHandlerInAllType(final SHandler<SEvent> handler) {
-        Set<Entry<String, SHandler<SEvent>>> entrySet = multimapHandlers.entrySet();
-        for (Entry<String, SHandler<SEvent>> entry : entrySet) {
-            if (handler.equals(entry.getValue())) {
-                multimapHandlers.remove(entry.getKey(), entry.getValue());
+        for(String eventType : eventHandlers.keySet()) {
+            Set<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
+
+            handlers.remove(handler);
+            if (handlers.isEmpty()) {
+                eventHandlers.remove(eventType);
             }
         }
     }
