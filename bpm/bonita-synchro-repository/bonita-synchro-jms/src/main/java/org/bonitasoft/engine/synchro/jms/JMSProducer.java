@@ -23,7 +23,9 @@ public class JMSProducer {
 
 	private final long timeout;
 
-	public JMSProducer(final long timeout) throws NamingException, JMSException {
+	private static JMSProducer jmsProducer;
+	
+	private JMSProducer(final long timeout) throws NamingException, JMSException {
 		final InitialContext context = new InitialContext();
 		final TopicConnectionFactory topicConnectionFactory = (TopicConnectionFactory) context.lookup(TOPIC_CONNECTION_FACTORY);
 		final Topic topic = (Topic) context.lookup(TOPIC_NAME);
@@ -50,6 +52,18 @@ public class JMSProducer {
 		});
 	}
 
+	public static JMSProducer getInstance(final long messageTimeout) {
+		if (jmsProducer == null) {
+			try {
+				jmsProducer = new JMSProducer(messageTimeout);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		}
+		return jmsProducer;
+	}
+	
 	public void sendMessage(final Map<String, Serializable> properties, final long body) throws JMSException {
 		final MapMessage message = session.createMapMessage();
 

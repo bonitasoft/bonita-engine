@@ -27,8 +27,8 @@ public class TaskReadyHandler extends AbstractUpdateHandler {
 
     private static final long serialVersionUID = 1L;
 
-    public TaskReadyHandler(final long tenantId, final JMSProducer jmsProducer) {
-        super(tenantId, jmsProducer);
+    public TaskReadyHandler(final long tenantId, final long messageTimeout) {
+        super(tenantId, messageTimeout);
     }
 
     @Override

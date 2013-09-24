@@ -27,8 +27,8 @@ public class ProcessInstanceFinishedHandler extends AbstractUpdateHandler {
 
     private static final long serialVersionUID = 1L;
     
-    public ProcessInstanceFinishedHandler(final long tenantId, final JMSProducer jmsProducer) {
-        super(tenantId, jmsProducer);
+    public ProcessInstanceFinishedHandler(final long tenantId, final long messageTimeout) {
+        super(tenantId, messageTimeout);
     }
 
     @Override

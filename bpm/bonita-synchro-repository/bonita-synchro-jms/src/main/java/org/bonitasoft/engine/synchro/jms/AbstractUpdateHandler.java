@@ -33,70 +33,70 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private final long tenantId;
+	private final long tenantId;
 
-    private final JMSProducer jmsProducer;
-    
-    private final Map<Class<?>, Method> getIdMethods = Collections.synchronizedMap(new HashMap<Class<?>, Method>());
-    
-    public AbstractUpdateHandler(final long tenantId, final JMSProducer jmsProducer) {
-        super();
-        this.tenantId = tenantId;
-        this.jmsProducer = jmsProducer;
-    }
+	private final Long messageTimeout;
 
-    protected abstract Map<String, Serializable> getEvent(final SEvent sEvent);
+	private final Map<Class<?>, Method> getIdMethods = Collections.synchronizedMap(new HashMap<Class<?>, Method>());
 
-    @Override
-    public void execute(final SEvent sEvent) throws SHandlerExecutionException {
-        try {
-            final Map<String, Serializable> event = getEvent(sEvent);
-            final Long id = getObjectId(sEvent);
+	public AbstractUpdateHandler(final long tenantId, final long messageTimeout) {
+		super();
+		this.tenantId = tenantId;
+		this.messageTimeout = messageTimeout;
+	}
 
-            final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-            final BonitaTransactionSynchronization synchronization = new SendJMSMessageSynchronization(event, id, jmsProducer);
+	protected abstract Map<String, Serializable> getEvent(final SEvent sEvent);
 
-            TransactionService transactionService = tenantServiceAccessor.getTransactionService();
-            transactionService.registerBonitaSynchronization(synchronization);
-            // System.out.println("++++++++++++++++++++ " + this.getClass().getSimpleName() + " executing for event " + event + " +++++++++++++++++++++");
-        } catch (final STransactionNotFoundException e) {
-            e.printStackTrace();
-            throw new SHandlerExecutionException(e);
-        }
-    }
+	@Override
+	public void execute(final SEvent sEvent) throws SHandlerExecutionException {
+		try {
+			final Map<String, Serializable> event = getEvent(sEvent);
+			final Long id = getObjectId(sEvent);
 
-    /**
-     * @param sEvent
-     * @return
-     */
-    private Long getObjectId(final SEvent sEvent) {
-        Long id = null;
-        Object object = null;
-        try {
-            object = sEvent.getObject();
-            final Class<?> clazz = object.getClass();
-            Method method = null;
-            if (getIdMethods.containsKey(clazz)) {
-            	method = getIdMethods.get(clazz);
-            } else {
-            	method = clazz.getMethod("getId");	
-            }
-            final Object invoke = method.invoke(object);
-            id = (Long) invoke;
-        } catch (final Throwable e) {
-            System.err.println("AbstractUpdateHandler: No id on object " + object);
-        }
-        return id;
-    }
+			final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
+			final BonitaTransactionSynchronization synchronization = new SendJMSMessageSynchronization(event, id, JMSProducer.getInstance(messageTimeout));
 
-    private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
-        try {
-            return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
-        } catch (Exception e) {
-            throw new SHandlerExecutionException(e.getMessage(), null);
-        }
-    }
+			TransactionService transactionService = tenantServiceAccessor.getTransactionService();
+			transactionService.registerBonitaSynchronization(synchronization);
+			// System.out.println("++++++++++++++++++++ " + this.getClass().getSimpleName() + " executing for event " + event + " +++++++++++++++++++++");
+		} catch (final STransactionNotFoundException e) {
+			e.printStackTrace();
+			throw new SHandlerExecutionException(e);
+		}
+	}
+
+	/**
+	 * @param sEvent
+	 * @return
+	 */
+	private Long getObjectId(final SEvent sEvent) {
+		Long id = null;
+		Object object = null;
+		try {
+			object = sEvent.getObject();
+			final Class<?> clazz = object.getClass();
+			Method method = null;
+			if (getIdMethods.containsKey(clazz)) {
+				method = getIdMethods.get(clazz);
+			} else {
+				method = clazz.getMethod("getId");	
+			}
+			final Object invoke = method.invoke(object);
+			id = (Long) invoke;
+		} catch (final Throwable e) {
+			System.err.println("AbstractUpdateHandler: No id on object " + object);
+		}
+		return id;
+	}
+
+	private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
+		try {
+			return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
+		} catch (Exception e) {
+			throw new SHandlerExecutionException(e.getMessage(), null);
+		}
+	}
 
 }
