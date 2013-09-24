@@ -5,6 +5,7 @@
 
 	<bean id="connectorCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
 		<property name="name" value="CONNECTOR" />
+		<property name="readIntensive" value="true" />
 	</bean>
 
 	<bean id="processDefCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">

@@ -30,6 +30,8 @@ public class CacheConfiguration {
 
     private boolean eternal = false;
 
+    private boolean readIntensive = false;
+
     private String name;
 
     /**
@@ -43,7 +45,7 @@ public class CacheConfiguration {
      * most implementation support LRU and LFU
      * some implementation (ehcache) support FIFO also
      * by default set to LRU
-     * 
+     *
      * @param evictionPolicy
      *            the evictionPolicy to set
      */
@@ -53,7 +55,7 @@ public class CacheConfiguration {
 
     /**
      * true if the elements are never evicted automatically
-     * 
+     *
      * @return the eternal
      */
     public boolean isEternal() {
@@ -71,7 +73,7 @@ public class CacheConfiguration {
     /**
      * The time to live is the time elements from this cache will be kept.
      * After this time the element can be evicted
-     * 
+     *
      * @return the timeToLiveSeconds
      */
     public long getTimeToLiveSeconds() {
@@ -79,8 +81,8 @@ public class CacheConfiguration {
     }
 
     /**
-     * the maximum number of element the cache will keep in memory
-     * 
+     * the maximum number of elements the cache will keep in memory
+     *
      * @return the maxElementsInMemory
      */
     public int getMaxElementsInMemory() {
@@ -88,8 +90,8 @@ public class CacheConfiguration {
     }
 
     /**
-     * the maximum number of element the cache will keep on disk after the limite of element in memory is reached
-     * 
+     * the maximum number of element the cache will keep on disk after the limit of elements in memory is reached
+     *
      * @return the maxElementsOnDisk
      */
     public int getMaxElementsOnDisk() {
@@ -98,7 +100,7 @@ public class CacheConfiguration {
 
     /**
      * if true nothing is stored on disk
-     * 
+     *
      * @return the inMemoryOnly
      */
     public boolean isInMemoryOnly() {
@@ -143,6 +145,23 @@ public class CacheConfiguration {
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * Are the elements stored in the cache read more often than written ?
+     *
+     * @return  readIntensive
+     */
+    public boolean isReadIntensive() {
+        return readIntensive;
+    }
+
+    /**
+     * @param readIntensive
+     *            the readIntensive to set
+     */
+    public void setReadIntensive(final boolean readIntensive) {
+        this.readIntensive = readIntensive;
     }
 
 }
