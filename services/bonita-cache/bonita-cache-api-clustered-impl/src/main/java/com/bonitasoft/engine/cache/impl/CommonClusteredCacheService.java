@@ -25,7 +25,7 @@ import com.hazelcast.core.HazelcastInstance;
 
 /**
  * Cache service that uses hazelcast
- * 
+ *
  * @author Baptiste Mesta
  */
 public abstract class CommonClusteredCacheService implements CommonCacheService {
@@ -102,7 +102,7 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
     }
 
     @Override
-    public List<?> getKeys(final String cacheName) throws CacheException {
+    public List<Object> getKeys(final String cacheName) throws CacheException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getKeys"));
         }
@@ -110,7 +110,7 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
         final String cacheNameKey = getKeyFromCacheName(cacheName);
         try {
             final Map<Serializable, Object> cache = hazelcastInstance.getMap(cacheNameKey);
-            final List<Serializable> keys = new ArrayList<Serializable>(cache.keySet());
+            final List<Object> keys = new ArrayList<Object>(cache.keySet());
 
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getKeys"));
