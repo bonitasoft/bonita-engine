@@ -56,7 +56,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         return ehCacheConfig;
     }
 
-    protected synchronized Cache createCache(final String cacheName, final String internalCacheName) {
+    protected synchronized Cache createCache(final String cacheName, final String internalCacheName) throws CacheException {
         Cache cache = cacheManager.getCache(internalCacheName);
         if (cache == null) {
             final CacheConfiguration cacheConfiguration = cacheConfigurations.get(cacheName);
@@ -66,8 +66,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
                 cache = new Cache(newCacheConfig);
                 cacheManager.addCache(cache);
             } else {
-                cacheManager.addCache(internalCacheName);
-                cache = cacheManager.getCache(internalCacheName);
+                throw new CacheException("No configuration found for the cache " + cacheName);
             }
         }
         return cache;
