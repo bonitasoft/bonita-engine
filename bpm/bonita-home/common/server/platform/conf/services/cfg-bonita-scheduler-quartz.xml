@@ -55,7 +55,6 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="jobTruster">
 			<bean class="org.bonitasoft.engine.scheduler.JobTruster">
 				<constructor-arg name="trusted">

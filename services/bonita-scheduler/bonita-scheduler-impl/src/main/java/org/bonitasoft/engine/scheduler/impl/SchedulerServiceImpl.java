@@ -52,9 +52,6 @@ import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -93,21 +90,18 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private final JobTruster jobTruster;
 
-    private final SessionService sessionService;
-
     /**
      * Create a new instance of scheduler service. Synchronous
      * QueriableLoggerService must be used to avoid an infinite loop.
      */
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final SSchedulerBuilderAccessor builderAccessor, final JobService jobService,
             final QueriableLoggerService queriableLogService, final TechnicalLoggerService logger, final EventService eventService,
-            final TransactionService transactionService, final SessionAccessor sessionAccessor, final SessionService sessionService, final JobTruster jobTruster) {
+            final TransactionService transactionService, final SessionAccessor sessionAccessor, final JobTruster jobTruster) {
         this.builderAccessor = builderAccessor;
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.queriableLogService = queriableLogService;
         this.logger = logger;
-        this.sessionService = sessionService;
         this.jobTruster = jobTruster;
         schedulStarted = eventService.getEventBuilder().createNewInstance(SCHEDULER_STARTED).done();
         schedulStopped = eventService.getEventBuilder().createNewInstance(SCHEDULER_STOPPED).done();
@@ -344,10 +338,8 @@ public class SchedulerServiceImpl implements SchedulerService {
      */
     public StatelessJob getPersistedJob(final JobIdentifier jobIdentifier) throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
-        SSession session = null;
         try {
-            session = sessionService.createSession(jobIdentifier.getTenantId(), "scheduler");
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+            sessionAccessor.setTenantId(jobIdentifier.getTenantId());
 
             final Callable<JobWrapper> callable = buildGetPersistedJobCallable(jobIdentifier);
             logAfterMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
@@ -355,17 +347,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         } catch (final Exception e) {
             throw new SSchedulerException("The job class couldn't be instantiated", e);
         } finally {
-            if (session != null) {
-                try {
-                    sessionAccessor.deleteSessionId();
-                    sessionService.deleteSession(session.getId());
-                } catch (final SSessionNotFoundException e) {
-                    logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getPersistedJob", e);
-                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);// FIXME
-                    }
-                }
-            }
+            sessionAccessor.deleteTenantId();
         }
     }
 
@@ -393,7 +375,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                 }
                 statelessJob.setAttributes(parameterMap);
                 final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), queriableLogService, statelessJob, logger,
-                        jobIdentifier.getTenantId(), eventService, jobTruster, sessionService, sessionAccessor, transactionService);
+                        jobIdentifier.getTenantId(), eventService, jobTruster, sessionAccessor, transactionService);
                 return jobWrapper;
             }
         };

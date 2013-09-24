@@ -37,8 +37,6 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
 
     protected transient TechnicalLoggerService loggerService;
 
-    private transient SessionService sessionService;
-
     private transient SessionAccessor sessionAccessor;
 
     public FailureHandlingBonitaWork(final BonitaWork work) {
@@ -64,12 +62,9 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         loggerService = tenantAccessor.getTechnicalLoggerService();
         sessionAccessor = tenantAccessor.getSessionAccessor();
-        sessionService = tenantAccessor.getSessionService();
         context.put(TENANT_ACCESSOR, tenantAccessor);
-        SSession session = null;
         try {
-            session = sessionService.createSession(getTenantId(), "workservice");
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
+            sessionAccessor.setTenantId(getTenantId());
 
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
@@ -95,16 +90,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             }
 
         } finally {
-            if (session != null) {
-                try {
-                    sessionAccessor.deleteSessionId();
-                    sessionService.deleteSession(session.getId());
-                } catch (final SSessionNotFoundException e) {
-                    if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                        loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-                    }
-                }
-            }
+        	sessionAccessor.deleteTenantId();
         }
     }
 

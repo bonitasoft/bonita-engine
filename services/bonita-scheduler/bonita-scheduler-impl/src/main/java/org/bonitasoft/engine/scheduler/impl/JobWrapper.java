@@ -28,9 +28,6 @@ import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -44,13 +41,6 @@ public class JobWrapper implements StatelessJob {
 
     private final class BonitaTransactionSynchronizationImplementation implements BonitaTransactionSynchronization {
 
-        private final long sessionId;
-
-        public BonitaTransactionSynchronizationImplementation(final long sessionId) {
-            this.sessionId = sessionId;
-            // TODO Auto-generated constructor stub
-        }
-
         @Override
         public void beforeCommit() {
             // TODO Auto-generated method stub
@@ -59,12 +49,7 @@ public class JobWrapper implements StatelessJob {
 
         @Override
         public void afterCompletion(final TransactionState txState) {
-            try {
-                sessionAccessor.deleteSessionId();
-                sessionService.deleteSession(sessionId);
-            } catch (final SSessionNotFoundException e) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);// FIXME
-            }
+            sessionAccessor.deleteTenantId();
         }
     }
 
@@ -86,15 +71,12 @@ public class JobWrapper implements StatelessJob {
 
     private final SessionAccessor sessionAccessor;
 
-    private final SessionService sessionService;
-
     private final TransactionService transactionService;
 
     public JobWrapper(final String name, final QueriableLoggerService logService, final StatelessJob statelessJob, final TechnicalLoggerService logger,
-            final long tenantId, final EventService eventService, final JobTruster jobTruster, final SessionService sessionService,
+            final long tenantId, final EventService eventService, final JobTruster jobTruster,
             final SessionAccessor sessionAccessor, final TransactionService transactionService) {
         this.name = name;
-        this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.statelessJob = statelessJob;
         this.logger = logger;
@@ -132,11 +114,8 @@ public class JobWrapper implements StatelessJob {
 
     @Override
     public void execute() throws SJobExecutionException, FireEventException {
-        SSession session = null;
         try {
-            session = createSession();// FIXME get the technical user of the tenant
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());// FIXME do that in the session service?
-
+            sessionAccessor.setTenantId(tenantId);
             if (eventService.hasHandlers(JOB_EXECUTING, null)) {
                 jobExecuting.setObject(this);
                 eventService.fireEvent(jobExecuting);
@@ -158,18 +137,12 @@ public class JobWrapper implements StatelessJob {
                 jobCompleted.setObject(this);
                 eventService.fireEvent(jobCompleted);
             }
-            if (session != null) {
-                try {
-                    transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronizationImplementation(session.getId()));
-                } catch (STransactionNotFoundException e) {
-                    throw new SJobExecutionException(e);
-                }
+            try {
+	            transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronizationImplementation());
+            } catch (STransactionNotFoundException e) {
+	            e.printStackTrace();
             }
         }
-    }
-
-    private SSession createSession() throws Exception {
-        return sessionService.createSession(tenantId, "scheduler");
     }
 
     @Override

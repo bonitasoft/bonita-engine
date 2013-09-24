@@ -80,7 +80,7 @@ public class SchedulerServiceImplTest {
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
 
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, builderAccessor, jobService, queriableLogService, logger, eventService,
-                transactionService, sessionAccessor, sessionService, jobTruster);
+                transactionService, sessionAccessor, jobTruster);
     }
 
     @Test
