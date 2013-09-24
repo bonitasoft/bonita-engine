@@ -1,25 +1,24 @@
 package org.bonitasoft.engine;
 
+import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith(Suite.class)
+@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({ BPMRemoteTests.class })
+@Initializer(BPMRemoteTestsForServers.class)
 public class BPMRemoteTestsForServers {
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+    public static void beforeAll() throws Exception {
         System.err.println("=================== BPMRemoteTestsForServers.beforeClass()");
         APITestUtil.createPlatformStructure();
+        APITestUtil.initializeAndStartPlatformWithDefaultTenant(true);
     }
 
-    @AfterClass
-    public static void afterClass() throws Exception {
+    public static void afterAll() throws Exception {
         System.err.println("=================== BPMRemoteTestsForServers.afterClass()");
+        APITestUtil.stopAndCleanPlatformAndTenant(true);
         APITestUtil.deletePlatformStructure();
     }
 }
