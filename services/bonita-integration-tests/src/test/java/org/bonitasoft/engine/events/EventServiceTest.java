@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.bonitasoft.engine.ServicesBuilder;
@@ -47,12 +46,11 @@ public class EventServiceTest {
     }
 
     @Test
-    public void addHandlerInEventfilters() throws Exception {
+    public void addHandlerInEventFilters() throws Exception {
         final TestHandler h = new TestHandler();
         eventSvc.addHandler(EVT_INTERESTING, h);
-        final Set<SHandler<SEvent>> newHandlerSet = new HashSet<SHandler<SEvent>>();
-        newHandlerSet.add(h);
-        assertTrue(eventSvc.getRegisteredHandlers().containsValue(newHandlerSet));
+        eventSvc.getHandlers(EVT_INTERESTING).contains(h);
+        assertTrue(eventSvc.getHandlers(EVT_INTERESTING).contains(h));
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
 
@@ -60,7 +58,8 @@ public class EventServiceTest {
     public void addNewTypeInRegisteredHandlers() throws Exception {
         final TestHandler h = new TestHandler();
         eventSvc.addHandler(EVT_INTERESTING, h);
-        assertTrue(eventSvc.getRegisteredHandlers().containsKey(EVT_INTERESTING));
+        fail("TEST TO REVIEW");
+        assertTrue(eventSvc.getHandlers(EVT_INTERESTING).contains(h));
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
 

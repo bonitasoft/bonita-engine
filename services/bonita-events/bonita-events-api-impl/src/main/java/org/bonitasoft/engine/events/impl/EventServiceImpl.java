@@ -228,11 +228,6 @@ public class EventServiceImpl implements EventService {
         return registeredHandlers.get(eventType);
     }
 
-    @Override
-    public Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers() {
-        return registeredHandlers;
-    }
-
     protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
         logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "NON-cluster implementation of addHandlerFor() method for eventType=" + eventType
                 + ", handler=" + handler.getClass().getSimpleName());

@@ -71,11 +71,6 @@ public class TransactionLifeCycleImplTest extends TransactionLifeCycleTest {
             }
 
             @Override
-            public Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers() {
-                return Collections.emptyMap();
-            }
-
-            @Override
             public Set<SHandler<SEvent>> getHandlers(final String eventType) {
                 return null;
             }
