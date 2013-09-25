@@ -61,7 +61,7 @@ public class ConnectorExecutorTest {
     }
 
     private ConnectorExecutor getConnectorExecutor() {
-        return new ConnectorExecutorImpl(10, 5, new TechnicalLoggerSLF4JImpl(), 100, 100, getSessionAccessor());
+        return new ConnectorExecutorImpl(10, 5, new TechnicalLoggerSLF4JImpl(), 100, 100, getSessionAccessor(), getSessionService());
     }
 
     private SessionAccessor getSessionAccessor() {
