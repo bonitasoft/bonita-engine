@@ -9,7 +9,6 @@
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
 
 	<bean id="persistentDataInstanceDSConf" class="org.bonitasoft.engine.data.instance.PersistentDataInstanceDataSourceConfiguration">
