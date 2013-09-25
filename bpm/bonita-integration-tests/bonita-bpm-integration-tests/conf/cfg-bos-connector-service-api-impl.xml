@@ -18,7 +18,6 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="eventService" ref="eventService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="archiveService" ref="archiveService" />
     </bean>
 
