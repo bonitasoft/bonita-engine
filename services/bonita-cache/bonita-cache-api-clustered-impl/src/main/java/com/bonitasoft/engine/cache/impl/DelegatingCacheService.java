@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
@@ -31,7 +32,7 @@ public class DelegatingCacheService implements CacheService {
 
     private final HashSet<String> localOnlyCaches;
 
-    public DelegatingCacheService(final CacheService localCache, final CacheService distributedCache, final List<String> localOnlyCaches) {
+    public DelegatingCacheService(final CacheService localCache, final CacheService distributedCache, final Set<String> localOnlyCaches) {
         this.localOnlyCaches = new HashSet<String>(localOnlyCaches);
         this.localCache = localCache;
         this.distributedCache = distributedCache;

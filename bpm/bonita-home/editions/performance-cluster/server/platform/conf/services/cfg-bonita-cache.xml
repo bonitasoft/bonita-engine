@@ -18,12 +18,12 @@
 		<constructor-arg name="localCache" ref="localCacheService" />
 		<constructor-arg name="distributedCache" ref="distributedCacheService" />
 		<constructor-arg name="localOnlyCaches">
-			<list>
+			<set>
 				<value>GROOVY_SCRIPT_CACHE_NAME</value>
 				<value>_PROCESSDEF</value>
 				<value>MIGRATION_PLAN_CACHE_NAME</value>
 				<value>USER_FILTER</value>
-			</list>
+			</set>
 		</constructor-arg>
 	</bean>
 	
