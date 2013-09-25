@@ -16,6 +16,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
@@ -27,8 +28,8 @@ public class ConnectorExecutorTimedOut extends ConnectorExecutorImpl {
 
     public ConnectorExecutorTimedOut(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
             final long keepAliveTimeSeconds,
-            final SessionAccessor sessionAccessor, final int timeout) {
-        super(queueCapacity, corePoolSize, loggerService, maximumPoolSize, keepAliveTimeSeconds, sessionAccessor);
+            final SessionAccessor sessionAccessor, final SessionService sessionService, final int timeout) {
+        super(queueCapacity, corePoolSize, loggerService, maximumPoolSize, keepAliveTimeSeconds, sessionAccessor, sessionService);
         this.timeout = timeout;
     }
 
