@@ -26,7 +26,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -81,13 +80,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
     @Override
     public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters) throws SConnectorException {
-        Callable<Map<String, Object>> callable = null;
-        try {
-            callable = new ExecuteConnectorCallable(inputParameters, sConnector, sessionAccessor.getSessionId(), sessionAccessor.getTenantId());
-        } catch (final SBonitaException e) {
-            disconnect(sConnector);
-            throw new SConnectorException(e);
-        }
+        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
         final Future<Map<String, Object>> submit = threadPoolExecutor.submit(callable);
         try {
             return getValue(submit);
@@ -104,7 +97,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }
     }
 
-    @SuppressWarnings("unused")
     protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
         return submit.get();
     }
@@ -129,20 +121,13 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
         private final SConnector sConnector;
 
-        private final long sessionId;
-
-        private final long tenantId;
-
-        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final long sessionId, final long tenantId) {
+        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
-            this.sessionId = sessionId;
-            this.tenantId = tenantId;
         }
 
         @Override
         public Map<String, Object> call() throws Exception {
-            sessionAccessor.setSessionInfo(sessionId, tenantId);
             sConnector.setInputParameters(inputParameters);
             try {
                 sConnector.validate();
@@ -151,6 +136,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             } catch (final SConnectorValidationException e) {
                 throw new SConnectorException(e);
             } finally {
+            	//in case a session has been created: see ConnectorAPIAccessorImpl
                 sessionAccessor.deleteSessionId();
             }
         }

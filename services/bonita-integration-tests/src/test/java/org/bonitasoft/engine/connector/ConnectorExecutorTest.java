@@ -21,6 +21,10 @@ import java.util.Map;
 
 import org.bonitasoft.engine.connector.impl.ConnectorExecutorImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerSLF4JImpl;
+import org.bonitasoft.engine.session.SSessionException;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
@@ -57,7 +61,11 @@ public class ConnectorExecutorTest {
     }
 
     private ConnectorExecutor getConnectorExecutor() {
-        return new ConnectorExecutorImpl(10, 5, new TechnicalLoggerSLF4JImpl(), 100, 100, new SessionAccessor() {
+        return new ConnectorExecutorImpl(10, 5, new TechnicalLoggerSLF4JImpl(), 100, 100, getSessionAccessor());
+    }
+
+    private SessionAccessor getSessionAccessor() {
+    	return new SessionAccessor() {
 
             @Override
             public long getTenantId() {
@@ -87,9 +95,93 @@ public class ConnectorExecutorTest {
             public void setTenantId(long tenantId) {
                 
             }
-        });
+        };
     }
-
+    
+    private SessionService getSessionService() {
+    	return new SessionService() {
+			
+			@Override
+			public void setSessionDuration(long duration) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void renewSession(long sessionId) throws SSessionException {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public boolean isValid(long sessionId) throws SSessionNotFoundException {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public boolean isAllowed(long sessionId, String actionKey) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public long getSessionDuration() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			
+			@Override
+			public SSession getSession(long sessionId) throws SSessionNotFoundException {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public long getDefaultSessionDuration() {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+			
+			@Override
+			public void deleteSessionsOfTenant(long tenantId) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void deleteSessions() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void deleteSession(long sessionId) throws SSessionNotFoundException {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public SSession createSession(long tenantId, long userId, String userName,
+			        boolean technicalUser) throws SSessionException {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public SSession createSession(long tenantId, String userName)
+			        throws SSessionException {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public void cleanInvalidSessions() {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+    }
     @Test
     public void testExecuteConnector() {
         getConnectorExecutor();

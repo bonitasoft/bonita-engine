@@ -17,61 +17,65 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 public class ConnectorAPIAccessorImpl implements APIAccessor {
 
-    private static final long serialVersionUID = 3365911149008207537L;
+	private static final long serialVersionUID = 3365911149008207537L;
 
-    private final long tenantId;
+	private final long tenantId;
 
-    public ConnectorAPIAccessorImpl(final long tenantId) {
-        super();
-        this.tenantId = tenantId;
-    }
+	private APISession apiSession;
 
-    protected APISession getAPISession() {
-        final TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance(tenantId);
-        final ReadSessionAccessor readSessionAccessor = tenantServiceAccessor.getReadSessionAccessor();
-        final SessionService sessionService = tenantServiceAccessor.getSessionService();
-        long sessionId;
-        try {
-            sessionId = readSessionAccessor.getSessionId();
-            final SSession session = sessionService.getSession(sessionId);
-            return ModelConvertor.toAPISession(session, null);
-        } catch (Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-    }
+	public ConnectorAPIAccessorImpl(final long tenantId) {
+		super();
+		this.tenantId = tenantId;
+	}
 
-    @Override
-    public IdentityAPI getIdentityAPI() {
-        return getAPI(IdentityAPI.class, getAPISession());
-    }
+	protected APISession getAPISession() {
+		if (apiSession == null) {
+			final TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance(tenantId);
+			final SessionAccessor sessionAccessor = tenantServiceAccessor.getSessionAccessor();
+			final SessionService sessionService = tenantServiceAccessor.getSessionService();
+			try {
+				final SSession session = sessionService.createSession(tenantId, ConnectorAPIAccessorImpl.class.getSimpleName());// FIXME get the
+				sessionAccessor.setSessionInfo(session.getId(), tenantId);
+				return ModelConvertor.toAPISession(session, null);
+			} catch (Exception e) {
+				throw new BonitaRuntimeException(e);
+			}
+		}
+		return apiSession;
+	}
 
-    @Override
-    public ProcessAPI getProcessAPI() {
-        return getAPI(ProcessAPI.class, getAPISession());
-    }
+	@Override
+	public IdentityAPI getIdentityAPI() {
+		return getAPI(IdentityAPI.class, getAPISession());
+	}
 
-    @Override
-    public CommandAPI getCommandAPI() {
-        return getAPI(CommandAPI.class, getAPISession());
-    }
+	@Override
+	public ProcessAPI getProcessAPI() {
+		return getAPI(ProcessAPI.class, getAPISession());
+	}
 
-    @Override
-    public ProfileAPI getProfileAPI() {
-        return getAPI(ProfileAPI.class, getAPISession());
-    }
+	@Override
+	public CommandAPI getCommandAPI() {
+		return getAPI(CommandAPI.class, getAPISession());
+	}
 
-    private static ServerAPI getServerAPI() {
-        return new ServerAPIImpl(false);
-    }
+	@Override
+	public ProfileAPI getProfileAPI() {
+		return getAPI(ProfileAPI.class, getAPISession());
+	}
 
-    private static <T> T getAPI(final Class<T> clazz, final APISession session) {
-        final ServerAPI serverAPI = getServerAPI();
-        final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
-        return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
-    }
+	private static ServerAPI getServerAPI() {
+		return new ServerAPIImpl(false);
+	}
+
+	private static <T> T getAPI(final Class<T> clazz, final APISession session) {
+		final ServerAPI serverAPI = getServerAPI();
+		final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
+		return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
+	}
 
 }
