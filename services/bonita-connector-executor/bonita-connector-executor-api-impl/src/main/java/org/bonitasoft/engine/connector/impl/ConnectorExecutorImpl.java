@@ -32,7 +32,9 @@ import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * Execute connectors directly
@@ -44,6 +46,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     private final SessionAccessor sessionAccessor;
+    
+    private final SessionService sessionService;
 
     /**
      * The handling of threads relies on the JVM
@@ -70,12 +74,13 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
      *            will wait for new tasks before terminating. (in seconds)
      */
     public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
-            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor) {
+            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService) {
         final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
         final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
         threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
         this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -137,7 +142,13 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
                 throw new SConnectorException(e);
             } finally {
             	//in case a session has been created: see ConnectorAPIAccessorImpl
-                sessionAccessor.deleteSessionId();
+            	try {
+            		final long sessionId = sessionAccessor.getSessionId();
+            		sessionAccessor.deleteSessionId();
+            		sessionService.deleteSession(sessionId);
+            	} catch (SessionIdNotSetException e) {
+            		//nothing, no session has been created
+            	}
             }
         }
     }

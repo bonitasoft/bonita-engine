@@ -8,6 +8,7 @@
 		<constructor-arg name="maximumPoolSize" value="100" />
 		<constructor-arg name="keepAliveTimeSeconds" value="100" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="sessionService" ref="sessionService" />
 	</bean>
 
 </beans>
