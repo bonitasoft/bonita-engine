@@ -17,13 +17,11 @@ import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,8 +45,6 @@ public class DataInstanceServiceImplTest {
 
     private TechnicalLoggerService logger;
 
-    private QueriableLoggerService queriableLoggerService;
-
     private DataInstanceServiceImpl dataInstanceServiceImpl;
 
     @Before
@@ -57,11 +53,10 @@ public class DataInstanceServiceImplTest {
         persistenceService = mock(ReadPersistenceService.class);
         recorder = mock(Recorder.class);
         eventBuilders = mock(SEventBuilders.class);
-        queriableLoggerService = mock(QueriableLoggerService.class);
         logger = mock(TechnicalLoggerService.class);
         archiveService = mock(ArchiveService.class);
         dataInstanceServiceImpl = new DataInstanceServiceImpl(dataSourceService, dataInstanceBuilders, recorder, eventBuilders, persistenceService,
-                archiveService, logger, queriableLoggerService);
+                archiveService, logger);
     }
 
     /**

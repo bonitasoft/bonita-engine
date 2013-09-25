@@ -30,7 +30,6 @@ import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommmentLogBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -45,17 +44,10 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
@@ -90,8 +82,6 @@ public class SCommentServiceImpl implements SCommentService {
 
     private final Map<SystemCommentType, Boolean> systemCommentType;
 
-    private final QueriableLoggerService queriableLoggerService;
-
     private final EventService eventService;
 
     private final ArchiveService archiveService;
@@ -99,7 +89,7 @@ public class SCommentServiceImpl implements SCommentService {
     public SCommentServiceImpl(final SCommentBuilders commentBuilders, final Recorder recorder, final SEventBuilders eventBuilders,
             final ReadPersistenceService persistenceService, final ArchiveService archiveService, final SessionService sessionService,
             final ReadSessionAccessor sessionAccessor, final Map<SystemCommentType, Boolean> systemCommentType,
-            final QueriableLoggerService queriableLoggerService, final EventService eventService) {
+            final EventService eventService) {
         super();
         this.commentBuilders = commentBuilders;
         this.recorder = recorder;
@@ -108,28 +98,12 @@ public class SCommentServiceImpl implements SCommentService {
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.systemCommentType = systemCommentType;
-        this.queriableLoggerService = queriableLoggerService;
         this.eventService = eventService;
         this.archiveService = archiveService;
     }
 
     private SInsertEvent getInsertEvent(final Object obj) {
         return (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(COMMENT).setObject(obj).done();
-    }
-
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
-
-    private SCommmentLogBuilder getCommmentLogBuilder(final ActionType actionType, final String message) {
-        final SCommmentLogBuilder logBuilder = commentBuilders.getCommentLogBuilder();
-        initializeLogBuilder(logBuilder, message);
-        updateLog(actionType, logBuilder);
-        return logBuilder;
     }
 
     private SDeleteEvent getDeleteEvent(final Object obj) {
@@ -172,7 +146,6 @@ public class SCommentServiceImpl implements SCommentService {
     public SComment addComment(final long processInstanceId, final String comment) throws SCommentAddException {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
         NullCheckingUtil.checkArgsNotNull(comment);
-        final SCommmentLogBuilder logBuilder = getCommmentLogBuilder(ActionType.CREATED, "creating a comment");
         try {
             final SCommentBuilder sCommentBuilder = commentBuilders.getSHumanCommentBuilder();
             final long userId = getUserId();
@@ -183,10 +156,8 @@ public class SCommentServiceImpl implements SCommentService {
                 insertEvent = getInsertEvent(sComment);
             }
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(processInstanceId, SQueriableLog.STATUS_OK, logBuilder, "addComment");
             return sComment;
         } catch (final SRecorderException e) {
-            initiateLogBuilder(processInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "addComment");
             throw new SCommentAddException("Imposible to create comment.", e);
         } catch (final SSessionNotFoundException e) {
             throw new SCommentAddException("Session is not found.", e);
@@ -198,7 +169,6 @@ public class SCommentServiceImpl implements SCommentService {
     @Override
     public void delete(final SComment comment) throws SCommentDeletionException {
         NullCheckingUtil.checkArgsNotNull(comment);
-        final SCommmentLogBuilder logBuilder = getCommmentLogBuilder(ActionType.DELETED, "creating a comment");
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(comment);
             SDeleteEvent deleteEvent = null;
@@ -206,11 +176,7 @@ public class SCommentServiceImpl implements SCommentService {
                 deleteEvent = getDeleteEvent(comment);
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(comment.getId(), SQueriableLog.STATUS_OK, logBuilder, "delete");
-
         } catch (final SRecorderException e) {
-            initiateLogBuilder(comment.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-
             throw new SCommentDeletionException("Imposible to delete comment.", e);
         }
     }
@@ -317,7 +283,6 @@ public class SCommentServiceImpl implements SCommentService {
     public SComment addSystemComment(final long processInstanceId, final String comment) throws SCommentAddException {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
         NullCheckingUtil.checkArgsNotNull(comment);
-        final SCommmentLogBuilder logBuilder = getCommmentLogBuilder(ActionType.CREATED, "creating a system comment");
         try {
             final SCommentBuilder sCommentBuilder = commentBuilders.getSSystemCommentBuilder();
             final SComment sComment = sCommentBuilder.createNewInstance(processInstanceId, comment, null).done();
@@ -327,10 +292,8 @@ public class SCommentServiceImpl implements SCommentService {
                 insertEvent = getInsertEvent(sComment);
             }
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(processInstanceId, SQueriableLog.STATUS_OK, logBuilder, "addSystemComment");
             return sComment;
         } catch (final SRecorderException e) {
-            initiateLogBuilder(processInstanceId, SQueriableLog.STATUS_FAIL, logBuilder, "addSystemComment");
             throw new SCommentAddException("Imposible to create system comment.", e);
         }
     }
@@ -341,16 +304,6 @@ public class SCommentServiceImpl implements SCommentService {
             return systemCommentType.get(sct);
         }
         return false;
-    }
-
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
-        }
     }
 
     @Override

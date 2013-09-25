@@ -28,22 +28,12 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.scheduler.JobService;
-import org.bonitasoft.engine.scheduler.builder.SJobLogQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterQueriableLogBuilder;
-import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilder;
-import org.bonitasoft.engine.scheduler.builder.SSchedulerBuilderAccessor;
 import org.bonitasoft.engine.scheduler.builder.impl.SJobParameterBuilderImpl;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
@@ -63,7 +53,6 @@ import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
 import org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl;
 import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Celine Souchet
@@ -71,20 +60,14 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  */
 public class JobServiceImpl implements JobService {
 
-    private final SSchedulerBuilderAccessor builderAccessor;
-
-    private final QueriableLoggerService queriableLogService;
-
     private final EventService eventService;
 
     private final Recorder recorder;
 
     private final ReadPersistenceService readPersistenceService;
 
-    public JobServiceImpl(final SSchedulerBuilderAccessor builderAccessor, final QueriableLoggerService queriableLogService, final EventService eventService,
+    public JobServiceImpl(final EventService eventService,
             final Recorder recorder, final ReadPersistenceService readPersistenceService) {
-        this.builderAccessor = builderAccessor;
-        this.queriableLogService = queriableLogService;
         this.readPersistenceService = readPersistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
@@ -92,7 +75,6 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor, final long tenantId) throws SJobDescriptorCreationException {
-        final SJobQueriableLogBuilder logBuilder = getJobQueriableLogBuilder(ActionType.CREATED, "Adding a new job descriptor");
         if (sJobDescriptor == null) {
             throw new SJobDescriptorCreationException("The job is null");
         } else if (sJobDescriptor.getJobName() == null) {
@@ -106,9 +88,7 @@ public class JobServiceImpl implements JobService {
 
         try {
             create(sJobDescriptorToRecord, JOB_DESCRIPTOR);
-            initiateLogBuilder(sJobDescriptorToRecord.getId(), SQueriableLog.STATUS_OK, logBuilder, "createJobDescriptor");
         } catch (final SRecorderException sre) {
-            initiateLogBuilder(sJobDescriptorToRecord.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createJobDescriptor");
             throw new SJobDescriptorCreationException(sre);
         }
         return sJobDescriptorToRecord;
@@ -122,12 +102,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteJobDescriptor(final SJobDescriptor sJobDescriptor) throws SJobDescriptorDeletionException {
-        final SJobQueriableLogBuilder logBuilder = getJobQueriableLogBuilder(ActionType.DELETED, "Deleting a job descriptor");
         try {
             delete(sJobDescriptor, JOB_DESCRIPTOR);
-            initiateLogBuilder(sJobDescriptor.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteJobDescriptor");
         } catch (final SBonitaException e) {
-            initiateLogBuilder(sJobDescriptor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteJobDescriptor");
             throw new SJobDescriptorDeletionException(e);
         }
     }
@@ -196,9 +173,6 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void createJobParameter(final SJobParameter sJobParameter, final long tenantId, final long jobDescriptorId) throws SJobParameterCreationException {
-        final SJobParameterQueriableLogBuilder logBuilder = getJobParameterQueriableLogBuilder(ActionType.CREATED, "Adding a parameter to the job",
-                jobDescriptorId);
-
         // Set the tenant manually on the object because it will be serialized
         final SJobParameterImpl sJobParameterToRecord = (SJobParameterImpl) getJobParameterBuilder()
                 .createNewInstance(sJobParameter.getKey(), sJobParameter.getValue()).setJobDescriptorId(jobDescriptorId).done();
@@ -206,9 +180,7 @@ public class JobServiceImpl implements JobService {
 
         try {
             create(sJobParameterToRecord, JOB_PARAMETER);
-            initiateLogBuilder(sJobParameterToRecord.getId(), SQueriableLog.STATUS_OK, logBuilder, "createJobParameter");
         } catch (final SRecorderException sre) {
-            initiateLogBuilder(sJobParameterToRecord.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createJobParameter");
             throw new SJobParameterCreationException(sre);
         }
     }
@@ -221,13 +193,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteJobParameter(final SJobParameter sJobParameter) throws SJobParameterDeletionException {
-        final SJobParameterQueriableLogBuilder logBuilder = getJobParameterQueriableLogBuilder(ActionType.DELETED, "Deleting a job parameter",
-                sJobParameter.getJobDescriptorId());
         try {
             delete(sJobParameter, JOB_PARAMETER);
-            initiateLogBuilder(sJobParameter.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteJobParameter");
         } catch (final SBonitaException e) {
-            initiateLogBuilder(sJobParameter.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteJobParameter");
             throw new SJobParameterDeletionException(e);
         }
     }
@@ -257,13 +225,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void createJobLog(final SJobLog sJobLog) throws SJobLogCreationException {
-        final SJobLogQueriableLogBuilder logBuilder = getJobLogQueriableLogBuilder(ActionType.CREATED, "Creating a new log for a job",
-                sJobLog.getJobDescriptorId());
         try {
             create(sJobLog, JOB_LOG);
-            initiateLogBuilder(sJobLog.getId(), SQueriableLog.STATUS_OK, logBuilder, "createJobLog");
         } catch (final SRecorderException sre) {
-            initiateLogBuilder(sJobLog.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createJobLog");
             throw new SJobLogCreationException(sre);
         }
     }
@@ -276,12 +240,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteJobLog(final SJobLog sJobLog) throws SJobLogDeletionException {
-        final SJobLogQueriableLogBuilder logBuilder = getJobLogQueriableLogBuilder(ActionType.DELETED, "Deleting a job log", sJobLog.getJobDescriptorId());
         try {
             delete(sJobLog, JOB_LOG);
-            initiateLogBuilder(sJobLog.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteJobLog");
         } catch (final SBonitaException e) {
-            initiateLogBuilder(sJobLog.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteJobLog");
             throw new SJobLogDeletionException(e);
         }
     }
@@ -314,47 +275,6 @@ public class JobServiceImpl implements JobService {
             return readPersistenceService.searchEntity(SJobLog.class, queryOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
-        }
-    }
-
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
-
-    private SJobQueriableLogBuilder getJobQueriableLogBuilder(final ActionType actionType, final String message) {
-        final SJobQueriableLogBuilder logBuilder = builderAccessor.getSJobQueriableLogBuilder();
-        initializeLogBuilder(logBuilder, message);
-        updateLog(actionType, logBuilder);
-        return logBuilder;
-    }
-
-    private SJobParameterQueriableLogBuilder getJobParameterQueriableLogBuilder(final ActionType actionType, final String message, final long jobId) {
-        final SJobParameterQueriableLogBuilder logBuilder = builderAccessor.getSJobParameterQueriableLogBuilder();
-        initializeLogBuilder(logBuilder, message);
-        updateLog(actionType, logBuilder);
-        logBuilder.jogDescriptorId(jobId);
-        return logBuilder;
-    }
-
-    private SJobLogQueriableLogBuilder getJobLogQueriableLogBuilder(final ActionType actionType, final String message, final long jobId) {
-        final SJobLogQueriableLogBuilder logBuilder = builderAccessor.getSJobLogQueriableLogBuilder();
-        initializeLogBuilder(logBuilder, message);
-        updateLog(actionType, logBuilder);
-        logBuilder.jogDescriptorId(jobId);
-        return logBuilder;
-    }
-
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLogService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLogService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
 

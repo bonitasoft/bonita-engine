@@ -39,8 +39,6 @@
 	<bean id="schedulerBuilderAccessor" class="org.bonitasoft.engine.scheduler.builder.impl.SSchedulerBuilderAccessorImpl" />
 	
 	<bean id="jobService" class="org.bonitasoft.engine.scheduler.impl.JobServiceImpl">
-		<constructor-arg name="builderAccessor" ref="schedulerBuilderAccessor" />
-		<constructor-arg name="queriableLogService" ref="syncQueriableLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="readPersistenceService" ref="persistenceService" />
@@ -50,21 +48,10 @@
 		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
 		<constructor-arg name="builderAccessor" ref="schedulerBuilderAccessor" />
 		<constructor-arg name="jobService" ref="jobService" />
-		<constructor-arg name="queriableLogService" ref="syncQueriableLoggerService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="sessionService" ref="sessionService" />
-		<constructor-arg name="jobTruster">
-			<bean class="org.bonitasoft.engine.scheduler.JobTruster">
-				<constructor-arg name="trusted">
-					<list>
-						<value>org.bonitasoft.engine.log.asyncflush.QueriableLogRecordJob</value>
-					</list>
-				</constructor-arg>
-			</bean>
-		</constructor-arg>
 	</bean>
 
 	<bean id="db-bonita-scheduler-quartz" class="org.bonitasoft.engine.persistence.DBConfiguration">

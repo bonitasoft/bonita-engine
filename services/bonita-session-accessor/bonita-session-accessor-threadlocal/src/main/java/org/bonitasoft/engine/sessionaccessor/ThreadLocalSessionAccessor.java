@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.sessionaccessor;
 
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * @author Yanyan Liu
@@ -24,20 +22,17 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
 
     private final Object mutex = new Object();
 
-    private final ThreadLocal<Map.Entry<Long, Long>> sessionData = new ThreadLocal<Map.Entry<Long, Long>>();
+    private final ThreadLocal<Long> sessionData = new ThreadLocal<Long>();
+    private final ThreadLocal <Long> tenantData = new ThreadLocal<Long>();
 
     @Override
     public long getSessionId() throws SessionIdNotSetException {
         Long sessionId = null;
         synchronized (mutex) {
-            final Entry<Long, Long> entry = sessionData.get();
-            if (entry == null) {
+            sessionId = sessionData.get();
+            if (sessionId == null) {
                 throw new SessionIdNotSetException("No session set.");
             }
-            sessionId = entry.getKey();
-        }
-        if (sessionId == null) {
-            throw new SessionIdNotSetException("No session set.");
         }
         return sessionId;
     }
@@ -45,7 +40,15 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
     @Override
     public void setSessionInfo(final long sessionId, final long tenantId) {
         synchronized (mutex) {
-            sessionData.set(new SessionInfo(sessionId, tenantId));
+            sessionData.set(sessionId);
+            tenantData.set(tenantId);
+        }
+    }
+    
+    @Override
+    public void setTenantId(final long tenantId) {
+    	synchronized (mutex) {
+            tenantData.set(tenantId);
         }
     }
 
@@ -55,19 +58,22 @@ public class ThreadLocalSessionAccessor implements SessionAccessor {
             sessionData.remove();
         }
     }
+    
+    @Override
+    public void deleteTenantId() {
+    	synchronized (mutex) {
+            tenantData.remove();
+        }   
+    }
 
     @Override
     public long getTenantId() throws TenantIdNotSetException {
         Long tenantId = null;
         synchronized (mutex) {
-            final Entry<Long, Long> entry = sessionData.get();
-            if (entry == null) {
+        	tenantId = tenantData.get();
+            if (tenantId == null) {
                 throw new TenantIdNotSetException("No tenantId set.");
             }
-            tenantId = entry.getValue();
-        }
-        if (tenantId == null) {
-            throw new TenantIdNotSetException("No tenantId set.");
         }
         return tenantId;
     }

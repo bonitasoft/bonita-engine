@@ -26,14 +26,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * Execute connectors directly
@@ -45,6 +46,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     private final SessionAccessor sessionAccessor;
+    
+    private final SessionService sessionService;
 
     /**
      * The handling of threads relies on the JVM
@@ -71,23 +74,18 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
      *            will wait for new tasks before terminating. (in seconds)
      */
     public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
-            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor) {
+            final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService) {
         final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
         final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
         threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
         this.sessionAccessor = sessionAccessor;
+        this.sessionService = sessionService;
     }
 
     @Override
     public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters) throws SConnectorException {
-        Callable<Map<String, Object>> callable = null;
-        try {
-            callable = new ExecuteConnectorCallable(inputParameters, sConnector, sessionAccessor.getSessionId(), sessionAccessor.getTenantId());
-        } catch (final SBonitaException e) {
-            disconnect(sConnector);
-            throw new SConnectorException(e);
-        }
+        final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
         final Future<Map<String, Object>> submit = threadPoolExecutor.submit(callable);
         try {
             return getValue(submit);
@@ -104,7 +102,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }
     }
 
-    @SuppressWarnings("unused")
     protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
         return submit.get();
     }
@@ -129,20 +126,13 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
         private final SConnector sConnector;
 
-        private final long sessionId;
-
-        private final long tenantId;
-
-        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector, final long sessionId, final long tenantId) {
+        private ExecuteConnectorCallable(final Map<String, Object> inputParameters, final SConnector sConnector) {
             this.inputParameters = inputParameters;
             this.sConnector = sConnector;
-            this.sessionId = sessionId;
-            this.tenantId = tenantId;
         }
 
         @Override
         public Map<String, Object> call() throws Exception {
-            sessionAccessor.setSessionInfo(sessionId, tenantId);
             sConnector.setInputParameters(inputParameters);
             try {
                 sConnector.validate();
@@ -151,7 +141,14 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             } catch (final SConnectorValidationException e) {
                 throw new SConnectorException(e);
             } finally {
-                sessionAccessor.deleteSessionId();
+            	//in case a session has been created: see ConnectorAPIAccessorImpl
+            	try {
+            		final long sessionId = sessionAccessor.getSessionId();
+            		sessionAccessor.deleteSessionId();
+            		sessionService.deleteSession(sessionId);
+            	} catch (SessionIdNotSetException e) {
+            		//nothing, no session has been created
+            	}
             }
         }
     }

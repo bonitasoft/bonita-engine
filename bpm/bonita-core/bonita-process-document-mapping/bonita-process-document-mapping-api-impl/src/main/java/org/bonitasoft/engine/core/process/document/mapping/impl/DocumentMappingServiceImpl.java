@@ -29,7 +29,6 @@ import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMappin
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.builder.SADocumentMappingBuilder;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingLogBuilder;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingUpdateBuilder;
 import org.bonitasoft.engine.core.process.document.mapping.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
@@ -44,19 +43,12 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Emmanuel Duchastenier
@@ -81,11 +73,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
 
     private final ArchiveService archiveService;
 
-    private final QueriableLoggerService queriableLoggerService;
-
     public DocumentMappingServiceImpl(final TechnicalLoggerService technicalLogger, final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor, final ArchiveService archiveService,
-            final QueriableLoggerService queriableLoggerService) {
+            final EventService eventService, final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor, final ArchiveService archiveService) {
         super();
         this.technicalLogger = technicalLogger;
         this.persistenceService = persistenceService;
@@ -93,12 +82,10 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
         this.eventService = eventService;
         this.documentMappingBuilderAccessor = documentMappingBuilderAccessor;
         this.archiveService = archiveService;
-        this.queriableLoggerService = queriableLoggerService;
     }
 
     @Override
     public SDocumentMapping create(final SDocumentMapping documentMapping) throws SDocumentMappingAlreadyExistsException, SDocumentMappingCreationException {
-        final SDocumentMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Process-Document Mapping", documentMapping);
         try {
             final InsertRecord insertRecord = new InsertRecord(documentMapping);
             SInsertEvent insertEvent = null;
@@ -106,17 +93,14 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
                 insertEvent = (SInsertEvent) eventService.getEventBuilder().createInsertEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(documentMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "create");
             return documentMapping;
         } catch (final SRecorderException e) {
-            initiateLogBuilder(documentMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "create");
             throw new SDocumentMappingCreationException(e);
         }
     }
 
     @Override
     public void delete(final SDocumentMapping documentMapping) throws SDocumentMappingDeletionException {
-        final SDocumentMappingLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a Process-Document Mapping", documentMapping);
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(documentMapping);
             SDeleteEvent deleteEvent = null;
@@ -124,9 +108,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
                 deleteEvent = (SDeleteEvent) eventService.getEventBuilder().createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(documentMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "delete");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(documentMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw handleDeletionError("can't delete Document Mapping " + documentMapping, e);
         }
     }
@@ -167,30 +149,6 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
         } catch (final SBonitaReadException e) {
             throw handleNotFoundError("Can't get the document mappings", e);
         }
-    }
-
-    private SDocumentMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SDocumentMapping documentMapping) {
-        final SDocumentMappingLogBuilder logBuilder = documentMappingBuilderAccessor.getSDocumentMappingLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        logBuilder.setProcessInstanceId(documentMapping.getProcessInstanceId());
-        return logBuilder;
-    }
-
-    private SDocumentMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SADocumentMapping documentMapping) {
-        final SDocumentMappingLogBuilder logBuilder = documentMappingBuilderAccessor.getSDocumentMappingLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        logBuilder.setProcessInstanceId(documentMapping.getProcessInstanceId());
-        return logBuilder;
-    }
-
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
     }
 
     private SDocumentMappingNotFoundException handleNotFoundError(final String message, final Exception e) {
@@ -294,7 +252,6 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     private SDocumentMapping updateMapping(final SDocumentMapping docMapping, final EntityUpdateDescriptor descriptor) throws SDocumentMappingException {
-        final SDocumentMappingLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating a documentMapping", docMapping);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(docMapping, descriptor);
         try {
             SUpdateEvent updateEvent = null;
@@ -302,10 +259,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
                 updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(DOCUMENTMAPPING).setObject(docMapping).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(docMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateMapping");
             return docMapping;
         } catch (final SRecorderException e) {
-            initiateLogBuilder(docMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateMapping");
             throw new SDocumentMappingException("Impossible to update document. ", e);
         }
     }
@@ -418,19 +373,9 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
         }
     }
 
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
-        }
-    }
 
     @Override
     public void delete(final SADocumentMapping documentMapping) throws SDocumentMappingDeletionException {
-        final SDocumentMappingLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting an archived Process-Document Mapping", documentMapping);
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(documentMapping);
             SDeleteEvent deleteEvent = null;
@@ -438,9 +383,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
                 deleteEvent = (SDeleteEvent) eventService.getEventBuilder().createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(documentMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "delete");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(documentMapping.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw handleDeletionError("can't delete archived Document Mapping " + documentMapping, e);
         }
     }
