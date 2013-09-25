@@ -15,7 +15,6 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.scheduler.JobService;
-import org.bonitasoft.engine.scheduler.JobTruster;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilder;
@@ -52,7 +51,6 @@ public class SchedulerServiceImplTest {
         TransactionService transactionService = mock(TransactionService.class);
         SessionAccessor sessionAccessor = mock(SessionAccessor.class);
         SessionService sessionService = mock(SessionService.class);
-        JobTruster jobTruster = mock(JobTruster.class);
 
         SEventBuilder sEventBuilder = mock(SEventBuilder.class);
         when(eventService.getEventBuilder()).thenReturn(sEventBuilder);
@@ -80,7 +78,7 @@ public class SchedulerServiceImplTest {
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
 
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, builderAccessor, jobService, queriableLogService, logger, eventService,
-                transactionService, sessionAccessor, jobTruster);
+                transactionService, sessionAccessor);
     }
 
     @Test

@@ -37,7 +37,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.Action
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.JobService;
-import org.bonitasoft.engine.scheduler.JobTruster;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
@@ -88,21 +87,18 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private final TransactionService transactionService;
 
-    private final JobTruster jobTruster;
-
     /**
      * Create a new instance of scheduler service. Synchronous
      * QueriableLoggerService must be used to avoid an infinite loop.
      */
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final SSchedulerBuilderAccessor builderAccessor, final JobService jobService,
             final QueriableLoggerService queriableLogService, final TechnicalLoggerService logger, final EventService eventService,
-            final TransactionService transactionService, final SessionAccessor sessionAccessor, final JobTruster jobTruster) {
+            final TransactionService transactionService, final SessionAccessor sessionAccessor) {
         this.builderAccessor = builderAccessor;
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.queriableLogService = queriableLogService;
         this.logger = logger;
-        this.jobTruster = jobTruster;
         schedulStarted = eventService.getEventBuilder().createNewInstance(SCHEDULER_STARTED).done();
         schedulStopped = eventService.getEventBuilder().createNewInstance(SCHEDULER_STOPPED).done();
         jobFailed = eventService.getEventBuilder().createNewInstance(JOB_FAILED).done();
@@ -375,7 +371,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                 }
                 statelessJob.setAttributes(parameterMap);
                 final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), queriableLogService, statelessJob, logger,
-                        jobIdentifier.getTenantId(), eventService, jobTruster, sessionAccessor, transactionService);
+                        jobIdentifier.getTenantId(), eventService, sessionAccessor, transactionService);
                 return jobWrapper;
             }
         };

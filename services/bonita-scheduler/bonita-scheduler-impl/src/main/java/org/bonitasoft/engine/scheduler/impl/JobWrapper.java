@@ -14,16 +14,13 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.JobTruster;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
@@ -74,7 +71,7 @@ public class JobWrapper implements StatelessJob {
     private final TransactionService transactionService;
 
     public JobWrapper(final String name, final QueriableLoggerService logService, final StatelessJob statelessJob, final TechnicalLoggerService logger,
-            final long tenantId, final EventService eventService, final JobTruster jobTruster,
+            final long tenantId, final EventService eventService,
             final SessionAccessor sessionAccessor, final TransactionService transactionService) {
         this.name = name;
         this.sessionAccessor = sessionAccessor;
@@ -85,21 +82,6 @@ public class JobWrapper implements StatelessJob {
         this.transactionService = transactionService;
         jobExecuting = eventService.getEventBuilder().createNewInstance(JOB_EXECUTING).done();
         jobCompleted = eventService.getEventBuilder().createNewInstance(JOB_COMPLETED).done();
-        if (jobTruster.isTrusted(statelessJob)) {// FIXME
-            try {
-                ClassReflector.invokeMethod(statelessJob, "setQueriableLoggerService", QueriableLoggerService.class, logService);
-            } catch (final IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (final IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (final InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (final SecurityException e) {
-                e.printStackTrace();
-            } catch (final NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
