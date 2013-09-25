@@ -28,7 +28,6 @@ import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceExceptio
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceLogBuilder;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
@@ -39,19 +38,12 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -66,23 +58,6 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     private ReadPersistenceService persistenceRead;
 
     private SEventBuilders eventBuilders;
-
-    private QueriableLoggerService queriableLoggerService;
-
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
-
-    private SDataInstanceLogBuilder getDataInstanceLogBuilder(final ActionType actionType, final String message) {
-        final SDataInstanceLogBuilder logBuilder = dataInstanceBuilders.getDataInstanceLogBuilder();
-        initializeLogBuilder(logBuilder, message);
-        updateLog(actionType, logBuilder);
-        return logBuilder;
-    }
 
     private SInsertEvent getInsertEvent(final Object obj) {
         return (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(DATA_INSTANCE).setObject(obj).done();
@@ -116,14 +91,11 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     @Override
     public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
-        final SDataInstanceLogBuilder logBuilder = getDataInstanceLogBuilder(ActionType.UPDATED, "Updating a data instance " + dataInstance.getName());
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dataInstance, descriptor);
         final SUpdateEvent updateEvent = getUpdateEvent(dataInstance);
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(dataInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateDataInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(dataInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateDataInstance");
             throw new SUpdateDataInstanceException("Impossible to update data instance '" + dataInstance.getName() + "': " + e.getMessage(), e);
         }
     }
@@ -131,14 +103,11 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     @Override
     public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
-        final SDataInstanceLogBuilder logBuilder = getDataInstanceLogBuilder(ActionType.DELETED, "Deleting a data instance");
         final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
         final SDeleteEvent deleteEvent = getDeleteEvent(dataInstance);
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(dataInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteDataInstance");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(dataInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteDataInstance");
             throw new SDeleteDataInstanceException("Impossible to delete data instance", e);
         }
     }
@@ -171,7 +140,6 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
         recorder = getResource(resources, Recorder.class, PersistentDataInstanceDataSourceConfiguration.RECORDER_KEY);
         dataInstanceBuilders = getResource(resources, SDataInstanceBuilders.class, PersistentDataInstanceDataSourceConfiguration.DATA_INSTANCE_BUILDERS_KEY);
         eventBuilders = getResource(resources, SEventBuilders.class, PersistentDataInstanceDataSourceConfiguration.EVENT_BUILDERS_KEY);
-        queriableLoggerService = getResource(resources, QueriableLoggerService.class, PersistentDataInstanceDataSourceConfiguration.QUERIABLE_LOGGER_SERVICE);
     }
 
     private <T> T getResource(final Map<String, Object> resources, final Class<T> clazz, final String key) {
@@ -242,16 +210,6 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
             return dataInstances;
         } catch (final SBonitaReadException e) {
             throw new SDataInstanceException("Cannot get the data instance with id " + dataInstanceIds, e);
-        }
-    }
-
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
         }
     }
 

@@ -43,9 +43,9 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -110,24 +110,22 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     protected APIAccessor getConnectorApiAccessor() throws SExpressionEvaluationException {
-        SSession sSession;
+        long tenantId;
         try {
-            sSession = this.sessionService.getSession(this.sessionAccessor.getSessionId());
-        } catch (SSessionNotFoundException e) {
-            throw new SExpressionEvaluationException(e);
-        } catch (SessionIdNotSetException e) {
+            tenantId = sessionAccessor.getTenantId();
+        } catch (TenantIdNotSetException e) {
             throw new SExpressionEvaluationException(e);
         }
-        return new ConnectorAPIAccessorImpl(sSession.getTenantId());
+        return new ConnectorAPIAccessorImpl(tenantId);
     }
 
-    private Serializable getLoggedUserFromSession() throws SExpressionEvaluationException {
+    private long getLoggedUserFromSession() throws SExpressionEvaluationException {
         try {
             return sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
         } catch (final SSessionNotFoundException e) {
             throw new SExpressionEvaluationException(e);
         } catch (final SessionIdNotSetException e) {
-            throw new SExpressionEvaluationException(e);
+            return -1;
         }
     }
 
