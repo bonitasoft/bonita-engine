@@ -24,7 +24,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -70,7 +69,7 @@ public class JobWrapper implements StatelessJob {
 
     private final TransactionService transactionService;
 
-    public JobWrapper(final String name, final QueriableLoggerService logService, final StatelessJob statelessJob, final TechnicalLoggerService logger,
+    public JobWrapper(final String name, final StatelessJob statelessJob, final TechnicalLoggerService logger,
             final long tenantId, final EventService eventService,
             final SessionAccessor sessionAccessor, final TransactionService transactionService) {
         this.name = name;

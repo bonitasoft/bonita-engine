@@ -24,8 +24,6 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
-import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
@@ -45,12 +43,10 @@ public class SchedulerServiceImplTest {
         jobService = mock(JobService.class);
 
         SSchedulerBuilderAccessor builderAccessor = mock(SSchedulerBuilderAccessor.class);
-        QueriableLoggerService queriableLogService = mock(QueriableLoggerService.class);
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         EventService eventService = mock(EventService.class);
         TransactionService transactionService = mock(TransactionService.class);
         SessionAccessor sessionAccessor = mock(SessionAccessor.class);
-        SessionService sessionService = mock(SessionService.class);
 
         SEventBuilder sEventBuilder = mock(SEventBuilder.class);
         when(eventService.getEventBuilder()).thenReturn(sEventBuilder);
@@ -74,10 +70,8 @@ public class SchedulerServiceImplTest {
         when(sLogBuilder.actionStatus(anyInt())).thenReturn(sLogBuilder);
         when(sLogBuilder.severity(any(SQueriableLogSeverity.class))).thenReturn(sLogBuilder);
         when(sLogBuilder.rawMessage(anyString())).thenReturn(sLogBuilder);
-
-        when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(false);
-
-        schedulerService = new SchedulerServiceImpl(schedulerExecutor, builderAccessor, jobService, queriableLogService, logger, eventService,
+        
+        schedulerService = new SchedulerServiceImpl(schedulerExecutor, builderAccessor, jobService, logger, eventService,
                 transactionService, sessionAccessor);
     }
 

@@ -50,7 +50,6 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -73,8 +72,6 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private final JobService jobService;
 
-    private final QueriableLoggerService queriableLogService;
-
     private final EventService eventService;
 
     private final SEvent schedulStarted;
@@ -92,12 +89,11 @@ public class SchedulerServiceImpl implements SchedulerService {
      * QueriableLoggerService must be used to avoid an infinite loop.
      */
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final SSchedulerBuilderAccessor builderAccessor, final JobService jobService,
-            final QueriableLoggerService queriableLogService, final TechnicalLoggerService logger, final EventService eventService,
+            final TechnicalLoggerService logger, final EventService eventService,
             final TransactionService transactionService, final SessionAccessor sessionAccessor) {
         this.builderAccessor = builderAccessor;
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
-        this.queriableLogService = queriableLogService;
         this.logger = logger;
         schedulStarted = eventService.getEventBuilder().createNewInstance(SCHEDULER_STARTED).done();
         schedulStopped = eventService.getEventBuilder().createNewInstance(SCHEDULER_STOPPED).done();
@@ -207,11 +203,6 @@ public class SchedulerServiceImpl implements SchedulerService {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e1);
             }
             throw new SSchedulerException(e);
-        } finally {
-            final SQueriableLog log = schedulingLogBuilder.done();
-            if (queriableLogService.isLoggable(log.getActionType(), log.getSeverity())) {
-                queriableLogService.log(this.getClass().getName(), "internalSchedule", log);
-            }
         }
 
         logAfterMethod(TechnicalLogSeverity.TRACE, "internalSchedule");
@@ -370,7 +361,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                     parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
                 }
                 statelessJob.setAttributes(parameterMap);
-                final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), queriableLogService, statelessJob, logger,
+                final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger,
                         jobIdentifier.getTenantId(), eventService, sessionAccessor, transactionService);
                 return jobWrapper;
             }
