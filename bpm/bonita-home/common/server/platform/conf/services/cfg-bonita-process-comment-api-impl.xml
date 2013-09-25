@@ -14,7 +14,6 @@
                 <entry key="STATE_CHANGE" value="true" />
             </map>
         </constructor-arg>
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="eventService" ref="eventService" />
     </bean>
 
