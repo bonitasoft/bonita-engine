@@ -13,11 +13,9 @@ import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 import com.bonitasoft.engine.api.impl.APIAccessorExt;
 
@@ -36,17 +34,14 @@ public class EngineConstantExpressionExecutorStrategy extends org.bonitasoft.eng
         return new APIAccessorExt();
     }
 
-    @Override
     protected APIAccessor getConnectorApiAccessor() throws SExpressionEvaluationException {
-        SSession sSession;
+        long tenantId;
         try {
-            sSession = this.sessionService.getSession(this.sessionAccessor.getSessionId());
-        } catch (SSessionNotFoundException e) {
-            throw new SExpressionEvaluationException(e);
-        } catch (SessionIdNotSetException e) {
+            tenantId = sessionAccessor.getTenantId();
+        } catch (TenantIdNotSetException e) {
             throw new SExpressionEvaluationException(e);
         }
-        return new ConnectorAPIAccessorExt(sSession.getTenantId());
+        return new ConnectorAPIAccessorExt(tenantId);
     }
 
 }
