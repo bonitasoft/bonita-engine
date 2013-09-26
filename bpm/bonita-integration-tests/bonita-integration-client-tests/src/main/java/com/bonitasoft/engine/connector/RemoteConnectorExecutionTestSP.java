@@ -459,13 +459,24 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithFaillingConnector();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
-        SearchResult<ConnectorInstance> searchResult = getProcessAPI().searchConnectorInstances(getFirst100ConnectorInstanceSearchOptions(waitForTaskToFail.getId(), FLOWNODE).done());
+        SearchResult<ConnectorInstance> searchResult = getProcessAPI().searchConnectorInstances(
+                getFirst100ConnectorInstanceSearchOptions(waitForTaskToFail.getId(), FLOWNODE).done());
         assertEquals(1, searchResult.getCount());
-        ConnectorInstance connectorInstance = searchResult.getResult().get(0);
-        ConnectorInstanceWithFailureInfo connectorInstanceWithFailureInfo = getProcessAPI().getConnectorInstanceWithFailureInformation(connectorInstance.getId());
+        final ConnectorInstance connectorInstance = searchResult.getResult().get(0);
+        final ConnectorInstanceWithFailureInfo connectorInstanceWithFailureInfo = getProcessAPI().getConnectorInstanceWithFailureInformation(
+                connectorInstance.getId());
         assertEquals(ConnectorState.FAILED, connectorInstanceWithFailureInfo.getState());
-        assertEquals("My message", connectorInstanceWithFailureInfo.getExceptionMessage());
-        assertEquals("My stack", connectorInstanceWithFailureInfo.getStackTrace());
+        assertEquals("org.bonitasoft.engine.connector.ConnectorException: unexpected", connectorInstanceWithFailureInfo.getExceptionMessage());
+        final String stackTrace = connectorInstanceWithFailureInfo.getStackTrace();
+        assertTrue(stackTrace
+                .contains("org.bonitasoft.engine.core.connector.exception.SConnectorException: org.bonitasoft.engine.connector.exception.SConnectorException: java.util.concurrent.ExecutionException: org.bonitasoft.engine.connector.exception.SConnectorException: org.bonitasoft.engine.connector.ConnectorException: unexpected"));
+        assertTrue(stackTrace
+                .contains("at org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl.executeConnectorInClassloader(ConnectorServiceImpl.java:315)"));
+        assertTrue(stackTrace.contains("at org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl.executeConnector(ConnectorServiceImpl.java:147)"));
+        assertTrue(stackTrace.contains("at org.bonitasoft.engine.connector.ConnectorServiceDecorator.executeConnector(ConnectorServiceDecorator.java:121)"));
+        assertTrue(stackTrace.contains("at org.bonitasoft.engine.execution.work.ExecuteConnectorWork.work(ExecuteConnectorWork.java:125)"));
+        assertTrue(stackTrace.contains("at org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork.work(FailureHandlingBonitaWork.java:77)"));
+        assertTrue(stackTrace.contains("at org.bonitasoft.engine.work.BonitaWork.run(BonitaWork.java:56)"));
 
         disableAndDeleteProcess(processDefinition);
     }
