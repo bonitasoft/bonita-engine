@@ -466,7 +466,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ConnectorInstanceWithFailureInfo connectorInstanceWithFailureInfo = getProcessAPI().getConnectorInstanceWithFailureInformation(
                 connectorInstance.getId());
         assertEquals(ConnectorState.FAILED, connectorInstanceWithFailureInfo.getState());
-        assertEquals("org.bonitasoft.engine.connector.ConnectorException: unexpected", connectorInstanceWithFailureInfo.getExceptionMessage());
+        assertEquals("unexpected", connectorInstanceWithFailureInfo.getExceptionMessage());
         final String stackTrace = connectorInstanceWithFailureInfo.getStackTrace();
         assertTrue(stackTrace
                 .contains("org.bonitasoft.engine.core.connector.exception.SConnectorException: org.bonitasoft.engine.connector.exception.SConnectorException: java.util.concurrent.ExecutionException: org.bonitasoft.engine.connector.exception.SConnectorException: org.bonitasoft.engine.connector.ConnectorException: unexpected"));
