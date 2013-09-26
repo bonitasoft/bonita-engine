@@ -1036,10 +1036,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new BonitaRuntimeException(sbe);
         }
     }
-    
-    public ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(long connectorInstanceId) throws ConnectorInstanceNotFoundException {
+
+    @Override
+    public ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(final long connectorInstanceId)
+            throws ConnectorInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
+        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         SConnectorInstanceWithFailureInfo serverObject;
         try {
             serverObject = connectorInstanceService.getConnectorInstanceWithFailureInfo(connectorInstanceId);
