@@ -39,6 +39,7 @@ import org.bonitasoft.engine.transaction.STransactionRollbackException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -141,6 +142,7 @@ public class RecorderTest extends CommonServiceTest {
         boolean foundUser = false;
     }
 
+    @Ignore
     @Test
     public void testReadNotCommittedInsert() throws Exception {
 
@@ -223,7 +225,7 @@ public class RecorderTest extends CommonServiceTest {
                 try {
                     while (!foo.insertCompleted) {
                         Thread.sleep(500);
-                        if ((System.currentTimeMillis() - start) > 3000) {
+                        if (System.currentTimeMillis() - start > 3000) {
                             throw new RuntimeException("timeout");
                         }
                     }

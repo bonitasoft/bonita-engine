@@ -26,6 +26,7 @@
 	
 	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
 		<constructor-arg name="jobService" ref="jobService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor">

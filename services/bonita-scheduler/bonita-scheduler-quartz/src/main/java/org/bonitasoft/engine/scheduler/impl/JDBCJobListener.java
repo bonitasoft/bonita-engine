@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -41,9 +42,12 @@ public class JDBCJobListener extends AbstractJobListener {
 
     private final JobService jobService;
 
-    public JDBCJobListener(final JobService jobService) {
+    private final TechnicalLoggerService logger;
+
+    public JDBCJobListener(final JobService jobService, final TechnicalLoggerService logger) {
         super();
         this.jobService = jobService;
+        this.logger = logger;
     }
 
     @Override
@@ -90,8 +94,8 @@ public class JDBCJobListener extends AbstractJobListener {
                     getSchedulerService().delete(jobDescriptor.getJobName());
                 }
             }
-        } catch (final SBonitaException sbe) {
-            throw new SBonitaRuntimeException(sbe);
+        } catch (final SBonitaException e) {
+            logger.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the job completion", e);
         }
     }
 
