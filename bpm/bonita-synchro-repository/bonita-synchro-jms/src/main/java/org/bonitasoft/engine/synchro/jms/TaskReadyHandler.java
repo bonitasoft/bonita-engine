@@ -15,6 +15,7 @@ package org.bonitasoft.engine.synchro.jms;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -27,8 +28,11 @@ public class TaskReadyHandler extends AbstractUpdateHandler {
 
     private static final long serialVersionUID = 1L;
 
+    private final String identifier;
+
     public TaskReadyHandler(final long tenantId, final long messageTimeout) {
         super(tenantId, messageTimeout);
+        this.identifier = UUID.randomUUID().toString();
     }
 
     @Override
@@ -50,4 +54,8 @@ public class TaskReadyHandler extends AbstractUpdateHandler {
     	return false;
     }
 
+    @Override
+    public String getIdentifier() {
+        return identifier;
+    }
 }

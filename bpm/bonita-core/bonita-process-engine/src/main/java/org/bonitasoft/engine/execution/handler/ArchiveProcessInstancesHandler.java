@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution.handler;
 
+import java.util.UUID;
+
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -45,8 +47,11 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
 
     private final long tenantId;
 
+    private final String identifier;
+
     public ArchiveProcessInstancesHandler(final long tenantId) {
         this.tenantId = tenantId;
+        this.identifier = UUID.randomUUID().toString();
     }
 
     @Override
@@ -103,6 +108,11 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             isInterested = isTerminal && (processInstance.getCallerId() <= 0 || SFlowNodeType.SUB_PROCESS.equals(processInstance.getCallerType()));
         }
         return isInterested;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
     }
 
 }

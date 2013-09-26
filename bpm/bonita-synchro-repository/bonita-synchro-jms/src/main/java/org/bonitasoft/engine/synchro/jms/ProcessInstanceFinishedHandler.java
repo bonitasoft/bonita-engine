@@ -15,6 +15,7 @@ package org.bonitasoft.engine.synchro.jms;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -26,9 +27,12 @@ import org.bonitasoft.engine.events.model.SEvent;
 public class ProcessInstanceFinishedHandler extends AbstractUpdateHandler {
 
     private static final long serialVersionUID = 1L;
-    
+
+    private final String identifier;
+
     public ProcessInstanceFinishedHandler(final long tenantId, final long messageTimeout) {
         super(tenantId, messageTimeout);
+        this.identifier = UUID.randomUUID().toString();
     }
 
     @Override
@@ -46,6 +50,11 @@ public class ProcessInstanceFinishedHandler extends AbstractUpdateHandler {
     		return result;
         }
         return false;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
     }
 
 }
