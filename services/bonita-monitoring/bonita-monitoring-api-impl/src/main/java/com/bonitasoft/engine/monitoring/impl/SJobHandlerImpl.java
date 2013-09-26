@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring.impl;
 
+import java.util.UUID;
+
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 
@@ -33,6 +35,12 @@ public class SJobHandlerImpl implements SHandler<SEvent> {
     public static final String JOB_COMPLETED = "JOB_COMPLETED";
 
     private int executingJobs = 0;
+
+    private final String identifier;
+
+    public SJobHandlerImpl() {
+        this.identifier = UUID.randomUUID().toString();
+    }
 
     @Override
     public void execute(final SEvent event) {
@@ -62,6 +70,11 @@ public class SJobHandlerImpl implements SHandler<SEvent> {
 
     public int getExecutingJobs() {
         return executingJobs;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
     }
 
 }

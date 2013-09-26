@@ -13,9 +13,11 @@
  **/
 package com.bonitasoft.engine.events.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -23,15 +25,11 @@ import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MapConfig.InMemoryFormat;
-import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.HazelcastInstance;
 
 public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
-    private final Map<String, Set<SHandler<SEvent>>> eventHandlers;
+    private final ConcurrentMap<String, List<SHandler<SEvent>>> eventHandlers;
 
     public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
             final HazelcastInstance hazelcastInstance) throws HandlerRegistrationException {
@@ -47,22 +45,19 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
             final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance)
             throws HandlerRegistrationException {
         super(eventBuilders, handlers, logger);
+        String mapName = "EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix;
         // --- Hard coded configuration for Hazelcast
-        Config config = hazelcastInstance.getConfig();
-        MapConfig mapConfig = new MapConfig("*" + "EVENT_SERVICE_HANDLERS-");
-        NearCacheConfig nearCacheConfig = new NearCacheConfig();
-        nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
-        config.addMapConfig(mapConfig);
+//        Config config = hazelcastInstance.getConfig();
+//
+//        NearCacheConfig nearCacheConfig = new NearCacheConfig();
+//        nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+//
+//        config.addMapConfig(new MapConfig(mapName));
         // ---
-        eventHandlers = hazelcastInstance.getMap("EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix);
+        eventHandlers = hazelcastInstance.getMap(mapName);
 
         // Create a Map that is shared across the cluster.
         registeredHandlers = null;
-
-        // register the handlers with their associated event type
-        for (final Map.Entry<String, SHandler<SEvent>> entry : handlers.entrySet()) {
-            addHandler(entry.getKey(), entry.getValue());
-        }
     }
 
     @Override
@@ -76,23 +71,40 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
     }
 
     @Override
-    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) {
-        if (!eventHandlers.containsKey(eventType)) {
-            Set<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
-            handlers.add(handler);
+    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+        // check if the given event type is already registered in the Event Service
+        if (containsHandlerFor(eventType)) {
+            // if the handler already exists for the same eventType, an Exception is thrown
+            final List<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
+            // the add method returns false if the given element already exists in the Set, and does nothing.
+            if (!handlers.add(handler)) {
+                throw new HandlerRegistrationException("This handler is already registered for this event type");
+            }
+
+            eventHandlers.replace(eventType, handlers);
+        } else {
+            // if the given type doesn't already exist in the eventFilters list, we create it
+            final List<SHandler<SEvent>> newHandlerSet = new ArrayList<SHandler<SEvent>>(3);
+            newHandlerSet.add(handler);
+            eventHandlers.put(eventType, newHandlerSet);
         }
     }
 
     @Override
-    protected void removeHandlerInAllType(final SHandler<SEvent> handler) {
+    protected void removeAllHandlersFor(final SHandler<SEvent> handler) {
         for(String eventType : eventHandlers.keySet()) {
-            Set<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
+            List<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
 
             handlers.remove(handler);
             if (handlers.isEmpty()) {
                 eventHandlers.remove(eventType);
             }
         }
+    }
+
+    // It should be used only for the tests
+    /*package*/ void removeAllHandlers() {
+        eventHandlers.clear();
     }
 
 }
