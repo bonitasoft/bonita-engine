@@ -51,7 +51,7 @@ public interface EventService {
     boolean hasHandlers(final String eventType, EventActionType actionType);
 
     /**
-     * Add the given handler to the Event Manager's handlers list. It guarantees no duplication in the handlers' list
+     * Add the given handler to the Event Manager's handlers list.
      *
      * @param eventType The type of the event the handler is interested in.
      * @param userHandler
