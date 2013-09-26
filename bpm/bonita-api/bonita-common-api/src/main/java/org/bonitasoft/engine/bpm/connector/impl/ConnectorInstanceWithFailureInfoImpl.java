@@ -17,25 +17,25 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
+ * 
  */
 public class ConnectorInstanceWithFailureInfoImpl extends ConnectorInstanceImpl implements ConnectorInstanceWithFailureInfo {
-    
+
     private static final long serialVersionUID = 7158777025106286625L;
 
-    public ConnectorInstanceWithFailureInfoImpl(String name, long containerId, String containerType, String connectorId, String version, ConnectorState state,
-            ConnectorEvent activationEvent, String exceptionMessage, String stackTrace) {
+    public ConnectorInstanceWithFailureInfoImpl(final String name, final long containerId, final String containerType, final String connectorId,
+            String version, ConnectorState state,
+            final ConnectorEvent activationEvent, final String exceptionMessage, final String stackTrace) {
         super(name, containerId, containerType, connectorId, version, state, activationEvent);
         this.exceptionMessage = exceptionMessage;
         this.stackTrace = stackTrace;
     }
 
-    private String exceptionMessage;
-    
-    private String stackTrace;
+    private final String exceptionMessage;
+
+    private final String stackTrace;
 
     @Override
     public String getExceptionMessage() {
