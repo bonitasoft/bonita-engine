@@ -113,6 +113,8 @@ public interface BPMInstanceBuilders {
 
     SConnectorInstanceBuilder getSConnectorInstanceBuilder();
 
+    SConnectorInstanceWithFailureInfoBuilder getSConnectorInstanceWithFailureInfoBuilder();
+
     SStartEventInstanceBuilder getSStartEventInstanceBuilder();
 
     SEndEventInstanceBuilder getSEndEventInstanceBuilder();

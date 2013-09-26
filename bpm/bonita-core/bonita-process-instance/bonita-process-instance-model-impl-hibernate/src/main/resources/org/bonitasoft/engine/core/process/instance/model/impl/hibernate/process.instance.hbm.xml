@@ -162,7 +162,7 @@
 		<property name="hitBys" column="hitBys" />
 	</subclass>
 
-	<class name="SConnectorInstanceImpl" table="connector_instance">
+	<class name="SConnectorInstanceImpl" table="connector_instance" polymorphism="explicit">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="id" type="long" />
@@ -181,6 +181,29 @@
 		</property>
 		<property name="state" column="state" />
 		<property name="executionOrder" column="executionOrder" />
+	</class>
+	
+	<class name="SConnectorInstanceWithFailureInfoImpl" table="connector_instance" polymorphism="explicit" >
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantid" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="containerId" column="containerId" />
+		<property name="containerType" column="containerType" />
+		<property name="connectorId" column="connectorId" />
+		<property name="version" column="version" />
+		<property name="name" column="name" />
+		<property name="activationEvent" column="activationEvent">
+			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
+				<param name="enumClass">
+					org.bonitasoft.engine.bpm.connector.ConnectorEvent
+				</param>
+			</type>
+		</property>
+		<property name="state" column="state" />
+		<property name="executionOrder" column="executionOrder" />
+		<property name="exceptionMessage" column="exceptionMessage" />
+		<property name="stackTrace" column="stackTrace" type="text"/>
 	</class>
 
 	<subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" abstract="true" extends="SFlowNodeInstanceImpl" />

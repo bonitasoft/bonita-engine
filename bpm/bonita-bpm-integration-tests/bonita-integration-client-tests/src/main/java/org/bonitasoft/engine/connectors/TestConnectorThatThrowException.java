@@ -22,36 +22,48 @@ import org.bonitasoft.engine.connector.ConnectorValidationException;
  */
 public class TestConnectorThatThrowException extends AbstractConnector {
 
+    public static final String DISCONNECT = "disconnect";
+
+    public static final String CONNECT = "connect";
+
+    public static final String NONE = "none";
+
+    public static final String RUNTIME = "runtime";
+
+    public static final String KIND = "kind";
+
+    public static final String NORMAL = "normal";
+
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
-        final Object inputParameter = getInputParameter("kind");
-        if (!"normal".equals(inputParameter) && !"runtime".equals(inputParameter) && !"none".equals(inputParameter) && !"connect".equals(inputParameter)) {
+        final Object inputParameter = getInputParameter(KIND);
+        if (!NORMAL.equals(inputParameter) && !RUNTIME.equals(inputParameter) && !NONE.equals(inputParameter) && !CONNECT.equals(inputParameter)) {
             throw new ConnectorValidationException("bad kind of exception");
         }
     }
 
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
-        final String kind = (String) getInputParameter("kind");
-        if (kind.equals("normal")) {
+        final String kind = (String) getInputParameter(KIND);
+        if (kind.equals(NORMAL)) {
             throw new ConnectorException("unexpected");
-        } else if (kind.equals("runtime")) {
+        } else if (kind.equals(RUNTIME)) {
             throw new RuntimeException("unexpected");
         }
     }
 
     @Override
     public void connect() throws ConnectorException {
-        final String kind = (String) getInputParameter("kind");
-        if (kind.equals("connect")) {
+        final String kind = (String) getInputParameter(KIND);
+        if (kind.equals(CONNECT)) {
             throw new RuntimeException("unexpected error in connect");
         }
     }
 
     @Override
     public void disconnect() throws ConnectorException {
-        final String kind = (String) getInputParameter("kind");
-        if (kind.equals("disconnect")) {
+        final String kind = (String) getInputParameter(KIND);
+        if (kind.equals(DISCONNECT)) {
             throw new RuntimeException("unexpected error in connect");
         }
     }
