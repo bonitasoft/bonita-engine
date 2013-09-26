@@ -130,7 +130,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         }
     }
 
-    public void setConnectorInstanceFailureException(SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, Throwable throwable)
+    @Override
+    public void setConnectorInstanceFailureException(final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, final Throwable throwable)
             throws SConnectorInstanceModificationException {
         SConnectorInstanceWithFailureInfoBuilder connectorWithFailureKeyProvider = instanceBuilders.getSConnectorInstanceWithFailureInfoBuilder();
         final SConnectorInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED,
@@ -157,7 +158,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         }
     }
 
-    private String getExceptionMessage(Throwable throwable) {
+    private String getExceptionMessage(final Throwable throwable) {
         if (throwable == null) {
             return null;
         }
@@ -166,13 +167,13 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             current = current.getCause();
         }
         String message = current.getMessage();
-        if(message.length() > MAX_MESSAGE_LENGTH) {
+        if (message.length() > MAX_MESSAGE_LENGTH) {
             message = message.substring(0, MAX_MESSAGE_LENGTH);
         }
         return message;
     }
 
-    private static String getStringStackTrace(Throwable throwable) throws IOException {
+    private static String getStringStackTrace(final Throwable throwable) throws IOException {
         if (throwable == null) {
             return null;
         }
@@ -291,10 +292,11 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         }
     }
 
-    public SConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInfo(long connectorInstanceId) throws SConnectorInstanceReadException,
+    @Override
+    public SConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInfo(final long connectorInstanceId) throws SConnectorInstanceReadException,
             SConnectorInstanceNotFoundException {
-        final SelectByIdDescriptor<SConnectorInstanceWithFailureInfo> selectByIdDescriptor = new SelectByIdDescriptor<SConnectorInstanceWithFailureInfo>("getConnectorInstanceWithFailureInfo",
-                SConnectorInstanceWithFailureInfo.class, connectorInstanceId);
+        final SelectByIdDescriptor<SConnectorInstanceWithFailureInfo> selectByIdDescriptor = new SelectByIdDescriptor<SConnectorInstanceWithFailureInfo>(
+                "getConnectorInstanceWithFailureInfo", SConnectorInstanceWithFailureInfo.class, connectorInstanceId);
         try {
             final SConnectorInstanceWithFailureInfo connectorInstance = persistenceService.selectById(selectByIdDescriptor);
             if (connectorInstance == null) {

@@ -126,12 +126,14 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition) throws SBonitaException {
-        setConnectorOnlyToFailed(context);
-        handleErrorEventOnFail(context, sConnectorDefinition);
+    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Throwable throwable)
+            throws SBonitaException {
+        setConnectorOnlyToFailed(context, throwable);
+        handleErrorEventOnFail(context, sConnectorDefinition, throwable);
     }
 
-    private void handleErrorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition) throws SBonitaException {
+    private void handleErrorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Throwable throwable)
+            throws SBonitaException {
         final BPMDefinitionBuilders bpmDefinitionBuilders = getBPMDefinitionBuilders(context);
         final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders.getThrowErrorEventTriggerDefinitionBuilder();
         final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
@@ -154,7 +156,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
                 throwEventInstance, errorEventTriggerDefinition, sFlowNodeInstance);
         if (!hasActionToExecute) {
-            setConnectorAndContainerToFailed(context);
+            setConnectorAndContainerToFailed(context, throwable);
         }
     }
 

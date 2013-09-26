@@ -114,7 +114,8 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition) throws SBonitaException {
+    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Throwable throwable)
+            throws SBonitaException {
         final BPMDefinitionBuilders bpmDefinitionBuilders = getBPMDefinitionBuilders(context);
         final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders.getThrowErrorEventTriggerDefinitionBuilder();
         final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
@@ -122,7 +123,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-        setConnectorOnlyToFailed(context);
+        setConnectorOnlyToFailed(context, throwable);
         // create a fake definition
         final String errorCode = sConnectorDefinition.getErrorCode();
         final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(errorCode).done();
@@ -136,7 +137,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
                 throwEventInstance, errorEventTriggerDefinition, null);
         if (!hasActionToExecute) {
-            setConnectorAndContainerToFailed(context);
+            setConnectorAndContainerToFailed(context, throwable);
         }
     }
 
