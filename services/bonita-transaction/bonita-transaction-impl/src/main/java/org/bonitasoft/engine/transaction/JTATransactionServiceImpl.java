@@ -16,6 +16,7 @@ package org.bonitasoft.engine.transaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
@@ -42,6 +43,8 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final EventService eventService;
 
+    private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
+
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup, final EventService eventService) {
         this(logger, txManagerLookup.getTransactionManager(), eventService);
     }
@@ -60,10 +63,11 @@ public class JTATransactionServiceImpl implements TransactionService {
         try {
             if (txManager.getStatus() == Status.STATUS_NO_TRANSACTION) {
                 boolean transactionStarted = false;
-                boolean mustRollback = false;
                 try {
                     txManager.begin();
                     transactionStarted = true;
+                    numberOfActiveTransactions.getAndIncrement();
+
                     final Transaction tx = txManager.getTransaction();
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
                         logger.log(getClass(), TechnicalLogSeverity.TRACE,
@@ -83,12 +87,11 @@ public class JTATransactionServiceImpl implements TransactionService {
                     // Should never happen as we do not want to support nested transaction
                     throw new STransactionCreationException(e);
                 } catch (final Throwable t) {
-                    mustRollback = true;
-                    throw new STransactionCreationException(t);
-                } finally {
-                    if (transactionStarted && mustRollback) {
+                    if (transactionStarted) {
                         txManager.rollback();
+                        numberOfActiveTransactions.getAndDecrement();
                     }
+                    throw new STransactionCreationException(t);
                 }
             } else {
                 throw new STransactionCreationException("We do not support nested transaction.");
@@ -121,17 +124,17 @@ public class JTATransactionServiceImpl implements TransactionService {
                 } catch (final SecurityException e) {
                     throw new STransactionRollbackException("", e);
                 } finally {
-                    if (eventService.hasHandlers(TRANSACTION_ROLLEDBACK_EVT, null)) {
+                    numberOfActiveTransactions.getAndDecrement();
+                    String eventName = TRANSACTION_ROLLEDBACK_EVT;
+                    if (eventService.hasHandlers(eventName, null)) {
                         // trigger the right event
-                        final SEvent tr_rolledback = eventService.getEventBuilder().createNewInstance(TRANSACTION_ROLLEDBACK_EVT).done();
+                        final SEvent tr_rolledback = eventService.getEventBuilder().createNewInstance(eventName).done();
                         eventService.fireEvent(tr_rolledback);
                     }
                 }
             } else {
-                String eventName = TRANSACTION_ROLLEDBACK_EVT;
                 try {
                     txManager.commit();
-                    eventName = TRANSACTION_COMMITED_EVT;
                 } catch (final SecurityException e) {
                     throw new STransactionCommitException("", e);
                 } catch (final IllegalStateException e) {
@@ -143,10 +146,12 @@ public class JTATransactionServiceImpl implements TransactionService {
                 } catch (final HeuristicRollbackException e) {
                     throw new STransactionCommitException("", e);
                 } finally {
+                    numberOfActiveTransactions.getAndDecrement();
+                    String eventName = TRANSACTION_COMMITED_EVT;
                     if (eventService.hasHandlers(eventName, null)) {
                         // trigger the right event
-                        final SEvent tr_commited = eventService.getEventBuilder().createNewInstance(eventName).done();
-                        eventService.fireEvent(tr_commited);
+                        final SEvent tr_committed = eventService.getEventBuilder().createNewInstance(eventName).done();
+                        eventService.fireEvent(tr_committed);
                     }
                 }
             }
@@ -246,6 +251,11 @@ public class JTATransactionServiceImpl implements TransactionService {
         } finally {
             complete();
         }
+    }
+
+    @Override
+    public long getNumberOfActiveTransactions() {
+        return numberOfActiveTransactions.get();
     }
 
 }

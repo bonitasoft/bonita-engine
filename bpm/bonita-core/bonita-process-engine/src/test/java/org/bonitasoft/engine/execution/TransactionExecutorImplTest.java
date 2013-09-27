@@ -58,7 +58,7 @@ public class TransactionExecutorImplTest {
         verify(transactionService, times(1)).executeInTransaction(any(Callable.class));
     }
 
-    // Minimal implementation of a TransactionService (we do not (and don't want !)) to see the JTATransactionServiceImpl
+    // Minimal implementation of a TransactionService (we do not (and don't want to !) see the JTATransactionServiceImpl)
     class MockTransactionService implements TransactionService {
 
         @Override
@@ -98,7 +98,7 @@ public class TransactionExecutorImplTest {
         }
 
         @Override
-        public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+        public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
             begin();
             try {
                 return callable.call();
@@ -111,7 +111,7 @@ public class TransactionExecutorImplTest {
         }
 
         @Override
-        public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
+        public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
             // TODO Auto-generated method stub
 
         }
@@ -120,6 +120,12 @@ public class TransactionExecutorImplTest {
         public List<BonitaTransactionSynchronization> getBonitaSynchronizations() {
             // TODO Auto-generated method stub
             return null;
+        }
+
+        @Override
+        public long getNumberOfActiveTransactions() {
+            // TODO Auto-generated method stub
+            return 0;
         }
 
     }

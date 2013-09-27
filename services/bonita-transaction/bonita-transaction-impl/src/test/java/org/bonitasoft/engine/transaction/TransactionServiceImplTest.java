@@ -150,25 +150,25 @@ public class TransactionServiceImplTest extends TransactionServiceTest {
         return new TechnicalLoggerService() {
 
             @Override
-            public void log(Class<?> callerClass, TechnicalLogSeverity severity, String message, Throwable t) {
+            public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void log(Class<?> callerClass, TechnicalLogSeverity severity, String message) {
+            public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void log(Class<?> callerClass, TechnicalLogSeverity severity, Throwable t) {
+            public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final Throwable t) {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public boolean isLoggable(Class<?> callerClass, TechnicalLogSeverity severity) {
+            public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
                 // TODO Auto-generated method stub
                 return false;
             }

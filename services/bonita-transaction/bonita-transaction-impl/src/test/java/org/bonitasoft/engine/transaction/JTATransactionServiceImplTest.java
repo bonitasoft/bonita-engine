@@ -1,6 +1,8 @@
 package org.bonitasoft.engine.transaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -10,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.Callable;
 
 import javax.transaction.Status;
+import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
 import org.bonitasoft.engine.events.EventService;
@@ -31,6 +34,7 @@ public class JTATransactionServiceImplTest {
 
         txService.begin();
         verify(txManager, times(1)).begin();
+        assertEquals(1, txService.getNumberOfActiveTransactions());
     }
 
     @Test(expected=STransactionCreationException.class)
@@ -44,6 +48,47 @@ public class JTATransactionServiceImplTest {
         JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager, eventService);
 
         txService.begin();
+    }
+
+    @Test
+    public void beginTransactionFailed() throws Exception {
+        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        TransactionManager txManager = mock(TransactionManager.class);
+        EventService eventService = mock(EventService.class);
+
+        when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
+        when(txManager.getTransaction()).thenThrow(new SystemException("Mocked"));
+
+        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager, eventService);
+
+        try {
+            txService.begin();
+            fail("Thanks to the mock an exception must have been thrown");
+        } catch (STransactionCreationException e) {
+            verify(txManager, times(1)).begin();
+            assertEquals(0, txService.getNumberOfActiveTransactions());
+        }
+    }
+
+    @Test
+    public void completeTransactionFailed() throws Exception {
+        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        TransactionManager txManager = mock(TransactionManager.class);
+        EventService eventService = mock(EventService.class);
+
+        when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_ACTIVE);
+        doThrow(new SystemException("Mocked")).when(txManager).commit();
+
+        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager, eventService);
+
+        txService.begin();
+        assertEquals(1, txService.getNumberOfActiveTransactions());
+        try {
+            txService.complete();
+            fail("Thanks to the mock an exception must have been thrown");
+        } catch (STransactionException e) {
+            assertEquals(0, txService.getNumberOfActiveTransactions());
+        }
     }
 
     @Test
@@ -93,10 +138,10 @@ public class JTATransactionServiceImplTest {
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
 
         JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager, eventService));
-        Callable<Void> callable = mock(Callable.class);
+        Callable<?> callable = mock(Callable.class);
 
         txService.executeInTransaction(callable);
-        
+
         verify(txManager).begin();
         verify(callable).call();
         verify(txManager).commit();
@@ -116,8 +161,8 @@ public class JTATransactionServiceImplTest {
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_MARKED_ROLLBACK);
 
         JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager, eventService));
-        
-        Callable<Void> callable = mock(Callable.class);
+
+        Callable<?> callable = mock(Callable.class);
         when(callable.call()).thenThrow(new Exception("Mocked exception"));
 
         try {
