@@ -192,9 +192,9 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public SActor getActor(final String actorName, final long scopeId) throws SActorNotFoundException {
-        final SelectOneDescriptor<SActor> selectListDescriptor = SelectDescriptorBuilder.getActor(actorName, scopeId);
+        final SelectOneDescriptor<SActor> selectOneDescriptor = SelectDescriptorBuilder.getActor(actorName, scopeId);
         try {
-            final SActor actor = persistenceService.selectOne(selectListDescriptor);
+            final SActor actor = persistenceService.selectOne(selectOneDescriptor);
             if (actor == null) {
                 throw new SActorNotFoundException("Actor not found with name: " + actorName + " of scopeId: " + scopeId);
             }
