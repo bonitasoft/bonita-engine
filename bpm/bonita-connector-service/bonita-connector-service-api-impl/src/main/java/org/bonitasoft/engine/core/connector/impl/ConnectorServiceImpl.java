@@ -81,7 +81,7 @@ import org.bonitasoft.engine.xml.SXMLParseException;
  * @author Celine Souchet
  */
 public class ConnectorServiceImpl implements ConnectorService {
-    
+
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private static final String IMPLEMENTATION_EXT = ".impl";
@@ -157,7 +157,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
         return connectorResult;
     }
-    
+
     /**
      * Build the log message using the connector instance's context (name, version, connector id, connector instance id, container type, container id)
      * 
@@ -183,7 +183,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         stb.append(">]");
         return stb.toString();
     }
-    
+
     private static String buildConnectorInputMessage(Map<String, Object> inputParameters) {
         StringBuilder stb = new StringBuilder();
         if (inputParameters != null && !inputParameters.isEmpty()) {
@@ -304,7 +304,6 @@ public class ConnectorServiceImpl implements ConnectorService {
             final Connector connector = (Connector) Class.forName(implementationClassName, true, classLoader).newInstance();
             final SConnectorAdapter sConnectorAdapter = new SConnectorAdapter(connector);
             return new ConnectorResult(connector, connectorExecutor.execute(sConnectorAdapter, inputParameters));
-
         } catch (final ClassNotFoundException e) {
             throw new SConnectorException(implementationClassName + " can not be found.", e);
         } catch (final InstantiationException e) {
