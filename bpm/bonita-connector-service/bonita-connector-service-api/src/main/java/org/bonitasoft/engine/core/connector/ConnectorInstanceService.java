@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModifica
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -85,13 +86,34 @@ public interface ConnectorInstanceService {
     void setState(SConnectorInstance sConnectorInstance, String state) throws SConnectorInstanceModificationException;
 
     /**
-     * @param connectorId
+     * Defines the exception associated to the connector failure
+     * @param connectorInstanceWithFailure failed connector instance
+     * @param throwable exception responsible for connector failure
+     * @throws SConnectorInstanceModificationException
+     * @since 6.1
+     */
+    void setConnectorInstanceFailureException(SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, Throwable throwable)
+            throws SConnectorInstanceModificationException;
+
+    /**
+     * @param connectorInstanceId
      * @return
      * @throws SConnectorInstanceReadException
      * @throws SConnectorInstanceNotFoundException
-     *             TODO
      */
-    SConnectorInstance getConnectorInstance(long connectorId) throws SConnectorInstanceReadException, SConnectorInstanceNotFoundException;
+    SConnectorInstance getConnectorInstance(long connectorInstanceId) throws SConnectorInstanceReadException, SConnectorInstanceNotFoundException;
+
+    /**
+     * Retrieves the connector instance with failure information for the given connector instance id
+     * 
+     * @param connectorInstanceId
+     * @return the connector instance with failure information for the given connector instance id
+     * @throws SConnectorInstanceReadException
+     * @throws SConnectorInstanceNotFoundException
+     * @since 6.1
+     */
+    SConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInfo(long connectorInstanceId) throws SConnectorInstanceReadException,
+            SConnectorInstanceNotFoundException;
 
     /**
      * @param containerId
@@ -165,7 +187,6 @@ public interface ConnectorInstanceService {
     void deleteArchivedConnectorInstance(SAConnectorInstance sConnectorInstance) throws SConnectorInstanceDeletionException;
 
     /**
-     * 
      * @param containerId
      * @param containerType
      * @throws SBonitaSearchException
@@ -175,7 +196,6 @@ public interface ConnectorInstanceService {
     void deleteConnectors(long containerId, String containerType) throws SBonitaSearchException, SConnectorInstanceDeletionException;
 
     /**
-     * 
      * @param containerId
      * @param containerType
      * @throws SBonitaSearchException

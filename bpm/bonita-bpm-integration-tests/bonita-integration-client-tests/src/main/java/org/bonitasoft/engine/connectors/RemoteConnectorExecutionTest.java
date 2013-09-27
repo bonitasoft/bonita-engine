@@ -95,6 +95,10 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     private static final String CONNECTOR_INPUT_NAME = "input1";
 
     private static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
+    
+    private static final String FLOWNODE = "flownode";
+
+    private static final String PROCESS = "process";
 
     @Test
     public void executeConnectorWithJNDILookpAndAPICall() throws Exception {
@@ -475,7 +479,6 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
         waitForTaskToFail(startProcess);
-
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -519,15 +522,12 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
         final ActivityInstance activityInstance = waitForTaskToFail(startProcess);
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
-        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, activityInstance.getId());
-        searchOptionsBuilder.sort(ConnectorInstancesSearchDescriptor.NAME, Order.ASC);
-        final SearchOptions searchOptions = searchOptionsBuilder.done();
+        final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(activityInstance.getId(), FLOWNODE).done();
         final SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
         assertEquals(ConnectorState.FAILED, instance.getState());
-
+        
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -549,10 +549,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
         final ActivityInstance activityInstance = waitForUserTask("step1", startProcess);
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
-        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, activityInstance.getId());
-        searchOptionsBuilder.sort(ConnectorInstancesSearchDescriptor.NAME, Order.ASC);
-        final SearchOptions searchOptions = searchOptionsBuilder.done();
+        final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(activityInstance.getId(), FLOWNODE).done();
         final SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
@@ -579,10 +576,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
         waitForProcessToBeInState(startProcess, ProcessInstanceState.ERROR);
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
-        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, startProcess.getId());
-        searchOptionsBuilder.sort(ConnectorInstancesSearchDescriptor.NAME, Order.ASC);
-        final SearchOptions searchOptions = searchOptionsBuilder.done();
+        final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(startProcess.getId(), PROCESS).done();
         final SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
@@ -795,16 +789,21 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
         final ActivityInstance activityInstance = waitForTaskToFail(startProcess);
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
-        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, activityInstance.getId());
-        searchOptionsBuilder.sort(ConnectorInstancesSearchDescriptor.NAME, Order.ASC);
-        final SearchOptions searchOptions = searchOptionsBuilder.done();
+        final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(activityInstance.getId(), FLOWNODE).done();
         final SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
         assertEquals(ConnectorState.FAILED, instance.getState());
-
+        
         disableAndDeleteProcess(processDefinition);
+    }
+
+    private SearchOptionsBuilder getFirst100ConnectorInstanceSearchOptions(long containerId, String containerType) {
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
+        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, containerId);
+        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE, containerType);
+        searchOptionsBuilder.sort(ConnectorInstancesSearchDescriptor.NAME, Order.ASC);
+        return searchOptionsBuilder;
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" })
@@ -1189,19 +1188,12 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step0", processInstance);
-        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
-        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, processInstance.getId());
-        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE, "process");
-        searchOptionsBuilder.sort(ConnectorInstancesSearchDescriptor.NAME, Order.ASC);
-        SearchOptions searchOptions = searchOptionsBuilder.done();
+        SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(processInstance.getId(), PROCESS).done();
         SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(2, connectorInstances.getCount());
         assertThat(connectorInstances.getResult(), nameAre("onEnterConnector", "onFinishConnector"));
 
-        searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
-        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, processInstance.getId());
-        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE, "process");
-        searchOptionsBuilder.sort(ConnectorInstancesSearchDescriptor.NAME, Order.ASC);
+        SearchOptionsBuilder searchOptionsBuilder = getFirst100ConnectorInstanceSearchOptions(processInstance.getId(), PROCESS);
         searchOptionsBuilder.searchTerm("onEnter");
         searchOptions = searchOptionsBuilder.done();
         connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
@@ -1241,7 +1233,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // search for archived connector instances
         searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.filter(ArchiveConnectorInstancesSearchDescriptor.CONTAINER_ID, processInstance.getId());
-        searchOptionsBuilder.filter(ArchiveConnectorInstancesSearchDescriptor.CONTAINER_TYPE, "process");
+        searchOptionsBuilder.filter(ArchiveConnectorInstancesSearchDescriptor.CONTAINER_TYPE, PROCESS);
         searchOptionsBuilder.sort(ArchiveConnectorInstancesSearchDescriptor.NAME, Order.ASC);
         searchOptions = searchOptionsBuilder.done();
         connectorInstances = getProcessAPI().searchArchivedConnectorInstances(searchOptions);

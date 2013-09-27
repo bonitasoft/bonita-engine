@@ -28,6 +28,7 @@ import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -60,7 +61,8 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         this.inputParametersContext = inputParametersContext;
     }
 
-    protected abstract void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition) throws SBonitaException;
+    protected abstract void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition, Throwable throwable)
+            throws SBonitaException;
 
     protected abstract SThrowEventInstance createThrowErrorEventInstance(Map<String, Object> context, final SEndEventDefinition eventDefinition)
             throws SBonitaException;
@@ -78,15 +80,17 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         return getTenantAccessor(context).getClassLoaderService().getLocalClassLoader("process", processDefinitionId);
     }
 
-    protected void setConnectorAndContainerToFailed(final Map<String, Object> context) throws SBonitaException {
-        setConnectorOnlyToFailed(context);
+    protected void setConnectorAndContainerToFailed(final Map<String, Object> context, final Throwable throwable) throws SBonitaException {
+        setConnectorOnlyToFailed(context, throwable);
         setContainerInFail(context);
     }
 
-    protected void setConnectorOnlyToFailed(final Map<String, Object> context) throws SBonitaException {
+    protected void setConnectorOnlyToFailed(final Map<String, Object> context, final Throwable throwable) throws SBonitaException {
         final ConnectorInstanceService connectorInstanceService = getTenantAccessor(context).getConnectorInstanceService();
-        final SConnectorInstance intTxConnectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
-        connectorInstanceService.setState(intTxConnectorInstance, ConnectorService.FAILED);
+        final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = connectorInstanceService
+                .getConnectorInstanceWithFailureInfo(connectorInstanceId);
+        connectorInstanceService.setState(connectorInstanceWithFailure, ConnectorService.FAILED);
+        connectorInstanceService.setConnectorInstanceFailureException(connectorInstanceWithFailure, throwable);
     }
 
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition,
@@ -218,13 +222,13 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             SConnectorDefinition sConnectorDefinition = getSConnectorDefinition(processDefinitionService);
             switch (sConnectorDefinition.getFailAction()) {
                 case ERROR_EVENT:
-                    errorEventOnFail(context, sConnectorDefinition);
+                    errorEventOnFail(context, sConnectorDefinition, e);
                     return false;
                 case FAIL:
-                    setConnectorAndContainerToFailed(context);
+                    setConnectorAndContainerToFailed(context, e);
                     return false;
                 case IGNORE:
-                    setConnectorOnlyToFailed(context);
+                    setConnectorOnlyToFailed(context, e);
                     return true;
                 default:
                     throw new Exception("No action defined for " + sConnectorDefinition.getFailAction());

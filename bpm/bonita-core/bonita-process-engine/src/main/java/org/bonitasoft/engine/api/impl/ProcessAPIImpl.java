@@ -904,7 +904,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     String message = LogMessageBuilder.builUserActionPrefix(session, starterId) + "has performed the task"
                             + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
                     logger.log(getClass(), TechnicalLogSeverity.INFO, message);
-                }
+            }
             }
 
         };
@@ -3336,7 +3336,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * execute the connector and return connector output if there is no operation or operation output if there is operation
-     * 
+     *
      * @param operations
      * @param operationInputValues
      */

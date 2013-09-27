@@ -16,6 +16,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance" value="f" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="g" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstance" value="c" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo" value="cfi" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" value="e" />

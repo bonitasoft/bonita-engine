@@ -14,6 +14,9 @@
  */
 package org.bonitasoft.engine.core.connector.impl;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,10 +34,12 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModifica
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceLogBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -73,6 +78,11 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  * @author Elias Ricken de Medeiros
  */
 public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
+
+    /**
+     * 
+     */
+    private static final int MAX_MESSAGE_LENGTH = 255;
 
     private final Recorder recorder;
 
@@ -117,6 +127,68 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         } catch (final SRecorderException e) {
             log(sConnectorInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setState");
             throw new SConnectorInstanceModificationException(e);
+        }
+    }
+
+    @Override
+    public void setConnectorInstanceFailureException(final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, final Throwable throwable)
+            throws SConnectorInstanceModificationException {
+        final SConnectorInstanceWithFailureInfoBuilder connectorWithFailureKeyProvider = instanceBuilders.getSConnectorInstanceWithFailureInfoBuilder();
+        final SConnectorInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED,
+                "Changing connector instance exception", connectorInstanceWithFailure);
+        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        entityUpdateDescriptor.addField(connectorWithFailureKeyProvider.getExceptionMessageKey(), getExceptionMessage(throwable));
+        try {
+            entityUpdateDescriptor.addField(connectorWithFailureKeyProvider.getStackTraceKey(), getStringStackTrace(throwable));
+        } catch (IOException e) {
+            throw new SConnectorInstanceModificationException(e);
+        }
+
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(connectorInstanceWithFailure, entityUpdateDescriptor);
+        SUpdateEvent updateEvent = null;
+        if (eventService.hasHandlers(CONNECTOR_INSTANCE, EventActionType.UPDATED)) {
+            updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(CONNECTOR_INSTANCE).setObject(connectorInstanceWithFailure).done();
+        }
+        try {
+            recorder.recordUpdate(updateRecord, updateEvent);
+            log(connectorInstanceWithFailure.getId(), SQueriableLog.STATUS_OK, logBuilder, "setState");
+        } catch (final SRecorderException e) {
+            log(connectorInstanceWithFailure.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setState");
+            throw new SConnectorInstanceModificationException(e);
+        }
+    }
+
+    private String getExceptionMessage(final Throwable throwable) {
+        if (throwable == null) {
+            return null;
+        }
+        Throwable current = throwable;
+        while (current.getCause() != null) {
+            current = current.getCause();
+        }
+        String message = current.getMessage();
+        if (message.length() > MAX_MESSAGE_LENGTH) {
+            message = message.substring(0, MAX_MESSAGE_LENGTH);
+        }
+        return message;
+    }
+
+    private static String getStringStackTrace(final Throwable throwable) throws IOException {
+        if (throwable == null) {
+            return null;
+        }
+        StringWriter writer = new StringWriter();
+        PrintWriter printer = null;
+        try {
+            printer = new PrintWriter(writer);
+            throwable.printStackTrace(printer);
+            String strStackTrace = writer.toString();
+            return strStackTrace;
+        } finally {
+            if (printer != null) {
+                printer.close();
+            }
+            writer.close();
         }
     }
 
@@ -206,13 +278,29 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public SConnectorInstance getConnectorInstance(final long connectorId) throws SConnectorInstanceReadException, SConnectorInstanceNotFoundException {
+    public SConnectorInstance getConnectorInstance(final long connectorInstanceId) throws SConnectorInstanceReadException, SConnectorInstanceNotFoundException {
         final SelectByIdDescriptor<SConnectorInstance> selectByIdDescriptor = new SelectByIdDescriptor<SConnectorInstance>("getConnectorInstance",
-                SConnectorInstance.class, connectorId);
+                SConnectorInstance.class, connectorInstanceId);
         try {
             final SConnectorInstance connectorInstance = persistenceService.selectById(selectByIdDescriptor);
             if (connectorInstance == null) {
-                throw new SConnectorInstanceNotFoundException(connectorId);
+                throw new SConnectorInstanceNotFoundException(connectorInstanceId);
+            }
+            return connectorInstance;
+        } catch (final SBonitaReadException e) {
+            throw new SConnectorInstanceReadException(e);
+        }
+    }
+
+    @Override
+    public SConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInfo(final long connectorInstanceId) throws SConnectorInstanceReadException,
+            SConnectorInstanceNotFoundException {
+        final SelectByIdDescriptor<SConnectorInstanceWithFailureInfo> selectByIdDescriptor = new SelectByIdDescriptor<SConnectorInstanceWithFailureInfo>(
+                "getConnectorInstanceWithFailureInfo", SConnectorInstanceWithFailureInfo.class, connectorInstanceId);
+        try {
+            final SConnectorInstanceWithFailureInfo connectorInstance = persistenceService.selectById(selectByIdDescriptor);
+            if (connectorInstance == null) {
+                throw new SConnectorInstanceNotFoundException(connectorInstanceId);
             }
             return connectorInstance;
         } catch (final SBonitaReadException e) {

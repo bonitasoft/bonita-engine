@@ -50,6 +50,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskI
 import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceLogBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceBuilder;
@@ -374,6 +375,11 @@ public class BPMinstanceBuildersImpl implements BPMInstanceBuilders {
     @Override
     public SASendTaskInstanceBuilder getSASendTaskInstanceBuilder() {
         return new SASendTaskInstanceBuilderImpl();
+    }
+
+    @Override
+    public SConnectorInstanceWithFailureInfoBuilder getSConnectorInstanceWithFailureInfoBuilder() {
+        return new SConnectorInstanceWithFailureInfoBuilderImpl();
     }
 
 }
