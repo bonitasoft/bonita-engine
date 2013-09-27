@@ -102,6 +102,8 @@ CREATE TABLE connector_instance (
   activationEvent VARCHAR(30),
   state VARCHAR(50),
   executionOrder INT,
+  exceptionMessage VARCHAR(255),
+  stackTrace TEXT,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 

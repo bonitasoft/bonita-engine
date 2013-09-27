@@ -102,6 +102,8 @@ CREATE TABLE connector_instance (
   activationEvent VARCHAR2(30),
   state VARCHAR2(50),
   executionOrder INT,
+  exceptionMessage VARCHAR2(255),
+  stackTrace VARCHAR22(1024),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -190,7 +192,7 @@ CREATE TABLE breakpoint (
   	state_id INT NOT NULL,
   	int_state_id INT NOT NULL,
   	elem_name VARCHAR2(255) NOT NULL,
-  	inst_scope NUMBER(1)  NOT NULL,
+  	inst_scope NUMBER(1) NOT NULL,
   	inst_id NUMBER(19, 0) NOT NULL,
   	def_id NUMBER(19, 0) NOT NULL,
   	PRIMARY KEY (tenantid, id)
