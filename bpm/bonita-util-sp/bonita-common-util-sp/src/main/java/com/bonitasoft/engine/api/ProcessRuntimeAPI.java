@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -376,5 +378,17 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @since 6.0
      */
     ProcessInstance updateProcessInstance(long processInstanceId, ProcessInstanceUpdater updater) throws ProcessInstanceNotFoundException, UpdateException;
+    
+    /**
+     * Retrieves an <code>ConnectorInstanceWithFailureInfo</code> specified by its identifier.
+     * 
+     * @param connectorInstanceId
+     *            the identifier of the <code>ConnectorInstanceWithFailureInfo</code> to be retrieved.
+     * @return the <code>ConnectorInstanceWithFailureInfo</code> instance.
+     * @throws ConnectorInstanceNotFoundException
+     *             if no <code>ConnectorInstanceWithFailureInfo</code> was found with the specified connectorInstanceId.
+     * @since 6.1
+     */
+    ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(long connectorInstanceId) throws ConnectorInstanceNotFoundException;
 
 }

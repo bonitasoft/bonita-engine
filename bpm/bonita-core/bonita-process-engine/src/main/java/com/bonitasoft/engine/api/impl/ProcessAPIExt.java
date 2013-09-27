@@ -38,6 +38,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
@@ -60,6 +61,7 @@ import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
+import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -74,6 +76,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInsta
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
@@ -1032,6 +1035,20 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException sbe) {
             throw new BonitaRuntimeException(sbe);
         }
+    }
+    
+    public ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(long connectorInstanceId) throws ConnectorInstanceNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
+        SConnectorInstanceWithFailureInfo serverObject;
+        try {
+            serverObject = connectorInstanceService.getConnectorInstanceWithFailureInfo(connectorInstanceId);
+        } catch (SConnectorInstanceNotFoundException e) {
+            throw new ConnectorInstanceNotFoundException(e);
+        } catch (SBonitaException e) {
+            throw new RetrieveException(e);
+        }
+        return ModelConvertor.toConnectorInstanceWithFailureInfo(serverObject);
     }
 
 }
