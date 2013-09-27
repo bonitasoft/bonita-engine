@@ -101,7 +101,15 @@ public class SessionServiceImpl implements SessionService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "isValid"));
         }
-        final SSession session = sessionProvider.getSession(sessionId);
+        SSession session = null; 
+        try {
+        session = sessionProvider.getSession(sessionId);
+        } catch (SSessionNotFoundException e) {
+        	if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Session with id '" + sessionId +"' is invalid because it does not exist.");
+            }
+        	throw e;
+        }
         final Date now = new Date();
         final boolean isValid = session.getExpirationDate().getTime() > now.getTime();
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
