@@ -1,6 +1,7 @@
 package com.bonitasoft.engine;
 
 import org.bonitasoft.engine.BonitaSuiteRunner;
+import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.event.InterruptingTimerBoundaryEventTest;
 import org.bonitasoft.engine.event.MessageBoundaryEventTest;
 import org.bonitasoft.engine.event.MessageEventSubProcessTest;
@@ -49,6 +50,7 @@ import com.bonitasoft.engine.platform.SPProcessManagementTest;
         SPIdentityTests.class,
         SPProcessManagementTest.class
 })
+@Initializer(TestsInitializerSP.class)
 public class SlowExecutionLocalIntegrationTestsSP extends LocalIntegrationTestsSP {
 
 }
