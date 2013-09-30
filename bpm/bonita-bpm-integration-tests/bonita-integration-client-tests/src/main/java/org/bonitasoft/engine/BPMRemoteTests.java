@@ -13,7 +13,6 @@ import org.bonitasoft.engine.identity.IdentityTests;
 import org.bonitasoft.engine.login.LoginAPITest;
 import org.bonitasoft.engine.login.PlatformLoginAPITest;
 import org.bonitasoft.engine.operation.OperationTest;
-import org.bonitasoft.engine.platform.RestartHandlersTests;
 import org.bonitasoft.engine.platform.command.PlatformCommandTest;
 import org.bonitasoft.engine.process.ProcessTests;
 import org.bonitasoft.engine.process.SupervisorTest;
@@ -25,7 +24,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        RestartHandlersTests.class,
         RemoteConnectorExecutionTest.class,
         PlatformCommandTest.class,
         ProcessTests.class,

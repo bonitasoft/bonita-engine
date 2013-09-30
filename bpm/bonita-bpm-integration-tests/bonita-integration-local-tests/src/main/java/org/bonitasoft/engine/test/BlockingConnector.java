@@ -18,9 +18,11 @@ public class BlockingConnector extends AbstractConnector {
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
         try {
+            System.out.println("Try aqcuire");
             semaphore.tryAcquire(15, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        semaphore.release();
     }
 }
