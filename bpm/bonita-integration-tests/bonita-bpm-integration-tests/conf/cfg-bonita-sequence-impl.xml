@@ -184,9 +184,9 @@
 			</map>
 		</constructor-arg>
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
-		<constructor-arg name="retries" value="5" />
-		<constructor-arg name="delay" value="5" />
-		<constructor-arg name="delayFactor" value="2" />
+		<constructor-arg name="retries" value="9" />
+		<constructor-arg name="delay" value="10" />
+		<constructor-arg name="delayFactor" value="3" />
 	</bean>
 
 </beans>

@@ -121,6 +121,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     public final long createTenant(final TenantCreator creator) throws CreationException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_TENANT);
         PlatformServiceAccessor platformAccessor = null;
+        // useless? done in create(Tenantcreator)
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
