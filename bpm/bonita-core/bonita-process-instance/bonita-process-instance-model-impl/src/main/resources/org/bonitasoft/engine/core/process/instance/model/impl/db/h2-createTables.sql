@@ -103,7 +103,7 @@ CREATE TABLE connector_instance (
   state VARCHAR(50),
   executionOrder INT,
   exceptionMessage VARCHAR(255),
-  stackTrace LONGVARCHAR,
+  stackTrace CLOB,
   PRIMARY KEY (tenantid, id)
 );
 
