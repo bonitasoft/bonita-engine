@@ -1041,7 +1041,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     public ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(final long connectorInstanceId)
             throws ConnectorInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
+        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         SConnectorInstanceWithFailureInfo serverObject;
         try {
             serverObject = connectorInstanceService.getConnectorInstanceWithFailureInfo(connectorInstanceId);
