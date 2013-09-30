@@ -1,5 +1,6 @@
 package com.bonitasoft.engine;
 
+import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.event.InterruptingTimerBoundaryEventTest;
 import org.bonitasoft.engine.event.MessageBoundaryEventTest;
 import org.bonitasoft.engine.event.MessageEventSubProcessTest;
@@ -11,7 +12,6 @@ import org.bonitasoft.engine.platform.PlatformLoginTest;
 import org.bonitasoft.engine.platform.PlatformTest;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.event.SPTimerBoundaryEventTest;
@@ -20,7 +20,7 @@ import com.bonitasoft.engine.platform.SPPlatformLoginTest;
 import com.bonitasoft.engine.platform.SPPlatformTest;
 import com.bonitasoft.engine.platform.SPProcessManagementTest;
 
-@RunWith(Suite.class)
+@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
 
         // Same suites as in LocalIntegrationTestsSP below:
