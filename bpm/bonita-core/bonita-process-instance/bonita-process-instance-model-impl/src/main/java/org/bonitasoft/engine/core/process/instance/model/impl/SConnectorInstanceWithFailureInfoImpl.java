@@ -36,11 +36,11 @@ public class SConnectorInstanceWithFailureInfoImpl extends SConnectorInstanceImp
         return exceptionMessage;
     }
 
-    public void setExceptionMessage(final String message) {
+    public void setExceptionMessage(String message) {
         this.exceptionMessage = message;
     }
 
-    public void setStackTrace(final String stackTrace) {
+    public void setStackTrace(String stackTrace) {
         this.stackTrace = stackTrace;
     }
 

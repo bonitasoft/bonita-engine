@@ -133,7 +133,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     @Override
     public void setConnectorInstanceFailureException(final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, final Throwable throwable)
             throws SConnectorInstanceModificationException {
-        SConnectorInstanceWithFailureInfoBuilder connectorWithFailureKeyProvider = instanceBuilders.getSConnectorInstanceWithFailureInfoBuilder();
+        final SConnectorInstanceWithFailureInfoBuilder connectorWithFailureKeyProvider = instanceBuilders.getSConnectorInstanceWithFailureInfoBuilder();
         final SConnectorInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED,
                 "Changing connector instance exception", connectorInstanceWithFailure);
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
