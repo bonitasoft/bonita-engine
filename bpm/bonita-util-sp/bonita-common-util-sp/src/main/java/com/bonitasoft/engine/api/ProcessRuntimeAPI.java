@@ -380,13 +380,13 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
     ProcessInstance updateProcessInstance(long processInstanceId, ProcessInstanceUpdater updater) throws ProcessInstanceNotFoundException, UpdateException;
     
     /**
-     * Retrieves an <code>ConnectorInstanceWithFailureInfo</code> specified by its identifier.
+     * Retrieves a <code>ConnectorInstanceWithFailureInfo</code> specified by its identifier.
      * 
      * @param connectorInstanceId
      *            the identifier of the <code>ConnectorInstanceWithFailureInfo</code> to be retrieved.
      * @return the <code>ConnectorInstanceWithFailureInfo</code> instance.
      * @throws ConnectorInstanceNotFoundException
-     *             if no <code>ConnectorInstanceWithFailureInfo</code> was found with the specified connectorInstanceId.
+     *             if no <code>ConnectorInstanceWithFailureInfo</code> is found with the specified connectorInstanceId.
      * @since 6.1
      */
     ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(long connectorInstanceId) throws ConnectorInstanceNotFoundException;
