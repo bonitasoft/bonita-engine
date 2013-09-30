@@ -17,7 +17,7 @@
 	<properties>
 		<server.port>8383</server.port>
 		<provider.port>8182</provider.port>
-		<tomcat.version>6.0.35</tomcat.version>
+		<tomcat.version>6.0.37</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
 		<tomcat.home>${project.build.directory}/${tomcat.name}</tomcat.home>
 		<tomcat.conf.dir>${tomcat.home}/conf</tomcat.conf.dir>
