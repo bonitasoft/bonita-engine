@@ -69,8 +69,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({ ActorMappingServiceImpl.class })
 public class ActorMappingServiceImplTest {
 
-    private final static String ACTOR = "ACTOR";
-
     private Recorder recorder;
 
     private ReadPersistenceService persistenceService;
@@ -413,7 +411,6 @@ public class ActorMappingServiceImplTest {
     public final void addActorsEmptyList() throws SActorCreationException {
         final Set<SActor> actors = new HashSet<SActor>();
 
-        // Let's call it for real:
         final Set<SActor> result = actorMappingServiceImpl.addActors(actors);
         assertNotNull(result);
         assertEquals(0, result.size());
