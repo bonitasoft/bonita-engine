@@ -94,6 +94,7 @@ import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -644,6 +645,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public IncidentService getIncidentService() {
         return getInstanceOf(IncidentService.class);
+    }
+
+    @Override
+    public JobService getJobService() {
+        return getInstanceOf(JobService.class);
     }
 
 }

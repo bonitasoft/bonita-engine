@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
@@ -340,6 +341,7 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
@@ -358,6 +360,11 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.scheduler.JobService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.model.SFailedJob;
+import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SSearchException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -590,7 +597,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private ArrayList<BonitaLock> createLocks(final LockService lockService, final String objectType, final List<Long> lockedProcesses,
             final List<Long> processInstanceIds) throws SLockException {
-        ArrayList<BonitaLock> locks = new ArrayList<BonitaLock>(processInstanceIds.size());
+        final ArrayList<BonitaLock> locks = new ArrayList<BonitaLock>(processInstanceIds.size());
         for (final Long processInstanceId : processInstanceIds) {
             final BonitaLock lock = lockService.lock(processInstanceId, objectType);
             locks.add(lock);
@@ -901,7 +908,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                 processExecutor.executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), starterId, session.getId());
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                    String message = LogMessageBuilder.builUserActionPrefix(session, starterId) + "has performed the task"
+                    final String message = LogMessageBuilder.builUserActionPrefix(session, starterId) + "has performed the task"
                             + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
                     logger.log(getClass(), TechnicalLogSeverity.INFO, message);
                 }
@@ -3336,7 +3343,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * execute the connector and return connector output if there is no operation or operation output if there is operation
-     *
+     * 
      * @param operations
      * @param operationInputValues
      */
@@ -4074,7 +4081,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             // TODO: refactor this method when deprecated addComment() method is removed from API:
             return addComment(processInstanceId, comment);
-        } catch (RetrieveException e) {
+        } catch (final RetrieveException e) {
             throw new CreationException("Cannot add a comment on a finished or inexistant process instance", e.getCause());
         }
     }
@@ -4085,9 +4092,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
-        } catch (SProcessInstanceReadException e) {
+        } catch (final SProcessInstanceReadException e) {
             throw new RetrieveException("Cannot add a comment on a finished or inexistant process instance", e); // FIXME: should be another exception
-        } catch (SProcessInstanceNotFoundException e) {
+        } catch (final SProcessInstanceNotFoundException e) {
             throw new RetrieveException("Cannot add a comment on a finished or inexistant process instance", e); // FIXME: should be another exception
         }
         final SCommentService commentService = tenantAccessor.getCommentService();
@@ -4142,7 +4149,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private SProcessDocument buildExternalProcessDocumentReference(final SProcessDocumentBuilders documentBuilders, final long processInstanceId,
             final String documentName, final String fileName, final String mimeType, final long authorId, final String url) {
-        SProcessDocumentBuilder documentBuilder = documentBuilders.getSProcessDocumentBuilder();
+        final SProcessDocumentBuilder documentBuilder = documentBuilders.getSProcessDocumentBuilder();
         initDocumentBuilder(documentBuilder, processInstanceId, documentName, fileName, mimeType, authorId);
         documentBuilder.setURL(url);
         documentBuilder.setHasContent(false);
@@ -4151,7 +4158,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private SProcessDocument buildProcessDocument(final SProcessDocumentBuilders documentBuilders, final long processInstanceId, final String documentName,
             final String fileName, final String mimetype, final long authorId) {
-        SProcessDocumentBuilder documentBuilder = documentBuilders.getSProcessDocumentBuilder();
+        final SProcessDocumentBuilder documentBuilder = documentBuilders.getSProcessDocumentBuilder();
         initDocumentBuilder(documentBuilder, processInstanceId, documentName, fileName, mimetype, authorId);
         documentBuilder.setHasContent(true);
         return documentBuilder.done();
@@ -5335,12 +5342,12 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
             try {
-                SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+                final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
                 // if it exists and is initializing or started
-                int stateId = processInstance.getStateId();
+                final int stateId = processInstance.getStateId();
                 if (stateId == 0/* initializing */|| stateId == 1/* started */) {
                     // the evaluation date is either now (initializing) or the start date if available
-                    long evaluationDate = stateId == 0 ? System.currentTimeMillis() : processInstance.getStartDate();
+                    final long evaluationDate = stateId == 0 ? System.currentTimeMillis() : processInstance.getStartDate();
                     return evaluateExpressionsInstanceLevelAndArchived(expressions, processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE,
                             processInstance.getProcessDefinitionId(), evaluationDate);
                 }
@@ -5492,6 +5499,42 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         searchArchivedProcessInstances.execute();
         return searchArchivedProcessInstances.getResult();
+    }
+
+    @Override
+    public List<FailedJob> getFailedJobs(final int startIndex, final int maxResults) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final JobService jobService = tenantAccessor.getJobService();
+        try {
+            final List<SFailedJob> failedJobs = jobService.getFailedJobs(startIndex, maxResults);
+            return ModelConvertor.toFailedJobs(failedJobs);
+        } catch (final SSchedulerException sse) {
+            throw new RetrieveException(sse);
+        }
+    }
+
+    @Override
+    public void replayFailedJob(final long jobDescriptorId) throws ExecutionException {
+        replayFailedJob(jobDescriptorId, null);
+    }
+
+    @Override
+    public void replayFailedJob(final long jobDescriptorId, final Map<String, Serializable> parameters) throws ExecutionException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SchedulerService schedulerService = tenantAccessor.getSchedulerService();
+        try {
+            if (parameters == null || parameters.isEmpty()) {
+                schedulerService.executeAgain(jobDescriptorId);
+            } else {
+                final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
+                for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
+                    jobParameters.add(schedulerService.getJobParameterBuilder().createNewInstance(parameter.getKey(), parameter.getValue()).done());
+                }
+                schedulerService.executeAgain(jobDescriptorId, jobParameters);
+            }
+        } catch (final SSchedulerException sse) {
+            throw new ExecutionException(sse);
+        }
     }
 
 }

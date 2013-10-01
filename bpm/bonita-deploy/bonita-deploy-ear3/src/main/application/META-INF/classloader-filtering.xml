@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<class-loader-filtering xmlns="http://org.ow2.jonas.lib.loader.mapping">
-  <filters>
-    <filter-name>org.quartz.*</filter-name>
-    <filter-name>org.hibernate.*</filter-name>
-  </filters>
-</class-loader-filtering>

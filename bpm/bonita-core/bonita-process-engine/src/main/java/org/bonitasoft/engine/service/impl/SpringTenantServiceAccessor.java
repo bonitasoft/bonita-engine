@@ -97,6 +97,8 @@ import org.bonitasoft.engine.profile.xml.ProfileEntryBinding;
 import org.bonitasoft.engine.profile.xml.ProfileMappingBinding;
 import org.bonitasoft.engine.profile.xml.ProfilesBinding;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
+import org.bonitasoft.engine.scheduler.JobService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -271,6 +273,10 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private SynchroService synchroService;
 
     private IncidentService incidentService;
+
+    private SchedulerService schedulerService;
+
+    private JobService jobService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -935,6 +941,22 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             incidentService = beanAccessor.getService(IncidentService.class);
         }
         return incidentService;
+    }
+
+    @Override
+    public SchedulerService getSchedulerService() {
+        if (schedulerService == null) {
+            schedulerService = beanAccessor.getService(SchedulerService.class);
+        }
+        return schedulerService;
+    }
+
+    @Override
+    public JobService getJobService() {
+        if (jobService == null) {
+            jobService = beanAccessor.getService(JobService.class);
+        }
+        return jobService;
     }
 
 }

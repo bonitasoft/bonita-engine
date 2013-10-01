@@ -230,6 +230,8 @@ import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.RoleBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
+import org.bonitasoft.engine.job.FailedJob;
+import org.bonitasoft.engine.job.impl.FailedJobImpl;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
@@ -251,6 +253,7 @@ import org.bonitasoft.engine.profile.impl.ProfileMemberImpl;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
+import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -1950,6 +1953,23 @@ public class ModelConvertor {
             newSProfileMemberBuilder.setUserId(userId);
         }
         return newSProfileMemberBuilder.done();
+    }
+
+    public static List<FailedJob> toFailedJobs(final List<SFailedJob> sFailedJobs) {
+        final List<FailedJob> failedJobs = new ArrayList<FailedJob>(sFailedJobs.size());
+        for (final SFailedJob sFailedJob : sFailedJobs) {
+            failedJobs.add(toFailedJob(sFailedJob));
+        }
+        return failedJobs;
+    }
+
+    public static FailedJob toFailedJob(final SFailedJob sFailedJob) {
+        final FailedJobImpl failedJob = new FailedJobImpl(sFailedJob.getJobDescriptorId(), sFailedJob.getJobName());
+        failedJob.setDescription(sFailedJob.getDescription());
+        failedJob.setLastMessage(sFailedJob.getLastMessage());
+        failedJob.setRetryNumber(sFailedJob.getRetryNumber());
+        failedJob.setLastUpdateDate(new Date(sFailedJob.getLastUpdateDate()));
+        return failedJob;
     }
 
 }

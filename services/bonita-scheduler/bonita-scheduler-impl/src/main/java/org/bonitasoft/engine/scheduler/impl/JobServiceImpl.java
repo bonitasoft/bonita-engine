@@ -35,6 +35,7 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
 import org.bonitasoft.engine.scheduler.builder.impl.SJobParameterBuilderImpl;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
@@ -47,6 +48,7 @@ import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterCreat
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterReadException;
+import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -300,6 +302,16 @@ public class JobServiceImpl implements JobService {
             insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(eventType).setObject(persistentObject).done();
         }
         recorder.recordInsert(insertRecord, insertEvent);
+    }
+
+    @Override
+    public List<SFailedJob> getFailedJobs(final int startIndex, final int maxResults) throws SSchedulerException {
+        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults);
+        try {
+            return readPersistenceService.selectList(SelectDescriptorBuilder.getFailedJobs(queryOptions));
+        } catch (final SBonitaReadException sbre) {
+            throw new SSchedulerException(sbre);
+        }
     }
 
 }

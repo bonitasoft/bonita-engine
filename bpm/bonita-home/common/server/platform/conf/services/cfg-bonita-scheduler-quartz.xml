@@ -19,11 +19,11 @@
 			</props>
 		</property>
 	</bean>
-	
-	<bean id="fileJobListener" class="org.bonitasoft.engine.scheduler.impl.FileJobListener">
+
+	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.FileJobListener">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
-	
+
 	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
 		<constructor-arg name="jobService" ref="jobService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
@@ -31,14 +31,19 @@
 
 	<bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor">
 		<constructor-arg name="schedulerFactory" ref="quartzSchedulerFactory" />
-		<constructor-arg name="jobListener" ref="jdbcJobListener" />
+		<constructor-arg name="jobListeners">
+			<list>
+				<ref bean="loggerJobListener" />
+				<ref bean="jdbcJobListener" />
+			</list>
+		</constructor-arg>
 		<constructor-arg ref="sessionAccessor" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="useOptimization" value="true" />
 	</bean>
 
 	<bean id="schedulerBuilderAccessor" class="org.bonitasoft.engine.scheduler.builder.impl.SSchedulerBuilderAccessorImpl" />
-	
+
 	<bean id="jobService" class="org.bonitasoft.engine.scheduler.impl.JobServiceImpl">
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
