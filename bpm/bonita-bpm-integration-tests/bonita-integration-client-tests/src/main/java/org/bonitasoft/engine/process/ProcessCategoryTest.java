@@ -362,7 +362,7 @@ public class ProcessCategoryTest extends CommonAPITest {
     }
 
     @Test
-    public void getNumberOfCategoriesOfInexistentProcess() throws Exception {
+    public void getNumberOfCategoriesOfInexistentProcess() {
         final long numberOfCategories = getProcessAPI().getNumberOfCategories(Long.MAX_VALUE);
         assertEquals(0, numberOfCategories);
     }
@@ -383,7 +383,7 @@ public class ProcessCategoryTest extends CommonAPITest {
     }
 
     @Test
-    public void getNumberOfProcessesInCategoryWithInexistentCategory() throws Exception {
+    public void getNumberOfProcessesInCategoryWithInexistentCategory() {
         final long processesInCategory = getProcessAPI().getNumberOfProcessDefinitionsOfCategory(Long.MAX_VALUE);
         assertEquals(0, processesInCategory);
     }

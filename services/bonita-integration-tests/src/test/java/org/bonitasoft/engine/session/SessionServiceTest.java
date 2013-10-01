@@ -21,10 +21,11 @@ import org.junit.Test;
 public class SessionServiceTest extends CommonServiceTest {
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         getSessionService().setSessionDuration(getSessionService().getDefaultSessionDuration());
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         TestUtil.closeTransactionIfOpen(getTransactionService());
@@ -81,13 +82,13 @@ public class SessionServiceTest extends CommonServiceTest {
         final String username = "matti";
         final SSession session = createSession(username);
         Thread.sleep(10);
-        //getTransactionService().begin();
+        // getTransactionService().begin();
         getSessionService().renewSession(session.getId());
-        //getTransactionService().complete();
+        // getTransactionService().complete();
 
-        //getTransactionService().begin();
+        // getTransactionService().begin();
         final SSession session2 = getSessionService().getSession(session.getId());
-        //getTransactionService().complete();
+        // getTransactionService().complete();
         assertTrue(session2.getExpirationDate().after(session.getExpirationDate()));
         assertTrue(session2.getLastRenewDate().after(session.getLastRenewDate()));
         assertEquals(session2.getLastRenewDate().getTime() + session2.getDuration(), session2.getExpirationDate().getTime());

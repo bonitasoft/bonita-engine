@@ -484,7 +484,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         assertEquals(null, archivedActivityInstance.getDisplayDescription());
 
-        final WaitForStep waitForStep = waitForStep(200, 1000, "task1", pi);
+        final WaitForStep waitForStep = waitForStep("task1", pi);
         final ActivityInstance activityInstance = waitForStep.getResult();
 
         assertEquals(null, activityInstance.getDisplayDescription());
@@ -536,7 +536,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // execute step 1 using john
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
+        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         assertEquals(0, step1.getExecutedBy());
         assignAndExecuteStep(step1, user.getId());
         waitForUserTask("step2", processInstance);
@@ -566,10 +566,10 @@ public class ProcessExecutionTest extends CommonAPITest {
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
+        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         assignAndExecuteStep(step1, user.getId());
         waitForUserTaskAndExecuteIt("step2", processInstance, user.getId());
-        waitForUserTask("step3", processInstance.getId());
+        waitForUserTask("step3", processInstance);
 
         final SearchResult<Comment> searchResult0 = getProcessAPI().searchComments(new SearchOptionsBuilder(0, 5).done());
         final List<Comment> commentList0 = searchResult0.getResult();

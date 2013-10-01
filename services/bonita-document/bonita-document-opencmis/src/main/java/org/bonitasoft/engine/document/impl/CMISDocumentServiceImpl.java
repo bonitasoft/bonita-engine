@@ -93,13 +93,10 @@ public class CMISDocumentServiceImpl implements DocumentService {
      * @param repositoryId
      * @param cmisUserProvider
      * @param categoryFolder
-     * @throws SessionIdNotSetException
-     * @throws SDocumentException
      * @throws SessionNotFoundException
      */
     public CMISDocumentServiceImpl(final SessionAccessor sessionAccessor, final SessionService sessionService, final String cmisServerUrl,
-            final String repositoryId, final CmisUserProvider cmisUserProvider, final SDocumentBuilders documentBuilders) throws SDocumentException,
-            SessionIdNotSetException {
+            final String repositoryId, final CmisUserProvider cmisUserProvider, final SDocumentBuilders documentBuilders) {
         super();
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
@@ -328,7 +325,7 @@ public class CMISDocumentServiceImpl implements DocumentService {
 
     /**
      * Get the ID of the root path
-     *
+     * 
      * @param session
      *            the CMIS session to act on
      * @return the root path ID in CMIS
@@ -358,7 +355,7 @@ public class CMISDocumentServiceImpl implements DocumentService {
 
     /**
      * Clears the whole subFolder hierarchy
-     *
+     * 
      * @param session
      *            the CMIS Session
      * @param folder

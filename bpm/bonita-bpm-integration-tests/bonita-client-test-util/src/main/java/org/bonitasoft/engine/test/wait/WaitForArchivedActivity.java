@@ -21,6 +21,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.WaitUntil;
 
+@Deprecated
 public class WaitForArchivedActivity extends WaitUntil {
 
     private final long activityId;

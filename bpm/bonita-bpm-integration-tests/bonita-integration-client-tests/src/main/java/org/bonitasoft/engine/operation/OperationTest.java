@@ -27,11 +27,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.operation.LeftOperand;
-import org.bonitasoft.engine.operation.LeftOperandBuilder;
-import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForStep;
@@ -196,10 +191,10 @@ public class OperationTest extends CommonAPITest {
                     getProcessAPI().getProcessDataInstance(dataIndex.getKey(), startProcess.getId()).getValue());
         }
 
-        final ActivityInstance waitForStep0 = waitForUserTask("step0", startProcess.getId());
+        final ActivityInstance waitForStep0 = waitForUserTask("step0", startProcess);
         assignAndExecuteStep(waitForStep0, john.getId());
 
-        waitForUserTask("step2", startProcess.getId()).getId();
+        waitForUserTask("step2", startProcess).getId();
 
         for (final Entry<String, Integer> dataIndex : inverDataOrder.entrySet()) {
             assertEquals("after execution of operation " + dataIndex.getKey(), valueAfter.get(dataIndex.getValue()),
@@ -472,7 +467,7 @@ public class OperationTest extends CommonAPITest {
         addMappingOfActorsForUser("actor", john.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance activityInstance = waitForUserTask("step2", processInstance, 3000);
+        final ActivityInstance activityInstance = waitForUserTask("step2", processInstance);
         final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("myDatum", activityInstance.getId());
 
         assertEquals(StringBuilder.class, activityDataInstance.getValue().getClass());

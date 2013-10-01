@@ -1,8 +1,6 @@
 package org.bonitasoft.engine.transaction;
 
-import java.util.Collections;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Set;
 
 import javax.naming.Context;
@@ -12,9 +10,6 @@ import javax.transaction.TransactionManager;
 
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.events.model.HandlerRegistrationException;
-import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
@@ -63,11 +58,11 @@ public class TransactionLifeCycleImplTest extends TransactionLifeCycleTest {
         return new EventService() {
 
             @Override
-            public void removeHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerUnregistrationException {
+            public void removeHandler(final String eventType, final SHandler<SEvent> handler) {
             }
 
             @Override
-            public void removeAllHandlers(final SHandler<SEvent> handler) throws HandlerUnregistrationException {
+            public void removeAllHandlers(final SHandler<SEvent> handler) {
             }
 
             @Override
@@ -136,11 +131,11 @@ public class TransactionLifeCycleImplTest extends TransactionLifeCycleTest {
             }
 
             @Override
-            public void fireEvent(final SEvent event) throws FireEventException {
+            public void fireEvent(final SEvent event) {
             }
 
             @Override
-            public void addHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+            public void addHandler(final String eventType, final SHandler<SEvent> handler) {
             }
 
             @Override
@@ -179,7 +174,6 @@ public class TransactionLifeCycleImplTest extends TransactionLifeCycleTest {
                 return false;
             }
         };
-
 
     }
 

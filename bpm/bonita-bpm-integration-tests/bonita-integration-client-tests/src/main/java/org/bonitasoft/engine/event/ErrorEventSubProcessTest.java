@@ -23,6 +23,7 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -208,7 +209,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         assignAndExecuteStep(step2, john.getId());
         waitForArchivedActivity(step2.getId(), TestStates.getNormalFinalState());
 
-        final Long eventSubProcessActivity = waitForFlowNode(processInstance.getId(), TestStates.getExecutingState(), "eventSubProcess", false, 10000);
+        final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, "eventSubProcess", false);
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
@@ -219,7 +220,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity, TestStates.getNormalFinalState());
+        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(processInstance, TestStates.getAbortedState());
 

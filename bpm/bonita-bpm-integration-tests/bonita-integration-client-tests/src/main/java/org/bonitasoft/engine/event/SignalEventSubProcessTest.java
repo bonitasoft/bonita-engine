@@ -24,6 +24,7 @@ import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -158,7 +159,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         // send signal to start event sub process
         getProcessAPI().sendSignal(SIGNAL_NAME);
 
-        waitForFlowNode(processInstance.getId(), TestStates.getExecutingState(), SUB_PROCESS_NAME, false, 10000);
+        waitForFlowNodeInExecutingState(processInstance, SUB_PROCESS_NAME, false);
         final ActivityInstance subStep = waitForUserTask(SUB_STEP, processInstance);
 
         Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
@@ -184,7 +185,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         Thread.sleep(50);
         getProcessAPI().sendSignal(SIGNAL_NAME);
 
-        final Long eventSubProcessActivity = waitForFlowNode(processInstance.getId(), TestStates.getExecutingState(), SUB_PROCESS_NAME, false, 10000);
+        final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, SUB_PROCESS_NAME, false);
         final ActivityInstance subStep = waitForUserTask(SUB_STEP, processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
@@ -195,7 +196,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity, TestStates.getNormalFinalState());
+        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(processInstance, TestStates.getAbortedState());
 

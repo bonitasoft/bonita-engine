@@ -1,5 +1,7 @@
 package org.bonitasoft.engine.event;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
@@ -23,8 +25,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class MessageBoundaryEventTest extends CommonAPITest {
 
@@ -220,7 +220,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("processWithBoundaryMessageEventAndMultiInstance"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
-        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance, 10000);
+        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance);
         assignAndExecuteStep(executionStep, donaBenta.getId());
 
         waitForProcessToFinish(processInstance);
@@ -272,7 +272,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("processWithBoundaryMessageEventAndMultiInstance"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
-        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance, 10000);
+        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance);
         assignAndExecuteStep(executionStep, donaBenta.getId());
 
         waitForProcessToFinish(processInstance);

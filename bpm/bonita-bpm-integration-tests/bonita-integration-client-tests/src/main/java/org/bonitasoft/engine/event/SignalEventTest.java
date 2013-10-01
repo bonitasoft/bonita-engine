@@ -74,7 +74,7 @@ public class SignalEventTest extends CommonAPITest {
 
         // Check that the process with trigger signal on start is not started, before send signal
         final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
-        waitForUserTask("step1", processInstanceWithEndSignal.getId());
+        waitForUserTask("step1", processInstanceWithEndSignal);
         checkNbOfProcessInstances(1);
 
         List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
@@ -119,7 +119,7 @@ public class SignalEventTest extends CommonAPITest {
         loginWith("john", "bpm");
         final ProcessInstance instance = getProcessAPI().startProcess(startSignal.getId());
 
-        waitForEvent(50, 25000, instance, "OnSignal", TestStates.getWaitingState());
+        waitForEvent(instance, "OnSignal", TestStates.getWaitingState());
 
         getProcessAPI().startProcess(endSignal.getId());
 
@@ -212,7 +212,7 @@ public class SignalEventTest extends CommonAPITest {
         loginWith("john", "bpm");
 
         final ProcessInstance instance = getProcessAPI().startProcess(intermediateSignal.getId());
-        waitForEvent(50, 25000, instance, "OnSignal", TestStates.getWaitingState());
+        waitForEvent(instance, "OnSignal", TestStates.getWaitingState());
 
         getProcessAPI().sendSignal("GO");
 

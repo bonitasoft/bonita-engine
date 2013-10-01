@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
@@ -87,8 +88,8 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
                 targetProcessDef.getVersion(), taskName2);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(callActivityProcDef.getId());
 
-        final Long waitForFlowNodeId = waitForFlowNode(parentProcessInstance.getId(), TestStates.getExecutingState(), "callActivity", false, 250000);
-        assertNotNull("expected call activity in executing state", waitForFlowNodeId);
+        final FlowNodeInstance waitForFlowNode = waitForFlowNodeInExecutingState(parentProcessInstance, "callActivity", false);
+        assertNotNull("Expected call activity in executing state", waitForFlowNode);
 
         checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC);
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);

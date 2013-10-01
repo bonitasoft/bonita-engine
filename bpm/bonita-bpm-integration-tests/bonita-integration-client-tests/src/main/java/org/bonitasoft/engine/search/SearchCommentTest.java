@@ -56,7 +56,7 @@ public class SearchCommentTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForStep waitForStep = waitForStep(50, 3000, "userTask1", processInstance);
+        final WaitForStep waitForStep = waitForStep("userTask1", processInstance);
         final String commentContent1 = "commentContent1";
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent1);
         final ActivityInstance activityInstance = waitForStep.getResult();
@@ -101,7 +101,7 @@ public class SearchCommentTest extends CommonAPITest {
 
         // create a ProcessInstance
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep(50, 5000, activityName, processInstance);
+        waitForStep(activityName, processInstance);
 
         // add an comment to ProcessInstance
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent);
@@ -232,8 +232,8 @@ public class SearchCommentTest extends CommonAPITest {
         // create a ProcessInstance
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep(50, 5000, "userTask1", processInstance);
-        waitForStep(50, 5000, "userTask1", processInstance2);
+        waitForStep("userTask1", processInstance);
+        waitForStep("userTask1", processInstance2);
 
         // add an comment to ProcessInstance
         final String commentContent1 = "commentContent1";
@@ -304,8 +304,8 @@ public class SearchCommentTest extends CommonAPITest {
         final ProcessInstance instance1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance2 = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
 
-        final WaitForStep waitForStep1 = waitForStep(50, 500, "userTask1", instance1);
-        final WaitForStep waitForStep2 = waitForStep(50, 500, "userTask2", instance1);
+        final WaitForStep waitForStep1 = waitForStep("userTask1", instance1);
+        final WaitForStep waitForStep2 = waitForStep("userTask2", instance1);
         final long stepId1 = waitForStep1.getStepId();
         final long stepId2 = waitForStep2.getStepId();
         getProcessAPI().assignUserTask(stepId1, jack.getId());
@@ -367,8 +367,8 @@ public class SearchCommentTest extends CommonAPITest {
 
         final ProcessInstance pi1 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
 
-        final WaitForStep waitForStep1 = waitForStep(50, 500, "userTask1", pi1);
-        final WaitForStep waitForStep2 = waitForStep(50, 500, "userTask2", pi1);
+        final WaitForStep waitForStep1 = waitForStep("userTask1", pi1);
+        final WaitForStep waitForStep2 = waitForStep("userTask2", pi1);
         final long stepId1 = waitForStep1.getStepId();
         final long stepId2 = waitForStep2.getStepId();
         getProcessAPI().assignUserTask(stepId1, john.getId());
@@ -392,7 +392,7 @@ public class SearchCommentTest extends CommonAPITest {
         loginWith(stevenUserName, PASSWORD);
 
         final ProcessInstance pi3 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
-        final WaitForStep waitForStep3 = waitForStep(50, 500, "userTask1", pi3);
+        final WaitForStep waitForStep3 = waitForStep("userTask1", pi3);
         final long stepId3 = waitForStep3.getStepId();
         getProcessAPI().assignUserTask(stepId3, jim.getId());
         final String commentContent5 = "Steven's comment Content5";

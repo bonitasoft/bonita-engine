@@ -94,7 +94,7 @@ public class BindingHandler extends DefaultHandler {
     }
 
     @Override
-    public void characters(final char[] ch, final int start, final int length) throws SAXException {
+    public void characters(final char[] ch, final int start, final int length) {
         if (tempVal == null) {
             tempVal = new StringBuilder();
         }

@@ -43,7 +43,6 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
@@ -148,13 +147,7 @@ public class ProcessActorTest extends CommonAPITest {
         assertEquals("Delivery all day and night long", actor.getDescription());
 
         getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue("no new activity found", new WaitUntil(20, 1000) {
-
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).size() == 1;
-            }
-        }.waitUntil());
+        waitForPendingTasks(john.getId(), 1);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
@@ -719,8 +712,8 @@ public class ProcessActorTest extends CommonAPITest {
 
         getProcessAPI().addRoleToActor(actor.getId(), role.getId());
 
-        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
-        assertNotNull(waitForUserTask("deliver", processInstanceId));
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask("deliver", processInstance);
         assertTrue("no new activity found", new CheckNbPendingTaskOf(getProcessAPI(), 20, 1500, false, 1, john).waitUntil());
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);

@@ -19,7 +19,7 @@ import javax.naming.NamingException;
  */
 public class SimpleMemoryContext implements Context {
 
-    private Map<String, Object> dictionary = new ConcurrentHashMap<String, Object>();
+    private final Map<String, Object> dictionary = new ConcurrentHashMap<String, Object>();
 
     public void clear() {
         dictionary.clear();
@@ -32,7 +32,7 @@ public class SimpleMemoryContext implements Context {
 
     @Override
     public Object lookup(String name) throws NamingException {
-//        System.out.println(toString() + " ~~~~ lookup " + name + " contains ? " + dictionary.containsKey(name));
+        // System.out.println(toString() + " ~~~~ lookup " + name + " contains ? " + dictionary.containsKey(name));
         if (dictionary.containsKey(name)) {
             return dictionary.get(name);
         }
@@ -46,7 +46,7 @@ public class SimpleMemoryContext implements Context {
 
     @Override
     public void bind(String name, Object o) throws NamingException {
-//        System.out.println(toString() + " ~~~~ binding " + name + " with " + o + " already bound ? " + dictionary.containsKey(name));
+        // System.out.println(toString() + " ~~~~ binding " + name + " with " + o + " already bound ? " + dictionary.containsKey(name));
         if (dictionary.containsKey(name)) {
             throw new NameAlreadyBoundException("Name " + name + " already bound!");
         }
@@ -54,12 +54,12 @@ public class SimpleMemoryContext implements Context {
     }
 
     @Override
-    public void rebind(Name name, Object o) throws NamingException {
+    public void rebind(Name name, Object o) {
         rebind(name.toString(), o);
     }
 
     @Override
-    public void rebind(String name, Object o) throws NamingException {
+    public void rebind(String name, Object o) {
         dictionary.put(name, o);
     }
 
@@ -89,32 +89,32 @@ public class SimpleMemoryContext implements Context {
     }
 
     @Override
-    public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(Name name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NamingEnumeration<NameClassPair> list(String string) throws NamingException {
+    public NamingEnumeration<NameClassPair> list(String string) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(Name name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NamingEnumeration<Binding> listBindings(String string) throws NamingException {
+    public NamingEnumeration<Binding> listBindings(String string) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void destroySubcontext(Name name) throws NamingException {
+    public void destroySubcontext(Name name) {
         destroySubcontext(name.toString());
     }
 
     @Override
-    public void destroySubcontext(String name) throws NamingException {
+    public void destroySubcontext(String name) {
         dictionary.remove(name);
     }
 
@@ -131,59 +131,59 @@ public class SimpleMemoryContext implements Context {
     }
 
     @Override
-    public Object lookupLink(Name name) throws NamingException {
+    public Object lookupLink(Name name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Object lookupLink(String string) throws NamingException {
+    public Object lookupLink(String string) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NameParser getNameParser(Name name) throws NamingException {
+    public NameParser getNameParser(Name name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NameParser getNameParser(String string) throws NamingException {
+    public NameParser getNameParser(String string) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Name composeName(Name name, Name name1) throws NamingException {
+    public Name composeName(Name name, Name name1) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String composeName(String string, String string1) throws NamingException {
+    public String composeName(String string, String string1) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Object addToEnvironment(String string, Object o) throws NamingException {
+    public Object addToEnvironment(String string, Object o) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Object removeFromEnvironment(String string) throws NamingException {
+    public Object removeFromEnvironment(String string) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Hashtable<?, ?> getEnvironment() throws NamingException {
+    public Hashtable<?, ?> getEnvironment() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void close() throws NamingException {
-//        System.out.println("Closing SimpleMemoryContext");
-//        Thread.dumpStack();
-//        clear();
+    public void close() {
+        // System.out.println("Closing SimpleMemoryContext");
+        // Thread.dumpStack();
+        // clear();
     }
 
     @Override
-    public String getNameInNamespace() throws NamingException {
+    public String getNameInNamespace() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

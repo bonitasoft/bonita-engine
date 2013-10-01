@@ -35,7 +35,7 @@ public class IncidentServiceImplTest {
     }
 
     @Test
-    public void testReportCallAllHandlers() throws Exception {
+    public void reportCallAllHandlers() {
         Incident incident = new Incident("test", "recovery", null, null);
         incidentService.report(incident);
         verify(handler1, times(1)).handle(incident);
@@ -43,7 +43,7 @@ public class IncidentServiceImplTest {
     }
 
     @Test
-    public void testReportCallAllHandlersEvenIfFirstThrowException() throws Exception {
+    public void reportCallAllHandlersEvenIfFirstThrowException() {
         doThrow(new RuntimeException()).when(handler1).handle(any(Incident.class));
         Incident incident = new Incident("test", "recovery", null, null);
         incidentService.report(incident);

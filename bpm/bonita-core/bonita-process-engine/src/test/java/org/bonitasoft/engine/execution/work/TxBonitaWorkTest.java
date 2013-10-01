@@ -44,19 +44,19 @@ public class TxBonitaWorkTest {
     }
 
     @Test
-    public void testGetDescription() throws Exception {
+    public void getDescription() {
         when(wrappedWork.getDescription()).thenReturn("The description");
         assertEquals("The description", txBonitawork.getDescription());
     }
 
     @Test
-    public void testGetRecoveryProcedure() throws Exception {
+    public void getRecoveryProcedure() {
         when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
         assertEquals("recoveryProcedure", txBonitawork.getRecoveryProcedure());
     }
 
     @Test
-    public void testHandleFailure() throws Exception {
+    public void handleFailure() throws Exception {
         Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         Exception e = new Exception();
         txBonitawork.handleFailure(e, context);
@@ -64,24 +64,24 @@ public class TxBonitaWorkTest {
     }
 
     @Test
-    public void testGetTenantId() throws Exception {
+    public void getTenantId() {
         when(wrappedWork.getTenantId()).thenReturn(12l);
         assertEquals(12, txBonitawork.getTenantId());
     }
 
     @Test
-    public void testSetTenantId() throws Exception {
+    public void setTenantId() {
         txBonitawork.setTenantId(12l);
         verify(wrappedWork).setTenantId(12l);
     }
 
     @Test
-    public void testGetWrappedWork() throws Exception {
+    public void getWrappedWork() {
         assertEquals(wrappedWork, txBonitawork.getWrappedWork());
     }
 
     @Test
-    public void testToString() throws Exception {
+    public void testToString() {
         when(wrappedWork.toString()).thenReturn("the to string");
         assertEquals("the to string", txBonitawork.toString());
     }

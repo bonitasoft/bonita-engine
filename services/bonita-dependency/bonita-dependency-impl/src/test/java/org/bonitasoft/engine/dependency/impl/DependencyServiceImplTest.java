@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.dependency.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +26,6 @@ import org.bonitasoft.engine.dependency.ArtifactAccessor;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
-import org.bonitasoft.engine.dependency.impl.DependencyServiceImpl;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
@@ -38,10 +41,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
 
 /**
  * @author Celine Souchet
@@ -66,7 +65,7 @@ public class DependencyServiceImplTest {
     private DependencyServiceImpl dependencyServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         builderAccessor = mock(DependencyBuilderAccessor.class);
         persistenceService = mock(ReadPersistenceService.class);
         recorder = mock(Recorder.class);

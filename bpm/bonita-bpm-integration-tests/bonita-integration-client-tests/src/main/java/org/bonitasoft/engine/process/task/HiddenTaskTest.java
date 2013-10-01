@@ -11,8 +11,8 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -25,7 +25,6 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbPendingTasksForUserUsingSearch;
 import org.junit.After;
 import org.junit.Before;
@@ -131,9 +130,8 @@ public class HiddenTaskTest extends CommonAPITest {
         final long id = processDef.getId();
         final ProcessInstance procInstance = getProcessAPI().startProcess(id);
 
-        final ActivityInstance task1 = waitForTaskInState("humanTask_1", procInstance, TestStates.getReadyState());
-        final ActivityInstance task2 = waitForTaskInState("humanTask_2", procInstance, TestStates.getReadyState());
-
+        final FlowNodeInstance task1 = waitForFlowNodeInReadyState(procInstance, "humanTask_1", false);
+        final FlowNodeInstance task2 = waitForFlowNodeInReadyState(procInstance, "humanTask_2", false);
         getProcessAPI().hideTasks(user.getId(), task1.getId(), task2.getId());
 
         // search Hidden tasks:

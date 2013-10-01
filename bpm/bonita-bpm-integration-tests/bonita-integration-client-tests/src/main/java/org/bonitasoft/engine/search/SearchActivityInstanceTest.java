@@ -244,11 +244,11 @@ public class SearchActivityInstanceTest extends CommonAPITest {
                 .addUserTask("userTask3", ACTOR_NAME).addUserTask("task4", ACTOR_NAME).getProcess();
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
-        final long pi0Id = getProcessAPI().startProcess(processDefinition.getId()).getId();
-        final long stepId1 = waitForUserTask("userTask1", pi0Id).getId();
-        final long stepId2 = waitForUserTask("userTask2", pi0Id).getId();
-        final long stepId3 = waitForUserTask("userTask3", pi0Id).getId();
-        final long stepId4 = waitForUserTask("task4", pi0Id).getId();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final long stepId1 = waitForUserTask("userTask1", processInstance).getId();
+        final long stepId2 = waitForUserTask("userTask2", processInstance).getId();
+        final long stepId3 = waitForUserTask("userTask3", processInstance).getId();
+        final long stepId4 = waitForUserTask("task4", processInstance).getId();
         getProcessAPI().assignUserTask(stepId1, john.getId());
         getProcessAPI().assignUserTask(stepId2, john.getId());
         getProcessAPI().assignUserTask(stepId3, jack.getId());
@@ -534,18 +534,18 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForStep waitForStep1 = waitForStep(100, 2000, "userTask1", pi1);
-        final WaitForStep waitForStep2 = waitForStep(100, 2000, "userTask2", pi1);
-        final WaitForStep waitForStep4 = waitForStep(100, 2000, "manualTask", pi1);
+        final WaitForStep waitForStep1 = waitForStep("userTask1", pi1);
+        final WaitForStep waitForStep2 = waitForStep("userTask2", pi1);
+        final WaitForStep waitForStep4 = waitForStep("manualTask", pi1);
         assertTrue(waitForStep1.waitUntil());
         assertTrue(waitForStep2.waitUntil());
         assertTrue(waitForStep4.waitUntil());
         final long stepId2 = waitForStep2.getStepId();
         getProcessAPI().assignUserTask(stepId2, user.getId());
 
-        final WaitForStep waitForStep11 = waitForStep(100, 2000, "userTask1", pi2);
-        final WaitForStep waitForStep22 = waitForStep(100, 2000, "userTask2", pi2);
-        final WaitForStep waitForStep44 = waitForStep(100, 2000, "manualTask", pi2);
+        final WaitForStep waitForStep11 = waitForStep("userTask1", pi2);
+        final WaitForStep waitForStep22 = waitForStep("userTask2", pi2);
+        final WaitForStep waitForStep44 = waitForStep("manualTask", pi2);
         assertTrue(waitForStep11.waitUntil());
         assertTrue(waitForStep22.waitUntil());
         assertTrue(waitForStep44.waitUntil());
@@ -825,7 +825,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         final HumanTaskInstance userTaskId = humanTasksSearch.getResult().get(0);
         assignAndExecuteStep(userTaskId, user.getId());
 
-        waitForStep(40, 2000, "Approval2", processInstance, TestStates.getReadyState());
+        waitForStep("Approval2", processInstance, TestStates.getReadyState());
 
         final List<HumanTaskInstance> userTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, activityInstanceCriterion);
         assertNotNull(userTaskInstances);
@@ -1232,15 +1232,15 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, user.getId(), processBuilder);
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ArchivedActivityInstanceSearchDescriptor.NAME, Order.ASC);
-        final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForActivity("sendTask", instance);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForActivity("sendTask", processInstance);
 
         final SearchResult<ActivityInstance> searchActivities = getProcessAPI().searchActivities(builder.done());
         assertEquals(1, searchActivities.getCount());
         final List<ActivityInstance> activities = searchActivities.getResult();
         final ActivityInstance activity = activities.get(0);
         assertEquals("sendTask", activity.getName());
-        waitForUserTask("userTask", instance.getId());
+        waitForUserTask("userTask", processInstance);
 
         deleteUser(user.getId());
         disableAndDeleteProcess(processDefinition);

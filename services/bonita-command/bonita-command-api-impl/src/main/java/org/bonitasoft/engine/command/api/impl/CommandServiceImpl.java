@@ -250,7 +250,7 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public void update(final SCommand command, final EntityUpdateDescriptor updateDescriptor) throws SCommandNotFoundException, SCommandUpdateException {
+    public void update(final SCommand command, final EntityUpdateDescriptor updateDescriptor) throws SCommandUpdateException {
         final boolean trace = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "update"));

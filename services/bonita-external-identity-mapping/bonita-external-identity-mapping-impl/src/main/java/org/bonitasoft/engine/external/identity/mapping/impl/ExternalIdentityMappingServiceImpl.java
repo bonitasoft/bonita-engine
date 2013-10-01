@@ -24,7 +24,6 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
-import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingAlreadyExistsException;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingCreationException;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingDeletionException;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingNotFoundException;
@@ -84,7 +83,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
 
     @Override
     public SExternalIdentityMapping createExternalIdentityMapping(final SExternalIdentityMapping externalIdentityMapping)
-            throws SExternalIdentityMappingAlreadyExistsException, SExternalIdentityMappingCreationException {
+            throws SExternalIdentityMappingCreationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createExternalIdentityMapping"));
         }

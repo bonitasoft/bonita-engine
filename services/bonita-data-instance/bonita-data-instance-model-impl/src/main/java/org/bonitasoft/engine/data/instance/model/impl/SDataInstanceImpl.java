@@ -206,6 +206,7 @@ public abstract class SDataInstanceImpl implements SDataInstance {
      * @throws SDataInstanceNotWellFormedException
      *             thrown if the data is not well formed
      */
+    @SuppressWarnings("unused")
     public void validate() throws SDataInstanceNotWellFormedException {
     }
 

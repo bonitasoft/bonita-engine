@@ -61,7 +61,7 @@ public class EventServiceImpl implements EventService {
 
     /**
      * Fire the given Event only to interested handlers
-     *
+     * 
      * @throws FireEventException
      */
     @Override
@@ -232,6 +232,7 @@ public class EventServiceImpl implements EventService {
         return registeredHandlers.get(eventType);
     }
 
+    @SuppressWarnings("unused")
     protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
         // check if the given event type is already registered in the Event Service
         if (containsHandlerFor(eventType)) {

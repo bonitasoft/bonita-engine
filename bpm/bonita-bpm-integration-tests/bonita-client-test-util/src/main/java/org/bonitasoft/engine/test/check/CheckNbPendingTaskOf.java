@@ -12,6 +12,7 @@ import org.bonitasoft.engine.test.WaitUntil;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
+@Deprecated
 public final class CheckNbPendingTaskOf extends WaitUntil {
 
     private final int nbActivities;

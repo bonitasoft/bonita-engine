@@ -41,7 +41,7 @@ public class TestConnectorThatThrowException extends AbstractConnector {
     }
 
     @Override
-    public void connect() throws ConnectorException {
+    public void connect() {
         final String kind = (String) getInputParameter("kind");
         if (kind.equals("connect")) {
             throw new RuntimeException("unexpected error in connect");
@@ -49,7 +49,7 @@ public class TestConnectorThatThrowException extends AbstractConnector {
     }
 
     @Override
-    public void disconnect() throws ConnectorException {
+    public void disconnect() {
         final String kind = (String) getInputParameter("kind");
         if (kind.equals("disconnect")) {
             throw new RuntimeException("unexpected error in connect");

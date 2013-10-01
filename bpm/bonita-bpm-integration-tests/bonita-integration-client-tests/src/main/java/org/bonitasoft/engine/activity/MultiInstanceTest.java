@@ -3,7 +3,6 @@ package org.bonitasoft.engine.activity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -904,36 +903,23 @@ public class MultiInstanceTest extends CommonAPITest {
 
     private void checkPendingTaskSequentially(final int loopMax, final ProcessInstance processInstance, final boolean mustBeFinished) throws Exception {
         for (int i = 0; i < loopMax; i++) {
-            final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 10000, false, 1, john);
-            if (!checkNbPendingTaskOf.waitUntil()) {
-                fail("failed on iteration " + i + " expected " + 1 + " pending task but was " + checkNbPendingTaskOf.getPendingHumanTaskInstances().size());
-            }
+            waitForPendingTasks(john.getId(), 1);
             final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
             final HumanTaskInstance pendingTask = pendingTasks.get(0);
 
             assignAndExecuteStep(pendingTask, john.getId());
         }
-        Thread.sleep(200);
         if (mustBeFinished) {
-            assertTrue("There was a new pending task but no more was expected", new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 0, john).waitUntil());
             waitForProcessToFinish(processInstance);
         }
     }
 
     private void checkPendingTaskInParallel(final int numberOfTask, final int numberOfTaskToCompleteMI, final ProcessInstance processInstance) throws Exception {
-        for (int i = 0; i < numberOfTaskToCompleteMI; i++) {
-            final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, numberOfTask - i, john);
-            if (!checkNbPendingTaskOf.waitUntil()) {
-                fail("failed on iteration " + i + " expected " + (numberOfTask - i) + " pending task but was "
-                        + checkNbPendingTaskOf.getPendingHumanTaskInstances().size());
-            }
-            final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
-            final HumanTaskInstance pendingTask = pendingTasks.get(0);
+        final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), numberOfTask);
 
-            assignAndExecuteStep(pendingTask, john.getId());
+        for (int i = 0; i < numberOfTaskToCompleteMI; i++) {
+            assignAndExecuteStep(pendingTasks.get(i), john.getId());
         }
-        Thread.sleep(200);
-        assertTrue("There was still pending task but no more was expected", new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 0, john).waitUntil());
         waitForProcessToFinish(processInstance);
         final int nbAbortedActivities = numberOfTask - numberOfTaskToCompleteMI;
         checkNbOfArchivedActivities(processInstance, nbAbortedActivities);

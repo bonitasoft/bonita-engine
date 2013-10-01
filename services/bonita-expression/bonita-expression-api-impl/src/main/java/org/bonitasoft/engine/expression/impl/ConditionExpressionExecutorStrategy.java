@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
@@ -78,7 +77,7 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionEvaluationException {
         final List<SExpression> dependencies = expression.getDependencies();
         final String content = expression.getContent();
         Object result;
@@ -202,7 +201,7 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionEvaluationException {
         final List<Object> evaluatedExpressions = new ArrayList<Object>(expressions.size());
         for (final SExpression sExpression : expressions) {
             evaluatedExpressions.add(evaluate(sExpression, dependencyValues, resolvedExpressions));

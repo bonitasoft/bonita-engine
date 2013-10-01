@@ -52,7 +52,7 @@ public class PlatformLoginServiceImplTest {
     private PlatformLoginServiceImpl platformLoginServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 

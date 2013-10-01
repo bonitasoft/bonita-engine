@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
@@ -33,7 +32,7 @@ public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExp
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionEvaluationException {
         final SExpression dependency = expression.getDependencies().get(0);
         final Object object = resolvedExpressions.get(dependency.getDiscriminant());
         Object callResult = null;
@@ -61,7 +60,7 @@ public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExp
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionEvaluationException {
         final List<Object> result = new ArrayList<Object>(2);
         for (final SExpression expression : expressions) {
             result.add(evaluate(expression, dependencyValues, resolvedExpressions));
