@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,15 +22,13 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -188,13 +189,12 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long waitForFlowNodeId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), "gateway2", false, 35000);
-        assertNotNull(waitForFlowNodeId);
+        final FlowNodeInstance waitForFlowNode = waitForFlowNodeInInterruptingState(processInstance, "gateway2", false);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
 
         // resume break point
-        getProcessAPI().executeFlowNode(waitForFlowNodeId);
+        getProcessAPI().executeFlowNode(waitForFlowNode.getId());
         waitForProcessToFinish(processInstance, TestStates.getCancelledState());
 
         // verify that the execution does not pass through the activity after the gateway
@@ -216,13 +216,13 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long waitForFlowNodeId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), "gateway1", false, 25000);
-        assertNotNull(waitForFlowNodeId);
+        final FlowNodeInstance waitForFlowNode = waitForFlowNodeInInterruptingState(processInstance, "gateway1", false);
+        assertNotNull(waitForFlowNode);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
 
         // resume break point
-        getProcessAPI().executeFlowNode(waitForFlowNodeId);
+        getProcessAPI().executeFlowNode(waitForFlowNode.getId());
         waitForProcessToFinish(processInstance, TestStates.getCancelledState());
 
         // verify that the execution does not pass through the activities after the gateway
@@ -245,13 +245,12 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long waitForFlowNodeId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), "gateway1", false, 25000);
-        assertNotNull(waitForFlowNodeId);
+        final FlowNodeInstance waitForFlowNode = waitForFlowNodeInInterruptingState(processInstance, "gateway1", false);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
 
         // resume break point
-        getProcessAPI().executeFlowNode(waitForFlowNodeId);
+        getProcessAPI().executeFlowNode(waitForFlowNode.getId());
         waitForProcessToFinish(processInstance, TestStates.getCancelledState());
 
         // verify that the execution does not pass through the activities after the gateway

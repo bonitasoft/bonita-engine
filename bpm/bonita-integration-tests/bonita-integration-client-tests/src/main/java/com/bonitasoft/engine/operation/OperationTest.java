@@ -1,5 +1,8 @@
 package com.bonitasoft.engine.operation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,9 +43,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta
@@ -279,10 +279,10 @@ public class OperationTest extends CommonAPITest {
                     getProcessAPI().getProcessDataInstance(dataIndex.getKey(), startProcess.getId()).getValue());
         }
 
-        final ActivityInstance waitForStep0 = waitForUserTask("step0", startProcess.getId());
+        final ActivityInstance waitForStep0 = waitForUserTask("step0", startProcess);
         assignAndExecuteStep(waitForStep0, john.getId());
 
-        waitForUserTask("step2", startProcess.getId()).getId();
+        waitForUserTask("step2", startProcess).getId();
 
         for (final Entry<String, Integer> dataIndex : inverDataOrder.entrySet()) {
             assertEquals("after execution of operation " + dataIndex.getKey(), valueAfter.get(dataIndex.getValue()),
@@ -508,7 +508,7 @@ public class OperationTest extends CommonAPITest {
         addMappingOfActorsForUser("actor", john.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance activityInstance = waitForUserTask("step2", processInstance, 3000);
+        final ActivityInstance activityInstance = waitForUserTask("step2", processInstance);
         final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("myDatum", activityInstance.getId());
 
         assertEquals(StringBuilder.class, activityDataInstance.getValue().getClass());

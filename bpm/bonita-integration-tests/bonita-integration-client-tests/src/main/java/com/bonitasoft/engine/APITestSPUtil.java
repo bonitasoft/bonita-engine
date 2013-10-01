@@ -64,10 +64,6 @@ public class APITestSPUtil extends APITestUtil {
 
     private ReportingAPI reportingAPI;
 
-    public static int DEFAULT_REPEAT = 50;
-
-    public static int DEFAULT_TIMEOUT = 2000;
-
     protected PlatformMonitoringAPI getPlatformMonitoringAPI() {
         return platformMonitoringAPI;
     }
@@ -185,7 +181,11 @@ public class APITestSPUtil extends APITestUtil {
         return count == minimalFrequency;
     }
 
-    protected SearchResult<HumanTaskInstance> waitForHumanTasks(final int repeatEach, final int timeout, final int nbTasks, final String taskName,
+    public SearchResult<HumanTaskInstance> waitForHumanTasks(final int nbTasks, final String taskName, final long processInstanceId) throws Exception {
+        return waitForHumanTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbTasks, taskName, processInstanceId);
+    }
+
+    private SearchResult<HumanTaskInstance> waitForHumanTasks(final int repeatEach, final int timeout, final int nbTasks, final String taskName,
             final long processInstanceId) throws Exception {
         final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, true, nbTasks, new SearchOptionsBuilder(0, 10000)
                 .filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).filter(HumanTaskInstanceSearchDescriptor.NAME, taskName)
@@ -249,7 +249,7 @@ public class APITestSPUtil extends APITestUtil {
         assignAndExecuteStep(activityInstance.getId(), user.getId());
     }
 
-    protected void waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
+    public void waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
         final ActivityInstance waitForUserTask = waitForUserTask(taskName, processInstance);
         assignAndExecuteStep(waitForUserTask, user);
     }
