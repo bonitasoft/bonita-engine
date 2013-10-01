@@ -27,6 +27,7 @@ import com.bonitasoft.engine.monitoring.mbean.impl.SServiceMXBeanImpl;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Laurent Vaills
  */
 public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implements TenantMonitoringService {
 
@@ -36,8 +37,6 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
 
     private final SessionService sessionService;
 
-    private final STransactionHandlerImpl transactionHandler;
-
     private final SJobHandlerImpl jobHandler;
 
     private final TransactionService transactionService;
@@ -46,11 +45,10 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
 
     public TenantMonitoringServiceImpl(final boolean allowMbeansRegistration, final IdentityService identityService, final EventService eventService,
             final TransactionService transactionService, final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final STransactionHandlerImpl transactionHandler, final SJobHandlerImpl jobHandler, final TechnicalLoggerService technicalLog)
+            final SJobHandlerImpl jobHandler, final TechnicalLoggerService technicalLog)
             throws HandlerRegistrationException {
         super(allowMbeansRegistration, technicalLog);
         this.identityService = identityService;
-        this.transactionHandler = transactionHandler;
         this.jobHandler = jobHandler;
         this.eventService = eventService;
         this.transactionService = transactionService;
@@ -69,10 +67,6 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
     }
 
     private void addHandlers() throws HandlerRegistrationException {
-        eventService.addHandler(STransactionHandlerImpl.TRANSACTION_ACTIVE_EVT, transactionHandler);
-        eventService.addHandler(STransactionHandlerImpl.TRANSACTION_COMMITED_EVT, transactionHandler);
-        eventService.addHandler(STransactionHandlerImpl.TRANSACTION_ROLLEDBACK_EVT, transactionHandler);
-
         eventService.addHandler(SJobHandlerImpl.JOB_COMPLETED, jobHandler);
         eventService.addHandler(SJobHandlerImpl.JOB_EXECUTING, jobHandler);
         eventService.addHandler(SJobHandlerImpl.JOB_FAILED, jobHandler);
@@ -89,7 +83,7 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
 
     @Override
     public long getNumberOfActiveTransactions() {
-        return transactionHandler.getNumberOfActiveTransactions();
+        return transactionService.getNumberOfActiveTransactions();
     }
 
     @Override

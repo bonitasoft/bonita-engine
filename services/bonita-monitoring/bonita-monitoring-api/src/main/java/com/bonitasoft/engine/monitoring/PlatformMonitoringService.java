@@ -25,7 +25,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get true if the scheduler service is started, false if it is stopped.
-     * 
+     *
      * @return true if the scheduler service is started, false if it is stopped, else return false.
      * @since 6.0
      */
@@ -33,7 +33,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the current number of active transactions at platform level.
-     * 
+     *
      * @return the current number of active transactions at platform level.
      * @since 6.0
      */
@@ -41,7 +41,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the sum of both heap and non-heap memory usage.
-     * 
+     *
      * @return the sum of both heap and non-heap memory usage.
      * @since 6.0
      */
@@ -50,7 +50,7 @@ public interface PlatformMonitoringService extends MonitoringService {
     /**
      * Get the percentage of memory used compare to maximum available memory.
      * This calculation is based on both the heap & non-heap maximum amount of memory that can be used.
-     * 
+     *
      * @throws SMonitoringException
      * @since 6.0
      */
@@ -63,14 +63,14 @@ public interface PlatformMonitoringService extends MonitoringService {
      * a period of time. The way in which the load average is calculated is operating system specific
      * but is typically a damped time-dependent average.
      * If the load average is not available, a negative value is returned.
-     * 
+     *
      * @since 6.0
      */
     double getSystemLoadAverage();
 
     /**
      * Get the number of milliseconds elapsed since the Java Virtual Machine started.
-     * 
+     *
      * @return the number of milliseconds elapsed since the Java Virtual Machine started.
      * @since 6.0
      */
@@ -80,7 +80,7 @@ public interface PlatformMonitoringService extends MonitoringService {
      * Get a timestamp (in millisecond) which indicates the date when the Java virtual
      * machine started.
      * Usually, a timestamp represents the time elapsed since the 1st of January, 1970.
-     * 
+     *
      * @return a long of start time.
      * @since 6.0
      */
@@ -89,14 +89,14 @@ public interface PlatformMonitoringService extends MonitoringService {
     /**
      * Get the total CPU time for all live threads in nanoseconds. It sums the CPU time
      * consumed by each live threads.
-     * 
+     *
      * @since 6.0
      */
     long getTotalThreadsCpuTime();
 
     /**
      * Get the current number of live threads including both daemon and non-daemon threads.
-     * 
+     *
      * @return the current number of live threads including both daemon and non-daemon threads.
      * @since 6.0
      */
@@ -104,7 +104,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the number of processors available to the Java virtual machine.
-     * 
+     *
      * @return the number of processors available to the Java virtual machine.
      * @since 6.0
      */
@@ -112,7 +112,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the operating system architecture
-     * 
+     *
      * @return the operating system architecture
      * @since 6.0
      */
@@ -120,7 +120,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the OS name
-     * 
+     *
      * @return the OS name
      * @since 6.0
      */
@@ -128,7 +128,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the OS version
-     * 
+     *
      * @return the OS version
      * @since 6.0
      */
@@ -136,7 +136,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the Java virtual machine implementation name
-     * 
+     *
      * @return the Java virtual machine implementation name
      * @since 6.0
      */
@@ -144,7 +144,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the Java virtual machine implementation vendor
-     * 
+     *
      * @return the Java virtual machine implementation vendor
      * @since 6.0
      */
@@ -152,7 +152,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the Java virtual machine implementation version
-     * 
+     *
      * @return the Java virtual machine implementation version
      * @since 6.0
      */
@@ -160,7 +160,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the Java virtual machine System properties list
-     * 
+     *
      * @return the Java virtual machine System properties list
      * @since 6.0
      */
@@ -168,7 +168,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the CPU time used by the process in nanoseconds, or -1 if this operation is not supported.
-     * 
+     *
      * @return the CPU time used by the process in nanoseconds.
      * @since 6.0
      */
@@ -176,7 +176,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the amount of virtual memory that is guaranteed to be available to the running process in bytes, or -1 if this operation is not supported.
-     * 
+     *
      * @return the amount of virtual memory that is guaranteed to be available to the running process in bytes, or -1 if this operation is not supported.
      * @since 6.0
      */
@@ -184,7 +184,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the total amount of swap space in bytes.
-     * 
+     *
      * @return the total amount of swap space in bytes.
      * @since 6.0
      */
@@ -192,7 +192,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the amount of free swap space in bytes.
-     * 
+     *
      * @return the amount of free swap space in bytes.
      * @since 6.0
      */
@@ -200,7 +200,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the amount of free physical memory in bytes.
-     * 
+     *
      * @return the amount of free physical memory in bytes.
      * @since 6.0
      */
@@ -208,7 +208,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get the total amount of physical memory in bytes.
-     * 
+     *
      * @return the total amount of physical memory in bytes.
      * @since 6.0
      */
@@ -216,7 +216,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get true if engine is running on top of a SUN/Oracle JVM.
-     * 
+     *
      * @return true if engine is running on top of a SUN/Oracle JVM, else return false.
      * @since 6.0
      */
@@ -224,7 +224,7 @@ public interface PlatformMonitoringService extends MonitoringService {
 
     /**
      * Get a map of last garbage collector MXBeans.
-     * 
+     *
      * @return a map of last garbage collector MXBeans.
      * @since 6.0
      */

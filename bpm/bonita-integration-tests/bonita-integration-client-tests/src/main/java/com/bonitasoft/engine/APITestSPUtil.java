@@ -44,6 +44,7 @@ import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.log.Log;
+import com.bonitasoft.engine.monitoring.MonitoringException;
 import com.bonitasoft.engine.reporting.Report;
 import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
 
@@ -191,6 +192,15 @@ public class APITestSPUtil extends APITestUtil {
         taskCreator.setDueDate(dueDate);
         taskCreator.setPriority(priority);
         return taskCreator;
+    }
+
+    public List<String> checkNoActiveTransactions() throws MonitoringException {
+        final List<String> messages = new ArrayList<String>();
+        long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
+        if (numberOfActiveTransactions != 0) {
+            messages.add("There are " + numberOfActiveTransactions + " active transactions.");
+        }
+        return messages;
     }
 
     public List<String> checkExistenceOfBreakpoints() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {

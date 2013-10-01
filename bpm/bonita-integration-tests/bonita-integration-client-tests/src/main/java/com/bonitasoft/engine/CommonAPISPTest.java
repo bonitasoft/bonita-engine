@@ -73,7 +73,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
 
     /**
      * FIXME: clean actors!
-     * 
+     *
      * @return
      * @throws BonitaException
      */
@@ -96,6 +96,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
             messages.addAll(checkExistenceOfCategories());
             messages.addAll(checkExistenceOfBreakpoints());
             messages.addAll(checkExistenceOfReports());
+            messages.addAll(checkNoActiveTransactions());
             logout();
         }
         return messages;

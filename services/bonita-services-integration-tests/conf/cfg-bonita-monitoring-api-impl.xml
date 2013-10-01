@@ -8,22 +8,18 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
-		<constructor-arg name="transactionHandler" ref="transactionHandlerService" />
 		<constructor-arg name="jobHandler" ref="jobHandlerService" />
 		<constructor-arg name="technicalLog" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="jobHandlerService" class="com.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" scope="prototype"/>
 
-	<bean id="transactionHandlerService" class="com.bonitasoft.engine.monitoring.impl.STransactionHandlerImpl" scope="prototype"/>
-
 	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl"/>
 
 	<bean id="platformMonitoringService" class="com.bonitasoft.engine.monitoring.impl.PlatformMonitoringServiceImpl">
 		<constructor-arg name="allowMbeansRegistration" value="true" />
 		<constructor-arg name="jvmMBean" ref="jvmMXBean" />
-		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="transactionHandler" ref="transactionHandlerService" />
+		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="schedulerService" ref="scheduler" />
 		<constructor-arg name="technicalLog" ref="technicalLoggerService" />
 	</bean>

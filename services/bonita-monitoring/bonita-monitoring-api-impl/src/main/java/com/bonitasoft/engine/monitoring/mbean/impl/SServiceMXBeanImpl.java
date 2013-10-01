@@ -48,8 +48,6 @@ public class SServiceMXBeanImpl implements SServiceMXBean {
 
     private final SessionService sessionService;
 
-    private long numberOfactiveTransactions = 0;
-
     private long numberOfExecutingJobs = 0;
 
     public SServiceMXBeanImpl(final TransactionService transactionSvc, final TenantMonitoringService monitoringService, final SessionAccessor sessionAccessor,
@@ -102,26 +100,7 @@ public class SServiceMXBeanImpl implements SServiceMXBean {
 
     @Override
     public long getNumberOfActiveTransactions() throws SMonitoringException {
-        long sessionId = -1;
-        try {
-            sessionId = MBeanUtil.createSesssion(transactionSvc, sessionAccessor, sessionService, tenantId, username);
-            // No transaction is opened because the service does not need the database.
-            numberOfactiveTransactions = monitoringService.getNumberOfActiveTransactions();
-        } catch (final Exception e) {
-            throw new SMonitoringException("Impossible to retrieve number of active transactions", e);
-        } finally {
-            if (sessionId != -1) {
-                try {
-                    sessionAccessor.deleteSessionId();
-                    sessionService.deleteSession(sessionId);
-                } catch (final SSessionNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-        return numberOfactiveTransactions;
-
+        return transactionSvc.getNumberOfActiveTransactions();
     }
 
     @Override
