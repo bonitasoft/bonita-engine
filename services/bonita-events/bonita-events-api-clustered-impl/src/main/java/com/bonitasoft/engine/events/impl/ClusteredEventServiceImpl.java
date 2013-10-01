@@ -25,6 +25,10 @@ import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MapConfig.InMemoryFormat;
+import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.HazelcastInstance;
 
 public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
@@ -47,12 +51,12 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
         super(eventBuilders, handlers, logger);
         String mapName = "EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix;
         // --- Hard coded configuration for Hazelcast
-//        Config config = hazelcastInstance.getConfig();
-//
-//        NearCacheConfig nearCacheConfig = new NearCacheConfig();
-//        nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
-//
-//        config.addMapConfig(new MapConfig(mapName));
+        Config config = hazelcastInstance.getConfig();
+
+        NearCacheConfig nearCacheConfig = new NearCacheConfig();
+        nearCacheConfig.setInMemoryFormat(InMemoryFormat.CACHED);
+
+        config.addMapConfig(new MapConfig(mapName));
         // ---
         eventHandlers = hazelcastInstance.getMap(mapName);
 
