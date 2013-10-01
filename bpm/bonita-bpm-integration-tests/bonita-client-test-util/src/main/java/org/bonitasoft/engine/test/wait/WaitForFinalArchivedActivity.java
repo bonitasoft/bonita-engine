@@ -25,6 +25,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.WaitUntil;
 
+@Deprecated
 public class WaitForFinalArchivedActivity extends WaitUntil {
 
     private final String activityName;
@@ -35,6 +36,7 @@ public class WaitForFinalArchivedActivity extends WaitUntil {
 
     private final ProcessAPI processAPI;
 
+    @Deprecated
     public WaitForFinalArchivedActivity(final int repeatEach, final int timeout, final String activityName, final long processInstanceId,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout);

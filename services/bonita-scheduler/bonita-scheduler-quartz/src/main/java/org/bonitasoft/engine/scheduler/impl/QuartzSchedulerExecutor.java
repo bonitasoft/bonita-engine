@@ -39,7 +39,6 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 import org.quartz.core.QuartzScheduler;
@@ -68,7 +67,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     private final AbstractJobListener jobListener;
 
     public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final AbstractJobListener jobListener,
-            final ReadSessionAccessor sessionAccessor, final TransactionService transactionService, final boolean useOptimization) throws SchedulerException {
+            final ReadSessionAccessor sessionAccessor, final TransactionService transactionService, final boolean useOptimization) {
         this.sessionAccessor = sessionAccessor;
         this.transactionService = transactionService;
         this.useOptimization = useOptimization;

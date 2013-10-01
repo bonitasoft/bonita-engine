@@ -14,7 +14,6 @@
  */
 package org.bonitasoft.engine.document.impl;
 
-import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.CookieStore;
@@ -81,7 +80,7 @@ public class AuthAwareCookieManager extends CookieManager {
     }
 
     @Override
-    public Map<String, List<String>> get(final URI uri, final Map<String, List<String>> requestHeaders) throws IOException {
+    public Map<String, List<String>> get(final URI uri, final Map<String, List<String>> requestHeaders) {
         // pre-condition check
         if (uri == null || requestHeaders == null) {
             throw new IllegalArgumentException("Argument is null");
@@ -116,7 +115,7 @@ public class AuthAwareCookieManager extends CookieManager {
     }
 
     @Override
-    public void put(final URI uri, final Map<String, List<String>> responseHeaders) throws IOException {
+    public void put(final URI uri, final Map<String, List<String>> responseHeaders) {
         // pre-condition check
         if (uri == null || responseHeaders == null) {
             throw new IllegalArgumentException("Argument is null");

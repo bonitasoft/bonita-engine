@@ -95,7 +95,7 @@ public final class SABlobDataInstanceImpl extends SADataInstanceImpl {
             ois = new ObjectInputStream(bais) {
 
                 @Override
-                protected Class<?> resolveClass(final ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+                protected Class<?> resolveClass(final ObjectStreamClass desc) throws ClassNotFoundException {
                     final String className = desc.getName();
                     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
                     return Class.forName(className, true, classLoader);

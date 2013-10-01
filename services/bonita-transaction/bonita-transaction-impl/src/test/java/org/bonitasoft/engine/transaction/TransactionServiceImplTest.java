@@ -1,8 +1,6 @@
 package org.bonitasoft.engine.transaction;
 
-import java.util.Collections;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Set;
 
 import javax.naming.Context;
@@ -12,9 +10,6 @@ import javax.transaction.TransactionManager;
 
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.events.model.HandlerRegistrationException;
-import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
@@ -47,7 +42,7 @@ public class TransactionServiceImplTest extends TransactionServiceTest {
 
     private TransactionManager getTransactionManager() {
         try {
-            final Hashtable env = new Hashtable();
+            final Hashtable<String, String> env = new Hashtable<String, String>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
 
             final Context ctx = new InitialContext(env);
@@ -62,11 +57,11 @@ public class TransactionServiceImplTest extends TransactionServiceTest {
         return new EventService() {
 
             @Override
-            public void removeHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerUnregistrationException {
+            public void removeHandler(final String eventType, final SHandler<SEvent> handler) {
             }
 
             @Override
-            public void removeAllHandlers(final SHandler<SEvent> handler) throws HandlerUnregistrationException {
+            public void removeAllHandlers(final SHandler<SEvent> handler) {
             }
 
             @Override
@@ -135,11 +130,11 @@ public class TransactionServiceImplTest extends TransactionServiceTest {
             }
 
             @Override
-            public void fireEvent(final SEvent event) throws FireEventException {
+            public void fireEvent(final SEvent event) {
             }
 
             @Override
-            public void addHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+            public void addHandler(final String eventType, final SHandler<SEvent> handler) {
             }
 
             @Override
@@ -178,7 +173,6 @@ public class TransactionServiceImplTest extends TransactionServiceTest {
                 return false;
             }
         };
-
 
     }
 

@@ -71,7 +71,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         Thread.sleep(50);
         getProcessAPI().sendSignal("MySignal");
 
-        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance, 10000);
+        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance);
         assignAndExecuteStep(executionStep, donaBenta.getId());
 
         waitForProcessToFinish(processInstance);
@@ -282,7 +282,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         Thread.sleep(50);
         getProcessAPI().sendSignal("MySignal");
 
-        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance, 60000);
+        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance);
         assignAndExecuteStep(executionStep, donaBenta.getId());
 
         waitForProcessToFinish(processInstance);

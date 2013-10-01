@@ -41,41 +41,41 @@ public class SQueriableLogParameterBuilderImplTest {
     public TestName name = new TestName();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         LOGGER.info("Testing : {}", name.getMethodName());
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         LOGGER.info("Tested: {}", name.getMethodName());
     }
 
     @Test
-    public void testCriateNewInstance() {
+    public void criateNewInstance() {
         final SQueriableLogParameter parameter = builder.createNewInstance("returnValue", "String").done();
         assertEquals("returnValue", parameter.getName());
         assertEquals("String", parameter.getValueType());
     }
 
     @Test
-    public void testSetStringValue() {
+    public void setStringValue() {
         final SQueriableLogParameter parameter = builder.createNewInstance("returnValue", "String").stringValue("38").done();
         assertEquals("38", parameter.getStringValue());
     }
 
     @Test
-    public void testSetBlobValue() {
+    public void setBlobValue() {
         final SQueriableLogParameter parameter = builder.createNewInstance("returnValue", "String").blobValue("blobValue").done();
         assertEquals("blobValue", parameter.getBlobValue().getValue());
     }
 
     @Test(expected = MissingMandatoryFieldsException.class)
-    public void testFailsIfNameIsNull() {
+    public void failsIfNameIsNull() {
         builder.createNewInstance(null, "Integer").done();
     }
 
     @Test(expected = MissingMandatoryFieldsException.class)
-    public void testFailsIfValueType() {
+    public void failsIfValueType() {
         builder.createNewInstance("name", null).done();
     }
 

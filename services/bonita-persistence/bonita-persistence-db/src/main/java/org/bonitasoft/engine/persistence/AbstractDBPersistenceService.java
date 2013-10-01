@@ -221,13 +221,13 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     @Override
     public <T extends PersistentObject> List<T> searchEntity(final Class<T> entityClass, final QueryOptions options, final Map<String, Object> parameters)
-            throws SBonitaSearchException, SBonitaReadException {
+            throws SBonitaReadException {
         return searchEntity(entityClass, null, options, parameters);
     }
 
     @Override
     public <T extends PersistentObject> List<T> searchEntity(final Class<T> entityClass, final String querySuffix, final QueryOptions options,
-            final Map<String, Object> parameters) throws SBonitaSearchException, SBonitaReadException {
+            final Map<String, Object> parameters) throws SBonitaReadException {
         final String queryName = getQueryName("search", querySuffix, entityClass, options.getFilters());
         final SelectListDescriptor<T> descriptor = new SelectListDescriptor<T>(queryName, parameters, entityClass, options);
         return selectList(descriptor);

@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +61,7 @@ public class QueriableLogRecordJob extends AbstractJob {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+    public void setAttributes(final Map<String, Serializable> attributes) {
         super.setAttributes(attributes);
         NullCheckingUtil.checkArgsNotNull(attributes.get("logs"));
         logs = (List<SQueriableLog>) attributes.get("logs");

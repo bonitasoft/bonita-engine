@@ -13,14 +13,12 @@
  **/
 package org.bonitasoft.engine.platform.session.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.platform.session.impl.PlatformSessionServiceImpl;
 import org.bonitasoft.engine.platform.session.model.builder.SPlatformSessionModelBuilder;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -41,7 +39,7 @@ public class PlatformSessionServiceImplTest {
     private PlatformSessionServiceImpl platformLoginServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 

@@ -13,16 +13,31 @@
  **/
 package org.bonitasoft.engine.data.instance.api.impl;
 
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.data.DataService;
+import org.bonitasoft.engine.data.SDataException;
+import org.bonitasoft.engine.data.SDataSourceInactiveException;
+import org.bonitasoft.engine.data.SDataSourceInitializationException;
+import org.bonitasoft.engine.data.SDataSourceNotFoundException;
+import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
+import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -48,7 +63,7 @@ public class DataInstanceServiceImplTest {
     private DataInstanceServiceImpl dataInstanceServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         dataSourceService = mock(DataService.class);
         persistenceService = mock(ReadPersistenceService.class);
         recorder = mock(Recorder.class);
@@ -89,10 +104,42 @@ public class DataInstanceServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstance(long)}.
+     * 
+     * @throws SDataInstanceException
+     * @throws SDataException
+     * @throws SDataSourceInactiveException
+     * @throws SDataSourceInitializationException
+     * @throws SDataSourceNotFoundException
      */
     @Test
-    public final void getDataInstanceById() {
-        // TODO : Not yet implemented
+    public final void getTransientDataInstanceById() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
+            SDataSourceInactiveException, SDataException {
+        final long dataInstanceId = 456L;
+        final SDataSource dataSource = mock(SDataSource.class);
+        doReturn(dataSource).when(dataSourceService).getDataSource(anyString(), anyString());
+        final DataInstanceDataSource dataInstanceDataSource = mock(DataInstanceDataSource.class);
+        doReturn(dataInstanceDataSource).when(dataSourceService).getDataSourceImplementation(eq(DataInstanceDataSource.class), anyLong());
+        final SDataInstance sDataInstance = mock(SDataInstance.class);
+        doReturn(sDataInstance).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
+
+        Assert.assertEquals(sDataInstance, dataInstanceServiceImpl.getDataInstance(dataInstanceId));
+    }
+
+    @Test(expected = SDataInstanceException.class)
+    @Ignore("To finish")
+    public final void getDefaultDataInstanceByIdNotExists() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
+            SDataSourceInactiveException, SDataException {
+        final long dataInstanceId = 456L;
+        final SDataSource dataSource = mock(SDataSource.class);
+        doReturn(dataSource).when(dataSourceService).getDataSource(anyString(), anyString());
+        final DataInstanceDataSource dataInstanceDataSource = mock(DataInstanceDataSource.class);
+        doReturn(dataInstanceDataSource).when(dataSourceService).getDataSourceImplementation(eq(DataInstanceDataSource.class), anyLong());
+        doThrow(new SDataInstanceException("plop")).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
+
+        final SDataInstance sDataInstance = mock(SDataInstance.class);
+        doReturn(sDataInstance).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
+
+        Assert.assertEquals(sDataInstance, dataInstanceServiceImpl.getDataInstance(dataInstanceId));
     }
 
     /**

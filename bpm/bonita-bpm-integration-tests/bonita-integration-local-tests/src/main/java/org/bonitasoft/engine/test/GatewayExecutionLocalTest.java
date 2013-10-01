@@ -63,7 +63,7 @@ public class GatewayExecutionLocalTest extends CommonAPITest {
             assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-            final FlowNodeInstance failFlowNodeInstance = waitForFlowNodeToFail(processInstance);
+            final FlowNodeInstance failFlowNodeInstance = waitForFlowNodeInFailedState(processInstance);
             assertEquals("gateway1", failFlowNodeInstance.getName());
             disableAndDeleteProcess(processDefinition);
         } finally {

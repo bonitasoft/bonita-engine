@@ -22,6 +22,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.WaitUntil;
 
+@Deprecated
 public class WaitForFlowNode extends WaitUntil {
 
     private final String name;
@@ -38,6 +39,7 @@ public class WaitForFlowNode extends WaitUntil {
 
     private final ProcessAPI processAPI;
 
+    @Deprecated
     public WaitForFlowNode(final int repeatEach, final int timeout, final String name, final long processInstanceId, final boolean useRootProcessInstance,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout);
@@ -47,12 +49,14 @@ public class WaitForFlowNode extends WaitUntil {
         this.processAPI = processAPI;
     }
 
+    @Deprecated
     public WaitForFlowNode(final int repeatEach, final int timeout, final String name, final long processInstanceId, final String state,
             final boolean rootProcessInstance, final ProcessAPI processAPI) {
         this(repeatEach, timeout, name, processInstanceId, rootProcessInstance, processAPI);
         this.state = state;
     }
 
+    @Deprecated
     public WaitForFlowNode(final int repeatEach, final int timeout, final String name, final long processInstanceId, final StateCategory stateCategory,
             final boolean rootProcessInstance, final ProcessAPI processAPI) {
         this(repeatEach, timeout, name, processInstanceId, rootProcessInstance, processAPI);

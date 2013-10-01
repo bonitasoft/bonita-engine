@@ -5,6 +5,7 @@ import java.util.Date;
 /**
  * @author Baptiste Mesta
  */
+@Deprecated
 public abstract class WaitUntil {
 
     private final int timeout;

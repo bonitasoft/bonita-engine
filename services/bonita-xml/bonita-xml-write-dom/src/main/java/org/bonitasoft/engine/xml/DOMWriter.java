@@ -91,7 +91,7 @@ public class DOMWriter implements XMLWriter {
     }
 
     @Override
-    public void write(final XMLNode rootNode, final Writer writer) throws IOException {
+    public void write(final XMLNode rootNode, final Writer writer) {
         try {
             final StreamResult sr = new StreamResult(writer);
             this.write(rootNode, sr);

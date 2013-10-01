@@ -55,7 +55,7 @@ public class LockProcessInstanceWorkTest {
     }
 
     @Test
-    public void testWorkDidNotLock() throws Exception {
+    public void workDidNotLock() throws Exception {
         Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         lockProcessInstanceWork.work(singletonMap);
         verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), any(RejectedLockHandler.class));
@@ -63,19 +63,19 @@ public class LockProcessInstanceWorkTest {
     }
 
     @Test
-    public void testGetDescription() throws Exception {
+    public void getDescription() {
         when(wrappedWork.getDescription()).thenReturn("The description");
         assertEquals("The description", lockProcessInstanceWork.getDescription());
     }
 
     @Test
-    public void testGetRecoveryProcedure() throws Exception {
+    public void getRecoveryProcedure() {
         when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
         assertEquals("recoveryProcedure", lockProcessInstanceWork.getRecoveryProcedure());
     }
 
     @Test
-    public void testHandleFailure() throws Exception {
+    public void handleFailure() throws Exception {
         Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         Exception e = new Exception();
         lockProcessInstanceWork.handleFailure(e, context);
@@ -83,24 +83,24 @@ public class LockProcessInstanceWorkTest {
     }
 
     @Test
-    public void testGetTenantId() throws Exception {
+    public void getTenantId() {
         when(wrappedWork.getTenantId()).thenReturn(12l);
         assertEquals(12, lockProcessInstanceWork.getTenantId());
     }
 
     @Test
-    public void testSetTenantId() throws Exception {
+    public void setTenantId() {
         lockProcessInstanceWork.setTenantId(12l);
         verify(wrappedWork).setTenantId(12l);
     }
 
     @Test
-    public void testGetWrappedWork() throws Exception {
+    public void getWrappedWork() {
         assertEquals(wrappedWork, lockProcessInstanceWork.getWrappedWork());
     }
 
     @Test
-    public void testToString() throws Exception {
+    public void testToString() {
         when(wrappedWork.toString()).thenReturn("the to string");
         assertEquals("the to string", lockProcessInstanceWork.toString());
     }

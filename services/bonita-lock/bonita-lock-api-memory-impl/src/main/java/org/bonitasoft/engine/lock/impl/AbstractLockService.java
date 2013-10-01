@@ -92,7 +92,7 @@ public abstract class AbstractLockService implements LockService {
     }
 
     @Override
-    public BonitaLock tryLock(final long objectToLockId, final String objectType, final RejectedLockHandler rejectedLockHandler) throws SLockException {
+    public BonitaLock tryLock(final long objectToLockId, final String objectType, final RejectedLockHandler rejectedLockHandler) {
         synchronized (mutex) {
             final String key = buildKey(objectToLockId, objectType);
             final Lock lock = getLock(key);

@@ -39,13 +39,16 @@ public class MemoryLockServiceTest {
 
     private final class RejectedLockHandlerWithState implements RejectedLockHandler {
 
-        @Override
-        public void executeOnLockFree() throws SLockException {
+        private static final long serialVersionUID = 1L;
 
+        @Override
+        public void executeOnLockFree() {
         }
     }
 
     private final class RejectedLockHandlerThatLock implements RejectedLockHandler {
+
+        private static final long serialVersionUID = 1L;
 
         private final int id;
 
@@ -89,8 +92,10 @@ public class MemoryLockServiceTest {
             this.isTry = isTry;
             this.rejectedLockHandler = new RejectedLockHandler() {
 
+                private static final long serialVersionUID = 1L;
+
                 @Override
-                public void executeOnLockFree() throws SLockException {
+                public void executeOnLockFree() {
                     // TODO Auto-generated method stub
 
                 }
@@ -140,8 +145,7 @@ public class MemoryLockServiceTest {
 
     @Test
     public void testTryLock() throws Exception {
-
-        BonitaLock lock = memoryLockService.lock(1, "a");
+        memoryLockService.lock(1, "a");
         TryLockThread tryLockThread = new TryLockThread(1, "a", true);
         tryLockThread.start();
         tryLockThread.join(100);
@@ -184,7 +188,7 @@ public class MemoryLockServiceTest {
 
     @Test
     public void testLockTimeout() throws Exception {
-        BonitaLock lock = memoryLockService.lock(2, "a");
+        memoryLockService.lock(2, "a");
         TryLockThread tryLockThread = new TryLockThread(2, "a", false);
         tryLockThread.start();
         tryLockThread.join(1200);

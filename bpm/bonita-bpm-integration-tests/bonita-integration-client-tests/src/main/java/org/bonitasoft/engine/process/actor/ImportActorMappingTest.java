@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.process.actor;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -23,12 +22,12 @@ import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.test.WaitUntil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,15 +68,9 @@ public class ImportActorMappingTest extends CommonAPITest {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
-        final long processInstanceId = getProcessAPI().startProcess(processDefinition.getId()).getId();
-        assertNotNull(waitForUserTask("userTask1", processInstanceId));
-        assertTrue("no new activity found", new WaitUntil(20, 500) {
-
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).size() == 1;
-            }
-        }.waitUntil());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("userTask1", processInstance);
+        waitForPendingTasks(john.getId(), 1);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, tasks.size());

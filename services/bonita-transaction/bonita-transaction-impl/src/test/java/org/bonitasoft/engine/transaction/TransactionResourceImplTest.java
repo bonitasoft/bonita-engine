@@ -1,8 +1,6 @@
 package org.bonitasoft.engine.transaction;
 
-import java.util.Collections;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Set;
 
 import javax.naming.Context;

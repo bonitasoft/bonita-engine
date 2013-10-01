@@ -740,7 +740,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
-    public PlatformState getPlatformState() throws PlatformNotFoundException {
+    public PlatformState getPlatformState() {
         if (isNodeStarted()) {
             return PlatformState.STARTED;
         }

@@ -510,7 +510,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         new WaitUntil(10, 15000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return BlockingConnector.semaphore.hasQueuedThreads() && semaphore1.hasQueuedThreads() && semaphore2.hasQueuedThreads();
             }
         };

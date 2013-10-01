@@ -33,11 +33,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEven
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.execution.work.ExecuteMessageCoupleWork;
 import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -87,7 +86,7 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
                 final long messageInstanceId = couple.getMessageInstanceId();
                 final long waitingMessageId = couple.getWaitingMessageId();
                 final SBPMEventType waitingMessageEventType = couple.getWaitingMessageEventType();
-                
+
                 // Mark messages that will be treated as "treatment in progress":
                 markMessageAsInProgress(messageInstanceId);
                 if (!START_WAITING_MESSAGE_LIST.contains(waitingMessageEventType)) {

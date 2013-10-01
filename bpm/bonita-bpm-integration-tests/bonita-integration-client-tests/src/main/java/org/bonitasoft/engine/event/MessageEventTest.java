@@ -43,7 +43,6 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.IntermediateThrowEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -476,8 +475,8 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docRef", "2", Integer.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
-        waitForEvent(50, 6000, receiveMessageProcessInstance2, CATCH_EVENT_NAME, TestStates.getWaitingState());
+        waitForEvent(receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
+        waitForEvent(receiveMessageProcessInstance2, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         // instantiate a process containing correlations matching with receiveMessageProcessInstance1
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(
@@ -521,8 +520,8 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI().startProcess(receiveMessageProcess.getId());
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
-        waitForEvent(50, 6000, receiveMessageProcessInstance2, CATCH_EVENT_NAME, TestStates.getWaitingState());
+        waitForEvent(receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
+        waitForEvent(receiveMessageProcessInstance2, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         // instantiate a process containing whom the targetProcess is of the ProcessDefinition receiveMessageProcess
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
@@ -586,7 +585,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance receiveMessageProcessInstance1 = getProcessAPI().startProcess(receiveMessageProcess.getId());
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
+        waitForEvent(receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         // instantiate a process containing correlations matching with receiveMessageProcessInstance1
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
@@ -619,7 +618,7 @@ public class MessageEventTest extends CommonAPITest {
                         buildAssignOperation("name", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
+        waitForEvent(receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         checkUserHasNoPendingTasks();
 
@@ -629,7 +628,8 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe 2", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
-        assertFalse(new WaitForStep(50, 6000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
+        assertFalse(new WaitForStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(),
+                getProcessAPI()).waitUntil());
 
         // instantiate a process having both two correlation keys matching, the process must go further
         final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(
@@ -637,7 +637,7 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance2));
-        waitForStep(50, 11000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
+        waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -829,7 +829,7 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
-        // waitForStep(50, 6000, "step1", receiveMessageProcessInstance);
+        // waitForStep( "step1", receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());
@@ -857,7 +857,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
-        waitForStep(50, 6000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
+        waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -1121,7 +1121,7 @@ public class MessageEventTest extends CommonAPITest {
                         buildAssignOperation("name", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
 
         // wait the event node instance
-        waitForEvent(50, 6000, receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
+        waitForEvent(receiveMessageProcessInstance1, CATCH_EVENT_NAME, TestStates.getWaitingState());
 
         // send a message having only one correlation key matching, the process must not go further
         sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.<Expression, Expression> emptyMap(), correlations1);
@@ -1129,7 +1129,7 @@ public class MessageEventTest extends CommonAPITest {
 
         // send a message having both two correlations keys matching, the process must go further
         sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.<Expression, Expression> emptyMap(), correlations2);
-        waitForStep(50, 9000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
+        waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(receiveMessageProcess);
     }
@@ -1156,7 +1156,7 @@ public class MessageEventTest extends CommonAPITest {
         final Expression lastNameValue = new ExpressionBuilder().createConstantStringExpression("Doe");
         sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.singletonMap(lastNameDisplay, lastNameValue));
 
-        waitForStep(50, 10000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
+        waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());
@@ -1183,7 +1183,7 @@ public class MessageEventTest extends CommonAPITest {
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "Message", "Loop", "Terminate", "Process" }, jira = "ENGINE-1723")
     @Test
-     public void sendMessageToTerminateProcessWithLoop() throws Exception {
+    public void sendMessageToTerminateProcessWithLoop() throws Exception {
         ProcessDefinition processToKillDefinition = null;
         ProcessDefinition killerProcessDefinition = null;
         try {

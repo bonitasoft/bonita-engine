@@ -24,14 +24,13 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 /**
  * @author Baptiste Mesta
  */
 public abstract class ResourceInSpecificFolderContribution implements BusinessArchiveContribution {
 
     @Override
-    public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException, InvalidBusinessArchiveFormatException {
+    public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
         final File folder = new File(barFolder, getFolderName());
         if (folder.exists() && !folder.isFile()) {
             final File[] listFiles = folder.listFiles();

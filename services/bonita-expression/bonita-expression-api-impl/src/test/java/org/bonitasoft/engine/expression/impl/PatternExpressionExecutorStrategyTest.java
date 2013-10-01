@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.SExpressionType;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
@@ -46,7 +45,7 @@ public class PatternExpressionExecutorStrategyTest {
     }
 
     private void patternTest(final String expressionContent, final String result, final List<String> dependencyNames, final List<Integer> dependencyContent)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionDependencyMissingException {
         final SExpressionImpl expression = new SExpressionImpl("pattern", expressionContent, SExpressionType.TYPE_PATTERN.name(), String.class.getName(), null,
                 getIntegerExpressions(dependencyNames, dependencyContent));
         final Map<Integer, Object> resolvedExpressions = getResolvedExpressionMap(expression);
@@ -55,7 +54,7 @@ public class PatternExpressionExecutorStrategyTest {
     }
 
     @Test
-    public void patternTestWithMultipleExpressions() throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public void patternTestWithMultipleExpressions() throws SExpressionDependencyMissingException {
         final SExpression expression1 = new SExpressionImpl("pattern1", "${bla} ${bla} test", SExpressionType.TYPE_PATTERN.name(), String.class.getName(),
                 null, getIntegerExpressions(Arrays.asList("bla"), Arrays.asList(12)));
         final SExpression expression2 = new SExpressionImpl("pattern1", "${bla} ${bli} test", SExpressionType.TYPE_PATTERN.name(), String.class.getName(),
@@ -67,7 +66,7 @@ public class PatternExpressionExecutorStrategyTest {
     }
 
     @Test(expected = SExpressionDependencyMissingException.class)
-    public void patternTestWithMissingValue() throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+    public void patternTestWithMissingValue() throws SExpressionDependencyMissingException {
         final SExpression expression1 = new SExpressionImpl("pattern1", "${bla} ${bla} test", SExpressionType.TYPE_PATTERN.name(), String.class.getName(),
                 null, getIntegerExpressions(Arrays.asList("bla"), Arrays.asList(12)));
         final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>(1);

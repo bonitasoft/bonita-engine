@@ -24,6 +24,7 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.test.WaitUntil;
 
+@Deprecated
 public class WaitForStep extends WaitUntil {
 
     private final String stepName;
@@ -38,6 +39,7 @@ public class WaitForStep extends WaitUntil {
 
     private final ProcessAPI processAPI;
 
+    @Deprecated
     public WaitForStep(final int repeatEach, final int timeout, final String stepName, final long processInstanceId, final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.stepName = stepName;
@@ -45,19 +47,13 @@ public class WaitForStep extends WaitUntil {
         this.processAPI = processAPI;
     }
 
+    @Deprecated
     public WaitForStep(final int repeatEach, final int timeout, final String stepName, final long processInstanceId, final String state,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.stepName = stepName;
         this.processInstanceId = processInstanceId;
         this.state = state;
-        this.processAPI = processAPI;
-    }
-
-    public WaitForStep(final String stepName, final long processInstanceId, final ProcessAPI processAPI) {
-        super(50, 3000);
-        this.stepName = stepName;
-        this.processInstanceId = processInstanceId;
         this.processAPI = processAPI;
     }
 

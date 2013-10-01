@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.persistence;
 
-import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +25,7 @@ public class TenantHibernatePersistenceServiceTest {
     private TenantHibernatePersistenceService tenantHibernatePersistenceService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     }
 
     /**

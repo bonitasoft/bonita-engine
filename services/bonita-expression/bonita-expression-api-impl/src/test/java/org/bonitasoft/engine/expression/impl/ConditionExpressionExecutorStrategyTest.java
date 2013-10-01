@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
@@ -114,14 +113,12 @@ public class ConditionExpressionExecutorStrategyTest {
         assertEquals(expectedValue, expressionResult);
     }
 
-    protected Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException,
-            SExpressionDependencyMissingException {
+    protected Object evaluate(final SExpression expression, final Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException {
         final Object result = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions);
         return result;
     }
 
-    protected List<Object> evaluate(final List<SExpression> expression, final Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException,
-            SExpressionDependencyMissingException {
+    protected List<Object> evaluate(final List<SExpression> expression, final Map<Integer, Object> resolvedExpressions) throws SExpressionEvaluationException {
         final List<Object> result = strategy.evaluate(expression, new HashMap<String, Object>(0), resolvedExpressions);
         return result;
     }

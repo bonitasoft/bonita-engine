@@ -887,29 +887,29 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         // Start first process, and wait the first step
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1_1 = waitForUserTask("step1", processInstance1.getId());
+        final ActivityInstance step1_1 = waitForUserTask("step1", processInstance1);
         // Set data to true, for the first instance
         getProcessAPI().updateActivityDataInstance("booleanData", step1_1.getId(), true);
 
         // Start second process, and wait the first step
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1_2 = waitForUserTask("step1", processInstance2.getId());
+        final ActivityInstance step1_2 = waitForUserTask("step1", processInstance2);
         // Set data to false, for the second instance
         getProcessAPI().updateActivityDataInstance("booleanData", step1_2.getId(), false);
 
         // Start third process, and wait the first step
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1_3 = waitForUserTask("step1", processInstance3.getId());
+        final ActivityInstance step1_3 = waitForUserTask("step1", processInstance3);
         // Set data to true, for the third instance
         getProcessAPI().updateActivityDataInstance("booleanData", step1_3.getId(), true);
 
         // Execute all step1
         assignAndExecuteStep(step1_1, user.getId());
-        waitForUserTask("step2", processInstance1.getId());
+        waitForUserTask("step2", processInstance1);
         assignAndExecuteStep(step1_2, user.getId());
-        waitForUserTask("step3", processInstance2.getId());
+        waitForUserTask("step3", processInstance2);
         assignAndExecuteStep(step1_3, user.getId());
-        waitForUserTask("step2", processInstance3.getId());
+        waitForUserTask("step2", processInstance3);
 
         // Check that only these 3 steps are pending
         assertEquals(3, getProcessAPI().getNumberOfPendingHumanTaskInstances(user.getId()));
@@ -977,7 +977,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final String userTaskName = "task1";
         final ProcessDefinition processDefinition = deployAndEnableProcWithPersistedAndTransientVariable(userTaskName);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance.getId());
+        final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance);
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         final Expression persistedVariableExpression = new ExpressionBuilder().createDataExpression("persistedVariable", String.class.getName());

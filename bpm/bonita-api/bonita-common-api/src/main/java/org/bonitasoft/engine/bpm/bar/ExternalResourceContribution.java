@@ -25,7 +25,6 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 /**
  * Deals with the external resources in a BusinessArchive. Is considered external a resource that is not managed by the Bonita Engine.
  * 
@@ -36,7 +35,7 @@ public class ExternalResourceContribution implements BusinessArchiveContribution
     public static final String EXTERNAL_RESOURCE_FOLDER = "resources";
 
     @Override
-    public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException, InvalidBusinessArchiveFormatException {
+    public boolean readFromBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
         final File externalResourceFolder = new File(barFolder, EXTERNAL_RESOURCE_FOLDER);
         if (externalResourceFolder.exists() && !externalResourceFolder.isFile()) {
             return readFromFileOrFolder(businessArchive, externalResourceFolder, null) > 0;

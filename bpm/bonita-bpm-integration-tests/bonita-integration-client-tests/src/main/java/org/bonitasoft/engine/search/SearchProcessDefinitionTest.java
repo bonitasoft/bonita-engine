@@ -90,7 +90,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final ProcessInstance pi1 = getProcessAPI().startProcess(user1.getId(), processDefinition1.getId());
         assertEquals(user1.getId(), pi1.getStartedBy());
 
-        waitForStep(300, 3000, "step1", pi1, TestStates.getReadyState());
+        waitForStep("step1", pi1, TestStates.getReadyState());
 
         // create process2
         final DesignProcessDefinition designProcessDefinition2 = APITestUtil.createProcessDefinitionWithHumanAndAutomaticSteps("My_Process2", PROCESS_VERSION,
@@ -99,7 +99,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final ProcessInstance pi2 = getProcessAPI().startProcess(user1.getId(), processDefinition2.getId());
         assertEquals(user1.getId(), pi2.getStartedBy());
 
-        waitForStep(300, 3000, "step1", pi2, TestStates.getReadyState());
+        waitForStep("step1", pi2, TestStates.getReadyState());
 
         final SearchOptions searchOptions = new SearchOptionsImpl(0, 5);
         final SearchResult<ProcessDeploymentInfo> searchRes = getProcessAPI().searchProcessDeploymentInfosStartedBy(userId1, searchOptions);

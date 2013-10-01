@@ -1,10 +1,8 @@
 package org.bonitasoft.engine.local;
 
-
 import java.util.Hashtable;
 
 import javax.naming.Context;
-import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
 /**
@@ -13,10 +11,11 @@ import javax.naming.spi.InitialContextFactory;
  */
 public class SimpleMemoryContextFactory implements InitialContextFactory {
 
-  private static final SimpleMemoryContext context = new SimpleMemoryContext();
+    private static final SimpleMemoryContext context = new SimpleMemoryContext();
 
-  @Override
-  public Context getInitialContext(final Hashtable<?, ?> environment) throws NamingException {
-    return context;
-  }
+    @SuppressWarnings("unused")
+    @Override
+    public Context getInitialContext(final Hashtable<?, ?> environment) {
+        return context;
+    }
 }

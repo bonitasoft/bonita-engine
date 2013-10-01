@@ -25,6 +25,7 @@ import org.bonitasoft.engine.test.WaitUntil;
 /**
  * @author Baptiste Mesta
  */
+@Deprecated
 public final class WaitForPendingTasks extends WaitUntil {
 
     private final int nbPendingTasks;
@@ -44,7 +45,7 @@ public final class WaitForPendingTasks extends WaitUntil {
 
     @Override
     protected boolean check() {
-        results = processAPI.getPendingHumanTaskInstances(userId, 0, 10, null);
+        results = processAPI.getPendingHumanTaskInstances(userId, 0, nbPendingTasks, null);
         return results.size() == nbPendingTasks;
     }
 

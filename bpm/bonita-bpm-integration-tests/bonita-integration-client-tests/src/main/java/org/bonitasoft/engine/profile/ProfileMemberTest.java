@@ -179,7 +179,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member" }, story = "Get number of profile members.")
     @Test
-    public void getNumberOfProfileMembers() throws Exception {
+    public void getNumberOfProfileMembers() {
         final List<Long> profileIds = new ArrayList<Long>();
         profileIds.add(adminProfileId);
         profileIds.add(userProfileId);
@@ -188,7 +188,6 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertEquals(2, numberOfProfileMembers.size());
         assertEquals(Long.valueOf(5L), numberOfProfileMembers.get(adminProfileId));
         assertEquals(Long.valueOf(1L), numberOfProfileMembers.get(userProfileId));
-
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Wrong parameter" }, story = "Execute profile member command with wrong parameter", jira = "ENGINE-586")

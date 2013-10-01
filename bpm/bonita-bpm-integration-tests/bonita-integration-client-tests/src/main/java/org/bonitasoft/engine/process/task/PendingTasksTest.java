@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.process.task;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -31,9 +30,7 @@ import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
-import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -141,13 +138,7 @@ public class PendingTasksTest extends CommonAPITest {
         getProcessAPI().startProcess(processDefinition1.getId());
         getProcessAPI().startProcess(processDefinition2.getId());
         // 6.check Pending tasks list. The below exception appears.
-        assertTrue("no pending user task instances are found", new WaitUntil(150, 1000) {
-
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getPendingHumanTaskInstances(userId, 0, 10, null).size() == 2;
-            }
-        }.waitUntil());
+        waitForPendingTasks(userId, 2);
         final List<HumanTaskInstance> userTaskInstances = getProcessAPI().getPendingHumanTaskInstances(userId, 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertNotNull(userTaskInstances);
         assertEquals(2, userTaskInstances.size());
@@ -177,7 +168,7 @@ public class PendingTasksTest extends CommonAPITest {
         final Date before = new Date();
         Thread.sleep(100);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep(50, 1000, "deliver", startProcess);
+        waitForStep("deliver", startProcess);
         final List<HumanTaskInstance> activityInstances = getProcessAPI().getPendingHumanTaskInstances(userId, 0, 10, ActivityInstanceCriterion.DEFAULT);
         Thread.sleep(100);
         final Date after = new Date();
@@ -233,13 +224,7 @@ public class PendingTasksTest extends CommonAPITest {
         processBuilder.addUserTask(taskName, "myActor");
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), "myActor", user);
         getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue("étape1 should be pending", new WaitUntil(30, 2000) {
-
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null).size() == 1;
-            }
-        }.waitUntil());
+        waitForPendingTasks(user.getId(), 1);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.searchTerm(taskName);
@@ -313,8 +298,8 @@ public class PendingTasksTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployProcessMappedToGroup(mainGroup);
         getProcessAPI().startProcess(processDefinition.getId());
         waitForPendingTasks(john.getId(), 1);
-        final WaitForPendingTasks waitForPendingTasks = new WaitForPendingTasks(DEFAULT_REPEAT, 250, 1, jack.getId(), getProcessAPI());
-        assertFalse(waitForPendingTasks.waitUntil());
+        final List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(jack.getId(), 0, 10, null);
+        assertTrue(pendingHumanTaskInstances.isEmpty());
 
         disableAndDeleteProcess(processDefinition);
         deleteUserMembership(m1.getId());

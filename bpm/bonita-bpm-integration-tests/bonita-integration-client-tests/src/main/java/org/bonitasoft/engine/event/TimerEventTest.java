@@ -63,11 +63,11 @@ public class TimerEventTest extends CommonAPITest {
                 actorName);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final long processInstanceId = processInstance.getId();
-        final ActivityInstance userTask = waitForUserTask(step1Name, processInstanceId);
+        final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
         assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
 
         waitForEventInWaitingState(processInstance, "intermediateCatchEvent");
+        final long processInstanceId = processInstance.getId();
         EventInstance eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
         checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.getWaitingState());
         // wait trigger activation
@@ -94,17 +94,16 @@ public class TimerEventTest extends CommonAPITest {
                 actorName);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final long processInstanceId = processInstance.getId();
-        final ActivityInstance userTask = waitForUserTask(step1Name, processInstanceId);
+        final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
         assertNotNull(userTask);
 
         assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
 
-        waitForFlowNode(processInstanceId, TestStates.getWaitingState(), "intermediateCatchEvent", true, 6000);
-        final EventInstance eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
+        waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.getWaitingState(), true);
+        final EventInstance eventInstance = getEventInstance(processInstance.getId(), "intermediateCatchEvent");
         checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.getWaitingState());
         // wait trigger activation
-        waitForUserTask(step2Name, processInstance, 10000);
+        waitForUserTask(step2Name, processInstance);
         final long now = System.currentTimeMillis();
         assertTrue("Event has triggered too early !" + (now - expectedDate), expectedDate <= now);
 
@@ -189,7 +188,7 @@ public class TimerEventTest extends CommonAPITest {
         processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
         assertEquals(1, processInstances.size());
 
-        assertNotNull(waitForUserTask(stepName, processInstances.get(0), 10000));
+        waitForUserTask(stepName, processInstances.get(0));
         disableAndDeleteProcess(definition);
     }
 

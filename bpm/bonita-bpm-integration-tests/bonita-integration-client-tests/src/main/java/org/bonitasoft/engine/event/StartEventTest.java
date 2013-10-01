@@ -68,7 +68,7 @@ public class StartEventTest extends CommonAPITest {
 
         // Verify that the start without trigger, and the start with a timer are started
         // wait for process instance creation
-        waitForUserTask("step1WithTimer", 11000);
+        waitForUserTask("step1WithTimer");
         humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
         assertEquals(2, humanTaskInstances.size());
         assertEquals("step1", humanTaskInstances.get(0).getName());
@@ -79,7 +79,7 @@ public class StartEventTest extends CommonAPITest {
 
         // Verify that the start without trigger, the start with a timer, and the start with signal are started
         getProcessAPI().sendSignal("signalName");
-        waitForUserTask("step1WithSignal", 11000);
+        waitForUserTask("step1WithSignal");
         humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
         assertEquals(3, humanTaskInstances.size());
         assertEquals("step1", humanTaskInstances.get(0).getName());
@@ -92,7 +92,7 @@ public class StartEventTest extends CommonAPITest {
         // Verify all start are started
         getProcessAPI().sendMessage("message", new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME),
                 new ExpressionBuilder().createConstantStringExpression("startEventWithMessage"), null);
-        waitForUserTask("step1WithMessage", 11000);
+        waitForUserTask("step1WithMessage");
         humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
         assertEquals(4, humanTaskInstances.size());
         assertEquals("step1", humanTaskInstances.get(0).getName());

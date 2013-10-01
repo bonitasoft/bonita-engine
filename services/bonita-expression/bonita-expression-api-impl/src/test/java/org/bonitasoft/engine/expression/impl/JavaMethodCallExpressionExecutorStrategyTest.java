@@ -48,7 +48,7 @@ public class JavaMethodCallExpressionExecutorStrategyTest {
     private Map<Integer, Object> listResolvedExp;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         list = new ArrayList<Integer>(2);
         list.add(1);
         list.add(2);

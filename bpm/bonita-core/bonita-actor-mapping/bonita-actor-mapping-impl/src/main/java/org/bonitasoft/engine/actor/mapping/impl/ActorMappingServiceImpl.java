@@ -273,7 +273,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public SActorMember addUserToActor(final long actorId, final long userId) throws SActorNotFoundException, SActorMemberCreationException {
+    public SActorMember addUserToActor(final long actorId, final long userId) throws SActorMemberCreationException {
         final SActorMemberImpl actorMember = new SActorMemberImpl();
         actorMember.setActorId(actorId);
         actorMember.setUserId(userId);
@@ -330,7 +330,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     @Override
-    public SActorMember addRoleToActor(final long actorId, final long roleId) throws SActorNotFoundException, SActorMemberCreationException {
+    public SActorMember addRoleToActor(final long actorId, final long roleId) throws SActorMemberCreationException {
         final SActorMemberImpl actorMember = new SActorMemberImpl();
         actorMember.setActorId(actorId);
         actorMember.setRoleId(roleId);

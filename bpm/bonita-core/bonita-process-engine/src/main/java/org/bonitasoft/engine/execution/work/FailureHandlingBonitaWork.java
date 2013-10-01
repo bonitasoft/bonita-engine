@@ -21,9 +21,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
@@ -90,7 +87,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             }
 
         } finally {
-        	sessionAccessor.deleteTenantId();
+            sessionAccessor.deleteTenantId();
         }
     }
 

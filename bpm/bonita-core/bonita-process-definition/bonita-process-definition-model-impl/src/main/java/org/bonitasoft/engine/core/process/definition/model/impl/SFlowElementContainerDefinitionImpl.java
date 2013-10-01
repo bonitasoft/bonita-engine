@@ -45,7 +45,6 @@ import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SBoundaryEventNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -565,7 +564,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     }
 
     @Override
-    public SBoundaryEventDefinition getBoundaryEvent(final String name) throws SBoundaryEventNotFoundException {
+    public SBoundaryEventDefinition getBoundaryEvent(final String name) {
         boolean found = false;
         SBoundaryEventDefinition boundaryEvent = null;
         final Iterator<SBoundaryEventDefinition> iterator = sBoundaryEvents.iterator();
