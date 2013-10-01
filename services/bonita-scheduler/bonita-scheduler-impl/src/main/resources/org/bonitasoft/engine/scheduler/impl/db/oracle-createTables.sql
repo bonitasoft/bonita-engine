@@ -22,7 +22,7 @@ CREATE TABLE job_log (
   jobDescriptorId NUMBER(19, 0) NOT NULL,
   retryNumber NUMBER(19, 0),
   lastUpdateDate NUMBER(19, 0),
-  lastMessage VARCHAR2(1024),
+  lastMessage CLOB,
   UNIQUE (tenantId, jobDescriptorId),
   PRIMARY KEY (tenantid, id)
 );

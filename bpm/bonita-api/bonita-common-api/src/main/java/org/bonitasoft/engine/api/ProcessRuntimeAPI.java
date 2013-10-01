@@ -19,7 +19,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
@@ -56,6 +55,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -1921,10 +1921,38 @@ public interface ProcessRuntimeAPI {
     Map<String, Serializable> evaluateExpressionsOnCompletedActivityInstance(long activityInstanceId, Map<Expression, Map<String, Serializable>> expressions)
             throws ExpressionEvaluationException;
 
+    /**
+     * Returns the list of jobs which failed.
+     * 
+     * @param startIndex
+     *            the result start index (starting from 0).
+     * @param maxResults
+     *            the maximum number of results to retrieve.
+     * @return the list of failed jobs.
+     */
     List<FailedJob> getFailedJobs(int startIndex, int maxResults);
 
+    /**
+     * Replays the failed job in order to unlock this one. The replay will use default parameters of the job.
+     * 
+     * @param jobDescriptorId
+     *            the identifier of the job descriptor.
+     * @throws ExecutionException
+     *             occurs when an exception is thrown during the job replay.
+     */
     void replayFailedJob(final long jobDescriptorId) throws ExecutionException;
 
+    /**
+     * Replays the failed job in order to unlock this one. The given parameters replace the stored parameters so if the job is executed in a CRON, all job
+     * execution will use these parameters.
+     * 
+     * @param jobDescriptorId
+     *            the identifier of the job descriptor.
+     * @param parameters
+     *            the job parameters.
+     * @throws ExecutionException
+     *             occurs when an exception is thrown during the job replay.
+     */
     void replayFailedJob(final long jobDescriptorId, Map<String, Serializable> parameters) throws ExecutionException;
 
 }
