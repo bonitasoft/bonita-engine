@@ -36,64 +36,44 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.session.model.SSession;
 
 /**
  * @author Ruiheng Fan
  * @author Celine Souchet
  * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
 public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
-    @SuppressWarnings("unchecked")
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        final List<Operation> operations;
-        final List<ConnectorDefinitionWithInputValues> connectorsWithInput;
-        final Map<String, Object> operationsInputValues;
-        try {
-            operations = (List<Operation>) parameters.get(OPERATIONS_LIST_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + OPERATIONS_LIST_KEY + " is missing or not convertible to List.", e);
-        }
-        try {
-            operationsInputValues = (Map<String, Object>) parameters.get(OPERATIONS_INPUT_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + OPERATIONS_INPUT_KEY + " is missing or not convertible to Map.", e);
-        }
+        final List<Operation> operations = getParameter(parameters, OPERATIONS_LIST_KEY, "Mandatory parameter " + OPERATIONS_LIST_KEY
+                + " is missing or not convertible to List.");
+        final Map<String, Object> operationsInputValues = getParameter(parameters, OPERATIONS_INPUT_KEY, "Mandatory parameter " + OPERATIONS_INPUT_KEY
+                + " is missing or not convertible to Map.");
+        final List<ConnectorDefinitionWithInputValues> connectorsWithInput = getParameter(parameters, CONNECTORS_LIST_KEY, "Mandatory parameter "
+                + CONNECTORS_LIST_KEY + " is missing or not convertible to List.");
+        final Long sProcessDefinitionID = getParameter(parameters, PROCESS_DEFINITION_ID_KEY, "Mandatory parameter " + PROCESS_DEFINITION_ID_KEY
+                + " is missing or not convertible to long.");
+
+        final Long userId = getParameter(parameters, USER_ID_KEY, "Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to String.");
 
         try {
-            connectorsWithInput = (List<ConnectorDefinitionWithInputValues>) parameters.get(CONNECTORS_LIST_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + CONNECTORS_LIST_KEY + " is missing or not convertible to List.", e);
-        }
-
-        long sProcessDefinitionID = 0L;
-        try {
-            sProcessDefinitionID = (Long) parameters.get(PROCESS_DEFINITION_ID_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + PROCESS_DEFINITION_ID_KEY + " is missing or not convertible to long.", e);
-        }
-
-        long userId;
-        try {
-            userId = (Long) parameters.get(USER_ID_KEY);
-        } catch (final Exception e) {
-            throw new SCommandParameterizationException("Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to String.", e);
-        }
-
-        try {
-            final ClassLoader processClassloader;
+            final TechnicalLoggerService logger = serviceAccessor.getTechnicalLoggerService();
             final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
-            processClassloader = classLoaderService.getLocalClassLoader("process", sProcessDefinitionID);
+            final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", sProcessDefinitionID);
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);
 
-                return startProcess(sProcessDefinitionID, userId, operations, operationsInputValues, connectorsWithInput).getId();
+                return startProcess(sProcessDefinitionID, userId, operations, operationsInputValues, connectorsWithInput, logger).getId();
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
@@ -109,16 +89,17 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
     }
 
     private ProcessInstance startProcess(final long processDefinitionId, final long userId, final List<Operation> operations,
-            final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws ProcessDefinitionNotFoundException,
-            CreationException, RetrieveException, ProcessDefinitionNotEnabledException {
+            final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final TechnicalLoggerService logger)
+            throws ProcessDefinitionNotFoundException, CreationException, RetrieveException, ProcessDefinitionNotEnabledException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
+        final SSession session = getSession();
         final long starterId;
         if (userId == 0) {
-            starterId = getUserIdFromSession();
+            starterId = session.getUserId();
         } else {
             starterId = userId;
         }
@@ -140,11 +121,30 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         SProcessInstance startedInstance;
         try {
             final List<SOperation> sOperations = toSOperation(operations, sOperationBuilders, sExpressionBuilders);
-            startedInstance = processExecutor.start(sDefinition, starterId, getUserIdFromSession(), sOperations, context, connectorsWithInput);
+            startedInstance = processExecutor.start(sDefinition, starterId, session.getUserId(), sOperations, context, connectorsWithInput);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e);
         }// FIXME in case process instance creation exception -> put it in failed
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            final StringBuilder stb = new StringBuilder();
+            stb.append("The user <");
+            stb.append(session.getUserName());
+            if (starterId != session.getUserId()) {
+                stb.append("> acting as delegate of user with id <");
+                stb.append(starterId);
+            }
+            stb.append("> has started instance <");
+            stb.append(startedInstance.getId());
+            stb.append("> of process <");
+            stb.append(sDefinition.getName());
+            stb.append("> in version <");
+            stb.append(sDefinition.getVersion());
+            stb.append("> and id <");
+            stb.append(sDefinition.getId());
+            stb.append(">");
+            logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
+        }
         return ModelConvertor.toProcessInstance(sDefinition, startedInstance);
     }
 

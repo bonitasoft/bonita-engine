@@ -34,6 +34,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -55,6 +56,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         final String message = "Mandatory parameter " + CONNECTORS_LIST_KEY + " is missing or not convertible to List.";
         final List<ConnectorDefinitionWithInputValues> connectorsList = getParameter(parameters, CONNECTORS_LIST_KEY, message);
 
+        final TechnicalLoggerService logger = serviceAccessor.getTechnicalLoggerService();
         final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
         final ClassLoader processClassloader;
@@ -75,7 +77,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-            executeActivity(sActivityInstanceID, processDefinitionID);
+            executeActivity(flowNodeInstance, logger);
         } catch (final BonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminate(Map<Operation, Map<String, Serializable>> operationsMap, long activityInstanceId)'",
