@@ -458,7 +458,7 @@ public class LogTest extends CommonAPISPTest {
         final long procInstanceId = startProcess.getId();
         assertEquals(0l, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());
         waitForUserTaskAndExecuteIt("step0", startProcess, userId);
-        waitForUserTask("step2", startProcess, 20000);
+        waitForUserTask("step2", startProcess);
 
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         assertEquals(numberOfUsers, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());

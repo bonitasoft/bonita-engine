@@ -1,5 +1,9 @@
 package com.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,6 +12,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.StateCategory;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -22,10 +27,6 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbOfProcessInstances;
 import org.bonitasoft.engine.test.wait.WaitForFlowNode;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
 
@@ -75,16 +76,11 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertEquals(targetProcess.getId(), targetProcInstToBeAborted.getProcessDefinitionId());
 
         // wait for the breakpoint
-        final Long waitForGatewayToBeExecutedId = waitForFlowNode(targetProcInstToBeExecuted.getId(), TestStates.getInterruptingState(), gatewayName, false,
-                350000);
-        assertNotNull(waitForGatewayToBeExecutedId);
-
-        final Long waitForGatewayToBeAbortedId = waitForFlowNode(targetProcInstToBeAborted.getId(), TestStates.getInterruptingState(), gatewayName, false,
-                350000);
-        assertNotNull(waitForGatewayToBeAbortedId);
+        final FlowNodeInstance waitForGatewayToBeExecuted = waitForFlowNodeInInterruptingState(targetProcInstToBeExecuted, gatewayName, false);
+        final FlowNodeInstance waitForGatewayToBeAborted = waitForFlowNodeInInterruptingState(targetProcInstToBeAborted, gatewayName, false);
 
         // resume the break point for the gateway of the first child --> normal state
-        getProcessAPI().executeFlowNode(waitForGatewayToBeExecutedId);
+        getProcessAPI().executeFlowNode(waitForGatewayToBeExecuted.getId());
         waitForProcessToFinish(targetProcInstToBeExecuted);
 
         final WaitForFlowNode waitForAbortingCategory = new WaitForFlowNode(50, 5000, gatewayName, targetProcInstToBeAborted.getId(), StateCategory.ABORTING,
@@ -92,14 +88,14 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertTrue(waitForAbortingCategory.waitUntil());
 
         // resume the break point for the gateway of the second child --> aborted state
-        getProcessAPI().executeFlowNode(waitForGatewayToBeAbortedId);
+        getProcessAPI().executeFlowNode(waitForGatewayToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
         waitForProcessToFinish(targetProcInstToBeAborted, TestStates.getAbortedState());
 
         // the gateway not executed must be in aborted state
         final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
-        searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, waitForGatewayToBeAbortedId);
+        searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, waitForGatewayToBeAborted.getId());
         searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.getAbortedState());
         final SearchResult<ArchivedFlowNodeInstance> searchActivities = getProcessAPI().searchArchivedFlowNodeInstances(searchBuilder.done());
         assertEquals(1, searchActivities.getCount());
@@ -141,15 +137,11 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertEquals(targetProcess.getId(), targetProcInstToBeAborted.getProcessDefinitionId());
 
         // wait for the breakpoint
-        final Long waitForFlowNodeToBeExecutedId = waitForFlowNode(targetProcInstToBeExecuted.getId(), TestStates.getInterruptingState(), taskName1, false,
-                25000);
-        assertNotNull(waitForFlowNodeToBeExecutedId);
-
-        final Long waitForFlowNodeToBeAbortedId = waitForFlowNode(targetProcInstToBeAborted.getId(), TestStates.getInterruptingState(), taskName1, false, 25000);
-        assertNotNull(waitForFlowNodeToBeAbortedId);
+        final FlowNodeInstance waitForFlowNodeToBeExecuted = waitForFlowNodeInInterruptingState(targetProcInstToBeExecuted, taskName1, false);
+        final FlowNodeInstance waitForFlowNodeToBeAborted = waitForFlowNodeInInterruptingState(targetProcInstToBeAborted, taskName1, false);
 
         // resume the break point for the first child --> normal state
-        getProcessAPI().executeFlowNode(waitForFlowNodeToBeExecutedId);
+        getProcessAPI().executeFlowNode(waitForFlowNodeToBeExecuted.getId());
         waitForProcessToFinish(targetProcInstToBeExecuted);
 
         final WaitForFlowNode waitForAbortingCategory = new WaitForFlowNode(50, 5000, taskName1, targetProcInstToBeAborted.getId(), StateCategory.ABORTING,
@@ -157,14 +149,14 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertTrue(waitForAbortingCategory.waitUntil());
 
         // resume the break point for the second child --> aborted state
-        getProcessAPI().executeFlowNode(waitForFlowNodeToBeAbortedId);
+        getProcessAPI().executeFlowNode(waitForFlowNodeToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
         waitForProcessToFinish(targetProcInstToBeAborted, TestStates.getAbortedState());
 
         // the task not executed must be in aborted state
         final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
-        searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, waitForFlowNodeToBeAbortedId);
+        searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, waitForFlowNodeToBeAborted.getId());
         searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.getAbortedState());
         final SearchResult<ArchivedFlowNodeInstance> searchActivities = getProcessAPI().searchArchivedFlowNodeInstances(searchBuilder.done());
         assertEquals(1, searchActivities.getCount());
@@ -207,16 +199,14 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertEquals(targetProcess.getId(), targetProcInstToBeAborted.getProcessDefinitionId());
 
         // wait for the breakpoint
-        final Long waitForFlowNodeToBeExecutedId = waitForFlowNode(targetProcInstToBeExecuted.getId(), TestStates.getInterruptingState(), startEventName,
-                false, 25000);
-        assertNotNull(waitForFlowNodeToBeExecutedId);
+        final FlowNodeInstance waitForFlowNodeToBeExecuted = waitForFlowNodeInInterruptingState(targetProcInstToBeExecuted, startEventName, false);
+        assertNotNull(waitForFlowNodeToBeExecuted);
 
-        final Long waitForFlowNodeToBeAbortedId = waitForFlowNode(targetProcInstToBeAborted.getId(), TestStates.getInterruptingState(), startEventName, false,
-                25000);
-        assertNotNull(waitForFlowNodeToBeAbortedId);
+        final FlowNodeInstance waitForFlowNodeToBeAborted = waitForFlowNodeInInterruptingState(targetProcInstToBeAborted, startEventName, false);
+        assertNotNull(waitForFlowNodeToBeAborted);
 
         // resume the break point for the the first child --> normal state
-        getProcessAPI().executeFlowNode(waitForFlowNodeToBeExecutedId);
+        getProcessAPI().executeFlowNode(waitForFlowNodeToBeExecuted.getId());
         waitForProcessToFinish(targetProcInstToBeExecuted);
 
         final WaitForFlowNode waitForAbortingCategory = new WaitForFlowNode(50, 5000, startEventName, targetProcInstToBeAborted.getId(),
@@ -224,7 +214,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertTrue(waitForAbortingCategory.waitUntil());
 
         // resume the break point for the second child --> aborted state
-        getProcessAPI().executeFlowNode(waitForFlowNodeToBeAbortedId);
+        getProcessAPI().executeFlowNode(waitForFlowNodeToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
         waitForProcessToFinish(targetProcInstToBeAborted, TestStates.getAbortedState());
@@ -272,16 +262,11 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertEquals(targetProcess.getId(), targetProcInstToBeAborted.getProcessDefinitionId());
 
         // wait for the breakpoint
-        final Long waitForFlowNodeToBeExecutedId = waitForFlowNode(targetProcInstToBeExecuted.getId(), TestStates.getInterruptingState(), throwEventName,
-                false, 25000);
-        assertNotNull(waitForFlowNodeToBeExecutedId);
-
-        final Long waitForFlowNodeToBeAbortedId = waitForFlowNode(targetProcInstToBeAborted.getId(), TestStates.getInterruptingState(), throwEventName, false,
-                25000);
-        assertNotNull(waitForFlowNodeToBeAbortedId);
+        final FlowNodeInstance waitForFlowNodeToBeExecuted = waitForFlowNodeInInterruptingState(targetProcInstToBeExecuted, throwEventName, false);
+        final FlowNodeInstance waitForFlowNodeToBeAborted = waitForFlowNodeInInterruptingState(targetProcInstToBeAborted, throwEventName, false);
 
         // resume the break point for the the first child --> normal state
-        getProcessAPI().executeFlowNode(waitForFlowNodeToBeExecutedId);
+        getProcessAPI().executeFlowNode(waitForFlowNodeToBeExecuted.getId());
         waitForProcessToFinish(targetProcInstToBeExecuted);
 
         final WaitForFlowNode waitForAbortingCategory = new WaitForFlowNode(50, 5000, throwEventName, targetProcInstToBeAborted.getId(),
@@ -289,7 +274,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         assertTrue(waitForAbortingCategory.waitUntil());
 
         // resume the break point for the second child --> aborted state
-        getProcessAPI().executeFlowNode(waitForFlowNodeToBeAbortedId);
+        getProcessAPI().executeFlowNode(waitForFlowNodeToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
         waitForProcessToFinish(targetProcInstToBeAborted, TestStates.getAbortedState());

@@ -37,6 +37,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
 import org.junit.Before;
@@ -44,6 +45,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
@@ -63,6 +66,12 @@ public class ClusterTests extends CommonAPISPTest {
         login();
         user = createUser(USERNAME, PASSWORD);
         logout();
+        // init the context here
+        changeToNode2();
+        PlatformSession platformSession = loginPlatform();
+        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
+        platformAPI.startNode();
+        changeToNode1();
         loginWith(USERNAME, PASSWORD);
     }
 
@@ -181,13 +190,10 @@ public class ClusterTests extends CommonAPISPTest {
         ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), "actor", user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait the all automatic task finish
-        final WaitForPendingTasks waitUntil = new WaitForPendingTasks(DEFAULT_REPEAT, 500000, 10, user.getId(), getProcessAPI());
-        assertTrue("no pending user task instances are found", waitUntil.waitUntil());
+        waitForPendingTasks(user.getId(), 10);
 
         // check that at least one data is set to "Node1" and at least one to "Node2"
-
         List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 20);
-
         boolean node1Ok = false;
         boolean node2Ok = false;
 

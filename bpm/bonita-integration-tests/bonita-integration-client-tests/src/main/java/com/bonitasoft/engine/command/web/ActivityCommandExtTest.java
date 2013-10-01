@@ -254,22 +254,21 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         parameters.put(OPERATIONS_INPUT_KEY, contexts);
         parameters.put("USER_ID_KEY", firstUser.getId());
         final long processInstanceId = (Long) getCommandAPI().execute(COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT, parameters);
+        final ProcessInstance processInstance = getProcessAPI().getProcessInstance(processInstanceId);
 
         assertEquals(resContent, getProcessAPI().getProcessDataInstance("text", processInstanceId).getValue());
         assertEquals(2, getProcessAPI().getProcessDataInstance(dataName, processInstanceId).getValue());
 
-        assertNotNull("User task step1 don't exist.", waitForUserTask("step1", processInstanceId, 12000));
+        assertNotNull("User task step1 don't exist.", waitForUserTask("step1", processInstance));
         HumanTaskInstance userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC)
                 .get(0);
         assignAndExecuteStep(userTaskInstance, getSession().getUserId());
 
-        assertNotNull("User task step2 don't exist.", waitForUserTask("step2", processInstanceId));
+        assertNotNull("User task step2 don't exist.", waitForUserTask("step2", processInstance));
         userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC).get(0);
         final String activityName = userTaskInstance.getName();
         assertNotNull(activityName);
         assertEquals("step2", activityName);
-
-        final ProcessInstance processInstance = getProcessAPI().getProcessInstance(processInstanceId);
         assertEquals(firstUser.getId(), processInstance.getStartedBy());
         deleteUser(firstUser);
     }
@@ -366,7 +365,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for the user task and assign it
-        final ActivityInstance userTask = waitForUserTask("step1", processInstance.getId());
+        final ActivityInstance userTask = waitForUserTask("step1", processInstance);
         getProcessAPI().assignUserTask(userTask.getId(), getSession().getUserId());
 
         // create operation to increment the variable
@@ -546,9 +545,9 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         processDefinition = getProcessAPI().deploy(businessArchive);
         addMappingOfActorsForUser("myActor", businessUser.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
-        final long processInstanceID = getProcessAPI().startProcess(processDefinition.getId()).getId();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
-        final ActivityInstance userTaskInstance = waitForUserTask("Request", processInstanceID);
+        final ActivityInstance userTaskInstance = waitForUserTask("Request", processInstance);
         final long taskId = userTaskInstance.getId();
         getProcessAPI().assignUserTask(taskId, getSession().getUserId());
 
@@ -567,7 +566,6 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
         // just check the operation is executed normally
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
-
-        waitForUserTask("Approval", processInstanceID);
+        waitForUserTask("Approval", processInstance);
     }
 }
