@@ -98,6 +98,7 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -563,8 +564,26 @@ public class BPMInstancesCreator {
             transaction.execute();
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Initialized variables for process instance <" + processInstance.getName() + "> with id <"
-                    + processInstance.getId() + ">");
+            StringBuilder stb = new StringBuilder();
+            stb.append("Initialized variables for process instance [name: <");
+            stb.append(processInstance.getName());
+            stb.append(">, version: <");
+            stb.append(processDefinition.getVersion());
+            stb.append(">, id: <");
+            stb.append(processInstance.getId());
+            stb.append(">, root process instance: <");
+            stb.append(processInstance.getRootProcessInstanceId());
+            stb.append(">, process definition: <");
+            stb.append(processInstance.getProcessDefinitionId());
+            if(processInstance.getCallerId() > 0) {
+                stb.append(">, caller id: <");
+                stb.append(processInstance.getCallerId());
+                stb.append(">, caller type: <");
+                stb.append(processInstance.getCallerType());
+            }
+            stb.append(">]");
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                    stb.toString());
         }
     }
 
@@ -625,9 +644,6 @@ public class BPMInstancesCreator {
             dataInstanceService.createDataInstance(dataInstance);
         }
 
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Initialized variables for " + containerType.getValue() + " with id <" + containerId + ">");
-        }
     }
 
     public void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
@@ -670,12 +686,21 @@ public class BPMInstancesCreator {
                     createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
                             expressionResolverService, dataInstanceService, sDataInstanceBuilders);
                 }
+                if (! sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                    String message = "Initialized variables for flow node" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
+                }
                 return sDataDefinitions.size() > 0;
             } catch (final SBonitaException e) {
                 throw new SActivityStateExecutionException(e);
             }
         }
         return false;
+    }
+
+    
+    public TechnicalLoggerService getLogger() {
+        return logger;
     }
 
 }

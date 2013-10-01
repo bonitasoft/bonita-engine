@@ -81,6 +81,8 @@ import org.bonitasoft.engine.xml.SXMLParseException;
  * @author Celine Souchet
  */
 public class ConnectorServiceImpl implements ConnectorService {
+    
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private static final String IMPLEMENTATION_EXT = ".impl";
 
@@ -149,19 +151,52 @@ public class ConnectorServiceImpl implements ConnectorService {
             throw new SConnectorException(e);
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(
-                    this.getClass(),
-                    TechnicalLogSeverity.DEBUG,
-                    "Executed connector <" + sConnectorInstance.getName() + "> with id <" + sConnectorInstance.getId() + ">, version <"
-                            + sConnectorInstance.getVersion() + ">, and inputs :");
-            if (inputParameters != null) {
-                final Set<String> inputNames = inputParameters.keySet();
-                for (final String inputName : inputNames) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "    <" + inputName + "> : <" + inputParameters.get(inputName) + ">");
-                }
-            }
+            String message = "Executed connector " + buildConnectorContextMessage(sConnectorInstance)
+                    + buildConnectorInputMessage(inputParameters);
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
         }
         return connectorResult;
+    }
+    
+    /**
+     * Build the log message using the connector instance's context (name, version, connector id, connector instance id, container type, container id)
+     * 
+     * @param conectorInstance
+     * @return the log message built using the connector instance's context
+     */
+    private static String buildConnectorContextMessage(final SConnectorInstance conectorInstance) {
+        StringBuilder stb = new StringBuilder();
+        stb.append(" [name: <");
+        stb.append(conectorInstance.getName());
+        stb.append(">, version: <");
+        stb.append(conectorInstance.getVersion());
+        stb.append(">, connector id: <");
+        stb.append(conectorInstance.getConnectorId());
+        stb.append(">, connector instance id: <");
+        stb.append(conectorInstance.getId());
+        stb.append(">, container type: <");
+        stb.append(conectorInstance.getContainerType());
+        stb.append(">, container id: <");
+        stb.append(conectorInstance.getContainerId());
+        stb.append(">, activation event: <");
+        stb.append(conectorInstance.getActivationEvent());
+        stb.append(">]");
+        return stb.toString();
+    }
+    
+    private static String buildConnectorInputMessage(Map<String, Object> inputParameters) {
+        StringBuilder stb = new StringBuilder();
+        if (inputParameters != null && !inputParameters.isEmpty()) {
+            stb.append(LINE_SEPARATOR);
+            stb.append("Inputs: ");
+            stb.append(LINE_SEPARATOR);
+            final Set<String> inputNames = inputParameters.keySet();
+            for (final String inputName : inputNames) {
+                stb.append("    <" + inputName + "> : <" + inputParameters.get(inputName) + ">");
+                stb.append(LINE_SEPARATOR);
+            }
+        }
+        return stb.toString();
     }
 
     @Override
