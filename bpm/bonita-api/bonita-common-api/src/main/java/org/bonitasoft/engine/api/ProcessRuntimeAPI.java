@@ -1922,7 +1922,7 @@ public interface ProcessRuntimeAPI {
             throws ExpressionEvaluationException;
 
     /**
-     * Returns the list of jobs which failed.
+     * Returns the list of jobs that failed.
      * 
      * @param startIndex
      *            the result start index (starting from 0).
@@ -1933,7 +1933,7 @@ public interface ProcessRuntimeAPI {
     List<FailedJob> getFailedJobs(int startIndex, int maxResults);
 
     /**
-     * Replays the failed job in order to unlock this one. The replay will use default parameters of the job.
+     * Replays the failed job in order to unlock it. The replay will use the stored parameters of the job.
      * 
      * @param jobDescriptorId
      *            the identifier of the job descriptor.
@@ -1943,8 +1943,8 @@ public interface ProcessRuntimeAPI {
     void replayFailedJob(final long jobDescriptorId) throws ExecutionException;
 
     /**
-     * Replays the failed job in order to unlock this one. The given parameters replace the stored parameters so if the job is executed in a CRON, all job
-     * execution will use these parameters.
+     * Replays the failed job in order to unlock it. The specified parameters replace the stored parameters. If the job is launched from CRON, all job
+     * executions use the specified parameters.
      * 
      * @param jobDescriptorId
      *            the identifier of the job descriptor.
