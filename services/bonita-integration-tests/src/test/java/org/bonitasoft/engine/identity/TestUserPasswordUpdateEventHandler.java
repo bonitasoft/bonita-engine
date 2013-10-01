@@ -2,6 +2,7 @@ package org.bonitasoft.engine.identity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -17,6 +18,12 @@ public class TestUserPasswordUpdateEventHandler extends UserUpdateEventHandler {
 
     // Set username as key, and new password as value.
     private final Map<String, String> userMap = new HashMap<String, String>();
+
+    private final String identifier;
+
+    public TestUserPasswordUpdateEventHandler() {
+        identifier = UUID.randomUUID().toString();
+    }
 
     @Override
     public void execute(final SUpdateEvent updateEvent) {
@@ -43,6 +50,11 @@ public class TestUserPasswordUpdateEventHandler extends UserUpdateEventHandler {
     @Override
     public void cleanUserMap() {
         userMap.clear();
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
     }
 
 }

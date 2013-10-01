@@ -22,12 +22,10 @@ import org.bonitasoft.engine.document.SDocumentException;
 import org.bonitasoft.engine.document.model.SDocumentBuilders;
 import org.bonitasoft.engine.document.model.SDocumentContent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,8 +40,6 @@ public class DocumentServiceImplTest {
 
     private ReadPersistenceService persistence;
 
-    private QueriableLoggerService queriableLoggerService;
-
     private SEventBuilders eventBuilders;
 
     private SDocumentBuilders documentBuilders;
@@ -54,10 +50,9 @@ public class DocumentServiceImplTest {
     public void setUp() {
         recorder = mock(Recorder.class);
         persistence = mock(ReadPersistenceService.class);
-        queriableLoggerService = mock(QueriableLoggerService.class);
         eventBuilders = mock(SEventBuilders.class);
         documentBuilders = mock(SDocumentBuilders.class);
-        documentServiceImpl = new DocumentServiceImpl(recorder, eventBuilders, persistence, documentBuilders, queriableLoggerService);
+        documentServiceImpl = new DocumentServiceImpl(recorder, eventBuilders, persistence, documentBuilders);
     }
 
     /**

@@ -25,12 +25,13 @@ CREATE TABLE job_log (
   retryNumber NUMERIC(19, 0),
   lastUpdateDate NUMERIC(19, 0),
   lastMessage NVARCHAR(MAX),
-  PRIMARY KEY (tenantid, id, jobDescriptorId)
+  UNIQUE (tenantId, jobDescriptorId),
+  PRIMARY KEY (tenantid, id)
 )
 GO
 
-ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id)
+ALTER TABLE job_log ADD CONSTRAINT fk_job_log_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE
 GO
 
-ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id)
+ALTER TABLE job_param ADD CONSTRAINT fk_job_param_jobid FOREIGN KEY (tenantid, jobDescriptorId) REFERENCES job_desc(tenantid, id) ON DELETE CASCADE
 GO

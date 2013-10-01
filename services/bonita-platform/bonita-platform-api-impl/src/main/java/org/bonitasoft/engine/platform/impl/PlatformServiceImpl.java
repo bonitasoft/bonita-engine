@@ -78,7 +78,7 @@ public class PlatformServiceImpl implements PlatformService {
     private final PlatformCacheService platformCacheService;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final List<TenantPersistenceService> tenantPersistenceServices,
-            final STenantBuilder tenantBuilder, final TechnicalLoggerService logger, PlatformCacheService platformCacheService) {
+            final STenantBuilder tenantBuilder, final TechnicalLoggerService logger, final PlatformCacheService platformCacheService) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.tenantBuilder = tenantBuilder;
@@ -409,9 +409,6 @@ public class PlatformServiceImpl implements PlatformService {
             if (sPlatform == null) {
                 // try to read it from database
                 sPlatform = readPlatform();
-                if (sPlatform == null) {
-                    throw new SPlatformNotFoundException("platform not present in cache");
-                }
                 cachePlatform(sPlatform);
             }
             return sPlatform;

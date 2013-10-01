@@ -13,10 +13,13 @@
  **/
 package org.bonitasoft.engine.events.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,13 +39,14 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 /**
  * @author Christophe Havard
  * @author Matthieu Chaffotte
+ * @author Laurent Vaills
  */
 public class EventServiceImpl implements EventService {
 
     /**
      * Contains a list of all events type and their registered handlers
      */
-    protected Map<String, Set<SHandler<SEvent>>> registeredHandlers;
+    protected Map<String, List<SHandler<SEvent>>> registeredHandlers;
 
     private final SEventBuilders eventBuilders;
 
@@ -52,12 +56,12 @@ public class EventServiceImpl implements EventService {
         super();
         this.eventBuilders = eventBuilders;
         this.logger = logger;
-        registeredHandlers = new HashMap<String, Set<SHandler<SEvent>>>();
+        registeredHandlers = new HashMap<String, List<SHandler<SEvent>>>();
     }
 
     /**
      * Fire the given Event only to interested handlers
-     * 
+     *
      * @throws FireEventException
      */
     @Override
@@ -111,11 +115,10 @@ public class EventServiceImpl implements EventService {
      * No handler duplication in a list for a given event type
      */
     @Override
-    public void addHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+    public final void addHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addHandler"));
         }
-        // the add method returns false if the given element already exists in the Set, and does nothing.
         if (handler != null && eventType != null) {
             addHandlerFor(eventType, handler);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -131,7 +134,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void removeAllHandlers(final SHandler<SEvent> handler) throws HandlerUnregistrationException {
+    public final void removeAllHandlers(final SHandler<SEvent> handler) throws HandlerUnregistrationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeAllHandlers"));
         }
@@ -142,7 +145,7 @@ public class EventServiceImpl implements EventService {
             }
             throw new HandlerUnregistrationException();
         } else {
-            removeHandlerInAllType(handler);
+            removeAllHandlersFor(handler);
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeAllHandlers"));
@@ -150,18 +153,26 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void removeHandler(final String eventType, final SHandler<SEvent> h) throws HandlerUnregistrationException {
+    public final void removeHandler(final String eventType, final SHandler<SEvent> h) throws HandlerUnregistrationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeHandler"));
         }
         if (h == null || eventType == null) {
             throw new HandlerUnregistrationException();
         }
-        // check if the handler has already been registered, then remove it
-        final Collection<SHandler<SEvent>> handlers = getHandlersFor(eventType);
-        if (handlers != null && handlers.contains(h)) {
-            handlers.remove(h);
-        } else {
+        boolean removed = false;
+        Collection<SHandler<SEvent>> handlers = getHandlersFor(eventType);
+        if (handlers != null) {
+            Iterator<SHandler<SEvent>> it = handlers.iterator();
+            while (!removed && it.hasNext()) {
+                SHandler<SEvent> handler = it.next();
+                if (h.getIdentifier().equals(handler.getIdentifier())) {
+                    it.remove();
+                    removed = true;
+                }
+            }
+        }
+        if (!removed) {
             throw new HandlerUnregistrationException();
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -170,7 +181,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Set<SHandler<SEvent>> getHandlers(final String eventType) {
+    public final Set<SHandler<SEvent>> getHandlers(final String eventType) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getHandlers"));
         }
@@ -188,19 +199,12 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public SEventBuilder getEventBuilder() {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getEventBuilder"));
-        }
-        final SEventBuilder sEventBuilder = eventBuilders.getEventBuilder();
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getEventBuilder"));
-        }
-        return sEventBuilder;
+    public final SEventBuilder getEventBuilder() {
+        return eventBuilders.getEventBuilder();
     }
 
     @Override
-    public boolean hasHandlers(final String eventType, final EventActionType actionType) {
+    public final boolean hasHandlers(final String eventType, final EventActionType actionType) {
         String key = eventType;
         if (actionType != null) {
             switch (actionType) {
@@ -228,33 +232,26 @@ public class EventServiceImpl implements EventService {
         return registeredHandlers.get(eventType);
     }
 
-    @Override
-    public Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers() {
-        return registeredHandlers;
-    }
-
     protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
-        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "NON-cluster implementation of addHandlerFor() method for eventType=" + eventType
-                + ", handler=" + handler.getClass().getSimpleName());
         // check if the given event type is already registered in the Event Service
         if (containsHandlerFor(eventType)) {
             // if the handler already exists for the same eventType, an Exception is thrown
-            final Set<SHandler<SEvent>> handlers = registeredHandlers.get(eventType);
-            if (!handlers.add(handler)) {
-                throw new HandlerRegistrationException("This handler is already registered for this event type");
-            }
+            final List<SHandler<SEvent>> handlers = registeredHandlers.get(eventType);
+            handlers.add(handler);
         } else {
             // if the given type doesn't already exist in the eventFilters list, we create it
-            final Set<SHandler<SEvent>> newHandlerSet = new HashSet<SHandler<SEvent>>();
+            final List<SHandler<SEvent>> newHandlerSet = new ArrayList<SHandler<SEvent>>(3);
             newHandlerSet.add(handler);
             registeredHandlers.put(eventType, newHandlerSet);
         }
     }
 
-    protected void removeHandlerInAllType(final SHandler<SEvent> handler) {
-        for (final Set<SHandler<SEvent>> handlers : registeredHandlers.values()) {
-            if (handlers.contains(handler)) {
-                handlers.remove(handler);
+    protected void removeAllHandlersFor(final SHandler<SEvent> handler) {
+        for (final String eventType : registeredHandlers.keySet()) {
+            try {
+                removeHandler(eventType, handler);
+            } catch (HandlerUnregistrationException e) {
+                // Nothing to do.
             }
         }
     }

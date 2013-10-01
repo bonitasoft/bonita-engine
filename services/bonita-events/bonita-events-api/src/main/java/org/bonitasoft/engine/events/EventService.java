@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.events;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.events.model.FireEventException;
@@ -52,7 +51,7 @@ public interface EventService {
     boolean hasHandlers(final String eventType, EventActionType actionType);
 
     /**
-     * Add the given handler to the Event Manager's handlers list. It guarantees no duplication in the handlers' list
+     * Add the given handler to the Event Manager's handlers list.
      *
      * @param eventType The type of the event the handler is interested in.
      * @param userHandler
@@ -81,13 +80,6 @@ public interface EventService {
      * Retrieve the list of all registered Handlers or the given EventType
      */
     Set<SHandler<SEvent>> getHandlers(String eventType);
-
-    /**
-     * Get all registered handlers
-     *
-     * @return The list of all registered handlers with their associated event type.
-     */
-    Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers();
 
     /**
      * Get the event model builder

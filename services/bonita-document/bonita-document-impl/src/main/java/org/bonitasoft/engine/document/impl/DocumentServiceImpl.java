@@ -28,24 +28,16 @@ import org.bonitasoft.engine.document.model.SDocument;
 import org.bonitasoft.engine.document.model.SDocumentBuilders;
 import org.bonitasoft.engine.document.model.SDocumentContent;
 import org.bonitasoft.engine.document.model.SDocumentContentBuilder;
-import org.bonitasoft.engine.document.model.SDocumentLogBuilder;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Zhao Na
@@ -61,15 +53,12 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final SDocumentBuilders documentBuilders;
 
-    private final QueriableLoggerService queriableLoggerService;
-
     public DocumentServiceImpl(final Recorder recorder, final SEventBuilders eventBuilders, final ReadPersistenceService persistenceService,
-            final SDocumentBuilders documentBuilders, final QueriableLoggerService queriableLoggerService) {
+            final SDocumentBuilders documentBuilders) {
         this.recorder = recorder;
         this.eventBuilders = eventBuilders;
         this.persistenceService = persistenceService;
         this.documentBuilders = documentBuilders;
-        this.queriableLoggerService = queriableLoggerService;
     }
 
     @Override
@@ -80,17 +69,13 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public SDocument storeDocumentContent(final SDocument sDocument, final byte[] documentContent) throws SDocumentStorageException {
         final String documentId = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
-        final SDocumentLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "store a document content");
         final SDocumentContent sdocumentContent = createDocumentContent(documentId, documentContent);
         final InsertRecord insertRecord = new InsertRecord(sdocumentContent);
         final SInsertEvent insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent("SDocumentContent").setObject(sdocumentContent)
                 .done();
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(sdocumentContent.getId(), SQueriableLog.STATUS_OK, logBuilder, "storeDocumentContent");
-
         } catch (final SRecorderException re) {
-            initiateLogBuilder(sdocumentContent.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "storeDocumentContent");
             throw new SDocumentStorageException(re);
         }
         try {
@@ -103,7 +88,6 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public void deleteDocumentContent(final String documentId) throws SDocumentDeletionException, SDocumentContentNotFoundException {
-        final SDocumentLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a document content");
         SDocumentContent sdocumentContent = null;
         try {
             // sdocumentContent = getDocumentContent(sDocument.getStorageId());
@@ -112,9 +96,7 @@ public class DocumentServiceImpl implements DocumentService {
             final SDeleteEvent deleteEvent = (SDeleteEvent) eventBuilders.getEventBuilder().createDeleteEvent("SDocumentContent").setObject(sdocumentContent)
                     .done();
             recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(sdocumentContent.getId(), SQueriableLog.STATUS_OK, logBuilder, "delete");
         } catch (final SRecorderException e) {
-            initiateLogBuilder(sdocumentContent.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SDocumentDeletionException("can't delete Document content " + sdocumentContent, e);
         }
     }
@@ -143,28 +125,4 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
-    private SDocumentLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SDocumentLogBuilder logBuilder = documentBuilders.getSDocumentLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        return logBuilder;
-    }
-
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
-
-    private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
-        }
-    }
 }

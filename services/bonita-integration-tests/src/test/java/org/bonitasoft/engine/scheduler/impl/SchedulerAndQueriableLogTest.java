@@ -12,7 +12,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
+import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.test.util.TestUtil;
@@ -49,36 +49,8 @@ public class SchedulerAndQueriableLogTest extends CommonServiceTest {
         TestUtil.stopScheduler(schedulerService, getTransactionService());
     }
 
-    @Test
-    public void testLogWhenScheduleAndExecuteAJob() throws Exception {
-        getTransactionService().begin();
-        final Date now = new Date();
-        final Trigger trigger = new OneShotTrigger("logevents", now, 10);
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.DoNothingJob", "DoNothingJob").setDescription("a job that does nothing").done();
-        schedulerService.schedule(jobDescriptor, trigger);
-        getTransactionService().complete();
-
-        // query schedule
-        getTransactionService().begin();
-
-        // FIXME: this can be improve: there are other action_types to be retrieved
-        final List<FilterOption> filters = new ArrayList<FilterOption>(1);
-        filters.add(createFilterOption("actionType", JOB_CREATED));
-        final List<SQueriableLog> logs = queriableLoggerService.searchLogs(new QueryOptions(0, 10, null, filters, null));
-        checkRetrievedLog(logs, SQueriableLog.STATUS_OK, JOB_CREATED);
-
-        getTransactionService().complete();
-    }
-
     private FilterOption createFilterOption(final String fieldName, final String fieldValue) {
         return new FilterOption(SQueriableLog.class, fieldName, fieldValue);
-    }
-
-    private void checkRetrievedLog(final List<SQueriableLog> logs, final int state, final String actionType) {
-        assertEquals(1, logs.size());
-        assertEquals(state, logs.get(0).getActionStatus());
-        assertEquals(actionType, logs.get(0).getActionType());
     }
 
     @Test
@@ -90,7 +62,7 @@ public class SchedulerAndQueriableLogTest extends CommonServiceTest {
         final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
                 .createNewInstance("org.bonitasoft.engine.scheduler.job.ThrowsExceptionJob.ThrowsExceptionJob()", "ThrowExceptionJob")
                 .setDescription("a job that throws exception").done();
-        final Trigger trigger = new OneShotTrigger("eventsLog", now, 10);
+        final Trigger trigger = new OneExecutionTrigger("eventsLog", now, 10);
         schedulerService.schedule(jobDescriptor, trigger);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();

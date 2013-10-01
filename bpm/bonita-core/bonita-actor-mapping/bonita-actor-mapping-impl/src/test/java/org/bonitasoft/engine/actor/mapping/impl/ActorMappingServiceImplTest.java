@@ -16,19 +16,32 @@ package org.bonitasoft.engine.actor.mapping.impl;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.withSettings;
+import static org.powermock.api.mockito.PowerMockito.doCallRealMethod;
+import static org.powermock.api.mockito.PowerMockito.doNothing;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.bonitasoft.engine.actor.mapping.SActorCreationException;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
+import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -36,39 +49,49 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Celine Souchet
  * 
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ ActorMappingServiceImpl.class })
 public class ActorMappingServiceImplTest {
 
-    @Mock
     private Recorder recorder;
 
-    @Mock
     private ReadPersistenceService persistenceService;
 
-    @Mock
     private EventService eventService;
 
-    @Mock
     private QueriableLoggerService queriableLoggerService;
 
-    @Mock
     private IdentityService identityService;
 
-    @InjectMocks
     private ActorMappingServiceImpl actorMappingServiceImpl;
+
+    @Before
+    public void initialize() {
+
+        recorder = mock(Recorder.class);
+        persistenceService = mock(ReadPersistenceService.class);
+        eventService = mock(EventService.class);
+        queriableLoggerService = mock(QueriableLoggerService.class);
+        identityService = mock(IdentityService.class);
+        actorMappingServiceImpl = new ActorMappingServiceImpl(persistenceService, recorder, eventService, queriableLoggerService, identityService);
+        MockitoAnnotations.initMocks(this);
+    }
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActor(long)}.
@@ -361,18 +384,69 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addActors(java.util.Set)}.
+     * 
+     * @throws SActorCreationException
      */
     @Test
-    public final void addActors() {
-        // TODO : "Not yet implemented"
+    public final void addActors() throws SActorCreationException {
+        final Set<SActor> actors = new HashSet<SActor>();
+        actors.add(mock(SActor.class));
+
+        final ActorMappingServiceImpl mockedActorMappingServiceImpl = mock(ActorMappingServiceImpl.class, withSettings().spiedInstance(actorMappingServiceImpl));
+        final SActor sActor = mock(SActor.class);
+        when(mockedActorMappingServiceImpl.addActor(any(SActor.class))).thenReturn(sActor);
+
+        // Let's call it for real:
+        doCallRealMethod().when(mockedActorMappingServiceImpl).addActors(actors);
+        final Set<SActor> result = mockedActorMappingServiceImpl.addActors(actors);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(sActor, result.toArray()[0]);
+
+        // and check methods are called:
+        verify(mockedActorMappingServiceImpl, times(1)).addActor(any(SActor.class));
+    }
+
+    @Test
+    public final void addActorsEmptyList() throws SActorCreationException {
+        final Set<SActor> actors = new HashSet<SActor>();
+
+        final Set<SActor> result = actorMappingServiceImpl.addActors(actors);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test(expected = SActorCreationException.class)
+    public final void addActorsThrowException() throws SActorCreationException {
+        final Set<SActor> actors = new HashSet<SActor>();
+        actors.add(mock(SActor.class));
+
+        final ActorMappingServiceImpl mockedActorMappingServiceImpl = mock(ActorMappingServiceImpl.class, withSettings().spiedInstance(actorMappingServiceImpl));
+        when(mockedActorMappingServiceImpl.addActor(any(SActor.class))).thenThrow(new SActorCreationException(""));
+
+        // Let's call it for real:
+        doCallRealMethod().when(mockedActorMappingServiceImpl).addActors(actors);
+        mockedActorMappingServiceImpl.addActors(actors);
     }
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addActor(org.bonitasoft.engine.actor.mapping.model.SActor)}.
+     * 
+     * @throws Exception
      */
     @Test
-    public final void addActor() {
-        // TODO : "Not yet implemented"
+    public final void addActor() throws Exception {
+        final SActor sActor = mock(SActor.class);
+        doReturn(1L).when(sActor).getId();
+
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+
+        // Let's call it for real:
+        final SActor result = actorMappingServiceImpl.addActor(sActor);
+        assertNotNull(result);
+        assertEquals(sActor, result);
     }
 
     /**

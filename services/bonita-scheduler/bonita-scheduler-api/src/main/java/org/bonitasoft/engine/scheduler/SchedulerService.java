@@ -89,9 +89,8 @@ public interface SchedulerService {
      * @param trigger
      * @throws SSchedulerException
      *             if an exception occurs.
-     * @throws FireEventException
      */
-    void schedule(SJobDescriptor jobDescriptor, Trigger trigger) throws SSchedulerException, FireEventException;
+    void schedule(SJobDescriptor jobDescriptor, Trigger trigger) throws SSchedulerException;
 
     /**
      * Schedules a job.
@@ -101,9 +100,20 @@ public interface SchedulerService {
      * @param trigger
      * @throws SSchedulerException
      *             if an exception occurs.
-     * @throws FireEventException
      */
-    void schedule(SJobDescriptor jobDescriptor, List<SJobParameter> parameters, Trigger trigger) throws SSchedulerException, FireEventException;
+    void schedule(SJobDescriptor jobDescriptor, List<SJobParameter> parameters, Trigger trigger) throws SSchedulerException;
+
+    void schedule(long jobDescriptorId) throws SSchedulerException;
+
+    /**
+     * Schedules a job.
+     * 
+     * @param jobDescriptorId
+     * @param jobParameters
+     * @throws SSchedulerException
+     *             if an exception occurs.
+     */
+    void schedule(long jobDescriptorId, List<SJobParameter> parameters) throws SSchedulerException;
 
     /**
      * execute a job.
@@ -112,9 +122,8 @@ public interface SchedulerService {
      * @param jobParameters
      * @throws SSchedulerException
      *             if an exception occurs.
-     * @throws FireEventException
      */
-    void executeNow(SJobDescriptor jobDescriptor, List<SJobParameter> parameters) throws SSchedulerException, FireEventException;
+    void executeNow(SJobDescriptor jobDescriptor, List<SJobParameter> parameters) throws SSchedulerException;
 
     /**
      * Deletes a job according to its name.
@@ -167,5 +176,7 @@ public interface SchedulerService {
      *             if an exception occurs.
      */
     List<String> getAllJobs() throws SSchedulerException;
+
+    boolean isStillScheduled(SJobDescriptor jobDescriptor) throws SSchedulerException;
 
 }

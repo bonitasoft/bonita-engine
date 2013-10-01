@@ -2672,7 +2672,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
             final SActivityInstance activity = activityInstanceService.getActivityInstance(activityInstanceId);
-            return processInstanceService.getProcessInstance(activity.getRootContainerId()).getProcessDefinitionId();
+            return processInstanceService.getProcessInstance(activity.getParentProcessInstanceId()).getProcessDefinitionId();
         } catch (final SBonitaException e) {
             throw new ProcessDefinitionNotFoundException(e);
         }
@@ -5401,7 +5401,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Map<Expression, Map<String, Serializable>> expressions) throws ExpressionEvaluationException {
         try {
             final ActivityInstance activityInstance = getActivityInstance(activityInstanceId);
-            final ProcessInstance processInstance = getProcessInstance(activityInstance.getParentContainerId());
+            final ProcessInstance processInstance = getProcessInstance(activityInstance.getParentProcessInstanceId());
 
             return evaluateExpressionsInstanceLevel(expressions, activityInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE, processInstance.getProcessDefinitionId());
         } catch (final BonitaException e) {

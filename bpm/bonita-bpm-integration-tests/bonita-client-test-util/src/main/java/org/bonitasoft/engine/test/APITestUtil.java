@@ -1541,4 +1541,17 @@ public class APITestUtil {
         this.session = session;
     }
 
+    protected byte[] getConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId, final String implementationVersion, final String implementationClassname) {
+        StringBuilder stb = new StringBuilder();
+        stb.append("<connectorImplementation>");
+        stb.append("");
+        stb.append("<definitionId>" + definitionId + "</definitionId>");
+        stb.append("<definitionVersion>" + definitionVersion + "</definitionVersion>");
+        stb.append("<implementationClassname>" + implementationClassname + "</implementationClassname>");
+        stb.append("<implementationId>" + implementationId + "</implementationId>");
+        stb.append("<implementationVersion>" + implementationVersion + "</implementationVersion>");
+        stb.append("</connectorImplementation>");
+        return stb.toString().getBytes();
+    }
+
 }

@@ -9,7 +9,6 @@ import org.bonitasoft.engine.continuation.WorkServiceTest;
 import org.bonitasoft.engine.data.DataTest;
 import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
 import org.bonitasoft.engine.dependency.DependencyServiceTest;
-import org.bonitasoft.engine.events.EventServiceTest;
 import org.bonitasoft.engine.exceptions.impl.ExceptionsManagerTests;
 import org.bonitasoft.engine.expression.ExpressionServiceTest;
 import org.bonitasoft.engine.identity.IdentityServiceTest;
@@ -19,6 +18,7 @@ import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationT
 import org.bonitasoft.engine.profile.ProfileServiceTest;
 import org.bonitasoft.engine.queriablelogger.QueriableLoggerServiceTest;
 import org.bonitasoft.engine.recorder.RecorderTest;
+import org.bonitasoft.engine.scheduler.impl.JobTest;
 import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorTest;
 import org.bonitasoft.engine.scheduler.impl.SchedulerAndQueriableLogTest;
 import org.bonitasoft.engine.session.PlatformSessionServiceTest;
@@ -40,7 +40,6 @@ import org.junit.runners.Suite.SuiteClasses;
         QueriableLoggerServiceTest.class,
         IdentityServiceTest.class,
         ExceptionManagerIntegrationTests.class,
-        EventServiceTest.class,
         AuthenticationServiceTest.class,
         PlatformAuthenticationServiceTest.class,
         SessionServiceTest.class,
@@ -54,6 +53,7 @@ import org.junit.runners.Suite.SuiteClasses;
         RecorderTest.class,
         SchedulerAndQueriableLogTest.class,
         QuartzSchedulerExecutorTest.class,
+        JobTest.class,
         CommandServiceIntegrationTest.class,
         // DocumentServiceTest.class,
         PlatformCommandServiceIntegrationTest.class,

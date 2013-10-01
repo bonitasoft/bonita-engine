@@ -101,7 +101,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     private static final String PROCESS = "process";
 
     @Test
-    public void executeConnectorWithJNDILookpAndAPICall() throws Exception {
+    public void executeConnectorWithJNDILookupAndAPICall() throws Exception {
         final Expression localDataExpression = new ExpressionBuilder().createConstantLongExpression(0L);
         final Expression processNameExpression = new ExpressionBuilder().createConstantStringExpression("process");
         final Expression processVersionExpression = new ExpressionBuilder().createConstantStringExpression("1.0");

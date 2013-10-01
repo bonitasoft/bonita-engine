@@ -67,11 +67,6 @@ public class TransactionResourceImplTest extends TransactionResourceTest {
             }
 
             @Override
-            public Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers() {
-                return Collections.emptyMap();
-            }
-
-            @Override
             public Set<SHandler<SEvent>> getHandlers(final String eventType) {
                 return null;
             }

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.scheduler.trigger;
 
 import java.util.Date;
 
-
 /**
  * @author Matthieu Chaffotte
  */
@@ -30,7 +29,7 @@ public class OneShotTrigger implements Trigger {
     public OneShotTrigger(final String name, final Date startDate) {
         this.name = name;
         this.startDate = startDate;
-        this.priority = 5;
+        priority = 5;
     }
 
     public OneShotTrigger(final String name, final Date startDate, final int priority) {

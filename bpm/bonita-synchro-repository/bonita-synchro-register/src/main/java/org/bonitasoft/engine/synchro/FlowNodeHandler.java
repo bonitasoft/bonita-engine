@@ -15,6 +15,7 @@ package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -25,9 +26,11 @@ import org.bonitasoft.engine.events.model.SEvent;
 public class FlowNodeHandler extends AbstractUpdateHandler {
 
     private static final long serialVersionUID = 1L;
+    private final String identifier;
 
     public FlowNodeHandler(final long tenantId) {
         super(tenantId);
+        this.identifier = UUID.randomUUID().toString();
     }
 
     @Override
@@ -40,6 +43,11 @@ public class FlowNodeHandler extends AbstractUpdateHandler {
     public boolean isInterested(final SEvent event) {
         // the !isStateExecuting avoid having 2 times the same event in case of execution of e.g. connectors
         return event.getObject() instanceof SFlowNodeInstance && !((SFlowNodeInstance) event.getObject()).isStateExecuting();
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
     }
 
 }

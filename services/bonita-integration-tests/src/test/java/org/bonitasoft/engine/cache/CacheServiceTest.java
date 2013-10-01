@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -128,16 +127,11 @@ public class CacheServiceTest {
         assertEquals("Object should still be in cache", value, object);
     }
 
-    @Test
-    public void defaultTimeoutConfig() throws Exception {
+    @Test(expected=CacheException.class)
+    public void cacheNotDefined() throws Exception {
         final String key = "defaultTimeout";
         final String anotherCacheName = "Should_use_default_config";
         cacheService.store(anotherCacheName, key, new String());
-        Serializable s = (Serializable) cacheService.get(anotherCacheName, key);
-        assertNotNull("Object should be in cache", s);
-        Thread.sleep(1000);
-        s = (Serializable) cacheService.get(anotherCacheName, key);
-        assertNotNull("Object should still be in cache with default timeout config", s);
     }
 
     @Test(expected = CacheException.class)

@@ -32,4 +32,8 @@ public interface SHandler<T extends SEvent> extends Serializable {
      */
     boolean isInterested(T event);
 
+    /**
+     * Returns a unique identifier for each instance of the Handler
+     */
+    String getIdentifier();
 }

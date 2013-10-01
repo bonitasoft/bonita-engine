@@ -62,14 +62,12 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Baptiste Mesta
@@ -94,25 +92,20 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
 
     private final SConnectorInstanceBuilder connectorKeyProvider;
 
-    private final QueriableLoggerService queriableLoggerService;
-
     private final ArchiveService archiveService;
 
     public ConnectorInstanceServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final BPMInstanceBuilders instanceBuilders,
-            final EventService eventService, final QueriableLoggerService queriableLoggerService, final ArchiveService archiveService) {
+            final EventService eventService, final ArchiveService archiveService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.instanceBuilders = instanceBuilders;
         this.archiveService = archiveService;
         connectorKeyProvider = instanceBuilders.getSConnectorInstanceBuilder();
         this.eventService = eventService;
-        this.queriableLoggerService = queriableLoggerService;
     }
 
     @Override
     public void setState(final SConnectorInstance sConnectorInstance, final String state) throws SConnectorInstanceModificationException {
-        final SConnectorInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED,
-                "Changing state of connetor instance " + sConnectorInstance.getName() + " to " + state, sConnectorInstance);
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(connectorKeyProvider.getStateKey(), state);
 
@@ -123,9 +116,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            log(sConnectorInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "setState");
         } catch (final SRecorderException e) {
-            log(sConnectorInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setState");
             throw new SConnectorInstanceModificationException(e);
         }
     }
@@ -134,13 +125,11 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     public void setConnectorInstanceFailureException(final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure, final Throwable throwable)
             throws SConnectorInstanceModificationException {
         final SConnectorInstanceWithFailureInfoBuilder connectorWithFailureKeyProvider = instanceBuilders.getSConnectorInstanceWithFailureInfoBuilder();
-        final SConnectorInstanceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED,
-                "Changing connector instance exception", connectorInstanceWithFailure);
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(connectorWithFailureKeyProvider.getExceptionMessageKey(), getExceptionMessage(throwable));
         try {
             entityUpdateDescriptor.addField(connectorWithFailureKeyProvider.getStackTraceKey(), getStringStackTrace(throwable));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new SConnectorInstanceModificationException(e);
         }
 
@@ -151,9 +140,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            log(connectorInstanceWithFailure.getId(), SQueriableLog.STATUS_OK, logBuilder, "setState");
         } catch (final SRecorderException e) {
-            log(connectorInstanceWithFailure.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "setState");
             throw new SConnectorInstanceModificationException(e);
         }
     }
@@ -177,12 +164,12 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         if (throwable == null) {
             return null;
         }
-        StringWriter writer = new StringWriter();
+        final StringWriter writer = new StringWriter();
         PrintWriter printer = null;
         try {
             printer = new PrintWriter(writer);
             throwable.printStackTrace(printer);
-            String strStackTrace = writer.toString();
+            final String strStackTrace = writer.toString();
             return strStackTrace;
         } finally {
             if (printer != null) {
@@ -200,12 +187,9 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(CONNECTOR_INSTANCE).setObject(connectorInstance).done();
         }
         final InsertRecord insertRecord = new InsertRecord(connectorInstance);
-        final SConnectorInstanceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new connector instance", connectorInstance);
         try {
             recorder.recordInsert(insertRecord, insertEvent);
-            log(connectorInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "createConnectorInstance");
         } catch (final SRecorderException e) {
-            log(connectorInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createConnectorInstance");
             throw new SConnectorInstanceCreationException(e);
         }
     }
@@ -332,16 +316,6 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         logBuilder.setActionType(actionType);
     }
 
-    private void log(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {
-        logBuilder.actionScope(String.valueOf(objectId));
-        logBuilder.actionStatus(sQueriableLogStatus);
-        logBuilder.objectId(objectId);
-        final SQueriableLog log = logBuilder.done();
-        if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
-            queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
-        }
-    }
-
     @Override
     public long getNumberOfConnectorInstances(final QueryOptions searchOptions) throws SBonitaSearchException {
         try {
@@ -381,12 +355,9 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             deleteEvent = (SDeleteEvent) eventService.getEventBuilder().createDeleteEvent(CONNECTOR_INSTANCE).setObject(connectorInstance).done();
         }
         final DeleteRecord deleteRecord = new DeleteRecord(connectorInstance);
-        final SConnectorInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a connector instance", connectorInstance);
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
-            log(connectorInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteConnectorInstance");
         } catch (final SRecorderException e) {
-            log(connectorInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteConnectorInstance");
             throw new SConnectorInstanceDeletionException(e);
         }
 
@@ -416,12 +387,9 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     public void deleteArchivedConnectorInstance(final SAConnectorInstance sConnectorInstance) throws SConnectorInstanceDeletionException {
         final SDeleteEvent deleteEvent = null;
         final DeleteRecord deleteRecord = new DeleteRecord(sConnectorInstance);
-        final SConnectorInstanceLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a connector instance", sConnectorInstance);
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
-            log(sConnectorInstance.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteConnectorInstance");
         } catch (final SRecorderException e) {
-            log(sConnectorInstance.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteConnectorInstance");
             throw new SConnectorInstanceDeletionException(e);
         }
     }

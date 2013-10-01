@@ -1057,7 +1057,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             getUserByUserName(sUser.getUserName());
             throw new AlreadyExistsException("A user with name \"" + sUser.getUserName() + "\" already exists");
         } catch (final UserNotFoundException unfe) {
-            // user does not exists but was unable to be created
+            // user does not exist but was unable to be created
         }
         try {
             final CreateUser createUser = new CreateUser(sUser, sPersonalData, sProfessionalData, tenantAccessor.getIdentityService(), tenantAccessor

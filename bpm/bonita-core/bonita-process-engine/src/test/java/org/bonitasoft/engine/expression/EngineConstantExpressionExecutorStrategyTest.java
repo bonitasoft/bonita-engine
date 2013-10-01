@@ -31,7 +31,8 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
@@ -79,10 +80,10 @@ public class EngineConstantExpressionExecutorStrategyTest {
     }
 
     private void taskAssigneeOnHumanTask(final SFlowNodeType flowNodeType, final SHumanTaskInstance humanTaskInstance)
-            throws SActivityInstanceNotFoundException, SActivityReadException, SExpressionEvaluationException {
+            throws SActivityInstanceNotFoundException, SExpressionEvaluationException, SFlowNodeNotFoundException, SFlowNodeReadException {
         final SExpression expression = mock(SExpression.class);
 
-        when(activityInstanceService.getActivityInstance(containerId)).thenReturn(humanTaskInstance);
+        when(activityInstanceService.getFlowNodeInstance(containerId)).thenReturn(humanTaskInstance);
         when(expression.getContent()).thenReturn(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName());
 
         final long taskAssigneeId = 10L;
@@ -99,7 +100,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
         final SExpression expression = mock(SExpression.class);
         final SAutomaticTaskInstance taskInstance = mock(SAutomaticTaskInstance.class);
 
-        when(activityInstanceService.getActivityInstance(containerId)).thenReturn(taskInstance);
+        when(activityInstanceService.getFlowNodeInstance(containerId)).thenReturn(taskInstance);
         when(expression.getContent()).thenReturn(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName());
 
         final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(activityInstanceService, null, null, null);

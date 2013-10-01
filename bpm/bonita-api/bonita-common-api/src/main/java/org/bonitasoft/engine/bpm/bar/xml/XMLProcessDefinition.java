@@ -285,7 +285,7 @@ public class XMLProcessDefinition {
 
     public static final String CONNECTOR_VERSION = "version";
 
-    public static final String STANDARD_LOOP_CHARACTERISTICS_NODE = "StandardLoopCharacteristics";
+    public static final String STANDARD_LOOP_CHARACTERISTICS_NODE = "standardLoopCharacteristics";
 
     public static final String LOOP_CONDITION = "loopCondition";
 

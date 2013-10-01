@@ -44,7 +44,8 @@ public class StartEventTest extends CommonAPITest {
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Start" }, story = "Execute process with several start event.", jira = "ENGINE-1592, ENGINE-1593")
     @Test
     public void executeSeveralStartEventsInSameProcessDefinition() throws Exception {
-        final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(10000);
+        int timerValue = 3000;
+        final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(timerValue);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addStartEvent("startEvent").addUserTask("step1", ACTOR_NAME).addTransition("startEvent", "step1");

@@ -8,7 +8,6 @@
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="documentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
 
 	<bean name="documentMappingBuilderAccessor" class="org.bonitasoft.engine.core.process.document.mapping.model.builder.impl.SDocumentMappingBuilderAccessorImpl" />

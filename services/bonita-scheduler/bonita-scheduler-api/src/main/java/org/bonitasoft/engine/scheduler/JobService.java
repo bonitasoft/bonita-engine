@@ -120,11 +120,14 @@ public interface JobService {
      *            JobParameters to create
      * @param tenantId
      *            Identifier of tenant
-     * @param jobDescriptorId TODO
+     * @param jobDescriptorId
+     *            TODO
      * @throws SJobParameterCreationException
      * @since 6.1
      */
-    void createJobParameters(List<SJobParameter> sJobParameters, long tenantId, long jobDescriptorId) throws SJobParameterCreationException;
+    void createJobParameters(List<SJobParameter> parameters, long tenantId, long jobDescriptorId) throws SJobParameterCreationException;
+
+    void setJobParameters(final long tenantId, long jobDescriptorId, List<SJobParameter> parameters) throws SJobParameterCreationException;
 
     /**
      * Create a new job parameter for a specific tenant
@@ -133,7 +136,8 @@ public interface JobService {
      *            JobParameter to create
      * @param tenantId
      *            Identifier of tenant
-     * @param jobDescriptorId TODO
+     * @param jobDescriptorId
+     *            TODO
      * @throws SJobParameterCreationException
      * @since 6.1
      */
@@ -172,18 +176,6 @@ public interface JobService {
      * @since 6.1
      */
     SJobParameter getJobParameter(long id) throws SJobParameterNotFoundException, SJobParameterReadException;
-
-    /**
-     * Search all job parameters according to a specific job descriptor
-     * 
-     * @param jobDescriptorId
-     *            Identifier of job descriptor
-     * @return A list of SJobParameter objects
-     * @throws SBonitaSearchException
-     * @since 6.1
-     */
-    @Deprecated
-    List<SJobParameter> searchJobParameters(long jobDescriptorId) throws SBonitaSearchException;
 
     /**
      * Search all job parameters according to specific criteria

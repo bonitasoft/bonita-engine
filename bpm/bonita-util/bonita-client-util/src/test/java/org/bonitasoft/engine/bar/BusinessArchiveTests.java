@@ -32,6 +32,7 @@ import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
+import org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
@@ -41,11 +42,14 @@ import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
+import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
+import org.bonitasoft.engine.bpm.flownode.impl.StandardLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.MultiInstanceLoopCharacteristicsBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SendTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
@@ -667,6 +671,42 @@ public class BusinessArchiveTests {
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
 
         checkProcessForCallActivity(process, result);
+    }
+
+    @Test
+    public void readProcessWithMultiInstanceFromBusinessArchive() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithMultiInstances", "1.0");
+        final MultiInstanceLoopCharacteristicsBuilder multiInstance1 = builder.addAutomaticTask("auto1").addMultiInstance(false, "inputList");
+        multiInstance1.addDataInputItemRef("input");
+        multiInstance1.addDataOutputItemRef("output");
+        multiInstance1.addLoopDataOutputRef("outputList");
+        final MultiInstanceLoopCharacteristicsBuilder multiInstance2 = builder.addAutomaticTask("auto2").addMultiInstance(true,
+                new ExpressionBuilder().createConstantIntegerExpression(5));
+        multiInstance2.addCompletionCondition(new ExpressionBuilder().createConstantBooleanExpression(false));
+        builder.addAutomaticTask("auto3").addLoop(true, new ExpressionBuilder().createConstantBooleanExpression(true),
+                new ExpressionBuilder().createConstantIntegerExpression(5));
+        final DesignProcessDefinition result = getDesignProcessDefinition(builder);
+
+        AutomaticTaskDefinition auto1 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto1");
+        MultiInstanceLoopCharacteristics multi1 = (MultiInstanceLoopCharacteristics) auto1.getLoopCharacteristics();
+        assertEquals(false, multi1.isSequential());
+        assertEquals("inputList", multi1.getLoopDataInputRef());
+        assertEquals("outputList", multi1.getLoopDataOutputRef());
+        assertEquals("input", multi1.getDataInputItemRef());
+        assertEquals("output", multi1.getDataOutputItemRef());
+
+        AutomaticTaskDefinition auto2 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto2");
+        MultiInstanceLoopCharacteristics multi2 = (MultiInstanceLoopCharacteristics) auto2.getLoopCharacteristics();
+        assertEquals(true, multi2.isSequential());
+        assertEquals("5", multi2.getLoopCardinality().getContent());
+        assertEquals("false", multi2.getCompletionCondition().getContent());
+
+        AutomaticTaskDefinition auto3 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto3");
+        StandardLoopCharacteristics loop2 = (StandardLoopCharacteristics) auto3.getLoopCharacteristics();
+        assertEquals(true, loop2.isTestBefore());
+        assertEquals("true", loop2.getLoopCondition().getContent());
+        assertEquals("5", loop2.getLoopMax().getContent());
+
     }
 
     @Test

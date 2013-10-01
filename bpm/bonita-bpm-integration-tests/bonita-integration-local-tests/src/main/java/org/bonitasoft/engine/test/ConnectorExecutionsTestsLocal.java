@@ -956,7 +956,10 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         processBuilder.addData("a", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("avalue"));
         processBuilder.addData("b", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("bvalue"));
         processBuilder.addData("c", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("cvalue"));
-        processBuilder.addAutomaticTask("step1");
+        AutomaticTaskDefinitionBuilder addAutomaticTask = processBuilder.addAutomaticTask("step1");
+        addAutomaticTask.addOperation(new OperationBuilder().createSetDataOperation("a", new ExpressionBuilder().createConstantStringExpression("changed")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetDataOperation("b", new ExpressionBuilder().createConstantStringExpression("changed")));
+        addAutomaticTask.addOperation(new OperationBuilder().createSetDataOperation("c", new ExpressionBuilder().createConstantStringExpression("changed")));
         BusinessArchive businessArchive = new BusinessArchiveBuilder()
                 .createNewBusinessArchive()
                 .setProcessDefinition(processBuilder.done())
@@ -984,21 +987,11 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         BlockingConnector.semaphore.release();
         waitForProcessToFinish(processInstance.getId());
-        disableAndDeleteProcess(processDefinition);
-    }
+        getProcessAPI().evaluateExpressionsAtProcessInstanciation(
+                processInstance.getId(), expressions);
+        assertEquals("avaluebvaluecvalue", evaluateExpressionsAtProcessInstanciation.get("ascripte"));
+        assertEquals("avalue", evaluateExpressionsAtProcessInstanciation.get("a"));
 
-    private byte[] getConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
-            final String implementationVersion,
-            final String implementationClassname) {
-        StringBuilder stb = new StringBuilder();
-        stb.append("<connectorImplementation>");
-        stb.append("");
-        stb.append("<definitionId>" + definitionId + "</definitionId>");
-        stb.append("<definitionVersion>" + definitionVersion + "</definitionVersion>");
-        stb.append("<implementationClassname>" + implementationClassname + "</implementationClassname>");
-        stb.append("<implementationId>" + implementationId + "</implementationId>");
-        stb.append("<implementationVersion>" + implementationVersion + "</implementationVersion>");
-        stb.append("</connectorImplementation>");
-        return stb.toString().getBytes();
+        disableAndDeleteProcess(processDefinition);
     }
 }

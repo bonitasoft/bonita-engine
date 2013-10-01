@@ -8,15 +8,20 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -37,12 +42,14 @@ import org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -57,6 +64,10 @@ public class BPMLocalTest extends CommonAPILocalTest {
     protected static final String JOHN_USERNAME = "john";
 
     protected static final String JOHN_PASSWORD = "bpm";
+
+    public static Semaphore semaphore1 = new Semaphore(1);
+
+    public static Semaphore semaphore2 = new Semaphore(1);
 
     private User john;
 
@@ -424,6 +435,133 @@ public class BPMLocalTest extends CommonAPILocalTest {
         processBuilder.addTransition("startEvent", userTaskName);
         processBuilder.addTransition(userTaskName, "endEvent");
         return deployAndEnableWithActor(processBuilder.done(), actorName, john);
+    }
+
+    @Test
+    @Cover(classes = {}, concept = BPMNConcept.ACTIVITIES, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode" }, story = "elements must be restarted when they were not completed when the node was shut down")
+    public void restartHandlerTests() throws Exception {
+        /*
+         * process with blocking connector
+         */
+        final ProcessDefinitionBuilder builder1 = new ProcessDefinitionBuilder().createNewInstance("p1", "1.0");
+        builder1.addActor("actor");
+        builder1.addUserTask("step1", "actor");
+        builder1.addAutomaticTask("step2").addConnector("myConnector", "blocking-connector", "1.0", ConnectorEvent.ON_ENTER);
+        builder1.addTransition("step1", "step2");
+        builder1.addUserTask("ustep2", "actor");
+        builder1.addTransition("step2", "ustep2");
+        BusinessArchive businessArchive = new BusinessArchiveBuilder()
+                .createNewBusinessArchive()
+                .setProcessDefinition(builder1.done())
+                .addConnectorImplementation(
+                        new BarResource("blocking-connector.impl", getConnectorImplementationFile("blocking-connector", "1.0", "blocking-connector-impl",
+                                "1.0",
+                                BlockingConnector.class.getName()))).done();
+        final ProcessDefinition p1 = deployAndEnableWithActor(businessArchive, "actor", john);
+
+        /*
+         * process with blocking operation (executing work)
+         */
+        final ProcessDefinitionBuilder builder2 = new ProcessDefinitionBuilder().createNewInstance("p2", "1.0");
+        String blockingGroovyScript1 = "org.bonitasoft.engine.test.BPMLocalTest.tryAcquireSemaphore1();\nreturn \"done\";";
+        builder2.addActor("actor");
+        builder2.addShortTextData("data", null);
+        builder2.addUserTask("step1", "actor");
+        builder2.addAutomaticTask("step2").addOperation(
+                new OperationBuilder().createSetDataOperation("data",
+                        new ExpressionBuilder().createGroovyScriptExpression("blockingGroovyScript1", blockingGroovyScript1, String.class.getName())));
+        builder2.addTransition("step1", "step2");
+        builder2.addUserTask("ustep2", "actor");
+        builder2.addTransition("step2", "ustep2");
+
+        final ProcessDefinition p2 = deployAndEnableWithActor(builder2.done(), "actor", john);
+
+        /*
+         * process with blocking transition (notify work)
+         */
+        final ProcessDefinitionBuilder builder3 = new ProcessDefinitionBuilder().createNewInstance("p3", "1.0");
+        String blockingGroovyScript2 = "org.bonitasoft.engine.test.BPMLocalTest.tryAcquireSemaphore2();\nreturn true;";
+        builder3.addActor("actor");
+        builder3.addUserTask("step1", "actor");
+        builder3.addAutomaticTask("step2");
+        builder3.addTransition("step1", "step2",
+                new ExpressionBuilder().createGroovyScriptExpression("blockingGroovyScript2", blockingGroovyScript2, Boolean.class.getName()));
+        builder3.addUserTask("ustep2", "actor");
+        builder3.addTransition("step2", "ustep2");
+
+        final ProcessDefinition p3 = deployAndEnableWithActor(builder3.done(), "actor", john);
+
+        // Block all 3 tasks
+        BlockingConnector.semaphore.acquire();
+        semaphore1.acquire();
+        semaphore2.acquire();
+
+        System.out.println("Start the process");
+        final ProcessInstance pi1 = getProcessAPI().startProcess(p1.getId());
+        final ProcessInstance pi2 = getProcessAPI().startProcess(p2.getId());
+        final ProcessInstance pi3 = getProcessAPI().startProcess(p3.getId());
+        waitForUserTaskAndExecuteIt("step1", pi1, john.getId());
+        waitForUserTaskAndExecuteIt("step1", pi2, john.getId());
+        waitForUserTaskAndExecuteIt("step1", pi3, john.getId());
+        System.out.println("executed step1");
+        logout();
+        final PlatformSession loginPlatform = APITestUtil.loginPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
+        new WaitUntil(10, 15000) {
+
+            @Override
+            protected boolean check() throws Exception {
+                return BlockingConnector.semaphore.hasQueuedThreads() && semaphore1.hasQueuedThreads() && semaphore2.hasQueuedThreads();
+            }
+        };
+        // stop node and in the same time release the semaphores to unlock works
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("release semaphores");
+                BlockingConnector.semaphore.release();
+                semaphore1.release();
+                semaphore2.release();
+                System.out.println("released semaphores");
+            }
+        });
+        System.out.println("stop node");
+        thread.start();
+        platformAPI.stopNode();
+        System.out.println("node stopped");
+        // release them (work will fail, node is stopped)
+        thread.join(1000);
+        Thread.sleep(50);
+        System.out.println("start node");
+        platformAPI.startNode();
+        System.out.println("node started");
+        APITestUtil.logoutPlatform(loginPlatform);
+        login();
+        // check we have all task ready
+        waitForPendingTasks(john.getId(), 3);
+        disableAndDeleteProcess(p1.getId());
+        disableAndDeleteProcess(p2.getId());
+        disableAndDeleteProcess(p3.getId());
+    }
+
+    public static void tryAcquireSemaphore1() throws InterruptedException {
+        System.out.println("tryAcquire semaphore1");
+        semaphore1.tryAcquire(15, TimeUnit.SECONDS);
+        semaphore1.release();
+        System.out.println("release semaphore1");
+    }
+
+    public static void tryAcquireSemaphore2() throws InterruptedException {
+        System.out.println("tryAcquire semaphore2");
+        semaphore2.tryAcquire(15, TimeUnit.SECONDS);
+        semaphore2.release();
+        System.out.println("release semaphore2");
     }
 
 }

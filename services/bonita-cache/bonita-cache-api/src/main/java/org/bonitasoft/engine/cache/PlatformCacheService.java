@@ -15,9 +15,9 @@ package org.bonitasoft.engine.cache;
 
 
 /**
- * Service that helps you to cache objects on a pltform level
- * Objects must be stored in a specific cache and this cache must exists
- * 
+ * Service that helps you to cache objects on a platform level
+ * Objects must be stored in a specific cache and this cache must exist
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @since 6.0

@@ -1,40 +1,36 @@
 package org.bonitasoft.engine.events;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.bonitasoft.engine.ServicesBuilder;
 import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
-import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.events.model.SHandler;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Christophe Havard
+ * @author Laurent Vaills
  */
-public class EventServiceTest {
+public abstract class EventServiceTest {
 
-    private static ServicesBuilder serviceBuilder;
-
-    private static EventService eventSvc;
+    private EventService eventSvc;
 
     // Test events
     private final String EVT_INTERESTING = "INTERESTING";
 
     private final String EVT_IRRELEVANT = "IRRELEVANT";
 
-    static {
-        serviceBuilder = new ServicesBuilder();
-        eventSvc = serviceBuilder.buildEventService();
+    @Before
+    public void beforeEachTest() {
+        eventSvc = instantiateEventServiceImplementation();
     }
+
+    /**
+     * @return
+     */
+    protected abstract EventService instantiateEventServiceImplementation();
 
     @Test(expected = FireEventException.class)
     public void fireNullEvent() throws Exception {
@@ -47,36 +43,26 @@ public class EventServiceTest {
     }
 
     @Test
-    public void addHandlerInEventfilters() throws Exception {
+    public void addHandlerInEventFilters() throws Exception {
         final TestHandler h = new TestHandler();
         eventSvc.addHandler(EVT_INTERESTING, h);
-        final Set<SHandler<SEvent>> newHandlerSet = new HashSet<SHandler<SEvent>>();
-        newHandlerSet.add(h);
-        assertTrue(eventSvc.getRegisteredHandlers().containsValue(newHandlerSet));
+        assertTrue(eventSvc.getHandlers(EVT_INTERESTING).contains(h));
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
 
     @Test
     public void addNewTypeInRegisteredHandlers() throws Exception {
+        assertTrue(eventSvc.getHandlers(EVT_INTERESTING).isEmpty());
+
         final TestHandler h = new TestHandler();
         eventSvc.addHandler(EVT_INTERESTING, h);
-        assertTrue(eventSvc.getRegisteredHandlers().containsKey(EVT_INTERESTING));
+        assertFalse(eventSvc.getHandlers(EVT_INTERESTING).isEmpty());
+
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
 
-    @Test(expected = HandlerRegistrationException.class)
-    public void handlerAlreadyExists() throws Exception {
-        final TestHandler h = new TestHandler();
-        eventSvc.addHandler(EVT_INTERESTING, h);
-        try {
-            eventSvc.addHandler(EVT_INTERESTING, h);
-        } finally {
-            eventSvc.removeHandler(EVT_INTERESTING, h);
-        }
-    }
-
     @Test(expected = HandlerUnregistrationException.class)
-    public void removeUnknownEvent() throws Exception {
+    public void removeUnknownHandler() throws Exception {
         final TestHandler h = new TestHandler();
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
@@ -84,41 +70,38 @@ public class EventServiceTest {
     @Test
     public void isEventFiltered() throws HandlerRegistrationException, FireEventException, HandlerUnregistrationException {
         // Register handler on a given event type.
-        final TestHandler h = new TestHandler();
+        final TestHandlerCallback h = new TestHandlerCallback();
         eventSvc.addHandler(EVT_INTERESTING, h);
 
         // Fire 2 different events
-        final SEvent interesting = eventSvc.getEventBuilder().createNewInstance(EVT_INTERESTING).done();
-        final SEvent irrelevant = eventSvc.getEventBuilder().createNewInstance(EVT_IRRELEVANT).done();
+        final TestEvent interesting = new TestEvent(EVT_INTERESTING);
+        final TestEvent irrelevant = new TestEvent(EVT_IRRELEVANT);
         eventSvc.fireEvent(interesting);
         eventSvc.fireEvent(irrelevant);
 
         // Check that only "interesting" events have been received by the registered handler
-        assertNotNull(h.getReceivedEvents());
-        assertFalse(h.getReceivedEvents().isEmpty());
-        for (final SEvent evt : h.getReceivedEvents()) {
-            if (!evt.getType().equals(EVT_INTERESTING)) {
-                fail("Wrong event received by the handler");
-            }
-        }
+        assertFalse(irrelevant.isFlagged());
+        assertTrue(interesting.isFlagged());
 
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
 
     @Test
     public void isEventReceivedByHandler() throws FireEventException, HandlerRegistrationException, HandlerUnregistrationException {
-        final TestHandler h = new TestHandler();
-        final SEvent interesting = eventSvc.getEventBuilder().createNewInstance(EVT_INTERESTING).done();
+        final TestHandlerCallback h = new TestHandlerCallback();
+        final TestEvent interesting = new TestEvent(EVT_INTERESTING);
 
         eventSvc.addHandler(EVT_INTERESTING, h);
         eventSvc.fireEvent(interesting);
 
-        assertEquals(1, h.getReceivedEvents().size());
+        assertTrue(interesting.isFlagged());
         eventSvc.removeHandler(EVT_INTERESTING, h);
     }
 
     @Test
     public void getAllHandlersByEvent() throws HandlerRegistrationException, HandlerUnregistrationException {
+        assertTrue(eventSvc.getHandlers(EVT_INTERESTING).isEmpty());
+
         // add 2 different handlers for 1 event type
         final TestHandler h1 = new TestHandler();
         final TestHandler h2 = new TestHandler();
@@ -126,9 +109,8 @@ public class EventServiceTest {
         eventSvc.addHandler(EVT_INTERESTING, h1);
         eventSvc.addHandler(EVT_INTERESTING, h2);
 
-        final Set<SHandler<SEvent>> evtList = eventSvc.getHandlers(EVT_INTERESTING);
         // now i check if the evtList contains my both handlers
-        assertTrue(evtList.contains(h1) && evtList.contains(h2));
+        assertFalse(eventSvc.getHandlers(EVT_INTERESTING).isEmpty());
 
         eventSvc.removeHandler(EVT_INTERESTING, h1);
         eventSvc.removeHandler(EVT_INTERESTING, h2);

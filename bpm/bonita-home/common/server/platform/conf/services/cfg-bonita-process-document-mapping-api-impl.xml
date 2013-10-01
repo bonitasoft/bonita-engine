@@ -8,6 +8,5 @@
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="documentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
         <constructor-arg name="archiveService" ref="archiveService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
 </beans>

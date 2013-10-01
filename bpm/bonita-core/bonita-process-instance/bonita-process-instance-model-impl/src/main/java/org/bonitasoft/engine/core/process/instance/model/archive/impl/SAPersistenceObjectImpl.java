@@ -42,6 +42,7 @@ public abstract class SAPersistenceObjectImpl implements ArchivedPersistentObjec
         return tenantId;
     }
 
+    @Override
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
@@ -51,6 +52,7 @@ public abstract class SAPersistenceObjectImpl implements ArchivedPersistentObjec
         return id;
     }
 
+    @Override
     public void setId(final long id) {
         this.id = id;
     }
@@ -114,7 +116,7 @@ public abstract class SAPersistenceObjectImpl implements ArchivedPersistentObjec
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        builder.append("SAPersistenceObjectImpl [id=");
+        builder.append(this.getClass().getSimpleName() + "[id=");
         builder.append(id);
         builder.append(", tenantId=");
         builder.append(tenantId);

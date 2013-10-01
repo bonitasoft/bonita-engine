@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.expression.control.model;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,7 +168,7 @@ public class SExpressionContext implements Serializable {
 
     public void setInputValues(final Map<String, Object> inputValues) {
         if (inputValues == null) {
-            this.inputValues = Collections.emptyMap();
+            this.inputValues = new HashMap<String, Object>();
         } else {
             this.inputValues = inputValues;
         }
