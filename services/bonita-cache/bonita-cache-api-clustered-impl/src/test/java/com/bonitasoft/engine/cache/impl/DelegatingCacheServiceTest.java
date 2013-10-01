@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheService;
@@ -41,7 +42,7 @@ public class DelegatingCacheServiceTest {
 
     @Before
     public void setup() {
-        delegatingCacheService = new DelegatingCacheService(localCache, distributedCache, Arrays.asList("local"));
+        delegatingCacheService = new DelegatingCacheService(localCache, distributedCache, Collections.singleton("local"));
     }
 
     @Test

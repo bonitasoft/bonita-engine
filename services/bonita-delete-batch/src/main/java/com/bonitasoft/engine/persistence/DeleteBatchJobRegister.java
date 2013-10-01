@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobRegister;
@@ -93,11 +92,6 @@ public class DeleteBatchJobRegister implements JobRegister {
                     loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "The delete job was already started");
                 }
             } catch (final SSchedulerException e) {
-                loggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register job because " + e.getMessage());
-                if (loggerService.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-                }
-            } catch (final FireEventException e) {
                 loggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register job because " + e.getMessage());
                 if (loggerService.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                     loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);

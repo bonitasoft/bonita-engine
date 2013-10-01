@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring.impl;
 
+import java.util.UUID;
+
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 
@@ -27,6 +29,12 @@ public class STransactionHandlerImpl implements SHandler<SEvent> {
     static final String TRANSACTION_ROLLEDBACK_EVT = "TRANSACTION_ROLLEDBACK";
 
     private int numberOfactiveTransactions = 0;
+
+    private final String identifier;
+
+    public STransactionHandlerImpl() {
+        this.identifier = UUID.randomUUID().toString();
+    }
 
     public int getNumberOfActiveTransactions() {
         return numberOfactiveTransactions;
@@ -55,6 +63,11 @@ public class STransactionHandlerImpl implements SHandler<SEvent> {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return identifier;
     }
 
 }

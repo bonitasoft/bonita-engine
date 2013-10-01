@@ -60,6 +60,7 @@
         		<entry key="IDENTITY_USER_MEMBERSHIP_DELETED:INTERNAL" value="true" />
         		<entry key="IDENTITY_USER_MEMBERSHIP_UPDATED:INTERNAL" value="true" />
         		<entry key="JOB_CREATED:INTERNAL" value="false" />
+        		<entry key="JOB_DELETED:INTERNAL" value="false" />
         		<entry key="JOB_PARAMETER_CREATED:INTERNAL" value="true" />
         		<entry key="MESSAGE_INSTANCE_CREATED:INTERNAL" value="true" />
         		<entry key="MESSAGE_INSTANCE_UPDATED:INTERNAL" value="true" />

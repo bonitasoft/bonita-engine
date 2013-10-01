@@ -13,12 +13,11 @@
  **/
 package com.bonitasoft.engine.events.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -27,11 +26,10 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.MultiMap;
 
 public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
-    private final MultiMap<String, SHandler<SEvent>> multimapHandlers;
+    private final ConcurrentMap<String, List<SHandler<SEvent>>> eventHandlers;
 
     public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
             final HazelcastInstance hazelcastInstance) throws HandlerRegistrationException {
@@ -47,55 +45,66 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
             final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance)
             throws HandlerRegistrationException {
         super(eventBuilders, handlers, logger);
-        multimapHandlers = hazelcastInstance.getMultiMap("EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix);
+        String mapName = "EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix;
+        // --- Hard coded configuration for Hazelcast
+//        Config config = hazelcastInstance.getConfig();
+//
+//        NearCacheConfig nearCacheConfig = new NearCacheConfig();
+//        nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+//
+//        config.addMapConfig(new MapConfig(mapName));
+        // ---
+        eventHandlers = hazelcastInstance.getMap(mapName);
 
         // Create a Map that is shared across the cluster.
         registeredHandlers = null;
-
-        // register the handlers with their associated event type
-        for (final Map.Entry<String, SHandler<SEvent>> entry : handlers.entrySet()) {
-            addHandler(entry.getKey(), entry.getValue());
-        }
     }
 
     @Override
-    protected boolean containsHandlerFor(String key) {
-        return multimapHandlers.containsKey(key);
+    protected boolean containsHandlerFor(final String eventType) {
+        return eventHandlers.containsKey(eventType);
     }
 
     @Override
     protected Collection<SHandler<SEvent>> getHandlersFor(final String eventType) {
-        return multimapHandlers.get(eventType);
+        return eventHandlers.get(eventType);
     }
 
     @Override
-    public Map<String, Set<SHandler<SEvent>>> getRegisteredHandlers() {
-        Set<Entry<String, SHandler<SEvent>>> entrySet = multimapHandlers.entrySet();
-        HashMap<String, Set<SHandler<SEvent>>> hashMap = new HashMap<String, Set<SHandler<SEvent>>>();
-        for (Entry<String, SHandler<SEvent>> entry : entrySet) {
-            if (!hashMap.containsKey(entry.getKey())) {
-                hashMap.put(entry.getKey(), new HashSet<SHandler<SEvent>>());
+    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
+        // check if the given event type is already registered in the Event Service
+        if (containsHandlerFor(eventType)) {
+            // if the handler already exists for the same eventType, an Exception is thrown
+            final List<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
+            // the add method returns false if the given element already exists in the Set, and does nothing.
+            if (!handlers.add(handler)) {
+                throw new HandlerRegistrationException("This handler is already registered for this event type");
             }
-            hashMap.get(entry.getKey()).add(entry.getValue());
-        }
-        return hashMap;
-    }
 
-    @Override
-    protected void addHandlerFor(String eventType, SHandler<SEvent> handler) {
-        if (!multimapHandlers.containsEntry(eventType, handler)) {
-            multimapHandlers.put(eventType, handler);
+            eventHandlers.replace(eventType, handlers);
+        } else {
+            // if the given type doesn't already exist in the eventFilters list, we create it
+            final List<SHandler<SEvent>> newHandlerSet = new ArrayList<SHandler<SEvent>>(3);
+            newHandlerSet.add(handler);
+            eventHandlers.put(eventType, newHandlerSet);
         }
     }
 
     @Override
-    protected void removeHandlerInAllType(SHandler<SEvent> handler) {
-        Set<Entry<String, SHandler<SEvent>>> entrySet = multimapHandlers.entrySet();
-        for (Entry<String, SHandler<SEvent>> entry : entrySet) {
-            if (handler.equals(entry.getValue())) {
-                multimapHandlers.remove(entry.getKey(), entry.getValue());
+    protected void removeAllHandlersFor(final SHandler<SEvent> handler) {
+        for(String eventType : eventHandlers.keySet()) {
+            List<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
+
+            handlers.remove(handler);
+            if (handlers.isEmpty()) {
+                eventHandlers.remove(eventType);
             }
         }
+    }
+
+    // It should be used only for the tests
+    /*package*/ void removeAllHandlers() {
+        eventHandlers.clear();
     }
 
 }
