@@ -16,7 +16,7 @@ CREATE TABLE data_instance (
 	doubleValue NUMERIC(19,5),
 	floatValue FLOAT,
 	blobValue MEDIUMBLOB,
-	clobValue TEXT,
+	clobValue MEDIUMTEXT,
 	discriminant VARCHAR(50) NOT NULL,
 	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
