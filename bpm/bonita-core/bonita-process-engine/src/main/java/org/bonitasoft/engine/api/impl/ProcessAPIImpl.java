@@ -5459,12 +5459,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private Map<String, Serializable> evaluateExpressionsInstanceLevelAndArchived(final Map<Expression, Map<String, Serializable>> expressions,
-            final long containerId, final String containerType, final long proceDefinitionId, final long time) throws SBonitaException {
+            final long containerId, final String containerType, final long processDefinitionId, final long time) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ExpressionResolverService expressionService = tenantAccessor.getExpressionResolverService();
         final SExpressionBuilders expBuilder = tenantAccessor.getSExpressionBuilders();
         final EvaluateExpressionsInstanceLevelAndArchived evaluations = new EvaluateExpressionsInstanceLevelAndArchived(expressions, containerId,
-                containerType, proceDefinitionId, time, expressionService, expBuilder);
+                containerType, processDefinitionId, time, expressionService, expBuilder);
         evaluations.execute();
         return evaluations.getResult();
     }

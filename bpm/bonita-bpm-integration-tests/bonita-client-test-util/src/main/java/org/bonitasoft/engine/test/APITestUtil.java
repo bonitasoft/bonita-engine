@@ -684,40 +684,46 @@ public class APITestUtil {
         getProcessAPI().executeFlowNode(flowNodeId);
     }
 
-    public ActivityInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws TimeoutException, Exception {
+    public HumanTaskInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws TimeoutException, Exception {
         return waitForUserTask(taskName, processInstance.getId(), DEFAULT_TIMEOUT);
     }
 
-    private ActivityInstance waitForUserTask(final String taskName, final long processInstanceId, final int timeout) throws Exception {
-        final Long waitForTask = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getReadyTaskEvent(processInstanceId, taskName),
-                timeout);
-        final ActivityInstance activityInstance = getActivityInstance(waitForTask);
-        assertNotNull(activityInstance);
-        return activityInstance;
+    private HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId, final int timeout) throws Exception {
+        final Map<String, Serializable> readyTaskEvent;
+        if (processInstanceId > 0) {
+            readyTaskEvent = ClientEventUtil.getReadyTaskEvent(processInstanceId, taskName);
+        } else {
+            readyTaskEvent = ClientEventUtil.getReadyTaskEvent(taskName);
+        }
+        final Long activityInstanceId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), readyTaskEvent, timeout);
+        final HumanTaskInstance getHumanTaskInstance = getHumanTaskInstance(activityInstanceId);
+        assertNotNull(getHumanTaskInstance);
+        return getHumanTaskInstance;
     }
 
-    protected ActivityInstance waitForUserTask(final String taskName) throws Exception {
-        return waitForUserTask(taskName, DEFAULT_TIMEOUT);
+    protected HumanTaskInstance waitForUserTask(final String taskName) throws Exception {
+        return waitForUserTask(taskName, -1, DEFAULT_TIMEOUT);
     }
 
-    private ActivityInstance waitForUserTask(final String taskName, final int timeout) throws Exception {
-        final Long waitForTask = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getReadyTaskEvent(taskName), timeout);
-        return getActivityInstance(waitForTask);
+    private HumanTaskInstance getHumanTaskInstance(final Long id) throws ActivityInstanceNotFoundException, RetrieveException {
+        if (id != null) {
+            return getProcessAPI().getHumanTaskInstance(id);
+        }
+        throw new RuntimeException("no id returned for human task ");
     }
 
     private ActivityInstance getActivityInstance(final Long id) throws ActivityInstanceNotFoundException, RetrieveException {
         if (id != null) {
             return getProcessAPI().getActivityInstance(id);
-        } else {
-            throw new RuntimeException("no id returned for task ");
         }
+        throw new RuntimeException("no id returned for activity instance ");
     }
 
     private FlowNodeInstance getFlowNodeInstance(final Long id) throws RuntimeException {
         try {
             return getProcessAPI().getFlowNodeInstance(id);
         } catch (final FlowNodeInstanceNotFoundException e) {
-            throw new RuntimeException("no id returned for task ");
+            throw new RuntimeException("no id returned for flownode instance ");
         }
     }
 
@@ -852,21 +858,26 @@ public class APITestUtil {
         return flowNodeInstance;
     }
 
-    protected ActivityInstance waitForTaskToFail(final ProcessInstance processInstance) throws Exception {
+    public ActivityInstance waitForTaskToFail(final ProcessInstance processInstance) throws Exception {
         final Long activityId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
                 ClientEventUtil.getTaskInState(processInstance.getId(), TestStates.getFailedState()), DEFAULT_TIMEOUT);
         return getActivityInstance(activityId);
     }
 
-    protected FlowNodeInstance waitForFlowNodeInFailedState(final ProcessInstance processInstance) throws Exception {
+    public FlowNodeInstance waitForFlowNodeInFailedState(final ProcessInstance processInstance) throws Exception {
         final Long activityId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
                 ClientEventUtil.getTaskInState(processInstance.getId(), TestStates.getFailedState()), DEFAULT_TIMEOUT);
         return getFlowNodeInstance(activityId);
     }
 
-    protected void waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception {
-        final ActivityInstance waitForUserTask = waitForUserTask(taskName, processInstance);
-        assignAndExecuteStep(waitForUserTask, userId);
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception {
+        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstance);
+        assignAndExecuteStep(humanTaskInstance, userId);
+        return humanTaskInstance;
+    }
+
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
+        return waitForUserTaskAndExecuteIt(taskName, processInstance, user.getId());
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception,
