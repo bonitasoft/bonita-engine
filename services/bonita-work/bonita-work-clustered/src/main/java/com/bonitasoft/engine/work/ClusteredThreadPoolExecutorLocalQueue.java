@@ -59,9 +59,17 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
         return "ExecutingWorkQueue@" + localMember.getUuid();
     }
 
+    /**
+     * @param localMember
+     * @return
+     */
+    private static String memberWorkQueueName(final Member localMember) {
+        return "WorkQueue@" + localMember.getUuid();
+    }
+
     private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {
-        workQueue = hazelcastInstance.getQueue("WorkQueue");
-        return workQueue;
+        Cluster cluster = hazelcastInstance.getCluster();
+        return hazelcastInstance.getQueue(memberWorkQueueName(cluster.getLocalMember()));
     }
 
     @Override
@@ -91,10 +99,14 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
         ILock lock = hazelcastInstance.getLock("WorkLock@"+member.getUuid());
         lock.lock();
         try {
-            // Transfer the member's queue into my own queue
+            // Transfer the member's queues into my own queues
             IQueue<Runnable> memberExecutingRunnable = hazelcastInstance.getQueue(memberExecutingWorkQueueName(member));
             executingRunnable.addAll(memberExecutingRunnable);
             memberExecutingRunnable.clear(); // No way to drop completely the queue ?
+
+            IQueue<Runnable> memberWorkQueue = hazelcastInstance.getQueue(memberWorkQueueName(member));
+            workQueue.addAll(memberWorkQueue);
+            memberWorkQueue.clear(); // No way to drop completely the queue ?
         } finally {
             lock.unlock();
         }
