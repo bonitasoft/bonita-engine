@@ -21,30 +21,24 @@ import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- * 
+ *
  * Factory that use a hazelcast executor
- * 
+ *
  * @author Baptiste Mesta
  */
 public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
-
-    private static final String EXECUTOR_NAME = "Bonita-Worker";
 
     private final HazelcastInstance hazelcastInstance;
 
     private final int corePoolSize;
 
-    private final int queueCapacity;
-
     private final int maximumPoolSize;
 
     private final long keepAliveTimeSeconds;
 
-    public ClusteredBonitaExecutorServiceFactory(final int corePoolSize, final int queueCapacity, final int maximumPoolSize, final long keepAliveTimeSeconds,
-            HazelcastInstance hazelcastInstance) {
+    public ClusteredBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
         this.hazelcastInstance = hazelcastInstance;
         this.corePoolSize = corePoolSize;
-        this.queueCapacity = queueCapacity;
         this.maximumPoolSize = maximumPoolSize;
         this.keepAliveTimeSeconds = keepAliveTimeSeconds;
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
