@@ -96,7 +96,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
     private static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
     
-    private static final String FLOWNODE = "flownode";
+    private static final String FLOWNODE = "flowNode";
 
     private static final String PROCESS = "process";
 
