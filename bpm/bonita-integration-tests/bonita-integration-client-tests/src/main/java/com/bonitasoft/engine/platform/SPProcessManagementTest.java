@@ -117,7 +117,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
     }
 
     @Test
-    public void testSearchCommentsInTenants() throws Exception {
+    public void searchCommentsInTenants() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
         loginWith(USERNAME, PASSWORD);
         DesignProcessDefinition designProcessDefinition;
@@ -125,10 +125,10 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final String commentContent1 = "commentContent1";
         final String commentContent2 = "commentContent2";
-        final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep("step1", pi);
-        getProcessAPI().addProcessComment(pi.getId(), commentContent1);
-        getProcessAPI().addProcessComment(pi.getId(), commentContent2);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step1", processInstance);
+        getProcessAPI().addProcessComment(processInstance.getId(), commentContent1);
+        getProcessAPI().addProcessComment(processInstance.getId(), commentContent2);
         logout();
 
         final long tenant1 = SPBPMTestUtil.constructTenant("suomenlinna", null, null, "hamme", "saari");
@@ -137,15 +137,15 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         final User user1 = createUser(USERNAME, PASSWORD);
         loginWith(USERNAME, PASSWORD, tenant1);
         final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition1.getId());
-        waitForStep("step1", pi1);
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
+        waitForUserTask("step1", processInstance1);
         final String commentContent11 = "commentContent11";
         final String commentContent12 = "commentContent12";
-        getProcessAPI().addProcessComment(pi1.getId(), commentContent11);
-        getProcessAPI().addProcessComment(pi1.getId(), commentContent12);
+        getProcessAPI().addProcessComment(processInstance1.getId(), commentContent11);
+        getProcessAPI().addProcessComment(processInstance1.getId(), commentContent12);
 
         final SearchOptionsBuilder builder0 = new SearchOptionsBuilder(0, 5);
-        builder0.filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, pi1.getId());
+        builder0.filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance1.getId());
         builder0.sort(SearchCommentsDescriptor.POSTDATE, Order.ASC);
 
         final SearchResult<Comment> searchResult0 = getProcessAPI().searchComments(builder0.done());
