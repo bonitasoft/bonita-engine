@@ -33,7 +33,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class ExecutorWorkService implements WorkService {
 
-	private static final int TIMEOUT = Integer.valueOf(System.getProperty("bonita.work.ttermination.timeout", "15"));
+	private static final int TIMEOUT = Integer.valueOf(System.getProperty("bonita.work.termination.timeout", "15"));
 
 	private final TransactionService transactionService;
 
