@@ -181,10 +181,12 @@ public class APITestSPUtil extends APITestUtil {
         return count == minimalFrequency;
     }
 
+    @Deprecated
     public SearchResult<HumanTaskInstance> waitForHumanTasks(final int nbTasks, final String taskName, final long processInstanceId) throws Exception {
         return waitForHumanTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbTasks, taskName, processInstanceId);
     }
 
+    @Deprecated
     private SearchResult<HumanTaskInstance> waitForHumanTasks(final int repeatEach, final int timeout, final int nbTasks, final String taskName,
             final long processInstanceId) throws Exception {
         final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, true, nbTasks, new SearchOptionsBuilder(0, 10000)
