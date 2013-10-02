@@ -17,15 +17,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceLogBuilder;
@@ -33,7 +28,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInsta
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -98,13 +92,8 @@ public class ConnectorInstanceServiceImplTest {
     public void setConnectorInstanceFailureException() throws Exception {
         Exception exception = new Exception(message);
         
-        ConnectorInstanceServiceImpl mockedConnectorInstanceServiceImpl = mock(ConnectorInstanceServiceImpl.class,
-                withSettings().spiedInstance(connectorInstanceServiceImpl));
-        when(mockedConnectorInstanceServiceImpl.getQueriableLog(any(ActionType.class), anyString(), any(SConnectorInstance.class))).thenReturn(connectorInstanceLogBuilder);
-        doCallRealMethod().when(mockedConnectorInstanceServiceImpl).setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
-        
         //call method
-        mockedConnectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
+        connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
         
         //verify
         ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
@@ -118,17 +107,30 @@ public class ConnectorInstanceServiceImplTest {
     }
 
     @Test
+    public void setConnectorInstanceFailureExceptionWithNullMessage() throws Exception {
+        Exception exception = new Exception();
+        
+        //call method
+        connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
+        
+        //verify
+        ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+        UpdateRecord updateRecord = updateRecordCaptor.getValue();
+        String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+        
+        assertNull(updateRecord.getFields().get(EXCEPTION_MESSAGE));
+        assertTrue(stackTrace.startsWith(Exception.class.getName()));
+        assertTrue(stackTrace.contains(getClass().getName() + ".setConnectorInstanceFailureExceptionWithNullMessage"));
+    }
+
+    @Test
     public void setConnectorInstanceFailureExceptionWithCausedBy() throws Exception {
         Exception causedByException = new Exception(causedByMessage);
         Exception exception = new Exception(message, causedByException);
         
-        ConnectorInstanceServiceImpl mockedConnectorInstanceServiceImpl = mock(ConnectorInstanceServiceImpl.class,
-                withSettings().spiedInstance(connectorInstanceServiceImpl));
-        when(mockedConnectorInstanceServiceImpl.getQueriableLog(any(ActionType.class), anyString(), any(SConnectorInstance.class))).thenReturn(connectorInstanceLogBuilder);
-        doCallRealMethod().when(mockedConnectorInstanceServiceImpl).setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
-        
         //call method
-        mockedConnectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
+        connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
         
         //verify
         ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
@@ -144,13 +146,8 @@ public class ConnectorInstanceServiceImplTest {
 
     @Test
     public void cleanConnectorInstanceFailureException() throws Exception {
-        ConnectorInstanceServiceImpl mockedConnectorInstanceServiceImpl = mock(ConnectorInstanceServiceImpl.class,
-                withSettings().spiedInstance(connectorInstanceServiceImpl));
-        when(mockedConnectorInstanceServiceImpl.getQueriableLog(any(ActionType.class), anyString(), any(SConnectorInstance.class))).thenReturn(connectorInstanceLogBuilder);
-        doCallRealMethod().when(mockedConnectorInstanceServiceImpl).setConnectorInstanceFailureException(connectorInstanceWithFailureMock, null);
-        
         //call method
-        mockedConnectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, null);
+        connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, null);
         
         //verify
         ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
@@ -175,13 +172,8 @@ public class ConnectorInstanceServiceImplTest {
         
         Exception exception = new Exception(longMessage);
         
-        ConnectorInstanceServiceImpl mockedConnectorInstanceServiceImpl = mock(ConnectorInstanceServiceImpl.class,
-                withSettings().spiedInstance(connectorInstanceServiceImpl));
-        when(mockedConnectorInstanceServiceImpl.getQueriableLog(any(ActionType.class), anyString(), any(SConnectorInstance.class))).thenReturn(connectorInstanceLogBuilder);
-        doCallRealMethod().when(mockedConnectorInstanceServiceImpl).setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
-        
         //call method
-        mockedConnectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
+        connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
         
         //verify
         ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);

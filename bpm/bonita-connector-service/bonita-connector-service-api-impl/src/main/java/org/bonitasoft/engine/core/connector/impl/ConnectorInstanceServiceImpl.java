@@ -154,7 +154,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             current = current.getCause();
         }
         String message = current.getMessage();
-        if (message.length() > MAX_MESSAGE_LENGTH) {
+        if (message != null && message.length() > MAX_MESSAGE_LENGTH) {
             message = message.substring(0, MAX_MESSAGE_LENGTH);
         }
         return message;
