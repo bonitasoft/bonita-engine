@@ -36,7 +36,6 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
