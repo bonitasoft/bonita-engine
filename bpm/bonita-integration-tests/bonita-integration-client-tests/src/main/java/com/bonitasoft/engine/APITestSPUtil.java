@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.CommandExecutionException;
@@ -33,7 +29,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -179,21 +174,6 @@ public class APITestSPUtil extends APITestUtil {
         }
 
         return count == minimalFrequency;
-    }
-
-    @Deprecated
-    public SearchResult<HumanTaskInstance> waitForHumanTasks(final int nbTasks, final String taskName, final long processInstanceId) throws Exception {
-        return waitForHumanTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbTasks, taskName, processInstanceId);
-    }
-
-    @Deprecated
-    private SearchResult<HumanTaskInstance> waitForHumanTasks(final int repeatEach, final int timeout, final int nbTasks, final String taskName,
-            final long processInstanceId) throws Exception {
-        final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, true, nbTasks, new SearchOptionsBuilder(0, 10000)
-                .filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).filter(HumanTaskInstanceSearchDescriptor.NAME, taskName)
-                .done(), getProcessAPI());
-        assertTrue(checkNbOfHumanTasks.waitUntil());
-        return checkNbOfHumanTasks.getHumanTaskInstances();
     }
 
     protected void deleteSupervisor(final Serializable id) throws BonitaException {
