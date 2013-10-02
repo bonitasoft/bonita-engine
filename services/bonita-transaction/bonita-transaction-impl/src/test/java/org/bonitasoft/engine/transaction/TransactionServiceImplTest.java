@@ -1,18 +1,12 @@
 package org.bonitasoft.engine.transaction;
 
 import java.util.Hashtable;
-import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.AfterClass;
@@ -37,7 +31,7 @@ public class TransactionServiceImplTest extends TransactionServiceTest {
 
     @Override
     protected TransactionService getTxService() {
-        return new JTATransactionServiceImpl(getLoggerService(), getTransactionManager(), getEventService());
+        return new JTATransactionServiceImpl(getLoggerService(), getTransactionManager());
     }
 
     private TransactionManager getTransactionManager() {
@@ -50,98 +44,6 @@ public class TransactionServiceImplTest extends TransactionServiceTest {
         } catch (final NamingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    // TODO See to use some mocks instead of Anonymous classes.
-    protected EventService getEventService() {
-        return new EventService() {
-
-            @Override
-            public void removeHandler(final String eventType, final SHandler<SEvent> handler) {
-            }
-
-            @Override
-            public void removeAllHandlers(final SHandler<SEvent> handler) {
-            }
-
-            @Override
-            public Set<SHandler<SEvent>> getHandlers(final String eventType) {
-                return null;
-            }
-
-            @Override
-            public SEventBuilder getEventBuilder() {
-                return getSEventBuilder();
-            }
-
-            private SEventBuilder getSEventBuilder() {
-                return new SEventBuilder() {
-
-                    private SEvent event;
-
-                    @Override
-                    public SEventBuilder createNewInstance(final String type) {
-                        event = new SEvent() {
-
-                            @Override
-                            public String getType() {
-                                return type;
-                            }
-
-                            @Override
-                            public Object getObject() {
-                                return null;
-                            }
-
-                            @Override
-                            public void setObject(final Object ob) {
-                            }
-                        };
-                        return this;
-                    }
-
-                    @Override
-                    public SEvent done() {
-                        return event;
-                    }
-
-                    @Override
-                    public SEventBuilder setObject(final Object ob) {
-                        event.setObject(ob);
-                        return this;
-                    }
-
-                    @Override
-                    public SEventBuilder createInsertEvent(final String type) {
-                        return this;
-                    }
-
-                    @Override
-                    public SEventBuilder createDeleteEvent(final String type) {
-                        return this;
-                    }
-
-                    @Override
-                    public SEventBuilder createUpdateEvent(final String type) {
-                        return this;
-                    }
-                };
-
-            }
-
-            @Override
-            public void fireEvent(final SEvent event) {
-            }
-
-            @Override
-            public void addHandler(final String eventType, final SHandler<SEvent> handler) {
-            }
-
-            @Override
-            public boolean hasHandlers(final String eventType, final EventActionType actionType) {
-                return false;
-            }
-        };
     }
 
     // TODO See to use some mocks instead of Anonymous classes.

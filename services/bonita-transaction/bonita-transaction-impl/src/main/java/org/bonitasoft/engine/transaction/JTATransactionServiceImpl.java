@@ -27,9 +27,6 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -41,17 +38,14 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private List<BonitaTransactionSynchronization> synchronizations;
 
-    private final EventService eventService;
-
     private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
 
-    public JTATransactionServiceImpl(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup, final EventService eventService) {
-        this(logger, txManagerLookup.getTransactionManager(), eventService);
+    public JTATransactionServiceImpl(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup) {
+        this(logger, txManagerLookup.getTransactionManager());
     }
 
-    public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager, final EventService eventService) {
+    public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager) {
         this.logger = logger;
-        this.eventService = eventService;
         if (txManager == null) {
             throw new IllegalArgumentException("The parameter txManager can't be null.");
         }
@@ -79,10 +73,6 @@ public class JTATransactionServiceImpl implements TransactionService {
                         synchronizations.clear();
                     }
                     synchronizations = new ArrayList<BonitaTransactionSynchronization>();
-                    if (eventService.hasHandlers(TRANSACTION_ACTIVE_EVT, null)) {
-                        final SEvent tr_active = eventService.getEventBuilder().createNewInstance(TRANSACTION_ACTIVE_EVT).done();
-                        eventService.fireEvent(tr_active);
-                    }
                 } catch (final NotSupportedException e) {
                     // Should never happen as we do not want to support nested transaction
                     throw new STransactionCreationException(e);
@@ -125,12 +115,6 @@ public class JTATransactionServiceImpl implements TransactionService {
                     throw new STransactionRollbackException("", e);
                 } finally {
                     numberOfActiveTransactions.getAndDecrement();
-                    String eventName = TRANSACTION_ROLLEDBACK_EVT;
-                    if (eventService.hasHandlers(eventName, null)) {
-                        // trigger the right event
-                        final SEvent tr_rolledback = eventService.getEventBuilder().createNewInstance(eventName).done();
-                        eventService.fireEvent(tr_rolledback);
-                    }
                 }
             } else {
                 try {
@@ -147,17 +131,9 @@ public class JTATransactionServiceImpl implements TransactionService {
                     throw new STransactionCommitException("", e);
                 } finally {
                     numberOfActiveTransactions.getAndDecrement();
-                    String eventName = TRANSACTION_COMMITED_EVT;
-                    if (eventService.hasHandlers(eventName, null)) {
-                        // trigger the right event
-                        final SEvent tr_committed = eventService.getEventBuilder().createNewInstance(eventName).done();
-                        eventService.fireEvent(tr_committed);
-                    }
                 }
             }
         } catch (final SystemException e) {
-            throw new STransactionCommitException("", e);
-        } catch (final FireEventException e) {
             throw new STransactionCommitException("", e);
         }
 

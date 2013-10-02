@@ -8,7 +8,6 @@
 	<bean id="transactionService" class="org.bonitasoft.engine.transaction.JTATransactionServiceImpl" scope="singleton">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="txManager" ref="transactionManager" />
-		<constructor-arg name="eventService" ref="eventService" />
 	</bean>
 
 </beans>

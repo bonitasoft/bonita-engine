@@ -15,7 +15,6 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
 
@@ -26,11 +25,10 @@ public class JTATransactionServiceImplTest {
     public void beginTransaction() throws Exception {
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         TransactionManager txManager = mock(TransactionManager.class);
-        EventService eventService = mock(EventService.class);
 
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
 
-        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager, eventService);
+        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
 
         txService.begin();
         verify(txManager, times(1)).begin();
@@ -41,11 +39,10 @@ public class JTATransactionServiceImplTest {
     public void doNotSupportNestedTransaction() throws Exception {
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         TransactionManager txManager = mock(TransactionManager.class);
-        EventService eventService = mock(EventService.class);
 
         when(txManager.getStatus()).thenReturn(Status.STATUS_ACTIVE);
 
-        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager, eventService);
+        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
 
         txService.begin();
     }
@@ -54,12 +51,11 @@ public class JTATransactionServiceImplTest {
     public void beginTransactionFailed() throws Exception {
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         TransactionManager txManager = mock(TransactionManager.class);
-        EventService eventService = mock(EventService.class);
 
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
         when(txManager.getTransaction()).thenThrow(new SystemException("Mocked"));
 
-        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager, eventService);
+        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
 
         try {
             txService.begin();
@@ -74,12 +70,11 @@ public class JTATransactionServiceImplTest {
     public void completeTransactionFailed() throws Exception {
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         TransactionManager txManager = mock(TransactionManager.class);
-        EventService eventService = mock(EventService.class);
 
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_ACTIVE);
         doThrow(new SystemException("Mocked")).when(txManager).commit();
 
-        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager, eventService);
+        JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
 
         txService.begin();
         assertEquals(1, txService.getNumberOfActiveTransactions());
@@ -98,12 +93,11 @@ public class JTATransactionServiceImplTest {
 
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         TransactionManager txManager = mock(TransactionManager.class);
-        EventService eventService = mock(EventService.class);
 
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
-        when(eventService.hasHandlers(TransactionService.TRANSACTION_ACTIVE_EVT, null)).thenThrow(new RuntimeException("Mocked"));
+        when(txManager.getTransaction()).thenThrow(new SystemException("Mocked"));
 
-        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager, eventService));
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
 
         try {
             txService.begin();
@@ -117,9 +111,8 @@ public class JTATransactionServiceImplTest {
     public void setRollbackOnly() throws Exception {
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         TransactionManager txManager = mock(TransactionManager.class);
-        EventService eventService = mock(EventService.class);
 
-        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager, eventService));
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
 
         txService.setRollbackOnly();
         verify(txManager).setRollbackOnly();
@@ -133,11 +126,10 @@ public class JTATransactionServiceImplTest {
     public void testExecuteInTransactionWithCommit() throws Exception {
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         TransactionManager txManager = mock(TransactionManager.class);
-        EventService eventService = mock(EventService.class);
 
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION);
 
-        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager, eventService));
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
         Callable<?> callable = mock(Callable.class);
 
         txService.executeInTransaction(callable);
@@ -155,12 +147,11 @@ public class JTATransactionServiceImplTest {
     public void testExecuteInTransactionWithRollback() throws Exception {
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         TransactionManager txManager = mock(TransactionManager.class);
-        EventService eventService = mock(EventService.class);
 
         // First to allow to start the transaction, then to force to call rollback
         when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_MARKED_ROLLBACK);
 
-        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager, eventService));
+        JTATransactionServiceImpl txService = spy(new JTATransactionServiceImpl(logger, txManager));
 
         Callable<?> callable = mock(Callable.class);
         when(callable.call()).thenThrow(new Exception("Mocked exception"));
