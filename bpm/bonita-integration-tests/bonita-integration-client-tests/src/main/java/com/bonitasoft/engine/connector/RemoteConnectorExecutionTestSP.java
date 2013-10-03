@@ -475,10 +475,11 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ConnectorInstanceWithFailureInfo connectorInstanceWithFailureInfo = getProcessAPI().getConnectorInstanceWithFailureInformation(
                 connectorInstance.getId());
         assertEquals(ConnectorState.FAILED, connectorInstanceWithFailureInfo.getState());
-        assertEquals("unexpected", connectorInstanceWithFailureInfo.getExceptionMessage());
+        assertEquals(TestConnectorThatThrowException.BUSINESS_LOGIC_EXCEPTION_MESSAGE, connectorInstanceWithFailureInfo.getExceptionMessage());
         final String stackTrace = connectorInstanceWithFailureInfo.getStackTrace();
         assertTrue(stackTrace
-                .contains("org.bonitasoft.engine.core.connector.exception.SConnectorException: org.bonitasoft.engine.connector.exception.SConnectorException: java.util.concurrent.ExecutionException: org.bonitasoft.engine.connector.exception.SConnectorException: org.bonitasoft.engine.connector.ConnectorException: unexpected"));
+                .contains("org.bonitasoft.engine.core.connector.exception.SConnectorException: org.bonitasoft.engine.connector.exception.SConnectorException: java.util.concurrent.ExecutionException: org.bonitasoft.engine.connector.exception.SConnectorException: org.bonitasoft.engine.connector.ConnectorException: "
+                        + TestConnectorThatThrowException.BUSINESS_LOGIC_EXCEPTION_MESSAGE));
         assertTrue(stackTrace
                 .contains("at org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl.executeConnectorInClassloader(ConnectorServiceImpl.java:"));
         assertTrue(stackTrace.contains("at org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl.executeConnector(ConnectorServiceImpl.java:"));
