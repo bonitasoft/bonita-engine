@@ -22,6 +22,8 @@ import org.bonitasoft.engine.connector.ConnectorValidationException;
  */
 public class TestConnectorThatThrowException extends AbstractConnector {
 
+    public static final String BUSINESS_LOGIC_EXCEPTION_MESSAGE = "unexpected ══════════════════════════ during connector execution";
+
     public static final String DISCONNECT = "disconnect";
 
     public static final String CONNECT = "connect";
@@ -46,7 +48,7 @@ public class TestConnectorThatThrowException extends AbstractConnector {
     protected void executeBusinessLogic() throws ConnectorException {
         final String kind = (String) getInputParameter(KIND);
         if (kind.equals(NORMAL)) {
-            throw new ConnectorException("unexpected");
+            throw new ConnectorException(BUSINESS_LOGIC_EXCEPTION_MESSAGE);
         } else if (kind.equals(RUNTIME)) {
             throw new RuntimeException("unexpected");
         }
