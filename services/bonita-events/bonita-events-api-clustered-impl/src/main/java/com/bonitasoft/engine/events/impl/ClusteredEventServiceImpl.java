@@ -16,7 +16,6 @@ package com.bonitasoft.engine.events.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,9 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
@@ -53,8 +55,8 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
     // Local copy of the eventHandlers Map keys to speed up performance. It has to be manipulated
     // only by the distributed tasks.
-    private final Set<String> localEventTypes = Collections.synchronizedSet(new HashSet<String>());
-
+    private final Set<String> localEventTypes = new HashSet<String>();
+    private final ReadWriteLock localEventTypesLock = new ReentrantReadWriteLock();
     private final HazelcastInstance hazelcastInstance;
 
     public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
@@ -95,7 +97,13 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
     @Override
     protected boolean containsHandlerFor(final String eventType) {
-        return localEventTypes.contains(eventType);
+        Lock readLock = localEventTypesLock.readLock();
+        readLock.lock();
+        try {
+            return localEventTypes.contains(eventType);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @Override
@@ -189,18 +197,38 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
     }
 
-    private static class ClearLocalEventType extends LocalClusteredServiceTask {
+    private static abstract class WriteLockLocalClusteredServiceTask extends LocalClusteredServiceTask {
+
+        @Override
+        final protected void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService) {
+            Lock writeLock = clusteredEventService.localEventTypesLock.writeLock();
+            writeLock.lock();
+            try {
+                doInsideWriteLock(clusteredEventService);
+            } finally {
+                writeLock.unlock();
+            }
+        }
+
+        /**
+         * @param clusteredEventService
+         */
+        protected abstract void doInsideWriteLock(final ClusteredEventServiceImpl clusteredEventService);
+
+    }
+
+    private static class ClearLocalEventType extends WriteLockLocalClusteredServiceTask {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService) {
+        protected void doInsideWriteLock(final ClusteredEventServiceImpl clusteredEventService) {
             clusteredEventService.localEventTypes.clear();
         }
 
     }
 
-    private static abstract class EventTypeCallable extends LocalClusteredServiceTask {
+    private static abstract class EventTypeCallable extends WriteLockLocalClusteredServiceTask {
 
         private static final long serialVersionUID = 1L;
 
@@ -221,7 +249,7 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
         }
 
         @Override
-        protected void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService) {
+        protected void doInsideWriteLock(final ClusteredEventServiceImpl clusteredEventService) {
             clusteredEventService.localEventTypes.add(eventType);
         }
 
@@ -234,7 +262,7 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
         }
 
         @Override
-        protected void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService) {
+        protected void doInsideWriteLock(final ClusteredEventServiceImpl clusteredEventService) {
             clusteredEventService.localEventTypes.remove(eventType);
         }
 
