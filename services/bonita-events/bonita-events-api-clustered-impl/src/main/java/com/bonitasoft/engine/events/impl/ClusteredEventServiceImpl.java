@@ -15,10 +15,16 @@ package com.bonitasoft.engine.events.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
@@ -30,10 +36,23 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapConfig.InMemoryFormat;
 import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastInstanceAware;
+import com.hazelcast.core.IExecutorService;
+import com.hazelcast.core.IMap;
+import com.hazelcast.core.Member;
 
+/**
+ *
+ * @author Laurent Vaills
+ *
+ */
 public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
-    private final ConcurrentMap<String, List<SHandler<SEvent>>> eventHandlers;
+    private final IMap<String, List<SHandler<SEvent>>> eventHandlers;
+    // Local copy of the eventHandlers Map keys to speed up performance. It has to be manipulated
+    // only by the distributed tasks.
+    private final Set<String> localEventTypes = Collections.synchronizedSet(new HashSet<String>());
+    private final HazelcastInstance hazelcastInstance;
 
     public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
             final HazelcastInstance hazelcastInstance) throws HandlerRegistrationException {
@@ -58,15 +77,22 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
         config.addMapConfig(new MapConfig(mapName));
         // ---
+        this.hazelcastInstance = hazelcastInstance;
+        hazelcastInstance.getUserContext().put("ClusteredEventService", this);
         eventHandlers = hazelcastInstance.getMap(mapName);
 
-        // Create a Map that is shared across the cluster.
+        // TODO
+        // See to fill the Set localEventTypes from another cluster's member
+        // Execute a Callable on a member that returns a copy of its own Set ?
+        // What if another handler is added while was executed but not yet returned ?
+
+        // We have created a Map that is shared across the cluster, so we do not need this one.
         registeredHandlers = null;
     }
 
     @Override
     protected boolean containsHandlerFor(final String eventType) {
-        return eventHandlers.containsKey(eventType);
+        return localEventTypes.contains(eventType);
     }
 
     @Override
@@ -91,6 +117,25 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
             final List<SHandler<SEvent>> newHandlerSet = new ArrayList<SHandler<SEvent>>(3);
             newHandlerSet.add(handler);
             eventHandlers.put(eventType, newHandlerSet);
+            EventTypeCallable task = new AddEventTypeCallable(eventType);
+            informOtherMembers(task);
+        }
+    }
+
+    /**
+     * @param task
+     */
+    private void informOtherMembers(final LocalClusteredServiceTask task) {
+        IExecutorService executorService = hazelcastInstance.getExecutorService("ClusteredEventServiceHandlerManagement");
+        Map<Member, Future<Void>> results = executorService.submitToAllMembers(task);
+        for(Map.Entry<Member, Future<Void>> entry : results.entrySet()) {
+            try {
+                entry.getValue().get();
+            } catch (InterruptedException e) {
+                throw new SBonitaRuntimeException(e);
+            } catch (ExecutionException e) {
+                throw new SBonitaRuntimeException(e);
+            }
         }
     }
 
@@ -102,13 +147,85 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
             handlers.remove(handler);
             if (handlers.isEmpty()) {
                 eventHandlers.remove(eventType);
+                EventTypeCallable task = new RemoveEventTypeCallable(eventType);
+                informOtherMembers(task);
+            } else {
+                eventHandlers.replace(eventType, handlers);
             }
         }
     }
 
     // It should be used only for the tests
-    /*package*/ void removeAllHandlers() {
+    /*package*/ synchronized void removeAllHandlers() {
         eventHandlers.clear();
+        informOtherMembers(new ClearLocalEventType());
+    }
+
+    private static abstract class LocalClusteredServiceTask implements Callable<Void>, HazelcastInstanceAware {
+        private transient HazelcastInstance hazelcastInstance;
+
+        @Override
+        public void setHazelcastInstance(final HazelcastInstance hazelcastInstance) {
+            this.hazelcastInstance = hazelcastInstance;
+        }
+
+        @Override
+        public Void call() throws Exception {
+            ClusteredEventServiceImpl clusteredEventService = (ClusteredEventServiceImpl) hazelcastInstance.getUserContext().get("ClusteredEventService");
+            doWithClusteredEventService(clusteredEventService);
+            return null;
+        }
+
+        /**
+         * @param clusteredEventService
+         */
+        protected abstract void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService);
+
+    }
+
+    private static class ClearLocalEventType extends LocalClusteredServiceTask {
+
+        @Override
+        protected void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService) {
+            clusteredEventService.localEventTypes.clear();
+        }
+
+    }
+
+    private static abstract class EventTypeCallable extends LocalClusteredServiceTask {
+
+        protected final String eventType;
+
+        public EventTypeCallable(final String eventType) {
+            this.eventType = eventType;
+        }
+
+    }
+
+    private static class AddEventTypeCallable extends EventTypeCallable {
+
+        public AddEventTypeCallable(final String eventType) {
+            super(eventType);
+        }
+
+        @Override
+        protected void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService) {
+            clusteredEventService.localEventTypes.add(eventType);
+        }
+
+    }
+
+    private static class RemoveEventTypeCallable extends EventTypeCallable {
+
+        public RemoveEventTypeCallable(final String eventType) {
+            super(eventType);
+        }
+
+        @Override
+        protected void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService) {
+            clusteredEventService.localEventTypes.remove(eventType);
+        }
+
     }
 
 }
