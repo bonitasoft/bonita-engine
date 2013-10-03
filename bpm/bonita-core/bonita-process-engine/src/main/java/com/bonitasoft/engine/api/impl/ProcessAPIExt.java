@@ -567,9 +567,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             // Reset connectors first:
             if (connectorsToReset != null) {
                 for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
-                    final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connEntry.getKey());
+                    final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = connectorInstanceService.getConnectorInstanceWithFailureInfo(connEntry.getKey());
+                    //set state
                     final ConnectorStateReset state = connEntry.getValue();
-                    connectorInstanceService.setState(connectorInstance, state.name());
+                    connectorInstanceService.setState(connectorInstanceWithFailure, state.name());
+                    //clean stack trace
+                    if (connectorInstanceWithFailure.getStackTrace() != null) {
+                        connectorInstanceService.setConnectorInstanceFailureException(connectorInstanceWithFailure, null);
+                    }
                 }
             }
 
