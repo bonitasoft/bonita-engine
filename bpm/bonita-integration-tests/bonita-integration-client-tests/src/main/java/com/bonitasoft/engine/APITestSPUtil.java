@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.CommandExecutionException;
@@ -241,9 +242,11 @@ public class APITestSPUtil extends APITestUtil {
         assignAndExecuteStep(activityInstance.getId(), user.getId());
     }
 
-    public void waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
+    @Override
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
         final ActivityInstance waitForUserTask = waitForUserTask(taskName, processInstance);
         assignAndExecuteStep(waitForUserTask, user);
+        return (HumanTaskInstance) waitForUserTask;
     }
 
 }
