@@ -158,7 +158,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
         private Map<String, Object> inputParameters;
 
-        private SConnectorInstanceWithFailureInfo connectorInstanceWithFailure;
+        private SConnectorInstance connectorInstance;
 
         private final ProcessDefinitionService processDefinitionService;
 
@@ -176,7 +176,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         }
 
         public SConnectorInstance getConnectorInstance() {
-            return connectorInstanceWithFailure;
+            return connectorInstance;
         }
 
         public SConnectorDefinition getsConnectorDefinition() {
@@ -187,10 +187,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         public Void call() throws Exception {
             sConnectorDefinition = getSConnectorDefinition(processDefinitionService);
             inputParameters = connectorService.evaluateInputParameters(sConnectorDefinition.getInputs(), inputParametersContext, null);
-            connectorInstanceWithFailure = connectorInstanceService.getConnectorInstanceWithFailureInfo(connectorInstanceId);
-            if (connectorInstanceWithFailure.getStackTrace() != null || connectorInstanceWithFailure.getActivationEvent() != null) {
-                connectorInstanceService.setConnectorInstanceFailureException(connectorInstanceWithFailure, null);
-            }
+            connectorInstance = connectorInstanceService.getConnectorInstance(connectorInstanceId);
             return null;
         }
     }
