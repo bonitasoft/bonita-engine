@@ -50,7 +50,6 @@ public class LicenseChecker {
         exceptions.put(Features.SERVICE_MONITORING, "The service monitoring is not an active feature.");
         exceptions.put(Features.SET_CONNECTOR_STATE, "Set the connector state is not an active feature.");
         exceptions.put(Features.WEB_ORGANIZATION_EXCHANGE, "Export Organization is not an active feature.");
-        exceptions.put(Features.GET_CONNECTOR_INSTANCE_STACKTRACE, "Retrieve the details of failed connector is not an active feature.");
     }
 
     public boolean checkLicence() {
