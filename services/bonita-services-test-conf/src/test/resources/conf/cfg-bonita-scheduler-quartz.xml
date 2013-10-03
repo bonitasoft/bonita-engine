@@ -22,10 +22,10 @@
 
 	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
 		<constructor-arg name="jobService" ref="jobService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="incidentService" ref="incidentService" />
 	</bean>
 
-	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.FileJobListener">
+	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 

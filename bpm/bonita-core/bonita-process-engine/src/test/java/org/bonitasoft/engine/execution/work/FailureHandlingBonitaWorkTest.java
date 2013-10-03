@@ -2,6 +2,7 @@ package org.bonitasoft.engine.execution.work;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -54,15 +55,15 @@ public class FailureHandlingBonitaWorkTest {
 
     @Test
     public void testWork() throws Exception {
-        Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         verify(wrappedWork, times(1)).work(singletonMap);
     }
 
     @Test
     public void testWorkFailureIsHandled() throws Exception {
-        Map<String, Object> singletonMap = new HashMap<String, Object>();
-        Exception e = new Exception();
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Exception e = new Exception();
         doThrow(e).when(wrappedWork).work(singletonMap);
         txBonitawork.work(singletonMap);
         verify(wrappedWork, times(1)).work(singletonMap);
@@ -71,20 +72,20 @@ public class FailureHandlingBonitaWorkTest {
 
     @Test
     public void testFailureHandlingFail() throws Exception {
-        Map<String, Object> singletonMap = new HashMap<String, Object>();
-        Exception e1 = new Exception();
-        Exception e2 = new Exception();
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Exception e1 = new Exception();
+        final Exception e2 = new Exception();
         doThrow(e1).when(wrappedWork).work(singletonMap);
         doThrow(e2).when(wrappedWork).handleFailure(e1, singletonMap);
         txBonitawork.work(singletonMap);
         verify(wrappedWork, times(1)).work(singletonMap);
         verify(wrappedWork, times(1)).handleFailure(e1, singletonMap);
-        verify(incidentService, times(1)).report(any(Incident.class));
+        verify(incidentService, times(1)).report(eq(0l), any(Incident.class));
     }
 
     @Test
     public void putInMap() {
-        Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));
     }
@@ -103,8 +104,8 @@ public class FailureHandlingBonitaWorkTest {
 
     @Test
     public void handleFailure() throws Exception {
-        Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
-        Exception e = new Exception();
+        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final Exception e = new Exception();
         txBonitawork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
     }

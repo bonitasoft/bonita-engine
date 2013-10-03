@@ -16,9 +16,7 @@ package org.bonitasoft.engine.scheduler.model.impl;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 
 /**
- * 
  * @author Celine Souchet
- * 
  */
 public class SJobLogImpl extends SPersistentObjectImpl implements SJobLog {
 

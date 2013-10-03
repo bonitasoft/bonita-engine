@@ -41,9 +41,9 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     }
 
     protected void logIncident(final Exception cause, final Exception exceptionWhenHandlingFailure) {
-        Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause, exceptionWhenHandlingFailure);
-        IncidentService incidentService = getTenantAccessor().getIncidentService();
-        incidentService.report(incident);
+        final Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause, exceptionWhenHandlingFailure);
+        final IncidentService incidentService = getTenantAccessor().getIncidentService();
+        incidentService.report(getTenantId(), incident);
     }
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -56,7 +56,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
 
     @Override
     public void work(final Map<String, Object> context) {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         loggerService = tenantAccessor.getTechnicalLoggerService();
         sessionAccessor = tenantAccessor.getSessionAccessor();
         context.put(TENANT_ACCESSOR, tenantAccessor);
@@ -69,19 +69,16 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             getWrappedWork().work(context);
         } catch (final Exception e) {
             // Edge case we cannot manage
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "A work failed, The failure will be handled, work is:  " + getDescription());
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "Exception was:" + e.getMessage());
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed, The failure will be handled, work is:  " + getDescription());
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage());
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
             }
             try {
                 getWrappedWork().handleFailure(e, context);;
-            } catch (Exception e1) {
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
-                        "Unexpected error while executing work " + getDescription() + ". You may consider restarting the system. This will restart all works.",
-                        e);
+            } catch (final Exception e1) {
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work " + getDescription()
+                        + ". You may consider restarting the system. This will restart all works.", e);
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
                 logIncident(e, e1);
             }
