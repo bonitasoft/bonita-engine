@@ -197,6 +197,7 @@
 										<junit printsummary="yes" fork="yes" forkmode="once"
 											showoutput="true" maxmemory="512m">
 <!-- 											<jvmarg line="-Xdebug -Xmx512m -Xms128m -XX:MaxPermSize=256m -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8500"/> -->
+											<jvmarg line="-Xmx512m -Xms128m -XX:MaxPermSize=256m" />
 											<classpath refid="test.path" />
 											<sysproperty key="bonita.home" value="${bonita.home}" />
 											<formatter type="xml" />
