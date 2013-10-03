@@ -40,7 +40,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         super(work);
     }
 
-    protected void logIncident(final Exception cause, final Exception exceptionWhenHandlingFailure) {
+    protected void logIncident(final Throwable cause, final Throwable exceptionWhenHandlingFailure) {
         final Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause, exceptionWhenHandlingFailure);
         final IncidentService incidentService = getTenantAccessor().getIncidentService();
         incidentService.report(getTenantId(), incident);
@@ -67,7 +67,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
             }
             getWrappedWork().work(context);
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             // Edge case we cannot manage
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed, The failure will be handled, work is:  " + getDescription());
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage());
@@ -75,8 +75,8 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
             }
             try {
-                getWrappedWork().handleFailure(e, context);;
-            } catch (final Exception e1) {
+                getWrappedWork().handleFailure(e, context);
+            } catch (final Throwable e1) {
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work " + getDescription()
                         + ". You may consider restarting the system. This will restart all works.", e);
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
