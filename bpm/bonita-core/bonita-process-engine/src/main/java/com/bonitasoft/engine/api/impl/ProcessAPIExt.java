@@ -1040,6 +1040,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(final long connectorInstanceId)
             throws ConnectorInstanceNotFoundException {
+        LicenseChecker.getInstance().checkLicenceAndFeature(Features.GET_CONNECTOR_INSTANCE_STACKTRACE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         SConnectorInstanceWithFailureInfo serverObject;

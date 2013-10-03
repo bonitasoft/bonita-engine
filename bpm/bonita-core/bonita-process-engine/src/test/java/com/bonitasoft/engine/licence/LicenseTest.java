@@ -95,5 +95,10 @@ public class LicenseTest {
     public void setConnectorStateFeature() {
         valideFeature(Features.SET_CONNECTOR_STATE);
     }
+    
+    @Test
+    public void setGetConnectorInstanceStackTraceFeature() {
+        valideFeature(Features.GET_CONNECTOR_INSTANCE_STACKTRACE);
+    }
 
 }
