@@ -29,6 +29,8 @@ public class BonitaHomeServer extends BonitaHome {
 
     private static final String TENANT_CONFIGURATION_FILE = "bonita-server.properties";
 
+    private static final String PROFILES_FILE = "profiles.xml";
+
     private static final String CONF = "conf";
 
     private static final String REPORTS = "reports";
@@ -53,7 +55,7 @@ public class BonitaHomeServer extends BonitaHome {
 
     private Properties platformProperties;
 
-    public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
+    public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();;
 
     private BonitaHomeServer() {
         platformProperties = null;
@@ -185,6 +187,10 @@ public class BonitaHomeServer extends BonitaHome {
 
     public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {
         return PropertiesManager.getProperties(new File(getTenantConfFolder(tenantId) + File.separatorChar + TENANT_CONFIGURATION_FILE));
+    }
+
+    public File getTenantProfilesFile(final Long tenantId) throws BonitaHomeNotSetException {
+        return new File(getTenantConfFolder(tenantId) + File.separatorChar + PROFILES_FILE);
     }
 
 }

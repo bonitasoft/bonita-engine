@@ -29,6 +29,12 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * 
+ * Initialize the engine and create/start or not the platform based on bonita-platform.xml
+ * properties used are:
+ * platform.create -- create the platform on startup
+ * node.start -- start the platform (node) on startup
+ * node.stop -- stop the platform (node) on shutdown
+ * 
  * @author Baptiste Mesta
  * 
  */
@@ -69,28 +75,13 @@ public class EngineInitializer {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
         PlatformAPIImpl platformAPI = new PlatformAPIImpl();
-        // final PlatformService platformService = platformAccessor.getPlatformService();
-        // long defaultTenantId;
         // initialization of the platform
         try {
             initAndStartPlatform(platformAPI);
-            // we always have a default tenant here
-            // defaultTenantId = platformService.getDefaultTenant().getId();
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
-        // // create a session on the default tenant
-        // TenantServiceAccessor serviceAccessor = TenantServiceSingleton.getInstance(defaultTenantId);
-        // SessionService sessionService = serviceAccessor.getSessionService();
-        //
-        // SSession tenantSession = sessionService.createSession(defaultTenantId, platformProperties.getTenantAdminUsername(defaultTenantId));
-        // sessionAccessor.setSessionInfo(tenantSession.getId(), defaultTenantId);
-        // try {
-        // initializeDefaultTenant();
-        // } finally {
-        // sessionService.deleteSession(tenantSession.getId());
-        // sessionAccessor.deleteSessionId();
-        // }
+
         long after = System.currentTimeMillis();
         LOGGER.log(Level.INFO, "Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
     }
@@ -119,41 +110,6 @@ public class EngineInitializer {
         }
     }
 
-    // /**
-    // * Initialize default tenant configuration folder
-    // *
-    // * @throws IOException
-    // * @throws BonitaException
-    // */
-    // protected void initializeDefaultTenant() throws Exception {
-    // LOGGER.log(Level.INFO, "Initializing default tenant...");
-    // try {
-    // final boolean wasDirectoryCreated = TenantsManagementUtils.addDirectoryForTenant(tenantId, platformManager.getPlatformSession());
-    // if (wasDirectoryCreated) {
-    // createDefaultProfiles(session);
-    // }
-    // TenantAPIAccessor.getLoginAPI().logout(session);
-    // } catch (final NumberFormatException e) {
-    // if (LOGGER.isLoggable(Level.SEVERE)) {
-    // final String msg = "Error while casting default tenant id";
-    // LOGGER.log(Level.SEVERE, msg, e);
-    // }
-    // throw e;
-    // } catch (final IOException e) {
-    // if (LOGGER.isLoggable(Level.SEVERE)) {
-    // final String msg = "Error while creating tenant directory";
-    // LOGGER.log(Level.SEVERE, msg, e);
-    // }
-    // throw e;
-    // } catch (final BonitaException e) {
-    // if (LOGGER.isLoggable(Level.SEVERE)) {
-    // final String msg = "Bonita exception while creating tenant directory";
-    // LOGGER.log(Level.SEVERE, msg, e);
-    // }
-    // throw e;
-    // }
-    // }
-
     public void unloadEngine() throws Exception {
         LOGGER.log(Level.INFO, "Stopping Bonita Engine...");
         // create a session to call the engine
@@ -171,20 +127,5 @@ public class EngineInitializer {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
     }
-    //
-    // protected void createDefaultProfiles(final APISession session) throws IOException {
-    // importProfilesFromResourceFile(session, "InitProfiles.xml");
-    // }
-    //
-    // @SuppressWarnings("unchecked")
-    // protected void importProfilesFromResourceFile(final APISession session, final String xmlFileName) throws IOException {
-    // final InputStream xmlStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(xmlFileName);
-    // final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
-    //
-    // final CommandCaller addProfiles = new CommandCaller(session, "importProfilesCommand");
-    // addProfiles.addParameter("xmlContent", xmlContent);
-    // addProfiles.addParameter("importPolicy", ImportPolicy.MERGE_DUPLICATES);
-    // final List<String> warningMsgs = (List<String>) addProfiles.run();
-    //
-    // }
+
 }

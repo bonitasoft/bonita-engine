@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
 import org.bonitasoft.engine.api.impl.transaction.platform.RefreshPlatformClassLoader;
 import org.bonitasoft.engine.api.impl.transaction.platform.RefreshTenantClassLoaders;
+import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandService;
@@ -65,6 +67,7 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -84,6 +87,8 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -96,6 +101,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.xml.Parser;
 
 /**
  * @author Matthieu Chaffotte
@@ -528,11 +534,42 @@ public class PlatformAPIImpl implements PlatformAPI {
             createDefaultDataSource(sDataSourceModelBuilder, dataService);
             final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
             createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
+            Parser profileParser = tenantServiceAccessor.getProfileParser();
+            ProfileService profileService = tenantServiceAccessor.getProfileService();
+            IdentityService identityService = tenantServiceAccessor.getIdentityService();
+            TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+            createDefaultProfiles(tenantId, profileParser, profileService, identityService, logger);
             sessionService.deleteSession(session.getId());
         } catch (final Exception e) {
             throw new STenantCreationException("Unable to create tenant " + tenantName, e);
         } finally {
             cleanSessionAccessor(sessionAccessor, platformSessionId);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void createDefaultProfiles(final Long tenantId, final Parser parser, final ProfileService profileService, final IdentityService identityService,
+            final TechnicalLoggerService logger)
+            throws Exception {
+        File tenantProfilesFile = BonitaHomeServer.getInstance().getTenantProfilesFile(tenantId);
+        if (!tenantProfilesFile.exists()) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Default profile file not present, will not create the default profiles, file: "
+                    + tenantProfilesFile.getAbsolutePath());
+            return;
+        }
+        final String xmlContent = IOUtil.getFileContent(tenantProfilesFile);
+        StringReader reader = new StringReader(xmlContent);
+        List<ExportedProfile> profiles;
+        try {
+            parser.validate(reader);
+            reader.close();
+            reader = new StringReader(xmlContent);
+            profiles = (List<ExportedProfile>) parser.getObjectFromXML(reader);
+            // importer -1 because we create the tenant
+            final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles, -1);
+            importProfiles.execute();
+        } finally {
+            reader.close();
         }
     }
 
