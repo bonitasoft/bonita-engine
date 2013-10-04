@@ -95,7 +95,7 @@ public class JDBCJobListener extends AbstractJobListener {
                 }
             }
         } catch (final SBonitaException sbe) {
-            final Integer tenantId = (Integer) jobDetail.getJobDataMap().getWrappedMap().get("tenantId");
+            final Long tenantId = (Long) jobDetail.getJobDataMap().getWrappedMap().get("tenantId");
             final Incident incident = new Incident("An exception occurs during the job execution of the job descriptor" + jobDescriptorId, "", jobException,
                     sbe);
             incidentService.report(tenantId, incident);
