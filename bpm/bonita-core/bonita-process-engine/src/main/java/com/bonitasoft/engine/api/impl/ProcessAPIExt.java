@@ -93,7 +93,6 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
@@ -125,6 +124,7 @@ import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
+import com.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
 import com.bonitasoft.engine.parameter.OrderBy;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.parameter.SParameter;
@@ -535,7 +535,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new UpdateException(e);
         }
         // refresh classloader in an other transaction.
-        DependencyService dependencyService = getTenantAccessor().getDependencyService();
+        final DependencyService dependencyService = getTenantAccessor().getDependencyService();
         try {
             dependencyService.refreshClassLoader("process", processDefinitionId);
         } catch (final SBonitaException e) {
@@ -590,7 +590,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new ActivityInstanceNotFoundException(e);
         } catch (final SBonitaException e) {
             throw new ActivityExecutionException(e);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new ActivityExecutionException(e);
         }
     }
@@ -603,7 +603,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
      */
     private void ensureNoMoreConnectoFailed(final long activityInstanceId, final ConnectorInstanceService connectorInstanceService)
             throws SConnectorInstanceReadException, ActivityExecutionException {
-        for (ConnectorEvent connectorEvent : ConnectorEvent.values()) {
+        for (final ConnectorEvent connectorEvent : ConnectorEvent.values()) {
             List<SConnectorInstance> connectorInstances;
             connectorInstances = connectorInstanceService.getConnectorInstances(activityInstanceId, SConnectorInstance.FLOWNODE_TYPE, connectorEvent, 0, 1,
                     ConnectorState.FAILED.name());
