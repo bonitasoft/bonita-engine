@@ -1965,7 +1965,7 @@ public interface ProcessRuntimeAPI {
     void replayFailedJob(final long jobDescriptorId, Map<String, Serializable> parameters) throws ExecutionException;
 
     /**
-     * Get the last archived data instance of the named data of the process instance.
+     * Gets the last archived data instance of the named data of the process instance.
      * 
      * @param dataName
      *            the name of the data.
@@ -1979,5 +1979,21 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     ArchivedDataInstance getArchivedProcessDataInstance(String dataName, long processInstanceId) throws ArchivedDataNotFoundException;
+
+    /**
+     * Gets the last archived data instance of the named data of the activity instance.
+     * 
+     * @param dataName
+     *            the name of the data.
+     * @param activityInstanceId
+     *            the identifier of the activity instance.
+     * @return an archived instance of data.
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws ArchivedDataNotFoundException
+     *             if the specified data cannot be found.
+     * @since 6.1
+     */
+    ArchivedDataInstance getArchivedActivityDataInstance(String dataName, long activityInstanceId) throws ArchivedDataNotFoundException;
 
 }

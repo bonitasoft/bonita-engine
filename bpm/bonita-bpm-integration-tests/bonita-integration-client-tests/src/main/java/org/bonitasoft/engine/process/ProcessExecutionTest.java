@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
@@ -608,7 +609,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
             "process instance" })
     @Test
-    public void getArchivedProcessDataInstanceFromAnArchiveProcess() throws Exception {
+    public void getArchivedProcessDataInstanceFromAnArchivedProcess() throws Exception {
         final String dataName = "title";
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
         builder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
@@ -665,6 +666,106 @@ public class ProcessExecutionTest extends CommonAPITest {
             // Do nothing
         } finally {
             disableAndDeleteProcess(processDefinition);
+        }
+    }
+
+    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "activity instance" })
+    @Test
+    public void getArchivedActivityDataInstance() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor").addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
+
+        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedActivityDataInstance(dataName, userTask.getId());
+        assertEquals("2", archivedData.getValue());
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(matti);
+    }
+
+    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "activity instance" })
+    @Test
+    public void getArchivedActivityDataInstanceFromAnArchivedProcess() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor").addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForProcessToFinish(processInstance.getId());
+
+        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedActivityDataInstance(dataName, userTask.getId());
+        assertEquals("2", archivedData.getValue());
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(matti);
+    }
+
+    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "activity instance" })
+    @Test
+    public void getArchivedTransientActivityDataInstance() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor").addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1")).isTransient();
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForProcessToFinish(processInstance.getId());
+
+        try {
+            getProcessAPI().getArchivedActivityDataInstance(dataName, userTask.getId());
+            fail("a transient data of an activity is not archived");
+        } catch (final ArchivedDataNotFoundException adnfe) {
+
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+            deleteUser(matti);
+        }
+    }
+
+    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "activity instance" })
+    @Test
+    public void getUnknownArchivedActivityDataInstance() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor");
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+
+        try {
+            getProcessAPI().getArchivedProcessDataInstance("o", userTask.getId());
+            fail("The data named 'o' does not exists");
+        } catch (final ArchivedDataNotFoundException dnfe) {
+            // Do nothing
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+            deleteUser(matti);
         }
     }
 

@@ -5553,4 +5553,17 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    @Override
+    public ArchivedDataInstance getArchivedActivityDataInstance(final String dataName, final long activityInstanceId) throws ArchivedDataNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        try {
+            final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+            return ModelConvertor.toArchivedDataInstance(dataInstance);
+        } catch (final SDataInstanceException sdie) {
+            throw new ArchivedDataNotFoundException(sdie);
+        }
+    }
+
 }
