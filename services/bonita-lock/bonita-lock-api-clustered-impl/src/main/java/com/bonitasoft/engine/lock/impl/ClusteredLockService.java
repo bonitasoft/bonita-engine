@@ -8,106 +8,131 @@
  *******************************************************************************/
 package com.bonitasoft.engine.lock.impl;
 
-import java.util.Collection;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.lock.RejectedLockHandler;
-import org.bonitasoft.engine.lock.impl.AbstractLockService;
+import org.bonitasoft.engine.lock.BonitaLock;
+import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.HazelcastInstanceAware;
-import com.hazelcast.core.IExecutorService;
-import com.hazelcast.core.MultiMap;
 
 /**
  * create and release locks using hazelcast
  * 
  * @author Baptiste Mesta
  */
-public class ClusteredLockService extends AbstractLockService {
+public class ClusteredLockService implements LockService {
 
 	private final HazelcastInstance hazelcastInstance;
 
-	private final MultiMap<String, RejectedLockHandler> rejectedLockHandlers;
+	private static final String SEPARATOR = "_";
 
-	private final IExecutorService executorService; 
+	protected final TechnicalLoggerService logger;
 
-	public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-			final int lockTimeout) {
-		super(logger, sessionAccessor, lockTimeout);
+	protected final int lockTimeout;
+
+	private final ReadSessionAccessor sessionAccessor;
+
+	protected final boolean debugEnable;
+
+	private final boolean traceEnable;
+
+	public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout) {
+		this.logger = logger;
+		this.sessionAccessor = sessionAccessor;
+		this.lockTimeout = lockTimeout;
+		this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
+		this.traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
 		this.hazelcastInstance = hazelcastInstance;
 		if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
 			throw new IllegalStateException("The clustering is not an active feature.");
 		}
-		this.executorService = this.hazelcastInstance.getExecutorService("ExecutorLock");
-		this.rejectedLockHandlers = this.hazelcastInstance.getMultiMap("rejectedLockHandlers");
 	}
 
+	@Override
+	public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
+		final String key = buildKey(objectToLockId, objectType);
+		final long before = System.currentTimeMillis();
+		if (traceEnable) {
+			logger.log(getClass(), TechnicalLogSeverity.TRACE, "lock id=" + key);
+		}
+		boolean lockObtained = false;
+		final Lock lock = hazelcastInstance.getLock(key);
+		try {
+	        lockObtained = lock.tryLock(lockTimeout, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+	        throw new SLockException(e);
+        }
+
+		if (!lockObtained) {
+			throw new SLockException("Timeout trying to lock " + objectToLockId + ":" + objectType);
+		}
+
+		if (traceEnable) {
+			logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked id=" + key);
+		}
+		final long time = System.currentTimeMillis() - before;
+
+		final TechnicalLogSeverity severity = selectSeverity(time);
+		if (severity != null) {
+			logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
+			if (TechnicalLogSeverity.DEBUG.equals(severity)) {
+				logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
+			}
+		}
+		return new BonitaLock(lock, objectType, objectToLockId);
+	}
+
+	@Override
+	public void unlock(final BonitaLock bonitaLock) throws SLockException {
+		final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType());
+		if (traceEnable) {
+			logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
+		}
+		final Lock lock = bonitaLock.getLock();
+		lock.unlock();
+		if (traceEnable) {
+			logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
+		}
+	}
+
+	private TechnicalLogSeverity selectSeverity(final long time) {
+		if (time > 150) {
+			return TechnicalLogSeverity.INFO;
+		} else if (time > 50) {
+			return TechnicalLogSeverity.DEBUG;
+		} else {
+			// No need to log anything
+			return null;
+		}
+	}
+
+	protected String buildKey(final long objectToLockId, final String objectType) {
+		try {
+			return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
+		} catch (TenantIdNotSetException e) {
+			throw new IllegalStateException("Tenant not set");
+		}
+	}
+
+
+	/*
 	@Override
 	protected Lock getLock(final String key) {
 		return hazelcastInstance.getLock(key);
 	}
 
 	@Override
-	protected void removeLockFromMapIfnotUsed(final String key) {
+	protected void innerUnLock(BonitaLock lock) {
+		lock.getLock().unlock();
 	}
+	 */
 
-	@Override
-	protected RejectedLockHandler getOneRejectedHandler(final String key) {
-		final Callable<RejectedLockHandler> task = new MyCallable(key);
-		try {
-	        return this.executorService.submitToKeyOwner(task, key).get();
-        } catch (InterruptedException e) {
-	        throw new SBonitaRuntimeException(e);
-        } catch (ExecutionException e) {
-        	throw new SBonitaRuntimeException(e);
-        }
-	}
-
-	private static final class MyCallable implements Callable<RejectedLockHandler>, HazelcastInstanceAware {
-		
-		private transient HazelcastInstance hazelcastInstance;
-		private String key;
-		
-		public MyCallable(final String key) {
-			this.key = key;
-		}
-		
-		@Override
-		public RejectedLockHandler call() throws Exception {
-			final MultiMap<String, RejectedLockHandler> rejectedLockHandlers = this.hazelcastInstance.getMultiMap("rejectedLockHandlers");
-			if (rejectedLockHandlers.containsKey(key)) {
-				final Collection<RejectedLockHandler> handlers = rejectedLockHandlers.get(key);
-				final RejectedLockHandler handler = handlers.iterator().next();
-				rejectedLockHandlers.remove(key, handler);
-				if (handlers.size() == 0) {
-					rejectedLockHandlers.remove(key);
-				}
-				return handler;
-			}
-			return null;
-		}
-
-		@Override
-		public void setHazelcastInstance(final HazelcastInstance hazelcastInstance) {
-			this.hazelcastInstance = hazelcastInstance;
-
-		}
-	}
-	@Override
-	protected void storeRejectedLock(final String key, final RejectedLockHandler handler) {
-		rejectedLockHandlers.put(key, handler);
-	}
-
-	@Override
-	protected boolean isOwnedByCurrentThread(final Lock lock, final String key) {
-		return false;
-	}
 }
