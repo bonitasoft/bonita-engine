@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.BonitaLock;
-import org.bonitasoft.engine.lock.RejectedLockHandler;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -37,87 +36,30 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class MemoryLockServiceTest {
 
-    private final class RejectedLockHandlerWithState implements RejectedLockHandler {
+    private final class LockThread extends Thread {
 
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public void executeOnLockFree() {
-        }
-    }
-
-    private final class RejectedLockHandlerThatLock implements RejectedLockHandler {
-
-        private static final long serialVersionUID = 1L;
+        private BonitaLock lock;
 
         private final int id;
 
         private final String type;
 
-        public RejectedLockHandlerThatLock(final int id, final String type) {
+        public LockThread(final int id, final String type) {
             this.id = id;
             this.type = type;
-        }
-
-        @Override
-        public void executeOnLockFree() throws SLockException {
-            BonitaLock tryLock = memoryLockService.tryLock(id, type, new RejectedLockHandlerWithState());
-            assertTrue(tryLock != null);
-            memoryLockService.unlock(tryLock);
-        }
-    }
-
-    private final class TryLockThread extends Thread {
-
-        private BonitaLock tryLock;
-
-        private final int id;
-
-        private final String type;
-
-        private final boolean isTry;
-
-        private final RejectedLockHandler rejectedLockHandler;
-
-        public TryLockThread(final int id, final String type, final boolean isTry, final RejectedLockHandler rejectedLockHandler) {
-            this.id = id;
-            this.type = type;
-            this.isTry = isTry;
-            this.rejectedLockHandler = rejectedLockHandler;
-        }
-
-        public TryLockThread(final int id, final String type, final boolean isTry) {
-            this.id = id;
-            this.type = type;
-            this.isTry = isTry;
-            this.rejectedLockHandler = new RejectedLockHandler() {
-
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void executeOnLockFree() {
-                    // TODO Auto-generated method stub
-
-                }
-            };
         }
 
         @Override
         public void run() {
             try {
-                if (isTry) {
-
-                    tryLock = memoryLockService.tryLock(id, type, rejectedLockHandler);
-                } else {
-                    tryLock = memoryLockService.lock(id, type);
-                }
+                lock = memoryLockService.lock(id, type);
             } catch (SLockException e) {
-                e.printStackTrace();
+            	//NOTHING
             }
         }
 
-        public boolean getResult() {
-            return tryLock != null;
+        public boolean isLockObtained() {
+            return lock != null;
         }
     }
 
@@ -125,74 +67,47 @@ public class MemoryLockServiceTest {
 
     private final ReadSessionAccessor sessionAccessor = mock(ReadSessionAccessor.class);
 
-    private final MemoryLockService memoryLockService = new MemoryLockService(logger, sessionAccessor, 1);
+    private MemoryLockService memoryLockService;
 
     @Before
     public void before() {
+    	memoryLockService = new MemoryLockService(logger, sessionAccessor, 1);
     }
 
     @Test
     public void testUnlock() throws Exception {
 
         BonitaLock lock = memoryLockService.lock(5, "a");
-        TryLockThread tryLockThread = new TryLockThread(5, "a", false);
-        tryLockThread.start();
+        LockThread lockThread = new LockThread(5, "a");
+        lockThread.start();
         Thread.sleep(100);
         memoryLockService.unlock(lock);
-        tryLockThread.join(1200);
-        assertTrue("should not be able to lock", tryLockThread.getResult());
+        lockThread.join(1200);
+        assertTrue("should not be able to lock", lockThread.isLockObtained());
     }
 
-    @Test
-    public void testTryLock() throws Exception {
-        memoryLockService.lock(1, "a");
-        TryLockThread tryLockThread = new TryLockThread(1, "a", true);
-        tryLockThread.start();
-        tryLockThread.join(100);
-        assertFalse("should not be able to lock", tryLockThread.getResult());
-    }
-
-    @Test
-    public void testTryLockOnSameThread() throws Exception {
-        RejectedLockHandlerWithState rejectedLockHandler1 = new RejectedLockHandlerWithState();
-        RejectedLockHandlerWithState rejectedLockHandler2 = new RejectedLockHandlerWithState();
-        BonitaLock lock = memoryLockService.tryLock(123, "abc", rejectedLockHandler1);
-        BonitaLock lock2 = memoryLockService.tryLock(123, "abc", rejectedLockHandler2);
-        memoryLockService.unlock(lock);
-        ReentrantLock rlock = (ReentrantLock) lock.getLock();
-        ReentrantLock rlock2 = (ReentrantLock) lock2.getLock();
-        assertTrue(rlock.isLocked());
-        memoryLockService.unlock(lock);
-        assertFalse(rlock2.isLocked());
-    }
-
-    @Test
-    public void testTryLockWithRejectThatLock() throws Exception {
-        BonitaLock lock = memoryLockService.tryLock(124, "abc", new RejectedLockHandlerWithState());
-        RejectedLockHandlerThatLock rejectedLockHandler = new RejectedLockHandlerThatLock(124, "abc");
-        TryLockThread tryLockThread = new TryLockThread(124, "abc", true, rejectedLockHandler);
-        tryLockThread.start();
-        Thread.sleep(50);
-        memoryLockService.unlock(lock);
-        tryLockThread.join(100);
+    @Test(expected=SLockException.class)
+    public void testLockOnSameThread() throws Exception {
+        memoryLockService.lock(123, "abc");
+        memoryLockService.lock(123, "abc");
     }
 
     @Test
     public void testLock() throws Exception {
         memoryLockService.lock(3, "a");
-        TryLockThread tryLockThread = new TryLockThread(4, "a", true);
-        tryLockThread.start();
-        tryLockThread.join(100);
-        assertTrue("should able to lock", tryLockThread.getResult());
+        LockThread lockThread = new LockThread(4, "a");
+        lockThread.start();
+        lockThread.join(100);
+        assertTrue("should able to lock", lockThread.isLockObtained());
     }
 
     @Test
     public void testLockTimeout() throws Exception {
         memoryLockService.lock(2, "a");
-        TryLockThread tryLockThread = new TryLockThread(2, "a", false);
-        tryLockThread.start();
-        tryLockThread.join(1200);
-        assertFalse("should not be able to lock", tryLockThread.getResult());
+        LockThread lockThread = new LockThread(2, "a");
+        lockThread.start();
+        lockThread.join(1200);
+        assertFalse("should not be able to lock", lockThread.isLockObtained());
     }
 
 }

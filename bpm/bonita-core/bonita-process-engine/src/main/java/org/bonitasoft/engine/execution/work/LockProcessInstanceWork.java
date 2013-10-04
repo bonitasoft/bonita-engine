@@ -16,10 +16,9 @@ package org.bonitasoft.engine.execution.work;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
-import org.bonitasoft.engine.execution.RescheduleWorkRejectedLockHandler;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.RejectedLockHandler;
+import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -44,27 +43,20 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         LockService lockService = getTenantAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
-        BonitaWork rootWork = getRootParent();
-        final RejectedLockHandler handler = new RescheduleWorkRejectedLockHandler(getTenantId(), rootWork);
-
-        BonitaLock lock = lockService.tryLock(processInstanceId, objectType, handler);
-        if (lock == null) {
-            // not locked but the work will be rescheduled by the rejectedLockHandler
-            return;
-        }
+        boolean lockObtained = false;
+        BonitaLock lock = null;
         try {
-            getWrappedWork().work(context);
+        	lock = lockService.lock(processInstanceId, objectType);
+        	lockObtained = true;
+        	getWrappedWork().work(context);
+        } catch (final SLockException e) {
+        	//TODO: something to to to reschedule the work
         } finally {
-            lockService.unlock(lock);
+        	if (lock != null && lockObtained) {
+        		lockService.unlock(lock);
+        	}
         }
 
     }
 
-    private BonitaWork getRootParent() {
-        BonitaWork root = this;
-        while (root.getParent() != null) {
-            root = root.getParent();
-        }
-        return root;
-    }
 }
