@@ -44,8 +44,10 @@ import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.impl.ArchivedConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceImpl;
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.data.impl.ArchivedDataInstanceImpl;
 import org.bonitasoft.engine.bpm.data.impl.BlobDataInstanceImpl;
 import org.bonitasoft.engine.bpm.data.impl.BooleanDataInstanceImpl;
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
@@ -191,6 +193,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UnknownElementType;
@@ -1202,6 +1205,21 @@ public class ModelConvertor {
         dataInstance.setId(sDataInstance.getId());
         dataInstance.setName(sDataInstance.getName());
         dataInstance.setValue(sDataInstance.getValue());
+        return dataInstance;
+    }
+
+    public static ArchivedDataInstance toArchivedDataInstance(final SADataInstance sDataInstance) {
+        final ArchivedDataInstanceImpl dataInstance = new ArchivedDataInstanceImpl();
+        dataInstance.setClassName(sDataInstance.getClassName());
+        dataInstance.setContainerId(sDataInstance.getContainerId());
+        dataInstance.setContainerType(sDataInstance.getContainerType());
+        dataInstance.setDataTypeClassName(sDataInstance.getClassName());
+        dataInstance.setDescription(sDataInstance.getDescription());
+        dataInstance.setId(sDataInstance.getId());
+        dataInstance.setName(sDataInstance.getName());
+        dataInstance.setValue(sDataInstance.getValue());
+        dataInstance.setArchiveDate(new Date(sDataInstance.getArchiveDate()));
+        dataInstance.setSourceObjectId(sDataInstance.getSourceObjectId());
         return dataInstance;
     }
 

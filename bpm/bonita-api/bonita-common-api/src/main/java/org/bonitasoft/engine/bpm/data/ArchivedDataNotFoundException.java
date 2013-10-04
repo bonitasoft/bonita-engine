@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,32 +11,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.connector;
+package org.bonitasoft.engine.bpm.data;
 
-import org.bonitasoft.engine.bpm.ArchivedElement;
-import org.bonitasoft.engine.bpm.BaseElement;
-import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
- * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface ArchivedConnectorInstance extends NamedElement, BaseElement, ArchivedElement {
+public class ArchivedDataNotFoundException extends NotFoundException {
 
-    String FLOWNODE_TYPE = "flowNode";
+    private static final long serialVersionUID = -1668767134016412650L;
 
-    String PROCESS_TYPE = "process";
-
-    long getContainerId();
-
-    String getContainerType();
-
-    String getConnectorId();
-
-    String getVersion();
-
-    ConnectorEvent getActivationEvent();
-
-    ConnectorState getState();
+    public ArchivedDataNotFoundException(final Throwable cause) {
+        super(cause);
+    }
 
 }

@@ -27,6 +27,8 @@ import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
+import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
@@ -1928,7 +1930,10 @@ public interface ProcessRuntimeAPI {
      *            the result start index (starting from 0).
      * @param maxResults
      *            the maximum number of results to retrieve.
+     * @throws InvalidSessionException
+     *             if the API session is invalid, e.g session has expired.
      * @return the list of failed jobs.
+     * @since 6.1
      */
     List<FailedJob> getFailedJobs(int startIndex, int maxResults);
 
@@ -1939,6 +1944,7 @@ public interface ProcessRuntimeAPI {
      *            the identifier of the job descriptor.
      * @throws ExecutionException
      *             occurs when an exception is thrown during the job replay.
+     * @since 6.1
      */
     void replayFailedJob(final long jobDescriptorId) throws ExecutionException;
 
@@ -1952,7 +1958,26 @@ public interface ProcessRuntimeAPI {
      *            the job parameters.
      * @throws ExecutionException
      *             occurs when an exception is thrown during the job replay.
+     * @throws InvalidSessionException
+     *             if the API session is invalid, e.g session has expired.
+     * @since 6.1
      */
     void replayFailedJob(final long jobDescriptorId, Map<String, Serializable> parameters) throws ExecutionException;
+
+    /**
+     * Get the last archived data instance of the named data of the process instance.
+     * 
+     * @param dataName
+     *            the name of the data.
+     * @param processInstanceId
+     *            the identifier of the process instance.
+     * @return an archived instance of data.
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws ArchivedDataNotFoundException
+     *             if the specified data cannot be found.
+     * @since 6.1
+     */
+    ArchivedDataInstance getArchivedProcessDataInstance(String dataName, long processInstanceId) throws ArchivedDataNotFoundException;
 
 }

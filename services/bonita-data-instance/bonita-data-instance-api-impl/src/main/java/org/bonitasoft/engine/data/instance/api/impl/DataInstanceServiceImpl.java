@@ -30,6 +30,7 @@ import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping;
@@ -395,8 +396,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
      * @param sDataInstanceVisibilityMapping
      * @throws SDataInstanceException
      */
-    private void deleteDataInstanceVisibilityMapping(final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping)
-            throws SDataInstanceException {
+    private void deleteDataInstanceVisibilityMapping(final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping) throws SDataInstanceException {
         final DeleteRecord record = new DeleteRecord(sDataInstanceVisibilityMapping);
         final SDeleteEvent deleteEvent = (SDeleteEvent) eventBuilders.getEventBuilder().createDeleteEvent(DATA_VISIBILITY_MAPPING).done();
         try {
@@ -531,6 +531,31 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             parameters.put("dataInstanceId", dataInstanceId);
             final SADataInstance saDataInstance = readPersistenceService.selectOne(new SelectOneDescriptor<SADataInstance>(
                     "getLastSADataInstanceByDataInstanceId", parameters, SADataInstance.class));
+            logAfterMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
+            return saDataInstance;
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance", e);
+            throw new SDataInstanceException("Unable to read SADataInstance", e);
+        }
+    }
+
+    @Override
+    public SADataInstance getLastSADataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
+        logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
+        final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        final Map<String, Object> parameters = new HashMap<String, Object>(1);
+        parameters.put("dataName", dataName);
+        parameters.put("containerId", containerId);
+        parameters.put("containerType", containerType);
+        try {
+            final SADataInstance saDataInstance = readPersistenceService.selectOne(new SelectOneDescriptor<SADataInstance>("getLastSADataInstanceByContainer",
+                    parameters, SADataInstance.class));
+            if (saDataInstance == null) {
+                final SDataInstanceNotFoundException exception = new SDataInstanceNotFoundException("No archived data instance found for data:" + dataName
+                        + " in container: " + containerType + " " + containerId);
+                logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance", exception);
+                throw exception;
+            }
             logAfterMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
             return saDataInstance;
         } catch (final SBonitaReadException e) {
@@ -692,4 +717,5 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             logger.log(this.getClass(), technicalLogSeverity, LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, e));
         }
     }
+
 }

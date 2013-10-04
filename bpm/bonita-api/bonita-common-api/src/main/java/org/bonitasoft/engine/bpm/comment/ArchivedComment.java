@@ -26,8 +26,6 @@ import org.bonitasoft.engine.bpm.NamedElement;
  */
 public interface ArchivedComment extends NamedElement, BaseElement, ArchivedElement {
 
-    long getSourceObjectId();
-
     Long getUserId();
 
     long getProcessInstanceId();

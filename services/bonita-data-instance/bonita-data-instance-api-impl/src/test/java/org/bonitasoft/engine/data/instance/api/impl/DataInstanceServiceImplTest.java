@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.data.instance.api.impl;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.SDataException;
 import org.bonitasoft.engine.data.SDataSourceInactiveException;
@@ -28,12 +30,16 @@ import org.bonitasoft.engine.data.SDataSourceInitializationException;
 import org.bonitasoft.engine.data.SDataSourceNotFoundException;
 import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +47,6 @@ import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class DataInstanceServiceImplTest {
 
@@ -264,12 +269,29 @@ public class DataInstanceServiceImplTest {
         // TODO : Not yet implemented
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getLastSADataInstance(long)}.
-     */
     @Test
-    public final void getLastSADataInstance() {
-        // TODO : Not yet implemented
+    public final void getLastSADataInstanceFromContainer() throws SBonitaException {
+        final SADataInstance archiveInstance = mock(SADataInstance.class);
+        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
+        doReturn(archiveInstance).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        final SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("kaupunki", 1, "PROCESS_INSTANCE");
+        Assert.assertNotNull(dataInstance);
+    }
+
+    @Test(expected = SDataInstanceNotFoundException.class)
+    public final void throwExceptionWhentheLastSADataInstanceFromContainerDoesNotExist() throws SBonitaException {
+        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
+        doReturn(null).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        dataInstanceServiceImpl.getLastSADataInstance("kaupunki", 1, "PRCESS_INSTANCE");
+    }
+
+    @Test(expected = SDataInstanceException.class)
+    public final void getLastSADataInstanceFromContainerThrowsAnExceptionDueToProblemOnPersistenceService() throws SBonitaException {
+        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
+        doThrow(new SBonitaReadException("moustache")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        dataInstanceServiceImpl.getLastSADataInstance("kaupunki", 1, "PRCESS_INSTANCE");
     }
 
     /**

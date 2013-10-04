@@ -155,6 +155,8 @@ import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
+import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
@@ -305,6 +307,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
@@ -5534,6 +5537,19 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
         } catch (final SSchedulerException sse) {
             throw new ExecutionException(sse);
+        }
+    }
+
+    @Override
+    public ArchivedDataInstance getArchivedProcessDataInstance(final String dataName, final long processInstanceId) throws ArchivedDataNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        try {
+            final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, processInstanceId,
+                    DataInstanceContainer.PROCESS_INSTANCE.toString());
+            return ModelConvertor.toArchivedDataInstance(dataInstance);
+        } catch (final SDataInstanceException sdie) {
+            throw new ArchivedDataNotFoundException(sdie);
         }
     }
 
