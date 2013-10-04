@@ -490,38 +490,38 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteProcessDefinition(final long processId) throws DeletionException {
+    public void deleteProcessDefinition(final long processDefinitionId) throws DeletionException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 1);
-        builder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processId);
+        builder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId);
         final SearchOptions searchOptions = builder.done();
 
         try {
             final boolean hasOpenProcessInstances = searchProcessInstances(getTenantAccessor(), searchOptions).getCount() > 0;
             if (hasOpenProcessInstances) {
-                throw new DeletionException("Some active process instances are still found, process #" + processId + " can't be deleted.");
+                throw new DeletionException("Some active process instances are still found, process #" + processDefinitionId + " can't be deleted.");
             }
             final boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
             if (hasArchivedProcessInstances) {
-                throw new DeletionException("Some archived process instances are still found, process #" + processId + " can't be deleted.");
+                throw new DeletionException("Some archived process instances are still found, process #" + processDefinitionId + " can't be deleted.");
             }
 
-            processManagementAPIImplDelegate.deleteProcessDefinition(processId);
+            processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
         } catch (final Exception e) {
             throw new DeletionException(e);
         }
     }
 
     @Override
-    public void deleteProcessDefinitions(final List<Long> processIds) throws DeletionException {
-        for (final Long processId : processIds) {
-            deleteProcessDefinition(processId);
+    public void deleteProcessDefinitions(final List<Long> processDefinitionIds) throws DeletionException {
+        for (final Long processDefinitionId : processDefinitionIds) {
+            deleteProcessDefinition(processDefinitionId);
         }
     }
 
     @Override
     @CustomTransactions
     @Deprecated
-    public void deleteProcess(final long processId) throws DeletionException {
+    public void deleteProcess(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         // multiple tx here because we must lock instances when deleting them
         // but if the second tx crash we can relaunch delete process without issues
@@ -531,9 +531,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
                 @Override
                 public Void call() throws Exception {
-                    deleteProcessInstancesFromProcessDefinition(processId, tenantAccessor);
+                    deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
                     try {
-                        processManagementAPIImplDelegate.deleteProcessDefinition(processId);
+                        processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
                     } catch (final BonitaHomeNotSetException e) {
                         throw new SProcessDeletionException(e);
                     } catch (final IOException e) {
@@ -665,9 +665,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     @CustomTransactions
     @Deprecated
-    public void deleteProcesses(final List<Long> processIdList) throws DeletionException {
-        for (final Long processId : processIdList) {
-            deleteProcess(processId);
+    public void deleteProcesses(final List<Long> processDefinitionIds) throws DeletionException {
+        for (final Long processDefinitionId : processDefinitionIds) {
+            deleteProcess(processDefinitionId);
         }
     }
 
@@ -822,14 +822,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     @CustomTransactions
     @Deprecated
-    public void disableAndDelete(final long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException {
+    public void disableAndDelete(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException {
         final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         try {
             transactionExecutor.execute(new TransactionContent() {
 
                 @Override
                 public void execute() throws SBonitaException {
-                    processManagementAPIImplDelegate.disableProcess(processId);
+                    processManagementAPIImplDelegate.disableProcess(processDefinitionId);
                 }
             });
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -837,7 +837,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException e) {
             throw new ProcessActivationException(e);
         }
-        deleteProcess(processId);
+        deleteProcess(processDefinitionId);
     }
 
     @Override
@@ -848,9 +848,9 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void disableProcess(final long processId) throws ProcessDefinitionNotFoundException, ProcessActivationException {
+    public void disableProcess(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException {
         try {
-            processManagementAPIImplDelegate.disableProcess(processId);
+            processManagementAPIImplDelegate.disableProcess(processDefinitionId);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -859,12 +859,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void enableProcess(final long processId) throws ProcessDefinitionNotFoundException, ProcessEnablementException {
+    public void enableProcess(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessEnablementException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         try {
-            final EnableProcess enableProcess = new EnableProcess(processDefinitionService, processId, eventsHandler,
+            final EnableProcess enableProcess = new EnableProcess(processDefinitionService, processDefinitionId, eventsHandler,
                     tenantAccessor.getTechnicalLoggerService(), getUserNameFromSession());
             enableProcess.execute();
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -971,11 +971,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public ProcessDefinition getProcessDefinition(final long processId) throws ProcessDefinitionNotFoundException {
+    public ProcessDefinition getProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
-            final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processId);
+            final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             return ModelConvertor.toProcessDefinition(sProcessDefinition);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
@@ -2904,7 +2904,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void updateProcessDeploymentInfo(final long processId, final ProcessDeploymentInfoUpdater processDeploymentInfoUpdater)
+    public void updateProcessDeploymentInfo(final long processDefinitionId, final ProcessDeploymentInfoUpdater processDeploymentInfoUpdater)
             throws ProcessDefinitionNotFoundException, UpdateException {
         if (processDeploymentInfoUpdater == null || processDeploymentInfoUpdater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
@@ -2915,7 +2915,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SProcessDefinitionDeployInfoUpdateBuilder processDeploymentInfoUpdateBuilder = tenantAccessor.getBPMDefinitionBuilders()
                 .getProcessDefinitionDeployInfoUpdateBuilder();
         final UpdateProcessDeploymentInfo updateProcessDeploymentInfo = new UpdateProcessDeploymentInfo(processDefinitionService,
-                processDeploymentInfoUpdateBuilder, processId, processDeploymentInfoUpdater);
+                processDeploymentInfoUpdateBuilder, processDefinitionId, processDeploymentInfoUpdater);
         try {
             updateProcessDeploymentInfo.execute();
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -3000,7 +3000,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public boolean isAllowedToStartProcess(final long processId, final Set<Long> actorIds) {
+    public boolean isAllowedToStartProcess(final long processDefinitionId, final Set<Long> actorIds) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
@@ -3012,7 +3012,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Iterator<SActor> iterator = actors.iterator();
             while (isAllowedToStartProcess && iterator.hasNext()) {
                 final SActor actor = iterator.next();
-                if (actor.getScopeId() != processId || !actor.isInitiator()) {
+                if (actor.getScopeId() != processDefinitionId || !actor.isInitiator()) {
                     isAllowedToStartProcess = false;
                 }
             }
@@ -3785,7 +3785,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteSupervisor(final Long processId, final Long userId, final Long roleId, final Long groupId) throws DeletionException {
+    public void deleteSupervisor(final Long processDefinitionId, final Long userId, final Long roleId, final Long groupId) throws DeletionException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         final SProcessSupervisorBuilders supervisorBuilders = serviceAccessor.getSSupervisorBuilders();
@@ -3793,7 +3793,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         // Prepare search options
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1);
         searchOptionsBuilder.sort(ProcessSupervisorSearchDescriptor.ID, Order.ASC);
-        searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID, processId == null ? -1 : processId);
+        searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId == null ? -1 : processDefinitionId);
         searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.USER_ID, userId == null ? -1 : userId);
         searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.ROLE_ID, roleId == null ? -1 : roleId);
         searchOptionsBuilder.filter(ProcessSupervisorSearchDescriptor.GROUP_ID, groupId == null ? -1 : groupId);
@@ -3811,7 +3811,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 supervisorService.deleteSupervisor(processSupervisors.get(0).getSupervisorId());
             } else {
                 throw new SSupervisorNotFoundException("No supervisor was found with userId = " + userId + ", roleId = " + roleId + ", groupId = " + groupId
-                        + ", processId = " + processId);
+                        + ", processDefinitionId = " + processDefinitionId);
             }
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
@@ -4671,7 +4671,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final Map<Long, ProcessDeploymentInfo> mProcessDeploymentInfos = new HashMap<Long, ProcessDeploymentInfo>();
         long processInstanceId = 0;
         long id = 0;
-        long processId = 0;
+        long processDefinitionId = 0;
         String name = "";
         String version = "";
         String description = "";
@@ -4691,8 +4691,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                     processInstanceId = Long.parseLong(value.toString());
                 } else if ("id".equals(key)) {
                     id = Long.parseLong(value.toString());
-                } else if ("processId".equals(key)) {
-                    processId = Long.parseLong(value.toString());
+                } else if ("processDefinitionId".equals(key)) {
+                    processDefinitionId = Long.parseLong(value.toString());
                 } else if ("name".equals(key)) {
                     name = m.get(key);
                 } else if ("version".equals(key)) {
@@ -4717,8 +4717,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                     displayDescription = String.valueOf(m.get(key));
                 }
             }
-            final ProcessDeploymentInfoImpl pDeplInfoImpl = new ProcessDeploymentInfoImpl(id, processId, name, version, description, new Date(deploymentDate),
-                    deployedBy, activationState, configurationState, displayName, new Date(lastUpdateDate), iconPath, displayDescription);
+            final ProcessDeploymentInfoImpl pDeplInfoImpl = new ProcessDeploymentInfoImpl(id, processDefinitionId, name, version, description, new Date(
+                    deploymentDate), deployedBy, activationState, configurationState, displayName, new Date(lastUpdateDate), iconPath, displayDescription);
             mProcessDeploymentInfos.put(processInstanceId, pDeplInfoImpl);
         }
         return mProcessDeploymentInfos;
@@ -5114,14 +5114,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public List<Problem> getProcessResolutionProblems(final long processId) throws ProcessDefinitionNotFoundException {
+    public List<Problem> getProcessResolutionProblems(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final List<ProcessDependencyResolver> resolvers = tenantAccessor.getDependencyResolver().getResolvers();
         SProcessDefinition processDefinition;
         try {
-            processDefinition = processDefinitionService.getProcessDefinition(processId);
+            processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SProcessDefinitionReadException e) {
