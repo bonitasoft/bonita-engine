@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -582,6 +583,8 @@ public class ProcessExecutionTest extends CommonAPITest {
         deleteUser("Tom");
     }
 
+    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
     @Test
     public void getArchivedProcessDataInstance() throws Exception {
         final String dataName = "title";
@@ -602,6 +605,8 @@ public class ProcessExecutionTest extends CommonAPITest {
         deleteUser(matti);
     }
 
+    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
     @Test
     public void getArchivedProcessDataInstanceFromAnArchiveProcess() throws Exception {
         final String dataName = "title";
@@ -618,6 +623,8 @@ public class ProcessExecutionTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
     @Test
     public void getArchivedTransientProcessDataInstance() throws Exception {
         final String dataName = "test";
@@ -640,6 +647,8 @@ public class ProcessExecutionTest extends CommonAPITest {
         deleteUser(matti);
     }
 
+    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
     @Test
     public void getUnknownArchivedProcessDataInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
