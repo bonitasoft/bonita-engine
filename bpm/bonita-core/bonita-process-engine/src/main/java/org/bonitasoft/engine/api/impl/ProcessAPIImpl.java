@@ -3560,7 +3560,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             throws SLockException {
         final List<BonitaLock> locks = new ArrayList<BonitaLock>();
         for (final SProcessInstance sProcessInstance : sProcessInstances) {
-            lockService.lock(sProcessInstance.getId(), objectType);
+            final BonitaLock bonitaLock = lockService.lock(sProcessInstance.getId(), objectType);
+            locks.add(bonitaLock);
         }
         return locks;
     }
