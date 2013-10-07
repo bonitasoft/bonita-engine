@@ -16,8 +16,10 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class LockProcessInstanceWorkTest {
 
@@ -32,13 +34,17 @@ public class LockProcessInstanceWorkTest {
     private TenantServiceAccessor tenantAccessor;
 
     private LockService lockService;
+    
+    private WorkService workService;
 
     @Before
     public void before() {
         lockProcessInstanceWork = new LockProcessInstanceWork(wrappedWork, processInstanceId);
         tenantAccessor = mock(TenantServiceAccessor.class);
         lockService = mock(LockService.class);
+        workService = mock(WorkService.class);
         when(tenantAccessor.getLockService()).thenReturn(lockService);
+        when(tenantAccessor.getWorkService()).thenReturn(workService);
     }
 
     @Test
@@ -103,6 +109,21 @@ public class LockProcessInstanceWorkTest {
     public void testToString() {
         when(wrappedWork.toString()).thenReturn("the to string");
         assertEquals("the to string", lockProcessInstanceWork.toString());
+    }
+    
+    @Test
+    public void testRescheduleWorkOnLockTimeout() throws Exception {
+    	// On first try to lock : exception to reschedule the work
+    	// On the second try : return a correct lock
+        when(lockService.lock(eq(processInstanceId), eq(PROCESS))).thenThrow(new SLockException("Mocked"));
+        Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+
+        LockProcessInstanceWork spiedWork = Mockito.spy(lockProcessInstanceWork);
+        spiedWork.work(context);
+        
+        //in fact we should ensure the rootWork of the lockProcessInstanceWork has been re-executed. We should check the method getRootWork has been called
+        verify(workService).executeWork(spiedWork);
+        verify(spiedWork).getRootWork();
     }
 
 }

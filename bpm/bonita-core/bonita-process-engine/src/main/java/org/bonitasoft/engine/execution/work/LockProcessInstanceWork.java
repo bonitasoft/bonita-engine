@@ -20,6 +20,8 @@ import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.WorkService;
 
 /**
  * Transactional work that lock the process instance
@@ -50,7 +52,7 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         	lockObtained = true;
         	getWrappedWork().work(context);
         } catch (final SLockException e) {
-        	//TODO: something to to to reschedule the work
+        	rescheduleWork(getTenantAccessor(context).getWorkService(), getRootWork());
         } finally {
         	if (lock != null && lockObtained) {
         		lockService.unlock(lock);
@@ -68,5 +70,23 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
     	return "nothing";
     }
     */
+
+	private void rescheduleWork(final WorkService workService, final BonitaWork rootWork) throws SLockException {
+        try {
+        	//executeWork is called and not registerWork because the registerWork is relying on transaction
+            workService.executeWork(rootWork);
+        } catch (WorkRegisterException e) {
+            throw new SLockException(e);
+        }
+	    
+    }
+
+    BonitaWork getRootWork() {
+        BonitaWork root = this;
+        while (root.getParent() != null) {
+            root = root.getParent();
+        }
+        return root;
+    }
 
 }
