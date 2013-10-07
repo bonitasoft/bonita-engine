@@ -458,16 +458,34 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public Map<Long, User> getUsers(final List<Long> userIds) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
         final Map<Long, User> users = new HashMap<Long, User>();
-        for (final Long userId : userIds) {
-            try {
-                final User user = getUser(userId);
-                users.put(userId, user);
-            } catch (final UserNotFoundException e) {
-                // if the user does not exist; skip the user
+        try {
+            final List<SUser> sUsers = identityService.getUsers(userIds);
+            for (final SUser sUser : sUsers) {
+                users.put(sUser.getId(), ModelConvertor.toUser(sUser));
             }
+            return users;
+        } catch (final SUserNotFoundException sunfe) {
+            throw new RetrieveException(sunfe);
         }
-        return users;
+    }
+
+    @Override
+    public Map<String, User> getUserIds(final List<String> userNames) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final IdentityService identityService = tenantAccessor.getIdentityService();
+        final Map<String, User> users = new HashMap<String, User>();
+        try {
+            final List<SUser> sUsers = identityService.getUsersByName(userNames);
+            for (final SUser sUser : sUsers) {
+                users.put(sUser.getUserName(), ModelConvertor.toUser(sUser));
+            }
+            return users;
+        } catch (final SIdentityException sunfe) {
+            throw new RetrieveException(sunfe);
+        }
     }
 
     @Override
@@ -1445,4 +1463,5 @@ public class IdentityAPIImpl implements IdentityAPI {
             throw new OrganizationExportException(e);
         }
     }
+
 }

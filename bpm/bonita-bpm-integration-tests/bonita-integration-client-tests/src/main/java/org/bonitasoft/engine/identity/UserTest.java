@@ -1072,4 +1072,23 @@ public class UserTest extends CommonAPITest {
         getIdentityAPI().deleteUser("bonitasoft");
     }
 
+    @Cover(jira = "ENGINE-1818", classes = { User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "User identifiers" })
+    @Test
+    public void getUserIds() throws BonitaException {
+        final User matti = getIdentityAPI().createUser("matti", "bpm");
+        final User jani = getIdentityAPI().createUser("jani", "bpm");
+
+        final List<String> userNames = new ArrayList<String>(3);
+        userNames.add("jani");
+        userNames.add("liisa");
+        userNames.add("matti");
+
+        final Map<String, User> userIds = getIdentityAPI().getUserIds(userNames);
+        assertEquals(2, userIds.size());
+        assertEquals(jani, userIds.get("jani"));
+        assertEquals(matti, userIds.get("matti"));
+
+        deleteUsers(matti, jani);
+    }
+
 }

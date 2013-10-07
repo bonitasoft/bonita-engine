@@ -85,7 +85,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * Default implementation of the Identity service
- *
+ * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Bole Zhang
@@ -605,7 +605,7 @@ public class IdentityServiceImpl implements IdentityService {
                 userMembership = getLightUserMembership(userMembership.getId());
             }
             deleteLightUserMembership(userMembership);
-        } catch (SIdentityException e) {
+        } catch (final SIdentityException e) {
             throw new SMembershipDeletionException("Can't delete membership " + userMembership, e);
         }
     }
@@ -615,7 +615,7 @@ public class IdentityServiceImpl implements IdentityService {
         try {
             final SUserMembership userMembership = getLightUserMembership(id);
             deleteLightUserMembership(userMembership);
-        } catch (SIdentityException e) {
+        } catch (final SIdentityException e) {
             throw new SMembershipDeletionException("Can't delete membership with id " + id, e);
         }
     }
@@ -1519,6 +1519,29 @@ public class IdentityServiceImpl implements IdentityService {
         } catch (final SBonitaReadException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsers", e));
+            }
+            throw new SUserNotFoundException(e);
+        }
+    }
+
+    @Override
+    public List<SUser> getUsersByName(final List<String> userNames) throws SIdentityException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByName"));
+        }
+        if (userNames == null || userNames.isEmpty()) {
+            return Collections.emptyList();
+        }
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("userNames", (Object) userNames);
+            final List<SUser> users = persistenceService.selectList(new SelectListDescriptor<SUser>("getUsersByName", parameters, SUser.class));
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUsersByName"));
+            }
+            return users;
+        } catch (final SBonitaReadException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getUsersByName", e));
             }
             throw new SUserNotFoundException(e);
         }

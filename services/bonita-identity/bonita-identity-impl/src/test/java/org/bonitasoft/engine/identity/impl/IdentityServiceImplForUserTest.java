@@ -37,6 +37,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Assert;
@@ -223,10 +224,38 @@ public class IdentityServiceImplForUserTest {
     @SuppressWarnings("unchecked")
     @Test(expected = SUserNotFoundException.class)
     public void getUsersByIdsThrowException() throws Exception {
-        when(persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", any(Collection.class))))
-                .thenThrow(SBonitaReadException.class);
+        when(persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", any(Collection.class)))).thenThrow(
+                SBonitaReadException.class);
 
-        assertTrue(identityServiceImpl.getUsers(Arrays.asList(1l)).isEmpty());
+        identityServiceImpl.getUsers(Arrays.asList(1l));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void getUsersByNames() throws Exception {
+        final SUser sUser1 = mock(SUser.class);
+        final SUser sUser2 = mock(SUser.class);
+        final List<SUser> users = Arrays.asList(sUser1, sUser2);
+        final List<String> names = Arrays.asList("matti", "marja", "taina");
+        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(users);
+        Assert.assertEquals(users, identityServiceImpl.getUsersByName(names));
+    }
+
+    @Test
+    public void getUsersByNullNames() throws Exception {
+        assertTrue(identityServiceImpl.getUsersByName(null).isEmpty());
+    }
+
+    @Test
+    public void getUsersByEmptyNames() throws Exception {
+        assertTrue(identityServiceImpl.getUsersByName(Collections.<String> emptyList()).isEmpty());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test(expected = SIdentityException.class)
+    public void getUsersByNamesThrowException() throws Exception {
+        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(SBonitaReadException.class);
+        identityServiceImpl.getUsersByName(Arrays.asList("hannu"));
     }
 
     /**
