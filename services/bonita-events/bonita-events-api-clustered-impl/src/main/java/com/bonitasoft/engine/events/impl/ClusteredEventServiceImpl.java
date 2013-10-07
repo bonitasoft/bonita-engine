@@ -13,6 +13,7 @@
  **/
 package com.bonitasoft.engine.events.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,16 +43,18 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.core.Member;
 
 /**
- *
+ * 
  * @author Laurent Vaills
- *
+ * 
  */
 public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
     private final IMap<String, List<SHandler<SEvent>>> eventHandlers;
+
     // Local copy of the eventHandlers Map keys to speed up performance. It has to be manipulated
     // only by the distributed tasks.
     private final Set<String> localEventTypes = Collections.synchronizedSet(new HashSet<String>());
+
     private final HazelcastInstance hazelcastInstance;
 
     public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
@@ -128,7 +131,7 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
     private void informOtherMembers(final LocalClusteredServiceTask task) {
         IExecutorService executorService = hazelcastInstance.getExecutorService("ClusteredEventServiceHandlerManagement");
         Map<Member, Future<Void>> results = executorService.submitToAllMembers(task);
-        for(Map.Entry<Member, Future<Void>> entry : results.entrySet()) {
+        for (Map.Entry<Member, Future<Void>> entry : results.entrySet()) {
             try {
                 entry.getValue().get();
             } catch (InterruptedException e) {
@@ -141,7 +144,7 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
     @Override
     protected void removeAllHandlersFor(final SHandler<SEvent> handler) {
-        for(String eventType : eventHandlers.keySet()) {
+        for (String eventType : eventHandlers.keySet()) {
             List<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
 
             handlers.remove(handler);
@@ -156,12 +159,15 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
     }
 
     // It should be used only for the tests
-    /*package*/ synchronized void removeAllHandlers() {
+    /* package */synchronized void removeAllHandlers() {
         eventHandlers.clear();
         informOtherMembers(new ClearLocalEventType());
     }
 
-    private static abstract class LocalClusteredServiceTask implements Callable<Void>, HazelcastInstanceAware {
+    private static abstract class LocalClusteredServiceTask implements Serializable, Callable<Void>, HazelcastInstanceAware {
+
+        private static final long serialVersionUID = 1L;
+
         private transient HazelcastInstance hazelcastInstance;
 
         @Override
@@ -185,6 +191,8 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
 
     private static class ClearLocalEventType extends LocalClusteredServiceTask {
 
+        private static final long serialVersionUID = 1L;
+
         @Override
         protected void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService) {
             clusteredEventService.localEventTypes.clear();
@@ -193,6 +201,8 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
     }
 
     private static abstract class EventTypeCallable extends LocalClusteredServiceTask {
+
+        private static final long serialVersionUID = 1L;
 
         protected final String eventType;
 
@@ -203,6 +213,8 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
     }
 
     private static class AddEventTypeCallable extends EventTypeCallable {
+
+        private static final long serialVersionUID = 1L;
 
         public AddEventTypeCallable(final String eventType) {
             super(eventType);
