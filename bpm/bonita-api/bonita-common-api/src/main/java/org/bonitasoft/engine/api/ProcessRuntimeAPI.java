@@ -1930,9 +1930,9 @@ public interface ProcessRuntimeAPI {
      *            the result start index (starting from 0).
      * @param maxResults
      *            the maximum number of results to retrieve.
-     * @throws InvalidSessionException
-     *             if the API session is invalid, e.g session has expired.
      * @return the list of failed jobs.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
     List<FailedJob> getFailedJobs(int startIndex, int maxResults);
@@ -1943,7 +1943,9 @@ public interface ProcessRuntimeAPI {
      * @param jobDescriptorId
      *            the identifier of the job descriptor.
      * @throws ExecutionException
-     *             occurs when an exception is thrown during the job replay.
+     *             occurs when an exception is thrown during the job replay
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
     void replayFailedJob(final long jobDescriptorId) throws ExecutionException;
@@ -1957,23 +1959,23 @@ public interface ProcessRuntimeAPI {
      * @param parameters
      *            the job parameters.
      * @throws ExecutionException
-     *             occurs when an exception is thrown during the job replay.
+     *             occurs when an exception is thrown during the job replay
      * @throws InvalidSessionException
-     *             if the API session is invalid, e.g session has expired.
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
     void replayFailedJob(final long jobDescriptorId, Map<String, Serializable> parameters) throws ExecutionException;
 
     /**
-     * Gets the last archived data instance of the named data of the process instance.
+     * Gets the last archived data instance of the named data of the specified process instance.
      * 
      * @param dataName
-     *            the name of the data.
+     *            the name of the data
      * @param processInstanceId
-     *            the identifier of the process instance.
+     *            the identifier of the process instance
      * @return an archived instance of data.
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *             If the session is invalid (expired, unknown, ...)
      * @throws ArchivedDataNotFoundException
      *             if the specified data cannot be found.
      * @since 6.1
@@ -1981,53 +1983,53 @@ public interface ProcessRuntimeAPI {
     ArchivedDataInstance getArchivedProcessDataInstance(String dataName, long processInstanceId) throws ArchivedDataNotFoundException;
 
     /**
-     * Gets the last archived data instance of the named data of the activity instance.
+     * Gets the last archived data instance of the named data of the specified activity instance.
      * 
      * @param dataName
-     *            the name of the data.
+     *            the name of the data
      * @param activityInstanceId
-     *            the identifier of the activity instance.
+     *            the identifier of the activity instance
      * @return an archived instance of data.
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *             If the session is invalid (expired, unknown, ...)
      * @throws ArchivedDataNotFoundException
-     *             if the specified data cannot be found.
+     *             if the specified data cannot be found
      * @since 6.1
      */
     ArchivedDataInstance getArchivedActivityDataInstance(String dataName, long activityInstanceId) throws ArchivedDataNotFoundException;
 
     /**
-     * Lists the last archived data instances of the process instance.
+     * Lists the last archived data instances of the specified process instance.
      * 
      * @param processInstanceId
-     *            the identifier of the process instance.
+     *            the identifier of the process instance
      * @param startIndex
-     *            the index of the page of results to get.
+     *            the start index
      * @param maxResults
-     *            the maximum number of results to get.
+     *            the max number of groups
      * @return the list of archived data instances.
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *             If the session is invalid (expired, unknown, ...)
      * @throws RetrieveException
-     *             if the specified data cannot be found.
+     *             If an exception occurs during the archived data retrieving
      * @since 6.1
      */
     List<ArchivedDataInstance> getArchivedProcessDataInstances(long processInstanceId, int startIndex, int maxResults);
 
     /**
-     * Lists the last archived data instances of the activity instance.
+     * Lists the last archived data instances of the specified activity instance.
      * 
      * @param activityInstanceId
-     *            the identifier of the activity instance.
+     *            the identifier of the activity instance
      * @param startIndex
-     *            the index of the page of results to get.
+     *            the start index
      * @param maxResults
-     *            the maximum number of results to get.
+     *            the max number of groups
      * @return the list of archived data instances.
      * @throws InvalidSessionException
-     *             if no current valid session is found.
+     *             If the session is invalid (expired, unknown, ...)
      * @throws RetrieveException
-     *             if the search fails because an archived process instance cannot be read.
+     *             If an exception occurs during the archived data retrieving
      * @since 6.1
      */
     List<ArchivedDataInstance> getArchivedActivityDataInstances(long activityInstanceId, int startIndex, int maxResults);
