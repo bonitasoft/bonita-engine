@@ -9,6 +9,7 @@
 package com.bonitasoft.engine;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -163,7 +164,7 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     /*
-     * Check that works are executed on every nodes
+     * Check that works are executed on node that started it
      */
     @Test
     public void clusteredWorkServiceIT() throws Exception {
@@ -197,15 +198,11 @@ public class ClusterTests extends CommonAPISPTest {
         boolean node2Ok = false;
 
         for (DataInstance dataInstance : processDataInstances) {
-            if ("Node1".equals(dataInstance.getValue())) {
-                node1Ok = true;
-            }
-            if ("Node2".equals(dataInstance.getValue())) {
-                node2Ok = true;
-            }
+            node1Ok |= "Node1".equals(dataInstance.getValue());
+            node2Ok |= "Node2".equals(dataInstance.getValue());
         }
         assertTrue("no data has 'Node1' as value: no work were executed on node1", node1Ok);
-        assertTrue("no data has 'Node2' as value: no work were executed on node2", node2Ok);
+        assertFalse("a data has 'Node2' as value: a work was executed on node2", node2Ok);
 
         disableAndDeleteProcess(processDefinition);
     }
