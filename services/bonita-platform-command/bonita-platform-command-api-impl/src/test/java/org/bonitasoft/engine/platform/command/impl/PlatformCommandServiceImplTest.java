@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.platform.command.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,17 +27,11 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.command.SPlatformCommandGettingException;
 import org.bonitasoft.engine.platform.command.SPlatformCommandNotFoundException;
-import org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -54,7 +52,7 @@ public class PlatformCommandServiceImplTest {
     private PlatformCommandServiceImpl platformCommandServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 

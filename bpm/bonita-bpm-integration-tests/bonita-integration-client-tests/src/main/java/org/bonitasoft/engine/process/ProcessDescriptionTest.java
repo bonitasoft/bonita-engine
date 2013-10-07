@@ -49,18 +49,18 @@ public class ProcessDescriptionTest extends CommonAPITest {
         processBuilder.addTransition("start", "gateway");
         processBuilder.addTransition("gateway", "userTask");
 
-        final ProcessDefinition definition = deployAndEnableWithActor(getBusinessArchive(processBuilder), ACTOR_NAME, user);
-        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
-        assertEquals("processDescription", instance.getDescription());
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(getBusinessArchive(processBuilder), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        assertEquals("processDescription", processInstance.getDescription());
 
-        final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("booleanProcessData", instance.getId());
+        final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("booleanProcessData", processInstance.getId());
         assertEquals("descBooleanProcessData", processDataInstance.getDescription());
 
-        final ActivityInstance userTask = waitForUserTask("userTask", instance.getId());
+        final ActivityInstance userTask = waitForUserTask("userTask", processInstance);
         final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("booleanUserTaskData", userTask.getId());
         assertEquals("descBooleanUserTaskData", activityDataInstance.getDescription());
 
-        disableAndDeleteProcess(definition);
+        disableAndDeleteProcess(processDefinition);
         deleteUser(user);
     }
 

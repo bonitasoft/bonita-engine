@@ -14,13 +14,11 @@
 package org.bonitasoft.engine.identity.impl;
 
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.identity.impl.IdentityServiceImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -47,7 +45,7 @@ public class IdentityServiceImplForRoleTest {
     private IdentityServiceImpl identityServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 

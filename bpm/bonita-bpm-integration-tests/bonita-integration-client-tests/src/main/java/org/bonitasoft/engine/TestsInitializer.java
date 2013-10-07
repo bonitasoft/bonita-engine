@@ -39,7 +39,7 @@ public class TestsInitializer {
 
     protected void after() throws Exception {
         System.out.println("=====================================================");
-        System.out.println("============ CLEANING OF TEST ENVIRONMENT =========");
+        System.out.println("============ CLEANING OF TEST ENVIRONMENT ===========");
         System.out.println("=====================================================");
 
         deleteTenantAndPlatform();
@@ -54,7 +54,7 @@ public class TestsInitializer {
 
     protected void before() throws Exception {
         System.out.println("=====================================================");
-        System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =====");
+        System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =======");
         System.out.println("=====================================================");
         long startTime = System.currentTimeMillis();
         setupBonitaHome();

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-
 /**
  * @author Emmanuel Duchastenier
  */
@@ -23,9 +22,4 @@ public interface ArchivedTransitionInstance extends ArchivedFlowElementInstance 
 
     long getTarget();
 
-    /**
-     * @return
-     * @since 6.0
-     */
-    long getSourceObjectId();
 }

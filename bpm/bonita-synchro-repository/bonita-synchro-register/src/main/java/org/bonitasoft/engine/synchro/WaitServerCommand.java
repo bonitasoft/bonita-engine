@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -28,7 +27,7 @@ public class WaitServerCommand extends TenantCommand {
 
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
-            throws SCommandParameterizationException, SCommandExecutionException {
+            throws SCommandExecutionException {
         if (parameters.get("clear") != null) {
             serviceAccessor.getSynchroService().clearAllEvents();
             return null;

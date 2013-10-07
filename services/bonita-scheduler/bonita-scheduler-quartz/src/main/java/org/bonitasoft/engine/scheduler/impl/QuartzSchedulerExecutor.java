@@ -39,7 +39,6 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 import org.quartz.core.QuartzScheduler;
@@ -65,15 +64,15 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     private QuartzScheduler quartzScheduler;
 
-    private final AbstractJobListener jobListener;
+    private final List<AbstractJobListener> jobListeners;
 
-    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final AbstractJobListener jobListener,
-            final ReadSessionAccessor sessionAccessor, final TransactionService transactionService, final boolean useOptimization) throws SchedulerException {
+    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final List<AbstractJobListener> jobListeners,
+            final ReadSessionAccessor sessionAccessor, final TransactionService transactionService, final boolean useOptimization) {
         this.sessionAccessor = sessionAccessor;
         this.transactionService = transactionService;
         this.useOptimization = useOptimization;
         this.schedulerFactory = schedulerFactory;
-        this.jobListener = jobListener;
+        this.jobListeners = jobListeners;
     }
 
     @Override
@@ -215,7 +214,9 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             }
             scheduler = schedulerFactory.getScheduler();
             scheduler.start();
-            scheduler.getListenerManager().addJobListener(jobListener);
+            for (final AbstractJobListener jobListener : jobListeners) {
+                scheduler.getListenerManager().addJobListener(jobListener);
+            }
 
             try {
                 if (useOptimization) {
@@ -388,7 +389,9 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public void setBOSSchedulerService(final SchedulerServiceImpl schedulerService) {
         schedulerFactory.setBOSSchedulerService(schedulerService);
-        jobListener.setBOSSchedulerService(schedulerService);
+        for (final AbstractJobListener jobListener : jobListeners) {
+            jobListener.setBOSSchedulerService(schedulerService);
+        }
     }
 
     private long getTenantIdFromSession() throws TenantIdNotSetException {

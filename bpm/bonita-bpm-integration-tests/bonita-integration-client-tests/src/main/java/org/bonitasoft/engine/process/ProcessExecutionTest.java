@@ -9,17 +9,22 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
+import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
@@ -29,6 +34,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -134,8 +140,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         getProcessAPI().enableProcess(processDefinition.getId());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue("expected an activity",
-                new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("expected an activity", new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
 
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
@@ -143,7 +148,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         assertEquals(TestStates.getReadyState(), step1.getState());
         assignAndExecuteStep(step1, getSession().getUserId());
         try {
-            ActivityInstance activityInstance = getProcessAPI().getActivityInstance(step1.getId());
+            final ActivityInstance activityInstance = getProcessAPI().getActivityInstance(step1.getId());
             if (!activityInstance.getState().equalsIgnoreCase("completed")) {
                 fail("the step should be completed");
             }
@@ -304,8 +309,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final long startDate = processInstance.getStartDate().getTime();
         assertTrue("The process instance must start between " + before + " and " + after + ", but was " + startDate, after >= startDate && startDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
-        assertTrue("expected 1 activity",
-                new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("expected 1 activity", new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
         before = new Date().getTime();
@@ -338,8 +342,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         assertTrue("The process instance " + processInstance.getName() + " must start between <" + before + "> and <" + after + ">, but was <"
                 + processStartDate + ">", after >= processStartDate && processStartDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
-        assertTrue("expected 1 activity",
-                new CheckNbOfActivities(getProcessAPI(), 20, 5000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("expected 1 activity", new CheckNbOfActivities(getProcessAPI(), 20, 5000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
 
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
@@ -419,8 +422,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue("Expected an activity",
-                new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("Expected an activity", new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
         final long before = new Date().getTime();
@@ -453,8 +455,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(user.getId(), processInstance.getStartedBy());
-        assertTrue("Expected an activity",
-                new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("Expected an activity", new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
         assignAndExecuteStep(step1, user.getId());
@@ -484,7 +485,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         assertEquals(null, archivedActivityInstance.getDisplayDescription());
 
-        final WaitForStep waitForStep = waitForStep(200, 1000, "task1", pi);
+        final WaitForStep waitForStep = waitForStep("task1", pi);
         final ActivityInstance activityInstance = waitForStep.getResult();
 
         assertEquals(null, activityInstance.getDisplayDescription());
@@ -536,7 +537,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // execute step 1 using john
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
+        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         assertEquals(0, step1.getExecutedBy());
         assignAndExecuteStep(step1, user.getId());
         waitForUserTask("step2", processInstance);
@@ -566,10 +567,10 @@ public class ProcessExecutionTest extends CommonAPITest {
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
+        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         assignAndExecuteStep(step1, user.getId());
         waitForUserTaskAndExecuteIt("step2", processInstance, user.getId());
-        waitForUserTask("step3", processInstance.getId());
+        waitForUserTask("step3", processInstance);
 
         final SearchResult<Comment> searchResult0 = getProcessAPI().searchComments(new SearchOptionsBuilder(0, 5).done());
         final List<Comment> commentList0 = searchResult0.getResult();
@@ -584,4 +585,326 @@ public class ProcessExecutionTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
         deleteUser("Tom");
     }
+
+    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
+    @Test
+    public void getArchivedProcessDataInstance() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor");
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
+
+        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedProcessDataInstance(dataName, processInstance.getId());
+        assertEquals("2", archivedData.getValue());
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(matti);
+    }
+
+    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
+    @Test
+    public void getArchivedProcessDataInstanceFromAnArchivedProcess() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
+        builder.addAutomaticTask("system");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcess(builder.getProcess());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForProcessToFinish(processInstance);
+
+        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedProcessDataInstance(dataName, processInstance.getId());
+        assertEquals("1", archivedData.getValue());
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
+    @Test
+    public void getArchivedTransientProcessDataInstance() throws Exception {
+        final String dataName = "test";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1")).isTransient();
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor");
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
+        waitForUserTaskAndExecuteIt("step", processInstance, matti.getId());
+        waitForProcessToFinish(processInstance);
+
+        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedProcessDataInstance(dataName, processInstance.getId());
+        assertEquals("2", archivedData.getValue());
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(matti);
+    }
+
+    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
+    @Test
+    public void getUnknownArchivedProcessDataInstance() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addAutomaticTask("system");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcess(builder.getProcess());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForProcessToFinish(processInstance);
+
+        try {
+            getProcessAPI().getArchivedProcessDataInstance("o", processInstance.getId());
+            fail("The data named 'o' does not exists");
+        } catch (final ArchivedDataNotFoundException dnfe) {
+            // Do nothing
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+        }
+    }
+
+    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "activity instance" })
+    @Test
+    public void getArchivedActivityDataInstance() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor").addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
+
+        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedActivityDataInstance(dataName, userTask.getId());
+        assertEquals("2", archivedData.getValue());
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(matti);
+    }
+
+    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "activity instance" })
+    @Test
+    public void getArchivedActivityDataInstanceFromAnArchivedProcess() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor").addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForProcessToFinish(processInstance.getId());
+
+        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedActivityDataInstance(dataName, userTask.getId());
+        assertEquals("2", archivedData.getValue());
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(matti);
+    }
+
+    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "activity instance" })
+    @Test
+    public void getArchivedTransientActivityDataInstance() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor").addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1")).isTransient();
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForProcessToFinish(processInstance.getId());
+
+        try {
+            getProcessAPI().getArchivedActivityDataInstance(dataName, userTask.getId());
+            fail("a transient data of an activity is not archived");
+        } catch (final ArchivedDataNotFoundException adnfe) {
+
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+            deleteUser(matti);
+        }
+    }
+
+    @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "activity instance" })
+    @Test
+    public void getUnknownArchivedActivityDataInstance() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor");
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+
+        try {
+            getProcessAPI().getArchivedProcessDataInstance("o", userTask.getId());
+            fail("The data named 'o' does not exists");
+        } catch (final ArchivedDataNotFoundException dnfe) {
+            // Do nothing
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+            deleteUser(matti);
+        }
+    }
+
+    @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
+    @Test
+    public void getArchivedProcessDataInstances() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
+        builder.addShortTextData("job", new ExpressionBuilder().createConstantStringExpression("job"));
+        builder.addShortTextData("desc", new ExpressionBuilder().createConstantStringExpression("desc"));
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor");
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
+
+        List<ArchivedDataInstance> archivedDataInstances = getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 0, 10);
+        assertEquals(3, archivedDataInstances.size());
+        ArchivedDataInstance archivedDataInstance = getArchivedDataInstance(archivedDataInstances, dataName);
+        assertEquals("2", archivedDataInstance.getValue());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "job");
+        assertEquals("job", archivedDataInstance.getValue());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
+        assertEquals("desc", archivedDataInstance.getValue());
+
+        archivedDataInstances = getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 0, 1);
+        assertEquals(1, archivedDataInstances.size());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, dataName);
+        assertEquals("2", archivedDataInstance.getValue());
+
+        archivedDataInstances = getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 1, 10);
+        assertEquals(2, archivedDataInstances.size());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "job");
+        assertEquals("job", archivedDataInstance.getValue());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
+        assertEquals("desc", archivedDataInstance.getValue());
+
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForProcessToFinish(processInstance.getId());
+
+        archivedDataInstances = getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 0, 10);
+        assertEquals(3, archivedDataInstances.size());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, dataName);
+        assertEquals("2", archivedDataInstance.getValue());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "job");
+        assertEquals("job", archivedDataInstance.getValue());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
+        assertEquals("desc", archivedDataInstance.getValue());
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(matti);
+    }
+
+    private ArchivedDataInstance getArchivedDataInstance(final List<ArchivedDataInstance> archivedDataInstances, final String dataName) {
+        ArchivedDataInstance archivedDataInstance = null;
+        final Iterator<ArchivedDataInstance> iterator = archivedDataInstances.iterator();
+        while (archivedDataInstance == null || iterator.hasNext()) {
+            final ArchivedDataInstance next = iterator.next();
+            if (next.getName().equals(dataName)) {
+                archivedDataInstance = next;
+            }
+        }
+        assertNotNull(archivedDataInstance);
+        return archivedDataInstance;
+    }
+
+    @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "process instance" })
+    @Test
+    public void getEmptyArchivedProcessDataInstances() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addActor("actor");
+        builder.addUserTask("step", "actor");
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        final List<ArchivedDataInstance> archivedDataInstances = getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 0, 10);
+        assertEquals(0, archivedDataInstances.size());
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(matti);
+    }
+
+    @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
+            "activity instance" })
+    @Test
+    public void getArchivedActivityDataInstances() throws Exception {
+        final String dataName = "title";
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
+        builder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("0"));
+        builder.addActor("actor");
+        final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step", "actor");
+        taskDefinitionBuilder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1"));
+        taskDefinitionBuilder.addShortTextData("job", new ExpressionBuilder().createConstantStringExpression("job"));
+        taskDefinitionBuilder.addShortTextData("desc", new ExpressionBuilder().createConstantStringExpression("desc"));
+
+        final User matti = createUser("matti", "bpm");
+
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        getProcessAPI().updateActivityDataInstance(dataName, userTask.getId(), "2");
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForProcessToFinish(processInstance.getId());
+
+        List<ArchivedDataInstance> archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTask.getId(), 0, 10);
+        assertEquals(3, archivedDataInstances.size());
+        ArchivedDataInstance archivedDataInstance = getArchivedDataInstance(archivedDataInstances, dataName);
+        assertEquals("2", archivedDataInstance.getValue());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "job");
+        assertEquals("job", archivedDataInstance.getValue());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
+        assertEquals("desc", archivedDataInstance.getValue());
+
+        archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTask.getId(), 0, 1);
+        assertEquals(1, archivedDataInstances.size());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, dataName);
+        assertEquals("2", archivedDataInstance.getValue());
+
+        archivedDataInstances = getProcessAPI().getArchivedActivityDataInstances(userTask.getId(), 1, 10);
+        assertEquals(2, archivedDataInstances.size());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "job");
+        assertEquals("job", archivedDataInstance.getValue());
+        archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
+        assertEquals("desc", archivedDataInstance.getValue());
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(matti);
+    }
+
 }

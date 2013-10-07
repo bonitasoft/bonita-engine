@@ -247,13 +247,13 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         getProcessAPI().enableProcess(processDefinition.getId());
 
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        checkProcessInstanceIsArchived(50, 1500, pi0);
+        checkProcessInstanceIsArchived(pi0);
 
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition.getId());
-        checkProcessInstanceIsArchived(50, 1500, pi1);
+        checkProcessInstanceIsArchived(pi1);
 
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDefinition.getId());
-        checkProcessInstanceIsArchived(50, 1500, pi2);
+        checkProcessInstanceIsArchived(pi2);
 
         // We asked for creation date descending order:
         List<ArchivedProcessInstance> processInstances = getProcessAPI().getArchivedProcessInstances(0, 10, asc);
@@ -537,7 +537,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, pedro);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep(50, 500, "step1", processInstance);
+        waitForStep("step1", processInstance);
 
         final long processInstanceId = processInstance.getId();
         processInstance = getProcessAPI().getProcessInstance(processInstanceId);

@@ -36,4 +36,13 @@
 		FROM org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl AS jl
 	</query>
 
+	<!-- Failed Job -->
+	<query name="getFailedJobs">
+		SELECT new org.bonitasoft.engine.scheduler.model.impl.SFailedJobImpl(jd.id, jd.jobName, jd.description, jl.retryNumber, jl.lastUpdateDate, jl.lastMessage)
+		FROM org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl AS jl,
+		     org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl AS jd
+		WHERE jd.id = jl.jobDescriptorId
+		ORDER BY jl.lastUpdateDate ASC
+	</query>
+
 </hibernate-mapping>

@@ -43,16 +43,6 @@ public class ArchivedConnectorInstanceImpl extends NamedElementImpl implements A
 
     private final long sourceObjectId;
 
-    /**
-     * @param name
-     * @param archiveDate
-     * @param containerId
-     * @param containerType
-     * @param connectorId
-     * @param version
-     * @param activationEvent
-     * @param state
-     */
     public ArchivedConnectorInstanceImpl(final String name, final Date archiveDate, final long containerId, final String containerType,
             final String connectorId, final String version, final ConnectorEvent activationEvent, final ConnectorState state, final long sourceObjectId) {
         super(name);

@@ -19,12 +19,8 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
- * 
- * 
- * Is a tenant service must be declared in tenant part
- * 
  * @author Baptsite Mesta
- * 
+ * @author Matthieu Chaffotte
  */
 public class IncidentServiceImpl implements IncidentService {
 
@@ -32,17 +28,17 @@ public class IncidentServiceImpl implements IncidentService {
 
     private final TechnicalLoggerService logger;
 
-    public IncidentServiceImpl(TechnicalLoggerService logger, List<IncidentHandler> handlers) {
+    public IncidentServiceImpl(final TechnicalLoggerService logger, final List<IncidentHandler> handlers) {
         this.logger = logger;
         this.handlers = handlers;
     }
 
     @Override
-    public void report(Incident incident) {
-        for (IncidentHandler handler : handlers) {
+    public void report(final long tenantId, final Incident incident) {
+        for (final IncidentHandler handler : handlers) {
             try {
-                handler.handle(incident);
-            } catch (Throwable t) {
+                handler.handle(tenantId, incident);
+            } catch (final Throwable t) {
                 logger.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to report an incident using the handler " + handler + " incident was " + incident);
             }
         }

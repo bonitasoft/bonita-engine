@@ -176,7 +176,7 @@ public class SendTaskTest extends CommonAPITest {
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(sendMessageProcessInstance.getId(), 0,
                 10, ActivityInstanceCriterion.LAST_UPDATE_DESC);
         assertTrue(archivedActivityInstances.get(0) instanceof ArchivedSendTaskInstance);
-        waitForStep(50, 10000, "step1", receiveMessageProcessInstance);
+        waitForStep("step1", receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());
@@ -217,7 +217,7 @@ public class SendTaskTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
-        waitForStep(50, 10000, "step1", receiveMessageProcessInstance);
+        waitForStep("step1", receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());

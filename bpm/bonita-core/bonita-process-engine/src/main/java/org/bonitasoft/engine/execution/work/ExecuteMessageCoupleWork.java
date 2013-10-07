@@ -85,7 +85,7 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService(), tenantAccessor.getBPMInstanceBuilders());
         resetMessageInstance(messageInstanceId, tenantAccessor.getEventInstanceService(), tenantAccessor.getBPMInstanceBuilders());

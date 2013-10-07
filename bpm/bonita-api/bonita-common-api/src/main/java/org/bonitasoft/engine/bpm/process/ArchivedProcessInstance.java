@@ -57,6 +57,4 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
 
     int getStateId();
 
-    long getSourceObjectId();
-
 }

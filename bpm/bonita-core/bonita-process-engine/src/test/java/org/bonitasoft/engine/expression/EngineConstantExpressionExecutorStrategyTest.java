@@ -30,7 +30,6 @@ import org.bonitasoft.engine.connector.EngineExecutionContext;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
@@ -80,7 +79,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
     }
 
     private void taskAssigneeOnHumanTask(final SFlowNodeType flowNodeType, final SHumanTaskInstance humanTaskInstance)
-            throws SActivityInstanceNotFoundException, SExpressionEvaluationException, SFlowNodeNotFoundException, SFlowNodeReadException {
+            throws SExpressionEvaluationException, SFlowNodeNotFoundException, SFlowNodeReadException {
         final SExpression expression = mock(SExpression.class);
 
         when(activityInstanceService.getFlowNodeInstance(containerId)).thenReturn(humanTaskInstance);

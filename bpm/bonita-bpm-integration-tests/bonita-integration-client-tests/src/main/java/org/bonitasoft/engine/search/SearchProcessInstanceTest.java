@@ -1076,12 +1076,10 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessDefinition process1Definition = deployAndEnableWithActor(designProcess1Definition, actorName, user);
 
         final ProcessInstance instance1 = getProcessAPI().startProcess(process1Definition.getId());
-        waitForUserTask("User task", instance1.getId());
+        waitForUserTask("User task", instance1);
 
         final SearchOptions opts = new SearchOptionsBuilder(0, 10).done();
-
         final SearchResult<ProcessInstance> processInstanceSearchResult = getProcessAPI().searchOpenProcessInstances(opts);
-
         assertThat(processInstanceSearchResult.getCount(), is(1L));
 
         disableAndDeleteProcess(process1Definition);
@@ -1153,7 +1151,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         // add supervisor
         final ProcessSupervisor supervisor1 = createSupervisor(processDefinition.getId(), user.getId());
 
-        waitForStep(500, 1000, "userTask1", processInstance);
+        waitForStep("userTask1", processInstance);
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         for (final ActivityInstance activityInstance : activityInstances) {
             final long activityInstanceId = activityInstance.getId();
@@ -1275,7 +1273,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessInstance procInstWithEventSubProc = getProcessAPI().startProcess(procWithEventSubProcess.getId());
 
         // wait for first step of parent process and send a signal that will launch the event sub-process
-        waitForUserTask(userTaskName, procInstWithEventSubProc.getId());
+        waitForUserTask(userTaskName, procInstWithEventSubProc);
         getProcessAPI().sendSignal(signalName);
 
         // execute user task and wait the parent process to finish (state aborted)
@@ -1297,7 +1295,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
 
         // start another instance and cancel it: the process will be in the state canceled
         final ProcessInstance processInstanceToCancel = getProcessAPI().startProcess(simpleProcess.getId());
-        waitForUserTask(userTaskName, processInstanceToCancel.getId());
+        waitForUserTask(userTaskName, processInstanceToCancel);
         getProcessAPI().cancelProcessInstance(processInstanceToCancel.getId());
         waitForProcessToFinish(processInstanceToCancel, TestStates.getCancelledState());
         return simpleProcess;

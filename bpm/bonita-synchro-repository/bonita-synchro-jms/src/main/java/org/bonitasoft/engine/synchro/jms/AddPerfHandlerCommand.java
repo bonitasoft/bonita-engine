@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
@@ -24,10 +23,10 @@ public class AddPerfHandlerCommand extends TenantCommand {
 
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
-            throws SCommandParameterizationException, SCommandExecutionException {
+            throws SCommandExecutionException {
         final EventService eventService = serviceAccessor.getEventService();
         final Long messageTimeout = (Long) parameters.get("timeout");
-        
+
         try {
             long tenantId = serviceAccessor.getTenantId();
             if (!containsHandler(eventService, PROCESSINSTANCE_STATE_UPDATED, ProcessInstanceFinishedHandler.class)) {

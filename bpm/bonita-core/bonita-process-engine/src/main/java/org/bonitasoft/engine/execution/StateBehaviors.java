@@ -92,7 +92,6 @@ import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.EndingIntermediateCatchEventExceptionStateImpl;
-import org.bonitasoft.engine.execution.work.ExecuteConnectorOfActivity;
 import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -619,7 +618,7 @@ public class StateBehaviors {
             try {
                 eventsHandler.handleThrowMessage(processDefinition, sendTaskDefinition, sendTaskInstance);
             } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException("unable to handle throw event " + flowNodeInstance, e);
+                throw new SActivityStateExecutionException("unable to handle throw message " + flowNodeInstance, e);
             }
         }
     }
@@ -672,7 +671,8 @@ public class StateBehaviors {
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();
         try {
-            workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId, connectorDefinitionName));
+            workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId,
+                    connectorInstanceId, connectorDefinitionName));
         } catch (final WorkRegisterException e) {
             throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstanceId,
                     e);

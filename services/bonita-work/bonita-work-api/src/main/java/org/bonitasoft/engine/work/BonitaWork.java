@@ -59,7 +59,7 @@ public abstract class BonitaWork implements Runnable, Serializable {
         }
     }
 
-    public abstract void handleFailure(Exception e, Map<String, Object> context) throws Exception;
+    public abstract void handleFailure(Throwable e, Map<String, Object> context) throws Exception;
 
     public long getTenantId() {
         if (tenantId <= 0) {

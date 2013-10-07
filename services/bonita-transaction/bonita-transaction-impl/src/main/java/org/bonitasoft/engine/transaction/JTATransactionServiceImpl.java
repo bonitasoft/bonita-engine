@@ -16,6 +16,7 @@ package org.bonitasoft.engine.transaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
@@ -26,9 +27,6 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -40,15 +38,14 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private List<BonitaTransactionSynchronization> synchronizations;
 
-    private final EventService eventService;
+    private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
 
-    public JTATransactionServiceImpl(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup, final EventService eventService) {
-        this(logger, txManagerLookup.getTransactionManager(), eventService);
+    public JTATransactionServiceImpl(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup) {
+        this(logger, txManagerLookup.getTransactionManager());
     }
 
-    public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager, final EventService eventService) {
+    public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager) {
         this.logger = logger;
-        this.eventService = eventService;
         if (txManager == null) {
             throw new IllegalArgumentException("The parameter txManager can't be null.");
         }
@@ -60,10 +57,11 @@ public class JTATransactionServiceImpl implements TransactionService {
         try {
             if (txManager.getStatus() == Status.STATUS_NO_TRANSACTION) {
                 boolean transactionStarted = false;
-                boolean mustRollback = false;
                 try {
                     txManager.begin();
                     transactionStarted = true;
+                    numberOfActiveTransactions.getAndIncrement();
+
                     final Transaction tx = txManager.getTransaction();
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
                         logger.log(getClass(), TechnicalLogSeverity.TRACE,
@@ -75,20 +73,15 @@ public class JTATransactionServiceImpl implements TransactionService {
                         synchronizations.clear();
                     }
                     synchronizations = new ArrayList<BonitaTransactionSynchronization>();
-                    if (eventService.hasHandlers(TRANSACTION_ACTIVE_EVT, null)) {
-                        final SEvent tr_active = eventService.getEventBuilder().createNewInstance(TRANSACTION_ACTIVE_EVT).done();
-                        eventService.fireEvent(tr_active);
-                    }
                 } catch (final NotSupportedException e) {
                     // Should never happen as we do not want to support nested transaction
                     throw new STransactionCreationException(e);
                 } catch (final Throwable t) {
-                    mustRollback = true;
-                    throw new STransactionCreationException(t);
-                } finally {
-                    if (transactionStarted && mustRollback) {
+                    if (transactionStarted) {
                         txManager.rollback();
+                        numberOfActiveTransactions.getAndDecrement();
                     }
+                    throw new STransactionCreationException(t);
                 }
             } else {
                 throw new STransactionCreationException("We do not support nested transaction.");
@@ -121,17 +114,11 @@ public class JTATransactionServiceImpl implements TransactionService {
                 } catch (final SecurityException e) {
                     throw new STransactionRollbackException("", e);
                 } finally {
-                    if (eventService.hasHandlers(TRANSACTION_ROLLEDBACK_EVT, null)) {
-                        // trigger the right event
-                        final SEvent tr_rolledback = eventService.getEventBuilder().createNewInstance(TRANSACTION_ROLLEDBACK_EVT).done();
-                        eventService.fireEvent(tr_rolledback);
-                    }
+                    numberOfActiveTransactions.getAndDecrement();
                 }
             } else {
-                String eventName = TRANSACTION_ROLLEDBACK_EVT;
                 try {
                     txManager.commit();
-                    eventName = TRANSACTION_COMMITED_EVT;
                 } catch (final SecurityException e) {
                     throw new STransactionCommitException("", e);
                 } catch (final IllegalStateException e) {
@@ -143,16 +130,10 @@ public class JTATransactionServiceImpl implements TransactionService {
                 } catch (final HeuristicRollbackException e) {
                     throw new STransactionCommitException("", e);
                 } finally {
-                    if (eventService.hasHandlers(eventName, null)) {
-                        // trigger the right event
-                        final SEvent tr_commited = eventService.getEventBuilder().createNewInstance(eventName).done();
-                        eventService.fireEvent(tr_commited);
-                    }
+                    numberOfActiveTransactions.getAndDecrement();
                 }
             }
         } catch (final SystemException e) {
-            throw new STransactionCommitException("", e);
-        } catch (final FireEventException e) {
             throw new STransactionCommitException("", e);
         }
 
@@ -246,6 +227,11 @@ public class JTATransactionServiceImpl implements TransactionService {
         } finally {
             complete();
         }
+    }
+
+    @Override
+    public long getNumberOfActiveTransactions() {
+        return numberOfActiveTransactions.get();
     }
 
 }

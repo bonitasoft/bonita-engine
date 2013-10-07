@@ -129,7 +129,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         TransactionService transactionService = getTenantAccessor(context).getTransactionService();
         ProcessDefinitionService processDefinitionService = getTenantAccessor(context).getProcessDefinitionService();
         if (handleError(context, transactionService, processDefinitionService, e)) {
@@ -139,7 +139,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
     private boolean handleError(final Map<String, Object> context, final TransactionService transactionService,
             final ProcessDefinitionService processDefinitionService,
-            final Exception e) throws Exception {
+            final Throwable e) throws Exception {
         HandleConnectorOnFailEventTxContent handleError;
         handleError = new HandleConnectorOnFailEventTxContent(e, processDefinitionService, context);
         return transactionService.executeInTransaction(handleError);
@@ -196,13 +196,13 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
      */
     private final class HandleConnectorOnFailEventTxContent implements Callable<Boolean> {
 
-        private final Exception e;
+        private final Throwable e;
 
         private final ProcessDefinitionService processDefinitionService;
 
         private final Map<String, Object> context;
 
-        private HandleConnectorOnFailEventTxContent(final Exception e, final ProcessDefinitionService processDefinitionService,
+        private HandleConnectorOnFailEventTxContent(final Throwable e, final ProcessDefinitionService processDefinitionService,
                 final Map<String, Object> context) {
             this.e = e;
             this.processDefinitionService = processDefinitionService;

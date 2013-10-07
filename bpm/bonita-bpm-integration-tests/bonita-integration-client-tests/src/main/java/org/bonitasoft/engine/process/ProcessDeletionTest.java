@@ -170,7 +170,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // start P3, the call activities will start instances of P2 a and P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        waitForUserTask(simpleStepName, rootProcessInstance.getId());
+        waitForUserTask(simpleStepName, rootProcessInstance);
 
         // check that the instances of p1, p2 and p3 were created
         List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
@@ -217,14 +217,14 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // start P3, the call activities will start instances of P2 a and P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTask(simpleStepName, rootProcessInstance.getId());
+        final ActivityInstance simpleTask = waitForUserTask(simpleStepName, rootProcessInstance);
         final long simpleProcessInstanceId = simpleTask.getParentProcessInstanceId();
 
         // execute simple task: p1 will finish
         assignAndExecuteStep(simpleTask, pedro.getId());
 
         // execute intermediate task: p2 will finish
-        final ActivityInstance intermediateTask = waitForUserTask(intermediateStepName, rootProcessInstance.getId());
+        final ActivityInstance intermediateTask = waitForUserTask(intermediateStepName, rootProcessInstance);
         final long intermediateProcessInstanceId = intermediateTask.getParentProcessInstanceId();
         assignAndExecuteStep(intermediateTask, pedro.getId());
 
@@ -295,10 +295,10 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // start P2, the call activities will start an instance of P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTask(simpleStepName, rootProcessInstance.getId());
+        final ActivityInstance simpleTask = waitForUserTask(simpleStepName, rootProcessInstance);
         assignAndExecuteStep(simpleTask, pedro.getId());
         final ProcessInstance simpleProcessInstance = getProcessAPI().getProcessInstance(simpleTask.getParentProcessInstanceId());
-        waitForUserTask(rootStepName, rootProcessInstance.getId());
+        waitForUserTask(rootStepName, rootProcessInstance);
         waitForProcessToFinish(simpleProcessInstance);
 
         // check that only one instance (p2) is in the journal: p1 is supposed to be archived
@@ -342,10 +342,10 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // start P2, the call activities will start an instance of P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTask(simpleStepName, rootProcessInstance.getId());
+        final ActivityInstance simpleTask = waitForUserTask(simpleStepName, rootProcessInstance);
         assignAndExecuteStep(simpleTask, pedro.getId());
         final ProcessInstance simpleProcessInstance = getProcessAPI().getProcessInstance(simpleTask.getParentProcessInstanceId());
-        waitForUserTask(rootStepName, rootProcessInstance.getId());
+        waitForUserTask(rootStepName, rootProcessInstance);
         waitForProcessToFinish(simpleProcessInstance);
 
         // check that only one instance (p2) is in the journal: p1 is supposed to be archived
@@ -385,11 +385,11 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for the first step in the parent process before sending signal the launch the event sub-process
-        waitForUserTask(parentTaskName, rootProcessInstance.getId());
+        waitForUserTask(parentTaskName, rootProcessInstance);
         getProcessAPI().sendSignal(signalName);
 
         // wait for first step in the event sub-process
-        waitForUserTask(childTaskName, rootProcessInstance.getId());
+        waitForUserTask(childTaskName, rootProcessInstance);
 
         // check the number of process instances: 2 expected the root process instance and the event subprocess
         List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT);
@@ -565,7 +565,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithDocument("myProcess", userTaskName, "Doc", url);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(userTaskName, processInstance.getId());
+        waitForUserTask(userTaskName, processInstance);
 
         // check the number of data and documents
         SearchResult<Document> documentsSearchResult = getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 10).done());
@@ -601,7 +601,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("myProcess", userTaskName);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(userTaskName, processInstance.getId());
+        waitForUserTask(userTaskName, processInstance);
 
         // add a comment
         getProcessAPI().addProcessComment(processInstance.getId(), "just do it.");
@@ -625,7 +625,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("ArchivedCommentsDeletion", userTaskName);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance.getId());
+        final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance);
 
         // add a comment
         getProcessAPI().addProcessComment(processInstance.getId(), "just do it.");
@@ -650,7 +650,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("ArchivedCommentsDeletion", userTaskName);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance.getId());
+        final ActivityInstance userTask = waitForUserTask(userTaskName, processInstance);
 
         // add a comment
         getProcessAPI().addProcessComment(processInstance.getId(), "just do it2.");

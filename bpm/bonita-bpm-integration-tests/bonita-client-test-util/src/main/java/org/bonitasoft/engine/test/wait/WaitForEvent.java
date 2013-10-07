@@ -24,6 +24,7 @@ import org.bonitasoft.engine.bpm.flownode.EventCriterion;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.test.WaitUntil;
 
+@Deprecated
 public class WaitForEvent extends WaitUntil {
 
     private final String eventName;
@@ -36,6 +37,7 @@ public class WaitForEvent extends WaitUntil {
 
     private final ProcessAPI processAPI;
 
+    @Deprecated
     public WaitForEvent(final int repeatEach, final int timeout, final String eventName, final long processInstanceId, final ProcessAPI processAPI) {
         super(repeatEach, timeout);
         this.eventName = eventName;
@@ -43,6 +45,7 @@ public class WaitForEvent extends WaitUntil {
         this.processAPI = processAPI;
     }
 
+    @Deprecated
     public WaitForEvent(final int repeatEach, final int timeout, final String eventName, final long processInstanceId, final String state,
             final ProcessAPI processAPI) {
         this(repeatEach, timeout, eventName, processInstanceId, processAPI);

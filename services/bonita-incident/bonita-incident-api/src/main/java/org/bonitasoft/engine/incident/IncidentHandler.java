@@ -14,11 +14,11 @@
 package org.bonitasoft.engine.incident;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
+ * @author Matthieu Chaffotte
  */
 public interface IncidentHandler {
 
-    void handle(Incident incident);
+    void handle(long tenantId, Incident incident);
+
 }

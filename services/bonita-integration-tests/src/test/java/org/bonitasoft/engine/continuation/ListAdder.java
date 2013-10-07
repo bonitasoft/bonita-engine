@@ -40,7 +40,7 @@ public class ListAdder extends BonitaWork {
     }
 
     @Override
-    public void work(final Map<String, Object> context) throws Exception {
+    public void work(final Map<String, Object> context) {
         try {
             Thread.sleep(delay);
         } catch (final InterruptedException e) {
@@ -50,6 +50,6 @@ public class ListAdder extends BonitaWork {
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) {
     }
 }

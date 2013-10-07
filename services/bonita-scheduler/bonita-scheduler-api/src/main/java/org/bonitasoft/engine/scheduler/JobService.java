@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
@@ -29,6 +30,7 @@ import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterCreat
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterReadException;
+import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -252,5 +254,7 @@ public interface JobService {
      * @since 6.1
      */
     List<SJobLog> searchJobLogs(QueryOptions queryOptions) throws SBonitaSearchException;
+
+    List<SFailedJob> getFailedJobs(int startIndex, int maxResults) throws SSchedulerException;
 
 }

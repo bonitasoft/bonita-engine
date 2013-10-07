@@ -23,6 +23,7 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -46,8 +47,6 @@ import org.junit.Test;
  * @author Elias Ricken de Medeiros
  */
 public class TimerEventSubProcessTest extends CommonAPITest {
-
-    private static final int TIMEOUT = 10000;
 
     private User john;
 
@@ -136,7 +135,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
 
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         assertNotNull(step1);
-        final Long eventSubProcessActivity = waitForFlowNode(processInstance.getId(), TestStates.getExecutingState(), "eventSubProcess", false, TIMEOUT);
+        final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, "eventSubProcess", false);
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
         assertNotNull(subStep);
 
@@ -146,7 +145,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
 
         waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity, TestStates.getNormalFinalState());
+        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(processInstance, TestStates.getAbortedState());
 

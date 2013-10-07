@@ -39,6 +39,4 @@ public interface ArchivedConnectorInstance extends NamedElement, BaseElement, Ar
 
     ConnectorState getState();
 
-    long getSourceObjectId();
-
 }

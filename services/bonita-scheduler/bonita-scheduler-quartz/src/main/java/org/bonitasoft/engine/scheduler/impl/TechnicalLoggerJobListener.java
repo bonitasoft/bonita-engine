@@ -34,66 +34,63 @@ import org.quartz.TriggerKey;
 
 /**
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
-public class FileJobListener extends AbstractJobListener {
+public class TechnicalLoggerJobListener extends AbstractJobListener {
 
-    private static final String jobToBeFiredMessage = "Job FIRED : group=''{1}'', name=''{0}'', class=''{5}'', datas=''{6}'', triggerGroup=''{4}'', triggerName=''{3}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}''";
+    private static final String jobToBeFiredMessage = "Job FIRED : group=''{1}'', name=''{0}'', class=''{5}'', data=''{6}'', triggerGroup=''{4}'', triggerName=''{3}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}''";
 
-    private static final String jobSuccessMessage = "Job COMPLETED : group=''{1}'', name=''{0}'', class=''{4}'', datas=''{5}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}'', reports=''{3}''";
+    private static final String jobSuccessMessage = "Job COMPLETED : group=''{1}'', name=''{0}'', class=''{4}'', data=''{5}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}'', reports=''{3}''";
 
-    private static final String jobFailedMessage = "Job FAILED : group=''{1}'', name=''{0}'', class=''{4}'', datas=''{5}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}'', reports=''{3}''";
+    private static final String jobFailedMessage = "Job FAILED : group=''{1}'', name=''{0}'', class=''{4}'', data=''{5}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}'', reports=''{3}''";
 
     private static final String jobWasVetoedMessage = "Job VETOED : group=''{1}'', name=''{0}'', class=''{5}'', triggerGroup=''{4}'', triggerName=''{3}'', at=''{2, date,HH:mm:ss MM/dd/yyyy}''";
 
     private final TechnicalLoggerService logger;
 
-    private final boolean info;
+    private final boolean trace;
 
     private final boolean warning;
 
-    public FileJobListener(final TechnicalLoggerService logger) {
+    public TechnicalLoggerJobListener(final TechnicalLoggerService logger) {
         this.logger = logger;
-        info = logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO);
+        trace = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
         warning = logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING);
     }
 
     @Override
     public String getName() {
-        return "FileJobListener";
+        return "TechnicalLoggerJobListener";
     }
 
     @Override
     public void jobToBeExecuted(final JobExecutionContext context) {
-        if (!info) {
-            return;
+        if (trace) {
+            final Trigger trigger = context.getTrigger();
+            final TriggerKey triggerKey = trigger.getKey();
+            final JobDetail jobDetail = context.getJobDetail();
+            final JobKey jobKey = jobDetail.getKey();
+            final String jobType = getJobType(context.getJobInstance());
+
+            final Object[] args = { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), triggerKey.getName(), triggerKey.getGroup(), jobType,
+                    getJobDataValueAndType(jobDetail), trigger.getPreviousFireTime(), trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount()) };
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, MessageFormat.format(jobToBeFiredMessage, args));
         }
-
-        final Trigger trigger = context.getTrigger();
-        final TriggerKey triggerKey = trigger.getKey();
-        final JobDetail jobDetail = context.getJobDetail();
-        final JobKey jobKey = jobDetail.getKey();
-        final String jobType = getJobType(context.getJobInstance());
-
-        final Object[] args = { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), triggerKey.getName(), triggerKey.getGroup(), jobType,
-                getJobDataValueAndType(jobDetail), trigger.getPreviousFireTime(), trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount()) };
-        logger.log(this.getClass(), TechnicalLogSeverity.INFO, MessageFormat.format(jobToBeFiredMessage, args));
     }
 
     @Override
     public void jobExecutionVetoed(final JobExecutionContext context) {
-        if (!info) {
-            return;
+        if (trace) {
+            final Trigger trigger = context.getTrigger();
+            final TriggerKey triggerKey = trigger.getKey();
+            final JobDetail jobDetail = context.getJobDetail();
+            final JobKey jobKey = jobDetail.getKey();
+            final String jobType = getJobType(context.getJobInstance());
+
+            final Object[] args = { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), triggerKey.getName(), triggerKey.getGroup(), jobType,
+                    trigger.getPreviousFireTime(), trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount()) };
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, MessageFormat.format(jobWasVetoedMessage, args));
         }
-
-        final Trigger trigger = context.getTrigger();
-        final TriggerKey triggerKey = trigger.getKey();
-        final JobDetail jobDetail = context.getJobDetail();
-        final JobKey jobKey = jobDetail.getKey();
-        final String jobType = getJobType(context.getJobInstance());
-
-        final Object[] args = { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), triggerKey.getName(), triggerKey.getGroup(), jobType,
-                trigger.getPreviousFireTime(), trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount()) };
-        logger.log(this.getClass(), TechnicalLogSeverity.INFO, MessageFormat.format(jobWasVetoedMessage, args));
     }
 
     @Override
@@ -105,23 +102,19 @@ public class FileJobListener extends AbstractJobListener {
         final String jobType = getJobType(context.getJobInstance());
 
         if (jobException != null) {
-            if (!warning) {
-                return;
+            if (warning) {
+                final Object[] args = new Object[] { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), jobException.getMessage(), jobType,
+                        getJobDataValueAndType(jobDetail), triggerKey.getName(), triggerKey.getGroup(), trigger.getPreviousFireTime(),
+                        trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount()) };
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format(jobFailedMessage, args), jobException);
             }
-
-            final Object[] args = new Object[] { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), jobException.getMessage(), jobType,
-                    getJobDataValueAndType(jobDetail), triggerKey.getName(), triggerKey.getGroup(), trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                    Integer.valueOf(context.getRefireCount()) };
-            logger.log(this.getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format(jobFailedMessage, args), jobException);
         } else {
-            if (!info) {
-                return;
+            if (trace) {
+                final Object[] args = new Object[] { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), String.valueOf(context.getResult()), jobType,
+                        getJobDataValueAndType(jobDetail), triggerKey.getName(), triggerKey.getGroup(), trigger.getPreviousFireTime(),
+                        trigger.getNextFireTime(), Integer.valueOf(context.getRefireCount()) };
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, MessageFormat.format(jobSuccessMessage, args));
             }
-
-            final Object[] args = new Object[] { jobKey.getName(), jobKey.getGroup(), new java.util.Date(), String.valueOf(context.getResult()), jobType,
-                    getJobDataValueAndType(jobDetail), triggerKey.getName(), triggerKey.getGroup(), trigger.getPreviousFireTime(), trigger.getNextFireTime(),
-                    Integer.valueOf(context.getRefireCount()) };
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, MessageFormat.format(jobSuccessMessage, args));
         }
     }
 
@@ -166,9 +159,10 @@ public class FileJobListener extends AbstractJobListener {
 
         @Override
         public String toString() {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("{'" + key + "'='" + value + "', class='" + classOfValue + "'}");
+            final StringBuilder builder = new StringBuilder("{'");
+            builder.append(key).append("'='").append(value).append("', class='").append(classOfValue).append("'}");
             return builder.toString();
         }
     }
+
 }

@@ -13,21 +13,44 @@
  **/
 package org.bonitasoft.engine.data.instance.api.impl;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.DataService;
+import org.bonitasoft.engine.data.SDataException;
+import org.bonitasoft.engine.data.SDataSourceInactiveException;
+import org.bonitasoft.engine.data.SDataSourceInitializationException;
+import org.bonitasoft.engine.data.SDataSourceNotFoundException;
+import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
+import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
+import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class DataInstanceServiceImplTest {
 
@@ -48,7 +71,7 @@ public class DataInstanceServiceImplTest {
     private DataInstanceServiceImpl dataInstanceServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         dataSourceService = mock(DataService.class);
         persistenceService = mock(ReadPersistenceService.class);
         recorder = mock(Recorder.class);
@@ -89,10 +112,64 @@ public class DataInstanceServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstance(long)}.
+     * 
+     * @throws SDataInstanceException
+     * @throws SDataException
+     * @throws SDataSourceInactiveException
+     * @throws SDataSourceInitializationException
+     * @throws SDataSourceNotFoundException
      */
     @Test
-    public final void getDataInstanceById() {
-        // TODO : Not yet implemented
+    public final void getTransientDataInstanceById() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
+            SDataSourceInactiveException, SDataException {
+        final long dataInstanceId = 456L;
+        final SDataSource dataSource = mock(SDataSource.class);
+        doReturn(dataSource).when(dataSourceService).getDataSource(anyString(), anyString());
+        final DataInstanceDataSource dataInstanceDataSource = mock(DataInstanceDataSource.class);
+        doReturn(dataInstanceDataSource).when(dataSourceService).getDataSourceImplementation(eq(DataInstanceDataSource.class), anyLong());
+        final SDataInstance sDataInstance = mock(SDataInstance.class);
+        doReturn(sDataInstance).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
+
+        Assert.assertEquals(sDataInstance, dataInstanceServiceImpl.getDataInstance(dataInstanceId));
+    }
+
+    @Test
+    public final void getDefaultDataInstanceById() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
+            SDataSourceInactiveException, SDataException {
+        final long dataInstanceId = 456L;
+        // Throw exception when get transient data
+        final SDataSource transientSDataSource = mock(SDataSource.class);
+        doReturn(1L).when(transientSDataSource).getId();
+        doReturn(transientSDataSource).when(dataSourceService).getDataSource(DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE,
+                DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE_VERSION);
+        final DataInstanceDataSource dataInstanceDataSource = mock(DataInstanceDataSource.class);
+        doReturn(dataInstanceDataSource).when(dataSourceService).getDataSourceImplementation(DataInstanceDataSource.class, 1L);
+        doThrow(new SDataInstanceException("plop")).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
+
+        // Get data instance in database
+        final SDataSource defaultSDataSource = mock(SDataSource.class);
+        doReturn(defaultSDataSource).when(dataSourceService).getDataSource(DataInstanceServiceImpl.DEFAULT_DATA_SOURCE,
+                DataInstanceServiceImpl.DATA_SOURCE_VERSION);
+        doReturn(2L).when(transientSDataSource).getId();
+        final DataInstanceDataSource dataInstanceDataSource2 = mock(DataInstanceDataSource.class);
+        doReturn(dataInstanceDataSource2).when(dataSourceService).getDataSourceImplementation(DataInstanceDataSource.class, 2L);
+        final SDataInstance sDataInstance = mock(SDataInstance.class);
+        doReturn(sDataInstance).when(dataInstanceDataSource2).getDataInstance(dataInstanceId);
+
+        Assert.assertEquals(sDataInstance, dataInstanceServiceImpl.getDataInstance(dataInstanceId));
+    }
+
+    @Test(expected = SDataInstanceException.class)
+    public final void getDataInstanceByIdNotExists() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
+            SDataSourceInactiveException, SDataException {
+        final long dataInstanceId = 456L;
+        final SDataSource transientSDataSource = mock(SDataSource.class);
+        doReturn(transientSDataSource).when(dataSourceService).getDataSource(anyString(), anyString());
+        final DataInstanceDataSource dataInstanceDataSource = mock(DataInstanceDataSource.class);
+        doReturn(dataInstanceDataSource).when(dataSourceService).getDataSourceImplementation(eq(DataInstanceDataSource.class), anyLong());
+        doThrow(new SDataInstanceException("plop")).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
+
+        dataInstanceServiceImpl.getDataInstance(dataInstanceId);
     }
 
     /**
@@ -196,12 +273,58 @@ public class DataInstanceServiceImplTest {
         // TODO : Not yet implemented
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getLastSADataInstance(long)}.
-     */
     @Test
-    public final void getLastSADataInstance() {
-        // TODO : Not yet implemented
+    public final void getLastSADataInstanceFromContainer() throws SBonitaException {
+        final SADataInstance archiveInstance = mock(SADataInstance.class);
+        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
+        doReturn(archiveInstance).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        final SADataInstance dataInstance = dataInstanceServiceImpl.getLastSADataInstance("kaupunki", 1, "PROCESS_INSTANCE");
+        Assert.assertNotNull(dataInstance);
+    }
+
+    @Test(expected = SDataInstanceNotFoundException.class)
+    public final void throwExceptionWhentheLastSADataInstanceFromContainerDoesNotExist() throws SBonitaException {
+        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
+        doReturn(null).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+
+        dataInstanceServiceImpl.getLastSADataInstance("kaupunki", 1, "PRCESS_INSTANCE");
+    }
+
+    @Test(expected = SDataInstanceException.class)
+    public final void getLastSADataInstanceFromContainerThrowsAnExceptionDueToProblemOnPersistenceService() throws SBonitaException {
+        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
+        doThrow(new SBonitaReadException("moustache")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        dataInstanceServiceImpl.getLastSADataInstance("kaupunki", 1, "PRCESS_INSTANCE");
+    }
+
+    @Test
+    public final void getLastSADataInstancesFromContainer() throws SBonitaException {
+        final List<SADataInstance> archiveInstances = mock(List.class);
+        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
+        doReturn(archiveInstances).when(persistenceService).selectList(any(SelectListDescriptor.class));
+
+        final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
+        Assert.assertEquals(archiveInstances, dataInstances);
+    }
+
+    @Test
+    public final void getEmptyLastSADataInstancesFromContainer() throws SBonitaException {
+        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
+        doReturn(Collections.emptyList()).when(persistenceService).selectList(any(SelectListDescriptor.class));
+
+        final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
+        Assert.assertEquals(Collections.emptyList(), dataInstances);
+    }
+
+    @Test(expected = SDataInstanceException.class)
+    public final void getLastSADataInstancesFromContainerThrowsAnExceptionDueToProblemOnPersistenceService() throws SBonitaException {
+        final List<SADataInstance> archiveInstances = mock(List.class);
+        doReturn(persistenceService).when(archiveService).getDefinitiveArchiveReadPersistenceService();
+        doThrow(new SBonitaReadException("moustache")).when(persistenceService).selectList(any(SelectListDescriptor.class));
+
+        final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
+        Assert.assertEquals(archiveInstances, dataInstances);
     }
 
     /**

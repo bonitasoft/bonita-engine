@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,18 +11,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.lock;
+package org.bonitasoft.engine.bpm.data;
 
-import java.io.Serializable;
+import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
- * A handler that is called when the LockService.tryLock was unable to acquire the lock
- * 
- * @author Charles Souillard
- * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
-public interface RejectedLockHandler extends Serializable {
+public class ArchivedDataNotFoundException extends NotFoundException {
 
-    void executeOnLockFree() throws SLockException;
+    private static final long serialVersionUID = -1668767134016412650L;
+
+    public ArchivedDataNotFoundException(final Throwable cause) {
+        super(cause);
+    }
 
 }

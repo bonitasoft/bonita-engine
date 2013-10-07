@@ -49,5 +49,10 @@
 			<artifactId>bonita-log-technical-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.incident</groupId>
+			<artifactId>bonita-incident-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

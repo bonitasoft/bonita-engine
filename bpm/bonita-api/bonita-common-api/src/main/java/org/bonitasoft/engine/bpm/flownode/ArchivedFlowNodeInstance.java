@@ -40,8 +40,6 @@ public interface ArchivedFlowNodeInstance extends NamedElement, BaseElement, Arc
 
     String getDisplayDescription();
 
-    long getSourceObjectId();
-
     /**
      * @return id of the user who originally executed the flownode
      * @since 6.0.1

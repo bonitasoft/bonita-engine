@@ -89,7 +89,7 @@ public class HumanTasksTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef2.getId());
         getProcessAPI().startProcess(processDef2.getId());
         getProcessAPI().startProcess(processDef2.getId());
-        checkNbOfHumanTasks(80, 3000, 5);
+        checkNbOfHumanTasks(5);
 
         final HumanTaskInstance taskInstance = getProcessAPI().getLastStateHumanTaskInstance(processInstance.getId(), "initTask2");
         assertNotNull(taskInstance);
@@ -167,7 +167,7 @@ public class HumanTasksTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef2.getId());
         getProcessAPI().startProcess(processDef2.getId());
         getProcessAPI().startProcess(processDef2.getId());
-        checkNbOfHumanTasks(80, 3000, 5);
+        checkNbOfHumanTasks(5);
 
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "initTask2", 0, 10);
         assertEquals(1, taskInstances.size());
@@ -268,7 +268,7 @@ public class HumanTasksTest extends CommonAPITest {
 
         assignAndExecuteStep(humanTask, user.getId());
 
-        getProcessAPI().assignUserTask(waitForStep(40, 2000, "initTask5", processInstance).getResult().getId(), user.getId());
+        getProcessAPI().assignUserTask(waitForStep("initTask5", processInstance).getResult().getId(), user.getId());
 
         humanTask = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 1, ActivityInstanceCriterion.REACHED_STATE_DATE_ASC).get(0);
         assertEquals("initTask1", humanTask.getName());

@@ -22,7 +22,6 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.jobs.BPMEventHandlingJob;
 import org.bonitasoft.engine.jobs.CleanInvalidSessionsJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -85,11 +84,12 @@ public final class ActivateTenant implements TransactionContent {
         }
     }
 
-    private void startEventHandling() throws SSchedulerException, FireEventException {
+    private void startEventHandling() throws SSchedulerException {
         final String jobClassName = BPMEventHandlingJob.class.getName();
         if (schedulerService.isStarted()) {
             if (plaformConfiguration.shouldStartEventHandlingJob()) {
-                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, BPM_EVENT_HANDLING, true).done();
+                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, BPM_EVENT_HANDLING, true)
+                        .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final String cron = plaformConfiguration.getEventHandlingJobCron(); //
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
@@ -105,12 +105,13 @@ public final class ActivateTenant implements TransactionContent {
         }
     }
 
-    private void startCleanInvalidSessionsJob() throws SSchedulerException, FireEventException {
+    private void startCleanInvalidSessionsJob() throws SSchedulerException {
         final String jobClassName = CleanInvalidSessionsJob.class.getName();
         if (schedulerService.isStarted()) {
             final String cron = plaformConfiguration.getCleanInvalidSessionsJobCron();
             if (!cron.equalsIgnoreCase("none")) {
-                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true).done();
+                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
+                        .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {

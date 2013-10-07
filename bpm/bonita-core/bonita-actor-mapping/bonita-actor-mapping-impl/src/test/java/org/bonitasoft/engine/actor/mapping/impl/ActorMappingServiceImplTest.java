@@ -83,7 +83,6 @@ public class ActorMappingServiceImplTest {
 
     @Before
     public void initialize() {
-
         recorder = mock(Recorder.class);
         persistenceService = mock(ReadPersistenceService.class);
         eventService = mock(EventService.class);

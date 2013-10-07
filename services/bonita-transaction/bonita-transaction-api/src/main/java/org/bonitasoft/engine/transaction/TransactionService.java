@@ -20,6 +20,7 @@ import org.omg.CORBA.SystemException;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Laurent Vaills
  */
 public interface TransactionService {
 
@@ -32,14 +33,14 @@ public interface TransactionService {
 
     /**
      * Create a new transaction and associate it with the current thread.
-     * 
+     *
      * @throws STransactionCreationException
      */
     void begin() throws STransactionCreationException;
 
     /**
      * Complete the transaction : either commit or rollback.
-     * 
+     *
      * @throws STransactionCommitException
      *             TODO
      * @throws STransactionRollbackException
@@ -49,7 +50,7 @@ public interface TransactionService {
 
     /**
      * Obtain the status of the transaction associated with the current thread.
-     * 
+     *
      * @return The transaction status. If no transaction is associated with
      *         the current thread, this method returns the Status.NoTransaction
      *         value.
@@ -66,7 +67,7 @@ public interface TransactionService {
      * Modify the transaction associated with the current thread such that
      * the only possible outcome of the transaction is to roll back the
      * transaction.
-     * 
+     *
      * @exception IllegalStateException
      *                Thrown if the current thread is
      *                not associated with a transaction.
@@ -92,7 +93,7 @@ public interface TransactionService {
      * the beforeCompletion method prior to starting the two-phase transaction
      * commit process. After the transaction is completed, the transaction
      * manager invokes the afterCompletion method.
-     * 
+     *
      * @param txSync
      *            The Synchronization object for the transaction associated
      *            with the target object.
@@ -108,7 +109,14 @@ public interface TransactionService {
      *                encounters an unexpected error condition.
      */
     void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException;
-    
+
     List<BonitaTransactionSynchronization> getBonitaSynchronizations();
+
+    /**
+     * Get the number of active transactions (i.e. transactions that opened but not yet completed or rolledback).
+     * A transaction that was just mark as "rollbackOnly" is considered as an active one.
+     * @return
+     */
+    long getNumberOfActiveTransactions();
 
 }

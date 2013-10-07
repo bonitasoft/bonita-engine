@@ -57,7 +57,7 @@ public class HTTPServerAPITest {
     private Map<String, String> parameters;
 
     @Before
-    public void initialize() throws Exception {
+    public void initialize() {
         MockitoAnnotations.initMocks(this);
     }
 

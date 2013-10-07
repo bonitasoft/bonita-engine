@@ -15,47 +15,60 @@ package org.bonitasoft.engine.incident;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
-
 /**
- * 
  * Report incident in a log file located inside the bonita home
- * 
- * 
  * Is a tenant service must be declared in tenant part
  * 
  * @author Baptiste Mesta
- * 
+ * @author Matthieu Chaffotte
  */
 public class FileLoggerIncidentHandler implements IncidentHandler {
 
-    private final Logger logger;
+    private final String logFilePath;
 
-    public FileLoggerIncidentHandler(final String logFile, final long tenantId) throws BonitaHomeNotSetException, SecurityException, IOException {
-        String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantId);
-        logger = Logger.getLogger("INCIDENT");
-        FileHandler fh;
-        fh = new FileHandler(tenantFolder + File.separatorChar + logFile);
-        logger.addHandler(fh);
-        SimpleFormatter formatter = new SimpleFormatter();
-        fh.setFormatter(formatter);
+    private final Map<Long, Logger> loggers;
 
+    public FileLoggerIncidentHandler(final String logFilePath) {
+        this.logFilePath = logFilePath;
+        loggers = new HashMap<Long, Logger>(2);
     }
 
     @Override
-    public void handle(final Incident incident) {
-        logger.log(Level.SEVERE, "An incident occurred: " + incident.getDescription());
-        logger.log(Level.SEVERE, "Exception was", incident.getCause());
-        logger.log(Level.SEVERE, "We were unable to handle the failure on the elements because of", incident.getExceptionWhenHandlingFailure());
-        String recoveryProcedure = incident.getRecoveryProcedure();
-        if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
-            logger.log(Level.SEVERE, "Procedure to recover: " + recoveryProcedure);
+    public void handle(final long tenantId, final Incident incident) {
+        try {
+            final Logger logger = getLogger(tenantId);
+            logger.log(Level.SEVERE, "An incident occurred: " + incident.getDescription());
+            logger.log(Level.SEVERE, "Exception was", incident.getCause());
+            logger.log(Level.SEVERE, "We were unable to handle the failure on the elements because of", incident.getExceptionWhenHandlingFailure());
+            final String recoveryProcedure = incident.getRecoveryProcedure();
+            if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
+                logger.log(Level.SEVERE, "Procedure to recover: " + recoveryProcedure);
+            }
+        } catch (final SecurityException e) {
+            e.printStackTrace();
+        } catch (final IOException e) {
+            e.printStackTrace();
         }
     }
+
+    private Logger getLogger(final long tenantId) throws SecurityException, IOException {
+        Logger logger = loggers.get(tenantId);
+        if (logger == null) {
+            logger = Logger.getLogger("INCIDENT" + tenantId);
+            final FileHandler fh = new FileHandler(logFilePath + File.separatorChar + tenantId + File.separatorChar + "incidents.log");
+            logger.addHandler(fh);
+            final SimpleFormatter formatter = new SimpleFormatter();
+            fh.setFormatter(formatter);
+            loggers.put(tenantId, logger);
+        }
+        return logger;
+    }
+
 }

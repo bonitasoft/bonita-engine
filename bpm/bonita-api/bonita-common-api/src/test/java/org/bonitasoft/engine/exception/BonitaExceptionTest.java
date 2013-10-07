@@ -22,7 +22,7 @@ import org.junit.Test;
 public class BonitaExceptionTest {
 
     @Test
-    public void newBonitaExceptionWithNullCauseShouldNotThrowNPE() throws Exception {
+    public void newBonitaExceptionWithNullCauseShouldNotThrowNPE() {
         new BonitaException("any message", null);
     }
 

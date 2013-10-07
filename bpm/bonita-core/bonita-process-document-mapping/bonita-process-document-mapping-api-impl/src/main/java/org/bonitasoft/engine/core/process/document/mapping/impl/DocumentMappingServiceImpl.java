@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
-import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingAlreadyExistsException;
 import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingCreationException;
 import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingDeletionException;
 import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingException;
@@ -85,7 +84,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     @Override
-    public SDocumentMapping create(final SDocumentMapping documentMapping) throws SDocumentMappingAlreadyExistsException, SDocumentMappingCreationException {
+    public SDocumentMapping create(final SDocumentMapping documentMapping) throws SDocumentMappingCreationException {
         try {
             final InsertRecord insertRecord = new InsertRecord(documentMapping);
             SInsertEvent insertEvent = null;
@@ -372,7 +371,6 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             throw handleNotFoundError("Can't get the archived document mappings", e);
         }
     }
-
 
     @Override
     public void delete(final SADocumentMapping documentMapping) throws SDocumentMappingDeletionException {

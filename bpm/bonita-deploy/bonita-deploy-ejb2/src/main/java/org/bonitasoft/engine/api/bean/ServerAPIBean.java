@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.bean;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +50,7 @@ public class ServerAPIBean implements SessionBean, ServerAPI {
     }
 
     @Override
-    public void setSessionContext(final SessionContext ctx) throws EJBException, RemoteException {
+    public void setSessionContext(final SessionContext ctx) throws EJBException {
         this.ctx = ctx;
     }
 

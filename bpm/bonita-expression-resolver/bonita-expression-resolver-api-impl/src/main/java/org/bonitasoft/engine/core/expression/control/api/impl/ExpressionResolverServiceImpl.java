@@ -101,7 +101,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             }
             // let's evaluate all expressions with no dependencies first:
             for (final ExpressionKind kind : ExpressionExecutorStrategy.NO_DEPENDENCY_EXPRESSION_EVALUATION_ORDER) {
-                evaluateExpressionsOfKind(dependencyValues, expressionMapByKind, resolvedExpressions, kind, evaluationContext, dataReplacement);
+                evaluateExpressionsOfKind(dependencyValues, expressionMapByKind, resolvedExpressions, kind, dataReplacement);
                 expressionMapByKind.remove(kind);
             }
             // Then evaluate recursively all remaining expressions:
@@ -153,8 +153,8 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
     }
 
     private void evaluateExpressionsOfKind(final Map<String, Object> dependencyValues, final Map<ExpressionKind, List<SExpression>> expressionMapByKind,
-            final Map<Integer, Object> resolvedExpressions, final ExpressionKind kind, final SExpressionContext evaluationContext,
-            final Map<SExpression, SExpression> dataReplacement) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
+            final Map<Integer, Object> resolvedExpressions, final ExpressionKind kind, final Map<SExpression, SExpression> dataReplacement)
+            throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         final List<SExpression> expressionsOfKind = expressionMapByKind.get(kind);
         if (expressionsOfKind != null) {

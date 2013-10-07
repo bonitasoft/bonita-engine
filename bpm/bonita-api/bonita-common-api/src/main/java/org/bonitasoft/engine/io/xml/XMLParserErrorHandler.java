@@ -36,7 +36,7 @@ public class XMLParserErrorHandler implements ErrorHandler {
     }
 
     @Override
-    public void warning(final SAXParseException spe) throws SAXException {
+    public void warning(final SAXParseException spe) {
         // nothing
     }
 

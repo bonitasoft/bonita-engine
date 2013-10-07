@@ -2,6 +2,7 @@ package org.bonitasoft.engine.execution.work;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -54,15 +55,15 @@ public class FailureHandlingBonitaWorkTest {
 
     @Test
     public void testWork() throws Exception {
-        Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         verify(wrappedWork, times(1)).work(singletonMap);
     }
 
     @Test
     public void testWorkFailureIsHandled() throws Exception {
-        Map<String, Object> singletonMap = new HashMap<String, Object>();
-        Exception e = new Exception();
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Exception e = new Exception();
         doThrow(e).when(wrappedWork).work(singletonMap);
         txBonitawork.work(singletonMap);
         verify(wrappedWork, times(1)).work(singletonMap);
@@ -71,63 +72,63 @@ public class FailureHandlingBonitaWorkTest {
 
     @Test
     public void testFailureHandlingFail() throws Exception {
-        Map<String, Object> singletonMap = new HashMap<String, Object>();
-        Exception e1 = new Exception();
-        Exception e2 = new Exception();
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        final Exception e1 = new Exception();
+        final Exception e2 = new Exception();
         doThrow(e1).when(wrappedWork).work(singletonMap);
         doThrow(e2).when(wrappedWork).handleFailure(e1, singletonMap);
         txBonitawork.work(singletonMap);
         verify(wrappedWork, times(1)).work(singletonMap);
         verify(wrappedWork, times(1)).handleFailure(e1, singletonMap);
-        verify(incidentService, times(1)).report(any(Incident.class));
+        verify(incidentService, times(1)).report(eq(0l), any(Incident.class));
     }
 
     @Test
-    public void testPutInMap() throws Exception {
-        Map<String, Object> singletonMap = new HashMap<String, Object>();
+    public void putInMap() {
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));
     }
 
     @Test
-    public void testGetDescription() throws Exception {
+    public void getDescription() {
         when(wrappedWork.getDescription()).thenReturn("The description");
         assertEquals("The description", txBonitawork.getDescription());
     }
 
     @Test
-    public void testGetRecoveryProcedure() throws Exception {
+    public void getRecoveryProcedure() {
         when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
         assertEquals("recoveryProcedure", txBonitawork.getRecoveryProcedure());
     }
 
     @Test
-    public void testHandleFailure() throws Exception {
-        Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
-        Exception e = new Exception();
+    public void handleFailure() throws Exception {
+        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final Exception e = new Exception();
         txBonitawork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
     }
 
     @Test
-    public void testGetTenantId() throws Exception {
+    public void getTenantId() {
         when(wrappedWork.getTenantId()).thenReturn(12l);
         assertEquals(12, txBonitawork.getTenantId());
     }
 
     @Test
-    public void testSetTenantId() throws Exception {
+    public void setTenantId() {
         txBonitawork.setTenantId(12l);
         verify(wrappedWork).setTenantId(12l);
     }
 
     @Test
-    public void testGetWrappedWork() throws Exception {
+    public void getWrappedWork() {
         assertEquals(wrappedWork, txBonitawork.getWrappedWork());
     }
 
     @Test
-    public void testToString() throws Exception {
+    public void testToString() {
         when(wrappedWork.toString()).thenReturn("the to string");
         assertEquals("the to string", txBonitawork.toString());
     }

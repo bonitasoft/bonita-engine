@@ -67,7 +67,7 @@ public class PlatformServiceImplTest {
     private PlatformServiceImpl platformServiceImpl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 

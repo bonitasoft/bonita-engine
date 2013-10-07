@@ -11,28 +11,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.lock.impl;
+package org.bonitasoft.engine.job;
 
-import java.util.concurrent.locks.ReentrantLock;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 
- * A lock with getOwner accessible
- * 
- * @author Baptiste Mesta
- * 
+ * @author Matthieu Chaffotte
  */
-public class BonitaReentrantLock extends ReentrantLock {
+public interface FailedJob extends Serializable {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
+    long getJobDescriptorId();
 
-    @Override
-    protected Thread getOwner() {
-        // TODO Auto-generated method stub
-        return super.getOwner();
-    }
+    String getJobName();
+
+    String getDescription();
+
+    String getLastMessage();
+
+    long getRetryNumber();
+
+    Date getLastUpdateDate();
 
 }

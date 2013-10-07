@@ -58,7 +58,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
-import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -79,8 +78,6 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private final ContainerRegistry containerRegistry;
 
-    private final LockService lockService;
-
     private final ProcessDefinitionService processDefinitionService;
 
     private final EventsHandler eventsHandler;
@@ -88,12 +85,11 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     private final TechnicalLoggerService logger;
 
     public ErrorEventHandlerStrategy(final BPMInstanceBuilders instanceBuilders, final EventInstanceService eventInstanceService,
-            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final LockService lockService,
+            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, 
             final ProcessDefinitionService processDefinitionService, final EventsHandler eventsHandler, final TechnicalLoggerService logger) {
         super(instanceBuilders, eventInstanceService);
         this.processInstanceService = processInstanceService;
         this.containerRegistry = containerRegistry;
-        this.lockService = lockService;
         this.processDefinitionService = processDefinitionService;
         this.eventsHandler = eventsHandler;
         this.logger = logger;
@@ -107,7 +103,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
                     + ((SErrorEventTriggerDefinition) sEventTriggerDefinition).getErrorCode() + " process instance = " + eventInstance.getRootContainerId());
         }
         final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(
-                getInstanceBuilders(), processInstanceService, getEventInstanceService(), containerRegistry, lockService, logger);
+                getInstanceBuilders(), processInstanceService, getEventInstanceService(), containerRegistry, logger);
         updateInterruptorErrorEvent(eventInstance);
         processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, -1, eventInstance.getId());
     }

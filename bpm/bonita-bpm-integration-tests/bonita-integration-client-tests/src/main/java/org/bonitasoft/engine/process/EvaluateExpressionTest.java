@@ -25,10 +25,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.bpm.actor.ActorCriterion;
-import org.bonitasoft.engine.bpm.actor.ActorInstance;
-import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -61,6 +57,10 @@ import org.junit.Test;
  */
 public class EvaluateExpressionTest extends CommonAPITest {
 
+    private static final String STEP2_NAME = "Approval";
+
+    private static final String STEP1_NAME = "Request";
+
     protected static final String USERNAME = "dwight";
 
     protected static final String PASSWORD = "Schrute";
@@ -78,27 +78,17 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Before
     public void before() throws Exception {
         login();
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addData("application", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("Word"));
-        processBuilder.addActor("myActor");
-        processBuilder.addUserTask("Request", "myActor");
-        processBuilder.addUserTask("Approval", "myActor");
-        processBuilder.addTransition("Request", "Approval");
-
-        final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
-        final BusinessArchive businessArchive = businessArchiveBuilder.setProcessDefinition(designProcessDefinition).done();
-        processDefinition = getProcessAPI().deploy(businessArchive);
         user = createUser(USERNAME, PASSWORD);
-
-        final ActorInstance processActor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
-        getProcessAPI().addUserToActor(processActor.getId(), user.getId());
-
-        getProcessAPI().enableProcess(processDefinition.getId());
-
         logout();
         loginWith(USERNAME, PASSWORD);
 
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processDefinitionBuilder.addData("application", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("Word"));
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask(STEP1_NAME, ACTOR_NAME);
+        processDefinitionBuilder.addUserTask(STEP2_NAME, ACTOR_NAME);
+        processDefinitionBuilder.addTransition(STEP1_NAME, STEP2_NAME);
+        processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
         processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final List<Expression> dependencies = new ArrayList<Expression>();
@@ -193,10 +183,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed activity" }, story = "Evaluate an expression on completed activity instance.")
     @Test
     public void evaluateExpressionsOnCompletedActivityInstance() throws Exception {
-        final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(getSession().getUserId(), 1);
-        final HumanTaskInstance userTaskInstance = waitForPendingTasks.get(0);
-        assignAndExecuteStep(userTaskInstance, getSession().getUserId());
-
+        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(userTaskInstance.getId(), expressions);
         Assert.assertEquals("Word-Excel", result.values().iterator().next().toString());
     }
@@ -210,36 +197,32 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed process instance" }, story = "Evaluate an expression on completed process instance.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnCompletedProcessInstance() throws Exception {
-        final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(getSession().getUserId(), 1);
-        final HumanTaskInstance userTaskInstance = waitForPendingTasks.get(0);
-        assignAndExecuteStep(userTaskInstance, getSession().getUserId());
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
+        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance, user);
+        waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
-        Assert.assertEquals(
-                "if Excel-Excel is returned, it means the values of the variable used are the latest ones whereas it should be the ones of when the activity was submited",
-                "Word-Excel", result.values().iterator().next().toString());
+        Assert.assertEquals("Word-Excel", result.values().iterator().next().toString());
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed process instance", "Updated data" }, story = "Evaluate an expression on completed process instance with variable update.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnCompletedProcessInstanceAfterVariableUpdate() throws Exception {
-        final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(getSession().getUserId(), 1);
-        final HumanTaskInstance userTaskInstance = waitForPendingTasks.get(0);
-        assignAndExecuteStep(userTaskInstance, getSession().getUserId());
-        getProcessAPI().updateProcessDataInstance("application", processInstance.getId(), "Excel");
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
+        getProcessAPI().updateProcessDataInstance("application", processInstance.getId(), "Plop");
+        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance, user);
+        waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
         Assert.assertEquals(
-                "if Excel-Excel is returned, it means the values of the variable used are the latest ones whereas it should be the ones of when the activity was submited",
-                "Word-Excel", result.values().iterator().next().toString());
+                "if Word-Excel is returned, it means the values of the variable used are the latest ones whereas it should be the ones of when the activity was submited",
+                "Plop-Excel", result.values().iterator().next().toString());
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Activity instance" }, story = "Evaluate expression on activity instance.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnActivityInstance() throws Exception {
-        final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(getSession().getUserId(), 1);
-        final HumanTaskInstance userTaskInstance = waitForPendingTasks.get(0);
-
+        final HumanTaskInstance userTaskInstance = waitForUserTask(STEP1_NAME, processInstance);
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskInstance.getId(), expressions);
         Assert.assertEquals("Word-Excel", result.values().iterator().next().toString());
     }
@@ -253,9 +236,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "taskAssigneeId" }, story = "Evaluate engine constant expression taskAssigneeID.", jira = "ENGINE-1256")
     @Test
     public void evaluateAssigneeId() throws Exception {
-        final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(getSession().getUserId(), 1);
-        final HumanTaskInstance userTaskInstance = waitForPendingTasks.get(0);
-        getProcessAPI().assignUserTask(userTaskInstance.getId(), user.getId());
+        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
 
         final Expression taskAssigneeExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.TASK_ASSIGNEE_ID);
         final Expression engineExecContextExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.ENGINE_EXECUTION_CONTEXT);
@@ -271,9 +252,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance", "Initial value" }, story = "Evalute an expression on process intance with initial values.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnProcessInstanceWithInitialValues() throws Exception {
-        final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(getSession().getUserId(), 1);
-        final HumanTaskInstance userTaskInstance = waitForPendingTasks.get(0);
-        assignAndExecuteStep(userTaskInstance, getSession().getUserId());
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
         getProcessAPI().updateProcessDataInstance("application", processInstance.getId(), "Excel");
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
@@ -284,9 +263,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance", "Current value" }, story = "Evalute an expression on process intance with current values.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnProcessInstanceWithCurrentValues() throws Exception {
-        final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(getSession().getUserId(), 1);
-        final HumanTaskInstance userTaskInstance = waitForPendingTasks.get(0);
-        assignAndExecuteStep(userTaskInstance, getSession().getUserId());
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
         getProcessAPI().updateProcessDataInstance("application", processInstance.getId(), "Excel");
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
