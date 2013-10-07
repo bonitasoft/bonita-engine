@@ -4691,7 +4691,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     processInstanceId = Long.parseLong(value.toString());
                 } else if ("id".equals(key)) {
                     id = Long.parseLong(value.toString());
-                } else if ("processDefinitionId".equals(key)) {
+                } else if ("processId".equals(key)) {
                     processDefinitionId = Long.parseLong(value.toString());
                 } else if ("name".equals(key)) {
                     name = m.get(key);
