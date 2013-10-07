@@ -90,7 +90,6 @@ public class ExecutorWorkService implements WorkService {
 			try {
 				transactionService.registerBonitaSynchronization(synchro);
 			} catch (final STransactionNotFoundException e) {
-				e.printStackTrace();
 				throw new WorkRegisterException(e.getMessage(), e);
 			}
 			synchronizations.set(synchro);

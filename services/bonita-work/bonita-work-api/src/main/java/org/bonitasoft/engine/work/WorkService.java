@@ -25,6 +25,7 @@ import java.util.concurrent.TimeoutException;
 public interface WorkService {
 
     /**
+     * This operation MUST be called with an active transaction. If no active transaction is found, a WorkRegisterException is thrown
      * @param work
      * @throws WorkRegisterException
      * @since 6.0
