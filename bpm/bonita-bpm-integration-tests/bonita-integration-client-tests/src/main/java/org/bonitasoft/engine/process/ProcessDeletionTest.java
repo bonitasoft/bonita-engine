@@ -75,7 +75,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         return deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, pedro);
     }
 
-    //@Test
+    @Test
     @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "Delete", "Process definition" }, jira = "")
     public void deleteProcessInstanceStopsCreatingNewActivities() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
@@ -126,7 +126,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         assertEquals(0, taskInstances.size());
     }
 
-    //@Test
+    @Test
     @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "Delete", "Process definition" })
     public void deleteProcessDefinitionStopsCreatingNewActivities() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("process To Delete", "2.5");
