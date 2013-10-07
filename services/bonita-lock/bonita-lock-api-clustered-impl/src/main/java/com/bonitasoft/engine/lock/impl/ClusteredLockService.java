@@ -30,100 +30,113 @@ import com.hazelcast.core.HazelcastInstance;
  */
 public class ClusteredLockService implements LockService {
 
-	private final HazelcastInstance hazelcastInstance;
+    private final HazelcastInstance hazelcastInstance;
 
-	private static final String SEPARATOR = "_";
+    private static final String SEPARATOR = "_";
 
-	protected final TechnicalLoggerService logger;
+    protected final TechnicalLoggerService logger;
 
-	protected final int lockTimeout;
+    protected final int lockTimeout;
 
-	private final ReadSessionAccessor sessionAccessor;
+    private final ReadSessionAccessor sessionAccessor;
 
-	protected final boolean debugEnable;
+    protected final boolean debugEnable;
 
-	private final boolean traceEnable;
+    private final boolean traceEnable;
 
-	public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout) {
-		this.logger = logger;
-		this.sessionAccessor = sessionAccessor;
-		this.lockTimeout = lockTimeout;
-		this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
-		this.traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
-		this.hazelcastInstance = hazelcastInstance;
-		if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
-			throw new IllegalStateException("The clustering is not an active feature.");
-		}
-	}
+    public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout) {
+        this.logger = logger;
+        this.sessionAccessor = sessionAccessor;
+        this.lockTimeout = lockTimeout;
+        this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
+        this.traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
+        this.hazelcastInstance = hazelcastInstance;
+        if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
+            throw new IllegalStateException("The clustering is not an active feature.");
+        }
+    }
 
-	@Override
-	public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
-		final String key = buildKey(objectToLockId, objectType);
-		final long before = System.currentTimeMillis();
-		if (traceEnable) {
-			logger.log(getClass(), TechnicalLogSeverity.TRACE, "lock id=" + key);
-		}
-		boolean lockObtained = false;
-		final Lock lock = hazelcastInstance.getLock(key);
-		try {
-	        lockObtained = lock.tryLock(lockTimeout, TimeUnit.SECONDS);
+    @Override
+    public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) {
+        try {
+            return innerTryLock(objectToLockId, objectType, timeout, timeUnit);
+        } catch (SLockException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
+        return innerTryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS);
+    }
+
+    public BonitaLock innerTryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) throws SLockException {
+        final String key = buildKey(objectToLockId, objectType);
+        final long before = System.currentTimeMillis();
+        if (traceEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "lock id=" + key);
+        }
+        boolean lockObtained = false;
+        final Lock lock = hazelcastInstance.getLock(key);
+        try {
+            lockObtained = lock.tryLock(timeout, timeUnit);
         } catch (InterruptedException e) {
-	        throw new SLockException(e);
+            throw new SLockException(e);
         }
 
-		if (!lockObtained) {
-			throw new SLockException("Timeout trying to lock " + objectToLockId + ":" + objectType);
-		}
+        if (!lockObtained) {
+            throw new SLockException("Timeout trying to lock " + objectToLockId + ":" + objectType);
+        }
 
-		if (traceEnable) {
-			logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked id=" + key);
-		}
-		final long time = System.currentTimeMillis() - before;
+        if (traceEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked id=" + key);
+        }
+        final long time = System.currentTimeMillis() - before;
 
-		final TechnicalLogSeverity severity = selectSeverity(time);
-		if (severity != null) {
-			logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
-			if (TechnicalLogSeverity.DEBUG.equals(severity)) {
-				logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
-			}
-		}
-		return new BonitaLock(lock, objectType, objectToLockId);
-	}
+        final TechnicalLogSeverity severity = selectSeverity(time);
+        if (severity != null) {
+            logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
+            if (TechnicalLogSeverity.DEBUG.equals(severity)) {
+                logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
+            }
+        }
+        return new BonitaLock(lock, objectType, objectToLockId);
+    }
 
-	@Override
-	public void unlock(final BonitaLock bonitaLock) throws SLockException {
-		final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType());
-		if (traceEnable) {
-			logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
-		}
-		final Lock lock = bonitaLock.getLock();
-		lock.unlock();
-		if (traceEnable) {
-			logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
-		}
-	}
+    @Override
+    public void unlock(final BonitaLock bonitaLock) throws SLockException {
+        final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType());
+        if (traceEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
+        }
+        final Lock lock = bonitaLock.getLock();
+        lock.unlock();
+        if (traceEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
+        }
+    }
 
-	private TechnicalLogSeverity selectSeverity(final long time) {
-		if (time > 150) {
-			return TechnicalLogSeverity.INFO;
-		} else if (time > 50) {
-			return TechnicalLogSeverity.DEBUG;
-		} else {
-			// No need to log anything
-			return null;
-		}
-	}
+    private TechnicalLogSeverity selectSeverity(final long time) {
+        if (time > 150) {
+            return TechnicalLogSeverity.INFO;
+        } else if (time > 50) {
+            return TechnicalLogSeverity.DEBUG;
+        } else {
+            // No need to log anything
+            return null;
+        }
+    }
 
-	protected String buildKey(final long objectToLockId, final String objectType) {
-		try {
-			return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
-		} catch (TenantIdNotSetException e) {
-			throw new IllegalStateException("Tenant not set");
-		}
-	}
+    protected String buildKey(final long objectToLockId, final String objectType) {
+        try {
+            return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
+        } catch (TenantIdNotSetException e) {
+            throw new IllegalStateException("Tenant not set");
+        }
+    }
 
 
-	/*
+    /*
 	@Override
 	protected Lock getLock(final String key) {
 		return hazelcastInstance.getLock(key);
@@ -133,6 +146,6 @@ public class ClusteredLockService implements LockService {
 	protected void innerUnLock(BonitaLock lock) {
 		lock.getLock().unlock();
 	}
-	 */
+     */
 
 }
