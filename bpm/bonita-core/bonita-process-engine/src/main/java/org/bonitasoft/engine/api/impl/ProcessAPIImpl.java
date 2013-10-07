@@ -4625,7 +4625,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final LockService lockService = tenantAccessor.getLockService();
 
-        
         final TransactionalProcessInstanceInterruptor processInstanceInterruptor = new TransactionalProcessInstanceInterruptor(bpmInstanceBuilders,
                 processInstanceService, activityInstanceService, processExecutor, tenantAccessor.getTechnicalLoggerService());
 
@@ -4633,16 +4632,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         BonitaLock lock = null;
         try {
-        	lock = lockService.lock(processInstanceId, objectType);
+            lock = lockService.lock(processInstanceId, objectType);
             processInstanceInterruptor.interruptProcessInstance(processInstanceId, SStateCategory.CANCELLING, getUserIdFromSession());
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
             // unlock process execution
             try {
-	            lockService.unlock(lock);
-            } catch (SLockException e) {
-	            // ignore it
+                lockService.unlock(lock);
+            } catch (final SLockException e) {
+                // ignore it
             }
         }
     }
@@ -5576,6 +5575,32 @@ public class ProcessAPIImpl implements ProcessAPI {
             return ModelConvertor.toArchivedDataInstance(dataInstance);
         } catch (final SDataInstanceException sdie) {
             throw new ArchivedDataNotFoundException(sdie);
+        }
+    }
+
+    @Override
+    public List<ArchivedDataInstance> getArchivedProcessDataInstances(final long processInstanceId, final int startIndex, final int maxResults) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        try {
+            final List<SADataInstance> dataInstances = dataInstanceService.getLastLocalSADataInstances(processInstanceId,
+                    DataInstanceContainer.PROCESS_INSTANCE.toString(), startIndex, maxResults);
+            return ModelConvertor.toArchivedDataInstances(dataInstances);
+        } catch (final SDataInstanceException sdie) {
+            throw new RetrieveException(sdie);
+        }
+    }
+
+    @Override
+    public List<ArchivedDataInstance> getArchivedActivityDataInstances(final long activityInstanceId, final int startIndex, final int maxResults) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        try {
+            final List<SADataInstance> dataInstances = dataInstanceService.getLastLocalSADataInstances(activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), startIndex, maxResults);
+            return ModelConvertor.toArchivedDataInstances(dataInstances);
+        } catch (final SDataInstanceException sdie) {
+            throw new RetrieveException(sdie);
         }
     }
 

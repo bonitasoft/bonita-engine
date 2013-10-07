@@ -246,7 +246,7 @@ public interface DataInstanceService {
     SADataInstance getLastSADataInstance(long dataInstanceId) throws SDataInstanceException;
 
     /**
-     * Get the last archived SADataInstance object for the named data in the container.
+     * Gets the last archived SADataInstance object for the named data in the container.
      * 
      * @param dataName
      *            the name of the data
@@ -258,6 +258,20 @@ public interface DataInstanceService {
      * @throws SDataInstanceException
      */
     SADataInstance getLastSADataInstance(String dataName, long containerId, String containerType) throws SDataInstanceException;
+
+    /**
+     * Gets the last archived SADataInstance objects of the container.
+     * 
+     * @param containerId
+     *            the identifier of the container
+     * @param containerType
+     *            the type of the container
+     * @param startIndex
+     * @param maxResults
+     * @return the last archived SADataInstance
+     * @throws SDataInstanceException
+     */
+    List<SADataInstance> getLastLocalSADataInstances(long containerId, String containerType, int startIndex, int maxResults) throws SDataInstanceException;
 
     /**
      * @param containerId

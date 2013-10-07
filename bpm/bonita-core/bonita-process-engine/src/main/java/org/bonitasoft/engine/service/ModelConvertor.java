@@ -1208,6 +1208,15 @@ public class ModelConvertor {
         return dataInstance;
     }
 
+    public static List<ArchivedDataInstance> toArchivedDataInstances(final List<SADataInstance> sADataInstances) {
+        final List<ArchivedDataInstance> dataInstances = new ArrayList<ArchivedDataInstance>();
+        for (final SADataInstance sADataInstance : sADataInstances) {
+            final ArchivedDataInstance dataInstance = toArchivedDataInstance(sADataInstance);
+            dataInstances.add(dataInstance);
+        }
+        return dataInstances;
+    }
+
     public static ArchivedDataInstance toArchivedDataInstance(final SADataInstance sDataInstance) {
         final ArchivedDataInstanceImpl dataInstance = new ArchivedDataInstanceImpl();
         dataInstance.setClassName(sDataInstance.getClassName());

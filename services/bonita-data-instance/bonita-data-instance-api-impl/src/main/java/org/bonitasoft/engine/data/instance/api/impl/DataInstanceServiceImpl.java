@@ -565,6 +565,25 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
+    public List<SADataInstance> getLastLocalSADataInstances(final long containerId, final String containerType, final int startIndex, final int maxResults)
+            throws SDataInstanceException {
+        logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastLocalSADataInstances");
+        try {
+            final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+            final Map<String, Object> parameters = new HashMap<String, Object>(2);
+            parameters.put("containerId", containerId);
+            parameters.put("containerType", containerType);
+            final List<SADataInstance> saDataInstances = readPersistenceService.selectList(new SelectListDescriptor<SADataInstance>(
+                    "getLastLocalSADataInstances", parameters, SADataInstance.class, new QueryOptions(startIndex, maxResults)));
+            logAfterMethod(TechnicalLogSeverity.TRACE, "getLastLocalSADataInstances");
+            return saDataInstances;
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLastLocalSADataInstances", e);
+            throw new SDataInstanceException("Unable to read SADataInstance", e);
+        }
+    }
+
+    @Override
     public long getNumberOfDataInstances(final long containerId, final DataInstanceContainer containerType) throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getNumberOfDataInstances");
         final HashMap<String, Object> parameters = new HashMap<String, Object>(2);

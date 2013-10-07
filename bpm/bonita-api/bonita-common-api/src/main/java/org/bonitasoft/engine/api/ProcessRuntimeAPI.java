@@ -1996,4 +1996,40 @@ public interface ProcessRuntimeAPI {
      */
     ArchivedDataInstance getArchivedActivityDataInstance(String dataName, long activityInstanceId) throws ArchivedDataNotFoundException;
 
+    /**
+     * Lists the last archived data instances of the process instance.
+     * 
+     * @param processInstanceId
+     *            the identifier of the process instance.
+     * @param startIndex
+     *            the index of the page of results to get.
+     * @param maxResults
+     *            the maximum number of results to get.
+     * @return the list of archived data instances.
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws RetrieveException
+     *             if the specified data cannot be found.
+     * @since 6.1
+     */
+    List<ArchivedDataInstance> getArchivedProcessDataInstances(long processInstanceId, int startIndex, int maxResults);
+
+    /**
+     * Lists the last archived data instances of the activity instance.
+     * 
+     * @param activityInstanceId
+     *            the identifier of the activity instance.
+     * @param startIndex
+     *            the index of the page of results to get.
+     * @param maxResults
+     *            the maximum number of results to get.
+     * @return the list of archived data instances.
+     * @throws InvalidSessionException
+     *             if no current valid session is found.
+     * @throws RetrieveException
+     *             if the search fails because an archived process instance cannot be read.
+     * @since 6.1
+     */
+    List<ArchivedDataInstance> getArchivedActivityDataInstances(long activityInstanceId, int startIndex, int maxResults);
+
 }

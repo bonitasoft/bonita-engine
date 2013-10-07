@@ -75,4 +75,19 @@
 		AND sa.containerType = :containerType
 	</query>
 
+	<query name="getLastLocalSADataInstances">
+		SELECT sa
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
+		WHERE sa.containerId = :containerId
+		AND sa.containerType = :containerType
+		AND sa.archiveDate IN (
+			SELECT MAX(archiveDate)
+			FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl
+			WHERE containerId = :containerId
+			AND containerType = :containerType
+			GROUP BY name
+		)
+		ORDER BY sa.archiveDate DESC
+	</query>
+
 </hibernate-mapping>
