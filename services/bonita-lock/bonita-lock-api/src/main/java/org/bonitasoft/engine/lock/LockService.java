@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.lock;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -40,4 +41,16 @@ public interface LockService {
      */
     BonitaLock lock(long objectToLockId, String objectType) throws SLockException;
 
+    /**
+     * Acquire the lock for the object having type and id in parameters waiting maximum timeout<br>
+     * 
+     * This method wait for the lock to be available. If it becomes available before the timeout expires the returns the obtained lock, else returns null
+     * 
+     * @param objectToLockId
+     * @param objectType
+     * @param timeout
+     * @param timeUnit
+     * @return the obtained lock if it has been acquired before the timeout expires or null if the timeout has expired.
+     */
+    BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit);
 }

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.lock.BonitaLock;
@@ -35,6 +36,10 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     protected final long processInstanceId;
 
+    private final long timeout = 20;
+
+    private final TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+
     public LockProcessInstanceWork(final BonitaWork wrappedWork, final long processInstanceId) {
         super(wrappedWork);
         this.processInstanceId = processInstanceId;
@@ -45,18 +50,19 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         LockService lockService = getTenantAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
-        boolean lockObtained = false;
         BonitaLock lock = null;
         try {
-        	lock = lockService.lock(processInstanceId, objectType);
-        	lockObtained = true;
-        	getWrappedWork().work(context);
-        } catch (final SLockException e) {
-        	rescheduleWork(getTenantAccessor(context).getWorkService(), getRootWork());
+            lock = lockService.tryLock(processInstanceId, objectType, timeout, timeUnit);
+            if (lock == null) {
+                //lock has not been obtained
+                rescheduleWork(getTenantAccessor(context).getWorkService(), getRootWork());
+                return;
+            }
+            getWrappedWork().work(context);
         } finally {
-        	if (lock != null && lockObtained) {
-        		lockService.unlock(lock);
-        	}
+            if (lock != null) {
+                lockService.unlock(lock);
+            }
         }
 
     }
@@ -69,16 +75,16 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
     	}
     	return "nothing";
     }
-    */
+     */
 
-	private void rescheduleWork(final WorkService workService, final BonitaWork rootWork) throws SLockException {
+    private void rescheduleWork(final WorkService workService, final BonitaWork rootWork) throws SLockException {
         try {
-        	//executeWork is called and not registerWork because the registerWork is relying on transaction
+            //executeWork is called and not registerWork because the registerWork is relying on transaction
             workService.executeWork(rootWork);
         } catch (WorkRegisterException e) {
             throw new SLockException(e);
         }
-	    
+
     }
 
     BonitaWork getRootWork() {
