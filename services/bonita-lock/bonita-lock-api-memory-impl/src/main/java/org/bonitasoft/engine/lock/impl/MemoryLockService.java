@@ -55,10 +55,14 @@ public final class MemoryLockService implements LockService {
 		final Condition condition;
 		final AtomicInteger count = new AtomicInteger(1);
 		public Pair(Condition condition) {
-	        super();
-	        this.condition = condition;
-        }
-		
+			super();
+			this.condition = condition;
+		}
+		@Override
+		public String toString() {
+			return "Pair [condition=" + condition + ", count=" + count + "]";
+		}
+
 	}
 	/**
 	 * 
@@ -87,19 +91,30 @@ public final class MemoryLockService implements LockService {
 		try {
 			Condition condition = null;
 			if (waiters.containsKey(key)) {
-				waiters.get(key).count.getAndIncrement();
-				condition = waiters.get(key).condition;
+				final Pair waiter = waiters.get(key); 
+				//System.out.println(Thread.currentThread().getName() + " - Locking waiter found for key '" + key + "': " + waiter);
+				waiter.count.getAndIncrement();
+				condition = waiter.condition;
 				boolean lockObtained = false;
 				try {
+					//System.out.println(Thread.currentThread().getName() + " - Locking awaiting condition: " +condition);
+					//System.out.println("Thread: " + Thread.currentThread().getName());
+					//Thread.dumpStack();
 					lockObtained = condition.await(lockTimeout, TimeUnit.SECONDS);
-				} catch (InterruptedException e) {
+					//System.out.println(Thread.currentThread().getName() + " - Lock obtained: " + lockObtained + " on condition: " +condition);
+					//System.out.println("\n\n\n");
+					//Thread.dumpStack();
+					//System.out.println("\n\n\n");
 
+				} catch (InterruptedException e) {
+				
 				}
 				if (!lockObtained) {
 					throw new SLockException("Timeout trying to lock " + objectToLockId + ":" + objectType);
 				}
 			} else {
 				condition = lock.newCondition();
+				//System.out.println(Thread.currentThread().getName() + " - No waiter found for key, creating a new waiter on condition: " + condition);
 				waiters.put(key, new Pair(condition));
 			}
 		} finally {
@@ -130,15 +145,18 @@ public final class MemoryLockService implements LockService {
 		try {
 
 			final Pair waiter = waiters.get(key);
+			//System.out.println(Thread.currentThread().getName() + " - Waiter found for key '" + key + "': " + waiter);
 			if (waiter == null) {
-				Thread.dumpStack();
+				//Thread.dumpStack();
 				throw new SLockException("Unable to unlock an unexisting lock for key: " + key); 
 			}
 			//conditions.remove(key);
 			waiter.count.getAndDecrement();
 			if (waiter.count.get() == 0) {
+				//System.out.println(Thread.currentThread().getName() + " - Removing condition for key '" + key + "'");
 				waiters.remove(key);
 			}
+			//System.out.println(Thread.currentThread().getName() + " - Signaling condition for key '" + key + "', condition = " + waiter.condition);
 			waiter.condition.signal();
 		} finally {
 			lock.unlock();

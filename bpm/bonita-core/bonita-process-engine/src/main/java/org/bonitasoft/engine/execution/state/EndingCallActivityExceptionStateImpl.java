@@ -38,7 +38,6 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
-import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
@@ -69,8 +68,6 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
 
     private final SDataInstanceBuilders dataInstanceBuilders;
 
-    private final LockService lockService;
-
     private final ProcessDefinitionService processDefinitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
@@ -79,7 +76,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
             final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
             final SCommentService commentService, final SCommentBuilders commentBuilders, final DataInstanceService dataInstanceService,
             final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final SDataInstanceBuilders dataInstanceBuilders,
-            final LockService lockService, final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
+            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
         super();
         this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.activityInstanceService = activityInstanceService;
@@ -92,7 +89,6 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
         this.documentMappingService = documentMappingService;
         this.logger = logger;
         this.dataInstanceBuilders = dataInstanceBuilders;
-        this.lockService = lockService;
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
     }
@@ -105,7 +101,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
             if (hasActiveChild) {
                 final SProcessInstance targetProcessInstance = processInstanceService.getChildOfActivity(flowNodeInstance.getId());
                 final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(
-                        bpmInstanceBuilders, processInstanceService, activityInstanceService, containerRegistry, lockService, logger);
+                        bpmInstanceBuilders, processInstanceService, activityInstanceService, containerRegistry, logger);
                 processInstanceInterruptor.interruptProcessInstance(targetProcessInstance.getId(), getStateCategory(), -1);
             } else {
                 archiveChildProcessInstance(flowNodeInstance);

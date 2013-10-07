@@ -89,12 +89,10 @@ public class ExecutingFlowNodeStateImpl extends FlowNodeStateWithConnectors {
         return "";
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
