@@ -8,14 +8,11 @@
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
-		<constructor-arg name="transactionHandler" ref="transactionHandler" />
 		<constructor-arg name="jobHandler" ref="jobHandler" />
 		<constructor-arg name="technicalLog" ref="technicalLoggerService" />
 	</bean>
 
 	<bean id="jobHandler" class="com.bonitasoft.engine.monitoring.impl.SJobHandlerImpl" />
-
-	<bean id="transactionHandler" class="com.bonitasoft.engine.monitoring.impl.STransactionHandlerImpl" />
 
 	<bean id="jvmMXBean" class="com.bonitasoft.engine.monitoring.mbean.impl.SJvmMXBeanImpl" />
 

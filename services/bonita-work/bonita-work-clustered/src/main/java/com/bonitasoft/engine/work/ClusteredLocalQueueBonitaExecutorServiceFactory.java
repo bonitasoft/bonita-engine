@@ -25,8 +25,9 @@ import com.hazelcast.core.HazelcastInstance;
  * Factory that use a hazelcast executor
  *
  * @author Baptiste Mesta
+ * @author Laurent Vaills
  */
-public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
+public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
 
     private final HazelcastInstance hazelcastInstance;
 
@@ -36,7 +37,7 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
 
     private final long keepAliveTimeSeconds;
 
-    public ClusteredBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
+    public ClusteredLocalQueueBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
         this.hazelcastInstance = hazelcastInstance;
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
@@ -47,10 +48,10 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
     }
 
     @Override
-    public ClusteredThreadPoolExecutor createExecutorService() {
+    public ThreadPoolExecutor createExecutorService() {
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker");
-        return new ClusteredThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance);
+        return new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance);
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
@@ -61,7 +62,7 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             throw new RejectedExecutionException("Unable to run the task " + task
-                    + "\n your work queue is full you might consider changing your configuration to scale more");
+                    + ".\n Your work queue is full, you might consider changing your configuration to scale more.");
         }
 
     }

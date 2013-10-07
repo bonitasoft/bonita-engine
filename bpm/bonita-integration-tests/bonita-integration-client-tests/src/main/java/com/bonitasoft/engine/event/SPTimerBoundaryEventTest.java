@@ -112,7 +112,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
 
             Thread.sleep(timerDuration); // wait timer trigger
 
-            final WaitForStep waitForExceptionStep = waitForStep(100, 500, "exceptionStep", processInstance, TestStates.getReadyState());
+            final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
 
             // ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
             // assertEquals(TestStates.getAbortedState(), archActivityInst.getState());

@@ -33,16 +33,16 @@ import com.hazelcast.core.HazelcastInstance;
  */
 public class BonitaHazelcastInstanceFactory {
 
-    private static HazelcastInstance hazelCastInstance;
+    private static HazelcastInstance hazelcastInstance;
 
     public static synchronized HazelcastInstance newHazelcastInstance(final Config config, final CacheConfigurations cacheConfigurations) {
-        if (hazelCastInstance == null) {
+        if (hazelcastInstance == null) {
             initializeCacheConfigurations(config, cacheConfigurations);
             // set classloader to null in order to use the context classloader instead
             config.setClassLoader(null);
-            hazelCastInstance = Hazelcast.newHazelcastInstance(config);
+            hazelcastInstance = Hazelcast.newHazelcastInstance(config);
         }
-        return hazelCastInstance;
+        return hazelcastInstance;
     }
 
     /**
@@ -79,8 +79,8 @@ public class BonitaHazelcastInstanceFactory {
     }
 
     public static synchronized HazelcastInstance getInstance() {
-        if (hazelCastInstance != null) {
-            return hazelCastInstance;
+        if (hazelcastInstance != null) {
+            return hazelcastInstance;
         }
         throw new IllegalStateException("The hazelcast instance has not been created. You may not be executed in clustered environment.");
     }

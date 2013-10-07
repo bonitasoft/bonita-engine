@@ -36,7 +36,6 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
 import org.bonitasoft.engine.execution.event.EventsHandler;
-import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -62,12 +61,12 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
             final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry,
             final ArchiveService archiveService, final TechnicalLoggerService logger, final DocumentMappingService documentMappingService,
             final SCommentService commentService, final SCommentBuilders commentBuilders, final BreakpointService breakpointService,
-            final LockService lockService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
+            final EventsHandler eventsHandler, final UserFilterService userFilterService,
             final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
                 expressionResolverService, schedulerService, dataInstanceService, eventInstanceService, sDataInstanceBuilders, instanceBuilders,
                 operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService, commentBuilders,
-                lockService, eventsHandler, userFilterService, actorMappingService, workService, tokenService);
+                eventsHandler, userFilterService, actorMappingService, workService, tokenService);
         this.breakpointService = breakpointService;
     }
 

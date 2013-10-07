@@ -560,6 +560,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Incident -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.incident</groupId>
+			<artifactId>bonita-incident-log</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Lock -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.lock</groupId>

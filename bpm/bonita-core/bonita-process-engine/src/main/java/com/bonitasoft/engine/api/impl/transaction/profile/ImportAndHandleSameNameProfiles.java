@@ -15,9 +15,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.SProfileAlreadyExistsException;
 import org.bonitasoft.engine.profile.SProfileCreationException;
-import org.bonitasoft.engine.profile.SProfileEntryAlreadyExistsException;
 import org.bonitasoft.engine.profile.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
@@ -99,7 +97,7 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
         }
     }
 
-    private long insertProfile(final ExportedProfile exportedProfile) throws SProfileAlreadyExistsException, SProfileCreationException {
+    private long insertProfile(final ExportedProfile exportedProfile) throws SProfileCreationException {
         final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
         final SProfileBuilder profileBuilder = builders.getSProfileBuilder();
         final long creationDate = System.currentTimeMillis();
@@ -110,8 +108,7 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
         return profileService.createProfile(sProfile).getId();
     }
 
-    private void insertParentProfileEntry(final long profileId, final ExportedParentProfileEntry parentprofileEntry)
-            throws SProfileEntryAlreadyExistsException, SProfileEntryCreationException {
+    private void insertParentProfileEntry(final long profileId, final ExportedParentProfileEntry parentprofileEntry) throws SProfileEntryCreationException {
         final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
         final SProfileEntryBuilder proEntryBuilder = builders.getSProfileEntryBuilder();
 
@@ -129,7 +126,7 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
     }
 
     private void insertChildProfileEntry(final long profileId, final long parentId, final ExportedProfileEntry childProfileEntry)
-            throws SProfileEntryAlreadyExistsException, SProfileEntryCreationException {
+            throws SProfileEntryCreationException {
         final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
         final SProfileEntryBuilder proEntryBuilder = builders.getSProfileEntryBuilder();
 
