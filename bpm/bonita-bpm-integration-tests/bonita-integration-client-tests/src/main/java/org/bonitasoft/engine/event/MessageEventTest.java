@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
 
 import java.util.ArrayList;
@@ -527,32 +526,14 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
 
-        final Boolean gotMessage1 = doesUserTaskExist(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
-        final Boolean gotMessage2 = doesUserTaskExist(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance2);
+        HumanTaskInstance waitForUserTask = waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
-        if (gotMessage1 && gotMessage2) {
-            fail("Only one of the process should receive the message");
-        } else if (!gotMessage1 && !gotMessage2) {
-            fail("At least one of the process should receive the message");
-        }
-
-        // process catches the message determined randomly.
-        // System.out.println("Only the instance " + ((gotMessage1) ? 1 : 2) + " got the message");
+        long processInstance = waitForUserTask.getRootContainerId();
+        assertTrue(processInstance == receiveMessageProcessInstance1.getId() || processInstance == receiveMessageProcessInstance2.getId());
+        assertEquals(1, getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT).size());
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
-    }
-
-    private Boolean doesUserTaskExist(final String taskName, final ProcessInstance processInstance) {
-        Boolean findUserTask = false;
-        try {
-            final ActivityInstance waitForUserTask = waitForUserTask(taskName, processInstance);
-            if (waitForUserTask != null) {
-                findUserTask = true;
-            }
-        } catch (final Exception e) {
-        }
-        return findUserTask;
     }
 
     /*
@@ -628,7 +609,8 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe 2", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
-        assertFalse(new WaitForStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(),
+        // 7 sec because it's an assert false
+        assertFalse(new WaitForStep(DEFAULT_REPEAT_EACH, 7000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(),
                 getProcessAPI()).waitUntil());
 
         // instantiate a process having both two correlation keys matching, the process must go further
