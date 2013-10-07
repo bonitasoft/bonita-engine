@@ -48,7 +48,6 @@ public abstract class EndingFlowNodeContainerExceptionStateImpl implements FlowN
         return flowNodeInstance.getTokenCount() > 0;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) throws SActivityStateExecutionException {
         return StateCode.DONE;

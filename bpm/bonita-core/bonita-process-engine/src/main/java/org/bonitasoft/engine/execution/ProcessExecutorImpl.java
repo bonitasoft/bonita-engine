@@ -110,7 +110,6 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
@@ -184,7 +183,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SExpressionBuilders expressionBuilders, final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final SProcessDocumentBuilders processDocumentBuilders, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
-            final BPMInstancesCreator bpmInstancesCreator, final LockService lockService, final TokenService tokenService,
+            final BPMInstancesCreator bpmInstancesCreator, final TokenService tokenService,
             final EventsHandler eventsHandler, final SOperationBuilders operationBuilders, final TransactionService transactionService,
             final FlowNodeStateManager flowNodeStateManager) {
         super();

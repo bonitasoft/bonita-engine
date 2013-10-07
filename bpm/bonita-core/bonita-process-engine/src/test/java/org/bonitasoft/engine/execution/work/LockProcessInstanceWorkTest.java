@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.execution.work;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -14,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.RejectedLockHandler;
+import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Before;
@@ -45,20 +44,21 @@ public class LockProcessInstanceWorkTest {
     @Test
     public void testWork() throws Exception {
         BonitaLock bonitaLock = new BonitaLock(new ReentrantLock(), PROCESS, processInstanceId);
-        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), any(RejectedLockHandler.class))).thenReturn(
+        when(lockService.lock(eq(processInstanceId), eq(PROCESS))).thenReturn(
                 bonitaLock);
         Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         lockProcessInstanceWork.work(singletonMap);
-        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), any(RejectedLockHandler.class));
+        verify(lockService, times(1)).lock(eq(processInstanceId), eq(PROCESS));
         verify(lockService, times(1)).unlock(bonitaLock);
         verify(wrappedWork, times(1)).work(singletonMap);
     }
 
     @Test
     public void workDidNotLock() throws Exception {
+    	when(lockService.lock(eq(processInstanceId), eq(PROCESS))).thenThrow(new SLockException("mock"));
         Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         lockProcessInstanceWork.work(singletonMap);
-        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), any(RejectedLockHandler.class));
+        verify(lockService, times(1)).lock(eq(processInstanceId), eq(PROCESS));
         verify(wrappedWork, times(0)).work(singletonMap);
     }
 

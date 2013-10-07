@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuil
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
-import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -39,9 +38,9 @@ public class CancellingCallActivityStateImpl extends EndingCallActivityException
             final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
             final SCommentService commentService, final SCommentBuilders commentBuilders, final DataInstanceService dataInstanceService,
             final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final SDataInstanceBuilders dataInstanceBuilders,
-            final LockService lockService, final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
+            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
         super(bpmInstanceBuilders, activityInstanceService, processInstanceService, containerRegistry, archiveService, commentService, commentBuilders,
-                dataInstanceService, documentMappingService, logger, dataInstanceBuilders, lockService, processDefinitionService, connectorInstanceService);
+                dataInstanceService, documentMappingService, logger, dataInstanceBuilders, processDefinitionService, connectorInstanceService);
     }
 
     @Override

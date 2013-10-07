@@ -3560,7 +3560,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             throws SLockException {
         final List<BonitaLock> locks = new ArrayList<BonitaLock>();
         for (final SProcessInstance sProcessInstance : sProcessInstances) {
-            lockService.lock(sProcessInstance.getId(), objectType);
+            final BonitaLock bonitaLock = lockService.lock(sProcessInstance.getId(), objectType);
+            locks.add(bonitaLock);
         }
         return locks;
     }
@@ -4624,13 +4625,25 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final LockService lockService = tenantAccessor.getLockService();
 
+        
         final TransactionalProcessInstanceInterruptor processInstanceInterruptor = new TransactionalProcessInstanceInterruptor(bpmInstanceBuilders,
-                processInstanceService, activityInstanceService, processExecutor, lockService, tenantAccessor.getTechnicalLoggerService());
+                processInstanceService, activityInstanceService, processExecutor, tenantAccessor.getTechnicalLoggerService());
 
+        // lock process execution
+        final String objectType = SFlowElementsContainerType.PROCESS.name();
+        BonitaLock lock = null;
         try {
+        	lock = lockService.lock(processInstanceId, objectType);
             processInstanceInterruptor.interruptProcessInstance(processInstanceId, SStateCategory.CANCELLING, getUserIdFromSession());
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
+        } finally {
+            // unlock process execution
+            try {
+	            lockService.unlock(lock);
+            } catch (SLockException e) {
+	            // ignore it
+            }
         }
     }
 

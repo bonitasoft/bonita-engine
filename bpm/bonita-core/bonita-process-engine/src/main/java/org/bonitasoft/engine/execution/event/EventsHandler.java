@@ -65,11 +65,9 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
-import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.work.WorkRegisterException;
-import org.bonitasoft.engine.work.WorkService;
 
 /**
  * Handle event depending on its type
@@ -90,9 +88,6 @@ public class EventsHandler {
     private final Map<SEventTriggerType, EventHandlerStrategy> handlers;
 
     private final ContainerRegistry containerRegistry;
-
-    private final WorkService workService;
-
     private final ProcessDefinitionService processDefinitionService;
 
     private final TokenService tokenService;
@@ -103,8 +98,6 @@ public class EventsHandler {
 
     private final ProcessInstanceService processInstanceService;
 
-    private final LockService lockService;
-
     private final TechnicalLoggerService logger;
 
     private final BPMDefinitionBuilders bpmDefinitionBuilders;
@@ -114,17 +107,15 @@ public class EventsHandler {
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
             final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders, final BPMDefinitionBuilders bpmDefinitionBuilders,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-            final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry, final WorkService workService,
-            final ProcessInstanceService processInstanceService, final LockService lockService, final TokenService tokenService,
+            final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
+            final ProcessInstanceService processInstanceService, final TokenService tokenService,
             final TechnicalLoggerService logger) {
         this.bpmDefinitionBuilders = bpmDefinitionBuilders;
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
-        this.workService = workService;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.processInstanceService = processInstanceService;
-        this.lockService = lockService;
         this.tokenService = tokenService;
         this.logger = logger;
         handlers = new HashMap<SEventTriggerType, EventHandlerStrategy>(4);
@@ -133,9 +124,9 @@ public class EventsHandler {
                 bpmInstancesCreator, dataInstanceService, sDataInstanceBuilders, processDefinitionService));
         handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, instanceBuilders, eventInstanceService));
         handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(instanceBuilders, processInstanceService, eventInstanceService,
-                containerRegistry, lockService, logger));
+                containerRegistry, logger));
         handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(instanceBuilders, eventInstanceService, processInstanceService, containerRegistry,
-                lockService, processDefinitionService, this, logger));
+                processDefinitionService, this, logger));
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -380,12 +371,12 @@ public class EventsHandler {
         if (triggerType.equals(SEventTriggerType.ERROR)) {
             // if error interrupt directly.
             final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(
-                    bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, eventInstanceService, containerRegistry, lockService, logger);
+                    bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, eventInstanceService, containerRegistry, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         } else if (isInterrupting) {
             // other interrupting catch
             TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(bpmInstancesCreator.getBPMInstanceBuilders(),
-                    processInstanceService, eventInstanceService, processExecutor, lockService, logger);
+                    processInstanceService, eventInstanceService, processExecutor, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
         processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),

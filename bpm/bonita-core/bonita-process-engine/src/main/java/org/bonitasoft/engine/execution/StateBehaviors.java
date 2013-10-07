@@ -618,7 +618,7 @@ public class StateBehaviors {
             try {
                 eventsHandler.handleThrowMessage(processDefinition, sendTaskDefinition, sendTaskInstance);
             } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException("unable to handle throw event " + flowNodeInstance, e);
+                throw new SActivityStateExecutionException("unable to handle throw message " + flowNodeInstance, e);
             }
         }
     }
