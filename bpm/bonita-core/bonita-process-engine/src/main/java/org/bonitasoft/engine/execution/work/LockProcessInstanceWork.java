@@ -46,18 +46,14 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         boolean lockObtained = false;
         BonitaLock lock = null;
         try {
-        	//System.out.println(Thread.currentThread().getName() + " - Locking instance " + processInstanceId + " from work: " + getWorkStack() + ", by thread " + Thread.currentThread().getName() + "...");
         	lock = lockService.lock(processInstanceId, objectType);
         	lockObtained = true;
-        	//System.out.println(Thread.currentThread().getName() + " - Locked instance " + processInstanceId + " from work: " + getWorkStack() + ", by thread " + Thread.currentThread().getName() + "...");
         	getWrappedWork().work(context);
         } catch (final SLockException e) {
         	//TODO: something to to to reschedule the work
         } finally {
         	if (lock != null && lockObtained) {
-        		//System.out.println(Thread.currentThread().getName() + " - Unlocking instance " + processInstanceId + " from work: " + getWorkStack() + ", by thread " + Thread.currentThread().getName() + "...");
         		lockService.unlock(lock);
-        		//System.out.println(Thread.currentThread().getName() + " - Unlocked instance " + processInstanceId + " from work: " + getWorkStack() + ", by thread " + Thread.currentThread().getName() + "...");
         	}
         }
 

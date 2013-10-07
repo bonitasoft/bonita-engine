@@ -91,20 +91,21 @@ public final class MemoryLockService implements LockService {
 		try {
 			Condition condition = null;
 			if (waiters.containsKey(key)) {
-				final Pair waiter = waiters.get(key); 
-				//System.out.println(Thread.currentThread().getName() + " - Locking waiter found for key '" + key + "': " + waiter);
+				final Pair waiter = waiters.get(key);
+				if (debugEnable) {
+					logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking waiter found for key '" + key + "': " + waiter);
+				}
 				waiter.count.getAndIncrement();
 				condition = waiter.condition;
 				boolean lockObtained = false;
 				try {
-					//System.out.println(Thread.currentThread().getName() + " - Locking awaiting condition: " +condition);
-					//System.out.println("Thread: " + Thread.currentThread().getName());
-					//Thread.dumpStack();
+					if (debugEnable) {
+						logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking awaiting condition: " + condition, new Exception("Forced exception to get Thread dump stack"));
+					}
 					lockObtained = condition.await(lockTimeout, TimeUnit.SECONDS);
-					//System.out.println(Thread.currentThread().getName() + " - Lock obtained: " + lockObtained + " on condition: " +condition);
-					//System.out.println("\n\n\n");
-					//Thread.dumpStack();
-					//System.out.println("\n\n\n");
+					if (debugEnable) {
+						logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Lock obtained: " + lockObtained + " on condition: " + condition, new Exception("Forced exception to get Thread dump stack"));
+					}
 
 				} catch (InterruptedException e) {
 				
@@ -114,7 +115,9 @@ public final class MemoryLockService implements LockService {
 				}
 			} else {
 				condition = lock.newCondition();
-				//System.out.println(Thread.currentThread().getName() + " - No waiter found for key, creating a new waiter on condition: " + condition);
+				if (debugEnable) {
+					logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - No waiter found for key, creating a new waiter on condition: " + condition);
+				}
 				waiters.put(key, new Pair(condition));
 			}
 		} finally {
@@ -145,18 +148,22 @@ public final class MemoryLockService implements LockService {
 		try {
 
 			final Pair waiter = waiters.get(key);
-			//System.out.println(Thread.currentThread().getName() + " - Waiter found for key '" + key + "': " + waiter);
+			if (debugEnable) {
+				logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Waiter found for key '" + key + "': " + waiter);
+			}
 			if (waiter == null) {
-				//Thread.dumpStack();
 				throw new SLockException("Unable to unlock an unexisting lock for key: " + key); 
 			}
-			//conditions.remove(key);
 			waiter.count.getAndDecrement();
 			if (waiter.count.get() == 0) {
-				//System.out.println(Thread.currentThread().getName() + " - Removing condition for key '" + key + "'");
+				if (debugEnable) {
+					logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Removing condition for key '" + key + "'");
+				}
 				waiters.remove(key);
 			}
-			//System.out.println(Thread.currentThread().getName() + " - Signaling condition for key '" + key + "', condition = " + waiter.condition);
+			if (debugEnable) {
+				logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Signaling condition for key '" + key + "', condition = " + waiter.condition);
+			}
 			waiter.condition.signal();
 		} finally {
 			lock.unlock();
