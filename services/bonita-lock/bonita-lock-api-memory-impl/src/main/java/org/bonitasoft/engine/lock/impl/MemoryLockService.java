@@ -16,8 +16,6 @@ package org.bonitasoft.engine.lock.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.BonitaLock;
@@ -32,12 +30,13 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
  * This service must be configured as a singleton.
  * 
  * @author Elias Ricken de Medeiros
+ * @author Baptiste Mesta
  */
-public final class MemoryLockService implements LockService {
+public class MemoryLockService implements LockService {
 
-    private final ReentrantLock lock = new ReentrantLock();
+    protected static final String SEPARATOR = "_";
 
-    private static final String SEPARATOR = "_";
+    private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
 
     protected final TechnicalLoggerService logger;
 
@@ -45,25 +44,12 @@ public final class MemoryLockService implements LockService {
 
     private final ReadSessionAccessor sessionAccessor;
 
+    private final Object mutex = new Object();
+
     protected final boolean debugEnable;
 
     private final boolean traceEnable;
 
-    private final Map<String, Pair> waiters;
-
-    private static class Pair {
-        final Condition condition;
-        final AtomicInteger count = new AtomicInteger(1);
-        public Pair(Condition condition) {
-            super();
-            this.condition = condition;
-        }
-        @Override
-        public String toString() {
-            return "Pair [condition=" + condition + ", count=" + count + "]";
-        }
-
-    }
     /**
      * 
      * @param logger
@@ -75,70 +61,112 @@ public final class MemoryLockService implements LockService {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
-        this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
-        this.traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
-        this.waiters = new HashMap<String, Pair>();
+        debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
+        traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
     }
 
+    protected ReentrantLock getLock(final String key) {
+        if (!locks.containsKey(key)) {
+            // use fair mode?
+            locks.put(key, new ReentrantLock());
+        }
+        return locks.get(key);
+    }
+
+    protected void removeLockFromMapIfnotUsed(final String key) {
+        ReentrantLock reentrantLock = locks.get(key);
+        /*
+         * The reentrant lock must not have waiting thread that try to lock it, nor a lockservice.lock that locked it nor rejectedlockhandlers waiting for it
+         */
+        if (reentrantLock != null && !reentrantLock.hasQueuedThreads() && !reentrantLock.isLocked()) {
+            if (debugEnable) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, "removed from map " + reentrantLock.hashCode() + " id=" + key);
+            }
+            locks.remove(key);
+        }
+    }
+
+    private String buildKey(final long objectToLockId, final String objectType) {
+        try {
+            return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
+        } catch (TenantIdNotSetException e) {
+            throw new IllegalStateException("Tenant not set");
+        }
+    }
 
     @Override
-    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit) {
-        try {
-            return innerTryLock(objectToLockId, objectType, timeout, timeUnit);
-        } catch (SLockException e) {
+    public void unlock(final BonitaLock lock) throws SLockException {
+        final String key = buildKey(lock.getObjectToLockId(), lock.getObjectType());
+        if (traceEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + lock.getLock().hashCode() + " id=" + key);
+        }
+        synchronized (mutex) {
+            try {
+                lock.getLock().unlock();
+                if (traceEnable) {
+                    logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + lock.getLock().hashCode() + " id=" + key);
+                }
+            } finally {
+                removeLockFromMapIfnotUsed(key);
+            }
+        }
+    }
+
+    @Override
+    public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) {
+        synchronized (mutex) {
+            final String key = buildKey(objectToLockId, objectType);
+            final ReentrantLock lock = getLock(key);
+
+            if (traceEnable) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "tryLock " + lock.hashCode() + " id=" + key);
+            }
+
+            if (lock.isHeldByCurrentThread()) {
+                return null;
+            }
+            try {
+                if (lock.tryLock(timeout, timeUnit)) {
+                    if (traceEnable) {
+                        logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked " + lock.hashCode() + " id=" + key);
+                    }
+                    return new BonitaLock(lock, objectType, objectToLockId);
+                }
+            } catch (InterruptedException e) {
+                logger.log(getClass(), TechnicalLogSeverity.ERROR, "The trylock was interrupted " + lock.hashCode() + " id=" + key);
+            }
+            if (traceEnable) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "not locked " + lock.hashCode() + " id=" + key);
+            }
             return null;
         }
     }
 
     @Override
     public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
-        return innerTryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS);
-    }
-
-
-    private BonitaLock innerTryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) throws SLockException {
-        final String key = buildKey(objectToLockId, objectType);
+        final String key;
+        final ReentrantLock lock;
+        synchronized (mutex) {
+            key = buildKey(objectToLockId, objectType);
+            lock = getLock(key);
+            if (lock.isHeldByCurrentThread()) {
+                throw new SLockException("lock is own by current Thread: " + lock.hashCode() + " id=" + key);
+            }
+        }
         final long before = System.currentTimeMillis();
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "lock " + lock.hashCode() + " id=" + key);
         }
-        lock.lock();
+        // outside mutex because it's a long lock
         try {
-            Condition condition = null;
-            if (waiters.containsKey(key)) {
-                final Pair waiter = waiters.get(key);
-                if (debugEnable) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking waiter found for key '" + key + "': " + waiter);
-                }
-                waiter.count.getAndIncrement();
-                condition = waiter.condition;
-                boolean lockObtained = false;
-                try {
-                    if (debugEnable) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking awaiting condition: " + condition, new Exception("Forced exception to get Thread dump stack"));
-                    }
-                    lockObtained = condition.await(timeout, timeUnit);
-                    if (debugEnable) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Lock obtained: " + lockObtained + " on condition: " + condition, new Exception("Forced exception to get Thread dump stack"));
-                    }
-
-                } catch (InterruptedException e) {
-
-                }
-                if (!lockObtained) {
-                    waiter.count.getAndDecrement();
-                    throw new SLockException("Timeout trying to lock " + objectToLockId + ":" + objectType);
-                }
-            } else {
-                condition = lock.newCondition();
-                if (debugEnable) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - No waiter found for key, creating a new waiter on condition: " + condition);
-                }
-                waiters.put(key, new Pair(condition));
+            boolean tryLock = lock.tryLock(lockTimeout, TimeUnit.SECONDS);
+            if (!tryLock) {
+                throw new SLockException("Timeout trying to lock " + objectToLockId + ":" + objectType);
             }
-        } finally {
-            lock.unlock();
+        } catch (InterruptedException e) {
+            throw new SLockException(e);
         }
+
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked " + lock.hashCode() + " id=" + key);
         }
@@ -154,42 +182,7 @@ public final class MemoryLockService implements LockService {
         return new BonitaLock(lock, objectType, objectToLockId);
     }
 
-    @Override
-    public void unlock(final BonitaLock bonitaLock) throws SLockException {
-        final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType());
-        if (traceEnable) {
-            logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
-        }
-        lock.lock();
-        try {
-
-            final Pair waiter = waiters.get(key);
-            if (debugEnable) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Waiter found for key '" + key + "': " + waiter);
-            }
-            if (waiter == null) {
-                throw new SLockException("Unable to unlock an unexisting lock for key: " + key); 
-            }
-            waiter.count.getAndDecrement();
-            if (waiter.count.get() == 0) {
-                if (debugEnable) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Removing condition for key '" + key + "'");
-                }
-                waiters.remove(key);
-            }
-            if (debugEnable) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Signaling condition for key '" + key + "', condition = " + waiter.condition);
-            }
-            waiter.condition.signal();
-        } finally {
-            lock.unlock();
-        }
-        if (traceEnable) {
-            logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
-        }
-    }
-
-    private TechnicalLogSeverity selectSeverity(final long time) {
+    TechnicalLogSeverity selectSeverity(final long time) {
         if (time > 150) {
             return TechnicalLogSeverity.INFO;
         } else if (time > 50) {
@@ -197,14 +190,6 @@ public final class MemoryLockService implements LockService {
         } else {
             // No need to log anything
             return null;
-        }
-    }
-
-    protected String buildKey(final long objectToLockId, final String objectType) {
-        try {
-            return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
-        } catch (TenantIdNotSetException e) {
-            throw new IllegalStateException("Tenant not set");
         }
     }
 }

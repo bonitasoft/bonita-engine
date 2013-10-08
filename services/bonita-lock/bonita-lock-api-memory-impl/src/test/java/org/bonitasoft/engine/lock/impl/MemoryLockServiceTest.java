@@ -4,8 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -54,7 +52,7 @@ public class MemoryLockServiceTest {
             try {
                 lock = memoryLockService.lock(id, type);
             } catch (SLockException e) {
-            	//NOTHING
+                // NOTHING
             }
         }
 
@@ -71,7 +69,7 @@ public class MemoryLockServiceTest {
 
     @Before
     public void before() {
-    	memoryLockService = new MemoryLockService(logger, sessionAccessor, 1);
+        memoryLockService = new MemoryLockService(logger, sessionAccessor, 1);
     }
 
     @Test
@@ -86,7 +84,7 @@ public class MemoryLockServiceTest {
         assertTrue("should not be able to lock", lockThread.isLockObtained());
     }
 
-    @Test(expected=SLockException.class)
+    @Test(expected = SLockException.class)
     public void testLockOnSameThread() throws Exception {
         memoryLockService.lock(123, "abc");
         memoryLockService.lock(123, "abc");
