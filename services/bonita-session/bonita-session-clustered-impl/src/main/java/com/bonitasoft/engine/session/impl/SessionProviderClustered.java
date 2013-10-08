@@ -18,6 +18,7 @@ import org.bonitasoft.engine.session.model.SSession;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
+import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
@@ -91,7 +92,7 @@ public final class SessionProviderClustered implements SessionProvider {
     }
 
     @Override
-    public synchronized void deleteSessionsOfTenant(long tenantId) {
+    public synchronized void deleteSessionsOfTenant(final long tenantId) {
         Iterator<Entry<Long, SSession>> iterator = sessions.entrySet().iterator();
         while (iterator.hasNext()) {
             Entry<Long, SSession> sSession = iterator.next();
