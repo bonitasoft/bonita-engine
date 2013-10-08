@@ -10,8 +10,18 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.bpm.bar.BarResource;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.filter.user.GroupUserFilter;
+import org.bonitasoft.engine.filter.user.TestFilter;
+import org.bonitasoft.engine.filter.user.TestFilterThatThrowException;
+import org.bonitasoft.engine.filter.user.TestFilterUsingActorName;
+import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
@@ -96,6 +106,49 @@ public abstract class CommonAPITest extends APITestUtil {
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
         return new BarResource(name, byteArray);
+    }
+
+    protected ProcessDefinition deployProcessWithTestFilter(final String actorName, final long userId, final ProcessDefinitionBuilder designProcessDefinition,
+            final String filterName) throws BonitaException, IOException {
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
+                designProcessDefinition.done());
+        final List<BarResource> impl = generateFilterImplementations(filterName);
+        for (final BarResource barResource : impl) {
+            businessArchiveBuilder.addUserFilters(barResource);
+        }
+        final List<BarResource> generateFilterDependencies = generateFilterDependencies();
+        for (final BarResource barResource : generateFilterDependencies) {
+            businessArchiveBuilder.addClasspathResource(barResource);
+        }
+
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
+        addMappingOfActorsForUser(actorName, userId, processDefinition);
+        getProcessAPI().enableProcess(processDefinition.getId());
+        return processDefinition;
+    }
+
+    private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {
+        final List<BarResource> resources = new ArrayList<BarResource>(1);
+        final InputStream inputStream = TestConnector.class.getClassLoader().getResourceAsStream("org/bonitasoft/engine/filter/user/" + filterName + ".impl");
+        final byte[] data = IOUtil.getAllContentFrom(inputStream);
+        inputStream.close();
+        resources.add(new BarResource(filterName + ".impl", data));
+        return resources;
+    }
+
+    private List<BarResource> generateFilterDependencies() throws IOException {
+        final List<BarResource> resources = new ArrayList<BarResource>(1);
+        byte[] data = IOUtil.generateJar(TestFilterThatThrowException.class);
+        resources.add(new BarResource("TestFilterThatThrowException.jar", data));
+        data = IOUtil.generateJar(TestFilter.class);
+        resources.add(new BarResource("TestFilter.jar", data));
+        data = IOUtil.generateJar(TestFilterWithAutoAssign.class);
+        resources.add(new BarResource("TestFilterWithAutoAssign.jar", data));
+        data = IOUtil.generateJar(TestFilterUsingActorName.class);
+        resources.add(new BarResource("TestFilterUsingActorName.jar", data));
+        data = IOUtil.generateJar(GroupUserFilter.class);
+        resources.add(new BarResource("TestGroupUserFilter.jar", data));
+        return resources;
     }
 
 }

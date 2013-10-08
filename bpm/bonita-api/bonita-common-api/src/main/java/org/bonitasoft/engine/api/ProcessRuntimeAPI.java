@@ -66,6 +66,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.filter.UserFilter;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.operation.Operation;
@@ -2006,7 +2007,7 @@ public interface ProcessRuntimeAPI {
      * @param startIndex
      *            the start index
      * @param maxResults
-     *            the max number of groups
+     *            the max number of archived data instances
      * @return the list of archived data instances.
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
@@ -2024,7 +2025,7 @@ public interface ProcessRuntimeAPI {
      * @param startIndex
      *            the start index
      * @param maxResults
-     *            the max number of groups
+     *            the max number of archived data instances
      * @return the list of archived data instances.
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
@@ -2033,5 +2034,24 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     List<ArchivedDataInstance> getArchivedActivityDataInstances(long activityInstanceId, int startIndex, int maxResults);
+
+    /**
+     * Lists the possible users (candidates) of the specified human task instance.
+     * Users are ordered by user name.
+     * 
+     * @param humanTaskInstanceId
+     *            the identifier of the human task instance
+     * @param startIndex
+     *            the start index
+     * @param maxResults
+     *            the max number of users
+     * @return the list of users.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @throws RetrieveException
+     *             If an exception occurs during the user retrieving
+     * @since 6.1
+     */
+    List<User> getPossibleUsersOfPendingHumanTasks(long humanTaskInstanceId, int startIndex, int maxResults);
 
 }

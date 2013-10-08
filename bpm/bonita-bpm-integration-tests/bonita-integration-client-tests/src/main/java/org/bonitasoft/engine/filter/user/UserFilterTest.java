@@ -3,15 +3,10 @@ package org.bonitasoft.engine.filter.user;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
-import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
@@ -24,7 +19,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -33,7 +27,6 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbAssignedTaskOf;
@@ -232,49 +225,6 @@ public class UserFilterTest extends CommonAPITest {
         pendingTasks = getProcessAPI().getPendingHumanTaskInstances(james.getId(), 0, 10, null);
         assertEquals(1, pendingTasks.size());
         disableAndDeleteProcess(processDefinition);
-    }
-
-    private ProcessDefinition deployProcessWithTestFilter(final String actorName, final long userId, final ProcessDefinitionBuilder designProcessDefinition,
-            final String filterName) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                designProcessDefinition.done());
-        final List<BarResource> impl = generateFilterImplementations(filterName);
-        for (final BarResource barResource : impl) {
-            businessArchiveBuilder.addUserFilters(barResource);
-        }
-        final List<BarResource> generateFilterDependencies = generateFilterDependencies();
-        for (final BarResource barResource : generateFilterDependencies) {
-            businessArchiveBuilder.addClasspathResource(barResource);
-        }
-
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(actorName, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
-    }
-
-    private List<BarResource> generateFilterDependencies() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
-        byte[] data = IOUtil.generateJar(TestFilterThatThrowException.class);
-        resources.add(new BarResource("TestFilterThatThrowException.jar", data));
-        data = IOUtil.generateJar(TestFilter.class);
-        resources.add(new BarResource("TestFilter.jar", data));
-        data = IOUtil.generateJar(TestFilterWithAutoAssign.class);
-        resources.add(new BarResource("TestFilterWithAutoAssign.jar", data));
-        data = IOUtil.generateJar(TestFilterUsingActorName.class);
-        resources.add(new BarResource("TestFilterUsingActorName.jar", data));
-        data = IOUtil.generateJar(GroupUserFilter.class);
-        resources.add(new BarResource("TestGroupUserFilter.jar", data));
-        return resources;
-    }
-
-    private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
-        final InputStream inputStream = TestConnector.class.getClassLoader().getResourceAsStream("org/bonitasoft/engine/filter/user/" + filterName + ".impl");
-        final byte[] data = IOUtil.getAllContentFrom(inputStream);
-        inputStream.close();
-        resources.add(new BarResource(filterName + ".impl", data));
-        return resources;
     }
 
     @Cover(jira = "ENGINE-1645", classes = { HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "update user filters" })

@@ -136,7 +136,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             throw new SActivityCreationException(e);
         }
         if (getLogger().isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            StringBuilder stb = new StringBuilder();
+            final StringBuilder stb = new StringBuilder();
             stb.append("Created ");
             stb.append(activityInstance.getType().getValue());
             stb.append(" <");
@@ -1080,4 +1080,19 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         }
 
     }
+
+    @Override
+    public List<Long> getPossibleUserIdsOfPendingTasks(final long humanTaskInstanceId, final int startIndex, final int maxResults)
+            throws SActivityReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("humanTaskInstanceId", humanTaskInstanceId);
+        final SelectListDescriptor<Long> elements = new SelectListDescriptor<Long>("getPossibleUserIdsOfPendingTasks", parameters, SActivityInstance.class,
+                new QueryOptions(startIndex, maxResults));
+        try {
+            return getPersistenceRead().selectList(elements);
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
+    }
+
 }

@@ -5604,4 +5604,18 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    @Override
+    public List<User> getPossibleUsersOfPendingHumanTasks(final long humanTaskInstanceId, final int startIndex, final int maxResults) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        try {
+            final List<Long> userIds = activityInstanceService.getPossibleUserIdsOfPendingTasks(humanTaskInstanceId, startIndex, maxResults);
+            final IdentityService identityService = getTenantAccessor().getIdentityService();
+            final List<SUser> sUsers = identityService.getUsers(userIds);
+            return ModelConvertor.toUsers(sUsers);
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+    }
+
 }

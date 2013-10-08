@@ -867,4 +867,6 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      */
     int getNumberOfActivityInstances(long processInstanceId) throws SActivityReadException;
 
+    List<Long> getPossibleUserIdsOfPendingTasks(long humanTaskInstanceId, int startIndex, int maxResults) throws SActivityReadException;
+
 }
