@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -29,7 +29,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
@@ -40,6 +39,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 /**
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<SUpdateEvent> {
 
@@ -65,7 +65,6 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             final BPMInstanceBuilders instancesBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
             final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             final DataInstanceService dataInstanceService = tenantServiceAccessor.getDataInstanceService();
-            final SDataInstanceBuilders sDataInstanceBuilders = tenantServiceAccessor.getSDataInstanceBuilders();
             final DocumentMappingService documentMappingService = tenantServiceAccessor.getDocumentMappingService();
             final SCommentService commentService = tenantServiceAccessor.getCommentService();
             final SCommentBuilders commentBuilders = tenantServiceAccessor.getSCommentBuilders();
@@ -73,13 +72,14 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor.getConnectorInstanceService();
 
             ProcessArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, dataInstanceService, documentMappingService,
-                    logger, instancesBuilders, sDataInstanceBuilders, commentService, commentBuilders, processDefinitionService, connectorInstanceService);
+                    logger, instancesBuilders, commentService, commentBuilders, processDefinitionService, connectorInstanceService);
         } catch (final SArchivingException e) {
             throw new SHandlerExecutionException(e);
         } catch (SBonitaException e) {
             throw new SHandlerExecutionException(e);
         }
     }
+
     /**
      * @param serviceAccessorFactory
      * @return

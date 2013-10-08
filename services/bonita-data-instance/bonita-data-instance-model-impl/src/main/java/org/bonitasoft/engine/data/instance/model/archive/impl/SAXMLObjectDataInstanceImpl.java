@@ -22,6 +22,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class SAXMLObjectDataInstanceImpl extends SADataInstanceImpl {
 
@@ -35,12 +36,16 @@ public final class SAXMLObjectDataInstanceImpl extends SADataInstanceImpl {
 
     public SAXMLObjectDataInstanceImpl(final SDataInstance sDataInstance) {
         super(sDataInstance);
+        setValue(sDataInstance.getValue());
     }
 
     @Override
     public Serializable getValue() {
-        final XStream xstream = new XStream(new StaxDriver());
-        return (Serializable) xstream.fromXML(value);
+        if (value != null) {
+            final XStream xstream = new XStream(new StaxDriver());
+            return (Serializable) xstream.fromXML(value);
+        }
+        return null;
     }
 
     @Override

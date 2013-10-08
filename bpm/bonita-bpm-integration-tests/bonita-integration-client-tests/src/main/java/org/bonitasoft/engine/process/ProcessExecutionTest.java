@@ -626,10 +626,10 @@ public class ProcessExecutionTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
+    @Cover(jira = "ENGINE-1820, ENGINE-1946", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = {
+            "Not archived", "transient data", "process instance" })
     @Test
-    public void getArchivedTransientProcessDataInstance() throws Exception {
+    public void dontArchivedTransientProcessDataInstance() throws Exception {
         final String dataName = "test";
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
         builder.addShortTextData(dataName, new ExpressionBuilder().createConstantStringExpression("1")).isTransient();
@@ -644,10 +644,12 @@ public class ProcessExecutionTest extends CommonAPITest {
         waitForUserTaskAndExecuteIt("step", processInstance, matti.getId());
         waitForProcessToFinish(processInstance);
 
-        final ArchivedDataInstance archivedData = getProcessAPI().getArchivedProcessDataInstance(dataName, processInstance.getId());
-        assertEquals("2", archivedData.getValue());
-        disableAndDeleteProcess(processDefinition);
-        deleteUser(matti);
+        try {
+            getProcessAPI().getArchivedProcessDataInstance(dataName, processInstance.getId());
+        } catch (final ArchivedDataNotFoundException e) {
+            disableAndDeleteProcess(processDefinition);
+            deleteUser(matti);
+        }
     }
 
     @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",

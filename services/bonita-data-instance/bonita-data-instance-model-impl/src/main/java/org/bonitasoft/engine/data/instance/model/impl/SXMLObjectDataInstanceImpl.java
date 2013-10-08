@@ -22,6 +22,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class SXMLObjectDataInstanceImpl extends SDataInstanceImpl {
 
@@ -58,8 +59,11 @@ public final class SXMLObjectDataInstanceImpl extends SDataInstanceImpl {
     }
 
     private Serializable revert(final String value) {
-        final XStream xstream = new XStream(new StaxDriver());
-        return (Serializable) xstream.fromXML(value);
+        if (value != null) {
+            final XStream xstream = new XStream(new StaxDriver());
+            return (Serializable) xstream.fromXML(value);
+        }
+        return null;
     }
 
 }

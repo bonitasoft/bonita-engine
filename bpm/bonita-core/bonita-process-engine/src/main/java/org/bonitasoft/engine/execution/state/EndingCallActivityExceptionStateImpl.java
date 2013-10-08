@@ -34,7 +34,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
@@ -66,8 +65,6 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
 
     private final TechnicalLoggerService logger;
 
-    private final SDataInstanceBuilders dataInstanceBuilders;
-
     private final ProcessDefinitionService processDefinitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
@@ -75,8 +72,8 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     public EndingCallActivityExceptionStateImpl(final BPMInstanceBuilders bpmInstanceBuilders, final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
             final SCommentService commentService, final SCommentBuilders commentBuilders, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final SDataInstanceBuilders dataInstanceBuilders,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
+            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService) {
         super();
         this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.activityInstanceService = activityInstanceService;
@@ -88,7 +85,6 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
         this.dataInstanceService = dataInstanceService;
         this.documentMappingService = documentMappingService;
         this.logger = logger;
-        this.dataInstanceBuilders = dataInstanceBuilders;
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
     }
@@ -127,7 +123,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
             SBonitaSearchException {
         final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
         ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentMappingService, logger,
-                bpmInstanceBuilders, dataInstanceBuilders, commentService, commentBuilders, processDefinitionService, connectorInstanceService);
+                bpmInstanceBuilders, commentService, commentBuilders, processDefinitionService, connectorInstanceService);
     }
 
     @Override

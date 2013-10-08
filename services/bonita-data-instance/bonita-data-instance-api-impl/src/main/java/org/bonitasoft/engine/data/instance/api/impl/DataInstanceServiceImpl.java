@@ -149,12 +149,16 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         archiveDataInstance(dataInstance);
     }
 
-    private void archiveDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
-        if (!dataInstance.isTransientData()) {
+    private void archiveDataInstance(final SDataInstance sDataInstance) throws SDataInstanceException {
+        archiveDataInstance(sDataInstance, System.currentTimeMillis());
+    }
+
+    private void archiveDataInstance(final SDataInstance sDataInstance, final long archiveDate) throws SDataInstanceException {
+        if (!sDataInstance.isTransientData()) {
             try {
-                final SADataInstance saDataInstance = dataInstanceBuilders.getSADataInstanceBuilder().createNewInstance(dataInstance).done();
+                final SADataInstance saDataInstance = dataInstanceBuilders.getSADataInstanceBuilder().createNewInstance(sDataInstance).done();
                 final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance);
-                archiveService.recordInsert(System.currentTimeMillis(), archiveInsertRecord);
+                archiveService.recordInsert(archiveDate, archiveInsertRecord);
             } catch (final SDefinitiveArchiveNotFound e) {
                 logOnExceptionMethod(TechnicalLogSeverity.TRACE, "updateDataInstance", e);
                 throw new SDataInstanceException("Unable to create SADataInstance", e);
@@ -162,6 +166,22 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 logOnExceptionMethod(TechnicalLogSeverity.TRACE, "updateDataInstance", e);
                 throw new SDataInstanceException("Unable to create SADataInstance", e);
             }
+        }
+    }
+
+    @Override
+    public void archiveLocalDataInstances(final long processInstanceId, final long archiveDate) throws SDataInstanceException {
+        final int archiveBatchSize = 50;
+        int currentIndex = 0;
+        List<SDataInstance> sDataInstances = getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
+                archiveBatchSize);
+
+        while (sDataInstances != null && sDataInstances.size() > 0) {
+            for (final SDataInstance sDataInstance : sDataInstances) {
+                archiveDataInstance(sDataInstance, archiveDate);
+            }
+            currentIndex += archiveBatchSize;
+            sDataInstances = getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex, archiveBatchSize);
         }
     }
 

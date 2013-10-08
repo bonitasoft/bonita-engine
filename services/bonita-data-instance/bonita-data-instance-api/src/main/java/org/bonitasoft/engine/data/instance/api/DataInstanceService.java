@@ -319,4 +319,16 @@ public interface DataInstanceService {
      */
     void deleteLocalDataInstances(long containerId, String dataInstanceContainerType, boolean dataPresent) throws SDataInstanceException;
 
+    /**
+     * Archive all data instances in database, for a specific process instance, at a specific date
+     * 
+     * @param processInstanceId
+     *            Identifier of process instance
+     * @param archiveDate
+     *            Date to archive
+     * @throws SDataInstanceException
+     * @since 6.1
+     */
+    void archiveLocalDataInstances(long processInstanceId, long archiveDate) throws SDataInstanceException;
+
 }

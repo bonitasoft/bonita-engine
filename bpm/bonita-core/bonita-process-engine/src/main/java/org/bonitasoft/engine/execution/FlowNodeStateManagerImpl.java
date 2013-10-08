@@ -89,7 +89,7 @@ import org.bonitasoft.engine.work.WorkService;
 
 /**
  * Default implementation of the activity state manager.
- *
+ * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
@@ -358,8 +358,8 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         executingThrowEvent = new ExecutingThrowEventStateImpl(stateBehaviors);
         executingLoop = new ExecutingLoopActivityStateImpl(expressionResolverService, bpmInstancesCreator, containerRegistry, activityInstanceService);
         completingCallActivity = new CompletingCallActivityStateImpl(stateBehaviors, operationService, processInstanceService, dataInstanceService,
-                documentMappingService, logger, instanceBuilders, sDataInstanceBuilders, archiveService, commentService, commentBuilders,
-                processDefinitionService, connectorInstanceService);
+                documentMappingService, logger, instanceBuilders, archiveService, commentService, commentBuilders, processDefinitionService,
+                connectorInstanceService);
         completingActivityWithBoundary = new CompletingActivityWithBoundaryStateImpl(stateBehaviors);
         executingCallActivity = new ExecutingCallActivityStateImpl(stateBehaviors);
         completed = new CompletedActivityStateImpl();
@@ -370,8 +370,8 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         cancellingFlowNode = new CancellingFlowNodeStateImpl();
         cancelingBoundaryAndIntermediateCatchEvent = new CancellingBoundaryAndIntermediateCatchEventStateImpl(stateBehaviors);
         cancellingCallActivity = new CancellingCallActivityStateImpl(instanceBuilders, activityInstanceService, processInstanceService, containerRegistry,
-                archiveService, commentService, commentBuilders, dataInstanceService, documentMappingService, logger, sDataInstanceBuilders,
-                processDefinitionService, connectorInstanceService);
+                archiveService, commentService, commentBuilders, dataInstanceService, documentMappingService, logger, processDefinitionService,
+                connectorInstanceService);
         cancellingActivityWithBoundary = new CancellingActivityWithBoundaryStateImpl(stateBehaviors);
         cancellingReceiveTask = new CancellingReceiveTaskStateImpl(stateBehaviors);
         initializingMultiInstance = new InitializingMultiInstanceActivityStateImpl(expressionResolverService, bpmInstancesCreator, activityInstanceService,
@@ -380,8 +380,8 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
                 activityInstanceService, dataInstanceService, stateBehaviors);
         abortingContainer = new AbortingFlowNodeContainerStateImpl(stateBehaviors);
         abortingCallActivity = new AbortingCallActivityStateImpl(instanceBuilders, activityInstanceService, processInstanceService, containerRegistry,
-                archiveService, commentService, commentBuilders, dataInstanceService, documentMappingService, logger, sDataInstanceBuilders,
-                processDefinitionService, connectorInstanceService);
+                archiveService, commentService, commentBuilders, dataInstanceService, documentMappingService, logger, processDefinitionService,
+                connectorInstanceService);
         abortingFlowNode = new AbortingFlowNodeStateImpl();
         abortingBoundaryAndIntermediateCatchEvent = new AbortingBoundaryAndIntermediateCatchEventStateImpl(stateBehaviors);
         abortingActivityWithBoundary = new AbortingActivityWithBoundaryStateImpl(stateBehaviors);

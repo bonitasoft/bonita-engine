@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -35,7 +35,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -43,6 +42,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl {
 
@@ -58,8 +58,6 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
 
     private final BPMInstanceBuilders bpmInstanceBuilders;
 
-    private final SDataInstanceBuilders dataInstanceBuilders;
-
     private final ArchiveService archiveService;
 
     private final SCommentService commentService;
@@ -73,9 +71,8 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
     public CompletingCallActivityStateImpl(final StateBehaviors stateBehaviors, final OperationService operationService,
             final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
             final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final BPMInstanceBuilders bpmInstanceBuilders,
-            final SDataInstanceBuilders dataInstanceBuilders, final ArchiveService archiveService, final SCommentService commentService,
-            final SCommentBuilders commentBuilders, final ProcessDefinitionService processDeifnitionService,
-            final ConnectorInstanceService connectorInstanceService) {
+            final ArchiveService archiveService, final SCommentService commentService, final SCommentBuilders commentBuilders,
+            final ProcessDefinitionService processDeifnitionService, final ConnectorInstanceService connectorInstanceService) {
         super(stateBehaviors);
         this.operationService = operationService;
         this.processInstanceService = processInstanceService;
@@ -83,7 +80,6 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
         this.documentMappingService = documentMappingService;
         this.logger = logger;
         this.bpmInstanceBuilders = bpmInstanceBuilders;
-        this.dataInstanceBuilders = dataInstanceBuilders;
         this.archiveService = archiveService;
         this.commentService = commentService;
         this.commentBuilders = commentBuilders;
@@ -112,7 +108,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
             }
             // archive child process instance
             ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentMappingService, logger,
-                    bpmInstanceBuilders, dataInstanceBuilders, commentService, commentBuilders, processDeifnitionService, connectorInstanceService);
+                    bpmInstanceBuilders, commentService, commentBuilders, processDeifnitionService, connectorInstanceService);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }

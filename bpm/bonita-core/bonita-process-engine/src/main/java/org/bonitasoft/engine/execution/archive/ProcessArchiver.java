@@ -59,8 +59,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -70,6 +68,7 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 /**
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ProcessArchiver {
 
@@ -78,8 +77,8 @@ public class ProcessArchiver {
     public static void archiveProcessInstance(final SProcessInstance processInstance, final ArchiveService archiveService,
             final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
             final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final BPMInstanceBuilders instancesBuilders,
-            final SDataInstanceBuilders sDataInstanceBuilders, final SCommentService commentService, final SCommentBuilders commentBuilders,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
+            final SCommentService commentService, final SCommentBuilders commentBuilders, final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
         final SAProcessInstanceBuilder saProcessInstanceBuilder = instancesBuilders.getSAProcessInstanceBuilder();
         final SAProcessInstance saProcessInstance = saProcessInstanceBuilder.createNewInstance(processInstance).done();
         final long archiveDate = saProcessInstance.getEndDate();
@@ -96,7 +95,7 @@ public class ProcessArchiver {
         }
         if (!processDefinition.getProcessContainer().getDataDefinitions().isEmpty()) {
             // Archive SADataInstance
-            archiveDataInstances(processInstance, archiveService, dataInstanceService, logger, instancesBuilders, sDataInstanceBuilders, archiveDate);
+            archiveDataInstances(processInstance, dataInstanceService, archiveDate);
         }
         // Archive SComment
         archiveComments(processInstance, archiveService, logger, instancesBuilders, commentService, commentBuilders, archiveDate);
@@ -223,42 +222,12 @@ public class ProcessArchiver {
         }
     }
 
-    private static void archiveDataInstances(final SProcessInstance processInstance, final ArchiveService archiveService,
-            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final BPMInstanceBuilders instancesBuilders,
-            final SDataInstanceBuilders sDataInstanceBuilders, final long archiveDate) throws SArchivingException {
-        final int archiveBatchSize = 50;
-        int currentIndex = 0;
+    private static void archiveDataInstances(final SProcessInstance processInstance, final DataInstanceService dataInstanceService,
+            final long archiveDate) throws SArchivingException {
         try {
-            List<SDataInstance> sDataInstances = dataInstanceService.getLocalDataInstances(processInstance.getId(),
-                    DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex, archiveBatchSize);
-
-            while (sDataInstances != null && sDataInstances.size() > 0) {
-                for (final SDataInstance sDataInstance : sDataInstances) {
-                    final SADataInstance saDataInstance = sDataInstanceBuilders.getSADataInstanceBuilder().createNewInstance(sDataInstance).done();
-                    if (saDataInstance != null) {
-                        final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saDataInstance);
-                        try {
-                            archiveService.recordInsert(archiveDate, insertRecord);
-                        } catch (final SRecorderException e) {
-                            throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
-                        } catch (final SDefinitiveArchiveNotFound e) {
-                            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                                logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR,
-                                        "the process instance was not archived id=" + processInstance.getId(), e);
-                            }
-                        }
-                    }
-                }
-                currentIndex += archiveBatchSize;
-                sDataInstances = dataInstanceService.getLocalDataInstances(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.toString(),
-                        currentIndex, archiveBatchSize);
-            }
+            dataInstanceService.archiveLocalDataInstances(processInstance.getId(), archiveDate);
         } catch (final SDataInstanceException e) {
-            // /FIXME: improve data service to make difference between invalid container and container without data
-            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.WARNING)) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.WARNING, "no data instances found for process. id=" + processInstance.getId(), e);
-            }
-            // return;
+            throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
         }
     }
 
