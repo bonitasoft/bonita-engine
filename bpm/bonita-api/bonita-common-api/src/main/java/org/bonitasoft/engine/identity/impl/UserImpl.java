@@ -25,7 +25,7 @@ import org.bonitasoft.engine.identity.User;
  */
 public class UserImpl implements User {
 
-    private static final long serialVersionUID = 259884549356731492L;
+    private static final long serialVersionUID = 4201480654772781891L;
 
     private final long id;
 
@@ -63,6 +63,25 @@ public class UserImpl implements User {
         this.id = id;
         this.userName = userName;
         this.password = password;
+    }
+
+    public UserImpl(final User user) {
+        id = user.getId();
+        userName = user.getUserName();
+        firstName = user.getFirstName();
+        lastName = user.getLastName();
+        password = user.getPassword();
+        iconName = user.getIconName();
+        iconPath = user.getIconPath();
+        title = user.getTitle();
+        jobTitle = user.getJobTitle();
+        creationDate = user.getCreationDate();
+        createdBy = user.getCreatedBy();
+        lastUpdate = user.getLastUpdate();
+        lastConnection = user.getLastConnection();
+        managerUserId = user.getManagerUserId();
+        managerUserName = user.getManagerUserName();
+        enabled = user.isEnabled();
     }
 
     @Override

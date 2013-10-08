@@ -87,6 +87,7 @@ import org.bonitasoft.engine.identity.ImportPolicy;
 import org.bonitasoft.engine.identity.MembershipNotFoundException;
 import org.bonitasoft.engine.identity.OrganizationExportException;
 import org.bonitasoft.engine.identity.OrganizationImportException;
+import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.RoleCriterion;
@@ -105,6 +106,7 @@ import org.bonitasoft.engine.identity.UserMembershipCriterion;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.UserUpdater;
 import org.bonitasoft.engine.identity.UserUpdater.UserField;
+import org.bonitasoft.engine.identity.impl.UserWithContactDataImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
@@ -409,6 +411,13 @@ public class IdentityAPIImpl implements IdentityAPI {
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
+    }
+
+    @Override
+    public UserWithContactData getUserWithProfessionalDetails(final long userId) throws UserNotFoundException {
+        final User user = getUser(userId);
+        final ContactData contactData = getUserContactData(userId, false);
+        return new UserWithContactDataImpl(user, contactData);
     }
 
     @Override

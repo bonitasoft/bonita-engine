@@ -1091,4 +1091,107 @@ public class UserTest extends CommonAPITest {
         deleteUsers(matti, jani);
     }
 
+    @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
+    @Test
+    public void getUserWithProContactData() throws BonitaException {
+        final String james = "james";
+        final User user = getIdentityAPI().createUser(james, "mbp");
+        final UserUpdater updateDescriptor = new UserUpdater();
+        final String firstName = "Changed first name";
+        updateDescriptor.setFirstName(firstName);
+        final String iconName = "new icon name";
+        updateDescriptor.setIconName(iconName);
+        final String iconPath = "new_icon_path";
+        updateDescriptor.setIconPath(iconPath);
+        final String jobTitle = "New job title";
+        updateDescriptor.setJobTitle(jobTitle);
+        final String lastName = "Modified Last name";
+        updateDescriptor.setLastName(lastName);
+        final long managerId = 12354L;
+        updateDescriptor.setManagerId(managerId);
+        final String password = "Ch4n63D_P455W0RD";
+        updateDescriptor.setPassword(password);
+        final String username = "new_user_name";
+        updateDescriptor.setUserName(username);
+
+        final ContactDataUpdater proDataUpDescr = new ContactDataUpdater();
+        final String address2 = "34 Gustave Eiffel";
+        proDataUpDescr.setAddress(address2);
+        final String building2 = "BigBlock";
+        proDataUpDescr.setBuilding(building2);
+        final String city2 = "L.A.";
+        proDataUpDescr.setCity(city2);
+        final String country2 = "Spain";
+        proDataUpDescr.setCountry(country2);
+        final String email2 = "noreply@bonitasoft.com";
+        proDataUpDescr.setEmail(email2);
+        final String faxNumber2 = "01-356743254";
+        proDataUpDescr.setFaxNumber(faxNumber2);
+        final String mobileNumber2 = "06-02-1111111";
+        proDataUpDescr.setMobileNumber(mobileNumber2);
+        final String phoneNumber2 = "04-76-111111";
+        proDataUpDescr.setPhoneNumber(phoneNumber2);
+        final String room2 = "A304";
+        proDataUpDescr.setRoom(room2);
+        final String state2 = "Isere";
+        proDataUpDescr.setState(state2);
+        final String website2 = "http://www.bonitasoft.com";
+        proDataUpDescr.setWebsite(website2);
+        final String zipCode2 = "38000";
+        proDataUpDescr.setZipCode(zipCode2);
+        final String title = "titre";
+        updateDescriptor.setTitle(title);
+        updateDescriptor.setProfessionalContactData(proDataUpDescr);
+        final User updatedUser = getIdentityAPI().updateUser(user.getId(), updateDescriptor);
+        final ContactData userContactData = getIdentityAPI().getUserContactData(updatedUser.getId(), false);
+
+        final UserWithContactData proUser = getIdentityAPI().getUserWithProfessionalDetails(updatedUser.getId());
+        assertEquals(userContactData, proUser.getContactData());
+        assertEquals(updatedUser, proUser.getUser());
+
+        getIdentityAPI().deleteUser(updatedUser.getId());
+    }
+
+    @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
+    @Test
+    public void getUserWithoutProContactData() throws BonitaException {
+        final String james = "james";
+        final User user = getIdentityAPI().createUser(james, "mbp");
+        final UserUpdater updateDescriptor = new UserUpdater();
+        final String firstName = "Changed first name";
+        updateDescriptor.setFirstName(firstName);
+        final String iconName = "new icon name";
+        updateDescriptor.setIconName(iconName);
+        final String iconPath = "new_icon_path";
+        updateDescriptor.setIconPath(iconPath);
+        final String jobTitle = "New job title";
+        updateDescriptor.setJobTitle(jobTitle);
+        final String lastName = "Modified Last name";
+        updateDescriptor.setLastName(lastName);
+        final long managerId = 12354L;
+        updateDescriptor.setManagerId(managerId);
+        final String password = "Ch4n63D_P455W0RD";
+        updateDescriptor.setPassword(password);
+        final String username = "new_user_name";
+        updateDescriptor.setUserName(username);
+        final User updatedUser = getIdentityAPI().updateUser(user.getId(), updateDescriptor);
+
+        final UserWithContactData proUser = getIdentityAPI().getUserWithProfessionalDetails(updatedUser.getId());
+        assertNull(proUser.getContactData());
+        assertEquals(updatedUser, proUser.getUser());
+
+        getIdentityAPI().deleteUser(updatedUser.getId());
+    }
+
+    @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
+    @Test(expected = UserNotFoundException.class)
+    public void throwExceptionWhenGettingUnknownUserWithProContactData() throws BonitaException {
+        getIdentityAPI().getUserWithProfessionalDetails(-45l);
+    }
+
+    @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
+    @Test(expected = UserNotFoundException.class)
+    public void throwExceptionWhenGettingTechnicalUserWithProContactData() throws BonitaException {
+        getIdentityAPI().getUserWithProfessionalDetails(-1l);
+    }
 }

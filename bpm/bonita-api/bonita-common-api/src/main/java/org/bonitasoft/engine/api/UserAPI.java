@@ -29,6 +29,7 @@ import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.UserUpdater;
+import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
@@ -192,6 +193,22 @@ public interface UserAPI {
      * @since 6.0
      */
     User getUserByUserName(String userName) throws UserNotFoundException;
+
+    /**
+     * Retrieves the user with his/her professional data.
+     * 
+     * @param userId
+     *            the identifier of the user
+     * @return the user
+     * @throws UserNotFoundException
+     *             If the user identifier does not refer to an existing user or the user identifier equals to the technical user identifier (-1)
+     * @throws RetrieveException
+     *             If an exception occurs during the user retrieving
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @since 6.1
+     */
+    UserWithContactData getUserWithProfessionalDetails(long userId) throws UserNotFoundException;
 
     /**
      * Retrieves the contact data (personal or professional) of the user.

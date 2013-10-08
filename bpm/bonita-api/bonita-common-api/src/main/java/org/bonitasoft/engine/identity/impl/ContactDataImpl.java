@@ -21,7 +21,7 @@ import org.bonitasoft.engine.identity.ContactData;
  */
 public class ContactDataImpl implements ContactData {
 
-    private static final long serialVersionUID = 3076805342443381795L;
+    private static final long serialVersionUID = 7363463979895325102L;
 
     private long userId;
 
@@ -57,6 +57,24 @@ public class ContactDataImpl implements ContactData {
 
     public ContactDataImpl(final long userId) {
         this.userId = userId;
+    }
+
+    public ContactDataImpl(final ContactData contactData) {
+        super();
+        userId = contactData.getUserId();
+        personal = contactData.isPersonal();
+        email = contactData.getEmail();
+        phoneNumber = contactData.getPhoneNumber();
+        mobileNumber = contactData.getMobileNumber();
+        faxNumber = contactData.getFaxNumber();
+        building = contactData.getBuilding();
+        room = contactData.getRoom();
+        address = contactData.getAddress();
+        zipCode = contactData.getZipCode();
+        city = contactData.getCity();
+        state = contactData.getState();
+        country = contactData.getCountry();
+        website = contactData.getWebsite();
     }
 
     @Override
