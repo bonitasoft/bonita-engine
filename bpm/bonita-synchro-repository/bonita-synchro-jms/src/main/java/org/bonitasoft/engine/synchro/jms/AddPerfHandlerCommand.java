@@ -27,14 +27,17 @@ public class AddPerfHandlerCommand extends TenantCommand {
             throws SCommandParameterizationException, SCommandExecutionException {
         final EventService eventService = serviceAccessor.getEventService();
         final Long messageTimeout = (Long) parameters.get("timeout");
-        
+
         try {
-            long tenantId = serviceAccessor.getTenantId();
+            final long tenantId = serviceAccessor.getTenantId();
             if (!containsHandler(eventService, PROCESSINSTANCE_STATE_UPDATED, ProcessInstanceFinishedHandler.class)) {
                 eventService.addHandler(PROCESSINSTANCE_STATE_UPDATED, new ProcessInstanceFinishedHandler(tenantId, messageTimeout));
             }
             if (!containsHandler(eventService, ACTIVITYINSTANCE_STATE_UPDATED, TaskReadyHandler.class)) {
                 eventService.addHandler(ACTIVITYINSTANCE_STATE_UPDATED, new TaskReadyHandler(tenantId, messageTimeout));
+            }
+            if (!containsHandler(eventService, ACTIVITYINSTANCE_STATE_UPDATED, FlowNodeReachStateHandler.class)) {
+                eventService.addHandler(ACTIVITYINSTANCE_STATE_UPDATED, new FlowNodeReachStateHandler(tenantId, messageTimeout, 3));
             }
             final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
             entityUpdateDescriptor.addField("system", true);
