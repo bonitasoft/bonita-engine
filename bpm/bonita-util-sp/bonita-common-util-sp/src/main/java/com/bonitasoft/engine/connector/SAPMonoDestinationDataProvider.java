@@ -21,6 +21,10 @@ import com.sap.conn.jco.ext.Environment;
  * 
  * Used by SAP connector in order to synchronize SAP {@link DestinationDataProvider} used
  * 
+ * 
+ * Warning: Internal use only!
+ * This class is subject to change without notice
+ * 
  * @author Aurelien Pupier
  * 
  */
