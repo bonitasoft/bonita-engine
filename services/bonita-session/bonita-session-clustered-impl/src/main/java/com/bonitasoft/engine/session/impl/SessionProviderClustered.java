@@ -38,6 +38,10 @@ public final class SessionProviderClustered implements SessionProvider {
         if (!manager.isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
+        // --- Hard coded configuration for Hazelcast
+        MapConfig mapConfig = hazelcastInstance.getConfig().getMapConfig(SESSION_MAP);
+        mapConfig.setTimeToLiveSeconds(0); // eternal. We specify the ttl when we put the session in the map.
+        // ---
         sessions = hazelcastInstance.getMap(SESSION_MAP);
     }
 
