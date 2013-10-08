@@ -34,6 +34,8 @@ import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapConfig.InMemoryFormat;
@@ -56,23 +58,28 @@ public class ClusteredEventServiceImpl extends ConfigurableEventServiceImpl {
     // Local copy of the eventHandlers Map keys to speed up performance. It has to be manipulated
     // only by the distributed tasks.
     private final Set<String> localEventTypes = new HashSet<String>();
+
     private final ReadWriteLock localEventTypesLock = new ReentrantReadWriteLock();
+
     private final HazelcastInstance hazelcastInstance;
 
     public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
             final HazelcastInstance hazelcastInstance) throws HandlerRegistrationException {
-        this("PLATFORM", eventBuilders, handlers, logger, hazelcastInstance);
+        this("PLATFORM", eventBuilders, handlers, logger, hazelcastInstance, Manager.getInstance());
     }
 
     public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
             final HazelcastInstance hazelcastInstance, final long tenantId) throws HandlerRegistrationException {
-        this("TENANT@" + tenantId, eventBuilders, handlers, logger, hazelcastInstance);
+        this("TENANT@" + tenantId, eventBuilders, handlers, logger, hazelcastInstance, Manager.getInstance());
     }
 
-    private ClusteredEventServiceImpl(final String eventServiceHandlerMapNameSuffix, final SEventBuilders eventBuilders,
-            final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance)
+    ClusteredEventServiceImpl(final String eventServiceHandlerMapNameSuffix, final SEventBuilders eventBuilders,
+            final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance, final Manager manager)
             throws HandlerRegistrationException {
         super(eventBuilders, handlers, logger);
+        if (!manager.isFeatureActive(Features.ENGINE_CLUSTERING)) {
+            throw new IllegalStateException("The clustering is not an active feature.");
+        }
         String mapName = "EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix;
         // --- Hard coded configuration for Hazelcast
         Config config = hazelcastInstance.getConfig();

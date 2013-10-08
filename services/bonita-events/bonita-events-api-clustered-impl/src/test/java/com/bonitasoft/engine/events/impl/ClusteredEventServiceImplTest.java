@@ -19,12 +19,15 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.After;
 import org.junit.BeforeClass;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
 public class ClusteredEventServiceImplTest extends EventServiceTest {
 
     private static HazelcastInstance hazelcastInstance;
+
     private ClusteredEventServiceImpl eventService;
 
     @BeforeClass
@@ -42,9 +45,10 @@ public class ClusteredEventServiceImplTest extends EventServiceTest {
         SEventBuilders eventBuilders = new SEventBuildersImpl();
         Map<String, SHandler<SEvent>> handlers = new HashMap<String, SHandler<SEvent>>();
         TechnicalLoggerService logger = mockTechnicalLoggerService();
-
+        Manager manager = mock(Manager.class);
+        when(manager.isFeatureActive(Features.ENGINE_CLUSTERING)).thenReturn(true);
         try {
-            eventService = new ClusteredEventServiceImpl(eventBuilders, handlers, logger, hazelcastInstance);
+            eventService = new ClusteredEventServiceImpl("PLATFORM", eventBuilders, handlers, logger, hazelcastInstance, manager);
             return eventService;
         } catch (HandlerRegistrationException e) {
             throw new RuntimeException(e);

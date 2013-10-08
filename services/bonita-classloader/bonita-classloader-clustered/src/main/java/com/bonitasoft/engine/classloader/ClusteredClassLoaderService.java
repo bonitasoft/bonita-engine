@@ -20,6 +20,8 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
 
@@ -43,9 +45,12 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     static TechnicalLoggerService loggerService;
 
     @SuppressWarnings("static-access")
-    public ClusteredClassLoaderService(HazelcastInstance hazelcastInstance,
-            ClassLoaderService classLoaderService,
-            TechnicalLoggerService loggerService) {
+    public ClusteredClassLoaderService(final HazelcastInstance hazelcastInstance,
+            final ClassLoaderService classLoaderService,
+            final TechnicalLoggerService loggerService) {
+        if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
+            throw new IllegalStateException("The clustering is not an active feature.");
+        }
         this.hazelcastInstance = hazelcastInstance;
         this.classLoaderService = classLoaderService;
         this.loggerService = loggerService;
@@ -67,25 +72,25 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     }
 
     @Override
-    public ClassLoader getLocalClassLoader(String type, long id)
+    public ClassLoader getLocalClassLoader(final String type, final long id)
             throws ClassLoaderException {
         return classLoaderService.getLocalClassLoader(type, id);
     }
 
     @Override
-    public void removeLocalClassLoader(String type, long id) {
+    public void removeLocalClassLoader(final String type, final long id) {
         classLoaderService.removeLocalClassLoader(type, id);
 
     }
 
     @Override
-    public void removeAllLocalClassLoaders(String type) {
+    public void removeAllLocalClassLoaders(final String type) {
         classLoaderService.removeAllLocalClassLoaders(type);
 
     }
 
     @Override
-    public void refreshGlobalClassLoader(Map<String, byte[]> resources)
+    public void refreshGlobalClassLoader(final Map<String, byte[]> resources)
             throws ClassLoaderException {
 
         // we use the executor service to refresh classloader on all nodes
@@ -98,8 +103,8 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
     }
 
     @Override
-    public void refreshLocalClassLoader(String type, long id,
-            Map<String, byte[]> resources) throws ClassLoaderException {
+    public void refreshLocalClassLoader(final String type, final long id,
+            final Map<String, byte[]> resources) throws ClassLoaderException {
 
         // we use the executor service to refresh classloader on all nodes
 
@@ -109,8 +114,8 @@ public class ClusteredClassLoaderService implements ClassLoaderService {
         executeRefreshOnCluster(type, id, refreshClassLoaderTask);
     }
 
-    private void executeRefreshOnCluster(String type, long id,
-            RefreshClassLoaderTask refreshClassLoaderTask)
+    private void executeRefreshOnCluster(final String type, final long id,
+            final RefreshClassLoaderTask refreshClassLoaderTask)
             throws ClassLoaderException {
         long before = System.currentTimeMillis();
         Map<Member, Future<TaskStatus>> submitToAllMembers = hazelcastInstance.getExecutorService(EXECUTOR_NAME).submitToAllMembers(refreshClassLoaderTask);
