@@ -352,7 +352,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1823", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+    @Cover(jira = "ENGINE-1819", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
             "human task" })
     @Test
     public void getPossibleUsersOfTaskUserActor() throws Exception {
@@ -379,7 +379,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1823", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+    @Cover(jira = "ENGINE-1819", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
             "human task" })
     @Test
     public void getPossibleUsersOfTaskRoleActor() throws Exception {
@@ -406,7 +406,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1823", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+    @Cover(jira = "ENGINE-1819", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
             "human task" })
     @Test
     public void getPossibleUsersOfTaskGroupActor() throws Exception {
@@ -433,7 +433,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1823", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+    @Cover(jira = "ENGINE-1819", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
             "human task" })
     @Test
     public void getPossibleUsersOfTaskSubGroupActor() throws Exception {
@@ -467,7 +467,7 @@ public class UserTaskAssignationTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(jira = "ENGINE-1823", classes = { User.class, HumanTaskInstance.class, UserFilter.class }, concept = BPMNConcept.ACTIVITIES, keywords = {
+    @Cover(jira = "ENGINE-1819", classes = { User.class, HumanTaskInstance.class, UserFilter.class }, concept = BPMNConcept.ACTIVITIES, keywords = {
             "possible users", "human task" })
     @Test
     public void getPossibleUsersOfFilteredTask() throws Exception {
@@ -499,6 +499,14 @@ public class UserTaskAssignationTest extends CommonAPITest {
         deleteRoles(role);
         deleteUser(jaakko);
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "ENGINE-1819", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",
+            "human task" })
+    @Test
+    public void getPossibleUsersOfUnknownTask() throws Exception {
+        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTasks(-156l, 0, 10);
+        assertEquals(0, possibleUsers.size());
     }
 
 }
