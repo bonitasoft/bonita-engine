@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.events;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -42,6 +43,14 @@ public abstract class EventServiceTest {
         eventSvc.addHandler(EVT_INTERESTING, null);
     }
 
+    @Test(expected = HandlerRegistrationException.class)
+    public void addTwiceTheSameHandler() throws Exception {
+        final TestHandler h = new TestHandler();
+        eventSvc.addHandler(EVT_INTERESTING, h);
+        assertEquals(1, eventSvc.getHandlers(EVT_INTERESTING).size());
+        eventSvc.addHandler(EVT_INTERESTING, h);
+    }
+
     @Test
     public void addHandlerInEventFilters() throws Exception {
         final TestHandler h = new TestHandler();
@@ -65,6 +74,16 @@ public abstract class EventServiceTest {
     public void removeUnknownHandler() throws Exception {
         final TestHandler h = new TestHandler();
         eventSvc.removeHandler(EVT_INTERESTING, h);
+    }
+
+    @Test
+    public void removeHandler() throws Exception {
+        final TestHandler h = new TestHandler();
+        eventSvc.addHandler(EVT_INTERESTING, h);
+        assertEquals(1, eventSvc.getHandlers(EVT_INTERESTING).size());
+
+        eventSvc.removeHandler(EVT_INTERESTING, h);
+        assertEquals(0, eventSvc.getHandlers(EVT_INTERESTING).size());
     }
 
     @Test

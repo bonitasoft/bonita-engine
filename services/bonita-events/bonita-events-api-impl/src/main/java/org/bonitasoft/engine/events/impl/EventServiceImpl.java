@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
@@ -54,11 +55,19 @@ public class EventServiceImpl extends AbstractEventServiceImpl {
     }
 
     @Override
-    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) {
+    protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
         // check if the given event type is already registered in the Event Service
         if (containsHandlerFor(eventType)) {
             // if the handler already exists for the same eventType, an Exception is thrown
             final List<SHandler<SEvent>> handlers = registeredHandlers.get(eventType);
+
+            // Check if another handler of the same class is already registered
+            for (SHandler<SEvent> tmpHandler : handlers) {
+                if (tmpHandler.getIdentifier().equals(handler.getIdentifier())) {
+                    throw new HandlerRegistrationException("The handler with identifier " + tmpHandler.getIdentifier() + " is already registered for the event " + eventType);
+                }
+            }
+
             handlers.add(handler);
         } else {
             // if the given type doesn't already exist in the eventFilters list, we create it
