@@ -15,6 +15,8 @@ package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.events.model.SEvent;
