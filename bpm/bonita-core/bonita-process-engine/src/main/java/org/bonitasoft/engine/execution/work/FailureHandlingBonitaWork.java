@@ -63,8 +63,8 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         try {
             sessionAccessor.setTenantId(getTenantId());
 
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.TRACE, "Starting work: " + getDescription());
             }
             getWrappedWork().work(context);
         } catch (final Throwable e) {
