@@ -1,9 +1,8 @@
 package com.bonitasoft.engine.session.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +20,8 @@ import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
@@ -35,44 +36,46 @@ public class SessionProviderClusteredTest {
 
     private IMap<Long, SSession> map;
 
-    @SuppressWarnings("unchecked")
     @Before
     public void setup() {
         manager = mock(Manager.class);
-        hazelcastInstance = mock(HazelcastInstance.class);
-        map = mock(IMap.class);
-        when(hazelcastInstance.<Long, SSession> getMap(anyString())).thenReturn(map);
-        Config config = mock(Config.class);
-        when(hazelcastInstance.getConfig()).thenReturn(config);
-        when(config.getMapConfig(SessionProviderClustered.SESSION_MAP)).thenReturn(mock(MapConfig.class));
         when(manager.isFeatureActive(Features.ENGINE_CLUSTERING)).thenReturn(true);
+
+        hazelcastInstance = buildHazelcastInstance();
         sessionProviderClustered = new SessionProviderClustered(manager, hazelcastInstance);
+    }
+
+    private HazelcastInstance buildHazelcastInstance() {
+        Config config = new Config();
+        //disable all networking
+        JoinConfig joinConfig = config.getNetworkConfig().getJoin();
+        joinConfig.getMulticastConfig().setEnabled(false);
+        joinConfig.getTcpIpConfig().setEnabled(false);
+        joinConfig.getAwsConfig().setEnabled(false);
+
+        return Hazelcast.newHazelcastInstance(config);
     }
 
     @Test
     public void testAddSession() throws Exception {
-        SSessionImpl session = new SSessionImpl(123l, 1, "john", "6.0", "BPM", 12);
+        SSession session = new SSessionImpl(123l, 1, "john", "6.0", "BPM", 12);
         sessionProviderClustered.addSession(session);
-        verify(map).put(123l, session);
+        assertThat(sessionProviderClustered.getSession(123l), is(session));
     }
 
-    @Test
+    @Test(expected = SSessionNotFoundException.class)
     public void testRemoveSession() throws Exception {
-        SSessionImpl session = new SSessionImpl(123l, 1, "john", "6.0", "BPM", 12);
-        when(map.remove(123l)).thenReturn(session);
+        SSession session = new SSessionImpl(123l, 1, "john", "6.0", "BPM", 12);
+        sessionProviderClustered.addSession(session);
         sessionProviderClustered.removeSession(123l);
+
+        // This call will throw an exception
+        sessionProviderClustered.getSession(123l);
     }
 
     @Test(expected = SSessionNotFoundException.class)
     public void testRemoveSessionNotFound() throws Exception {
         sessionProviderClustered.removeSession(123l);
-    }
-
-    @Test
-    public void testGetSession() throws Exception {
-        SSessionImpl session = new SSessionImpl(123l, 1, "john", "6.0", "BPM", 12);
-        when(map.get(123l)).thenReturn(session);
-        assertEquals(session, sessionProviderClustered.getSession(123l));
     }
 
     @Test(expected = SSessionNotFoundException.class)
@@ -84,11 +87,14 @@ public class SessionProviderClusteredTest {
     public void testUpdateSession() throws Exception {
         SSessionImpl session = new SSessionImpl(123l, 1, "john", "6.0", "BPM", 12);
         session.setLastRenewDate(new Date(System.currentTimeMillis() - 100));
+        sessionProviderClustered.addSession(session);
+
         SSessionImpl sessionUpdated = new SSessionImpl(123l, 1, "john", "6.0", "BPM", 12);
-        sessionUpdated.setLastRenewDate(new Date(System.currentTimeMillis()));
-        when(map.containsKey(123l)).thenReturn(true);
+        Date lastRenewDate = new Date(System.currentTimeMillis());
+        sessionUpdated.setLastRenewDate(lastRenewDate);
+
         sessionProviderClustered.updateSession(sessionUpdated);
-        verify(map).put(123l, sessionUpdated);
+        assertThat(sessionProviderClustered.getSession(123l).getLastRenewDate(), is(lastRenewDate));
     }
 
     @Test(expected = SSessionNotFoundException.class)
@@ -100,13 +106,17 @@ public class SessionProviderClusteredTest {
     @Test
     public void testCleanInvalidSessions() throws Exception {
         verifyZeroInteractions(map);
-
     }
 
-    @Test
+    @Test(expected = SSessionNotFoundException.class)
     public void testRemoveSessions() throws Exception {
+        SSession session = new SSessionImpl(123l, 1, "john", "6.0", "BPM", 12);
+        sessionProviderClustered.addSession(session);
+
         sessionProviderClustered.removeSessions();
-        verify(map).clear();
+
+        // This call will throw an exception
+        sessionProviderClustered.getSession(123l);
     }
 
 }
