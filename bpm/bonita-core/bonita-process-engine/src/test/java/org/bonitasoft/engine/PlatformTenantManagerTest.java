@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,7 +64,7 @@ public class PlatformTenantManagerTest {
         verify(platformAPI, times(1)).startNode();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = PlatformNotFoundException.class)
     public void testStartPlatformWhenNotCreated() throws Exception {
         when(platformAPI.isPlatformCreated()).thenReturn(false);
         platformTenantManager.startPlatform(platformAPI);

@@ -257,4 +257,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     JobService getJobService();
 
+    void destroy();
+
 }

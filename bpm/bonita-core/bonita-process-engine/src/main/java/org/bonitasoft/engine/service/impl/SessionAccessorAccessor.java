@@ -23,4 +23,6 @@ public interface SessionAccessorAccessor {
 
     SessionAccessor getSessionAccessor();
 
+    void destroy();
+
 }

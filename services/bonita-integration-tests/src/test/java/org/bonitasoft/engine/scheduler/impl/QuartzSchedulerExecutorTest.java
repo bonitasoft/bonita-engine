@@ -118,20 +118,20 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
 
     @Test
     public void testCheckShutdownScheduler() throws Exception {
-        schedulerService.shutdown();
-        assertTrue(schedulerService.isShutdown());
+        schedulerService.stop();
+        assertTrue(schedulerService.isStopped());
     }
 
     @Test
     public void testCheckShutdownSchedulerTwice() throws Exception {
-        schedulerService.shutdown();
-        schedulerService.shutdown();
+        schedulerService.stop();
+        schedulerService.stop();
     }
 
     @Test
     public void testCanRestartTheSchedulerAfterShutdown() throws Exception {
-        schedulerService.shutdown();
-        assertTrue(schedulerService.isShutdown());
+        schedulerService.stop();
+        assertTrue(schedulerService.isStopped());
         schedulerService.start();
         assertTrue(schedulerService.isStarted());
     }

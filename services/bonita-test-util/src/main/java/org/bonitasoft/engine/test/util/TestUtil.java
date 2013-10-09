@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.test.util;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
@@ -46,14 +45,14 @@ public class TestUtil {
         return DEFAULT_PASSWORD;
     }
 
-    public static void startScheduler(final SchedulerService scheduler) throws SSchedulerException, FireEventException {
+    public static void startScheduler(final SchedulerService scheduler) throws Exception {
         if (!scheduler.isStarted()) {
             scheduler.start();
         }
     }
 
-    public static void stopScheduler(final SchedulerService scheduler, final TransactionService txService) throws SSchedulerException, FireEventException {
-        if (scheduler.isStarted() && !scheduler.isShutdown()) {
+    public static void stopScheduler(final SchedulerService scheduler, final TransactionService txService) throws Exception {
+        if (scheduler.isStarted() && !scheduler.isStopped()) {
             try {
                 try {// FIXME will only delete jobs of the current tenant
                     txService.begin();
@@ -67,7 +66,7 @@ public class TestUtil {
             } catch (final STransactionException txException) {
                 throw new SSchedulerException(txException);
             }
-            scheduler.shutdown();
+            scheduler.stop();
         }
     }
 

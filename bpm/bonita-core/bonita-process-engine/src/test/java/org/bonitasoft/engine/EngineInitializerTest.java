@@ -2,6 +2,7 @@ package org.bonitasoft.engine;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -31,14 +33,15 @@ public class EngineInitializerTest {
 
     private EngineInitializer engineInitializer;
 
+    private ServiceAccessorFactory serviceAccessorFactory;
+
     @Before
     public void before() throws Exception {
         // static mocks
         mockStatic(ServiceAccessorFactory.class);
         mockStatic(SpringPlatformFileSystemBeanAccessor.class);
 
-        // accessors
-        ServiceAccessorFactory serviceAccessorFactory = mock(ServiceAccessorFactory.class);
+        serviceAccessorFactory = mock(ServiceAccessorFactory.class);
         when(ServiceAccessorFactory.getInstance()).thenReturn(serviceAccessorFactory);
         PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         when(serviceAccessorFactory.createPlatformServiceAccessor()).thenReturn(platformServiceAccessor);
@@ -91,6 +94,15 @@ public class EngineInitializerTest {
         when(platformProperties.shouldStopPlatform()).thenReturn(true);
         engineInitializer.unloadEngine();
         verify(platformManager, times(1)).stopPlatform(any(PlatformAPI.class));
+        verify(serviceAccessorFactory, times(1)).destroyAccessors();
+    }
+
+    @Test
+    public void testUnloadEnginWhenPlatformNotCreated() throws Exception {
+        when(platformProperties.shouldStopPlatform()).thenReturn(true);
+        doThrow(new PlatformNotFoundException("tada")).when(platformManager).stopPlatform(any(PlatformAPI.class));
+        engineInitializer.unloadEngine();
+        verify(serviceAccessorFactory, times(1)).destroyAccessors();
     }
 
     @Test

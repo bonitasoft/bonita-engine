@@ -15,14 +15,16 @@ package org.bonitasoft.engine.work;
 
 import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
+
 /**
  * This service allows to trigger the execution of work asynchronously
  * Any runnable registered on the service will be launched in other thread at the end of the transaction.
- *
+ * 
  * @author Charles Souillard
  * @author Baptiste Mesta
  */
-public interface WorkService {
+public interface WorkService extends ServiceWithLifecycle {
 
     /**
      * This operation MUST be called with an active transaction. If no active transaction is found, a WorkRegisterException is thrown
@@ -40,35 +42,35 @@ public interface WorkService {
     void executeWork(final BonitaWork work) throws WorkRegisterException;
 
     /**
-     *
+     * 
      * Stop the execution of works for a tenant
-     *
+     * 
      * @param tenantId
      */
     void stop(Long tenantId);
 
     /**
-     *
+     * 
      * Allow to start works of this tenant
-     *
+     * 
      * @param tenantId
      */
     void start(Long tenantId);
 
     /**
-     *
+     * 
      * Stop the execution of work for this local work service
-     *
+     * 
      * @throws TimeoutException
      */
-    void shutdown() throws TimeoutException;
+    void stop() throws TimeoutException;
 
     /**
-     *
+     * 
      * start the execution of work for this local work service
-     *
+     * 
      * @throws TimeoutException
      */
-    void startup();
+    void start();
 
 }

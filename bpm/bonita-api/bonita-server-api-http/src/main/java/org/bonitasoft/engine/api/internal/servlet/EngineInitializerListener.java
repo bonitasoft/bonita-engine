@@ -17,18 +17,18 @@ public class EngineInitializerListener implements ServletContextListener {
     @Override
     public void contextDestroyed(final ServletContextEvent arg0) {
         try {
-            new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).initializeEngine();
+            new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).unloadEngine();
         } catch (Throwable e) {
-            LOGGER.log(Level.SEVERE, "Error while initializing the Engine", e);
+            LOGGER.log(Level.SEVERE, "Error while unloading the Engine", e);
         }
     }
 
     @Override
     public void contextInitialized(final ServletContextEvent arg0) {
         try {
-            new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).unloadEngine();
+            new EngineInitializer(PlatformTenantManager.getInstance(), new EngineInitializerProperties()).initializeEngine();
         } catch (Throwable e) {
-            LOGGER.log(Level.SEVERE, "Error while unloading the Engine", e);
+            LOGGER.log(Level.SEVERE, "Error while initializing the Engine", e);
         }
     }
 

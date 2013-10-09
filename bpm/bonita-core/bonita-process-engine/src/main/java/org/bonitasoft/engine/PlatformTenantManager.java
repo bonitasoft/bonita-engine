@@ -17,6 +17,7 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
 
 /**
  * @author Baptiste Mesta
@@ -49,7 +50,7 @@ public class PlatformTenantManager {
 
     private void updatePlatform(final PlatformAPI platformAPI, final String platformState) throws Exception {
         if (!platformAPI.isPlatformCreated()) {
-            throw new IllegalStateException("Can't start or stop platform if it is not created");
+            throw new PlatformNotFoundException("Can't start or stop platform if it is not created");
         }
         if (platformState.equals(START)) {
             platformAPI.startNode();

@@ -49,6 +49,7 @@ import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandBuilder;
 import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -60,7 +61,6 @@ import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceState;
 import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
 import org.bonitasoft.engine.dependency.SDependencyException;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -90,7 +90,6 @@ import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -230,8 +229,12 @@ public class PlatformAPIImpl implements PlatformAPI {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         final WorkService workService = platformAccessor.getWorkService();
+        List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
         try {
             try {
+                for (ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
+                    serviceWithLifecycle.start();
+                }
                 final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
                 final RefreshPlatformClassLoader refreshPlatformClassLoader = new RefreshPlatformClassLoader(platformAccessor);
                 executor.execute(refreshPlatformClassLoader);
@@ -255,7 +258,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                     }
                 }
                 // FIXME: shouldn't we also stop the workService?:
-                workService.startup();
+                workService.start();
                 if (!isNodeStarted()) {
                     if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
                         schedulerService.start();
@@ -322,7 +325,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             // If an exception is thrown, stop the platform that was started.
             try {
                 shutdownScheduler(platformAccessor, schedulerService);
-            } catch (final SBonitaException exp) {
+            } catch (final Exception exp) {
                 throw new StartNodeException("Platform stoping failed : " + exp.getMessage(), e);
             }
             throw e;
@@ -340,6 +343,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     public void stopNode() throws StopNodeException {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
             if (plaformConfiguration.shouldStartScheduler()) {
@@ -347,9 +351,12 @@ public class PlatformAPIImpl implements PlatformAPI {
                 shutdownScheduler(platformAccessor, schedulerService);
             }
             final WorkService workService = platformAccessor.getWorkService();
-            workService.shutdown();
+            workService.stop();
             if (plaformConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
+            }
+            for (ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
+                serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
@@ -371,10 +378,9 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void shutdownScheduler(final PlatformServiceAccessor platformAccessor, final SchedulerService schedulerService) throws SSchedulerException,
-            FireEventException {
+    private void shutdownScheduler(final PlatformServiceAccessor platformAccessor, final SchedulerService schedulerService) throws Exception {
         if (isNodeStarted()) {
-            schedulerService.shutdown();
+            schedulerService.stop();
         }
     }
 
@@ -689,8 +695,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (schedulerStarted) {
                 try {
                     // stop scheduler after scheduling global jobs
-                    schedulerService.shutdown();
-                } catch (final SBonitaException e) {
+                    schedulerService.stop();
+                } catch (final Exception e) {
                     log(platformAccessor, e);
                     throw new STenantActivationException(e);
                 }

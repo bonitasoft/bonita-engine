@@ -959,4 +959,9 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return jobService;
     }
 
+    @Override
+    public void destroy() {
+        beanAccessor.destroy();
+    }
+
 }

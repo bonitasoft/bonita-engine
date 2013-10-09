@@ -86,7 +86,7 @@ public class EngineInitializerProperties {
     private String getProperty(final String propertyName, final Properties properties) {
         String property = properties.getProperty(propertyName);
         if (property == null) {
-            throw new IllegalStateException("Mandatory property not set in bonita-platform.xml: " + propertyName);
+            throw new IllegalStateException("Mandatory property not set in bonita-platform.properties: " + propertyName);
         }
         return property;
     }

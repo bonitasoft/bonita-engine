@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
@@ -123,9 +124,15 @@ public class EngineInitializer {
             if (platformProperties.shouldStopPlatform()) {
                 platformManager.stopPlatform(platformAPI);
             }
+        } catch (PlatformNotFoundException e) {
+            LOGGER.log(Level.WARNING, "The platform cannot be stop because it does not exists!");
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
+        // after that the engine is unloaded
+        ServiceAccessorFactory.getInstance().destroyAccessors();
+        LOGGER.log(Level.INFO, "Bonita Engine Stopped!");
+
     }
 
 }

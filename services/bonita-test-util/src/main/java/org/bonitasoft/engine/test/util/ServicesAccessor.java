@@ -36,7 +36,7 @@ public final class ServicesAccessor {
         return ServiceAccessorHolder.INSTANCE;
     }
 
-    private final AbsoluteFileSystemXmlApplicationContext context;
+    private AbsoluteFileSystemXmlApplicationContext context;
 
     private ServicesAccessor() {
         super();
@@ -100,6 +100,11 @@ public final class ServicesAccessor {
 
     public <T> T getInstanceOf(final String name, final Class<T> class1) {
         return context.getBean(name, class1);
+    }
+
+    public void destroy() {
+        context.destroy();
+        context = null;
     }
 
 }

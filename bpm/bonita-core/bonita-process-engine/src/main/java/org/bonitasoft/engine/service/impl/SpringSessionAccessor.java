@@ -40,4 +40,10 @@ public class SpringSessionAccessor implements SessionAccessorAccessor {
         return sessionAccessor;
     }
 
+    @Override
+    public void destroy() {
+        SpringSessionAccessorFileSystemBeanAcessor.destroy();
+
+    }
+
 }

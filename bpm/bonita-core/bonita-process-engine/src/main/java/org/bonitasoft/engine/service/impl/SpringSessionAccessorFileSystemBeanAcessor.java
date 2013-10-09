@@ -73,4 +73,9 @@ public class SpringSessionAccessorFileSystemBeanAcessor {
             context.refresh();
         }
     }
+
+    public static void destroy() {
+        context.destroy();
+        context = null;
+    }
 }

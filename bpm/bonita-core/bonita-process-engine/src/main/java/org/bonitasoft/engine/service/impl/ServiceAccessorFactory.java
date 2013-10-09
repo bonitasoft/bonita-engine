@@ -18,7 +18,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -58,7 +60,8 @@ public final class ServiceAccessorFactory {
         return INSTANCE;
     }
 
-    public PlatformServiceAccessor createPlatformServiceAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+    public synchronized PlatformServiceAccessor createPlatformServiceAccessor() throws BonitaHomeNotSetException, InstantiationException,
+            IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         if (platformServiceAccessor == null) {
             initPropertiesIfNeeded();
@@ -80,7 +83,7 @@ public final class ServiceAccessorFactory {
         }
     }
 
-    public TenantServiceAccessor createTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
+    public synchronized TenantServiceAccessor createTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         if (!tenantServiceAccessor.containsKey(tenantId)) {
             initPropertiesIfNeeded();
@@ -95,7 +98,8 @@ public final class ServiceAccessorFactory {
         return tenantServiceAccessor.get(tenantId);
     }
 
-    public SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException, ClassNotFoundException,
+    public synchronized SessionAccessor createSessionAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+            ClassNotFoundException,
             IOException, BonitaHomeConfigurationException {
         if (sessionAccessorAccessor == null) {
             initPropertiesIfNeeded();
@@ -108,7 +112,8 @@ public final class ServiceAccessorFactory {
         return sessionAccessorAccessor.getSessionAccessor();
     }
 
-    public APIAccessResolver createAPIAccessResolver() throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException, InstantiationException,
+    public synchronized APIAccessResolver createAPIAccessResolver() throws BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException,
+            InstantiationException,
             IllegalAccessException, ClassNotFoundException {
         if (apiAccessResolver == null) {
             initPropertiesIfNeeded();
@@ -121,4 +126,17 @@ public final class ServiceAccessorFactory {
         return apiAccessResolver;
     }
 
+    public synchronized void destroyAccessors() {
+        Set<Entry<Long, TenantServiceAccessor>> tenantAccessors = tenantServiceAccessor.entrySet();
+        for (Entry<Long, TenantServiceAccessor> tenantAccessor : tenantAccessors) {
+            tenantAccessor.getValue().destroy();
+
+        }
+        tenantServiceAccessor.clear();
+        platformServiceAccessor.destroy();
+        platformServiceAccessor = null;
+        sessionAccessorAccessor.destroy();
+        sessionAccessorAccessor = null;
+
+    }
 }

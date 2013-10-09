@@ -43,7 +43,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : configurations) {
             this.cacheConfigurations.put(cacheConfig.getName(), getEhCacheConfiguration(cacheConfig));
         }
-        cacheManager = configFile != null ?CacheManager.create(configFile) :CacheManager.create();
+        cacheManager = configFile != null ? CacheManager.create(configFile) : CacheManager.create();
     }
 
     protected CacheConfiguration getEhCacheConfiguration(final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig) {
@@ -264,6 +264,10 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             }
             throw new CacheException(e);
         }
+    }
+
+    public void destroy() {
+        this.cacheManager.shutdown();
     }
 
 }

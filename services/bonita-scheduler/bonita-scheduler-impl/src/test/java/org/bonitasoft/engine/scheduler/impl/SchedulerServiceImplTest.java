@@ -84,7 +84,7 @@ public class SchedulerServiceImplTest {
     @Test
     public void isShutDown() throws Exception {
         when(schedulerExecutor.isShutdown()).thenReturn(false);
-        assertFalse(schedulerService.isShutdown());
+        assertFalse(schedulerService.isStopped());
     }
 
     @Test(expected = SSchedulerException.class)

@@ -21,12 +21,12 @@ public class WorkServiceTest extends CommonServiceTest {
 
     @Before
     public void before() {
-        getWorkService().startup();
+        getWorkService().start();
     }
 
     @After
     public void after() throws TimeoutException {
-        getWorkService().shutdown();
+        getWorkService().stop();
     }
 
     @Test

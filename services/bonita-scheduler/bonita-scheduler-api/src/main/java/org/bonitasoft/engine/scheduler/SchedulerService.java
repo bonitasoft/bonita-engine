@@ -15,7 +15,7 @@ package org.bonitasoft.engine.scheduler;
 
 import java.util.List;
 
-import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilder;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -27,7 +27,7 @@ import org.bonitasoft.engine.scheduler.trigger.Trigger;
  * @author Matthieu Chaffotte
  * @since 6.0
  */
-public interface SchedulerService {
+public interface SchedulerService extends ServiceWithLifecycle {
 
     String JOB_DESCRIPTOR = "JOB_DESCRIPTOR";
 
@@ -62,25 +62,7 @@ public interface SchedulerService {
      * @return true if the service is shutdown; false otherwise.
      * @throws SSchedulerException
      */
-    boolean isShutdown() throws SSchedulerException;
-
-    /**
-     * Starts the scheduler service.
-     * 
-     * @throws SSchedulerException
-     *             if an exception occurs.
-     * @throws FireEventException
-     */
-    void start() throws SSchedulerException, FireEventException;
-
-    /**
-     * Shutdowns the scheduler service.
-     * 
-     * @throws SSchedulerException
-     *             if an exception occurs.
-     * @throws FireEventException
-     */
-    void shutdown() throws SSchedulerException, FireEventException;
+    boolean isStopped() throws SSchedulerException;
 
     /**
      * Schedules a job.

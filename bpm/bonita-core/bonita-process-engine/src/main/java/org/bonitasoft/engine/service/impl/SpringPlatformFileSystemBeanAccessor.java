@@ -86,4 +86,9 @@ public class SpringPlatformFileSystemBeanAccessor {
         return getContext().getBean(name, serviceClass);
     }
 
+    public static void destroy() {
+        context.destroy();
+        context = null;
+    }
+
 }

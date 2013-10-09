@@ -13,9 +13,12 @@
  **/
 package org.bonitasoft.engine.service;
 
+import java.util.List;
+
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -82,5 +85,9 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     WorkService getWorkService();
 
     PlatformCacheService getPlatformCacheService();
+
+    List<ServiceWithLifecycle> getServicesToStart();
+
+    void destroy();
 
 }

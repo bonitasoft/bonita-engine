@@ -234,7 +234,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public boolean isShutdown() throws SSchedulerException {
+    public boolean isStopped() throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "isShutdown");
         final boolean isShutdown = schedulerExecutor.isShutdown();
         logAfterMethod(TechnicalLogSeverity.TRACE, "isShutdown");
@@ -250,7 +250,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void shutdown() throws SSchedulerException, FireEventException {
+    public void stop() throws SSchedulerException, FireEventException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "shutdown");
         schedulerExecutor.shutdown();
         eventService.fireEvent(schedulStopped);
