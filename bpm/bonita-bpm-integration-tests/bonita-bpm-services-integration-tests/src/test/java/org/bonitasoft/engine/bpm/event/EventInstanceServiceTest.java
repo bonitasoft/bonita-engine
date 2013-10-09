@@ -537,12 +537,12 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         checkWaitingEvents(0, waitingEventClass, processDefinitionIdKey, flowNodeInstanceIdKey, eventInstanceId);
 
         final SWaitingMessageEventBuilder waitingMessageBuilder = bpmInstanceBuilders.getSWaitingMessageEventBuilder();
-        final SWaitingMessageEvent messageWaitingEvent = waitingMessageBuilder.createNewWaitingMessageIntermediateEventInstance(5, processInstance.getId(),
+        final SWaitingMessageEvent messageWaitingEvent = waitingMessageBuilder.createNewWaitingMessageIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
                 eventInstanceId, "m1", processInstance.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName()).done();
         createWaitingEvent(messageWaitingEvent);
 
         final SWaitingSignalEventBuilder waitingSignalEventBuilder = bpmInstanceBuilders.getSWaitingSignalEventBuilder();
-        final SWaitingSignalEvent waitingSignalEvent = waitingSignalEventBuilder.createNewWaitingSignalIntermediateEventInstance(5, processInstance.getId(),
+        final SWaitingSignalEvent waitingSignalEvent = waitingSignalEventBuilder.createNewWaitingSignalIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
                 eventInstanceId, "go", processInstance.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName()).done();
         createWaitingEvent(waitingSignalEvent);
 
