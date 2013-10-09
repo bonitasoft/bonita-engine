@@ -252,6 +252,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(loopDataOutputName, process.getId());
         assertNotNull("unable to find the loop data output on the process", processDataInstance);
         final List<?> list = (List<?>) processDataInstance.getValue();
+        waitForUserTask("lastTask", process);
         disableAndDeleteProcess(processDefinition);
         return list;
     }
