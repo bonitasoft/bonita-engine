@@ -19,6 +19,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
@@ -40,6 +42,9 @@ public class SessionProviderClusteredTest {
         hazelcastInstance = mock(HazelcastInstance.class);
         map = mock(IMap.class);
         when(hazelcastInstance.<Long, SSession> getMap(anyString())).thenReturn(map);
+        Config config = mock(Config.class);
+        when(hazelcastInstance.getConfig()).thenReturn(config);
+        when(config.getMapConfig(SessionProviderClustered.SESSION_MAP)).thenReturn(mock(MapConfig.class));
         when(manager.isFeatureActive(Features.ENGINE_CLUSTERING)).thenReturn(true);
         sessionProviderClustered = new SessionProviderClustered(manager, hazelcastInstance);
     }

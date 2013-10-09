@@ -27,7 +27,7 @@ import com.hazelcast.core.IMap;
  */
 public final class SessionProviderClustered implements SessionProvider {
 
-    private static final String SESSION_MAP = "SESSION_MAP";
+    static final String SESSION_MAP = "SESSION_MAP";
 
     private final IMap<Long, SSession> sessions;
 
