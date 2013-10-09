@@ -10,6 +10,7 @@ package com.bonitasoft.engine.session.impl;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.session.SSessionAlreadyExistsException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -35,7 +36,7 @@ public final class SessionProviderClustered implements SessionProvider {
         this(Manager.getInstance(), hazelcastInstance);
     }
 
-    public SessionProviderClustered(final Manager manager, final HazelcastInstance hazelcastInstance) {
+    SessionProviderClustered(final Manager manager, final HazelcastInstance hazelcastInstance) {
         if (!manager.isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
@@ -52,7 +53,15 @@ public final class SessionProviderClustered implements SessionProvider {
         if (sessions.containsKey(id)) {
             throw new SSessionAlreadyExistsException("A session wih id \"" + id + "\" already exists");
         }
-        sessions.put(id, session);
+        storeInMap(session, id);
+    }
+
+    /**
+     * @param session
+     * @param id
+     */
+    private void storeInMap(final SSession session, final long id) {
+        sessions.put(id, session, session.getDuration(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -78,7 +87,7 @@ public final class SessionProviderClustered implements SessionProvider {
         if (!sessions.containsKey(sessionId)) {
             throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
         }
-        sessions.put(sessionId, session);
+        storeInMap(session, sessionId);
     }
 
     @Override
