@@ -47,7 +47,7 @@ public class ClusteredEventServiceImplTest extends EventServiceTest {
         joinConfig.getTcpIpConfig().setEnabled(false);
         joinConfig.getAwsConfig().setEnabled(false);
 
-        hazelcastInstance1 = Hazelcast.newHazelcastInstance(config);
+        hazelcastInstance = Hazelcast.newHazelcastInstance(config);
     }
 
     @AfterClass
