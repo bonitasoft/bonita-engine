@@ -46,20 +46,22 @@ public class SWaitingMessageEventBuilderImpl extends SWaitingEventKeyProviderImp
     }
 
     @Override
-    public SWaitingMessageEventBuilder createNewWaitingMessageIntermediateEventInstance(final long processdefinitionId, final long processInstanceId,
+    public SWaitingMessageEventBuilder createNewWaitingMessageIntermediateEventInstance(final long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
             final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName) {
         entity = new SWaitingMessageEventImpl(SBPMEventType.INTERMEDIATE_CATCH_EVENT, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName,
                 messageName);
-        entity.setRootProcessInstanceId(processInstanceId);
+        entity.setRootProcessInstanceId(rootProcessInstanceId);
+        entity.setParentProcessInstanceId(processInstanceId);
         entity.setFlowNodeInstanceId(flowNodeInstanceId);
         return this;
     }
 
     @Override
-    public SWaitingMessageEventBuilder createNewWaitingMessageBoundaryEventInstance(final long processdefinitionId, final long processInstanceId,
+    public SWaitingMessageEventBuilder createNewWaitingMessageBoundaryEventInstance(final long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
             final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName) {
         entity = new SWaitingMessageEventImpl(SBPMEventType.BOUNDARY_EVENT, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, messageName);
-        entity.setRootProcessInstanceId(processInstanceId);
+        entity.setRootProcessInstanceId(rootProcessInstanceId);
+        entity.setParentProcessInstanceId(processInstanceId);
         entity.setFlowNodeInstanceId(flowNodeInstanceId);
         return this;
     }
@@ -69,6 +71,7 @@ public class SWaitingMessageEventBuilderImpl extends SWaitingEventKeyProviderImp
         entity = new SWaitingMessageEventImpl(waitingMessage.getEventType(), waitingMessage.getProcessDefinitionId(), waitingMessage.getProcessName(),
                 waitingMessage.getFlowNodeDefinitionId(), waitingMessage.getFlowNodeName(), waitingMessage.getMessageName());
         entity.setRootProcessInstanceId(waitingMessage.getRootProcessInstanceId());
+        entity.setParentProcessInstanceId(waitingMessage.getParentProcessInstanceId());
         entity.setFlowNodeInstanceId(waitingMessage.getFlowNodeInstanceId());
         return this;
     }

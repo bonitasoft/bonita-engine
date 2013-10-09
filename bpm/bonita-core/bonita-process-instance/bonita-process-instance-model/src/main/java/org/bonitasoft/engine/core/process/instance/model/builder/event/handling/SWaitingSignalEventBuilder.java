@@ -29,10 +29,10 @@ public interface SWaitingSignalEventBuilder extends SWaitingEventKeyProvider {
             final long rootProcessInstanceId, final String signalName, final String processName, final long flowNodeDefinitionId, final String flowNodeName,
             final long subProcessId);
 
-    SWaitingSignalEventBuilder createNewWaitingSignalIntermediateEventInstance(long processdefinitionId, final long processInstanceId,
+    SWaitingSignalEventBuilder createNewWaitingSignalIntermediateEventInstance(long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
             final long flowNodeInstanceId, final String signalName, final String processName, final long flowNodeDefinitionId, final String flowNodeName);
 
-    SWaitingSignalEventBuilder createNewWaitingSignalBoundaryEventInstance(long processdefinitionId, final long processInstanceId,
+    SWaitingSignalEventBuilder createNewWaitingSignalBoundaryEventInstance(long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
             final long flowNodeInstanceId, final String signalName, final String processName, final long flowNodeDefinitionId, final String flowNodeName);
 
     SWaitingSignalEvent done();

@@ -57,11 +57,11 @@ public class SignalEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SSignalEventTriggerDefinition sSignalEventTriggerDefinition = (SSignalEventTriggerDefinition) sEventTriggerDefinition;
         switch (eventDefinition.getType()) {
             case BOUNDARY_EVENT:
-                builder.createNewWaitingSignalBoundaryEventInstance(processDefinition.getId(), eventInstance.getParentContainerId(), eventInstance.getId(),
+                builder.createNewWaitingSignalBoundaryEventInstance(processDefinition.getId(), eventInstance.getRootProcessInstanceId(), eventInstance.getParentContainerId(), eventInstance.getId(),
                         sSignalEventTriggerDefinition.getSignalName(), processDefinition.getName(), eventDefinition.getId(), eventInstance.getName());
                 break;
             case INTERMEDIATE_CATCH_EVENT:
-                builder.createNewWaitingSignalIntermediateEventInstance(processDefinition.getId(), eventInstance.getParentContainerId(), eventInstance.getId(),
+                builder.createNewWaitingSignalIntermediateEventInstance(processDefinition.getId(), eventInstance.getRootProcessInstanceId(), eventInstance.getParentContainerId(), eventInstance.getId(),
                         sSignalEventTriggerDefinition.getSignalName(), processDefinition.getName(), eventDefinition.getId(), eventInstance.getName());
                 break;
             case START_EVENT:

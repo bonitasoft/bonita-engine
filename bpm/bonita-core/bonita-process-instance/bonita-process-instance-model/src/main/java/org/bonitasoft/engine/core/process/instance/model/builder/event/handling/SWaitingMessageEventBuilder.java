@@ -32,10 +32,10 @@ public interface SWaitingMessageEventBuilder extends SWaitingEventKeyProvider, S
             final long rootProcessInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName,
             final long subProcessId);
 
-    SWaitingMessageEventBuilder createNewWaitingMessageIntermediateEventInstance(long processdefinitionId, final long processInstanceId,
+    SWaitingMessageEventBuilder createNewWaitingMessageIntermediateEventInstance(long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
             final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName);
 
-    SWaitingMessageEventBuilder createNewWaitingMessageBoundaryEventInstance(long processdefinitionId, final long processInstanceId,
+    SWaitingMessageEventBuilder createNewWaitingMessageBoundaryEventInstance(long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
             final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName);
 
     SWaitingMessageEventBuilder createNewInstance(SWaitingMessageEvent waitingMessage);

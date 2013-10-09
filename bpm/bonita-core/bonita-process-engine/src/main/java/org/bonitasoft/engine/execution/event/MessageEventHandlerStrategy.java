@@ -108,14 +108,14 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         switch (eventDefinition.getType()) {
             case BOUNDARY_EVENT:
                 builder = getInstanceBuilders().getSWaitingMessageEventBuilder().createNewWaitingMessageBoundaryEventInstance(processDefinition.getId(),
-                        eventInstance.getRootContainerId(), eventInstance.getId(), messageName, processName, eventInstance.getFlowNodeDefinitionId(),
+                        eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(), eventInstance.getId(), messageName, processName, eventInstance.getFlowNodeDefinitionId(),
                         eventInstance.getName());
                 expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
                         processDefinition.getId());
                 break;
             case INTERMEDIATE_CATCH_EVENT:
                 builder = getInstanceBuilders().getSWaitingMessageEventBuilder().createNewWaitingMessageIntermediateEventInstance(processDefinition.getId(),
-                        eventInstance.getRootContainerId(), eventInstance.getId(), messageName, processName, eventInstance.getFlowNodeDefinitionId(),
+                        eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(), eventInstance.getId(), messageName, processName, eventInstance.getFlowNodeDefinitionId(),
                         eventInstance.getName());
                 expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
                         processDefinition.getId());
@@ -143,7 +143,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         SExpressionContext expressionContext;
 
         builder = getInstanceBuilders().getSWaitingMessageEventBuilder().createNewWaitingMessageIntermediateEventInstance(processDefinition.getId(),
-                receiveTaskInstance.getRootContainerId(), receiveTaskInstance.getId(), messageName, processName, receiveTaskInstance.getFlowNodeDefinitionId(),
+                receiveTaskInstance.getRootContainerId(), receiveTaskInstance.getParentProcessInstanceId(), receiveTaskInstance.getId(), messageName, processName, receiveTaskInstance.getFlowNodeDefinitionId(),
                 receiveTaskInstance.getName());
         expressionContext = new SExpressionContext(receiveTaskInstance.getParentContainerId(), getParentContainerType(receiveTaskInstance).name(),
                 processDefinition.getId());
