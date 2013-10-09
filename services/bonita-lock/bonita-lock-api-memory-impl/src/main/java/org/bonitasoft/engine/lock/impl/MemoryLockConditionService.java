@@ -53,9 +53,9 @@ public final class MemoryLockConditionService implements LockService {
     private final Map<String, Pair> waiters;
 
     private final int lockPoolSize;
-    
+
     private final String formatString;
-    
+
     private static class Pair {
         final Condition condition;
         final AtomicInteger count = new AtomicInteger(1);
@@ -76,15 +76,15 @@ public final class MemoryLockConditionService implements LockService {
      * @param lockTimeout
      *            timeout to obtain a lock in seconds
      */
-    public MemoryLockConditionService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout) {
+    public MemoryLockConditionService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout, final int lockPoolSize) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
         this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
         this.traceEnable = true;//logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         this.waiters = new HashMap<String, Pair>();
-        
-        this.lockPoolSize = 100;
+        this.lockPoolSize = lockPoolSize;
+
         this.formatString = "%0" + String.valueOf(lockPoolSize).length() + "d";
         for (int i = 0 ; i < lockPoolSize ; i++) {
             final String key = String.format(formatString, i);
@@ -93,17 +93,18 @@ public final class MemoryLockConditionService implements LockService {
             }
             this.locks.put(key, new ReentrantLock());
         }
-        
+
     }
-    
+
     private Lock getLock(final long objectToLockId) {
-        //System.err.println("Creating a key for objectToLockId:" + objectToLockId + "...");
         final long idOnReducedNbOfDigits = objectToLockId % lockPoolSize;
         final String lockKey = String.format(formatString, idOnReducedNbOfDigits);
-        //System.err.println("Created a key for objectToLockId:" + objectToLockId + ": " + lockKey);
+        if (!this.locks.containsKey(lockKey)) {
+            throw new RuntimeException("No lock defined for objectToLockId '" + objectToLockId + "' with generated key '" + lockKey + "'");
+        }
         return this.locks.get(lockKey);
     }
-    
+
 
     @Override
     public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit) {
