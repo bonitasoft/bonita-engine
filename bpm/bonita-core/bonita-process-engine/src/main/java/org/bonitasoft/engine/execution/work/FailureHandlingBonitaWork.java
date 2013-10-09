@@ -70,10 +70,8 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         } catch (final Throwable e) {
             // Edge case we cannot manage
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed, The failure will be handled, work is:  " + getDescription());
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage());
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
-            }
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage(), e);
+
             try {
                 getWrappedWork().handleFailure(e, context);
             } catch (final Throwable e1) {
