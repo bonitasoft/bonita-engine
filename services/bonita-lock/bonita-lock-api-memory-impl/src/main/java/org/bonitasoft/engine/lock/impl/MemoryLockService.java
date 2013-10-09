@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.lock.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +37,7 @@ public class MemoryLockService implements LockService {
 
     protected static final String SEPARATOR = "_";
 
-    private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
+    private final Map<String, ReentrantLock> locks = Collections.synchronizedMap(new HashMap<String, ReentrantLock>());
 
     protected final TechnicalLoggerService logger;
 
@@ -44,11 +45,15 @@ public class MemoryLockService implements LockService {
 
     private final ReadSessionAccessor sessionAccessor;
 
-    private final Object mutex = new Object();
+    private final Map<String, Object> mutexs = new HashMap<String, Object>();
 
     protected final boolean debugEnable;
 
     private final boolean traceEnable;
+
+    private final int lockPoolSize;
+
+    private final String formatString;
 
     /**
      * 
@@ -57,14 +62,33 @@ public class MemoryLockService implements LockService {
      * @param lockTimeout
      *            timeout to obtain a lock in seconds
      */
-    public MemoryLockService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout) {
+    public MemoryLockService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout, final int lockPoolSize) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
-        debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
-        traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
+        this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
+        this.traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
+        this.lockPoolSize = lockPoolSize;
+        
+        this.formatString = "%0" + String.valueOf(lockPoolSize).length() + "d";
+        for (int i = 0 ; i < lockPoolSize ; i++) {
+            final String key = String.format(formatString, i);
+            if (traceEnable) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "Creating a mutex for key: " + key);
+            }
+            this.mutexs.put(key, new Object());
+        }
     }
 
+    private Object getMutex(final long objectToLockId) {
+        final long idOnReducedNbOfDigits = objectToLockId % lockPoolSize;
+        final String mutexKey = String.format(formatString, idOnReducedNbOfDigits);
+        if (!this.mutexs.containsKey(mutexKey)) {
+            throw new RuntimeException("No mutext defined for objectToLockId '" + objectToLockId + "' with generated key '" + mutexKey + "'");
+        }
+        return this.mutexs.get(mutexKey);
+    }
+    
     protected ReentrantLock getLock(final String key) {
         if (!locks.containsKey(key)) {
             // use fair mode?
@@ -100,7 +124,7 @@ public class MemoryLockService implements LockService {
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + lock.getLock().hashCode() + " id=" + key);
         }
-        synchronized (mutex) {
+        synchronized (getMutex(lock.getObjectToLockId())) {
             try {
                 lock.getLock().unlock();
                 if (traceEnable) {
@@ -114,7 +138,7 @@ public class MemoryLockService implements LockService {
 
     @Override
     public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) {
-        synchronized (mutex) {
+        synchronized (getMutex(objectToLockId)) {
             final String key = buildKey(objectToLockId, objectType);
             final ReentrantLock lock = getLock(key);
 
@@ -146,7 +170,7 @@ public class MemoryLockService implements LockService {
     public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
         final String key;
         final ReentrantLock lock;
-        synchronized (mutex) {
+        synchronized (getMutex(objectToLockId)) {
             key = buildKey(objectToLockId, objectType);
             lock = getLock(key);
             if (lock.isHeldByCurrentThread()) {

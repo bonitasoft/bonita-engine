@@ -69,7 +69,7 @@ public class MemoryLockServiceTest {
 
     @Before
     public void before() {
-        memoryLockService = new MemoryLockService(logger, sessionAccessor, 1);
+        memoryLockService = new MemoryLockService(logger, sessionAccessor, 1, 12);
     }
 
     @Test
