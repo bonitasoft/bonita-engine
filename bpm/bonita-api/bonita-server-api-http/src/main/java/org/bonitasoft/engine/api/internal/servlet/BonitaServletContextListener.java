@@ -43,12 +43,9 @@ public class BonitaServletContextListener implements ServletContextListener {
             PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
             SPlatformSession createSession = platformSessionService.createSession("john");
             sessionAccessor.setSessionInfo(createSession.getId(), -1);
-            System.out.println("BonitaServletContextListener CreateSession " + createSession);
             PlatformAPIImpl platformAPI = new PlatformAPIImpl();
             if (platformAPI.isPlatformCreated()) {
-                System.out.println("BonitaServletContextListener platform created, starting the node");
                 platformAPI.startNode();
-                System.out.println("BonitaServletContextListener platform created, node started");
             }
             platformSessionService.deleteSession(createSession.getId());
             sessionAccessor.deleteSessionId();
