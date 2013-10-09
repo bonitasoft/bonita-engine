@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkService;
@@ -36,6 +37,8 @@ public class LockProcessInstanceWorkTest {
     private LockService lockService;
 
     private WorkService workService;
+    
+    private TechnicalLoggerService loggerService;
 
     @Before
     public void before() {
@@ -43,8 +46,10 @@ public class LockProcessInstanceWorkTest {
         tenantAccessor = mock(TenantServiceAccessor.class);
         lockService = mock(LockService.class);
         workService = mock(WorkService.class);
+        loggerService = mock(TechnicalLoggerService.class);
         when(tenantAccessor.getLockService()).thenReturn(lockService);
         when(tenantAccessor.getWorkService()).thenReturn(workService);
+        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
     }
 
     @Test

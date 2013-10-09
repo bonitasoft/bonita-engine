@@ -20,6 +20,8 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
@@ -47,35 +49,48 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     @Override
     public void work(final Map<String, Object> context) throws Exception {
-        LockService lockService = getTenantAccessor(context).getLockService();
+        final TechnicalLoggerService loggerService = getTenantAccessor(context).getTechnicalLoggerService();
+        final LockService lockService = getTenantAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
         BonitaLock lock = null;
         try {
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " trying to get lock for instance " + processInstanceId + ": " + getWorkStack());
+            }
             lock = lockService.tryLock(processInstanceId, objectType, timeout, timeUnit);
             if (lock == null) {
                 //lock has not been obtained
+                if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " did not get lock for instance " + processInstanceId + ": " + getWorkStack());
+                }                
                 rescheduleWork(getTenantAccessor(context).getWorkService(), getRootWork());
                 return;
+            }
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " obtained lock for instance " + processInstanceId + ": " + getWorkStack());
             }
             getWrappedWork().work(context);
         } finally {
             if (lock != null) {
                 lockService.unlock(lock);
+                if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " has unlocked lock for instance " + processInstanceId + ": " + getWorkStack());
+                }
             }
         }
 
     }
-    /*
+
     private String getWorkStack() {
-    	if (this.getWrappedWork() instanceof TxBonitaWork) {
-    		final TxBonitaWork txBonitaWork = (TxBonitaWork) this.getWrappedWork();
-    		final BonitaWork doingWork = txBonitaWork.getWrappedWork();
-    		return doingWork.getDescription();
-    	}
-    	return "nothing";
+        if (this.getWrappedWork() instanceof TxBonitaWork) {
+            final TxBonitaWork txBonitaWork = (TxBonitaWork) this.getWrappedWork();
+            final BonitaWork doingWork = txBonitaWork.getWrappedWork();
+            return doingWork.getDescription();
+        }
+        return "nothing";
     }
-     */
+
 
     private void rescheduleWork(final WorkService workService, final BonitaWork rootWork) throws SLockException {
         try {
