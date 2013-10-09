@@ -47,6 +47,9 @@ public class WorkFactory {
     public static BonitaWork createExecuteFlowNodeWork(final long flowNodeInstanceId, final List<SOperation> operations,
             final SExpressionContext contextDependency,
             final long processInstanceId) {
+        if (processInstanceId <= 0) {
+            throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
+        }
         return new FailureHandlingBonitaWork(new LockProcessInstanceWork(new TxBonitaWork(new ExecuteFlowNodeWork(flowNodeInstanceId, operations,
                 contextDependency, processInstanceId)), processInstanceId));
     }
