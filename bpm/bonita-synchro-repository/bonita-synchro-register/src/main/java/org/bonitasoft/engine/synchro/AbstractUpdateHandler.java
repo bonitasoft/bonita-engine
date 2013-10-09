@@ -35,6 +35,8 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
 
     private final long tenantId;
 
+    private final Map<Class<?>, Method> getIdMethods = Collections.synchronizedMap(new HashMap<Class<?>, Method>());
+
     public AbstractUpdateHandler(final long tenantId) {
         super();
         this.tenantId = tenantId;
@@ -46,9 +48,9 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
     public void execute(final SEvent sEvent) throws SHandlerExecutionException {
         try {
             final Map<String, Serializable> event = getEvent(sEvent);
-            Long id = getObjectId(sEvent);
+            final Long id = getObjectId(sEvent);
 
-            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
+            final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
             final BonitaTransactionSynchronization synchronization = new WaitForEventSynchronization(event, id, tenantServiceAccessor.getSynchroService());
 
             TransactionService transactionService = tenantServiceAccessor.getTransactionService();
@@ -69,7 +71,13 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
         Object object = null;
         try {
             object = sEvent.getObject();
-            final Method method = object.getClass().getMethod("getId");
+            final Class<?> clazz = object.getClass();
+            Method method = null;
+            if (getIdMethods.containsKey(clazz)) {
+                method = getIdMethods.get(clazz);
+            } else {
+                method = clazz.getMethod("getId");
+            }
             final Object invoke = method.invoke(object);
             id = (Long) invoke;
         } catch (final Throwable e) {
