@@ -14,9 +14,12 @@
 package com.bonitasoft.engine.service.impl;
 
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
@@ -27,29 +30,38 @@ import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
 import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.LifecycleService;
 
 /**
  * @author Baptiste Mesta
  */
-public class BonitaHazelcastInstanceFactory {
+public class BonitaHazelcastInstanceFactory implements ServiceWithLifecycle {
 
-    private static HazelcastInstance hazelcastInstance;
+    private HazelcastInstance hazelcastInstance;
 
-    public static synchronized HazelcastInstance newHazelcastInstance(final Config config, final CacheConfigurations cacheConfigurations) {
+    public BonitaHazelcastInstanceFactory() {
+    }
+
+    public synchronized HazelcastInstance newHazelcastInstance(final Config config, final CacheConfigurations cacheConfigurations) {
         if (hazelcastInstance == null) {
-            initializeCacheConfigurations(config, cacheConfigurations);
-            // set classloader to null in order to use the context classloader instead
-            config.setClassLoader(null);
-            hazelcastInstance = Hazelcast.newHazelcastInstance(config);
+            hazelcastInstance = createNewInstance(config, cacheConfigurations);
         }
         return hazelcastInstance;
+    }
+
+    private HazelcastInstance createNewInstance(final Config config, final CacheConfigurations cacheConfigurations) {
+        initializeCacheConfigurations(config, cacheConfigurations);
+        // set classloader to null in order to use the context classloader instead
+        config.setClassLoader(null);
+        HazelcastInstance hazelcastInstance2 = Hazelcast.newHazelcastInstance(config);
+        return hazelcastInstance2;
     }
 
     /**
      * @param config
      * @param cacheConfigurations
      */
-    private static void initializeCacheConfigurations(final Config config, final CacheConfigurations cacheConfigurations) {
+    private void initializeCacheConfigurations(final Config config, final CacheConfigurations cacheConfigurations) {
         final List<CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
         for (final CacheConfiguration cacheConfiguration : configurations) {
             // use wildcard because name of caches are: "<tenant id>_<cache name>"
@@ -78,10 +90,24 @@ public class BonitaHazelcastInstanceFactory {
         }
     }
 
-    public static synchronized HazelcastInstance getInstance() {
+    public synchronized HazelcastInstance getInstance() {
         if (hazelcastInstance != null) {
             return hazelcastInstance;
         }
         throw new IllegalStateException("The hazelcast instance has not been created. You may not be executed in clustered environment.");
+    }
+
+    @Override
+    public void start() throws SBonitaException {
+        // // Do nothing, spring start hazelcast...
+    }
+
+    @Override
+    public void stop() throws SBonitaException, TimeoutException {
+    }
+
+    public void destroy() {
+        LifecycleService lifecycleService = hazelcastInstance.getLifecycleService();
+        lifecycleService.shutdown();
     }
 }

@@ -1,8 +1,22 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:hz="http://www.hazelcast.com/schema/spring"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:hz="http://www.hazelcast.com/schema/spring"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd ">
-	<!-- configure the instance named bonita,it is the default instance used by bonita -->
-	
-	<bean id="hazelcastInstance" class="com.bonitasoft.engine.service.impl.BonitaHazelcastInstanceFactory" factory-method="newHazelcastInstance" scope="singleton">
+	<!-- configure the instance named bonita,it is the default instance used 
+		by bonita -->
+
+	<bean id="servicesToStart" class="java.util.ArrayList">
+		<constructor-arg name="c">
+			<list>
+				<ref bean="hazelcastService"/>
+			</list>
+		</constructor-arg>
+	</bean>
+	<!-- the factory with start stop method that returns the hazelcast instance -->
+	<bean id="hazelcastService" class="com.bonitasoft.engine.service.impl.BonitaHazelcastInstanceFactory" scope="singleton" destroy-method="destroy"></bean>
+
+	<bean id="hazelcastInstance"
+		factory-bean="hazelcastService"
+		factory-method="newHazelcastInstance" scope="singleton" >
 		<constructor-arg>
 			<bean class="com.hazelcast.config.Config">
 				<property name="groupConfig">
@@ -36,21 +50,21 @@
 						</property>
 					</bean>
 				</property>
-<!-- 				<property name="serializationConfig"> -->
-<!-- 					<bean class="com.hazelcast.config.SerializationConfig"> -->
-<!-- 						<property name="serializerConfigs"> -->
-<!-- 						<list> -->
-<!-- 							<bean class="com.hazelcast.config.SerializerConfig"> -->
-<!-- 								<property name="className" value="com.bonitasoft.engine.classloader.BonitaSerializer"/> -->
-<!-- 								<property name="typeClassName" value="org.bonitasoft.engine.commons.BonitaSerializable"/> -->
-<!-- 							</bean> -->
-<!-- 						</list> -->
-<!-- 						</property> -->
-<!-- 					</bean> -->
-<!-- 				</property> -->
+				<!-- <property name="serializationConfig"> -->
+				<!-- <bean class="com.hazelcast.config.SerializationConfig"> -->
+				<!-- <property name="serializerConfigs"> -->
+				<!-- <list> -->
+				<!-- <bean class="com.hazelcast.config.SerializerConfig"> -->
+				<!-- <property name="className" value="com.bonitasoft.engine.classloader.BonitaSerializer"/> -->
+				<!-- <property name="typeClassName" value="org.bonitasoft.engine.commons.BonitaSerializable"/> -->
+				<!-- </bean> -->
+				<!-- </list> -->
+				<!-- </property> -->
+				<!-- </bean> -->
+				<!-- </property> -->
 			</bean>
 		</constructor-arg>
-		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations"/>
+		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
 	</bean>
-	
+
 </beans>

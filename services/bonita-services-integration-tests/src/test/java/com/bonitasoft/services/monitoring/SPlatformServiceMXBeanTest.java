@@ -14,9 +14,7 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.Test;
 
@@ -40,11 +38,11 @@ public class SPlatformServiceMXBeanTest extends CommonServiceSPTest {
         monitoringService = getServicesBuilder().buildPlatformMonitoringService();
     }
 
-    public void startScheduler() throws SSchedulerException, FireEventException {
+    public void startScheduler() throws Exception {
         TestUtil.startScheduler(schedulerService);
     }
 
-    public void stopScheduler() throws SSchedulerException, FireEventException {
+    public void stopScheduler() throws Exception {
         TestUtil.stopScheduler(schedulerService, getTransactionService());
     }
 

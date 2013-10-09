@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
@@ -194,13 +195,13 @@ public class PlatformMonitoringServiceTest extends CommonServiceSPTest {
     }
 
     @Test
-    public void isSchedulerStartedTest() throws SBonitaException, STransactionRollbackException {
+    public void isSchedulerStartedTest() throws SBonitaException, STransactionRollbackException, TimeoutException {
         getTransactionService().begin();
         assertFalse(monitoringService.isSchedulerStarted());
 
         schedulerService.start();
         assertTrue(monitoringService.isSchedulerStarted());
-        schedulerService.shutdown();
+        schedulerService.stop();
 
         assertFalse(monitoringService.isSchedulerStarted());
         getTransactionService().complete();
