@@ -31,7 +31,7 @@ public abstract class MonitoringServiceImpl implements MonitoringService {
 
     private final boolean allowMbeansRegistration;
 
-    private final TechnicalLoggerService technicalLog;
+    protected final TechnicalLoggerService technicalLog;
 
     public MonitoringServiceImpl(final boolean allowMbeans, final TechnicalLoggerService technicalLog) {
         allowMbeansRegistration = allowMbeans;

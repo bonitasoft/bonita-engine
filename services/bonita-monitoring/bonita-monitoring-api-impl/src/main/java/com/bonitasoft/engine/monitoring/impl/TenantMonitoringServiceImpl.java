@@ -8,10 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring.impl;
 
+import static java.util.Arrays.asList;
+
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -45,8 +48,7 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
 
     public TenantMonitoringServiceImpl(final boolean allowMbeansRegistration, final IdentityService identityService, final EventService eventService,
             final TransactionService transactionService, final SessionAccessor sessionAccessor, final SessionService sessionService,
-            final SJobHandlerImpl jobHandler, final TechnicalLoggerService technicalLog)
-            throws HandlerRegistrationException {
+            final SJobHandlerImpl jobHandler, final TechnicalLoggerService technicalLog) {
         super(allowMbeansRegistration, technicalLog);
         this.identityService = identityService;
         this.jobHandler = jobHandler;
@@ -66,10 +68,17 @@ public class TenantMonitoringServiceImpl extends MonitoringServiceImpl implement
         addMBean(serviceBean);
     }
 
-    private void addHandlers() throws HandlerRegistrationException {
-        eventService.addHandler(SJobHandlerImpl.JOB_COMPLETED, jobHandler);
-        eventService.addHandler(SJobHandlerImpl.JOB_EXECUTING, jobHandler);
-        eventService.addHandler(SJobHandlerImpl.JOB_FAILED, jobHandler);
+    private void addHandlers() {
+        for (String event : asList(SJobHandlerImpl.JOB_COMPLETED, SJobHandlerImpl.JOB_EXECUTING, SJobHandlerImpl.JOB_FAILED)) {
+            try {
+                eventService.addHandler(event, jobHandler);
+            } catch (HandlerRegistrationException hre) {
+                // It has already been registered, just log a warning
+                if (technicalLog.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                    technicalLog.log(getClass(), TechnicalLogSeverity.WARNING, hre);
+                }
+            }
+        }
     }
 
     @Override
