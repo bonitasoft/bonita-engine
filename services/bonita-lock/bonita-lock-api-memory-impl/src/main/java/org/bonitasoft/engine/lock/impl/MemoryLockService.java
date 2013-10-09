@@ -45,15 +45,13 @@ public class MemoryLockService implements LockService {
 
     private final ReadSessionAccessor sessionAccessor;
 
-    private final Map<String, Object> mutexs = new HashMap<String, Object>();
+    private final Map<Integer, Object> mutexs;
 
     protected final boolean debugEnable;
 
     private final boolean traceEnable;
 
     private final int lockPoolSize;
-
-    private final String formatString;
 
     /**
      * 
@@ -70,23 +68,22 @@ public class MemoryLockService implements LockService {
         this.traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         this.lockPoolSize = lockPoolSize;
         
-        this.formatString = "%0" + String.valueOf(lockPoolSize).length() + "d";
+        //the goal of this map of mutexs is not to solve completely the competition between keys
+        //it is only improving the default "one lock" behavior by partitioning ids among a chosen pool size
+        //this a sharding approach
+        final Map<Integer, Object> tmpMutexs = new HashMap<Integer, Object>();
         for (int i = 0 ; i < lockPoolSize ; i++) {
-            final String key = String.format(formatString, i);
-            if (traceEnable) {
-                logger.log(getClass(), TechnicalLogSeverity.TRACE, "Creating a mutex for key: " + key);
-            }
-            this.mutexs.put(key, new Object());
+            tmpMutexs.put(i, new Object());
         }
+        this.mutexs = Collections.unmodifiableMap(tmpMutexs);
     }
 
     private Object getMutex(final long objectToLockId) {
-        final long idOnReducedNbOfDigits = objectToLockId % lockPoolSize;
-        final String mutexKey = String.format(formatString, idOnReducedNbOfDigits);
-        if (!this.mutexs.containsKey(mutexKey)) {
-            throw new RuntimeException("No mutext defined for objectToLockId '" + objectToLockId + "' with generated key '" + mutexKey + "'");
+        final int poolKeyForThisObjectId = Long.valueOf(objectToLockId % lockPoolSize).intValue();
+        if (!this.mutexs.containsKey(poolKeyForThisObjectId)) {
+            throw new RuntimeException("No mutex defined for objectToLockId '" + objectToLockId + "' with generated key '" + poolKeyForThisObjectId + "'");
         }
-        return this.mutexs.get(mutexKey);
+        return this.mutexs.get(poolKeyForThisObjectId);
     }
     
     protected ReentrantLock getLock(final String key) {

@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.lock.impl;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +37,7 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
  */
 public final class MemoryLockConditionService implements LockService {
 
-    private final Map<String, ReentrantLock> locks = new HashMap<String, ReentrantLock>();
+    private final Map<Integer, ReentrantLock> locks;
 
     private static final String SEPARATOR = "_";
 
@@ -53,8 +54,6 @@ public final class MemoryLockConditionService implements LockService {
     private final Map<String, Pair> waiters;
 
     private final int lockPoolSize;
-
-    private final String formatString;
 
     private static class Pair {
         final Condition condition;
@@ -85,24 +84,23 @@ public final class MemoryLockConditionService implements LockService {
         this.waiters = new HashMap<String, Pair>();
         this.lockPoolSize = lockPoolSize;
 
-        this.formatString = "%0" + String.valueOf(lockPoolSize).length() + "d";
+        //the goal of this map of mutexs is not to solve completely the competition between keys
+        //it is only improving the default "one lock" behavior by partitioning ids among a chosen pool size
+        //this a sharding approach
+        final Map<Integer, ReentrantLock> tmpLocks = new HashMap<Integer, ReentrantLock>();
         for (int i = 0 ; i < lockPoolSize ; i++) {
-            final String key = String.format(formatString, i);
-            if (traceEnable) {
-                logger.log(getClass(), TechnicalLogSeverity.TRACE, "Creating a lock for key: " + key);
-            }
-            this.locks.put(key, new ReentrantLock());
+            tmpLocks.put(i, new ReentrantLock());
         }
+        this.locks = Collections.unmodifiableMap(tmpLocks);
 
     }
 
     private Lock getLock(final long objectToLockId) {
-        final long idOnReducedNbOfDigits = objectToLockId % lockPoolSize;
-        final String lockKey = String.format(formatString, idOnReducedNbOfDigits);
-        if (!this.locks.containsKey(lockKey)) {
-            throw new RuntimeException("No lock defined for objectToLockId '" + objectToLockId + "' with generated key '" + lockKey + "'");
+        final int poolKeyForThisObjectId = Long.valueOf(objectToLockId % lockPoolSize).intValue();
+        if (!this.locks.containsKey(poolKeyForThisObjectId)) {
+            throw new RuntimeException("No lock defined for objectToLockId '" + objectToLockId + "' with generated key '" + poolKeyForThisObjectId + "'");
         }
-        return this.locks.get(lockKey);
+        return this.locks.get(poolKeyForThisObjectId);
     }
 
 
