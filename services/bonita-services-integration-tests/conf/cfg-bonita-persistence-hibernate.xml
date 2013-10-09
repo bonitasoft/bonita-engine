@@ -249,6 +249,7 @@
 <!--                 <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" value="read-write"/> -->
 <!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" value="read-write"/> -->
+<!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="read-write" /> -->
             </map>
 		</constructor-arg>
 	</bean>
