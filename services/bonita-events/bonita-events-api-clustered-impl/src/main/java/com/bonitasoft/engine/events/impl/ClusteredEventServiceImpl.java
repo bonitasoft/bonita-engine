@@ -79,7 +79,7 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
     ClusteredEventServiceImpl(final String eventServiceHandlerMapNameSuffix, final SEventBuilders eventBuilders,
             final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance, final Manager manager)
-            throws HandlerRegistrationException {
+                    throws HandlerRegistrationException {
         super(eventBuilders, logger);
         if (!manager.isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
@@ -99,13 +99,6 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
         hazelcastInstance.getUserContext().put("ClusteredEventService", this);
 
         eventHandlers = hazelcastInstance.getMap(mapName);
-        String prefix = "---- ";
-        System.out.println(prefix + "Cluster : " + hazelcastInstance.getCluster().getMembers());
-        System.out.println(prefix + "EventHandlers : " + eventHandlers.size() + " " + eventHandlers);
-        for (Map.Entry<String, List<SHandler<SEvent>>> entry : eventHandlers.entrySet()) {
-            System.out.println(prefix + "Entry : " + entry.getKey() + " -> " + entry.getValue());
-        }
-        System.out.println(prefix + "EventHandlers end");
         if (eventHandlers.isEmpty()) {
             // it seems we are the first one in the cluster so let's add the default handlers
             // There is another way, maybe cleaner, to know if we are the first one in the cluster :
@@ -116,7 +109,6 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
             for(Map.Entry<String, SHandler<SEvent>> entry : handlers.entrySet()) {
                 addHandler(entry.getKey(), entry.getValue());
             }
-            System.out.println(prefix + "Added the default handlers : " + handlers);
         } else {
             // If we are not the first one we have to initialize a local copy of the already registered events.
             localEventTypes.addAll(eventHandlers.keySet());
