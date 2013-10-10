@@ -5,7 +5,7 @@
 		by bonita -->
 
 	<bean id="servicesToStart" class="java.util.ArrayList">
-		<constructor-arg name="c">
+		<constructor-arg>
 			<list>
 				<ref bean="hazelcastService"/>
 			</list>
