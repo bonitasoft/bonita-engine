@@ -16,6 +16,7 @@ package org.bonitasoft.engine.actor.mapping.impl;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -40,6 +41,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
@@ -235,7 +237,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
                 List<SActorMember> actorMembers;
                 do {
                     actorMembers = getActorMembers(actor.getId(), 0, NUMBER_OF_RESULT);
-                    for (SActorMember sActorMember : actorMembers) {
+                    for (final SActorMember sActorMember : actorMembers) {
                         removeActorMember(sActorMember);
                     }
                 } while (actorMembers.size() > 0);
@@ -244,7 +246,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
             }
         } catch (final SBonitaReadException bre) {
             throw new SActorDeletionException(bre);
-        } catch (SActorMemberDeletionException e) {
+        } catch (final SActorMemberDeletionException e) {
             throw new SActorDeletionException(e);
         }
     }
@@ -317,7 +319,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
             return addActorMember;
         } catch (final SIdentityException e) {
             throw new SActorMemberCreationException(e);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new SActorMemberCreationException(e);
         }
     }
@@ -381,7 +383,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     @Override
     public void removeActorMember(final SActorMember sActorMember) throws SActorMemberDeletionException {
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting an actor member");
-        long actorMemberId = sActorMember.getId();
+        final long actorMemberId = sActorMember.getId();
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(sActorMember);
             SDeleteEvent deleteEvent = null;
@@ -484,6 +486,14 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         } catch (final SRecorderException e) {
             throw new SActorMemberDeletionException("Can't delete all actor members.", e);
         }
+    }
+
+    @Override
+    public List<Long> getPossibleUserIdsOfActorId(final long actorId, final int startIndex, final int maxResults) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getPossibleUserIdsOfActorId", parameters, SActor.class, new QueryOptions(
+                startIndex, maxResults));
+        return persistenceService.selectList(descriptor);
     }
 
 }

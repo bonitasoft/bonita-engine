@@ -62,6 +62,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * This API deals with definition objects such as {@link ProcessDefinition}, {@link ProcessDeploymentInfo}, {@link Category}, ...
@@ -1628,5 +1629,26 @@ public interface ProcessManagementAPI {
      * @since 6.1
      */
     void disableAndDeleteProcessDefinition(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException;
+
+    /**
+     * Lists the possible users (candidates) of the specified human task definition.
+     * Users are ordered by user name.
+     * 
+     * @param processDefinitionId
+     *            the identifier of process definition
+     * @param humanTaskName
+     *            the name of the human task
+     * @param startIndex
+     *            the start index
+     * @param maxResults
+     *            the list of users.
+     * @return the list of users.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @throws RetrieveException
+     *             If an exception occurs during the user retrieving
+     * @since 6.1
+     */
+    List<User> getPossibleUsersOfHumanTask(long processDefinitionId, String humanTaskName, int startIndex, int maxResults);
 
 }

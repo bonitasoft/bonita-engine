@@ -357,4 +357,6 @@ public interface ActorMappingService {
      */
     void deleteAllActorMembers() throws SActorMemberDeletionException;
 
+    List<Long> getPossibleUserIdsOfActorId(long actorId, int startIndex, int maxResults) throws SBonitaReadException;
+
 }

@@ -144,4 +144,26 @@
 		WHERE actormember.roleId = :roleId
 	</query>
 
+	<query name="getPossibleUserIdsOfActorId">
+		SELECT user.id
+		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+			 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
+			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
+			 org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
+		WHERE actor.id = :actorId
+		AND actor.id = actormember.actorId
+		AND (
+			actormember.userId = user.id
+		 	OR (
+		 		user_membership.userId = user.id
+		 		AND (
+		 			actormember.groupId = user_membership.groupId
+        			OR actormember.roleId = user_membership.roleId
+		 		)
+		    )
+		)
+		GROUP BY user.id
+		ORDER BY MIN(user.userName)
+	</query>
+
 </hibernate-mapping>

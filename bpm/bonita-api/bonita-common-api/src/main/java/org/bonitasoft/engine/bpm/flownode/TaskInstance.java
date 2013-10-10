@@ -13,12 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.flownode;
 
-
-
-
 /**
  * @author Baptiste Mesta
- *
  */
 public interface TaskInstance extends ActivityInstance {
 

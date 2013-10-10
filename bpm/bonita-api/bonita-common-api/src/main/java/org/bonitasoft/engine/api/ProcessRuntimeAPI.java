@@ -2052,6 +2052,6 @@ public interface ProcessRuntimeAPI {
      *             If an exception occurs during the user retrieving
      * @since 6.1
      */
-    List<User> getPossibleUsersOfPendingHumanTasks(long humanTaskInstanceId, int startIndex, int maxResults);
+    List<User> getPossibleUsersOfPendingHumanTask(long humanTaskInstanceId, int startIndex, int maxResults);
 
 }

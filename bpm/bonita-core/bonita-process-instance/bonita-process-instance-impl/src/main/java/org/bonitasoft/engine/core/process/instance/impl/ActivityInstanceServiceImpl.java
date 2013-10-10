@@ -1086,10 +1086,17 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             throws SActivityReadException {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("humanTaskInstanceId", humanTaskInstanceId);
+        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults);
         final SelectListDescriptor<Long> elements = new SelectListDescriptor<Long>("getPossibleUserIdsOfPendingTasks", parameters, SActivityInstance.class,
-                new QueryOptions(startIndex, maxResults));
+                queryOptions);
         try {
-            return getPersistenceRead().selectList(elements);
+            List<Long> userIds = getPersistenceRead().selectList(elements);
+            if (userIds.isEmpty()) {
+                final SelectListDescriptor<Long> selectDescriptor = new SelectListDescriptor<Long>("getPossibleUserIdsOfPendingTasksWithoutMemberships",
+                        parameters, SActivityInstance.class, queryOptions);
+                userIds = getPersistenceRead().selectList(selectDescriptor);
+            }
+            return userIds;
         } catch (final SBonitaReadException e) {
             throw new SActivityReadException(e);
         }

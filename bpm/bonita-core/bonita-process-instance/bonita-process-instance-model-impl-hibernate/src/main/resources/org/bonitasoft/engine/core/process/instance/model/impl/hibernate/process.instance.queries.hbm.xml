@@ -1311,25 +1311,48 @@
 	<query name="getPossibleUserIdsOfPendingTasks">
 		SELECT user.id
 		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
-			org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
-			org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
-			org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-			org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+			 org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
+			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
+			 org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
+			 org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
 		WHERE mapping.activityId = :humanTaskInstanceId
 		AND (
 			mapping.userId = user.id
 			OR (
 				mapping.actorId = actor.id
 				AND actor.id = actormember.actorId
-				AND user.id = user_membership.userId
 				AND (
-         			actormember.userId = user_membership.userId
-        			OR actormember.groupId = user_membership.groupId
-        			OR actormember.roleId = user_membership.roleId
-        		)
+					actormember.userId = user.id
+					OR (
+						user.id = user_membership.userId
+						AND (
+        					actormember.groupId = user_membership.groupId
+        					OR actormember.roleId = user_membership.roleId
+        				)
+					)
+				)
         	)
 		)
 		ORDER By user.userName
+	</query>
+	
+	<query name="getPossibleUserIdsOfPendingTasksWithoutMemberships">
+		SELECT user.id
+		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
+			 org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
+			 org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
+		WHERE mapping.activityId = :humanTaskInstanceId
+		AND (
+			mapping.userId = user.id
+			OR (
+				mapping.actorId = actor.id
+				AND actor.id = actormember.actorId
+				AND	actormember.userId = user.id
+        	)
+		)
+		GROUP BY user.id
+		ORDER BY MIN(user.userName)
 	</query>
 
 </hibernate-mapping>

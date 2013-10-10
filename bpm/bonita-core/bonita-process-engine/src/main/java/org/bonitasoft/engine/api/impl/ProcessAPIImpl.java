@@ -71,7 +71,6 @@ import org.bonitasoft.engine.api.impl.transaction.category.RemoveCategoriesFromP
 import org.bonitasoft.engine.api.impl.transaction.category.RemoveProcessDefinitionsOfCategory;
 import org.bonitasoft.engine.api.impl.transaction.category.UpdateCategory;
 import org.bonitasoft.engine.api.impl.transaction.comment.AddComment;
-import org.bonitasoft.engine.api.impl.transaction.comment.GetComments;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetNumberOfConnectorImplementations;
@@ -253,6 +252,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionE
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -4115,15 +4115,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<Comment> getComments(final long processInstanceId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final SCommentService commentService = tenantAccessor.getCommentService();
-        final GetComments getComments = new GetComments(commentService, processInstanceId);
         try {
-            getComments.execute();
-            final List<SComment> sComments = getComments.getResult();
+            final List<SComment> sComments = commentService.getComments(processInstanceId);
             return ModelConvertor.toComments(sComments);
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
+        } catch (final SBonitaReadException sbe) {
+            throw new RetrieveException(sbe);
         }
     }
 
@@ -5605,7 +5602,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public List<User> getPossibleUsersOfPendingHumanTasks(final long humanTaskInstanceId, final int startIndex, final int maxResults) {
+    public List<User> getPossibleUsersOfPendingHumanTask(final long humanTaskInstanceId, final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
@@ -5613,6 +5610,30 @@ public class ProcessAPIImpl implements ProcessAPI {
             final IdentityService identityService = getTenantAccessor().getIdentityService();
             final List<SUser> sUsers = identityService.getUsers(userIds);
             return ModelConvertor.toUsers(sUsers);
+        } catch (final SBonitaException sbe) {
+            throw new RetrieveException(sbe);
+        }
+    }
+
+    @Override
+    public List<User> getPossibleUsersOfHumanTask(final long processDefinitionId, final String humanTaskName, final int startIndex, final int maxResults) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        try {
+            final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            final SFlowNodeDefinition flowNode = processDefinition.getProcessContainer().getFlowNode(humanTaskName);
+            if (!(flowNode instanceof SHumanTaskDefinition)) {
+                return Collections.emptyList();
+            }
+            final SHumanTaskDefinition humanTask = (SHumanTaskDefinition) flowNode;
+            final String actorName = humanTask.getActorName();
+            final ActorMappingService actorMappingService = getTenantAccessor().getActorMappingService();
+            final SActor actor = actorMappingService.getActor(actorName, processDefinitionId);
+            final List<Long> userIds = actorMappingService.getPossibleUserIdsOfActorId(actor.getId(), startIndex, maxResults);
+            final List<SUser> users = tenantAccessor.getIdentityService().getUsers(userIds);
+            return ModelConvertor.toUsers(users);
+        } catch (final SProcessDefinitionNotFoundException spdnfe) {
+            return Collections.emptyList();
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
