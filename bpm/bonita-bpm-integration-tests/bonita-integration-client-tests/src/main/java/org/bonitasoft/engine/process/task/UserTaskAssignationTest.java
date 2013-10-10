@@ -718,11 +718,6 @@ public class UserTaskAssignationTest extends CommonAPITest {
         possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", 2, 4);
         assertEquals(0, possibleUsers.size());
 
-        possibleUsers = getProcessAPI().getPossibleUsersOfHumanTask(processDefinition.getId(), "step1", -1, 10);
-        assertEquals(2, possibleUsers.size());
-        assertEquals(jaakko, possibleUsers.get(0));
-        assertEquals(jack, possibleUsers.get(1));
-
         // cleanup:
         deleteGroups(group);
         deleteRoles(role);
