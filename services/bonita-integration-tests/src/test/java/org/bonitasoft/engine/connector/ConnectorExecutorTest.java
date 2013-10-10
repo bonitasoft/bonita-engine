@@ -65,7 +65,7 @@ public class ConnectorExecutorTest {
     }
 
     private SessionAccessor getSessionAccessor() {
-    	return new SessionAccessor() {
+        return new SessionAccessor() {
 
             @Override
             public long getTenantId() {
@@ -78,109 +78,103 @@ public class ConnectorExecutorTest {
             }
 
             @Override
-            public void setSessionInfo(long sessionId, long tenantId) {
+            public void setSessionInfo(final long sessionId, final long tenantId) {
 
             }
 
             @Override
             public void deleteSessionId() {
             }
-            
+
             @Override
             public void deleteTenantId() {
-                
+
             }
-            
+
             @Override
-            public void setTenantId(long tenantId) {
-                
+            public void setTenantId(final long tenantId) {
+
             }
         };
     }
-    
+
     private SessionService getSessionService() {
-    	return new SessionService() {
-			
-			@Override
-			public void setSessionDuration(long duration) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void renewSession(long sessionId) throws SSessionException {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public boolean isValid(long sessionId) throws SSessionNotFoundException {
-				// TODO Auto-generated method stub
-				return false;
-			}
-			
-			@Override
-			public boolean isAllowed(long sessionId, String actionKey) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-			
-			@Override
-			public long getSessionDuration() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-			
-			@Override
-			public SSession getSession(long sessionId) throws SSessionNotFoundException {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public long getDefaultSessionDuration() {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-			
-			@Override
-			public void deleteSessionsOfTenant(long tenantId) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void deleteSessions() {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void deleteSession(long sessionId) throws SSessionNotFoundException {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public SSession createSession(long tenantId, long userId, String userName,
-			        boolean technicalUser) throws SSessionException {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public SSession createSession(long tenantId, String userName)
-			        throws SSessionException {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public void cleanInvalidSessions() {
-				// TODO Auto-generated method stub
-				
-			}
-		};
+        return new SessionService() {
+
+            @Override
+            public void setSessionDuration(final long duration) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void renewSession(final long sessionId) throws SSessionException {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public boolean isValid(final long sessionId) throws SSessionNotFoundException {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            @Override
+            public long getSessionDuration() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
+
+            @Override
+            public SSession getSession(final long sessionId) throws SSessionNotFoundException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public long getDefaultSessionDuration() {
+                // TODO Auto-generated method stub
+                return 0;
+            }
+
+            @Override
+            public void deleteSessionsOfTenant(final long tenantId) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void deleteSessions() {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void deleteSession(final long sessionId) throws SSessionNotFoundException {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public SSession createSession(final long tenantId, final long userId, final String userName,
+                    final boolean technicalUser) throws SSessionException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public SSession createSession(final long tenantId, final String userName)
+                    throws SSessionException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public void cleanInvalidSessions() {
+                // TODO Auto-generated method stub
+
+            }
+        };
     }
     @Test
     public void testExecuteConnector() {

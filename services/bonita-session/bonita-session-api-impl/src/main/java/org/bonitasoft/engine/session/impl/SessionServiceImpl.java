@@ -119,12 +119,6 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public boolean isAllowed(final long sessionId, final String actionKey) {
-        // FIXME
-        return true;
-    }
-
-    @Override
     public SSession getSession(final long sessionId) throws SSessionNotFoundException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getSession"));

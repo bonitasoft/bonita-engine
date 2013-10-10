@@ -69,8 +69,6 @@ public interface SessionService {
      */
     boolean isValid(long sessionId) throws SSessionNotFoundException;
 
-    boolean isAllowed(long sessionId, String actionKey);
-
     /**
      * Retrieve a session by its id
      * 
