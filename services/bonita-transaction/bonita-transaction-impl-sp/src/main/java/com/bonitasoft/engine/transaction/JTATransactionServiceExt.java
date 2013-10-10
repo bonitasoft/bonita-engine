@@ -4,7 +4,6 @@ import java.util.concurrent.Callable;
 
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SRetryableException;
@@ -17,30 +16,30 @@ public class JTATransactionServiceExt extends JTATransactionServiceImpl {
     private final long delay;
     private final double delayFactor;
 
-    public JTATransactionServiceExt(TechnicalLoggerService logger, BonitaTransactionManagerLookup txManagerLookup, EventService eventService, final int retries,
+    public JTATransactionServiceExt(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup, final int retries,
             final long delay, final double delayFactor) {
-        super(logger, txManagerLookup, eventService);
+        super(logger, txManagerLookup);
         this.retries = retries;
         this.delay = delay;
         this.delayFactor = delayFactor;
 
     }
 
-    public JTATransactionServiceExt(final TechnicalLoggerService logger, final TransactionManager txManager, final EventService eventService, final int retries,
+    public JTATransactionServiceExt(final TechnicalLoggerService logger, final TransactionManager txManager, final int retries,
             final long delay, final double delayFactor) {
-        super(logger, txManager, eventService);
+        super(logger, txManager);
         this.retries = retries;
         this.delay = delay;
         this.delayFactor = delayFactor;
     }
 
     @Override
-    public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+    public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
         int attempt = 0;
         long sleepTime = delay;
         T result = null;
-        do { 
-            // Do not sleep for the 1st attempt. 
+        do {
+            // Do not sleep for the 1st attempt.
             if (attempt != 0) {
                 sleep(sleepTime);
                 sleepTime *= delayFactor;
@@ -72,7 +71,7 @@ public class JTATransactionServiceExt extends JTATransactionServiceImpl {
     /**
      * @param sleepTime
      */
-    private void sleep(long sleepTime) {
+    private void sleep(final long sleepTime) {
         try {
             Thread.sleep(sleepTime);
         } catch (final InterruptedException ie) {

@@ -50,6 +50,7 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
+import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -62,6 +63,7 @@ import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -71,6 +73,7 @@ import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.xml.Parser;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
@@ -121,6 +124,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     public final long createTenant(final TenantCreator creator) throws CreationException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_TENANT);
         PlatformServiceAccessor platformAccessor = null;
+        // useless? done in create(Tenantcreator)
         try {
             platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
             final PlatformService platformService = platformAccessor.getPlatformService();
@@ -263,6 +267,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final CommandService commandService = tenantServiceAccessor.getCommandService();
+            final Parser profileParser = tenantServiceAccessor.getProfileParser();
+            final ProfileService profileService = tenantServiceAccessor.getProfileService();
+            final IdentityService identityService = tenantServiceAccessor.getIdentityService();
+            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             final Callable<Long> initializeTenant = new Callable<Long>() {
 
                 @Override
@@ -283,6 +291,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         final SCommandBuilder commandBuilder = tenantServiceAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
                         createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
                         deployTenantReports(tenantId, tenantServiceAccessor);
+                        createDefaultProfiles(tenantId, profileParser, profileService, identityService, logger);
                         sessionService.deleteSession(session.getId());
                         return tenantId;
                     } finally {

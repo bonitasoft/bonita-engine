@@ -63,7 +63,7 @@ public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements M
 
     @Override
     protected void afterExecute(final Runnable r, final Throwable t) {
-        executingWorks.remove(r);
+        executingWorks.remove(localMemberUUID, r);
     }
 
     @Override

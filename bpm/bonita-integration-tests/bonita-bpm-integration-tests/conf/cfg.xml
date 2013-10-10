@@ -87,7 +87,6 @@
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="commentService" ref="commentService" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
-		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="workService" ref="workService" />
@@ -131,7 +130,6 @@
 		<constructor-arg name="documentMappingService" ref="documentMappingService" />
 		<constructor-arg name="commentService" ref="commentService" />
 		<constructor-arg name="commentBuilders" ref="commentBuilders" />		
-		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="userFilterService" ref="userFilterService" />
 		<constructor-arg name="actorMappingService" ref="actorMappingService" />
@@ -151,10 +149,8 @@
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />
-		<constructor-arg name="workService" ref="workService" />
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="tokenService" ref="tokenService" />
-		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
@@ -190,7 +186,6 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="containerRegistry" ref="containerRegistry" />
 		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="tokenService" ref="tokenService"/>
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="operationBuilders" ref="sOperationBuilders"/>
@@ -203,7 +198,6 @@
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="processExecutor" ref="processExecutor" />
-		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 

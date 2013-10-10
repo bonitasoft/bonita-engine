@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +19,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.CommandExecutionException;
@@ -33,7 +30,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.APITestUtil;
-import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +45,7 @@ import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.log.Log;
+import com.bonitasoft.engine.monitoring.MonitoringException;
 import com.bonitasoft.engine.reporting.Report;
 import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
 
@@ -63,10 +60,6 @@ public class APITestSPUtil extends APITestUtil {
     private PlatformMonitoringAPI platformMonitoringAPI;
 
     private ReportingAPI reportingAPI;
-
-    public static int DEFAULT_REPEAT = 50;
-
-    public static int DEFAULT_TIMEOUT = 2000;
 
     protected PlatformMonitoringAPI getPlatformMonitoringAPI() {
         return platformMonitoringAPI;
@@ -185,15 +178,6 @@ public class APITestSPUtil extends APITestUtil {
         return count == minimalFrequency;
     }
 
-    protected SearchResult<HumanTaskInstance> waitForHumanTasks(final int repeatEach, final int timeout, final int nbTasks, final String taskName,
-            final long processInstanceId) throws Exception {
-        final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, true, nbTasks, new SearchOptionsBuilder(0, 10000)
-                .filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).filter(HumanTaskInstanceSearchDescriptor.NAME, taskName)
-                .done(), getProcessAPI());
-        assertTrue(checkNbOfHumanTasks.waitUntil());
-        return checkNbOfHumanTasks.getHumanTaskInstances();
-    }
-
     protected void deleteSupervisor(final Serializable id) throws BonitaException {
         final Map<String, Serializable> deleteParameters = new HashMap<String, Serializable>();
         deleteParameters.put(SUPERVISOR_ID_KEY, id);
@@ -209,6 +193,15 @@ public class APITestSPUtil extends APITestUtil {
         taskCreator.setDueDate(dueDate);
         taskCreator.setPriority(priority);
         return taskCreator;
+    }
+
+    public List<String> checkNoActiveTransactions() throws MonitoringException {
+        final List<String> messages = new ArrayList<String>();
+        long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
+        if (numberOfActiveTransactions != 0) {
+            messages.add("There are " + numberOfActiveTransactions + " active transactions.");
+        }
+        return messages;
     }
 
     public List<String> checkExistenceOfBreakpoints() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
@@ -249,9 +242,11 @@ public class APITestSPUtil extends APITestUtil {
         assignAndExecuteStep(activityInstance.getId(), user.getId());
     }
 
-    protected void waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
+    @Override
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
         final ActivityInstance waitForUserTask = waitForUserTask(taskName, processInstance);
         assignAndExecuteStep(waitForUserTask, user);
+        return (HumanTaskInstance) waitForUserTask;
     }
 
 }
