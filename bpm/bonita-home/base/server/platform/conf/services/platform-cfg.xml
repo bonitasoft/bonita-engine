@@ -43,7 +43,7 @@
 
 
 	<bean id="servicesToStart" class="java.util.ArrayList">
-		<constructor-arg name="c">
+		<constructor-arg >
 			<list>
 			</list>
 		</constructor-arg>
