@@ -95,7 +95,7 @@ public class ClusteredLockService implements LockService {
 
         final TechnicalLogSeverity severity = selectSeverity(time);
         if (severity != null) {
-            logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
+            logger.log(getClass(), severity, "The blocking call to lock for the key " + key + " took " + time + "ms.");
             if (TechnicalLogSeverity.DEBUG.equals(severity)) {
                 logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
             }
