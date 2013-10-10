@@ -1632,7 +1632,11 @@ public interface ProcessManagementAPI {
 
     /**
      * Lists the possible users (candidates) of the specified human task definition.
+     * <b>
+     * If the task contains a user filter, this one is not executed.
      * Users are ordered by user name.
+     * If the task or the process do not exist the result will be an empty list.
+     * It is the same if the flow node is not a human task.
      * 
      * @param processDefinitionId
      *            the identifier of process definition
