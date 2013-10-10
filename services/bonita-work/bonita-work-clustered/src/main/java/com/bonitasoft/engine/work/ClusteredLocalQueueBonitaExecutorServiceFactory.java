@@ -50,7 +50,7 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
     @Override
     public ThreadPoolExecutor createExecutorService() {
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
-        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker");
+        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", maximumPoolSize);
         return new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance);
     }
 
