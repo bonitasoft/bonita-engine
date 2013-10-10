@@ -19,7 +19,7 @@ import org.bonitasoft.engine.session.model.builder.SSessionBuilders;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SSesssionBuildersImpl implements SSessionBuilders {
+public class SSessionBuildersImpl implements SSessionBuilders {
 
     @Override
     public SSessionBuilder getSessionBuilder() {
