@@ -51,18 +51,18 @@ public abstract class AbstractEventServiceImpl implements EventService {
                     FireEventException fireEventException = null;
                     for (final SHandler<SEvent> handler : handlers) {
                         // for each handler, I check if it's interested or not by the given event
-                        if (handler.isInterested(event)) {
-                            // for now, I just log the Exception into the console
-                            try {
+                        try {
+                            if (handler.isInterested(event)) {
                                 handler.execute(event);
-                            } catch (final Exception e) {
-                                if (fireEventException == null) {
-                                    fireEventException = new FireEventException("Unable to execute some handler");
-                                }
-                                fireEventException.addHandlerException(e);
-                                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to execute handler", e);
-                                }
+                            }
+                        } catch (final Exception e) {
+                            if (fireEventException == null) {
+                                fireEventException = new FireEventException("Unable to execute some handler");
+                            }
+                            fireEventException.addHandlerException(e);
+                            // for now, I just log the Exception into the console
+                            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
+                                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to execute handler", e);
                             }
                         }
                     }
