@@ -245,6 +245,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Incident -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.incident</groupId>
+			<artifactId>bonita-incident-log</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Command -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.command</groupId>

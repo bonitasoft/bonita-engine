@@ -16,8 +16,8 @@ package org.bonitasoft.engine.work;
 import java.io.Serializable;
 
 /**
- * A runnable that notify a listener of it's state
- * 
+ * A runnable that notifies a listener of its state
+ *
  * @author Baptiste Mesta
  */
 public abstract class BonitaRunnable implements Runnable, Serializable {

@@ -24,6 +24,7 @@ import org.bonitasoft.engine.test.WaitUntil;
 /**
  * @author Baptiste Mesta
  */
+@Deprecated
 public final class WaitForCompletedArchivedStep extends WaitUntil {
 
     private final String value;

@@ -25,7 +25,11 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * @author Frederic Bouquet
  * @author Matthieu Chaffotte
  */
-public final class BonitaHomeServer extends BonitaHome {
+public class BonitaHomeServer extends BonitaHome {
+
+    private static final String TENANT_CONFIGURATION_FILE = "bonita-server.properties";
+
+    private static final String PROFILES_FILE = "profiles.xml";
 
     private static final String CONF = "conf";
 
@@ -51,7 +55,7 @@ public final class BonitaHomeServer extends BonitaHome {
 
     private Properties platformProperties;
 
-    public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
+    public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();;
 
     private BonitaHomeServer() {
         platformProperties = null;
@@ -88,7 +92,7 @@ public final class BonitaHomeServer extends BonitaHome {
         return path.toString();
     }
 
-    public File getPlaformFile() throws BonitaHomeNotSetException {
+    public File getPlatformFile() throws BonitaHomeNotSetException {
         final String platformFolder = getPlatformConfFolder();
         final StringBuilder builder = new StringBuilder(platformFolder);
         builder.append(File.separatorChar).append("bonita-platform.properties");
@@ -176,9 +180,17 @@ public final class BonitaHomeServer extends BonitaHome {
 
     public Properties getPlatformProperties() throws BonitaHomeNotSetException, IOException {
         if (platformProperties == null) {
-            platformProperties = PropertiesManager.getProperties(getPlaformFile());
+            platformProperties = PropertiesManager.getProperties(getPlatformFile());
         }
         return platformProperties;
+    }
+
+    public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {
+        return PropertiesManager.getProperties(new File(getTenantConfFolder(tenantId) + File.separatorChar + TENANT_CONFIGURATION_FILE));
+    }
+
+    public File getTenantProfilesFile(final Long tenantId) throws BonitaHomeNotSetException {
+        return new File(getTenantConfFolder(tenantId) + File.separatorChar + PROFILES_FILE);
     }
 
 }

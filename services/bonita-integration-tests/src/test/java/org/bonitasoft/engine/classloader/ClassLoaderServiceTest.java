@@ -77,7 +77,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         classLoaderService = getServicesBuilder().buildClassLoaderService();
         dependencyService = getServicesBuilder().buildDependencyService();
         platformDependencyService = getServicesBuilder().buildPlatformDependencyService();

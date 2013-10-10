@@ -29,7 +29,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
-import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -48,19 +47,16 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
 
     private final ContainerRegistry containerRegistry;
 
-    private final LockService lockService;
-
     private final TechnicalLoggerService logger;
 
     public TerminateEventHandlerStrategy(final BPMInstanceBuilders bpmInstanceBuilders, final ProcessInstanceService processInstanceService,
-            final FlowNodeInstanceService activityInstanceService, final ContainerRegistry containerRegistry, final LockService lockService,
+            final FlowNodeInstanceService activityInstanceService, final ContainerRegistry containerRegistry,
             final TechnicalLoggerService logger) {
         super();
         this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.processInstanceService = processInstanceService;
         this.activityInstanceService = activityInstanceService;
         this.containerRegistry = containerRegistry;
-        this.lockService = lockService;
         this.logger = logger;
     }
 
@@ -68,7 +64,7 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
         final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(
-                bpmInstanceBuilders, processInstanceService, activityInstanceService, containerRegistry, lockService, logger);
+                bpmInstanceBuilders, processInstanceService, activityInstanceService, containerRegistry, logger);
         processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, -1, eventInstance.getId());
         // Parent should always be process for event (but must change that id it's not the case anymore
     }

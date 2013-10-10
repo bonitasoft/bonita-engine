@@ -17,6 +17,7 @@ import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
 import org.bonitasoft.engine.scheduler.job.ThrowsExceptionJob;
+import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -116,7 +117,7 @@ public class JobTest extends CommonServiceTest {
         getTransactionService().begin();
         parameters.clear();
         parameters.add(parameterBuilder.createNewInstance("throwException", Boolean.FALSE).done());
-        schedulerService.schedule(jobDescriptors.get(0).getId(), parameters);
+        schedulerService.executeAgain(jobDescriptors.get(0).getId(), parameters);
         getTransactionService().complete();
         Thread.sleep(1000);
 
@@ -160,7 +161,7 @@ public class JobTest extends CommonServiceTest {
         parameters.clear();
         parameters.add(parameterBuilder.createNewInstance("throwException", Boolean.FALSE).done());
         JOB_SERVICE.setJobParameters(getDefaultTenantId(), jobDescriptors.get(0).getId(), parameters);
-        schedulerService.schedule(jobDescriptors.get(0).getId());
+        schedulerService.executeAgain(jobDescriptors.get(0).getId());
         getTransactionService().complete();
         Thread.sleep(500);
 
@@ -202,11 +203,11 @@ public class JobTest extends CommonServiceTest {
         getTransactionService().complete();
 
         getTransactionService().begin();
-        schedulerService.schedule(jobDescriptors.get(0).getId());
+        schedulerService.executeAgain(jobDescriptors.get(0).getId());
         getTransactionService().complete();
 
         getTransactionService().begin();
-        schedulerService.schedule(jobDescriptors.get(0).getId());
+        schedulerService.executeAgain(jobDescriptors.get(0).getId());
         getTransactionService().complete();
         Thread.sleep(500);
         getTransactionService().begin();
@@ -252,7 +253,7 @@ public class JobTest extends CommonServiceTest {
         parameters.clear();
         parameters.add(parameterBuilder.createNewInstance("throwException", Boolean.FALSE).done());
 
-        schedulerService.schedule(jobDescriptors.get(0).getId(), parameters);
+        schedulerService.executeAgain(jobDescriptors.get(0).getId(), parameters);
         getTransactionService().complete();
         Thread.sleep(500);
 
@@ -271,6 +272,48 @@ public class JobTest extends CommonServiceTest {
         getTransactionService().begin();
         jobLogs = JOB_SERVICE.searchJobLogs(options);
         assertEquals(1, jobLogs.size());
+        getTransactionService().complete();
+    }
+
+    @Test
+    public void getFailedJobs() throws Exception {
+        final Date now = new Date();
+        getTransactionService().begin();
+        final Trigger trigger = new OneExecutionTrigger("logevents", now, 10);
+        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+                .createNewInstance(ThrowsExceptionJob.class.getName(), "ThowExceptionJob2").done();
+
+        final SJobParameterBuilder parameterBuilder = schedulerService.getJobParameterBuilder();
+        final SJobParameter parameter = parameterBuilder.createNewInstance("throwException", Boolean.TRUE).done();
+        final List<SJobParameter> parameters = new ArrayList<SJobParameter>(2);
+        parameters.add(parameter);
+        schedulerService.schedule(jobDescriptor, parameters, trigger);
+        getTransactionService().complete();
+
+        Thread.sleep(800);
+
+        getTransactionService().begin();
+        final List<FilterOption> filters = new ArrayList<FilterOption>(2);
+        filters.add(new FilterOption(SJobDescriptor.class, "jobClassName", ThrowsExceptionJob.class.getName()));
+        final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
+        final List<SJobDescriptor> jobDescriptors = JOB_SERVICE.searchJobDescriptors(queryOptions);
+        assertEquals(1, jobDescriptors.size());
+
+        List<SFailedJob> failedJobs = JOB_SERVICE.getFailedJobs(0, 10);
+        assertEquals(1, failedJobs.size());
+        getTransactionService().complete();
+
+        getTransactionService().begin();
+        parameters.clear();
+        parameters.add(parameterBuilder.createNewInstance("throwException", Boolean.FALSE).done());
+        JOB_SERVICE.setJobParameters(getDefaultTenantId(), jobDescriptors.get(0).getId(), parameters);
+        schedulerService.executeAgain(jobDescriptors.get(0).getId());
+        getTransactionService().complete();
+        Thread.sleep(500);
+
+        getTransactionService().begin();
+        failedJobs = JOB_SERVICE.getFailedJobs(0, 10);
+        assertEquals(0, failedJobs.size());
         getTransactionService().complete();
     }
 

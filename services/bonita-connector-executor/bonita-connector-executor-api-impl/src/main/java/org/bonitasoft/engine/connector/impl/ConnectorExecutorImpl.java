@@ -46,7 +46,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     private final ThreadPoolExecutor threadPoolExecutor;
 
     private final SessionAccessor sessionAccessor;
-    
+
     private final SessionService sessionService;
 
     /**
@@ -102,6 +102,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }
     }
 
+    @SuppressWarnings("unused")
     protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
         return submit.get();
     }
@@ -141,14 +142,14 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             } catch (final SConnectorValidationException e) {
                 throw new SConnectorException(e);
             } finally {
-            	//in case a session has been created: see ConnectorAPIAccessorImpl
-            	try {
-            		final long sessionId = sessionAccessor.getSessionId();
-            		sessionAccessor.deleteSessionId();
-            		sessionService.deleteSession(sessionId);
-            	} catch (SessionIdNotSetException e) {
-            		//nothing, no session has been created
-            	}
+                // in case a session has been created: see ConnectorAPIAccessorImpl
+                try {
+                    final long sessionId = sessionAccessor.getSessionId();
+                    sessionAccessor.deleteSessionId();
+                    sessionService.deleteSession(sessionId);
+                } catch (SessionIdNotSetException e) {
+                    // nothing, no session has been created
+                }
             }
         }
     }

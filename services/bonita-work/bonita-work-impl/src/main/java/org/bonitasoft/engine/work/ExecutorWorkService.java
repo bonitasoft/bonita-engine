@@ -33,7 +33,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class ExecutorWorkService implements WorkService {
 
-	private static final int TIMEOUT = Integer.valueOf(System.getProperty("bonita.work.ttermination.timeout", "15"));
+	private static final int TIMEOUT = Integer.valueOf(System.getProperty("bonita.work.termination.timeout", "15"));
 
 	private final TransactionService transactionService;
 
@@ -90,7 +90,6 @@ public class ExecutorWorkService implements WorkService {
 			try {
 				transactionService.registerBonitaSynchronization(synchro);
 			} catch (final STransactionNotFoundException e) {
-				e.printStackTrace();
 				throw new WorkRegisterException(e.getMessage(), e);
 			}
 			synchronizations.set(synchro);

@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -37,7 +36,7 @@ public abstract class AbstractJob implements StatelessJob {
     }
 
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+    public void setAttributes(final Map<String, Serializable> attributes) {
         NullCheckingUtil.checkArgsNotNull(attributes.get("name"));
         name = (String) attributes.get("name");
     }

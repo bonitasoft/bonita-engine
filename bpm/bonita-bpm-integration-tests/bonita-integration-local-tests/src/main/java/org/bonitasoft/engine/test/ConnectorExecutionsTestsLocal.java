@@ -431,7 +431,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for step containing the connector and execute it
-        final ActivityInstance step1 = waitForUserTask(taskName, processInstance.getId());
+        final ActivityInstance step1 = waitForUserTask(taskName, processInstance);
         assignAndExecuteStep(step1, userId);
         waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState());
 
@@ -562,8 +562,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         assertTrue(waitUntil.waitUntil());
 
         // Remove all for the end
-        waitForProcessToFinish(processInstance, 10500);
-
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -597,12 +596,12 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, userId, designProcessDefinition, false);
-        final long processInstanceId = getProcessAPI().startProcess(processDefinition.getId()).getId();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final WaitUntil waitUntil = waitForVariableStorage(50, 2000, inputName, valueOfInput1);
         assertTrue(waitUntil.waitUntil());
 
-        waitForUserTask("step2", processInstanceId);
+        waitForUserTask("step2", processInstance);
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -690,12 +689,12 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         final long userId = getIdentityAPI().getUserByUserName(JOHN).getId();
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, userId, designProcessDefinition, false);
-        final long processInstanceId = getProcessAPI().startProcess(processDefinition.getId()).getId();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final WaitUntil waitUntil = waitForVariableStorage(50, 2000, inputName, valueOfInput1);
         assertTrue(waitUntil.waitUntil());
 
-        assertNotNull(waitForUserTask("step2", processInstanceId));
+        assertNotNull(waitForUserTask("step2", processInstance));
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -834,7 +833,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         addMappingOfActorsForUser(delivery, userId, processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", process, 10000);
+        waitForUserTask("step2", process);
         assertEquals("value", getProcessAPI().getProcessDataInstance("value", process.getId()).getValue());
 
         disableAndDeleteProcess(processDefinition);

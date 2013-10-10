@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.incident.Incident;
+import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -42,12 +42,12 @@ public class JDBCJobListener extends AbstractJobListener {
 
     private final JobService jobService;
 
-    private final TechnicalLoggerService logger;
+    private final IncidentService incidentService;
 
-    public JDBCJobListener(final JobService jobService, final TechnicalLoggerService logger) {
+    public JDBCJobListener(final JobService jobService, final IncidentService incidentService) {
         super();
         this.jobService = jobService;
-        this.logger = logger;
+        this.incidentService = incidentService;
     }
 
     @Override
@@ -94,8 +94,11 @@ public class JDBCJobListener extends AbstractJobListener {
                     getSchedulerService().delete(jobDescriptor.getJobName());
                 }
             }
-        } catch (final SBonitaException e) {
-            logger.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the job completion", e);
+        } catch (final SBonitaException sbe) {
+            final Long tenantId = (Long) jobDetail.getJobDataMap().getWrappedMap().get("tenantId");
+            final Incident incident = new Incident("An exception occurs during the job execution of the job descriptor" + jobDescriptorId, "", jobException,
+                    sbe);
+            incidentService.report(tenantId, incident);
         }
     }
 

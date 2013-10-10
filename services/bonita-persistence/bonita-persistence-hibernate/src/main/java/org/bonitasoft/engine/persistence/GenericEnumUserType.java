@@ -100,7 +100,7 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
     }
 
     @Override
-    public void nullSafeSet(final PreparedStatement st, final Object value, final int index) throws SQLException {
+    public void nullSafeSet(final PreparedStatement st, final Object value, final int index) {
         try {
             if (value == null) {
                 st.setNull(index, this.type.sqlType());

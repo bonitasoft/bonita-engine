@@ -54,8 +54,7 @@ public class AbortProcessInstanceTest extends AbstractProcessInstanceTest {
         assertTrue(checkNbOfProcessInstances.waitUntil());
 
         // execute task1 of a target process instance
-        final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf(50, 3000, true, 2 * loopCardinality, pedro)
-                .getPendingHumanTaskInstances();
+        final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf(true, 2 * loopCardinality, pedro).getPendingHumanTaskInstances();
         final HumanTaskInstance humanTaskInst1ToExecute = pendingHumanTaskInstances.get(0);
         assertEquals(taskName1, humanTaskInst1ToExecute.getName());
         assignAndExecuteStep(humanTaskInst1ToExecute, pedro.getId());

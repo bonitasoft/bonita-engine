@@ -156,13 +156,13 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void schedule(final long jobDescriptorId) throws SSchedulerException {
+    public void executeAgain(final long jobDescriptorId) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         schedulerExecutor.executeAgain(jobDescriptorId, getTenantId(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());
     }
 
     @Override
-    public void schedule(final long jobDescriptorId, final List<SJobParameter> parameters) throws SSchedulerException {
+    public void executeAgain(final long jobDescriptorId, final List<SJobParameter> parameters) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         jobService.setJobParameters(getTenantId(), jobDescriptor.getId(), parameters);
         schedulerExecutor.executeAgain(jobDescriptorId, getTenantId(), jobDescriptor.getJobName(), jobDescriptor.disallowConcurrentExecution());

@@ -21,9 +21,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
@@ -43,10 +40,10 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         super(work);
     }
 
-    protected void logIncident(final Exception cause, final Exception exceptionWhenHandlingFailure) {
-        Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause, exceptionWhenHandlingFailure);
-        IncidentService incidentService = getTenantAccessor().getIncidentService();
-        incidentService.report(incident);
+    protected void logIncident(final Throwable cause, final Throwable exceptionWhenHandlingFailure) {
+        final Incident incident = new Incident(getDescription(), getRecoveryProcedure(), cause, exceptionWhenHandlingFailure);
+        final IncidentService incidentService = getTenantAccessor().getIncidentService();
+        incidentService.report(getTenantId(), incident);
     }
 
     protected TenantServiceAccessor getTenantAccessor() {
@@ -59,7 +56,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
 
     @Override
     public void work(final Map<String, Object> context) {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         loggerService = tenantAccessor.getTechnicalLoggerService();
         sessionAccessor = tenantAccessor.getSessionAccessor();
         context.put(TENANT_ACCESSOR, tenantAccessor);
@@ -70,27 +67,24 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Starting work: " + getDescription());
             }
             getWrappedWork().work(context);
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             // Edge case we cannot manage
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "A work failed, The failure will be handled, work is:  " + getDescription());
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING,
-                    "Exception was:" + e.getMessage());
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed, The failure will be handled, work is:  " + getDescription());
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage());
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, e);
             }
             try {
-                getWrappedWork().handleFailure(e, context);;
-            } catch (Exception e1) {
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
-                        "Unexpected error while executing work " + getDescription() + ". You may consider restarting the system. This will restart all works.",
-                        e);
+                getWrappedWork().handleFailure(e, context);
+            } catch (final Throwable e1) {
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work " + getDescription()
+                        + ". You may consider restarting the system. This will restart all works.", e);
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
                 logIncident(e, e1);
             }
 
         } finally {
-        	sessionAccessor.deleteTenantId();
+            sessionAccessor.deleteTenantId();
         }
     }
 

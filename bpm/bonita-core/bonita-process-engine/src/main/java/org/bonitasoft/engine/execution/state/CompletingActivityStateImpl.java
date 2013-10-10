@@ -86,7 +86,6 @@ public class CompletingActivityStateImpl extends FlowNodeStateWithConnectors {
     protected void beforeOnEnter(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {

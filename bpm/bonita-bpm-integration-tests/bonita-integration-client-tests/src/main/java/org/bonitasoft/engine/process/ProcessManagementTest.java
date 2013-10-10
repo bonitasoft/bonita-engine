@@ -33,7 +33,6 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
@@ -71,7 +70,6 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
-import org.bonitasoft.engine.test.wait.WaitForCompletedArchivedStep;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Before;
@@ -322,7 +320,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         final int nbActivities = 3; // task1, task2, task3
         final int nbOfStates = 2; // executing, completed
-        checkNbOfArchivedActivityInstances(20, 5000, processInstance2, 3 * nbOfStates);
+        checkNbOfArchivedActivityInstances(processInstance2, 3 * nbOfStates);
         List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(processInstance2.getId(), 0, 100, criterionAsc);
         for (int i = 0; i < nbOfStates; i++) {
             if (criterionAsc.equals(ActivityInstanceCriterion.REACHED_STATE_DATE_ASC) || criterionAsc.equals(ActivityInstanceCriterion.LAST_UPDATE_ASC)) {
@@ -402,7 +400,7 @@ public class ProcessManagementTest extends CommonAPITest {
             assertEquals(activityInstance.getState(), TestStates.getReadyState());
         }
 
-        checkNbOfOpenActivities(40, 3000, processInstance2, 2);
+        checkNbOfOpenActivities(processInstance2, 2);
         openedActivityInstances = getProcessAPI().getOpenActivityInstances(processInstance1.getId(), 0, 200, ActivityInstanceCriterion.DEFAULT);
         for (final ActivityInstance activityInstance : openedActivityInstances) {
             // Check that all TestStates are Open (Ready):
@@ -868,7 +866,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForStep(50, 1000, "step1", processInstance);
+        waitForStep("step1", processInstance);
 
         final List<ActivityInstance> activityInstances = new ArrayList<ActivityInstance>(getProcessAPI().getActivities(processInstance.getId(), 0, 20));
         final ActivityInstance activityInstance = activityInstances.get(activityInstances.size() - 1);
@@ -1094,20 +1092,14 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
 
-        final long activityInstanceId = waitForStep(50, 500, "step1", pi0).getStepId();
+        final long activityInstanceId = waitForStep("step1", pi0).getStepId();
         final HumanTaskInstance userTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
         assertEquals(displayName, userTaskInstance.getDisplayName());
         assertEquals(displayDescription, userTaskInstance.getDisplayDescription());
         assignAndExecuteStep(userTaskInstance, user.getId());
+        waitForCompletedArchivedStep("step1", processDefinition.getId(), displayName, displayDescriptionAfterCompletion + pi0.getId());
 
-        final String value = "step1";
-        final long id = processDefinition.getId();
-        final WaitForCompletedArchivedStep waitUntil = new WaitForCompletedArchivedStep(50, 500, value, id, getProcessAPI());
-        assertTrue(waitUntil.waitUntil());
-        final ArchivedHumanTaskInstance saUserTaskInstance = waitUntil.getArchivedTask();
-        assertEquals(displayName, saUserTaskInstance.getDisplayName());
-        assertEquals(displayDescriptionAfterCompletion + pi0.getId(), saUserTaskInstance.getDisplayDescription());
-
+        // Clean up
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
     }
@@ -1133,15 +1125,9 @@ public class ProcessManagementTest extends CommonAPITest {
         assertEquals(displayName, userTaskInstance.getDisplayName());
         assertEquals(displayDescription, userTaskInstance.getDisplayDescription());
         assignAndExecuteStep(userTaskInstance, user.getId());
+        waitForCompletedArchivedStep("step1", processDefinition.getId(), displayName, displayDescription);
 
-        final String value = "step1";
-        final long id = processDefinition.getId();
-        final WaitForCompletedArchivedStep waitUntil = new WaitForCompletedArchivedStep(50, 500, value, id, getProcessAPI());
-        assertTrue(waitUntil.waitUntil());
-        final ArchivedHumanTaskInstance saUserTaskInstance = waitUntil.getArchivedTask();
-        assertEquals(displayName, saUserTaskInstance.getDisplayName());
-        assertEquals(displayDescription, saUserTaskInstance.getDisplayDescription());
-
+        // Clean up
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
     }
@@ -1158,20 +1144,15 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
 
-        final long activityInstanceId = waitForStep(50, 500, stepName, pi0).getStepId();
+        final long activityInstanceId = waitForStep(stepName, pi0).getStepId();
         final HumanTaskInstance userTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
         assertEquals(stepName, userTaskInstance.getDisplayName());
         assertEquals(stepDescription, userTaskInstance.getDisplayDescription());
         assertEquals(stepDescription, userTaskInstance.getDescription());
         assignAndExecuteStep(userTaskInstance, user.getId());
+        waitForCompletedArchivedStep(stepName, processDefinition.getId(), stepName, stepDescription);
 
-        final long id = processDefinition.getId();
-        final WaitForCompletedArchivedStep waitUntil = new WaitForCompletedArchivedStep(50, 500, stepName, id, getProcessAPI());
-        assertTrue(waitUntil.waitUntil());
-        final ArchivedHumanTaskInstance saUserTaskInstance = waitUntil.getArchivedTask();
-        assertEquals(stepName, saUserTaskInstance.getDisplayName());
-        assertEquals(stepDescription, saUserTaskInstance.getDisplayDescription());
-
+        // Clean up
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
     }
@@ -1422,7 +1403,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep(50, 500, "step1", pi0);
+        waitForStep("step1", pi0);
 
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi0.getId(), 0, 10);
         final long activityInstanceId = activityInstances.get(0).getId();
@@ -1450,7 +1431,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessDefinition processDefinition1 = deployAndEnableProcess(designProcessDefinition1);
 
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition1.getId());
-        checkProcessInstanceIsArchived(200, 2000, pi1);
+        checkProcessInstanceIsArchived(pi1);
 
         // get archived process instances. It will have only the state completed.
         final List<ArchivedProcessInstance> aProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 10, ProcessInstanceCriterion.ARCHIVE_DATE_DESC);

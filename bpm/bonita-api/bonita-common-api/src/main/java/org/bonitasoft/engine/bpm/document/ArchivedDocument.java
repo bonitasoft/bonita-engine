@@ -27,8 +27,6 @@ public interface ArchivedDocument extends NamedElement, BaseElement, ArchivedEle
 
     long getProcessInstanceId();
 
-    long getSourceObjectId();
-
     String getDocumentURL();
 
     boolean getDocumentHasContent();

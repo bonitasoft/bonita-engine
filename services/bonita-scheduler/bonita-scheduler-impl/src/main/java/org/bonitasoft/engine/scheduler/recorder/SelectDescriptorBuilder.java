@@ -13,8 +13,15 @@
  **/
 package org.bonitasoft.engine.scheduler.recorder;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.scheduler.model.SFailedJob;
+import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 
 /**
  * @author Celine Souchet
@@ -24,6 +31,11 @@ public class SelectDescriptorBuilder {
     // FIXME put in a common model
     public static <T extends PersistentObject> SelectByIdDescriptor<T> getElementById(final Class<T> clazz, final String elementName, final long id) {
         return new SelectByIdDescriptor<T>("get" + elementName + "ById", clazz, id);
+    }
+
+    public static SelectListDescriptor<SFailedJob> getFailedJobs(final QueryOptions queryOptions) {
+        final Map<String, Object> parameters = Collections.emptyMap();
+        return new SelectListDescriptor<SFailedJob>("getFailedJobs", parameters, SJobDescriptor.class, queryOptions);
     }
 
 }

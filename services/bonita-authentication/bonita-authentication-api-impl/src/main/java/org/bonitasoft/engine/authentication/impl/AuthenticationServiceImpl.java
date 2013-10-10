@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.authentication.impl;
 
-import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -39,7 +38,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public boolean checkUserCredentials(final String userName, final String password) throws AuthenticationException {
+    public boolean checkUserCredentials(final String userName, final String password) {
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "checkUserCredentials"));

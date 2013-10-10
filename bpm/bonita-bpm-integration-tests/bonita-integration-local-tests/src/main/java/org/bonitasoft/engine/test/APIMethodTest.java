@@ -4,7 +4,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
@@ -66,9 +68,8 @@ public class APIMethodTest {
     }
 
     private boolean isADefaultMethod(final Method method) {
-        final String methodName = method.getName();
-        return "wait".equals(methodName) || "equals".equals(methodName) || "toString".equals(methodName) || "hashCode".equals(methodName)
-                || "getClass".equals(methodName) || "notify".equals(methodName) || "notifyAll".equals(methodName);
+        final List<String> defaultMethods = Arrays.asList("wait", "equals", "toString", "hashCode", "getClass", "notify", "notifyAll");
+        return defaultMethods.contains(method.getName());
     }
 
 }

@@ -46,8 +46,10 @@ import org.bonitasoft.engine.bpm.connector.impl.ArchivedConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceWithFailureInfoImpl;
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.data.impl.ArchivedDataInstanceImpl;
 import org.bonitasoft.engine.bpm.data.impl.BlobDataInstanceImpl;
 import org.bonitasoft.engine.bpm.data.impl.BooleanDataInstanceImpl;
 import org.bonitasoft.engine.bpm.data.impl.DataDefinitionImpl;
@@ -194,6 +196,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UnknownElementType;
@@ -233,6 +236,8 @@ import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.RoleBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
+import org.bonitasoft.engine.job.FailedJob;
+import org.bonitasoft.engine.job.impl.FailedJobImpl;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
@@ -254,6 +259,7 @@ import org.bonitasoft.engine.profile.impl.ProfileMemberImpl;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
+import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -1205,6 +1211,30 @@ public class ModelConvertor {
         return dataInstance;
     }
 
+    public static List<ArchivedDataInstance> toArchivedDataInstances(final List<SADataInstance> sADataInstances) {
+        final List<ArchivedDataInstance> dataInstances = new ArrayList<ArchivedDataInstance>();
+        for (final SADataInstance sADataInstance : sADataInstances) {
+            final ArchivedDataInstance dataInstance = toArchivedDataInstance(sADataInstance);
+            dataInstances.add(dataInstance);
+        }
+        return dataInstances;
+    }
+
+    public static ArchivedDataInstance toArchivedDataInstance(final SADataInstance sDataInstance) {
+        final ArchivedDataInstanceImpl dataInstance = new ArchivedDataInstanceImpl();
+        dataInstance.setClassName(sDataInstance.getClassName());
+        dataInstance.setContainerId(sDataInstance.getContainerId());
+        dataInstance.setContainerType(sDataInstance.getContainerType());
+        dataInstance.setDataTypeClassName(sDataInstance.getClassName());
+        dataInstance.setDescription(sDataInstance.getDescription());
+        dataInstance.setId(sDataInstance.getId());
+        dataInstance.setName(sDataInstance.getName());
+        dataInstance.setValue(sDataInstance.getValue());
+        dataInstance.setArchiveDate(new Date(sDataInstance.getArchiveDate()));
+        dataInstance.setSourceObjectId(sDataInstance.getSourceObjectId());
+        return dataInstance;
+    }
+
     public static ActorMember toActorMember(final SActorMember sActorMember) {
         return new ActorMemberImpl(sActorMember.getId(), sActorMember.getUserId(), sActorMember.getGroupId(), sActorMember.getRoleId());
     }
@@ -1964,6 +1994,23 @@ public class ModelConvertor {
             newSProfileMemberBuilder.setUserId(userId);
         }
         return newSProfileMemberBuilder.done();
+    }
+
+    public static List<FailedJob> toFailedJobs(final List<SFailedJob> sFailedJobs) {
+        final List<FailedJob> failedJobs = new ArrayList<FailedJob>(sFailedJobs.size());
+        for (final SFailedJob sFailedJob : sFailedJobs) {
+            failedJobs.add(toFailedJob(sFailedJob));
+        }
+        return failedJobs;
+    }
+
+    public static FailedJob toFailedJob(final SFailedJob sFailedJob) {
+        final FailedJobImpl failedJob = new FailedJobImpl(sFailedJob.getJobDescriptorId(), sFailedJob.getJobName());
+        failedJob.setDescription(sFailedJob.getDescription());
+        failedJob.setLastMessage(sFailedJob.getLastMessage());
+        failedJob.setRetryNumber(sFailedJob.getRetryNumber());
+        failedJob.setLastUpdateDate(new Date(sFailedJob.getLastUpdateDate()));
+        return failedJob;
     }
 
 }

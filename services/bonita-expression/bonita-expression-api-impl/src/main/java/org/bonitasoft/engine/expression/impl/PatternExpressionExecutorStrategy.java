@@ -22,7 +22,6 @@ import java.util.Map;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 
@@ -35,7 +34,7 @@ public class PatternExpressionExecutorStrategy extends NonEmptyContentExpression
 
     @Override
     public Serializable evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            throws SExpressionDependencyMissingException {
         final List<SExpression> dependencies = expression.getDependencies();
         final Map<String, Object> values = new HashMap<String, Object>(dependencies.size());
         for (final SExpression exp : dependencies) {
@@ -57,7 +56,7 @@ public class PatternExpressionExecutorStrategy extends NonEmptyContentExpression
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+            throws SExpressionDependencyMissingException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, dependencyValues, resolvedExpressions));

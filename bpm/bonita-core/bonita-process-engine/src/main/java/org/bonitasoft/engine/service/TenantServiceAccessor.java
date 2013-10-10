@@ -75,6 +75,8 @@ import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
+import org.bonitasoft.engine.scheduler.JobService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
@@ -250,5 +252,9 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     SynchroService getSynchroService();
 
     IncidentService getIncidentService();
+
+    SchedulerService getSchedulerService();
+
+    JobService getJobService();
 
 }

@@ -24,7 +24,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
-import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -43,9 +42,9 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
     private final ContainerRegistry containerRegistry;
 
     public TransactionContainedProcessInstanceInterruptor(final BPMInstanceBuilders bpmInstanceBuilders, final ProcessInstanceService processInstanceService,
-            final FlowNodeInstanceService flowNodeInstanceService, final ContainerRegistry containerRegistry, final LockService lockService,
+            final FlowNodeInstanceService flowNodeInstanceService, final ContainerRegistry containerRegistry,
             final TechnicalLoggerService logger) {
-        super(bpmInstanceBuilders, lockService, logger);
+        super(bpmInstanceBuilders, logger);
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.containerRegistry = containerRegistry;

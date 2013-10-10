@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.test.WaitUntil;
 
+@Deprecated
 public final class CheckNbOfProcessInstances extends WaitUntil {
 
     private final ProcessAPI processAPI;
@@ -33,6 +34,7 @@ public final class CheckNbOfProcessInstances extends WaitUntil {
 
     private final ProcessInstanceCriterion orderBy;
 
+    @Deprecated
     public CheckNbOfProcessInstances(final int repeatEach, final int timeout, final int nbOfProcInst, final ProcessInstanceCriterion orderBy,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout);
@@ -41,6 +43,7 @@ public final class CheckNbOfProcessInstances extends WaitUntil {
         this.processAPI = processAPI;
     }
 
+    @Deprecated
     public CheckNbOfProcessInstances(final int repeatEach, final int timeout, final int nbOfProcInst, final ProcessAPI processAPI) {
         this(repeatEach, timeout, nbOfProcInst, ProcessInstanceCriterion.NAME_ASC, processAPI);
     }

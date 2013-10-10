@@ -15,7 +15,6 @@ package org.bonitasoft.engine.process;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,7 +56,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.WaitUntil;
 import org.junit.Test;
 
 public class SupervisorTest extends CommonAPITest {
@@ -89,13 +87,7 @@ public class SupervisorTest extends CommonAPITest {
         getProcessAPI().startProcess(definition.getId());
         getProcessAPI().startProcess(definition.getId());
         getProcessAPI().startProcess(definition.getId());
-        assertTrue("no new activity found", new WaitUntil(20, 1000) {
-
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).size() == 3;
-            }
-        }.waitUntil());
+        waitForPendingTasks(john.getId(), 3);
 
         final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         // Two assign tasks
@@ -234,13 +226,7 @@ public class SupervisorTest extends CommonAPITest {
         assertEquals(delivery, actor.getName());
 
         getProcessAPI().startProcess(definition.getId());
-        assertTrue("no new activity found", new WaitUntil(20, 5000) {
-
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null).size() == 1;
-            }
-        }.waitUntil());
+        waitForPendingTasks(john.getId(), 1);
 
         final ProcessSupervisor createdSupervisor = getProcessAPI().createProcessSupervisorForUser(definition.getId(), matti.getId());
         assertEquals(definition.getId(), createdSupervisor.getProcessDefinitionId());

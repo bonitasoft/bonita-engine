@@ -43,6 +43,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
 
     private CacheService cacheService;
 
+    @SuppressWarnings("unused")
     @Override
     public void setParameters(final Map<String, String> dataSourceParameters) {
         // TODO Auto-generated method stub
@@ -222,7 +223,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
     }
 
     @Override
-    public List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) throws SDataInstanceException {
+    public List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) {
         final List<SDataInstance> results = new ArrayList<SDataInstance>(dataInstanceIds.size());
         for (final Long dataInstanceId : dataInstanceIds) {
             try {

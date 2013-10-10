@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.test.WaitUntil;
 
+@Deprecated
 public final class CheckNbOfArchivedActivities extends WaitUntil {
 
     private final ProcessAPI processAPI;
@@ -38,6 +39,7 @@ public final class CheckNbOfArchivedActivities extends WaitUntil {
 
     private String activityState = null;
 
+    @Deprecated
     public CheckNbOfArchivedActivities(final ProcessAPI processAPI, final int repeatEach, final int timeout, final boolean throwExceptions,
             final ProcessInstance processInstance, final int nbActivities) {
         super(repeatEach, timeout, throwExceptions);
@@ -46,6 +48,7 @@ public final class CheckNbOfArchivedActivities extends WaitUntil {
         this.processAPI = processAPI;
     }
 
+    @Deprecated
     public CheckNbOfArchivedActivities(final ProcessAPI processAPI, final int repeatEach, final int timeout, final boolean throwExceptions,
             final ProcessInstance processInstance, final int nbActivities, final String state) {
         this(processAPI, repeatEach, timeout, throwExceptions, processInstance, nbActivities);

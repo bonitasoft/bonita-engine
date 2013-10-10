@@ -14,13 +14,15 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
-import org.bonitasoft.engine.execution.RescheduleWorkRejectedLockHandler;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
-import org.bonitasoft.engine.lock.RejectedLockHandler;
+import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.WorkService;
 
 /**
  * Transactional work that lock the process instance
@@ -34,6 +36,10 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
 
     protected final long processInstanceId;
 
+    private final long timeout = 20;
+
+    private final TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+
     public LockProcessInstanceWork(final BonitaWork wrappedWork, final long processInstanceId) {
         super(wrappedWork);
         this.processInstanceId = processInstanceId;
@@ -44,27 +50,49 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         LockService lockService = getTenantAccessor(context).getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
 
-        BonitaWork rootWork = getRootParent();
-        final RejectedLockHandler handler = new RescheduleWorkRejectedLockHandler(getTenantId(), rootWork);
-
-        BonitaLock lock = lockService.tryLock(processInstanceId, objectType, handler);
-        if (lock == null) {
-            // not locked but the work will be rescheduled by the rejectedLockHandler
-            return;
-        }
+        BonitaLock lock = null;
         try {
+            lock = lockService.tryLock(processInstanceId, objectType, timeout, timeUnit);
+            if (lock == null) {
+                //lock has not been obtained
+                rescheduleWork(getTenantAccessor(context).getWorkService(), getRootWork());
+                return;
+            }
             getWrappedWork().work(context);
         } finally {
-            lockService.unlock(lock);
+            if (lock != null) {
+                lockService.unlock(lock);
+            }
+        }
+
+    }
+    /*
+    private String getWorkStack() {
+    	if (this.getWrappedWork() instanceof TxBonitaWork) {
+    		final TxBonitaWork txBonitaWork = (TxBonitaWork) this.getWrappedWork();
+    		final BonitaWork doingWork = txBonitaWork.getWrappedWork();
+    		return doingWork.getDescription();
+    	}
+    	return "nothing";
+    }
+     */
+
+    private void rescheduleWork(final WorkService workService, final BonitaWork rootWork) throws SLockException {
+        try {
+            //executeWork is called and not registerWork because the registerWork is relying on transaction
+            workService.executeWork(rootWork);
+        } catch (WorkRegisterException e) {
+            throw new SLockException(e);
         }
 
     }
 
-    private BonitaWork getRootParent() {
+    BonitaWork getRootWork() {
         BonitaWork root = this;
         while (root.getParent() != null) {
             root = root.getParent();
         }
         return root;
     }
+
 }

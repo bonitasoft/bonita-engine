@@ -93,7 +93,7 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void logout(final long sessionId) throws SLoginException, SSessionNotFoundException {
+    public void logout(final long sessionId) throws SSessionNotFoundException {
         sessionService.deleteSession(sessionId);
     }
 

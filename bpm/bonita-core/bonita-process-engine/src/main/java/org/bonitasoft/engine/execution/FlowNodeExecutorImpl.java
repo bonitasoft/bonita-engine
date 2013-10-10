@@ -45,7 +45,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.WorkFactory;
-import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -96,7 +95,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
             final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
             final ProcessDefinitionService processDefinitionService, final SCommentService commentService, final ProcessInstanceService processInstanceService,
-            final LockService lockService, final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
+            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
             final WorkService workService, final TransactionService transactionService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;

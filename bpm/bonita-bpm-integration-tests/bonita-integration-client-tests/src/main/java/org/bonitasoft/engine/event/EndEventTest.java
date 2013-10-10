@@ -181,7 +181,7 @@ public class EndEventTest extends CommonAPITest {
         }
         final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        checkNbOfHumanTasks(40, 30000, 14);
+        checkNbOfHumanTasks(14);
         waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);

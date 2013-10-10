@@ -103,7 +103,7 @@ public interface SchedulerService {
      */
     void schedule(SJobDescriptor jobDescriptor, List<SJobParameter> parameters, Trigger trigger) throws SSchedulerException;
 
-    void schedule(long jobDescriptorId) throws SSchedulerException;
+    void executeAgain(long jobDescriptorId) throws SSchedulerException;
 
     /**
      * Schedules a job.
@@ -113,7 +113,7 @@ public interface SchedulerService {
      * @throws SSchedulerException
      *             if an exception occurs.
      */
-    void schedule(long jobDescriptorId, List<SJobParameter> parameters) throws SSchedulerException;
+    void executeAgain(long jobDescriptorId, List<SJobParameter> parameters) throws SSchedulerException;
 
     /**
      * execute a job.
@@ -137,7 +137,7 @@ public interface SchedulerService {
     boolean delete(String jobName) throws SSchedulerException;
 
     /**
-     * Deletes all jobs in a group.
+     * Deletes all jobs.
      * 
      * @throws SSchedulerException
      *             if an exception occurs.

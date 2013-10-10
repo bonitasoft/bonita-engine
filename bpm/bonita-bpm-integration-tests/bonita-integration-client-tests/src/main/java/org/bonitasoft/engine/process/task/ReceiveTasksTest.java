@@ -111,7 +111,7 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "delivery", user, "m1", null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity(50, 5000, "waitForMessage", receiveMessageProcessInstance, "waiting");
+        waitForActivity("waitForMessage", receiveMessageProcessInstance, "waiting");
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
@@ -144,7 +144,7 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "delivery", user, "m2", null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity(50, 5000, "waitForMessage", receiveMessageProcessInstance, "waiting");
+        waitForActivity("waitForMessage", receiveMessageProcessInstance, "waiting");
 
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
@@ -194,8 +194,6 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "delivery", user, "m3", null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity(50, 5000, "waitForMessage", receiveMessageProcessInstance, "waiting");
-
         waitForUserTask("userTask1", receiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -211,28 +209,30 @@ public class ReceiveTasksTest extends CommonAPITest {
             "Send", "Receive" })
     @Test
     public void receiveMessageSentTwice() throws Exception {
-        final ProcessDefinition sendMessageProcess1 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess1", "m4", "receiveMessageProcess",
-                "waitForMessage", null, null, null, null);
-        final ProcessDefinition sendMessageProcess2 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess2", "m4", "receiveMessageProcess",
-                "waitForMessage", null, null, null, null);
+        ProcessDefinition sendMessageProcess1 = null;
+        ProcessDefinition sendMessageProcess2 = null;
+        ProcessDefinition receiveMessageProcess = null;
+        try {
+            sendMessageProcess1 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess1", "m4", "receiveMessageProcess",
+                    "waitForMessage", null, null, null, null);
+            sendMessageProcess2 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess2", "m4", "receiveMessageProcess",
+                    "waitForMessage", null, null, null, null);
+            final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
+            final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(sendMessageProcess2.getId());
+            assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+            assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance2));
 
-        final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
-        final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(sendMessageProcess2.getId());
-
-        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
-        assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance2));
-
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
-                "delivery", user, "m4", null, null, null);
-
-        final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity(50, 5000, "waitForMessage", receiveMessageProcessInstance, "waiting");
-
-        waitForUserTask("userTask1", receiveMessageProcessInstance, 50000);
-
-        disableAndDeleteProcess(sendMessageProcess1);
-        disableAndDeleteProcess(sendMessageProcess2);
-        disableAndDeleteProcess(receiveMessageProcess);
+            receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
+                    "delivery", user, "m4", null, null, null);
+            final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
+            waitForUserTask("userTask1", receiveMessageProcessInstance);
+            final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI().startProcess(receiveMessageProcess.getId());
+            waitForUserTask("userTask1", receiveMessageProcessInstance2);
+        } finally {
+            disableAndDeleteProcess(sendMessageProcess1);
+            disableAndDeleteProcess(sendMessageProcess2);
+            disableAndDeleteProcess(receiveMessageProcess);
+        }
     }
 
     /*
@@ -255,7 +255,7 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "delivery", user, "m5", null, Collections.singletonMap("name", String.class.getName()), receiveMessageOperations);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity(50, 5000, "waitForMessage", receiveMessageProcessInstance, "waiting");
+        waitForActivity("waitForMessage", receiveMessageProcessInstance, "waiting");
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
@@ -285,12 +285,11 @@ public class ReceiveTasksTest extends CommonAPITest {
             "Send", "Receive" })
     @Test
     public void cancelInstanceShouldDeleteWaitingEvents() throws Exception {
-
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
                 "delivery", user, "m1", null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity(50, 5000, "waitForMessage", receiveMessageProcessInstance, "waiting");
+        waitForActivity("waitForMessage", receiveMessageProcessInstance, "waiting");
 
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());

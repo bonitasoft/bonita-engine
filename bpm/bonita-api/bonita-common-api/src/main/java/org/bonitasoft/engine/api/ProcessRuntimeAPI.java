@@ -27,6 +27,8 @@ import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
+import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
@@ -55,6 +57,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -64,6 +67,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.UserNotFoundException;
+import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -1918,5 +1922,116 @@ public interface ProcessRuntimeAPI {
      */
     Map<String, Serializable> evaluateExpressionsOnCompletedActivityInstance(long activityInstanceId, Map<Expression, Map<String, Serializable>> expressions)
             throws ExpressionEvaluationException;
+
+    /**
+     * Returns the list of jobs that failed.
+     * 
+     * @param startIndex
+     *            the result start index (starting from 0).
+     * @param maxResults
+     *            the maximum number of results to retrieve.
+     * @return the list of failed jobs.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @since 6.1
+     */
+    List<FailedJob> getFailedJobs(int startIndex, int maxResults);
+
+    /**
+     * Replays the failed job in order to unlock it. The replay will use the stored parameters of the job.
+     * 
+     * @param jobDescriptorId
+     *            the identifier of the job descriptor.
+     * @throws ExecutionException
+     *             occurs when an exception is thrown during the job replay
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @since 6.1
+     */
+    void replayFailedJob(final long jobDescriptorId) throws ExecutionException;
+
+    /**
+     * Replays the failed job in order to unlock it. The specified parameters replace the stored parameters. If the job is launched from CRON, all job
+     * executions use the specified parameters.
+     * 
+     * @param jobDescriptorId
+     *            the identifier of the job descriptor.
+     * @param parameters
+     *            the job parameters.
+     * @throws ExecutionException
+     *             occurs when an exception is thrown during the job replay
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @since 6.1
+     */
+    void replayFailedJob(final long jobDescriptorId, Map<String, Serializable> parameters) throws ExecutionException;
+
+    /**
+     * Gets the last archived data instance of the named data of the specified process instance.
+     * 
+     * @param dataName
+     *            the name of the data
+     * @param processInstanceId
+     *            the identifier of the process instance
+     * @return an archived instance of data.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @throws ArchivedDataNotFoundException
+     *             if the specified data cannot be found.
+     * @since 6.1
+     */
+    ArchivedDataInstance getArchivedProcessDataInstance(String dataName, long processInstanceId) throws ArchivedDataNotFoundException;
+
+    /**
+     * Gets the last archived data instance of the named data of the specified activity instance.
+     * 
+     * @param dataName
+     *            the name of the data
+     * @param activityInstanceId
+     *            the identifier of the activity instance
+     * @return an archived instance of data.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @throws ArchivedDataNotFoundException
+     *             if the specified data cannot be found
+     * @since 6.1
+     */
+    ArchivedDataInstance getArchivedActivityDataInstance(String dataName, long activityInstanceId) throws ArchivedDataNotFoundException;
+
+    /**
+     * Lists the last archived data instances of the specified process instance.
+     * 
+     * @param processInstanceId
+     *            the identifier of the process instance
+     * @param startIndex
+     *            the start index
+     * @param maxResults
+     *            the max number of groups
+     * @return the list of archived data instances.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @throws RetrieveException
+     *             If an exception occurs during the archived data retrieving
+     * @since 6.1
+     */
+    List<ArchivedDataInstance> getArchivedProcessDataInstances(long processInstanceId, int startIndex, int maxResults);
+
+    /**
+     * Lists the last archived data instances of the specified activity instance.
+     * 
+     * @param activityInstanceId
+     *            the identifier of the activity instance
+     * @param startIndex
+     *            the start index
+     * @param maxResults
+     *            the max number of groups
+     * @return the list of archived data instances.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
+     * @throws RetrieveException
+     *             If an exception occurs during the archived data retrieving
+     * @since 6.1
+     */
+    List<ArchivedDataInstance> getArchivedActivityDataInstances(long activityInstanceId, int startIndex, int maxResults);
 
 }

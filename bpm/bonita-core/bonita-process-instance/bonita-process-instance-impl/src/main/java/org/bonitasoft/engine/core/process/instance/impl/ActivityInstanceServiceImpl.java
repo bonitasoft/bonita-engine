@@ -332,7 +332,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public SAActivityInstance getMostRecentArchivedActivityInstance(final long activityInstanceId) throws SActivityReadException, SActivityInstanceNotFoundException {
+    public SAActivityInstance getMostRecentArchivedActivityInstance(final long activityInstanceId) throws SActivityReadException,
+            SActivityInstanceNotFoundException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final SelectListDescriptor<SAActivityInstance> descriptor = SelectDescriptorBuilder.getArchivedActivityInstanceWithActivityId(activityInstanceId);
         try {
@@ -1041,7 +1042,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     @Override
-    public void deleteArchivedPendingMappings(final long flowNodeInstanceId) throws SActivityModificationException {
+    public void deleteArchivedPendingMappings(final long flowNodeInstanceId) {
         // TODO archived pending mapping... first we need to have archived pending mapping and so on
         // final SEventBuilder eventBuilder = getEventService().getEventBuilder();
         // List<SPendingActivityMapping> mappings = null;

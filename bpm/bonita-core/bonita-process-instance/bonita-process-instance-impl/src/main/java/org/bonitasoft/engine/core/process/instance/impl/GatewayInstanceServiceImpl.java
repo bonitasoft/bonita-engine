@@ -183,8 +183,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     }
 
     @Override
-    public void hitTransition(final SGatewayInstance gatewayInstance, final long transitionIndex) throws SGatewayModificationException,
-            SGatewayCreationException {
+    public void hitTransition(final SGatewayInstance gatewayInstance, final long transitionIndex) throws SGatewayModificationException {
         final String hitBys = gatewayInstance.getHitBys();
         String columnValue;
         if (hitBys == null || hitBys.isEmpty()) {

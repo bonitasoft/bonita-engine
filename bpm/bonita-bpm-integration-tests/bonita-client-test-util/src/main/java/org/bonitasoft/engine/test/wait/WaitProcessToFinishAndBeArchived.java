@@ -23,6 +23,7 @@ import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.WaitUntil;
 
+@Deprecated
 public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
 
     private final ProcessInstance processInstance;
@@ -31,6 +32,7 @@ public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
 
     private final String state;
 
+    @Deprecated
     public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final ProcessInstance processInstance,
             final ProcessAPI processAPI, final String state) {
         super(repeatEach, timeout, throwExceptions);
@@ -39,11 +41,13 @@ public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
         this.state = state;
     }
 
+    @Deprecated
     public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final ProcessInstance processInstance,
             final ProcessAPI processAPI) {
         this(repeatEach, timeout, throwExceptions, processInstance, processAPI, TestStates.getNormalFinalState());
     }
 
+    @Deprecated
     public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final ProcessAPI processAPI) {
         this(repeatEach, timeout, false, processInstance, processAPI);
     }

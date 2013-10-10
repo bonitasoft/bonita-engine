@@ -61,13 +61,6 @@ public class XPathReadExpressionExecutorStrategyTest {
         strategy = new XPathReadExpressionExecutorStrategy();
     }
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @Before
-    public void setUp() throws Exception {
-    }
-
     private String getXPathType() {
         return SExpressionType.TYPE_XPATH_READ.name();
     }

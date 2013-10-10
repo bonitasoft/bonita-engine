@@ -23,7 +23,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +104,7 @@ public class HTTPServerAPI implements ServerAPI {
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
         String response = null;
         try {
             response = executeHttpPost(options, apiInterfaceName, methodName, classNameParameters, parametersValues, xstream);

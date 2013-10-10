@@ -78,7 +78,7 @@ public class ActivityCommandTest extends CommonAPITest {
         final BusinessArchive businessArchive = buildBusinessArchiveWithDataTransientAndConnector();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance.getId(), getSession().getUserId()).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId()).getId();
 
         // Execute it with operation using the command to update data instance
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -98,10 +98,10 @@ public class ActivityCommandTest extends CommonAPITest {
     @Test
     public void executeActionsAndTerminateWithCustomJarInOperation() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
-        final long processInstanceID = getProcessAPI().startProcess(processDefinition.getId()).getId();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // process is deployed here with a custom jar
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstanceID, getSession().getUserId()).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId()).getId();
 
         // execute it with operation using the command
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -118,9 +118,9 @@ public class ActivityCommandTest extends CommonAPITest {
     @Test
     public void executeActionsAndTerminate() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
-        final long processInstanceID = getProcessAPI().startProcess(processDefinition.getId()).getId();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstanceID, getSession().getUserId()).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId()).getId();
 
         // execute it with operation using the command
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -129,8 +129,8 @@ public class ActivityCommandTest extends CommonAPITest {
         executeActionsAndTerminate("application", activityInstanceId, fieldValues, rightOperand);
 
         // check we have the other task ready and the operation was executed
-        waitForUserTask("step2", processInstanceID);
-        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("application", processInstanceID);
+        waitForUserTask("step2", processInstance);
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("application", processInstance.getId());
         Assert.assertEquals("Excel", dataInstance.getValue().toString());
 
         // Clean

@@ -400,19 +400,19 @@ public class BPMLocalTest extends CommonAPILocalTest {
     @Test
     public void incidentIsLogged() throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        WorkService workService = tenantAccessor.getWorkService();
-        BonitaWork runnable = new FailureHandlingBonitaWork(new FailingWork());
+        final WorkService workService = tenantAccessor.getWorkService();
+        final BonitaWork runnable = new FailureHandlingBonitaWork(new FailingWork());
         workService.executeWork(runnable);
         Thread.sleep(100);
-        String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());
-        File file = new File(tenantFolder + File.separatorChar + "INCIDENT.log");
+        final String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());
+        final File file = new File(tenantFolder + File.separatorChar + "incidents.log");
         String content = org.bonitasoft.engine.io.IOUtil.read(file);
         assertTrue("File content is: " + content, content.contains("An incident occurred: MyJob"));
         assertTrue("File content is: " + content, content.contains("an unexpected exception"));
         assertTrue("File content is: " + content, content.contains("unable to handle failure"));
         try {
             assertTrue("File content is: " + content, content.contains("Procedure to recover: The recovery procedure"));
-        } catch (AssertionError ass) {
+        } catch (final AssertionError ass) {
             // fail something to flush the logs:
             new FailureHandlingBonitaWork(new FailingWork());
             workService.executeWork(runnable);
@@ -450,20 +450,19 @@ public class BPMLocalTest extends CommonAPILocalTest {
         builder1.addTransition("step1", "step2");
         builder1.addUserTask("ustep2", "actor");
         builder1.addTransition("step2", "ustep2");
-        BusinessArchive businessArchive = new BusinessArchiveBuilder()
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder()
                 .createNewBusinessArchive()
                 .setProcessDefinition(builder1.done())
                 .addConnectorImplementation(
                         new BarResource("blocking-connector.impl", getConnectorImplementationFile("blocking-connector", "1.0", "blocking-connector-impl",
-                                "1.0",
-                                BlockingConnector.class.getName()))).done();
+                                "1.0", BlockingConnector.class.getName()))).done();
         final ProcessDefinition p1 = deployAndEnableWithActor(businessArchive, "actor", john);
 
         /*
          * process with blocking operation (executing work)
          */
         final ProcessDefinitionBuilder builder2 = new ProcessDefinitionBuilder().createNewInstance("p2", "1.0");
-        String blockingGroovyScript1 = "org.bonitasoft.engine.test.BPMLocalTest.tryAcquireSemaphore1();\nreturn \"done\";";
+        final String blockingGroovyScript1 = "org.bonitasoft.engine.test.BPMLocalTest.tryAcquireSemaphore1();\nreturn \"done\";";
         builder2.addActor("actor");
         builder2.addShortTextData("data", null);
         builder2.addUserTask("step1", "actor");
@@ -480,7 +479,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
          * process with blocking transition (notify work)
          */
         final ProcessDefinitionBuilder builder3 = new ProcessDefinitionBuilder().createNewInstance("p3", "1.0");
-        String blockingGroovyScript2 = "org.bonitasoft.engine.test.BPMLocalTest.tryAcquireSemaphore2();\nreturn true;";
+        final String blockingGroovyScript2 = "org.bonitasoft.engine.test.BPMLocalTest.tryAcquireSemaphore2();\nreturn true;";
         builder3.addActor("actor");
         builder3.addUserTask("step1", "actor");
         builder3.addAutomaticTask("step2");
@@ -510,18 +509,18 @@ public class BPMLocalTest extends CommonAPILocalTest {
         new WaitUntil(10, 15000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return BlockingConnector.semaphore.hasQueuedThreads() && semaphore1.hasQueuedThreads() && semaphore2.hasQueuedThreads();
             }
         };
         // stop node and in the same time release the semaphores to unlock works
-        Thread thread = new Thread(new Runnable() {
+        final Thread thread = new Thread(new Runnable() {
 
             @Override
             public void run() {
                 try {
                     Thread.sleep(200);
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
                 System.out.println("release semaphores");

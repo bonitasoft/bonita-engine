@@ -24,6 +24,7 @@ import org.bonitasoft.engine.test.WaitUntil;
 /**
  * @author Baptiste Mesta
  */
+@Deprecated
 public final class CheckNbOfArchivedActivityInstances extends WaitUntil {
 
     private final ProcessAPI processAPI;
@@ -32,6 +33,7 @@ public final class CheckNbOfArchivedActivityInstances extends WaitUntil {
 
     private final int expected;
 
+    @Deprecated
     public CheckNbOfArchivedActivityInstances(final int repeatEach, final int timeout, final ProcessInstance processInstance, final int expected,
             final ProcessAPI processAPI) {
         super(repeatEach, timeout, false);

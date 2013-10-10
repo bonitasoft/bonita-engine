@@ -14,13 +14,10 @@
 package org.bonitasoft.engine.incident;
 
 /**
- * 
- * 
  * Service that report incidents to an administrator
  * 
- * 
  * @author Baptiste Mesta
- * 
+ * @author Matthieu Chaffotte
  */
 public interface IncidentService {
 
@@ -30,5 +27,6 @@ public interface IncidentService {
      * @param incident
      *            the incident to be reported
      */
-    void report(Incident incident);
+    void report(long tenantId, Incident incident);
+
 }

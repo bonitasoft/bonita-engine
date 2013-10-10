@@ -78,7 +78,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
     }
 
     @Override
-    public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
+    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = getTenantAccessor(context).getFlowNodeStateManager();
         final FlowNodeExecutor flowNodeExecutor = getTenantAccessor(context).getFlowNodeExecutor();

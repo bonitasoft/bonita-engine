@@ -1,8 +1,6 @@
 package org.bonitasoft.engine.transaction;
 
-import java.util.Collections;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Set;
 
 import javax.naming.Context;
@@ -10,14 +8,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
-import org.bonitasoft.engine.events.model.HandlerRegistrationException;
-import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
-import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.AfterClass;
@@ -43,7 +33,7 @@ public class TransactionLifeCycleImplTest extends TransactionLifeCycleTest {
 
     @Override
     protected TransactionService getTxService() {
-        return new JTATransactionServiceImpl(getLoggerService(), getTransactionManager(), getEventService());
+        return new JTATransactionServiceImpl(getLoggerService(), getTransactionManager());
     }
 
     private TransactionManager getTransactionManager() {
@@ -59,127 +49,34 @@ public class TransactionLifeCycleImplTest extends TransactionLifeCycleTest {
     }
 
     // TODO See to use some mocks instead of Anonymous classes.
-    protected EventService getEventService() {
-        return new EventService() {
-
-            @Override
-            public void removeHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerUnregistrationException {
-            }
-
-            @Override
-            public void removeAllHandlers(final SHandler<SEvent> handler) throws HandlerUnregistrationException {
-            }
-
-            @Override
-            public Set<SHandler<SEvent>> getHandlers(final String eventType) {
-                return null;
-            }
-
-            @Override
-            public SEventBuilder getEventBuilder() {
-                return getSEventBuilder();
-            }
-
-            private SEventBuilder getSEventBuilder() {
-                return new SEventBuilder() {
-
-                    private SEvent event;
-
-                    @Override
-                    public SEventBuilder createNewInstance(final String type) {
-                        event = new SEvent() {
-
-                            @Override
-                            public String getType() {
-                                return type;
-                            }
-
-                            @Override
-                            public Object getObject() {
-                                return null;
-                            }
-
-                            @Override
-                            public void setObject(final Object ob) {
-                            }
-                        };
-                        return this;
-                    }
-
-                    @Override
-                    public SEvent done() {
-                        return event;
-                    }
-
-                    @Override
-                    public SEventBuilder setObject(final Object ob) {
-                        event.setObject(ob);
-                        return this;
-                    }
-
-                    @Override
-                    public SEventBuilder createInsertEvent(final String type) {
-                        return this;
-                    }
-
-                    @Override
-                    public SEventBuilder createDeleteEvent(final String type) {
-                        return this;
-                    }
-
-                    @Override
-                    public SEventBuilder createUpdateEvent(final String type) {
-                        return this;
-                    }
-                };
-
-            }
-
-            @Override
-            public void fireEvent(final SEvent event) throws FireEventException {
-            }
-
-            @Override
-            public void addHandler(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
-            }
-
-            @Override
-            public boolean hasHandlers(final String eventType, final EventActionType actionType) {
-                return false;
-            }
-        };
-    }
-
-    // TODO See to use some mocks instead of Anonymous classes.
     protected TechnicalLoggerService getLoggerService() {
 
         return new TechnicalLoggerService() {
 
             @Override
-            public void log(Class<?> callerClass, TechnicalLogSeverity severity, String message, Throwable t) {
+            public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void log(Class<?> callerClass, TechnicalLogSeverity severity, String message) {
+            public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void log(Class<?> callerClass, TechnicalLogSeverity severity, Throwable t) {
+            public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final Throwable t) {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public boolean isLoggable(Class<?> callerClass, TechnicalLogSeverity severity) {
+            public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
                 // TODO Auto-generated method stub
                 return false;
             }
         };
-
 
     }
 

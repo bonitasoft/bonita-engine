@@ -120,10 +120,8 @@ public class LoopTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), actorName, john);
         try {
-            ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-            ActivityInstance userTask = waitForUserTask(activityName, processInstance.getId());
-
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+            final ActivityInstance userTask = waitForUserTask(activityName, processInstance);
             Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
             expressions.put(new ExpressionBuilder().createConstantBooleanExpression(true), new HashMap<String, Serializable>(0));
             getProcessAPI().evaluateExpressionsOnActivityInstance(userTask.getId(), expressions);

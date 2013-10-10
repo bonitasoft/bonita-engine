@@ -4,19 +4,17 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.connector.AbstractConnector;
-import org.bonitasoft.engine.connector.ConnectorException;
-import org.bonitasoft.engine.connector.ConnectorValidationException;
 
 public class BlockingConnector extends AbstractConnector {
 
     public static Semaphore semaphore = new Semaphore(1);
 
     @Override
-    public void validateInputParameters() throws ConnectorValidationException {
+    public void validateInputParameters() {
     }
 
     @Override
-    protected void executeBusinessLogic() throws ConnectorException {
+    protected void executeBusinessLogic() {
         try {
             System.out.println("Try aqcuire");
             semaphore.tryAcquire(15, TimeUnit.SECONDS);

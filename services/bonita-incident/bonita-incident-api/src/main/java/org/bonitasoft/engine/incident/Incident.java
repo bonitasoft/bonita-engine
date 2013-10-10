@@ -24,11 +24,11 @@ public class Incident {
 
     private final String recoveryProcedure;
 
-    private final Exception cause;
+    private final Throwable cause;
 
-    private final Exception exceptionWhenHandlingFailure;
+    private final Throwable exceptionWhenHandlingFailure;
 
-    public Incident(final String description, final String recoveryProcedure, final Exception cause, final Exception exceptionWhenHandlingFailure) {
+    public Incident(final String description, final String recoveryProcedure, final Throwable cause, final Throwable exceptionWhenHandlingFailure) {
         super();
         this.description = description;
         this.recoveryProcedure = recoveryProcedure;
@@ -44,11 +44,11 @@ public class Incident {
         return recoveryProcedure;
     }
 
-    public Exception getCause() {
+    public Throwable getCause() {
         return cause;
     }
 
-    public Exception getExceptionWhenHandlingFailure() {
+    public Throwable getExceptionWhenHandlingFailure() {
         return exceptionWhenHandlingFailure;
     }
 

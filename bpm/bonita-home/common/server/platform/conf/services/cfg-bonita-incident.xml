@@ -6,8 +6,7 @@
 		<constructor-arg name="handlers">
 			<list>
 				<bean class="org.bonitasoft.engine.incident.FileLoggerIncidentHandler">
-					<constructor-arg name="logFile" value="INCIDENT.log" />
-					<constructor-arg name="tenantId" value="${tenantId}" />
+					<constructor-arg name="logFilePath" value="${bonita.home}/server/tenants" />
 				</bean>
 			</list>
 		</constructor-arg>

@@ -172,7 +172,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
         waitForUserTaskAndExecuteIt("step0", startProcess, johnUserId);
 
-        waitForUserTask("step2", startProcess.getId());
+        waitForUserTask("step2", startProcess);
 
         assertEquals(valueOfInput1, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
 
@@ -197,7 +197,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         waitForUserTaskAndExecuteIt(multiTaskName, processInstance, johnUserId);
 
         // wait for the second multi-instance
-        final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance.getId());
+        final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance);
 
         // check the data value
         DataInstance globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
@@ -210,7 +210,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assignAndExecuteStep(multiInstance, johnUserId);
 
         // wait for user task that follows the multi task
-        waitForUserTask(userTaskName, processInstance.getId());
+        waitForUserTask(userTaskName, processInstance);
 
         // check the data value
         globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
@@ -281,7 +281,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
         waitForUserTaskAndExecuteIt("step0", startProcess, johnUserId);
-        waitForUserTask("step2", startProcess.getId(), 10000);
+        waitForUserTask("step2", startProcess);
 
         final String value = (String) getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue();
         assertEquals(nbOfConnectors + 1, value.length());
@@ -395,7 +395,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     }
 
     @Test
-    public void getNumberofConnectorImplementationsWhenProcessDoesNotExists() throws Exception {
+    public void getNumberofConnectorImplementationsWhenProcessDoesNotExists() {
         assertEquals(0, getProcessAPI().getNumberOfConnectorImplementations(123l));
     }
 
@@ -1217,7 +1217,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         designProcessDefinition.addTransition("step1", "step2");
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
+        final ActivityInstance step2 = waitForUserTask("step2", processInstance);
         // search with filter on name
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.filter(ArchiveConnectorInstancesSearchDescriptor.NAME, "myConnectorOnStep");
@@ -1399,7 +1399,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, userIds, designProcessDefinition, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, jack.getId());
-        waitForUserTask("step2", processInstance.getId());
+        waitForUserTask("step2", processInstance);
 
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
         assertEquals(Long.valueOf(johnUserId), processDataInstance.getValue());
