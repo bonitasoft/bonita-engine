@@ -426,23 +426,14 @@ public class MessageEventTest extends CommonAPITest {
     public void messageIntermediateCatchEventMessageSentBeforeCatch() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);
-
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 10000, true, 1, user);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(CATCH_MESSAGE_STEP1_NAME, taskInstance.getName());
-
-        disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
+        disableAndDeleteProcess(sendMessageProcess);
     }
 
     /*
