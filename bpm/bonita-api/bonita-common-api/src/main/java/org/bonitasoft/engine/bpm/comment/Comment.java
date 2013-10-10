@@ -16,12 +16,12 @@ package org.bonitasoft.engine.bpm.comment;
 
 import org.bonitasoft.engine.bpm.BonitaObject;
 
-
 /**
  * @author Hongwen Zang
  */
 public interface Comment extends BonitaObject {
 
+    @Deprecated
     long getTenantId();
 
     long getId();
@@ -33,4 +33,5 @@ public interface Comment extends BonitaObject {
     long getPostDate();
 
     String getContent();
+
 }

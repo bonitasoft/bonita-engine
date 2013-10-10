@@ -53,6 +53,7 @@ public abstract class DataInstanceImpl implements DataInstance {
         className = dataDefinition.getClassName();
     }
 
+    @Deprecated
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
@@ -89,6 +90,7 @@ public abstract class DataInstanceImpl implements DataInstance {
         this.className = className;
     }
 
+    @Deprecated
     public long getTenantId() {
         return tenantId;
     }

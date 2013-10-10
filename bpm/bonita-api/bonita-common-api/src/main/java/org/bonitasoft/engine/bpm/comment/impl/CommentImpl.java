@@ -40,6 +40,7 @@ public class CommentImpl implements Comment {
         super();
     }
 
+    @Deprecated
     public CommentImpl(final long id, final long tenantId, final long userId, final long processInstanceId, final long postDate, final String content) {
         super();
         this.id = id;
@@ -87,6 +88,7 @@ public class CommentImpl implements Comment {
     }
 
     @Override
+    @Deprecated
     public long getTenantId() {
         return tenantId;
     }
@@ -100,6 +102,7 @@ public class CommentImpl implements Comment {
         this.id = id;
     }
 
+    @Deprecated
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }

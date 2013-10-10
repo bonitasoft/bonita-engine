@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm;
 
-
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
