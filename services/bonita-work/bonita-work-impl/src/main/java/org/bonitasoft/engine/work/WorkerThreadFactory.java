@@ -21,17 +21,32 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class WorkerThreadFactory implements ThreadFactory {
 
-    private static AtomicInteger nbThread = new AtomicInteger(1);
+    private final AtomicInteger nbThread = new AtomicInteger(1);
 
     private final String name;
 
-    public WorkerThreadFactory(final String name) {
+    private final int padding;
+
+    public WorkerThreadFactory(final String name, final int maximumPoolSize) {
         this.name = name;
+        this.padding = guessPadding(maximumPoolSize);
+    }
+
+    /**
+     * @param maximumPoolSize
+     */
+    static int guessPadding(int maximumPoolSize) {
+        int tmpPadding = 0;
+        while (maximumPoolSize > 0) {
+            maximumPoolSize /= 10;
+            tmpPadding++;
+        }
+        return tmpPadding;
     }
 
     @Override
     public Thread newThread(final Runnable runnable) {
-        return new Thread(runnable, name + "-" + nbThread.getAndIncrement());
+        return new Thread(runnable, String.format(name + "-" + "%0" + padding + "d", nbThread.getAndIncrement()));
     }
 
 }

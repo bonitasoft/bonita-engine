@@ -53,7 +53,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     public ThreadPoolExecutor createExecutorService() {
         final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
-        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker");
+        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", maximumPoolSize);
         return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
     }
 
