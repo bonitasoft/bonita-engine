@@ -20,5 +20,6 @@
 		<module>bonita-deploy-ear3</module>
 		<module>bonita-deploy-war</module>
 		<module>bonita-engine-deploy</module>
+		<module>bonita-deploy-tcp</module>
 	</modules>
 </project>

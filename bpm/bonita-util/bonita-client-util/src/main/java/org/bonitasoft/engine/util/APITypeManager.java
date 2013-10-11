@@ -51,6 +51,8 @@ public class APITypeManager {
                 apiAccessType = ApiAccessType.EJB2;
             } else if (apiType.equalsIgnoreCase(ApiAccessType.HTTP.name())) {
                 apiAccessType = ApiAccessType.HTTP;
+            } else if (apiType.equalsIgnoreCase(ApiAccessType.TCP.name())) {
+                apiAccessType = ApiAccessType.TCP;
             } else {
                 throw new UnknownAPITypeException("Invalid API type: " + apiType);
             }

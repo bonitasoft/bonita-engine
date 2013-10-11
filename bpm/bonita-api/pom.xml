@@ -22,6 +22,7 @@
 		<module>bonita-client-api-ejb2</module>
 		<module>bonita-client-api-ejb3</module>
 		<module>bonita-server-api-http</module>
+		<module>bonita-client-api-tcp</module>
 	</modules>
 
 </project>
