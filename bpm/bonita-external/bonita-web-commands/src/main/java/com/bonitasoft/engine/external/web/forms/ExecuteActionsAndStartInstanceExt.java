@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotEnabledException;
@@ -41,7 +42,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.model.SSession;
 
 /**
  * @author Ruiheng Fan
@@ -96,7 +96,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
-        final SSession session = getSession();
+        final SessionInfos session = SessionInfos.getSessionInfos();
         final long starterId;
         if (userId == 0) {
             starterId = session.getUserId();
@@ -129,7 +129,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             final StringBuilder stb = new StringBuilder();
             stb.append("The user <");
-            stb.append(session.getUserName());
+            stb.append(session.getUsername());
             if (starterId != session.getUserId()) {
                 stb.append("> acting as delegate of user with id <");
                 stb.append(starterId);

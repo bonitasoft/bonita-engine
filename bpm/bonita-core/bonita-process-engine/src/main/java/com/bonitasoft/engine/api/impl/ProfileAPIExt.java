@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
+import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.profile.DeleteAllExistingProfiles;
 import org.bonitasoft.engine.api.impl.transaction.profile.GetProfile;
@@ -71,7 +72,6 @@ import com.bonitasoft.engine.profile.ProfileEntryCreator.ProfileEntryField;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater;
 import com.bonitasoft.engine.profile.ProfileEntryUpdater.ProfileEntryUpdateField;
 import com.bonitasoft.engine.profile.ProfileUpdater;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
@@ -111,7 +111,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         } catch (final SProfileNotFoundException sProfileNotFoundException) {
             try {
                 final SProfile profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, profileService.getSProfileBuilderAccessor()
-                        .getSProfileBuilder(), false, getUserIdFromSession()));
+                        .getSProfileBuilder(), false, SessionInfos.getUserIdFromSession()));
                 return SPModelConvertor.toProfile(profile);
             } catch (final SProfileCreationException e) {
                 throw new CreationException(e);
@@ -223,7 +223,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
         final SProfileBuilder profileBuilder = builders.getSProfileBuilder();
         final SProfileEntryBuilder sProfileEntryBuilder = builders.getSProfileEntryBuilder();
-        final long importerId = getUserIdFromSession();
+        final long importerId = SessionInfos.getUserIdFromSession();
         for (final ExportedProfile exportedProfile : exportedProfiles) {
             if (exportedProfile.getName() != null && !"".equals(exportedProfile.getName())) {
                 final GetProfileByName getProfileByName = new GetProfileByName(profileService, exportedProfile.getName());
@@ -301,7 +301,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     private List<String> importInCaseDuplicate(final TransactionExecutor transactionExecutor, final ProfileService profileService,
             final IdentityService identityService, final List<ExportedProfile> profiles, final ImportPolicy policy) throws ExecutionException {
         final ImportAndHandleSameNameProfiles importAndHandler = new ImportAndHandleSameNameProfiles(profileService, identityService, profiles, policy,
-                getUserIdFromSession());
+                SessionInfos.getUserIdFromSession());
         try {
             transactionExecutor.execute(importAndHandler);
         } catch (final SBonitaException e) {
@@ -318,7 +318,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         } catch (final SBonitaException e) {
             throw new ExecutionException(e);
         }
-        final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles, getUserIdFromSession());
+        final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles, SessionInfos.getUserIdFromSession());
         try {
             transactionExecutor.execute(importProfiles);
         } catch (final SBonitaException e) {
@@ -357,7 +357,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         final UpdateProfile updateProfile = new UpdateProfile(profileService, profileService.getSProfileBuilderAccessor().getSProfileUpdateBuilder(), id,
-                updateDescriptor, getUserIdFromSession());
+                updateDescriptor, SessionInfos.getUserIdFromSession());
         try {
             updateProfile.execute();
             return SPModelConvertor.toProfile(updateProfile.getResult());
@@ -489,20 +489,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         creator.setPage(exportedProfileEntry.getPage());
         creator.setType(exportedProfileEntry.getType());
         return creator;
-    }
-
-    private long getUserIdFromSession() {
-        SessionAccessor sessionAccessor;
-        long userId;
-        try {
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long sessionId = sessionAccessor.getSessionId();
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            userId = platformServiceAccessor.getSessionService().getSession(sessionId).getUserId();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        return userId;
     }
 
 }

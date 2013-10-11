@@ -8,7 +8,6 @@ import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
@@ -23,24 +22,24 @@ public class ClusteredTestSuiteIT {
 
     public static void beforeAll() throws Exception {
         System.err.println("=================== ClusteredTestSuiteIT.beforeClass()");
-        APITestUtil.createPlatformStructure();
-        SPBPMTestUtil.createEnvironmentWithDefaultTenant();
-        // init the context here
         changeToNode2();
         PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
-        platformAPI.startNode();
+        SPBPMTestUtil.setDefaultTenantId(platformAPI.getDefaultTenant().getId());
         platformLoginAPI.logout(platformSession);
         changeToNode1();
-        // platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        // platformSession = platformLoginAPI.login("platformAdmin", "platform");
-        // platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
-        // platformAPI.startNode();
-        // platformLoginAPI.logout(platformSession);
     }
 
     public static void afterAll() throws Exception {
+        changeToNode2();
+        PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+        PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
+        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
+        platformAPI.stopNode();
+        changeToNode1();
+        platformAPI.stopNode();
+        platformLoginAPI.logout(platformSession);
         System.err.println("=================== ClusteredTestSuiteIT.afterClass()");
         SPBPMTestUtil.destroyPlatformAndTenants();
         APITestSPUtil.deletePlatformStructure();

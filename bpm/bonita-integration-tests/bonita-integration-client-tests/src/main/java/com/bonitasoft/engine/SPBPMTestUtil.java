@@ -69,6 +69,10 @@ public class SPBPMTestUtil {
         logoutTenant(loginDefaultTenant);
     }
 
+    public static void setDefaultTenantId(final long defaultTenantId) {
+        SPBPMTestUtil.defaultTenantId = defaultTenantId;
+    }
+
     public static void destroyPlatformAndTenants() throws BonitaException {
         final APISession loginDefaultTenant = loginDefaultTenant();
         ClientEventUtil.undeployCommand(loginDefaultTenant);

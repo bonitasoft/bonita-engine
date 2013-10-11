@@ -26,6 +26,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
+import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
@@ -107,7 +108,6 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.process.SearchProcessInstances;
 import org.bonitasoft.engine.service.ModelConvertor;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ProcessAPI;
@@ -325,7 +325,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final Map<ManualTaskField, Serializable> fields = creator.getFields();
         final TaskPriority prio = fields.get(ManualTaskField.PRIORITY) != null ? (TaskPriority) fields.get(ManualTaskField.PRIORITY) : TaskPriority.NORMAL;
         try {
-            final String userName = getUserNameFromSession();
+            final String userName = SessionInfos.getUserNameFromSession();
             tenantAccessor = getTenantAccessor();
             final IdentityService identityService = tenantAccessor.getIdentityService();
             final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -375,18 +375,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
-        }
-    }
-
-    private String getUserNameFromSession() {
-        SessionAccessor sessionAccessor = null;
-        try {
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long sessionId = sessionAccessor.getSessionId();
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            return platformServiceAccessor.getSessionService().getSession(sessionId).getUserName();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
         }
     }
 

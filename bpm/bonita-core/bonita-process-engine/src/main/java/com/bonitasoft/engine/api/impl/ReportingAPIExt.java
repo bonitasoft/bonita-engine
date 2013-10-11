@@ -11,6 +11,7 @@ package com.bonitasoft.engine.api.impl;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -38,7 +39,6 @@ import com.bonitasoft.engine.reporting.Report;
 import com.bonitasoft.engine.reporting.ReportCreator;
 import com.bonitasoft.engine.reporting.ReportNotFoundException;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -49,20 +49,6 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
  * @author Celine Souchet
  */
 public class ReportingAPIExt implements ReportingAPI {
-
-    private long getUserIdFromSession() {
-        SessionAccessor sessionAccessor;
-        long userId;
-        try {
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long sessionId = sessionAccessor.getSessionId();
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            userId = platformServiceAccessor.getSessionService().getSession(sessionId).getUserId();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        return userId;
-    }
 
     protected void checkReportAlreadyExists(final String name, final TenantServiceAccessor tenantAccessor) throws AlreadyExistsException {
         // Check if the problem is primary key duplication:
@@ -82,7 +68,7 @@ public class ReportingAPIExt implements ReportingAPI {
     public Report createReport(final String name, final String description, final byte[] content) throws AlreadyExistsException, CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         ReportingService reportingService = tenantAccessor.getReportingService();
-        final long userId = getUserIdFromSession();
+        final long userId = SessionInfos.getUserIdFromSession();
         final SReportBuilder reportBuilder = reportingService.getReportBuilder();
         reportBuilder.createNewInstance(name, userId, false, description, null);
         SReport report = reportBuilder.done();
@@ -99,7 +85,7 @@ public class ReportingAPIExt implements ReportingAPI {
     @Override
     public Report createReport(final ReportCreator reportCreator, final byte[] content) throws AlreadyExistsException, CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final long userId = getUserIdFromSession();
+        final long userId = SessionInfos.getUserIdFromSession();
         ReportingService reportingService = tenantAccessor.getReportingService();
         final SReportBuilder reportBuilder = reportingService.getReportBuilder();
         final SReport sReport = SPModelConvertor.constructSReport(reportCreator, reportBuilder, userId);
