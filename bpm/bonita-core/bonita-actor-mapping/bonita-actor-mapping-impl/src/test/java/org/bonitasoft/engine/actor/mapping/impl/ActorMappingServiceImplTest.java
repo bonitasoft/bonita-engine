@@ -36,14 +36,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.actor.mapping.SActorCreationException;
+import org.bonitasoft.engine.actor.mapping.SActorDeletionException;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.SActorUpdateException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilder;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorUpdateBuilderImpl;
+import org.bonitasoft.engine.actor.mapping.persistence.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -55,6 +58,7 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
@@ -495,10 +499,63 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#deleteActors(long)}.
+     * 
+     * @throws Exception
      */
     @Test
-    public final void deleteActors() {
-        // TODO : "Not yet implemented"
+    public final void deleteActors() throws Exception {
+        final int scopeId = 9;
+        final List<SActor> sActors = new ArrayList<SActor>(3);
+        final SActor sActor = mock(SActor.class);
+        doReturn(3L).when(sActor).getId();
+        sActors.add(sActor);
+
+        final List<SActorMember> sActorMembers = new ArrayList<SActorMember>();
+        final SActorMember sActorMember = mock(SActorMember.class);
+        doReturn(4L).when(sActorMember).getId();
+        sActorMembers.add(sActorMember);
+
+        doReturn(sActors).when(persistenceService).selectList(SelectDescriptorBuilder.getActorsOfScope(scopeId));
+        doReturn(sActorMembers).doReturn(new ArrayList<SActorMember>()).when(persistenceService).selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+
+        actorMappingServiceImpl.deleteActors(scopeId);
+        // verifyPrivate(actorMappingServiceImpl, times(1)).invoke("deleteActor", any());
+        // verifyPrivate(actorMappingServiceImpl, times(1)).invoke("removeActorMember", any());
+    }
+
+    @Test
+    public final void deleteNoActorMembers() throws SBonitaReadException, SRecorderException, SActorDeletionException {
+        final int scopeId = 9;
+        final List<SActor> sActors = new ArrayList<SActor>(3);
+        final SActor sActor = mock(SActor.class);
+        doReturn(3L).when(sActor).getId();
+        sActors.add(sActor);
+
+        final List<SActorMember> sActorMembers = new ArrayList<SActorMember>();
+
+        doReturn(sActors).when(persistenceService).selectList(SelectDescriptorBuilder.getActorsOfScope(scopeId));
+        doReturn(sActorMembers).when(persistenceService).selectList(SelectDescriptorBuilder.getActorMembers(3, 0, 50));
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+
+        actorMappingServiceImpl.deleteActors(scopeId);
+    }
+
+    @Test
+    public final void deleteNoActors() throws SBonitaReadException, SRecorderException, SActorDeletionException {
+        final int scopeId = 9;
+        final List<SActor> sActors = new ArrayList<SActor>(3);
+
+        doReturn(sActors).when(persistenceService).selectList(SelectDescriptorBuilder.getActorsOfScope(scopeId));
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+
+        actorMappingServiceImpl.deleteActors(scopeId);
     }
 
     /**
