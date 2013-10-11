@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
@@ -37,6 +38,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.actor.mapping.SActorCreationException;
 import org.bonitasoft.engine.actor.mapping.SActorDeletionException;
+import org.bonitasoft.engine.actor.mapping.SActorMemberDeletionException;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.SActorUpdateException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
@@ -58,6 +60,7 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -559,6 +562,26 @@ public class ActorMappingServiceImplTest {
     }
 
     /**
+     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#deleteAllActorMembers()}.
+     * 
+     * @throws SRecorderException
+     * @throws SActorMemberDeletionException
+     */
+    @Test
+    public final void deleteAllActorMembers() throws SRecorderException, SActorMemberDeletionException {
+        doNothing().when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
+
+        actorMappingServiceImpl.deleteAllActorMembers();
+    }
+
+    @Test(expected = SActorMemberDeletionException.class)
+    public final void deleteAllActorMembersThrowException() throws SRecorderException, SActorMemberDeletionException {
+        doThrow(new SRecorderException("plop")).when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
+
+        actorMappingServiceImpl.deleteAllActorMembers();
+    }
+
+    /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addUserToActor(long, long)}.
      */
     @Test
@@ -604,14 +627,6 @@ public class ActorMappingServiceImplTest {
      */
     @Test
     public final void removeActorMemberSActorMember() {
-        // TODO : "Not yet implemented"
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#deleteAllActorMembers()}.
-     */
-    @Test
-    public final void deleteAllActorMembers() {
         // TODO : "Not yet implemented"
     }
 
