@@ -25,7 +25,6 @@ import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.service.impl.SpringPlatformFileSystemBeanAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
@@ -68,8 +67,6 @@ public class EngineInitializer {
         LOGGER.log(Level.INFO, "Initializing Bonita Engine...");
         long before = System.currentTimeMillis();
         LOGGER.log(Level.INFO, "Initializing spring context...");
-        // initialize spring context
-        SpringPlatformFileSystemBeanAccessor.initializeContext(null);
         // create a session to call the engine
         PlatformServiceAccessor platformAccessor = getPlatformAccessor();
         PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
