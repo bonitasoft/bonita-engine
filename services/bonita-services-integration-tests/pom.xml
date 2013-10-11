@@ -110,7 +110,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-cached-data-impl</artifactId>
+			<artifactId>bonita-data-cached-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

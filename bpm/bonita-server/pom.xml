@@ -743,7 +743,7 @@
     <!-- Cached Data Service -->
     <dependency>
       <groupId>com.bonitasoft.engine.data</groupId>
-      <artifactId>bonita-cached-data-impl</artifactId>
+      <artifactId>bonita-data-cached-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -1081,7 +1081,7 @@
                   <include>org.bonitasoft.engine.work:bonita-work-impl</include>
                   <include>com.bonitasoft.engine.work:bonita-work-clustered</include>
                   <!-- Cached Data Service Impl -->
-                  <include>com.bonitasoft.engine.data:bonita-cached-data-impl</include>
+                  <include>com.bonitasoft.engine.data:bonita-data-cached-impl</include>
                   <!-- XML -->
                   <include>org.bonitasoft.engine.xml:bonita-xml-parse-api</include>
                   <include>org.bonitasoft.engine.xml:bonita-xml-parse-sax</include>

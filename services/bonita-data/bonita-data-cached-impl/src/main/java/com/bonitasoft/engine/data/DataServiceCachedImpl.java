@@ -22,7 +22,7 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
-public class CachedDataServiceImpl extends DataServiceImpl implements DataService {
+public class DataServiceCachedImpl extends DataServiceImpl implements DataService {
     
     //not using synchronized map as data is never changing. 
     // We prefer having fast reads and synchronized only writes (happen only a few times during the warm up)
@@ -30,7 +30,7 @@ public class CachedDataServiceImpl extends DataServiceImpl implements DataServic
     private final Map<String, SDataSource> sDataSourcesByNameAndVersion = new HashMap<String, SDataSource>();
     private final Map<String, DataSourceImplementation> sDataSourceImplementations = new HashMap<String, DataSourceImplementation>();
 
-    public CachedDataServiceImpl(final SDataSourceModelBuilder modelBuilder,
+    public DataServiceCachedImpl(final SDataSourceModelBuilder modelBuilder,
             final Recorder recorder, final ReadPersistenceService persistenceService,
             final ClassLoaderService classLoaderService, final EventService eventService,
             final List<DataSourceConfiguration> dataSourceConfigurations,
