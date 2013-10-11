@@ -146,11 +146,6 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
         return deployProcessWithTestConnectorAndParameter(actor, user, designProcessDefinition, null);
     }
 
-    protected void addResource(final List<BarResource> resources, final Class<?> clazz, final String name) throws IOException {
-        final byte[] data = IOUtil.generateJar(clazz);
-        resources.add(new BarResource(name, data));
-    }
-
     protected List<BarResource> generateConnectorImplementations() throws IOException {
         final List<BarResource> resources = new ArrayList<BarResource>(2);
         addResource(resources, "/org/bonitasoft/engine/connectors/TestConnector.impl", "TestConnector.impl");

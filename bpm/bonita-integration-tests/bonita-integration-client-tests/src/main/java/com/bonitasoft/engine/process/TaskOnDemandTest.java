@@ -8,6 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 import java.util.List;
 
@@ -31,10 +35,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class TaskOnDemandTest extends CommonAPISPTest {
 
@@ -145,7 +145,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, keywords = { "add subtask" })
+    @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, keywords = { "add subtask" }, jira = "")
     @Test
     public void createUserTaskOnParent() throws Exception {
         final String password = "secretPassword";

@@ -220,7 +220,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state" })
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state" }, jira = "")
     @Test
     public void resetConnectorInstancesState() throws Exception {
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("normal");
@@ -308,7 +308,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" })
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" }, jira = "")
     @Test
     public void replayActivityWithResetConnectorStates() throws Exception {
         final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");
@@ -426,7 +426,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" })
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector state", "activity replay" }, jira = "")
     @Test(expected = ActivityExecutionException.class)
     public void replayActivityWithUnresolvedFailedConnectors() throws Exception {
         final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");
@@ -651,7 +651,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "At process instanciation" }, story = "Execute connector at process instanciation.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "At process instanciation" }, story = "Execute connector at process instanciation.", jira = "")
     @Test
     public void executeConnectorAtProcessInstanciation() throws Exception {
         final String valueOfInput1 = "Lily";
@@ -712,7 +712,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance" }, story = "Execute connector on an activity instance.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance" }, story = "Execute connector on an activity instance.", jira = "")
     @Test
     public void executeConnectorOnActivityInstance() throws Exception {
         final String valueOfInput1 = "Lily";
@@ -812,7 +812,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         }
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed activity", "Activity instance" }, story = "Execute connector on completed activity instance.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed activity", "Activity instance" }, story = "Execute connector on completed activity instance.", jira = "")
     @Test
     public void executeConnectorOnCompletedActivityInstance() throws Exception {
         final String valueOfInput1 = "Lily";
@@ -922,7 +922,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         }
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed process instance", "Process instance" }, story = "Execute connector on completed process instance.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed process instance", "Process instance" }, story = "Execute connector on completed process instance.", jira = "")
     @Test
     public void executeConnectorOnCompletedProcessInstance() throws Exception {
         final String valueOfInput1 = "Lily";
@@ -1027,7 +1027,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         }
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Process instance" }, story = "Execute connector on process instance.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Process instance" }, story = "Execute connector on process instance.", jira = "")
     @Test
     public void executeConnectorOnProcessInstance() throws Exception {
         final String valueOfInput1 = "Lily";

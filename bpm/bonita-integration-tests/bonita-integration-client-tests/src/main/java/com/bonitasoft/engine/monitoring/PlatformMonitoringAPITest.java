@@ -35,13 +35,13 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
         login();
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Memory", "Usage" }, story = "Get current memory usage.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Memory", "Usage" }, story = "Get current memory usage.", jira = "")
     @Test
     public void getCurrentMemoryUsage() throws BonitaException {
         assertTrue(getPlatformMonitoringAPI().getCurrentMemoryUsage() > 0);
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Memory", "Usage", "Percentage" }, story = "Get memory usage percentage.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Memory", "Usage", "Percentage" }, story = "Get memory usage percentage.", jira = "")
     @Test
     public void getMemoryUsagePercentage() throws BonitaException {
         final float memoryUsagePercentage = getPlatformMonitoringAPI().getMemoryUsagePercentage();
@@ -58,19 +58,19 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
     // assertTrue(result > 0);
     // }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Up time" }, story = "Get up time.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Up time" }, story = "Get up time.", jira = "")
     @Test
     public void getUpTime() throws BonitaException {
         assertTrue(getPlatformMonitoringAPI().getUpTime() > 0);
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Start time" }, story = "Get start time.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Start time" }, story = "Get start time.", jira = "")
     @Test
     public void getStartTime() throws BonitaException {
         assertTrue(getPlatformMonitoringAPI().getStartTime() > 0);
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Thread", "CPU time" }, story = "Get total threads CPU time.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Thread", "CPU time" }, story = "Get total threads CPU time.", jira = "")
     @Test
     public void getTotalThreadsCpuTime() throws BonitaException {
         assertTrue(getPlatformMonitoringAPI().getTotalThreadsCpuTime() > 0);
@@ -79,69 +79,69 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
         assertTrue(result > 0);
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Thread" }, story = "Get thread count.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Thread" }, story = "Get thread count.", jira = "")
     @Test
     public void getThreadCount() throws BonitaException {
         assertTrue(getPlatformMonitoringAPI().getThreadCount() > 0);
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Processor" }, story = "Get available processors.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Processor" }, story = "Get available processors.", jira = "")
     @Test
     public void getAvailableProcessors() throws BonitaException {
         assertTrue(getPlatformMonitoringAPI().getAvailableProcessors() > 0);
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = "OS architecture", story = "Get OS architecture.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = "OS architecture", story = "Get OS architecture.", jira = "")
     @Test
     public void getOSArch() throws BonitaException {
         assertNotNull(getPlatformMonitoringAPI().getOSArch());
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "OS name" }, story = "Get OS name.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "OS name" }, story = "Get OS name.", jira = "")
     @Test
     public void getOSName() throws BonitaException {
         assertNotNull(getPlatformMonitoringAPI().getOSName());
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "OS version" }, story = "Get OS version.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "OS version" }, story = "Get OS version.", jira = "")
     @Test
     public void getOSVersion() throws BonitaException {
         assertNotNull(getPlatformMonitoringAPI().getOSVersion());
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "JVM name" }, story = "Get JVM name.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "JVM name" }, story = "Get JVM name.", jira = "")
     @Test
     public void getJvmName() throws BonitaException {
         assertNotNull(getPlatformMonitoringAPI().getJvmName());
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "JVM vendor" }, story = "Get JVM vendor.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "JVM vendor" }, story = "Get JVM vendor.", jira = "")
     @Test
     public void getJvmVendor() throws BonitaException {
         assertNotNull(getPlatformMonitoringAPI().getJvmVendor());
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "JVM version" }, story = "Get JVM version.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "JVM version" }, story = "Get JVM version.", jira = "")
     @Test
     public void getJvmVersion() throws BonitaException {
         assertNotNull(getPlatformMonitoringAPI().getJvmVersion());
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "JVM", "System properties" }, story = "Get JVM system properties.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "JVM", "System properties" }, story = "Get JVM system properties.", jira = "")
     @Test
     public void getJvmSystemProperties() throws BonitaException {
         final Map<String, String> systemProperties = getPlatformMonitoringAPI().getJvmSystemProperties();
         assertNotNull(systemProperties);
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Scheduler" }, story = "Test if scheduler is started.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Scheduler" }, story = "Test if scheduler is started.", jira = "")
     @Test
     public void isSchedulerStartedTest() throws Exception {
         // TODO how to improve that?
         assertTrue("The scheduler should be started", getPlatformMonitoringAPI().isSchedulerStarted());
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Transaction", "Active" }, story = "Get number of active transactions.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Transaction", "Active" }, story = "Get number of active transactions.", jira = "")
     @Test
     public void getNumberOfActiveTransactions() throws Exception {
         Thread.sleep(500);// wait for potential work to finish
@@ -239,7 +239,7 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
         }
     }
 
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Monitoring information", "Optional" }, story = "Test if optional monitoring information are available.")
+    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Monitoring information", "Optional" }, story = "Test if optional monitoring information are available.", jira = "")
     @Test
     public void isOptionalMonitoringInformationAvailable() throws Exception {
         if (getPlatformMonitoringAPI().getJvmVendor().indexOf("Sun") >= 0) {

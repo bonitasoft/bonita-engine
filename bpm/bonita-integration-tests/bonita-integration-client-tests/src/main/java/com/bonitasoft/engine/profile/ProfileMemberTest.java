@@ -27,13 +27,13 @@ import com.bonitasoft.engine.platform.TenantCreator;
 
 public class ProfileMemberTest extends AbstractProfileTest {
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Group" }, story = "Create and delete group to profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Group" }, story = "Create and delete group to profile.", jira = "")
     @Test
     public void createAndDeleteGroupToProfile() throws BonitaException {
         checkCreateAndDeleProfileMember("group", null, group1.getId(), null);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Role", "Group" }, story = "Create and delete role and group to profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Role", "Group" }, story = "Create and delete role and group to profile.", jira = "")
     @Test
     public void createAndDeleteRoleAndGroupToProfile() throws BonitaException {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
@@ -44,13 +44,13 @@ public class ProfileMemberTest extends AbstractProfileTest {
         checkCreateAndDeleProfileMember("roleAndGroup", null, group1.getId(), role1.getId());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Role" }, story = "Create and delete role to profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete", "Role" }, story = "Create and delete role to profile.", jira = "")
     @Test
     public void createAndDeleteRoleToProfile() throws BonitaException {
         checkCreateAndDeleProfileMember("role", null, null, role3.getId());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete" }, story = "Create and delete user profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Create", "Delete" }, story = "Create and delete user profile.", jira = "")
     @Test
     public void createandDeleteUserProfile() throws BonitaException {
         checkCreateAndDeleProfileMember("user", user2.getId(), null, null);

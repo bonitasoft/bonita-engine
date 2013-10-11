@@ -47,7 +47,6 @@ import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdater;
-import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
@@ -505,11 +504,6 @@ public class LogTest extends CommonAPISPTest {
         final List<BarResource> resources = new ArrayList<BarResource>(1);
         addResource(resources, APIAccessorConnector.class, "APIAccessorConnector.jar");
         return resources;
-    }
-
-    private void addResource(final List<BarResource> resources, final Class<?> clazz, final String name) throws IOException {
-        final byte[] data = IOUtil.generateJar(clazz);
-        resources.add(new BarResource(name, data));
     }
 
     private void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {

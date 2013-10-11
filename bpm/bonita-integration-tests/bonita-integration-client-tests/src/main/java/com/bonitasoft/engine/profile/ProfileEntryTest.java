@@ -30,7 +30,7 @@ import org.junit.Test;
  */
 public class ProfileEntryTest extends AbstractProfileTest {
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create and delete profile entry.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create and delete profile entry.", jira = "")
     @Test
     public void createAndDeleteProfileEntry() throws BonitaException {
         final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry1", adminProfileId).setDescription("Description profileEntry1")
@@ -106,7 +106,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().deleteProfileEntry(profileEntry2.getId());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create profile entry in 2nd position.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "Delete" }, story = "Create profile entry in 2nd position.", jira = "")
     @Test
     public void insertInIndex2() throws BonitaException {
         final ProfileEntryCreator profileEntryCreator0 = new ProfileEntryCreator("ProfileEntry0", adminProfileId).setDescription("Description profileEntry1")
@@ -128,7 +128,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
         assertEquals(2L, getProfileEntryResult.getIndex());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "No index" }, story = "Create profile entry without index.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Create", "No index" }, story = "Create profile entry without index.", jira = "")
     @Test
     public void createProfileEntryWithoutIndex() throws BonitaException {
         // Create Profile1
@@ -166,7 +166,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().createProfileEntry(profileEntryCreator);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update" }, story = "Update profile entry.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update" }, story = "Update profile entry.", jira = "")
     @Test
     public void updateProfileEntry() throws BonitaException {
         final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry2", adminProfileId).setDescription("Description profileEntry2")
@@ -191,7 +191,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().deleteProfileEntry(createdProfile.getId());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Delete", "Index" }, story = "Update profile entry index on delete.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Delete", "Index" }, story = "Update profile entry index on delete.", jira = "")
     @Test
     public void updateProfileEntryIndexOnDelete() throws BonitaException {
         // Create Profile1
@@ -264,7 +264,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().deleteProfile(profileId);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Insert", "Index" }, story = "Update profile entry index on insert.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Insert", "Index" }, story = "Update profile entry index on insert.", jira = "")
     @Test
     public void updateProfileEntryIndexOnInsert() throws BonitaException {
         // Create Profile Entry 1
@@ -301,7 +301,7 @@ public class ProfileEntryTest extends AbstractProfileTest {
         getProfileAPI().deleteProfile(profileId);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Index" }, story = "Update profile entry index on update.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Update", "Index" }, story = "Update profile entry index on update.", jira = "")
     @Test
     public void updateProfileEntryIndexOnUpdate() throws BonitaException {
         // Create Profile1

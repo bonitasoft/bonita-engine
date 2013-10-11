@@ -39,7 +39,7 @@ import com.bonitasoft.engine.api.ProfileAPI;
 @SuppressWarnings("javadoc")
 public class ProfileTest extends AbstractProfileTest {
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.", jira = "")
     @Test
     public void defaultProfileCreation() throws BonitaException {
         Profile getProfileResult = getProfileAPI().getProfile(adminProfileId);

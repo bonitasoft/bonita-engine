@@ -36,7 +36,7 @@ import com.bonitasoft.engine.api.ProfileAPI;
 
 public class ProfileImportAndExportTest extends AbstractProfileTest {
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export all profiles.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export all profiles.", jira = "")
     @Test
     public void exportAllProfiles() throws BonitaException, IOException {
         final Map<Long, Long> numberOfProfileMembers = getProfileAPI().getNumberOfProfileMembers(Arrays.asList(adminProfileId, userProfileId));
@@ -73,7 +73,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         f.delete();
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export specified profiles.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export" }, story = "Export specified profiles.", jira = "")
     @Test
     public void exportProfilesSpecified() throws BonitaException, IOException {
         final List<Long> profileIds = new ArrayList<Long>();
@@ -104,7 +104,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         f.delete();
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
     @Test
     public void importAndExport() throws BonitaException, IOException, SAXException {
         final InputStream xmlStream1 = ProfileImportAndExportTest.class.getResourceAsStream("AllProfiles.xml");
@@ -119,7 +119,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         XMLUnit.compareXML(new String(xmlContent), new String(profilebytes));
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profile on other duplicate.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profile on other duplicate.", jira = "")
     @Test
     public void importOnOtherDuplicate() throws BonitaException, IOException {
         // profile entries
@@ -297,7 +297,7 @@ public class ProfileImportAndExportTest extends AbstractProfileTest {
         assertEquals(new String(xmlBytes), new String(profilebytes));
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profiles and delete existing.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profiles and delete existing.", jira = "")
     @Test
     public void importProfilesDeleteExisting() throws BonitaException, IOException {
         final InputStream xmlStream1 = ProfileImportAndExportTest.class.getResourceAsStream("AllProfiles.xml");

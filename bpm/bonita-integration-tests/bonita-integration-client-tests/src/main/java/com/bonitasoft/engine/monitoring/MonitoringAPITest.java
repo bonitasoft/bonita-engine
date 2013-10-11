@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.monitoring;
 
+import static org.junit.Assert.assertEquals;
+
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -9,8 +11,6 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.MonitoringAPI;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -27,7 +27,7 @@ public class MonitoringAPITest extends CommonAPISPTest {
         login();
     }
 
-    @Cover(classes = MonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "User" }, story = "Get number of users.")
+    @Cover(classes = MonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "User" }, story = "Get number of users.", jira = "")
     @Test
     public void getNumberOfUsers() throws Exception {
         long numberOfUsers = getMonitoringAPI().getNumberOfUsers();
@@ -78,14 +78,14 @@ public class MonitoringAPITest extends CommonAPISPTest {
     // assertEquals(0L, t2NumberOfUsers);
     // }
 
-    @Cover(classes = MonitoringAPITest.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "Executing process" }, story = "Get number of executing processes.")
+    @Cover(classes = MonitoringAPITest.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "Executing process" }, story = "Get number of executing processes.", jira = "")
     @Test
     public void getNumberOfExecutingProcesses() throws BonitaException {
         final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfExecutingProcesses();
         assertEquals(0, numberOfActiveTransactions);
     }
 
-    @Cover(classes = MonitoringAPITest.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "Active transaction" }, story = "Get number of active transaction.")
+    @Cover(classes = MonitoringAPITest.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "Active transaction" }, story = "Get number of active transaction.", jira = "")
     @Test
     public void getNumberOfActiveTransaction() throws BonitaException {
         final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
