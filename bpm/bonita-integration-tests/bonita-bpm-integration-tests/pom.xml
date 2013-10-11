@@ -97,6 +97,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-data-cached-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Dependency -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.dependency</groupId>
