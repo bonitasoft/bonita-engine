@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
@@ -197,7 +196,7 @@ public class APITestSPUtil extends APITestUtil {
 
     public List<String> checkNoActiveTransactions() throws MonitoringException {
         final List<String> messages = new ArrayList<String>();
-        long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
+        final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
         if (numberOfActiveTransactions != 0) {
             messages.add("There are " + numberOfActiveTransactions + " active transactions.");
         }
@@ -243,8 +242,8 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
-        final ActivityInstance waitForUserTask = waitForUserTask(taskName, processInstance);
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final long processInstanceId, final User user) throws Exception {
+        final ActivityInstance waitForUserTask = waitForUserTask(taskName, processInstanceId);
         assignAndExecuteStep(waitForUserTask, user);
         return (HumanTaskInstance) waitForUserTask;
     }

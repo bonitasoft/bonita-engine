@@ -58,7 +58,7 @@ public class ManualTasksTest extends CommonAPISPTest {
         final User user = createUser("login1", "password");
         final ProcessDefinition processDefinition = deployProcessWithUserTask(user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance task = waitForUserTask("Request", startProcess);
+        final ActivityInstance task = waitForUserTask("Request", startProcess.getId());
         final long taskId = task.getId();
         login();
         loginWith("login1", "password");

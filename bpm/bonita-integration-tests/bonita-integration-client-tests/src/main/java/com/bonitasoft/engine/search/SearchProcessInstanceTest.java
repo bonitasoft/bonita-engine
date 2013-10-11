@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.search;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -36,9 +39,6 @@ import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceSearchDescriptor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Matthieu Chaffotte
@@ -244,7 +244,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, delivery, user1);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
-        waitForUserTask("step1", processInstance1);
+        waitForUserTask("step1", processInstance1.getId());
         logout();
 
         loginWith("john1", "bpm");
@@ -252,7 +252,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition2 = deployAndEnableWithActor(designProcessDefinition2, delivery, user2);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
-        waitForUserTask("step1", processInstance2);
+        waitForUserTask("step1", processInstance2.getId());
         logout();
 
         loginWith("john3", "bpm");
@@ -260,7 +260,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, delivery, user3);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition3.getId());
-        waitForUserTask("step1", processInstance3);
+        waitForUserTask("step1", processInstance3.getId());
         logout();
 
         loginWith("john2", "bpm");
@@ -268,7 +268,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition4 = deployAndEnableWithActor(designProcessDefinition4, delivery, user4);
         final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition4.getId());
-        waitForUserTask("step1", processInstance4);
+        waitForUserTask("step1", processInstance4.getId());
         logout();
 
         loginWith("john4", "bpm");
@@ -276,11 +276,11 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition5 = deployAndEnableWithActor(designProcessDefinition5, delivery, user1);
         final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDefinition5.getId());
-        waitForUserTask("step1", processInstance5);
+        waitForUserTask("step1", processInstance5.getId());
 
         // Search term for STRING_INDEX
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ProcessInstanceSearchDescriptor.ID, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor.ID, Order.ASC);
         searchOptionsBuilder.searchTerm("value1");
         final List<ProcessInstance> archivedProcessInstances = getProcessAPI().searchOpenProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
@@ -406,7 +406,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         // Search term for STRING_INDEX
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        searchOptionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
+        searchOptionsBuilder.sort(org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
         searchOptionsBuilder.searchTerm("value1");
         archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done()).getResult();
         assertNotNull(archivedProcessInstances);
