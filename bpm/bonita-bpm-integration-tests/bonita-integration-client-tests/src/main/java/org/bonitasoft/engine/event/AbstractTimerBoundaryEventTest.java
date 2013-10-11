@@ -44,7 +44,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
 
     protected User donaBenta;
 
-    private final String ACTOR_NAME = "delivery";
+    protected final String ACTOR_NAME = "delivery";
 
     @Before
     public void beforeTest() throws BonitaException {
@@ -139,8 +139,8 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         processDefinitionBuilder.addStartEvent("start");
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask(taskWithBoundaryName, ACTOR_NAME);
         userTaskDefinitionBuilder.addBoundaryEvent("timer", interrupting).addTimerEventTriggerDefinition(timerType, timerExpr);
-        userTaskDefinitionBuilder.addUserTask(exceptionTaskName, ACTOR_NAME);
-        userTaskDefinitionBuilder.addUserTask(normalFlowTaskName, ACTOR_NAME);
+        processDefinitionBuilder.addUserTask(exceptionTaskName, ACTOR_NAME);
+        processDefinitionBuilder.addUserTask(normalFlowTaskName, ACTOR_NAME);
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundaryName);
         processDefinitionBuilder.addTransition(taskWithBoundaryName, normalFlowTaskName);

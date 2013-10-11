@@ -6,6 +6,7 @@ import org.bonitasoft.engine.event.MessageBoundaryEventTest;
 import org.bonitasoft.engine.event.MessageEventSubProcessTest;
 import org.bonitasoft.engine.event.MessageEventTest;
 import org.bonitasoft.engine.event.NonInterruptingTimerBoundaryEventTest;
+import org.bonitasoft.engine.event.TimerBoundaryEventTest;
 import org.bonitasoft.engine.event.TimerEventSubProcessTest;
 import org.bonitasoft.engine.event.TimerEventTest;
 import org.bonitasoft.engine.platform.PlatformLoginTest;
@@ -26,6 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
         // Specific slow test suites below:
         NonInterruptingTimerBoundaryEventTest.class,
         InterruptingTimerBoundaryEventTest.class,
+        TimerBoundaryEventTest.class,
         TimerEventTest.class,
         MessageEventTest.class,
         MessageBoundaryEventTest.class,

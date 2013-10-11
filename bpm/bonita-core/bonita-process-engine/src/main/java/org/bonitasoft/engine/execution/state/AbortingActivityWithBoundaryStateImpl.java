@@ -48,7 +48,7 @@ public class AbortingActivityWithBoundaryStateImpl extends EndingActivityWithBou
 
     @Override
     public SStateCategory getStateCategory() {
-        return SStateCategory.NORMAL;
+        return SStateCategory.ABORTING;
     }
 
     @Override
