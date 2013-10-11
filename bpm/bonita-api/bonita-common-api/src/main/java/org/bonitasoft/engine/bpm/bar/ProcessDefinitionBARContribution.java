@@ -218,7 +218,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         }
     }
 
-    private DesignProcessDefinition deserializeProcessDefinition(final File file) throws IOException, InvalidBusinessArchiveFormatException {
+    public DesignProcessDefinition deserializeProcessDefinition(final File file) throws IOException, InvalidBusinessArchiveFormatException {
         Object objectFromXML;
         try {
             handler.validate(file);
@@ -237,12 +237,14 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     @Override
     public void saveToBarFolder(final BusinessArchive businessArchive, final File barFolder) throws IOException {
-        FileOutputStream fout;
+        final DesignProcessDefinition processDefinition = businessArchive.getProcessDefinition();
+        serializeProcessDefinition(barFolder, processDefinition);
+    }
+
+    public void serializeProcessDefinition(final File barFolder, final DesignProcessDefinition processDefinition) throws IOException {
         try {
-            final DesignProcessDefinition processDefinition;
-            fout = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML));
+            final FileOutputStream fout = new FileOutputStream(new File(barFolder, PROCESS_DEFINITION_XML));
             try {
-                processDefinition = businessArchive.getProcessDefinition();
                 final XMLNode rootNode = new XMLProcessDefinition().getXMLProcessDefinition(processDefinition);
                 handler.write(rootNode, fout);
             } finally {
@@ -257,7 +259,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
 
     protected String generateInfosFromDefinition(final DesignProcessDefinition processDefinition) {
         final FlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-        return new StringBuilder("key1:").append(processDefinition.getActors().size()).append(",key2:").append(processContainer.getTransitions().size())
+        return new StringBuilder("key1:").append(processDefinition.getActorsList().size()).append(",key2:").append(processContainer.getTransitions().size())
                 .append(",key3:").append(processContainer.getActivities().size()).toString();
     }
 

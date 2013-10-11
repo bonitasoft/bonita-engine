@@ -32,7 +32,10 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder {
             final GatewayType gatewayType) {
         super(container, processDefinitionBuilder);
         gateway = new GatewayDefinitionImpl(name, gatewayType);
-        container.addGateway(gateway);
+
+        if (!container.getGatewaysList().contains(gateway)) {
+            container.addGateway(gateway);
+        }
     }
 
     public TransitionDefinitionBuilder addDefaultTransition(final String target) {

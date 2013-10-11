@@ -114,7 +114,7 @@ public class ActivityCommandTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Activity", "Action" }, story = "Execute actions and terminate.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Activity", "Action" }, story = "Execute actions and terminate.", jira = "")
     @Test
     public void executeActionsAndTerminate() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);

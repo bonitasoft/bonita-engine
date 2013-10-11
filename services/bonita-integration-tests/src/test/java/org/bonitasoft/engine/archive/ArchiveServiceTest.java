@@ -248,7 +248,7 @@ public class ArchiveServiceTest extends CommonServiceTest {
     }
 
     @Test
-    @Cover(classes = { ReadPersistenceService.class }, concept = BPMNConcept.OTHERS, keywords = { "archived objects" })
+    @Cover(classes = { ReadPersistenceService.class }, concept = BPMNConcept.OTHERS, keywords = { "archived objects" }, jira = "")
     public void testGetDefinitiveArchiveReadPersistenceService() {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         assertNotNull(persistenceService);

@@ -19,14 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
@@ -131,11 +128,6 @@ public class ConnectorExecutionTest extends CommonAPITest {
         return processDefinition;
     }
 
-    protected void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
-        final BarResource barResource = getResource(path, name);
-        resources.add(barResource);
-    }
-
     private List<BarResource> generateFilterImplementations() throws IOException {
         final List<BarResource> resources = new ArrayList<BarResource>(1);
         final InputStream inputStream = TestConnector.class.getClassLoader().getResourceAsStream(
@@ -180,12 +172,6 @@ public class ConnectorExecutionTest extends CommonAPITest {
         return processDefinition;
     }
 
-    private void addConnectorImplemWithDependency(final BusinessArchiveBuilder bizArchive, final String implemPath, final String implemName,
-            final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
-        bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
-        bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
-    }
-
     private List<BarResource> generateDefaultConnectorDependencies() throws IOException {
         final List<BarResource> resources = new ArrayList<BarResource>(6);
         addResource(resources, TestConnector.class, "TestConnector.jar");
@@ -201,11 +187,6 @@ public class ConnectorExecutionTest extends CommonAPITest {
     protected ProcessDefinition deployAndEnableProcessWithTestConnector(final String actor, final long userId,
             final ProcessDefinitionBuilder designProcessDefinition) throws BonitaException, IOException {
         return deployAndEnableProcessWithTestConnectorAndParameter(actor, userId, designProcessDefinition, null);
-    }
-
-    public void addResource(final List<BarResource> resources, final Class<?> clazz, final String name) throws IOException {
-        final byte[] data = IOUtil.generateJar(clazz);
-        resources.add(new BarResource(name, data));
     }
 
     protected List<BarResource> generateConnectorImplementations() throws IOException {

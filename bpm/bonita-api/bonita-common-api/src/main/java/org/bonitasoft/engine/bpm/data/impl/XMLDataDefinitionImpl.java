@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,6 +18,7 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Feng Hui
+ * @author Celine Souchet
  */
 public class XMLDataDefinitionImpl extends DataDefinitionImpl implements XMLDataDefinition {
 
@@ -47,6 +48,44 @@ public class XMLDataDefinitionImpl extends DataDefinitionImpl implements XMLData
 
     public void setElement(final String element) {
         this.element = element;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (namespace == null ? 0 : namespace.hashCode());
+        result = prime * result + (element == null ? 0 : element.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final XMLDataDefinitionImpl other = (XMLDataDefinitionImpl) obj;
+        if (namespace == null) {
+            if (other.namespace != null) {
+                return false;
+            }
+        } else if (!namespace.equals(other.namespace)) {
+            return false;
+        }
+        if (element == null) {
+            if (other.element != null) {
+                return false;
+            }
+        } else if (!element.equals(other.element)) {
+            return false;
+        }
+        return true;
     }
 
 }

@@ -18,6 +18,7 @@ import org.bonitasoft.engine.exception.NotFoundException;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ProcessDefinitionNotFoundException extends NotFoundException {
 
@@ -32,7 +33,10 @@ public class ProcessDefinitionNotFoundException extends NotFoundException {
     }
 
     public ProcessDefinitionNotFoundException(final long processDefinitionId) {
-        super("Process definition not found, id=" + processDefinitionId);
+        super("Process definition does not found, with id=" + processDefinitionId);
     }
 
+    public ProcessDefinitionNotFoundException(final long processDefinitionId, final Throwable cause) {
+        super("Process definition does not found, with id=" + processDefinitionId, cause);
+    }
 }

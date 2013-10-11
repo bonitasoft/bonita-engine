@@ -41,7 +41,6 @@ public class ActorDefinitionBinding extends NamedElementBinding {
     public ActorDefinition getObject() {
         final ActorDefinitionImpl actorDefintionImpl = new ActorDefinitionImpl(name);
         actorDefintionImpl.setDescription(description);
-        actorDefintionImpl.setInitiator(false);
         return actorDefintionImpl;
     }
 

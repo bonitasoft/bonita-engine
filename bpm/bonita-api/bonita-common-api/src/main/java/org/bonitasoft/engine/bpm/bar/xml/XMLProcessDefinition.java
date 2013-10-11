@@ -397,7 +397,7 @@ public class XMLProcessDefinition {
 
         final XMLNode actors = new XMLNode(ACTORS_NODE);
         dependencies.addChild(actors);
-        for (final ActorDefinition actor : processDefinition.getActors()) {
+        for (final ActorDefinition actor : processDefinition.getActorsList()) {
             final XMLNode actorNode = new XMLNode(ACTOR_NODE);
             fillActorNode(actorNode, actor);
             actors.addChild(actorNode);
@@ -407,7 +407,7 @@ public class XMLProcessDefinition {
         if (actorInitiator != null) {
             final XMLNode initiatorNode = new XMLNode(INITIATOR_NODE);
             rootNode.addChild(initiatorNode);
-            fillActorNode(initiatorNode, actorInitiator);
+            fillInitiatorActorNode(initiatorNode, actorInitiator);
         }
         return rootNode;
     }
@@ -484,7 +484,7 @@ public class XMLProcessDefinition {
 
             flowNodes.addChild(activityNode);
         }
-        for (final GatewayDefinition gateway : containerDefinition.getGateways()) {
+        for (final GatewayDefinition gateway : containerDefinition.getGatewaysList()) {
             final XMLNode gatewayNode = new XMLNode(GATEWAY_NODE);
             fillGatewayNode(gatewayNode, gateway);
             flowNodes.addChild(gatewayNode);
@@ -905,6 +905,10 @@ public class XMLProcessDefinition {
         }
     }
 
+    private void fillInitiatorActorNode(final XMLNode actorNode, final ActorDefinition actor) {
+        actorNode.addAttribute(NAME, actor.getName());
+    }
+
     private void fillParameterNode(final XMLNode parameterNode, final ParameterDefinition parameter) {
         parameterNode.addAttribute(NAME, parameter.getName());
         parameterNode.addAttribute(PARAMETER_TYPE, parameter.getType());
@@ -960,13 +964,13 @@ public class XMLProcessDefinition {
     }
 
     private void fillExpressionNode(final XMLNode expressionNode, final Expression expression, final boolean isCondition) {
-        expressionNode.addAttribute(EXPRESSION_TYPE, expression.getExpressionType());
-        expressionNode.addAttribute(NAME, expression.getName());
         if (isCondition && !"java.lang.Boolean".equals(expression.getReturnType())) {
             throw new BonitaRuntimeException("The return type of the expression must be Boolean");
-        } else {
-            expressionNode.addAttribute(EXPRESSION_RETURN_TYPE, expression.getReturnType());
         }
+
+        expressionNode.addAttribute(EXPRESSION_TYPE, expression.getExpressionType());
+        expressionNode.addAttribute(NAME, expression.getName());
+        expressionNode.addAttribute(EXPRESSION_RETURN_TYPE, expression.getReturnType());
         expressionNode.addAttribute(EXPRESSION_INTERPRETER, expression.getInterpreter());
         expressionNode.addChild(EXPRESSION_CONTENT, expression.getContent());
         for (final Expression dependency : expression.getDependencies()) {

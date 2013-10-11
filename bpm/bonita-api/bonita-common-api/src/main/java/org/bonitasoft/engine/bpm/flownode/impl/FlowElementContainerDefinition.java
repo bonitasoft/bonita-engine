@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -41,7 +41,22 @@ public interface FlowElementContainerDefinition extends BaseElement {
 
     Set<TransitionDefinition> getTransitions();
 
+    /**
+     * 
+     * @return A set of GatewayDefinition
+     * @see #getGatewaysList()
+     * @since 6.0
+     * @deprecated As of release 6.1, replaced by {@link #getGatewaysList()}
+     */
+    @Deprecated
     Set<GatewayDefinition> getGateways();
+
+    /**
+     * 
+     * @return A list of GatewayDefinition
+     * @since 6.1
+     */
+    List<GatewayDefinition> getGatewaysList();
 
     GatewayDefinition getGateway(String name);
 

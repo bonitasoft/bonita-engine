@@ -31,7 +31,7 @@ import org.junit.Test;
  */
 public class ProfileTest extends AbstractProfileTest {
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search" }, story = "Search profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search" }, story = "Search profile.", jira = "")
     @Test
     public void searchProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -42,7 +42,7 @@ public class ProfileTest extends AbstractProfileTest {
         assertEquals("User", searchedProfiles.getResult().get(0).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search" }, story = "Search profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Search" }, story = "Search profile.", jira = "")
     @Test
     public void searchProfileWithSearchTerm() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);

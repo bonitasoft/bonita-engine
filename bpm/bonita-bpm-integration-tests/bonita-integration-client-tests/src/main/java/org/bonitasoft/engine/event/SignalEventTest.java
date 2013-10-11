@@ -49,7 +49,7 @@ public class SignalEventTest extends CommonAPITest {
         logout();
     }
 
-    @Cover(classes = { EventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal Event", "Start event", "End event", "Send", "Receive" }, story = "Send a signal from an end event of a process to a start event of an other process.")
+    @Cover(classes = { EventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal Event", "Start event", "End event", "Send", "Receive" }, story = "Send a signal from an end event of a process to a start event of an other process.", jira = "")
     @Test
     public void sendSignal() throws Exception {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
@@ -96,7 +96,7 @@ public class SignalEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal event",
-            "Intermediate catch event", "End event", "Send", "Receive" }, story = "Send a signal from an end event of a process to an intermediate catch event of an other process.")
+            "Intermediate catch event", "End event", "Send", "Receive" }, story = "Send a signal from an end event of a process to an intermediate catch event of an other process.", jira = "")
     @Test
     public void sendIntermediateCatchSignal() throws Exception {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
@@ -136,7 +136,7 @@ public class SignalEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { EventInstance.class, IntermediateThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal event",
-            "Intermediate catch event", "Start event", "Send", "Receive" }, story = "Send a sigal from an intermediate throw event of a process to a start event of an other process.")
+            "Intermediate catch event", "Start event", "Send", "Receive" }, story = "Send a sigal from an intermediate throw event of a process to a start event of an other process.", jira = "")
     @Test
     public void sendIntermadiateThrowSignal() throws Exception {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();

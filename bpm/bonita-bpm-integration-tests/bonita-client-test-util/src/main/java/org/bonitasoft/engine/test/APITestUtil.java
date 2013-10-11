@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
+import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.category.Category;
@@ -90,6 +92,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCriterion;
 import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
@@ -499,9 +502,9 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorsName, final User user)
+    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorName, final User user)
             throws BonitaException {
-        return deployAndEnableWithActor(businessArchive, Collections.singletonList(actorsName), Collections.singletonList(user));
+        return deployAndEnableWithActor(businessArchive, Collections.singletonList(actorName), Collections.singletonList(user));
     }
 
     protected ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
@@ -1642,6 +1645,15 @@ public class APITestUtil {
         stb.append("<implementationVersion>" + implementationVersion + "</implementationVersion>");
         stb.append("</connectorImplementation>");
         return stb.toString().getBytes();
+    }
+
+    public void addResource(final List<BarResource> resources, final Class<?> clazz, final String name) throws IOException {
+        resources.add(buildBarResource(clazz, name));
+    }
+
+    public BarResource buildBarResource(final Class<?> clazz, final String name) throws IOException {
+        final byte[] data = IOUtil.generateJar(clazz);
+        return new BarResource(name, data);
     }
 
 }

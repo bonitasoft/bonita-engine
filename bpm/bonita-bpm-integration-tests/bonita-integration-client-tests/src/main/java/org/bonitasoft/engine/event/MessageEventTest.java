@@ -316,7 +316,7 @@ public class MessageEventTest extends CommonAPITest {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
      * check receiveProcess has started and halt on the user task.
      */
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> deploy receive process -> start send process )")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> deploy receive process -> start send process )", jira = "")
     @Test
     public void messageStartEventMessageSentAfterEnable() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
@@ -342,7 +342,7 @@ public class MessageEventTest extends CommonAPITest {
      * dynamic -> deployAndEnable(sendProcess), deployAndEnable(receiveProcess), startProcess(sendProcess)
      * check receiveProcess has started and halt on the user task.
      */
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> deploy receive process -> start send process )")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> deploy receive process -> start send process )", jira = "")
     @Test
     public void messageStartEventMessageSentAfterEnableWithNoTargetFlowNode() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, null);
@@ -367,7 +367,7 @@ public class MessageEventTest extends CommonAPITest {
      * Differs only by the dynamic with messageStartEventMessageSentAfterEnable (Before instead of After)
      * dynamic -> deployAndEnable(sendProcess), startProcess(sendProcess), deployAndEnable(receiveProcess)
      */
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> start send process -> deploy receive process)")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", "Send", "Receive" }, story = "Send a message from an end event of a process and receive it in a start event of an other process. (Step : deploy send process -> start send process -> deploy receive process)", jira = "")
     @Test
     public void messageStartEventMessageSentBeforeEnable() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
@@ -442,7 +442,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : receiveProcesses stop on catchEvent, sendProcess1 is finished.
      */
     @Cover(classes = { EventInstance.class, IntermediateThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive", "Several messages", "Correlation" }, story = "Check correlation, to determine the target process when sending a message, works well.")
+            "Intermediate catch event", "Send", "Receive", "Several messages", "Correlation" }, story = "Check correlation, to determine the target process when sending a message, works well.", jira = "")
     @Test
     public void messageIntermediateCatchEventWithCorrelations() throws Exception {
         final Map<String, String> data = new HashMap<String, String>();
@@ -499,7 +499,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : receiveProcesses stop on catchEvent, sendProcess1 is finished.
      */
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive", "Correlation" }, story = "Verify that if a send process has for targets two instances of the same ProcessDefinition and no correlation key is defined (equivalent to matching keys), exactly one of the receive process catches the message.")
+            "Intermediate catch event", "Send", "Receive", "Correlation" }, story = "Verify that if a send process has for targets two instances of the same ProcessDefinition and no correlation key is defined (equivalent to matching keys), exactly one of the receive process catches the message.", jira = "")
     @Test
     public void messageIntermediateCatchEventWithoutCorrelations() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
@@ -533,7 +533,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : receiveProcess stop on catchEvent , sendProcess is finished, receiveProcess continues and reaches user task.
      */
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Send", "Receive", "Correlation" }, story = "Verify that even if matching correlations keys are not in the same order in the receiveProcess and sendProcess, the message is transmitted.")
+            "Send", "Receive", "Correlation" }, story = "Verify that even if matching correlations keys are not in the same order in the receiveProcess and sendProcess, the message is transmitted.", jira = "")
     @Test
     public void correlationKeyInWrongOrderShouldWork() throws Exception {
         final ArrayList<BEntry<Expression, Expression>> correlations = new ArrayList<BEntry<Expression, Expression>>(2);
@@ -577,7 +577,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : sendProcess is finished, , receiveProcess start and stop on user task, data is transmitted to the receiveProcess
      */
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive", "Correlation" }, story = "Verify that a send process must have at least all correlation keys of the receive process for the message to be transmitted.")
+            "Intermediate catch event", "Send", "Receive", "Correlation" }, story = "Verify that a send process must have at least all correlation keys of the receive process for the message to be transmitted.", jira = "")
     @Test
     public void multipleCorrelationsKeys() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithMessageEndEventAndCorrelation();
@@ -673,7 +673,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : sendProcess is finished, receiveProcess start and stop on user task.
      */
     @Cover(classes = { EventInstance.class, ThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate throw event", "Start event", "Send", "Receive" }, story = "Send a message from an intermediate throw event of a process and receive it in a start event of an other process.")
+            "Intermediate throw event", "Start event", "Send", "Receive" }, story = "Send a message from an intermediate throw event of a process and receive it in a start event of an other process.", jira = "")
     @Test
     public void messageIntermediateThrowEventMessageSentAfterEnable() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
@@ -695,7 +695,7 @@ public class MessageEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { EventInstance.class, ThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate throw event", "Start event", "Send", "Receive" }, story = "Send a message from an intermediate throw event of a process and receive it in a start event of an other process.")
+            "Intermediate throw event", "Start event", "Send", "Receive" }, story = "Send a message from an intermediate throw event of a process and receive it in a start event of an other process.", jira = "")
     @Test
     public void messageIntermediateThrow2EventMessages() throws Exception {
         final List<String> messages = new ArrayList<String>();
@@ -738,7 +738,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : sendProcess is finished, , receiveProcess start and stop on user task, data is transmitted to the receiveProcess
      */
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event", "Start event", "End event", " Message data",
-            "Send", "Receive" }, story = "Send a message with data from an end event of a process to a start event of an other process.")
+            "Send", "Receive" }, story = "Send a message with data from an end event of a process to a start event of an other process.", jira = "")
     @Test
     public void dataTransferFromMessageEndEventToStartMessageEvent() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent", null,
@@ -776,7 +776,7 @@ public class MessageEventTest extends CommonAPITest {
      * the receiveProcess.
      */
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.")
+            "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.", jira = "")
     @Test
     public void dataTransferFromMessageEndEventToMessageIntermediateCatchEvent() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, null,
@@ -818,7 +818,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : sendProcess is finished, receiveProcess reaches catchEvent and continue (found message sent by sendProcess) and reaches user task.
      */
     @Cover(classes = { EventInstance.class, IntermediateThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate throw event", "Send", "Receive" }, story = "Verify receive process receive message targeting it, even if the message is sent before its existence.")
+            "Intermediate throw event", "Send", "Receive" }, story = "Verify receive process receive message targeting it, even if the message is sent before its existence.", jira = "")
     @Test
     public void messageSentProcessFinishBeforeReceiveProcessIsEnabled() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
@@ -890,7 +890,7 @@ public class MessageEventTest extends CommonAPITest {
      * But the studio forbid this case, so this should never happen in the Engine.
      */
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class, IntermediateThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = {
-            "Event", "Message event", "Throw event", "Catch event", "Send", "Receive" }, story = "Message goes from a throw event to a catch event belonging to the same process hence the same pool (forbidden by BPMN 2.0).")
+            "Event", "Message event", "Throw event", "Catch event", "Send", "Receive" }, story = "Message goes from a throw event to a catch event belonging to the same process hence the same pool (forbidden by BPMN 2.0).", jira = "")
     @Test
     public void messageEventIntraProcess() throws Exception {
         final ProcessDefinition sendAndReceiveMessageProcess = deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", CATCH_EVENT_NAME);
@@ -910,7 +910,7 @@ public class MessageEventTest extends CommonAPITest {
      * checks : sendProcess is finished, receiveProcess reaches catchEvent and continue (found message sent by sendProcess) and reaches user task.
      */
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive" }, story = "Send a message from an end event to an intermediate event. Check send process is finished, receive process reaches catch event and continue.")
+            "Intermediate catch event", "Send", "Receive" }, story = "Send a message from an end event to an intermediate event. Check send process is finished, receive process reaches catch event and continue.", jira = "")
     @Test
     public void messageIntermediateCatchEventMessageMultiSend() throws Exception {
         final ProcessDefinition sendMessageProcess1 = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess1", MESSAGE, CATCH_MESSAGE_PROCESS_NAME,
@@ -940,7 +940,7 @@ public class MessageEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Delete" }, story = "Check that delete process instance should delete waiting events.")
+            "Intermediate catch event", "Delete" }, story = "Check that delete process instance should delete waiting events.", jira = "")
     @Test
     public void deleteProcessInstanceShouldDeleteWaitingEvents() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithMessageIntermediateCatchEvent(null, null, null);

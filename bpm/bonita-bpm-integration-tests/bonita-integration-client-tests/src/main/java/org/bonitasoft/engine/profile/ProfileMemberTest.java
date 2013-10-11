@@ -20,7 +20,7 @@ import org.junit.Test;
 
 public class ProfileMemberTest extends AbstractProfileTest {
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User" }, story = "Get profile for user.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User" }, story = "Get profile for user.", jira = "")
     @Test
     public void getProfileForUser() throws BonitaException {
         // Get Profile For User
@@ -42,7 +42,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertEquals("Administrator", getUserProfiles.get(0).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Group" }, story = "Get profile for user from group.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Group" }, story = "Get profile for user from group.", jira = "")
     @Test
     public void getProfileForUserFromGroup() throws BonitaException {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
@@ -54,7 +54,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertEquals("User", getUserProfiles.get(1).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Role" }, story = "Get profile for user from role.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Role" }, story = "Get profile for user from role.", jira = "")
     @Test
     public void getProfileForUserFromRole() throws BonitaException {
         getIdentityAPI().addUserMembership(user1.getId(), group1.getId(), role1.getId());
@@ -66,7 +66,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertEquals("User", getUserProfiles.get(1).getName());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Group", "Role" }, story = "Get profile for user from role and group.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Group", "Role" }, story = "Get profile for user from role and group.", jira = "")
     @Test
     public void getProfileForUserFromRoleAndGroup() throws BonitaException {
         getIdentityAPI().addUserMembership(user5.getId(), group3.getId(), role3.getId());
@@ -95,7 +95,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertEquals(0, profilesForUser.size());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Search" }, story = "Search user profile members for proile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Search" }, story = "Search user profile members for proile.", jira = "")
     @Test
     public void searchUserProfileMembersForProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -110,7 +110,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertEquals("userName1", searchedProfileMember.getResult().get(0).getDisplayNamePart3());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Group", "Search" }, story = "Search group profile members for profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Group", "Search" }, story = "Search group profile members for profile.", jira = "")
     @Test
     public void searchGroupProfileMembersForProfile() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -126,7 +126,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertTrue(displayNamePart3 == null || displayNamePart3.isEmpty());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Search" }, story = "Search role profile members for profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Search" }, story = "Search role profile members for profile.", jira = "")
     @Test
     public void searchRoleProfileMembersForProfile() throws BonitaException {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -154,7 +154,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertEquals("role2", searchedProfileMember.getResult().get(1).getDisplayNamePart1());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Group", "Search" }, story = "Search role and group of profile members for profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Group", "Search" }, story = "Search role and group of profile members for profile.", jira = "")
     @Test
     public void searchRoleAndGroupProfileMembersForProfile() throws BonitaException {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -177,7 +177,7 @@ public class ProfileMemberTest extends AbstractProfileTest {
         assertEquals("group2", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member" }, story = "Get number of profile members.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member" }, story = "Get number of profile members.", jira = "")
     @Test
     public void getNumberOfProfileMembers() {
         final List<Long> profileIds = new ArrayList<Long>();

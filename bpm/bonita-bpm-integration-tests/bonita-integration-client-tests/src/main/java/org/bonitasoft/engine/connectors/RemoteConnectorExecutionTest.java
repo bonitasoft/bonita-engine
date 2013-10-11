@@ -138,7 +138,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         businessArchiveBuilder.addClasspathResource(new BarResource(fileBaseName + ".jar", IOUtil.generateJar(clazz)));
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Automatic activity", "Data output" }, story = "Test connector on finish of an automatic activity with data output.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Automatic activity", "Data output" }, story = "Test connector on finish of an automatic activity with data output.", jira = "")
     @Test
     public void executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput() throws Exception {
         final String delivery = "Delivery men";
@@ -175,7 +175,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "multi-instance", "activitity data" }, story = "Test connector on finish of an multi-instance activity with local data expression.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "multi-instance", "activitity data" }, story = "Test connector on finish of an multi-instance activity with local data expression.", jira = "")
     @Test
     public void executeConnectorOnFinishOfMultiInstancedActivity() throws Exception {
         // deploy the process
@@ -240,7 +240,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         return deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Multiple", "On activity" }, story = "Test multiple connectors on one activity.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Multiple", "On activity" }, story = "Test multiple connectors on one activity.", jira = "")
     @Test
     public void executeConnectorMultipleConnectorsOnOneActivity() throws Exception {
         final String delivery = "Delivery men";
@@ -288,7 +288,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "No connector implementation", "Redeploy process" }, story = "Test process redeployment with no connector implementation.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "No connector implementation", "Redeploy process" }, story = "Test process redeployment with no connector implementation.", jira = "")
     @Test
     public void redeployProcessWithNoConnectorImplem() throws Exception {
         final String delivery = "Delivery men";
@@ -311,7 +311,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition2);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Process definition" }, story = "Execute connector on process definition.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Process definition" }, story = "Execute connector on process definition.", jira = "")
     @Test
     public void executeConnectorOnProcessDefinition() throws Exception {
         final String valueOfInput1 = "Lily";
@@ -367,7 +367,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         return inputValues;
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" })
+    @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "")
     @Test
     public void executeConnectorInJar() throws Exception {
         final String delivery = "Delivery men";
@@ -807,7 +807,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" })
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" }, jira = "")
     @Test
     public void executeConnectorThatThrowRuntimeExceptionFailUserTaskOnEnter() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("runtime", FailAction.FAIL, false);
@@ -818,7 +818,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" })
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" }, jira = "")
     @Test
     public void executeConnectorThatThrowRuntimeExceptionInConnectFailUserTaskOnEnter() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("connect", FailAction.FAIL, false);
@@ -829,7 +829,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" })
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Throw Exception", "On enter", "Failed", "User task" }, jira = "")
     @Test
     public void executeConnectorThatThrowRuntimeExceptionInDisconnectFailUserTaskOnEnter() throws Exception {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("disconnect", FailAction.FAIL, false);
@@ -1174,7 +1174,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Cover(classes = ConnectorInstance.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Search" }, story = "Search connector instances")
+    @Cover(classes = ConnectorInstance.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Search" }, story = "Search connector instances", jira = "")
     @Test
     public void searchConnectorInstances() throws Exception {
         final String delivery = "Delivery men";
@@ -1340,7 +1340,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "connected resources" }, story = "Test connector with connected resources.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "connected resources" }, story = "Test connector with connected resources.", jira = "")
     @Test
     // The connector output is list to which an element is added when the method connect or disconnect is called.
     // when the output operations are executed only the method is connect is supposed to be called, that is, the list must contain only one element.
@@ -1416,7 +1416,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         deleteUser(jack.getId());
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Engine Execution Context", }, story = "Access the connector execution context from a connector.")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Engine Execution Context", }, story = "Access the connector execution context from a connector.", jira = "")
     @Test
     public void getEngineExecutionContext() throws Exception {
         final String dataName = "taskAssignee";

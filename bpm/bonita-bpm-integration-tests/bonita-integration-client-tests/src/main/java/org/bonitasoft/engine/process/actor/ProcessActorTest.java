@@ -71,9 +71,8 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test(expected = AlreadyExistsException.class)
     public void mapTwiceSameActorToAGroup() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask("DeliveryProcess", delivery, "deliver");
-        final ActorInstance actor = checkActors(delivery, definition);
+        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask(PROCESS_NAME, ACTOR_NAME, "deliver");
+        final ActorInstance actor = checkActors(ACTOR_NAME, definition);
         final Group ergo = createGroup("Ergonomists");
         try {
             getProcessAPI().addGroupToActor(actor.getId(), ergo.getId());
@@ -88,9 +87,8 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     @Cover(classes = { Group.class, ActorMember.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "ActorMappingService" }, jira = "ENGINE-952")
     public void mapActorToAlreadyMappedParentGroupShouldBeHandledSilently() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask("DeliveryProcess", delivery, "deliver");
-        final ActorInstance actor = checkActors(delivery, definition);
+        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask(PROCESS_NAME, ACTOR_NAME, "deliver");
+        final ActorInstance actor = checkActors(ACTOR_NAME, definition);
         final Group all = createGroup("Everyone");
         final Group ergo = createGroup("Ergonomists", all.getPath());
         try {
@@ -113,9 +111,8 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void mapActorToAGroupAndGroupPlusRoleIsValid() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask("DeliveryProcess", delivery, "deliver");
-        final ActorInstance actor = checkActors(delivery, definition);
+        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask(PROCESS_NAME, ACTOR_NAME, "deliver");
+        final ActorInstance actor = checkActors(ACTOR_NAME, definition);
         final Role role = createRole("Quality Manager");
         final Group ergo = createGroup("Ergonomists");
         try {
@@ -132,19 +129,17 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void johnHasGotAPendingTask() throws Exception {
-        final String delivery = "Delivery men";
-
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("DeliveryProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("deliver", delivery);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("deliver", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
-        assertEquals(delivery, actor.getName());
-        assertEquals("Delivery all day and night long", actor.getDescription());
+        assertEquals(ACTOR_NAME, actor.getName());
+        assertEquals(DESCRIPTION, actor.getDescription());
 
         getProcessAPI().startProcess(processDefinition.getId());
         waitForPendingTasks(john.getId(), 1);
@@ -158,17 +153,15 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void deployProcessWithActorMappingNotMatchingOrganization() throws Exception {
-        final String delivery = "Delivery men";
-
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("DeliveryProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("deliver", delivery);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("deliver", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
         final BusinessArchiveBuilder barBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         barBuilder.setProcessDefinition(designProcessDefinition);
         final StringBuilder builder = new StringBuilder();
         builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         builder.append("<actormapping:actorMappings xmlns:actormapping=\"http://www.bonitasoft.org/ns/actormapping/6.0\">");
-        builder.append("\t<actorMapping name=\"Delivery men\">");
+        builder.append("\t<actorMapping name=\"ACTOR_NAME men\">");
         builder.append("\t\t<groups>");
         builder.append("\t\t\t<group>/unknown</group>");
         builder.append("\t\t</groups>");
@@ -190,8 +183,8 @@ public class ProcessActorTest extends CommonAPITest {
         final Problem problem = processResolutionProblems.get(0);
         assertEquals("actor", problem.getResource());
         final List<ActorInstance> actors = getProcessAPI().getActors(processDeploymentInfo.getProcessId(), 0, 50, ActorCriterion.NAME_ASC);
-        final ActorInstance deliveryActor = actors.get(0);
-        getProcessAPI().addUserToActor(deliveryActor.getId(), john.getId());
+        final ActorInstance ACTOR_NAMEActor = actors.get(0);
+        getProcessAPI().addUserToActor(ACTOR_NAMEActor.getId(), john.getId());
         getProcessAPI().enableProcess(processDeploymentInfo.getProcessId());
         assertEquals(ActivationState.ENABLED, getProcessAPI().getProcessDeploymentInfo(processDeploymentInfo.getProcessId()).getActivationState());
 
@@ -201,19 +194,14 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void butJamesHasNoPendingTask() throws Exception {
-        final String username = "james";
-        final String password = "suomenlinna";
-        final User user = createUser(username, password);
-
-        final String delivery = "Delivery men";
-
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
+        final User user = createUser(USERNAME, PASSWORD);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(designProcessDefinition);
 
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
         getProcessAPI().startProcess(processDefinition.getId());
         Thread.sleep(1000);
 
@@ -227,18 +215,12 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void eliasHasAssignedAndPendingUserTasks() throws Exception {
-        final String username = "elias";
-        final String password = "suomenlinna";
-        final User user = createUser(username, password);
-
-        final String coders = "Coding men";
-
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(coders).addDescription("Coding all scrum-sprint-long").addUserTask("userTask1", coders).addUserTask("userTask2", coders)
-                .addUserTask("userTask3", coders);
+        final User user = createUser(USERNAME, PASSWORD);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
+                .addUserTask("userTask3", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
-
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, coders, user);
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, user);
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         checkNbOfActivitiesInReadyState(startedProcess, 3);
@@ -258,9 +240,9 @@ public class ProcessActorTest extends CommonAPITest {
         deleteUser(user);
     }
 
-    private ProcessDefinition preparationBeforeTest(final String delivery) throws Exception {
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").setActorInitiator(delivery).addUserTask("userTask1", delivery);
+    private ProcessDefinition preparationBeforeTest(final String ACTOR_NAME) throws Exception {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
@@ -269,7 +251,7 @@ public class ProcessActorTest extends CommonAPITest {
             file.delete();
             BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive.done(), file);
             final BusinessArchive archive = BusinessArchiveFactory.readBusinessArchive(file);
-            return deployAndEnableWithActor(archive.getProcessDefinition(), delivery, john);
+            return deployAndEnableWithActor(archive.getProcessDefinition(), ACTOR_NAME, john);
         } finally {
             file.delete();
         }
@@ -278,15 +260,14 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     @Cover(classes = { ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Description" }, jira = "ENGINE-1065")
     public void getActor() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinition definition = preparationBeforeTest(delivery);
+        final ProcessDefinition definition = preparationBeforeTest(ACTOR_NAME);
 
         // Get the existing process def actor list:
-        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
+        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 10, ActorCriterion.NAME_ASC);
         final ActorInstance actor = actors.get(0);
-        assertEquals(delivery, actor.getName());
+        assertEquals(ACTOR_NAME, actor.getName());
         assertEquals(definition.getId(), actor.getProcessDefinitionId());
-        assertEquals("Delivery all day and night long", actor.getDescription());
+        assertEquals(DESCRIPTION, actor.getDescription());
 
         disableAndDeleteProcess(definition);
     }
@@ -294,11 +275,8 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     public void getActors() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
-
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-
         final List<String> actorNameList = initActorAndDescription(processBuilder, 5);
-
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.getProcess(), actorNameList,
                 Arrays.asList(user, user, user, user, user));
 
@@ -336,7 +314,6 @@ public class ProcessActorTest extends CommonAPITest {
     @Test
     public void getActorsByIds() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
-
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription("actor description1");
         processBuilder.addActor("actor2").addDescription("actor description2");
@@ -373,8 +350,7 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void updateActor() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinition definition = preparationBeforeTest(delivery);
+        final ProcessDefinition definition = preparationBeforeTest(ACTOR_NAME);
 
         // Get the existing process def actor list:
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
@@ -382,18 +358,18 @@ public class ProcessActorTest extends CommonAPITest {
         final long actorId = actor.getId();
         final ActorInstance actorRes = getProcessAPI().getActor(actorId);
         assertEquals(actorId, actorRes.getId());
-        assertEquals(delivery, actorRes.getName());
+        assertEquals(ACTOR_NAME, actorRes.getName());
         assertEquals(definition.getId(), actorRes.getProcessDefinitionId());
 
         final String changedDescription = "It's okay!";
-        final String changedName = "Delivery women";
+        final String changedName = "ACTOR_NAME women";
         final ActorUpdater descriptor = new ActorUpdater();
         descriptor.setDescription(changedDescription);
         descriptor.setDisplayName(changedName);
         final ActorInstance actorUpdated = getProcessAPI().updateActor(actorId, descriptor);
 
         assertEquals(actorId, actorUpdated.getId());
-        assertEquals(delivery, actorUpdated.getName());
+        assertEquals(ACTOR_NAME, actorUpdated.getName());
         assertEquals(changedDescription, actorUpdated.getDescription());
         assertEquals(changedName, actorUpdated.getDisplayName());
         assertEquals(definition.getId(), actorUpdated.getProcessDefinitionId());
@@ -414,19 +390,18 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void addActorMembers() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition processDefinition = processBuilder.done();
 
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, delivery, john);
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinition, ACTOR_NAME, john);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
-        assertEquals(delivery, actor.getName());
+        assertEquals(ACTOR_NAME, actor.getName());
 
         assertEquals(1l, getProcessAPI().getNumberOfActorMembers(actor.getId()));
 
@@ -444,17 +419,16 @@ public class ProcessActorTest extends CommonAPITest {
     @Cover(classes = { User.class, ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Number", "Users", "Actor" }, jira = "ENGINE-681")
     @Test
     public void getNumberOfUsersOfActor() throws Exception {
-        final String delivery = "Delivery men";
         final User user1 = createUser("user1", "bpm");
         final User user2 = createUser("user2", "bpm");
         final User user3 = createUser("user3", "bpm");
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
-        addMappingOfActorsForUser(delivery, user1.getId(), definition);
-        addMappingOfActorsForUser(delivery, user2.getId(), definition);
+        addMappingOfActorsForUser(ACTOR_NAME, user1.getId(), definition);
+        addMappingOfActorsForUser(ACTOR_NAME, user2.getId(), definition);
         getProcessAPI().enableProcess(definition.getId());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
 
@@ -464,7 +438,7 @@ public class ProcessActorTest extends CommonAPITest {
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
-        assertEquals(delivery, actor.getName());
+        assertEquals(ACTOR_NAME, actor.getName());
 
         // Check number of users mapped to actor
         final long result = getProcessAPI().getNumberOfUsersOfActor(actor.getId());
@@ -483,17 +457,16 @@ public class ProcessActorTest extends CommonAPITest {
     @Cover(classes = { Role.class, ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Number", "Roles", "Actor" }, jira = "ENGINE-683")
     @Test
     public void getNumberOfRolesOfActor() throws Exception {
-        final String delivery = "Delivery men";
         final Role role1 = createRole("role1");
         final Role role2 = createRole("role2");
         final Role role3 = createRole("role3");
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("roleTask1", delivery);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("roleTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
-        addMappingOfActorsForRole(delivery, role1.getId(), definition);
-        addMappingOfActorsForRole(delivery, role2.getId(), definition);
+        addMappingOfActorsForRole(ACTOR_NAME, role1.getId(), definition);
+        addMappingOfActorsForRole(ACTOR_NAME, role2.getId(), definition);
         getProcessAPI().enableProcess(definition.getId());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
 
@@ -503,7 +476,7 @@ public class ProcessActorTest extends CommonAPITest {
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
-        assertEquals(delivery, actor.getName());
+        assertEquals(ACTOR_NAME, actor.getName());
 
         // Check number of roles mapped to actor
         final long result = getProcessAPI().getNumberOfRolesOfActor(actor.getId());
@@ -520,17 +493,16 @@ public class ProcessActorTest extends CommonAPITest {
     @Cover(classes = { Group.class, ActorInstance.class, ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Number", "Groups", "Actor" }, jira = "ENGINE-682")
     @Test
     public void getNumberOfGroupsOfActor() throws Exception {
-        final String delivery = "Delivery men";
         final Group group1 = createGroup("group1");
         final Group group2 = createGroup("group2");
         final Group group3 = createGroup("group3");
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("groupTask1", delivery);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("groupTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
-        addMappingOfActorsForGroup(delivery, group1.getId(), definition);
-        addMappingOfActorsForGroup(delivery, group2.getId(), definition);
+        addMappingOfActorsForGroup(ACTOR_NAME, group1.getId(), definition);
+        addMappingOfActorsForGroup(ACTOR_NAME, group2.getId(), definition);
         getProcessAPI().enableProcess(definition.getId());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
 
@@ -540,7 +512,7 @@ public class ProcessActorTest extends CommonAPITest {
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
-        assertEquals(delivery, actor.getName());
+        assertEquals(ACTOR_NAME, actor.getName());
 
         // Check number of groups mapped to actor
         final long result = getProcessAPI().getNumberOfGroupsOfActor(actor.getId());
@@ -558,7 +530,6 @@ public class ProcessActorTest extends CommonAPITest {
             "Number", "Group", "Role", "Actor" }, jira = "ENGINE-684")
     @Test
     public void getNumberOfMembershipsOfActor() throws Exception {
-        final String delivery = "Delivery men";
         final User user1 = createUser("user1", "bpm");
         final User user2 = createUser("user2", "bpm");
         final Group group1 = createGroup("group1");
@@ -566,13 +537,13 @@ public class ProcessActorTest extends CommonAPITest {
         final Role role1 = createRole("role1");
         final Role role2 = createRole("role2");
 
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery).addDescription("Delivery all day and night long").addUserTask("userMembershipTask1", delivery);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userMembershipTask1", ACTOR_NAME);
         final ProcessDefinition definition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
-        addMappingOfActorsForUser(delivery, user1.getId(), definition);
-        addMappingOfActorsForRoleAndGroup(delivery, user1.getId(), group1.getId(), definition);
-        addMappingOfActorsForRoleAndGroup(delivery, user1.getId(), group2.getId(), definition);
+        addMappingOfActorsForUser(ACTOR_NAME, user1.getId(), definition);
+        addMappingOfActorsForRoleAndGroup(ACTOR_NAME, user1.getId(), group1.getId(), definition);
+        addMappingOfActorsForRoleAndGroup(ACTOR_NAME, user1.getId(), group2.getId(), definition);
         getProcessAPI().enableProcess(definition.getId());
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
 
@@ -582,7 +553,7 @@ public class ProcessActorTest extends CommonAPITest {
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
-        assertEquals(delivery, actor.getName());
+        assertEquals(ACTOR_NAME, actor.getName());
 
         // Check number of userMemberships mapped to actor
         final long result = getProcessAPI().getNumberOfMembershipsOfActor(actor.getId());
@@ -600,12 +571,11 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void getStartableProcessesForActors() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery);
-        processBuilder.setActorInitiator(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
 
         final ActorInstance actorInstance = getProcessAPI().getActorInitiator(processDefinition.getId());
         final Set<Long> actorIds = new HashSet<Long>();
@@ -621,12 +591,11 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void testIsAllowedToStartProcess() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
-        processBuilder.addActor(delivery);
-        processBuilder.setActorInitiator(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
 
         final ActorInstance actorInstance = getProcessAPI().getActorInitiator(processDefinition.getId());
         final Set<Long> actorIds = new HashSet<Long>();
@@ -641,8 +610,8 @@ public class ProcessActorTest extends CommonAPITest {
     private ProcessDefinition deployAndEnableProcessWithHumanTask(final String processName, final String actorName, final String userTaskName)
             throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        processBuilder.createNewInstance(processName, "1.0");
-        processBuilder.addActor(actorName).addDescription("Delivery all day and night long");
+        processBuilder.createNewInstance(processName, PROCESS_VERSION);
+        processBuilder.addActor(actorName).addDescription(DESCRIPTION);
         processBuilder.addStartEvent("startEvent");
         processBuilder.addUserTask(userTaskName, actorName);
         processBuilder.addEndEvent("endEvent");
@@ -659,9 +628,8 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void userHasGotAPendingTaskFromGroup() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask("DeliveryProcess", delivery, "deliver");
-        final ActorInstance actor = checkActors(delivery, definition);
+        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask(PROCESS_NAME, ACTOR_NAME, "deliver");
+        final ActorInstance actor = checkActors(ACTOR_NAME, definition);
 
         final Group group = getIdentityAPI().createGroup("group1", null);
         final Role role = getIdentityAPI().createRole("role1");
@@ -681,9 +649,8 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void mapActorToASubGroup() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask("DeliveryProcess", delivery, "deliver");
-        final ActorInstance actor = checkActors(delivery, definition);
+        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask(PROCESS_NAME, ACTOR_NAME, "deliver");
+        final ActorInstance actor = checkActors(ACTOR_NAME, definition);
 
         final Group parent = createGroup("parent");
         final Group sub = createGroup("sub", "/parent");
@@ -701,10 +668,8 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void userHasGotAPendingTaskFromRole() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask("DeliveryProcess", delivery, "deliver");
-
-        final ActorInstance actor = checkActors(delivery, definition);
+        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask(PROCESS_NAME, ACTOR_NAME, "deliver");
+        final ActorInstance actor = checkActors(ACTOR_NAME, definition);
 
         final Group group = getIdentityAPI().createGroup("group1", null);
         final Role role = getIdentityAPI().createRole("role1");
@@ -714,7 +679,7 @@ public class ProcessActorTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask("deliver", processInstance);
-        assertTrue("no new activity found", new CheckNbPendingTaskOf(getProcessAPI(), 20, 1500, false, 1, john).waitUntil());
+        waitForPendingTasks(john.getId(), 1);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
@@ -725,10 +690,9 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void userHasGotAPendingTaskFromRoleAndGroup() throws Exception {
-        final String delivery = "Delivery men";
-        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask("DeliveryProcess", delivery, "deliver");
+        final ProcessDefinition definition = deployAndEnableProcessWithHumanTask(PROCESS_NAME, ACTOR_NAME, "deliver");
 
-        final ActorInstance actor = checkActors(delivery, definition);
+        final ActorInstance actor = checkActors(ACTOR_NAME, definition);
 
         final Group group = getIdentityAPI().createGroup("group1", null);
         final Role role = getIdentityAPI().createRole("role1");
@@ -737,7 +701,7 @@ public class ProcessActorTest extends CommonAPITest {
         getProcessAPI().addRoleAndGroupToActor(actor.getId(), role.getId(), group.getId());
 
         getProcessAPI().startProcess(definition.getId());
-        assertTrue("no new activity found", new CheckNbPendingTaskOf(getProcessAPI(), 20, 1500, false, 1, john).waitUntil());
+        waitForPendingTasks(john.getId(), 1);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
@@ -748,10 +712,10 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Test
     public void userDontGetAPendingTaskFromRoleOrGroupIfRoleAndGroupNeeded() throws Exception {
-        final String actorName = "Delivery men";
+        final String actorName = "ACTOR_NAME men";
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        processBuilder.createNewInstance("DeliveryProcess", "1.0");
-        processBuilder.addActor(actorName).addDescription("Delivery all day and night long");
+        processBuilder.createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(actorName).addDescription(DESCRIPTION);
         processBuilder.addStartEvent("startEvent");
         processBuilder.addUserTask("deliver", actorName);
         processBuilder.addEndEvent("endEvent");
@@ -794,7 +758,7 @@ public class ProcessActorTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        processBuilder.addActor("Actor2").addDescription("working all-day-long");
+        processBuilder.addActor("Actor2").addDescription(DESCRIPTION + 2);
         processBuilder.addActor("initiator", true);
 
         // Process def : one starting automatic activity that fires 3 human activities:
@@ -827,11 +791,11 @@ public class ProcessActorTest extends CommonAPITest {
         deleteUser(user.getId());
     }
 
-    private ActorInstance checkActors(final String delivery, final ProcessDefinition definition) {
+    private ActorInstance checkActors(final String ACTOR_NAME, final ProcessDefinition definition) {
         final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
-        assertEquals(delivery, actor.getName());
+        assertEquals(ACTOR_NAME, actor.getName());
         return actor;
     }
 
@@ -843,7 +807,7 @@ public class ProcessActorTest extends CommonAPITest {
     @Cover(classes = { ProcessDeploymentInfo.class }, concept = BPMNConcept.PROCESS, keywords = { "Pagination", "process definition" }, jira = "ENGINE-1375")
     @Test
     public void getPaginatedStartableProcessesForActors() throws Exception {
-        final ProcessDefinition firstDefinition = getProcessDefinition("firstProcess");
+        final ProcessDefinition firstDefinition = getProcessDefinition(PROCESS_NAME);
         final ProcessDefinition secondDefinition = getProcessDefinition("secondProcess");
 
         final ActorInstance firstActorInstance = getProcessAPI().getActorInitiator(firstDefinition.getId());
@@ -862,12 +826,11 @@ public class ProcessActorTest extends CommonAPITest {
     }
 
     private ProcessDefinition getProcessDefinition(final String processName) throws BonitaException {
-        final String delivery = "Delivery men";
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
-        processBuilder.addActor(delivery);
-        processBuilder.setActorInitiator(delivery).addDescription("Delivery all day and night long").addUserTask("userTask1", delivery);
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.done();
-        return deployAndEnableWithActor(designProcessDefinition, delivery, john);
+        return deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, john);
     }
 
 }

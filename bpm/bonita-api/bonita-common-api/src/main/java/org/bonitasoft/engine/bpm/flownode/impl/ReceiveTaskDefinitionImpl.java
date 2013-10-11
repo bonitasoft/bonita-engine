@@ -20,6 +20,7 @@ import org.bonitasoft.engine.operation.Operation;
 
 /**
  * @author Julien Molinaro
+ * @author Celine Souchet
  */
 public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements ReceiveTaskDefinition {
 
@@ -48,6 +49,36 @@ public class ReceiveTaskDefinitionImpl extends TaskDefinitionImpl implements Rec
     @Override
     public CatchMessageEventTriggerDefinition getTrigger() {
         return trigger;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (trigger == null ? 0 : trigger.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ReceiveTaskDefinitionImpl other = (ReceiveTaskDefinitionImpl) obj;
+        if (trigger == null) {
+            if (other.trigger != null) {
+                return false;
+            }
+        } else if (!trigger.equals(other.trigger)) {
+            return false;
+        }
+        return true;
     }
 
 }

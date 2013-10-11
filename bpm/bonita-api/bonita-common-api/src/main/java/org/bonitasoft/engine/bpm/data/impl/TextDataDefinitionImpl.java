@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,6 +19,7 @@ import org.bonitasoft.engine.expression.Expression;
 /**
  * @author Feng Hui
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class TextDataDefinitionImpl extends DataDefinitionImpl implements TextDataDefinition {
 
@@ -37,6 +38,32 @@ public class TextDataDefinitionImpl extends DataDefinitionImpl implements TextDa
 
     public void setLongText(final boolean longText) {
         this.longText = longText;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (longText ? 1231 : 1237);
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final TextDataDefinitionImpl other = (TextDataDefinitionImpl) obj;
+        if (longText != other.longText) {
+            return false;
+        }
+        return true;
     }
 
 }

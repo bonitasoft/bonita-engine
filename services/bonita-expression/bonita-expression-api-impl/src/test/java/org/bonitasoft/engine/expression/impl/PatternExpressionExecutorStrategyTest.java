@@ -107,32 +107,32 @@ public class PatternExpressionExecutorStrategyTest {
         return new SExpressionImpl(name, String.valueOf(content), SExpression.TYPE_CONSTANT, Integer.class.getName(), null, null);
     }
 
-    @Cover(classes = PatternExpressionExecutorStrategy.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Command", "Pattern", "Escape" }, story = "Test pattern with escape.")
+    @Cover(classes = PatternExpressionExecutorStrategy.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Command", "Pattern", "Escape" }, story = "Test pattern with escape.", jira = "")
     @Test
     public void testPatternWithEscape() throws Exception {
         patternTest("ahah bla ${bla}", "ahah bla 12", Arrays.asList("bla"), Arrays.asList(12));
     }
 
-    @Cover(classes = PatternExpressionExecutorStrategy.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Command", "Pattern", "Escape" }, story = "Test pattern with escape.")
+    @Cover(classes = PatternExpressionExecutorStrategy.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Command", "Pattern", "Escape" }, story = "Test pattern with escape.", jira = "")
     @Test
     public void testPatternWithNotInDependencies() throws Exception {
         patternTest("ahah bla bla", "ahah bla bla", Arrays.asList("blo"), Arrays.asList(12));
     }
 
-    @Cover(classes = PatternExpressionExecutorStrategy.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Command", "Pattern", "Space" }, story = "Test pattern with spaces.")
+    @Cover(classes = PatternExpressionExecutorStrategy.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Command", "Pattern", "Space" }, story = "Test pattern with spaces.", jira = "")
     @Test
     public void testPatternWithSpaces() throws Exception {
         patternTest("${bla} ${blablabla}  ${bla} ${bla}a bla${bla} bla", "12 ${blablabla}  12 12a bla12 bla", Arrays.asList("bla"), Arrays.asList(12));
     }
 
     @Cover(classes = PatternExpressionExecutorStrategy.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Command", "Pattern", "Space",
-            "Line break" }, story = "Test pattern with spaces and line breaks.")
+            "Line break" }, story = "Test pattern with spaces and line breaks.", jira = "")
     @Test
     public void testPatternWithSpacesAndLineBreak() throws Exception {
         patternTest("${bla} ${bla}${bla}${bla}  ${bla} ${bla}a ${bla}\n${bla} ${bla}", "12 121212  12 12a 12\n12 12", Arrays.asList("bla"), Arrays.asList(12));
     }
 
-    @Cover(classes = PatternExpressionExecutorStrategy.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Command", "Pattern", "Replacement" }, story = "Test pattern with multiple replacements.")
+    @Cover(classes = PatternExpressionExecutorStrategy.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Command", "Pattern", "Replacement" }, story = "Test pattern with multiple replacements.", jira = "")
     @Test
     public void testPatternMultipleReplacements() throws Exception {
         patternTest("${bla} ${blo} ${blu}${bla}${bla}", "1 2 311", Arrays.asList("bla", "blo", "blu"), Arrays.asList(1, 2, 3));

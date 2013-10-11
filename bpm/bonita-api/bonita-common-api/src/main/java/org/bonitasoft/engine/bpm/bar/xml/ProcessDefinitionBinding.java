@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -28,12 +28,13 @@ import org.bonitasoft.engine.bpm.process.impl.DesignProcessDefinitionImpl;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ProcessDefinitionBinding extends NamedElementBinding {
 
     private String version;
 
-    private final List<ActorDefinition> actors = new ArrayList<ActorDefinition>();
+    private final List<ActorDefinitionImpl> actors = new ArrayList<ActorDefinitionImpl>();
 
     private String actorInitiatorName;
 
@@ -64,7 +65,7 @@ public class ProcessDefinitionBinding extends NamedElementBinding {
     @Override
     public void setChildObject(final String name, final Object value) {
         if (XMLProcessDefinition.ACTOR_NODE.equals(name)) {
-            actors.add((ActorDefinition) value);
+            actors.add((ActorDefinitionImpl) value);
         } else if (XMLProcessDefinition.INITIATOR_NODE.equals(name)) {
             actorInitiatorName = (String) value;
         } else if (XMLProcessDefinition.PARAMETER_NODE.equals(name)) {
@@ -86,12 +87,12 @@ public class ProcessDefinitionBinding extends NamedElementBinding {
             for (final StringIndex stringIndex : stringIndexes) {
                 processDefinitionImpl.setStringIndex(stringIndex.getIndex(), stringIndex.getLabel(), stringIndex.getValue());
             }
-            for (final ActorDefinition actor : actors) {
+            for (final ActorDefinitionImpl actor : actors) {
+                if (actorInitiatorName != null && actorInitiatorName.equals(actor.getName())) {
+                    actor.setInitiator(true);
+                    processDefinitionImpl.setActorInitiator(actor);
+                }
                 processDefinitionImpl.addActor(actor);
-            }
-            if (actorInitiatorName != null) {
-                final ActorDefinition actor = processDefinitionImpl.getActor(actorInitiatorName);
-                processDefinitionImpl.setActorInitiator(actor);
             }
             for (final ParameterDefinition parameter : parameters) {
                 processDefinitionImpl.addParameter(parameter);

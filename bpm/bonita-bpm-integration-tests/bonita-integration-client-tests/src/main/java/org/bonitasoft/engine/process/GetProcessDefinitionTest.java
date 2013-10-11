@@ -1,7 +1,10 @@
 package org.bonitasoft.engine.process;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,18 +12,28 @@ import java.util.List;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
+import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.category.Category;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.connectors.TestConnector;
+import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.filter.user.TestFilter;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -53,7 +66,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         login();
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Category" })
+    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Category" }, jira = "")
     @Test
     public void getProcessDefinitionsUnrelatedToCategoryUserCanStart() throws Exception {
         beforeSearchProcessDefinitionsUserCanStart();
@@ -528,7 +541,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition3);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Group", "Process" }, story = "Tests the cases were the 2roles-2users-2groups removed separately would'nt cause the process to pass in unresolved but would altoger. The list of prrocesses returned must reflect that.")
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Group", "Process" }, story = "Tests the cases were the 2roles-2users-2groups removed separately would'nt cause the process to pass in unresolved but would altoger. The list of prrocesses returned must reflect that.", jira = "")
     @Test
     public void getProcessesWithActorWithParticularCases() throws Exception {
         final String actorName = "actor";
@@ -672,6 +685,87 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         deleteUser(user1);
         deleteUser(user2);
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Get", "DesignProcessDefinition", "Existing" }, jira = "ENGINE-1817")
+    @Test
+    public void getExistingDesignProcessDefinition() throws Exception {
+        final User user = createUser("any", "contrasena");
+
+        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME);
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME, true);
+        processBuilder.addActor("actor2").addDescription(DESCRIPTION);
+        processBuilder.addDescription(DESCRIPTION);
+        processBuilder.addAutomaticTask("AutomaticTask").addCallActivity("CallActivity", targetProcessNameExpr, targetProcessVersionExpr)
+                .addManualTask("ManualTask", ACTOR_NAME)
+                .addBoundaryEvent("BoundaryEvent").addSignalEventTrigger("signalName");
+        processBuilder.addUserTask("UserTask", ACTOR_NAME).addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0")
+                .addInput("userId", new ExpressionBuilder().createConstantLongExpression(3));
+        processBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0",
+                ConnectorEvent.ON_ENTER);
+        processBuilder.addDocumentDefinition("Doc").addUrl("plop");
+        processBuilder.addGateway("Gateway", GatewayType.PARALLEL).addDescription(DESCRIPTION);
+        processBuilder.addBlobData("BlobData", null).addDescription("blolbDescription").addBooleanData("BooleanData", null);
+        processBuilder.addDisplayName("plop").addDisplayDescription("plop2").addEndEvent("EndEvent");
+        processBuilder.addIntermediateCatchEvent("IntermediateCatchEvent").addIntermediateThrowEvent("IntermediateThrowEvent");
+        processBuilder.addReceiveTask("ReceiveTask", "messageName");
+        processBuilder.addSendTask("SendTask", "messageName", targetProcessNameExpr);
+        processBuilder.addTransition("BoundaryEvent", "ManualTask");
+
+        final DesignProcessDefinition designProcessDefinition = processBuilder.done();
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, user);
+        assertNotNull(processDefinition);
+
+        final DesignProcessDefinition resultDesignProcessDefinition = getProcessAPI().getDesignProcessDefinition(processDefinition.getId());
+        assertEquals(designProcessDefinition, resultDesignProcessDefinition);
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(user.getId());
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Get", "DesignProcessDefinition", "Not Existing" }, jira = "ENGINE-1817")
+    @Test(expected = ProcessDefinitionNotFoundException.class)
+    public void getNotExistingDesignProcessDefinition() throws Exception {
+        getProcessAPI().getDesignProcessDefinition(16548654L);
+    }
+
+    private ProcessDefinition deployProcessWithTestFilter(final DesignProcessDefinition designProcessDefinition, final User user)
+            throws BonitaException, IOException {
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
+                designProcessDefinition);
+        final List<BarResource> impl = generateFilterImplementations("TestFilter");
+        for (final BarResource barResource : impl) {
+            businessArchiveBuilder.addUserFilters(barResource);
+        }
+        final List<BarResource> generateFilterDependencies = new ArrayList<BarResource>(1);
+        final byte[] data = IOUtil.generateJar(TestFilter.class);
+        generateFilterDependencies.add(new BarResource("TestFilter.jar", data));
+        for (final BarResource barResource : generateFilterDependencies) {
+            businessArchiveBuilder.addClasspathResource(barResource);
+        }
+
+        businessArchiveBuilder.addConnectorImplementation(getResource("/org/bonitasoft/engine/connectors/TestConnectorThatThrowException.impl",
+                "TestConnectorThatThrowException.impl"));
+        businessArchiveBuilder.addClasspathResource(buildBarResource(TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar"));
+
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
+        addMappingOfActorsForUser(ACTOR_NAME, user.getId(), processDefinition);
+        addMappingOfActorsForUser("actor2", user.getId(), processDefinition);
+
+        getProcessAPI().enableProcess(processDefinition.getId());
+        return processDefinition;
+    }
+
+    private List<BarResource> generateFilterImplementations(final String filterName) throws IOException {
+        final List<BarResource> resources = new ArrayList<BarResource>(1);
+        final InputStream inputStream = TestConnector.class.getClassLoader().getResourceAsStream("org/bonitasoft/engine/filter/user/" + filterName + ".impl");
+        final byte[] data = IOUtil.getAllContentFrom(inputStream);
+        inputStream.close();
+        resources.add(new BarResource("TestFilter.impl", data));
+        return resources;
     }
 
 }

@@ -1272,17 +1272,13 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         return resources;
     }
 
-    protected void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
-        final BarResource barResource = getResource(path, name);
-        resources.add(barResource);
-    }
-
     private List<BarResource> generateDefaultConnectorDependencies() throws IOException {
         final List<BarResource> resources = new ArrayList<BarResource>(6);
         addResource(resources, TestConnectorLongToExecute.class, "TestConnectorLongToExecute.jar");
         return resources;
     }
 
+    @Override
     public void addResource(final List<BarResource> resources, final Class<?> clazz, final String name) throws IOException {
         final byte[] data = IOUtil.generateJar(clazz);
         resources.add(new BarResource(name, data));

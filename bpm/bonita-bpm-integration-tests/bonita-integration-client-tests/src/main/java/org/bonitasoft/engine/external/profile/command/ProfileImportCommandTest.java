@@ -43,7 +43,7 @@ public class ProfileImportCommandTest extends AbstractCommandProfileTest {
         return Arrays.asList(user1, user2, user3, user4, user5);
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Command", "Profile", "Import" }, story = "Import profiles and delete existing.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Command", "Profile", "Import" }, story = "Import profiles and delete existing.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void importProfilesCommand() throws BonitaException, IOException {
@@ -153,7 +153,7 @@ public class ProfileImportCommandTest extends AbstractCommandProfileTest {
         getCommandAPI().execute(IMPORT_PROFILES_CMD, parameters);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Creation" }, story = "Create default profile.", jira = "")
     @Test
     public void defaultProfileCreation() throws BonitaException {
         Profile getProfileResult = getProfileAPI().getProfile(adminProfileId);

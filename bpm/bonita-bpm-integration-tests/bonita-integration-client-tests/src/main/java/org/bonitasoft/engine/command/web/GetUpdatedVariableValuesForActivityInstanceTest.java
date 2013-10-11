@@ -65,7 +65,7 @@ public class GetUpdatedVariableValuesForActivityInstanceTest extends CommonAPITe
     }
 
     @Test
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Updated variable value", "Activity instance" }, story = "Get updated variable values for activity instance.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTIVITIES, keywords = { "Command", "Updated variable value", "Activity instance" }, story = "Get updated variable values for activity instance.", jira = "")
     public void getUpdatedVariableValuesForActivity() throws Exception {
         final User user = createUser("toto", "titi");
         // create process definition:

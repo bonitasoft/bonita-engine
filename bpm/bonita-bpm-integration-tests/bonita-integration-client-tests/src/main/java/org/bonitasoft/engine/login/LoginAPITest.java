@@ -126,7 +126,7 @@ public class LoginAPITest extends CommonAPITest {
         loginTenant.login("matti", null);
     }
 
-    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with wrong password")
+    @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with wrong password", jira = "ENGINE-622")
     @Test(expected = LoginException.class)
     public void loginFailsWithWrongPassword() throws BonitaException {
         final String userName = "Truc";

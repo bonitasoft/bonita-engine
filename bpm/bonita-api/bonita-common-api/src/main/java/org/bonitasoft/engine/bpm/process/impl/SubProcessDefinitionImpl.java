@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -51,6 +51,40 @@ public class SubProcessDefinitionImpl extends ActivityDefinitionImpl implements 
     @Override
     public boolean isTriggeredByEvent() {
         return triggeredByEvent;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (triggeredByEvent ? 1231 : 1237);
+        result = prime * result + (subProcessContainer == null ? 0 : subProcessContainer.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SubProcessDefinitionImpl other = (SubProcessDefinitionImpl) obj;
+        if (triggeredByEvent != other.triggeredByEvent) {
+            return false;
+        }
+        if (subProcessContainer == null) {
+            if (other.subProcessContainer != null) {
+                return false;
+            }
+        } else if (!subProcessContainer.equals(other.subProcessContainer)) {
+            return false;
+        }
+        return true;
     }
 
 }

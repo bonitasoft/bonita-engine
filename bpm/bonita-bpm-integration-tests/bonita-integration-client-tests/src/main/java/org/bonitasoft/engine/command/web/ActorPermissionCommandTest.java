@@ -103,7 +103,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         return processDefBuilder;
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Start process" }, story = "Test if an actor is allowed to start a process.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Start process" }, story = "Test if an actor is allowed to start a process.", jira = "")
     @Test
     public void testIsAllowedToStartProcesses() throws Exception {
         final String userName = "Manu";
@@ -154,7 +154,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         cleanup(manu.getId(), pIds);
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Start process" }, story = "Test if an actor is allowed to start a process.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Start process" }, story = "Test if an actor is allowed to start a process.", jira = "")
     @Test
     public void testIsAllowedToStartProcess() throws Exception {
         final String userName = "Manu";
@@ -199,7 +199,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         cleanup(manu.getId(), Arrays.asList(processDefinition.getId()));
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Initiator actor", "Overview form" }, story = "Test if initiator actor is allowed to see overview form.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Initiator actor", "Overview form" }, story = "Test if initiator actor is allowed to see overview form.", jira = "")
     @Test
     public void testIsAllowedToSeeOverviewFormForInitiatorActor() throws Exception {
         final String userName = "Manu";
@@ -242,7 +242,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Archived process instance", "Overview form",
-            "User" }, story = "Test if user is allowed to see overview form for archived process instances.")
+            "User" }, story = "Test if user is allowed to see overview form for archived process instances.", jira = "")
     @Ignore("test was bad (does not test archived things)")
     @Test
     public void testIsAllowedToSeeOverviewFormForArchivedProcessInstancesInvolvingUser() throws Exception {
@@ -275,7 +275,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Archived process instance", "Overview form",
-            "User" }, story = "Test if user is allowed to see overview form for archived process instances.")
+            "User" }, story = "Test if user is allowed to see overview form for archived process instances.", jira = "")
     @Test
     public void testIsAllowedToSeeOverviewFormForProcessInstancesInvolvingUser() throws Exception {
         final User user = createUser("jack", "bpm");

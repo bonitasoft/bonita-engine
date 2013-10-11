@@ -84,7 +84,7 @@ public class SupervisorCommandTest extends CommonAPITest {
         logout();
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Process" }, story = "Test if a user is supervisor of a process.")
+    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Process" }, story = "Test if a user is supervisor of a process.", jira = "")
     @Test
     public void testIsUserProcessSupervisor() throws Exception {
         final User user = createUser();
@@ -142,7 +142,7 @@ public class SupervisorCommandTest extends CommonAPITest {
         return createUser(userName, "bpm");
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Get", "Delete" }, story = "Get and delete supervisor.")
+    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "User", "Get", "Delete" }, story = "Get and delete supervisor.", jira = "")
     @Test
     public void testAddGetAndDeleteSupervisor() throws BonitaException {
         final User user = this.createUser();
@@ -233,7 +233,7 @@ public class SupervisorCommandTest extends CommonAPITest {
         deleteProcess(processDefinition1, processDefinition2);
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group" }, story = "Add group to supervisor.")
+    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Group" }, story = "Add group to supervisor.", jira = "")
     @Test
     public void testAddGroupToSupervisor() throws Exception {
         final Group group = createGroup();
@@ -263,7 +263,7 @@ public class SupervisorCommandTest extends CommonAPITest {
         return getIdentityAPI().createGroup("Engine", null);
     }
 
-    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Membership" }, story = "Add membership to supervisor.")
+    @Cover(classes = ProcessSupervisor.class, concept = BPMNConcept.SUPERVISOR, keywords = { "Supervisor", "Membership" }, story = "Add membership to supervisor.", jira = "")
     @Test
     public void testAddMembershipToSupervisor() throws Exception {
         final User user = createUser();

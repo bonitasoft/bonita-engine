@@ -141,6 +141,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.category.CategoryNotFoundException;
@@ -808,15 +809,19 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sDefinition, final long tenantId) throws BonitaHomeNotSetException,
-            IOException {
+    protected void unzipBar(final BusinessArchive businessArchive, final SProcessDefinition sProcessDefinition, final long tenantId)
+            throws BonitaHomeNotSetException, IOException {
+        final File processFolder = getProcessFolder(sProcessDefinition.getId(), tenantId);
+        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, processFolder);
+    }
+
+    private File getProcessFolder(final long processDefinitionId, final long tenantId) throws BonitaHomeNotSetException {
         final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
         final File file = new File(processesFolder);
         if (!file.exists()) {
             file.mkdirs();
         }
-        final File processFolder = new File(file, String.valueOf(sDefinition.getId()));
-        BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, processFolder);
+        return new File(file, String.valueOf(processDefinitionId));
     }
 
     @Override
@@ -981,6 +986,23 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SProcessDefinitionReadException e) {
             throw new RetrieveException(e);
+        }
+    }
+
+    @Override
+    public DesignProcessDefinition getDesignProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            final File processFolder = getProcessFolder(processDefinitionId, tenantAccessor.getTenantId());
+            final File processDesignFile = new File(processFolder, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
+            final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
+            return processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
+        } catch (BonitaHomeNotSetException e) {
+            throw new ProcessDefinitionNotFoundException(e);
+        } catch (InvalidBusinessArchiveFormatException e) {
+            throw new ProcessDefinitionNotFoundException(e);
+        } catch (IOException e) {
+            throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
         }
     }
 

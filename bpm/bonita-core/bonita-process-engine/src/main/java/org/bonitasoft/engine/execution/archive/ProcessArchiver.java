@@ -225,7 +225,7 @@ public class ProcessArchiver {
     private static void archiveDataInstances(final SProcessInstance processInstance, final DataInstanceService dataInstanceService,
             final long archiveDate) throws SArchivingException {
         try {
-            dataInstanceService.archiveLocalDataInstances(processInstance.getId(), archiveDate);
+            dataInstanceService.archiveLocalDataInstancesFromProcessInstance(processInstance.getId(), archiveDate);
         } catch (final SDataInstanceException e) {
             throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
         }

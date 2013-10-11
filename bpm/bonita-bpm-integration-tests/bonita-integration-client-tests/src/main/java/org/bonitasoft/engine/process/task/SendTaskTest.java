@@ -149,7 +149,7 @@ public class SendTaskTest extends CommonAPITest {
      * the receiveProcess.
      */
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.")
+            "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.", jira = "")
     @Test
     public void dataTransferFromSendTaskToMessageIntermediateCatchEventWithTargetFlowNode() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m14", "receiveMessageProcess",
@@ -192,7 +192,7 @@ public class SendTaskTest extends CommonAPITest {
      * the receiveProcess.
      */
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message event",
-            "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.")
+            "Intermediate catch event", "Send", "Receive" }, story = "Send a message with data from an and event of a process  to an intermediate event of an other process.", jira = "")
     @Test
     public void dataTransferFromSendTaskToMessageIntermediateCatchEvent() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m14", "receiveMessageProcess", null,

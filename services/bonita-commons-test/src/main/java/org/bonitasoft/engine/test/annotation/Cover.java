@@ -35,7 +35,7 @@ public @interface Cover {
 
     String story() default "";
 
-    String jira() default "";
+    String jira();
 
     String[] keywords();
 

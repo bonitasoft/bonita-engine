@@ -1359,6 +1359,18 @@ public interface ProcessManagementAPI {
             ProcessDeploymentInfoCriterion sortingCriterion);
 
     /**
+     * Returns a specific process definition that include informations such as tasks definition, actors...
+     * 
+     * @param processDefinitionId
+     *            Identifier of process definition
+     * @return The corresponding process definition with informations.
+     * @throws ProcessDefinitionNotFoundException
+     *             if the process definition doesn't exist.
+     * @since 6.1
+     */
+    DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws ProcessDefinitionNotFoundException;
+
+    /**
      * Searches the number and the list of processes supervised by the user.
      * 
      * @param userId

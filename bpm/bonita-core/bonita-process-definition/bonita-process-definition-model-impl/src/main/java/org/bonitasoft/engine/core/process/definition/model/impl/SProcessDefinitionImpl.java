@@ -89,7 +89,7 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         stringIndexValue3 = ServerModelConvertor.convertExpression(sExpressionBuilders, processDefinition.getStringIndexValue(3));
         stringIndexValue4 = ServerModelConvertor.convertExpression(sExpressionBuilders, processDefinition.getStringIndexValue(4));
         stringIndexValue5 = ServerModelConvertor.convertExpression(sExpressionBuilders, processDefinition.getStringIndexValue(5));
-        for (final ActorDefinition actor : processDefinition.getActors()) {
+        for (final ActorDefinition actor : processDefinition.getActorsList()) {
             actors.add(new SActorDefinitionImpl(actor));
         }
 

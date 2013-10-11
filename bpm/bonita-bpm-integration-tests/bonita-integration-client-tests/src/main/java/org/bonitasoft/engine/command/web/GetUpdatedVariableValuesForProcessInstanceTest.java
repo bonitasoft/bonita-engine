@@ -63,7 +63,7 @@ public class GetUpdatedVariableValuesForProcessInstanceTest extends CommonAPITes
         logout();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROCESS, keywords = { "Command", "Updated variable value", "Process instance" }, story = "Get updated variable values for process instance.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROCESS, keywords = { "Command", "Updated variable value", "Process instance" }, story = "Get updated variable values for process instance.", jira = "")
     @Test
     public void testGetUpdatedVariableValuesForProcessInstance() throws Exception {
         final User user = createUser("toto", "titi");

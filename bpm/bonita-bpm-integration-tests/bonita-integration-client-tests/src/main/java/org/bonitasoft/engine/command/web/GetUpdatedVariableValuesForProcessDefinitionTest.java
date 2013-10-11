@@ -66,7 +66,7 @@ public class GetUpdatedVariableValuesForProcessDefinitionTest extends CommonAPIT
         logout();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROCESS, keywords = { "Command", "Updated variable value", "Process definition" }, story = "Get updated variable values for process definition.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROCESS, keywords = { "Command", "Updated variable value", "Process definition" }, story = "Get updated variable values for process definition.", jira = "")
     @Test(expected = CommandExecutionException.class)
     public void testGetUpdatedVariableValuesForProcessDefinition() throws Exception {
         final User user = createUser("toto", "titi");

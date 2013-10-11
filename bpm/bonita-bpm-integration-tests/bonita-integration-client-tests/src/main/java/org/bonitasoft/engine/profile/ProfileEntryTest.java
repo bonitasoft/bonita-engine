@@ -20,7 +20,7 @@ import org.junit.Test;
  */
 public class ProfileEntryTest extends AbstractProfileTest {
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Search" }, story = "Search profile entry.")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile entry", "Search" }, story = "Search profile entry.", jira = "")
     @Test
     public void searchProfileEntry() throws BonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);

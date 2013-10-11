@@ -1,5 +1,8 @@
 package org.bonitasoft.engine.command.web;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -24,9 +27,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Emmanuel Duchastenier
  */
@@ -42,7 +42,7 @@ public class ActorCommandTest extends CommonAPITest {
         logout();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Command", "User id", "Team" }, story = "Get actors ids for user id including team.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Command", "User id", "Team" }, story = "Get actors ids for user id including team.", jira = "")
     @Test
     public void getActorIdsForUserIdIncludingTeam() throws Exception {
         final String userName = "Richard";

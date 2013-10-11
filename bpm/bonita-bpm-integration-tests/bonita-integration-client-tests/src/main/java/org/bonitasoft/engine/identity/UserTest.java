@@ -579,7 +579,7 @@ public class UserTest extends CommonAPITest {
     }
 
     @Cover(classes = { IdentityAPI.class, ContactDataUpdater.class, User.class, ContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "update",
-            "user", "contact data" })
+            "user", "contact data" }, jira = "")
     @Test
     public void updateUserWithOnlyDataChanging() throws BonitaException {
         final User user = getIdentityAPI().createUser("james", "mbp");

@@ -78,11 +78,10 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     public DesignProcessDefinition done() throws InvalidProcessDefinitionException {
         validateProcess();
-        if (designErrors.isEmpty()) {
-            return process;
-        } else {
+        if (!designErrors.isEmpty()) {
             throw new InvalidProcessDefinitionException(designErrors);
         }
+        return process;
     }
 
     private void validateProcess() {
@@ -109,10 +108,23 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private void validateActors() {
         final ActorDefinition actorInitiator = process.getActorInitiator();
         if (actorInitiator != null) {
-            final ActorDefinition actor = process.getActor(actorInitiator.getName());
+            final String actorInitiatorName = actorInitiator.getName();
+            final ActorDefinition actor = process.getActor(actorInitiatorName);
             if (actor == null) {
-                designErrors.add("No actor is found for initiator '" + actorInitiator.getName() + "'.");
+                designErrors.add("No actor is found for initiator '" + actorInitiatorName + "'.");
             }
+
+            // FIXME : Don't remove. See JIRA ENGINE-1975
+            // int nbInitiator = 0;
+            // final List<ActorDefinition> actors = process.getActorsList();
+            // for (final ActorDefinition actorDefinition : actors) {
+            // if (actorDefinition.getName().equals(actorInitiatorName)) {
+            // nbInitiator++;
+            // }
+            // if (nbInitiator > 1) {
+            // designErrors.add("More than one actor are named '" + actorInitiatorName + "'. All names must be unique.");
+            // }
+            // }
         }
     }
 
@@ -123,13 +135,12 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateMultiInstances(flowElementContainer);
         validateEvents(flowElementContainer, isRootContainer);
         validateActivities(flowElementContainer);
-
     }
 
     private void validateFlowNodeUnique(final FlowElementContainerDefinition flowElementContainer, final List<String> names) {
         validateFlowNodeName(names, flowElementContainer.getActivities());
         validateFlowNodeName(names, flowElementContainer.getEndEvents());
-        validateFlowNodeName(names, flowElementContainer.getGateways());
+        validateFlowNodeName(names, flowElementContainer.getGatewaysList());
         validateFlowNodeName(names, flowElementContainer.getIntermediateCatchEvents());
         validateFlowNodeName(names, flowElementContainer.getIntermediateThrowEvents());
         validateFlowNodeName(names, flowElementContainer.getStartEvents());
@@ -159,14 +170,16 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     private void validateActivities(final FlowElementContainerDefinition processContainer) {
         for (final ActivityDefinition activity : processContainer.getActivities()) {
             if (activity instanceof CallActivityDefinition && ((CallActivityDefinition) activity).getCallableElement() == null) {
-                addError("The call activity " + activity.getName() + "has a null callable element");
+                addError("The call activity " + activity.getName() + " has a null callable element");
+            }
+            if (activity instanceof SendTaskDefinition && ((SendTaskDefinition) activity).getMessageTrigger().getTargetProcess() == null) {
+                addError("The send task " + activity.getName() + " hasn't target");
             }
         }
-
     }
 
     private void validateGateways(final FlowElementContainerDefinition processContainer) {
-        for (final GatewayDefinition gateway : processContainer.getGateways()) {
+        for (final GatewayDefinition gateway : processContainer.getGatewaysList()) {
             for (final TransitionDefinition transition : gateway.getOutgoingTransitions()) {
                 switch (gateway.getGatewayType()) {
                     case PARALLEL:

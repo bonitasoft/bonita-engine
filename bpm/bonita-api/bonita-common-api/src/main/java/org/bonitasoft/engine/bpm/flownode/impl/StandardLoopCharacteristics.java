@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,6 +18,7 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class StandardLoopCharacteristics implements LoopCharacteristics {
 
@@ -53,6 +54,48 @@ public class StandardLoopCharacteristics implements LoopCharacteristics {
 
     public Expression getLoopMax() {
         return loopMax;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (testBefore ? 1231 : 1237);
+        result = prime * result + (loopCondition == null ? 0 : loopCondition.hashCode());
+        result = prime * result + (loopMax == null ? 0 : loopMax.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final StandardLoopCharacteristics other = (StandardLoopCharacteristics) obj;
+        if (testBefore != other.testBefore) {
+            return false;
+        }
+        if (loopCondition == null) {
+            if (other.loopCondition != null) {
+                return false;
+            }
+        } else if (!loopCondition.equals(other.loopCondition)) {
+            return false;
+        }
+        if (loopMax == null) {
+            if (other.loopMax != null) {
+                return false;
+            }
+        } else if (!loopMax.equals(other.loopMax)) {
+            return false;
+        }
+        return true;
     }
 
 }

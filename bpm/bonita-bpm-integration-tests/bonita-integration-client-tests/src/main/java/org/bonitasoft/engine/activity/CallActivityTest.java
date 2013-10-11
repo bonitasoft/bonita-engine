@@ -188,7 +188,7 @@ public class CallActivityTest extends CommonAPITest {
      * No Inputs or Outputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
     @Test
     public void callActivity() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, false, PROCESS_VERSION, false);
@@ -199,7 +199,7 @@ public class CallActivityTest extends CommonAPITest {
      * Only Inputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "Call Activity" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "Call Activity" }, jira = "")
     @Test
     public void callActivityWithDataInputOperations() throws Exception {
         executeCallAtivityUntilEndOfProcess(true, false, PROCESS_VERSION, false);
@@ -209,7 +209,7 @@ public class CallActivityTest extends CommonAPITest {
      * Only Outputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
     @Test
     public void callActivityWithDataOutputOperations() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, true, PROCESS_VERSION, false);
@@ -219,7 +219,7 @@ public class CallActivityTest extends CommonAPITest {
      * Only Outputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
     @Test
     public void callActivityWithDataOutputOperationsAndTerminateEnd() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, true, PROCESS_VERSION, true);
@@ -229,7 +229,7 @@ public class CallActivityTest extends CommonAPITest {
      * Only Outputs for the callActivity
      * See executeCallAtivityUntilEndOfProcess for details.
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
     @Test
     public void callActivityWithDataInputAndOutputOperationsAndVersion2() throws Exception {
         executeCallAtivityUntilEndOfProcess(true, true, "2.0", false);
@@ -575,7 +575,7 @@ public class CallActivityTest extends CommonAPITest {
     /*
      * Tested until 200, works !
      */
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
     @Test
     public void multiLevelCallActivity() throws Exception {
         variableMultiLevelCallActivity(10);
@@ -597,7 +597,7 @@ public class CallActivityTest extends CommonAPITest {
         assignAndExecuteStep(activityInstance, user.getId());
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
     @Test
     public void callUndeployedProcess() throws Exception {
 
@@ -644,7 +644,7 @@ public class CallActivityTest extends CommonAPITest {
      * Tested until 200, works !
      * Don't use 0 as argument though.
      */
-    @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Loop" })
+    @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Loop" }, jira = "")
     @Test
     public void callActivityInALoop() throws Exception {
         callActivityInALoop(10);
@@ -659,7 +659,7 @@ public class CallActivityTest extends CommonAPITest {
         return targetPI;
     }
 
-    @Cover(classes = CallActivityInstance.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Archiving" })
+    @Cover(classes = CallActivityInstance.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Archiving" }, jira = "")
     @Test
     public void getArchivedCallActivityInstance() throws Exception {
 
@@ -691,13 +691,13 @@ public class CallActivityTest extends CommonAPITest {
         disableAndDeleteProcess(targetProcessDef);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
     @Test
     public void callActivityUsingLatestVersion() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, false, null, false);
     }
 
-    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" })
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
     @Test
     public void callActivityUsingInexistingVersion() throws Exception {
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity("delivery", false, false, "callingProcess", "targetProcess", 0,
@@ -768,7 +768,7 @@ public class CallActivityTest extends CommonAPITest {
 
     }
 
-    @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Dependencies" })
+    @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Dependencies" }, jira = "")
     @Test
     public void callActivityWithDependencies() throws Exception {
         ProcessDefinition targetProcessDef = null;
@@ -826,7 +826,7 @@ public class CallActivityTest extends CommonAPITest {
         }
     }
 
-    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" })
+    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
     @Test
     public void callActivityCheckAttributes() throws Exception {
         ProcessDefinition targetProcessDef = null;
@@ -883,7 +883,7 @@ public class CallActivityTest extends CommonAPITest {
         }
     }
 
-    @Cover(classes = { ProcessDefinitionBuilder.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Expression" })
+    @Cover(classes = { ProcessDefinitionBuilder.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Expression" }, jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void callActivityTargetProcessExprIsNull() throws Exception {
         final Expression targetProcessNameExpr = null;

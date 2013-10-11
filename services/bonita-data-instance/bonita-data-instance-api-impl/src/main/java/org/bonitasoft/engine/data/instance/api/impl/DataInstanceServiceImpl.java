@@ -170,7 +170,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public void archiveLocalDataInstances(final long processInstanceId, final long archiveDate) throws SDataInstanceException {
+    public void archiveLocalDataInstancesFromProcessInstance(final long processInstanceId, final long archiveDate) throws SDataInstanceException {
         final int archiveBatchSize = 50;
         int currentIndex = 0;
         List<SDataInstance> sDataInstances = getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,

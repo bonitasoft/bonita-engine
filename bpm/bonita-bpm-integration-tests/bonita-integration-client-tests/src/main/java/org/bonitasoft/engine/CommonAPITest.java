@@ -21,6 +21,7 @@ import org.bonitasoft.engine.filter.user.TestFilter;
 import org.bonitasoft.engine.filter.user.TestFilterThatThrowException;
 import org.bonitasoft.engine.filter.user.TestFilterUsingActorName;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
+import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Rule;
@@ -108,6 +109,17 @@ public abstract class CommonAPITest extends APITestUtil {
         return new BarResource(name, byteArray);
     }
 
+    public void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
+        final BarResource barResource = getResource(path, name);
+        resources.add(barResource);
+    }
+
+    public void addConnectorImplemWithDependency(final BusinessArchiveBuilder bizArchive, final String implemPath, final String implemName,
+            final Class<? extends AbstractConnector> dependencyClassName, final String dependencyJarName) throws IOException {
+        bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
+        bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
+    }
+    
     protected ProcessDefinition deployProcessWithTestFilter(final String actorName, final long userId, final ProcessDefinitionBuilder designProcessDefinition,
             final String filterName) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(

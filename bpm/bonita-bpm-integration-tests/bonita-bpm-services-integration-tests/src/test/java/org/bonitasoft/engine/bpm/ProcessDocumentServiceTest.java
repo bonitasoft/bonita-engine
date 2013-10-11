@@ -59,7 +59,7 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
                 .getDocumentNameKey();
     }
 
-@Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Attach", "ProcessInstance", "Document", "Content" })
+    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Attach", "ProcessInstance", "Document", "Content" }, jira = "")
     @Test
     public void attachDocumentToProcessInstanceTestWithContent() throws SBonitaException {
         final byte[] documentContent = "this is the content of the document".getBytes();
@@ -82,7 +82,7 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
         removeDocument(result);
     }
 
-    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Attach", "ProcessInstance", "Document" })
+    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Attach", "ProcessInstance", "Document" }, jira = "")
     @Test
     public void attachDocumentToProcessInstanceTest() throws SBonitaException {
         transactionService.begin();
@@ -105,7 +105,7 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
         removeDocument(result);
     }
 
-    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Contents", "Document" })
+    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Contents", "Document" }, jira = "")
     @Test
     public void getDocumentContentTest() throws SBonitaException {
         final byte[] documentContent = "this is the content of the document".getBytes();
@@ -118,7 +118,7 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
         removeDocument(sProcessDocument);
     }
 
-    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "Id" })
+    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "Id" }, jira = "")
     @Test
     public void getDocumentByIdTest() throws SBonitaException {
         final byte[] documentContent = "this is the content of the document".getBytes();
@@ -131,7 +131,7 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
         removeDocument(sProcessDocument);
     }
 
-    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "ProcessId", "Name" })
+    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "ProcessId", "Name" }, jira = "")
     @Test
     public void getDocumentByNameAndProcessIdTest() throws SBonitaException {
         final byte[] documentContent = "this is the content of the document".getBytes();
@@ -149,7 +149,7 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
         removeDocument(sProcessDocument);
     }
 
-    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "Number", "ProcessInstance" })
+    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "Number", "ProcessInstance" }, jira = "")
     @Test
     public void getNumberOfDocumentsOfProcessInstanceTest() throws SBonitaException {
         final List<SProcessDocument> list = createAndAttachDocumentToProcessInstances();
@@ -164,7 +164,7 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
         removeDocuments(list);
     }
 
-    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "Number", "ProcessInstance" })
+    @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "Document", "Number", "ProcessInstance" }, jira = "")
     @Test
     public void getDocumentsOfProcessInstanceTest() throws SBonitaException {
         final List<SProcessDocument> list = createAndAttachDocumentToProcessInstances();

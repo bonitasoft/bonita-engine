@@ -225,7 +225,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         getProcessAPI().evaluateExpressionsAtProcessInstanciation(36, expressions);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed activity" }, story = "Evaluate an expression on completed activity instance.")
+    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed activity" }, story = "Evaluate an expression on completed activity instance.", jira = "")
     @Test
     public void evaluateExpressionsOnCompletedActivityInstance() throws Exception {
         final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
@@ -383,7 +383,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         getProcessAPI().evaluateExpressionsOnProcessDefinition(36, expressions);
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Complex expression" }, story = "Evaluate a complex expression.")
+    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Complex expression" }, story = "Evaluate a complex expression.", jira = "")
     @Ignore("not yet supported")
     @Test
     public void evaluateComplexExpression() throws Exception {
@@ -424,7 +424,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         cleanup(manu.getId(), processDefinition.getId());
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Complex expression", "Process instance" }, story = "Evaluate a complex expression on process instance.")
+    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Complex expression", "Process instance" }, story = "Evaluate a complex expression on process instance.", jira = "")
     @Ignore("not yet supported")
     @Test
     public void evaluateComplexExpressionOnProcessInstance() throws Exception {
@@ -460,7 +460,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         cleanup(manu.getId(), processDefinition.getId());
     }
 
-    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Pattern expression" }, story = "Evaluate a pattern expression.")
+    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Pattern expression" }, story = "Evaluate a pattern expression.", jira = "")
     @Test
     public void evaluatePatternExpression() throws Exception {
         final String userName = "Manu";

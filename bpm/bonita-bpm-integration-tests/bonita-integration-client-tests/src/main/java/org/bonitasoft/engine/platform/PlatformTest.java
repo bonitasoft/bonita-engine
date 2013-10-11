@@ -79,20 +79,20 @@ public class PlatformTest {
 
     };
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Test if platform is created.")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Test if platform is created.", jira = "")
     @Test
     public void isPlatformCreated() throws BonitaException {
         assertTrue(platformAPI.isPlatformCreated());
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Get exception when creating platform.")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Get exception when creating platform.", jira = "")
     @Test(expected = CreationException.class)
     public void createPlatformException() throws BonitaException {
         assertTrue(platformAPI.isPlatformCreated());
         platformAPI.createAndInitializePlatform();
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Get platform.")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Get platform.", jira = "")
     @Test
     public void getPlatform() throws BonitaException {
         final Platform platform = platformAPI.getPlatform();
@@ -114,7 +114,7 @@ public class PlatformTest {
                         || initialVersion.startsWith(platformVersionToTest + "-rc"));
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Delete platform.")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Delete platform.", jira = "")
     @Test
     public void deletePlatform() throws BonitaException {
         platformAPI.stopNode();
@@ -122,7 +122,7 @@ public class PlatformTest {
         assertFalse(platformAPI.isPlatformCreated());
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "State" }, story = "Try to get platfom state.")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "State" }, story = "Try to get platfom state.", jira = "")
     @Test
     public void getPlatformState() throws Exception {
         // test started state
@@ -155,7 +155,7 @@ public class PlatformTest {
         platformAPI.cleanAndDeletePlaftorm();
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "stop node then start it with same session.")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "stop node then start it with same session.", jira = "")
     @Test
     public void stopNodeAndStartNode() throws Exception {
         LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();

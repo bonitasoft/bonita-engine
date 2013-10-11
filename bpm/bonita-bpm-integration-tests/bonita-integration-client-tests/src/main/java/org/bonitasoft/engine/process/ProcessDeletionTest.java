@@ -127,7 +127,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "Delete", "Process definition" })
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "Delete", "Process definition" }, jira = "")
     public void deleteProcessDefinitionStopsCreatingNewActivities() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("process To Delete", "2.5");
         final String actorName = "delivery";
@@ -618,7 +618,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "archived comments" })
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "archived comments" }, jira = "")
     public void deleteProcessInstanceAndComments() throws Exception {
         // deploy and start a simple process
         final String userTaskName = "etapa1";
@@ -643,7 +643,7 @@ public class ProcessDeletionTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "archived comments" })
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process definition", "archived comments" }, jira = "")
     public void deleteArchivedProcessInstanceAndComments() throws Exception {
         // deploy and start a simple process
         final String userTaskName = "etapa1";

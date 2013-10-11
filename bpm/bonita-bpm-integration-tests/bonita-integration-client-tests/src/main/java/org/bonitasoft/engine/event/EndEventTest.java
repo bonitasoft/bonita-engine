@@ -41,7 +41,7 @@ public class EndEventTest extends CommonAPITest {
         user = createUser("john", "bpm");
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Start event", "End event" }, story = "Execute process with start and end events.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Start event", "End event" }, story = "Execute process with start and end events.", jira = "")
     @Test
     public void executeStartAndEndEvents() throws Exception {
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0")
@@ -65,7 +65,7 @@ public class EndEventTest extends CommonAPITest {
     }
 
     @Cover(classes = EventInstance.class, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = { "Event",
-            "Start event", "Incoming transition" }, story = "Check that a start event can't have an incoming transition.")
+            "Start event", "Incoming transition" }, story = "Check that a start event can't have an incoming transition.", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void startEventCannotHaveIncomingTransition() throws BonitaException {
         new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addStartEvent("startEvent").addAutomaticTask("step1")
@@ -73,14 +73,14 @@ public class EndEventTest extends CommonAPITest {
     }
 
     @Cover(classes = EventInstance.class, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = { "Event",
-            "End event", "Outgoing transition" }, story = "Check that an end event can't have an outgoing transition.")
+            "End event", "Outgoing transition" }, story = "Check that an end event can't have an outgoing transition.", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void endEventCannotHaveOutgoingTransition() throws BonitaException {
         new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addAutomaticTask("step1").addEndEvent("endEvent")
                 .addTransition("endEvent", "step1").getProcess();
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event" }, story = "Execute process with only a terminate end event.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event" }, story = "Execute process with only a terminate end event.", jira = "")
     @Test
     public void terminateEndEventAlone() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
@@ -93,7 +93,7 @@ public class EndEventTest extends CommonAPITest {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "Start event", "End event", "Automatic task" }, story = "Execute a process with start event, terminate end event and automatic task.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "Start event", "End event", "Automatic task" }, story = "Execute a process with start event, terminate end event and automatic task.", jira = "")
     @Test
     public void executeStartAndEndEventWithTask() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeStartAndEndEventWithTask", "1.0");
@@ -105,7 +105,7 @@ public class EndEventTest extends CommonAPITest {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event", "User task" }, story = "Execute a process with a terminate end event and user task.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event", "User task" }, story = "Execute a process with a terminate end event and user task.", jira = "")
     @Test
     public void terminateEndEventWithTasks() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
@@ -121,7 +121,7 @@ public class EndEventTest extends CommonAPITest {
         disableAndDeleteProcess(process);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event", "Branch not finished" }, story = "Execute a process with terminate end event and a branch not finished.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event", "Branch not finished" }, story = "Execute a process with terminate end event and a branch not finished.", jira = "")
     @Test
     public void terminateEndEventWithNotFinishedBranch() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
@@ -166,7 +166,7 @@ public class EndEventTest extends CommonAPITest {
     }
 
     // @Ignore("Currently ignored because it cause timeout lock on data base: need to refactor transactions and so on")
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event", "Multiple branches not finished" }, story = "Execute a process with terminate end event and multiple branches not finished.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Terminate event", "End event", "Multiple branches not finished" }, story = "Execute a process with terminate end event and multiple branches not finished.", jira = "")
     @Test
     public void terminateEndEvendWithNotFinishedMultipleBranch() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
@@ -189,7 +189,7 @@ public class EndEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Multi-instance",
-            "End event", "Terminate event", "Parallel" }, story = "Execute a process with a terminate end event and parallel multi-instance.")
+            "End event", "Terminate event", "Parallel" }, story = "Execute a process with a terminate end event and parallel multi-instance.", jira = "")
     @Test
     public void terminateEventWithMultiInstanceParallel() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("terminateEventWithMultiInstance", "1.0");
@@ -205,7 +205,7 @@ public class EndEventTest extends CommonAPITest {
     }
 
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Multi-instance",
-            "End event", "Terminate event", "Sequential", "User task" }, story = "Execute a process with a terminate end event and sequential multi-instance.")
+            "End event", "Terminate event", "Sequential", "User task" }, story = "Execute a process with a terminate end event and sequential multi-instance.", jira = "")
     @Test
     public void terminateEventWithMultiInstanceSequential() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("terminateEventWithMultiInstance", "1.0");

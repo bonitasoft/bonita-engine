@@ -159,7 +159,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         activities = new HashSet<SActivityDefinition>(activities2.size());
         initializeActivities(activities2, sExpressionBuilders, sOperationBuilders, sDataDefinitionBuilders);
 
-        final Set<GatewayDefinition> gateways2 = container.getGateways();
+        final List<GatewayDefinition> gateways2 = container.getGatewaysList();
         gateways = new HashSet<SGatewayDefinition>(gateways2.size());
         gatewaysMap = new HashMap<String, SGatewayDefinition>(gateways2.size());
         final Iterator<GatewayDefinition> iterator1 = gateways2.iterator();

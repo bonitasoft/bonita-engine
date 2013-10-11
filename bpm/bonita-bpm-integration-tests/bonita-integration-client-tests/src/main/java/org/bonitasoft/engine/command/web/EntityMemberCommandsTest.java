@@ -1,5 +1,10 @@
 package org.bonitasoft.engine.command.web;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,11 +34,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class EntityMemberCommandsTest extends CommonAPITest {
 
@@ -109,7 +109,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         logout();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Create", "Delete" }, story = "Create new entity member and delete it.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Create", "Delete" }, story = "Create new entity member and delete it.", jira = "")
     @Test
     public void testCreateNewEntityMemberAndDeleteIt() throws Exception {
         final User newUser = createUser("test1", "password");
@@ -142,7 +142,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         deleteUser(newUser.getId());
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Delete" }, story = "Delete all entity members for external id.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Delete" }, story = "Delete all entity members for external id.", jira = "")
     @Test
     @SuppressWarnings("unchecked")
     public void testDeleteAllEntityMembersForExternalId() throws Exception {
@@ -205,7 +205,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         deleteRoles(role);
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search" }, story = "Search entity members involving.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search" }, story = "Search entity members involving.", jira = "")
     @Test
     @SuppressWarnings("unchecked")
     public void testSearchEntityMembersInvolving() throws Exception {
@@ -274,7 +274,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         deleteUser(newUser2);
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User", "Role" }, story = "Search entity members involving user in role.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User", "Role" }, story = "Search entity members involving user in role.", jira = "")
     @Test
     @SuppressWarnings("unchecked")
     public void testSearchEntityMembersInvolvingUserInRole() throws Exception {
@@ -318,7 +318,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         deleteUser(newUser);
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User" }, story = "Search entity members for user.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User" }, story = "Search entity members for user.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void testSearchEntityMembersForUser() throws Exception {
@@ -365,7 +365,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         afterSearchEntityMembersForUser();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User", "Filter" }, story = "Search entity members for user with filter.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User", "Filter" }, story = "Search entity members for user with filter.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void testSearchEntityMembersForUserWithFilter() throws Exception {
@@ -395,7 +395,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         afterSearchEntityMembersForUser();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User", "Search term" }, story = "Search entity members for user with search term.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User", "Search term" }, story = "Search entity members for user with search term.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void testSearchEntityMembersForUserWithSearchTerm() throws Exception {
@@ -414,7 +414,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         afterSearchEntityMembersForUser();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "Group" }, story = "Search entity members for group.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "Group" }, story = "Search entity members for group.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void testSearchEntityMembersForGroup() throws Exception {
@@ -432,7 +432,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         afterSearchEntityMembersForGroup();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "Role" }, story = "Search entity members for role.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "Role" }, story = "Search entity members for role.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void testSearchEntityMembersForRole() throws Exception {
@@ -451,7 +451,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         afterSearchEntityMembersForRole();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "Role", "Group" }, story = "Search entity members for role and group.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "Role", "Group" }, story = "Search entity members for role and group.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void testSearchEntityMembersForRoleAndGroup() throws Exception {
@@ -476,7 +476,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         afterSearchEntityMembersForRoleAndGroup();
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User" }, story = "Search entity members for user.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search", "User" }, story = "Search entity members for user.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void searchEntityMembersForUser() throws Exception {
@@ -519,7 +519,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         deleteEntityMembers(member1);
     }
 
-    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search" }, story = "Search entity members.")
+    @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Search" }, story = "Search entity members.", jira = "")
     @SuppressWarnings("unchecked")
     @Test
     public void searchEntityMembers() throws Exception {

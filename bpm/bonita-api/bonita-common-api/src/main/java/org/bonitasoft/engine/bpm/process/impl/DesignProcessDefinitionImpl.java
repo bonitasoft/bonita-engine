@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,8 +13,10 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
@@ -28,6 +30,7 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Elias Ricken de Medeiros
  * @author Yanyan Liu
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implements DesignProcessDefinition {
 
@@ -39,7 +42,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
 
     private final Set<ParameterDefinition> parameters;
 
-    private final Set<ActorDefinition> actors;
+    private final List<ActorDefinition> actors;
 
     private ActorDefinition actorInitiator;
 
@@ -68,7 +71,7 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     public DesignProcessDefinitionImpl(final String name, final String version) {
         super(name, version);
         parameters = new HashSet<ParameterDefinition>();
-        actors = new HashSet<ActorDefinition>();
+        actors = new ArrayList<ActorDefinition>();
     }
 
     public void setDisplayName(final String name) {
@@ -90,8 +93,14 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     }
 
     @Override
-    public Set<ActorDefinition> getActors() {
+    public List<ActorDefinition> getActorsList() {
         return actors;
+    }
+
+    @Deprecated
+    @Override
+    public Set<ActorDefinition> getActors() {
+        return new HashSet<ActorDefinition>(actors);
     }
 
     @Override
@@ -161,6 +170,20 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
         }
     }
 
+    public ActorDefinition getActor(final String actorName) {
+        final Iterator<ActorDefinition> iterator = actors.iterator();
+        ActorDefinition actorDefinition = null;
+        boolean found = false;
+        while (!found && iterator.hasNext()) {
+            final ActorDefinition next = iterator.next();
+            if (next.getName().equals(actorName)) {
+                found = true;
+                actorDefinition = next;
+            }
+        }
+        return actorDefinition;
+    }
+
     public void setStringIndex(final int index, final String label, final Expression initialValue) {
         switch (index) {
             case 1:
@@ -192,37 +215,37 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (actorInitiator == null ? 0 : actorInitiator.hashCode());
-        result = prime * result + (actors == null ? 0 : actors.hashCode());
-        result = prime * result + (displayDescription == null ? 0 : displayDescription.hashCode());
-        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
-        result = prime * result + (flowElementContainer == null ? 0 : flowElementContainer.hashCode());
-        result = prime * result + (parameters == null ? 0 : parameters.hashCode());
-        result = prime * result + (stringIndexLabel1 == null ? 0 : stringIndexLabel1.hashCode());
-        result = prime * result + (stringIndexLabel2 == null ? 0 : stringIndexLabel2.hashCode());
-        result = prime * result + (stringIndexLabel3 == null ? 0 : stringIndexLabel3.hashCode());
-        result = prime * result + (stringIndexLabel4 == null ? 0 : stringIndexLabel4.hashCode());
-        result = prime * result + (stringIndexLabel5 == null ? 0 : stringIndexLabel5.hashCode());
-        result = prime * result + (stringIndexValue1 == null ? 0 : stringIndexValue1.hashCode());
-        result = prime * result + (stringIndexValue2 == null ? 0 : stringIndexValue2.hashCode());
-        result = prime * result + (stringIndexValue3 == null ? 0 : stringIndexValue3.hashCode());
-        result = prime * result + (stringIndexValue4 == null ? 0 : stringIndexValue4.hashCode());
-        result = prime * result + (stringIndexValue5 == null ? 0 : stringIndexValue5.hashCode());
+        result = prime * result + ((actorInitiator == null) ? 0 : actorInitiator.hashCode());
+        result = prime * result + ((actors == null) ? 0 : actors.hashCode());
+        result = prime * result + ((displayDescription == null) ? 0 : displayDescription.hashCode());
+        result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
+        result = prime * result + ((flowElementContainer == null) ? 0 : flowElementContainer.hashCode());
+        result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+        result = prime * result + ((stringIndexLabel1 == null) ? 0 : stringIndexLabel1.hashCode());
+        result = prime * result + ((stringIndexLabel2 == null) ? 0 : stringIndexLabel2.hashCode());
+        result = prime * result + ((stringIndexLabel3 == null) ? 0 : stringIndexLabel3.hashCode());
+        result = prime * result + ((stringIndexLabel4 == null) ? 0 : stringIndexLabel4.hashCode());
+        result = prime * result + ((stringIndexLabel5 == null) ? 0 : stringIndexLabel5.hashCode());
+        result = prime * result + ((stringIndexValue1 == null) ? 0 : stringIndexValue1.hashCode());
+        result = prime * result + ((stringIndexValue2 == null) ? 0 : stringIndexValue2.hashCode());
+        result = prime * result + ((stringIndexValue3 == null) ? 0 : stringIndexValue3.hashCode());
+        result = prime * result + ((stringIndexValue4 == null) ? 0 : stringIndexValue4.hashCode());
+        result = prime * result + ((stringIndexValue5 == null) ? 0 : stringIndexValue5.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
         if (!super.equals(obj)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof DesignProcessDefinitionImpl)) {
             return false;
         }
-        final DesignProcessDefinitionImpl other = (DesignProcessDefinitionImpl) obj;
+        DesignProcessDefinitionImpl other = (DesignProcessDefinitionImpl) obj;
         if (actorInitiator == null) {
             if (other.actorInitiator != null) {
                 return false;
@@ -346,20 +369,6 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
                 + stringIndexLabel4 + ", stringIndexLabel5=" + stringIndexLabel5 + ", stringIndexValue1=" + stringIndexValue1 + ", stringIndexValue2="
                 + stringIndexValue2 + ", stringIndexValue3=" + stringIndexValue3 + ", stringIndexValue4=" + stringIndexValue4 + ", stringIndexValue5="
                 + stringIndexValue5 + "]";
-    }
-
-    public ActorDefinition getActor(final String actorName) {
-        final Iterator<ActorDefinition> iterator = actors.iterator();
-        ActorDefinition actorDefinition = null;
-        boolean found = false;
-        while (!found && iterator.hasNext()) {
-            final ActorDefinition next = iterator.next();
-            if (next.getName().equals(actorName)) {
-                found = true;
-                actorDefinition = next;
-            }
-        }
-        return actorDefinition;
     }
 
 }

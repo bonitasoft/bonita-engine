@@ -68,7 +68,7 @@ public class ProcessCategoryTest extends CommonAPITest {
         processDefinitions = new ArrayList<ProcessDefinition>();
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category" })
+    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category" }, jira = "")
     @Test
     public void createCategory() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -98,7 +98,7 @@ public class ProcessCategoryTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class, AlreadyExistsException.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category",
-            "Exception" })
+            "Exception" }, jira = "")
     @Test(expected = AlreadyExistsException.class)
     public void createCategoryWithCategoryAlreadyExistException() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -109,13 +109,13 @@ public class ProcessCategoryTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class, CreationException.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category",
-            "Exception" })
+            "Exception" }, jira = "")
     @Test(expected = CreationException.class)
     public void createCategoryWithCategoryCreationException() throws Exception {
         getProcessAPI().createCategory(null, description);
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Number", "Category" })
+    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Number", "Category" }, jira = "")
     @Test
     public void getNumberOfCategories() throws Exception {
         final Category category1 = getProcessAPI().createCategory(name + 1, description);
@@ -127,7 +127,7 @@ public class ProcessCategoryTest extends CommonAPITest {
         assertEquals(2, categoriesCount);
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Existed" })
+    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Existed" }, jira = "")
     @Test
     public void getCategory() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -142,7 +142,7 @@ public class ProcessCategoryTest extends CommonAPITest {
         assertEquals(description, rCategory.getDescription());
     }
 
-    @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception" })
+    @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception" }, jira = "")
     @Test(expected = CategoryNotFoundException.class)
     public void getCategoryWithCategoryNotFoundException() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -152,7 +152,7 @@ public class ProcessCategoryTest extends CommonAPITest {
         getProcessAPI().getCategory(category.getId() + 1);
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Existed", "Several" })
+    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Existed", "Several" }, jira = "")
     @Test
     public void getCategories() throws Exception {
         final Category category1 = getProcessAPI().createCategory("category1", description);
@@ -184,7 +184,7 @@ public class ProcessCategoryTest extends CommonAPITest {
         assertEquals(0, categoriesNameAsc.size());
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Update" })
+    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Update" }, jira = "")
     @Test
     public void updateCategory() throws Exception {
         final Category oldCategory = getProcessAPI().createCategory(name, description);
@@ -203,7 +203,7 @@ public class ProcessCategoryTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception",
-            "Update" })
+            "Update" }, jira = "")
     @Test(expected = CategoryNotFoundException.class)
     public void updateCategoryWithCategoryNotFoundException() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -213,13 +213,13 @@ public class ProcessCategoryTest extends CommonAPITest {
         getProcessAPI().updateCategory(category.getId() + 1, updater);
     }
 
-    @Cover(classes = { ProcessAPI.class, UpdateException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Exception", "Update" })
+    @Cover(classes = { ProcessAPI.class, UpdateException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Exception", "Update" }, jira = "")
     @Test(expected = UpdateException.class)
     public void updateCategoryWithCategoryUpdateException() throws Exception {
         getProcessAPI().updateCategory(0, null);
     }
 
-    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Delete" })
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Delete" }, jira = "")
     @Test(expected = CategoryNotFoundException.class)
     public void deleteCategory() throws Exception {
         final Category category = getProcessAPI().createCategory(name, description);
@@ -228,13 +228,13 @@ public class ProcessCategoryTest extends CommonAPITest {
     }
 
     @Cover(classes = { ProcessAPI.class, CategoryNotFoundException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Unexisted", "Exception",
-            "Delete" })
+            "Delete" }, jira = "")
     @Test(expected = DeletionException.class)
     public void deleteCategoryWithCategoryNotFoundException() throws Exception {
         getProcessAPI().deleteCategory(Long.MAX_VALUE);
     }
 
-    @Cover(classes = { ProcessAPI.class, DeletionException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Exception", "Delete" })
+    @Cover(classes = { ProcessAPI.class, DeletionException.class }, concept = BPMNConcept.PROCESS, keywords = { "Category", "Exception", "Delete" }, jira = "")
     @Test(expected = DeletionException.class)
     public void deleteCategoryWithCategoryDeletionException() throws Exception {
         getProcessAPI().deleteCategory(0);
@@ -456,7 +456,7 @@ public class ProcessCategoryTest extends CommonAPITest {
         assertEquals(0, outOfRangeCategories.size());
     }
 
-    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Get", "Category", "ProcessDefinition" })
+    @Cover(classes = { ProcessAPI.class, Category.class }, concept = BPMNConcept.PROCESS, keywords = { "Get", "Category", "ProcessDefinition" }, jira = "")
     @Test
     public void getCategoriesUnrelatedToProcessDefinition() throws Exception {
         // generate categories

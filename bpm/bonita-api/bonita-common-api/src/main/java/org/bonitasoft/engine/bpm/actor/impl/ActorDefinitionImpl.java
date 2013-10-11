@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011,2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,6 +17,7 @@ import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ActorDefinitionImpl implements ActorDefinition {
 
@@ -28,8 +29,14 @@ public class ActorDefinitionImpl implements ActorDefinition {
 
     private boolean initiator;
 
+    /**
+     * Create a actor definition with his name that is not initiator
+     * 
+     * @param name
+     */
     public ActorDefinitionImpl(final String name) {
         this.name = name;
+        initiator = false;
     }
 
     @Override
@@ -59,28 +66,32 @@ public class ActorDefinitionImpl implements ActorDefinition {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + (initiator ? 1231 : 1237);
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof ActorDefinitionImpl)) {
             return false;
         }
-        final ActorDefinitionImpl other = (ActorDefinitionImpl) obj;
+        ActorDefinitionImpl other = (ActorDefinitionImpl) obj;
         if (description == null) {
             if (other.description != null) {
                 return false;
             }
         } else if (!description.equals(other.description)) {
+            return false;
+        }
+        if (initiator != other.initiator) {
             return false;
         }
         if (name == null) {
@@ -100,6 +111,8 @@ public class ActorDefinitionImpl implements ActorDefinition {
         builder.append(name);
         builder.append(", description=");
         builder.append(description);
+        builder.append(", initiator=");
+        builder.append(initiator);
         builder.append("]");
         return builder.toString();
     }

@@ -66,7 +66,7 @@ public class PlatformLoginTest {
 
     };
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Login" }, story = "Try to log with wrong loggin.")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Login" }, story = "Try to log with wrong loggin.", jira = "")
     @Test(expected = PlatformLoginException.class)
     public void wrongLogin() throws BonitaException {
         try {
@@ -78,7 +78,7 @@ public class PlatformLoginTest {
         }
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Login" }, story = "Try to log with wrong loggin.")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Login" }, story = "Try to log with wrong loggin.", jira = "")
     @Test(expected = SessionNotFoundException.class)
     public void logoutWithWrongSession() throws BonitaException {
         try {

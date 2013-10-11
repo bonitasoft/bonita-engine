@@ -53,7 +53,7 @@ public class OrganizationTest extends CommonAPITest {
         logout();
     }
 
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Number of users" })
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Number of users" }, jira = "")
     @Test
     public void importOrganization() throws Exception {
         // create XML file
@@ -246,7 +246,7 @@ public class OrganizationTest extends CommonAPITest {
         getIdentityAPI().deleteOrganization();
     }
 
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization" }, story = "import same organization twice work")
+    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization" }, story = "import same organization twice work", jira = "")
     @Test
     public void importACMEOrganizationTwiceWithDefaultProfile() throws Exception {
         // create XML file
@@ -315,7 +315,7 @@ public class OrganizationTest extends CommonAPITest {
         }
     }
 
-    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "User" }, story = "check that import fail restore to previous state the organization")
+    @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "User" }, story = "check that import fail restore to previous state the organization", jira = "")
     @Test(expected = OrganizationImportException.class)
     public void importOrganizationFailRollBackToOldOrganization() throws Exception {
         final InputStream xmlStream = OrganizationTest.class.getResourceAsStream("organizationFailOnDuplicates.xml");

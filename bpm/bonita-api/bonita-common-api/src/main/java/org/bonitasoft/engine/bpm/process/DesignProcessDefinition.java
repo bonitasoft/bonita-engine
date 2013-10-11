@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.process;
 
+import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
@@ -22,6 +23,7 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface DesignProcessDefinition extends ProcessDefinition {
 
@@ -33,7 +35,22 @@ public interface DesignProcessDefinition extends ProcessDefinition {
 
     Set<ParameterDefinition> getParameters();
 
+    /**
+     * 
+     * @return A set of ActorDefinition
+     * @see #getActorsList()
+     * @since 6.0
+     * @deprecated As of release 6.1, replaced by {@link #getActorsList()}
+     */
+    @Deprecated
     Set<ActorDefinition> getActors();
+
+    /**
+     * 
+     * @return A list of ActorDefinition
+     * @since 6.1
+     */
+    List<ActorDefinition> getActorsList();
 
     ActorDefinition getActorInitiator();
 

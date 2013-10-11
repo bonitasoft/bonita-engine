@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -51,7 +51,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
 
     private final Set<TransitionDefinition> transitions;
 
-    private final Set<GatewayDefinition> gateways;
+    private final List<GatewayDefinition> gateways;
 
     private final List<StartEventDefinition> startEvents;
 
@@ -72,7 +72,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     public FlowElementContainerDefinitionImpl() {
         activities = new ArrayList<ActivityDefinition>();
         transitions = new HashSet<TransitionDefinition>();
-        gateways = new HashSet<GatewayDefinition>();
+        gateways = new ArrayList<GatewayDefinition>();
         startEvents = new ArrayList<StartEventDefinition>(1);
         intermediateCatchEvents = new ArrayList<IntermediateCatchEventDefinition>(4);
         endEvents = new ArrayList<EndEventDefinition>(4);
@@ -130,9 +130,15 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         return Collections.unmodifiableSet(transitions);
     }
 
+    @Deprecated
     @Override
     public Set<GatewayDefinition> getGateways() {
-        return Collections.unmodifiableSet(gateways);
+        return Collections.unmodifiableSet(new HashSet<GatewayDefinition>(gateways));
+    }
+
+    @Override
+    public List<GatewayDefinition> getGatewaysList() {
+        return Collections.unmodifiableList(gateways);
     }
 
     @Override
@@ -263,6 +269,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         result = prime * result + (intermediateThrowEvents == null ? 0 : intermediateThrowEvents.hashCode());
         result = prime * result + (startEvents == null ? 0 : startEvents.hashCode());
         result = prime * result + (transitions == null ? 0 : transitions.hashCode());
+        result = prime * result + (flowNodes == null ? 0 : flowNodes.hashCode());
         return result;
     }
 
@@ -346,6 +353,13 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
                 return false;
             }
         } else if (!transitions.equals(other.transitions)) {
+            return false;
+        }
+        if (flowNodes == null) {
+            if (other.flowNodes != null) {
+                return false;
+            }
+        } else if (!flowNodes.equals(other.flowNodes)) {
             return false;
         }
         return true;

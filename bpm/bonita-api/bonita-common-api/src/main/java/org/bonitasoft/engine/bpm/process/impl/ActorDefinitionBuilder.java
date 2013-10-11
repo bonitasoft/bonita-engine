@@ -17,6 +17,7 @@ import org.bonitasoft.engine.bpm.actor.impl.ActorDefinitionImpl;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ActorDefinitionBuilder extends ProcessBuilder implements DescriptionBuilder {
 
@@ -30,7 +31,10 @@ public class ActorDefinitionBuilder extends ProcessBuilder implements Descriptio
         if (initiator) {
             process.setActorInitiator(actor);
         }
-        process.addActor(actor);
+
+        if (!getProcessDefinition().getActorsList().contains(actor)) {
+            process.addActor(actor);
+        }
     }
 
     @Override

@@ -329,6 +329,6 @@ public interface DataInstanceService {
      * @throws SDataInstanceException
      * @since 6.1
      */
-    void archiveLocalDataInstances(long processInstanceId, long archiveDate) throws SDataInstanceException;
+    void archiveLocalDataInstancesFromProcessInstance(long processInstanceId, long archiveDate) throws SDataInstanceException;
 
 }

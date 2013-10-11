@@ -51,7 +51,7 @@ public class TimerEventTest extends CommonAPITest {
         logoutThenloginAs(USERNAME, PASSWORD);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Intermediate catch event", "User task" }, story = "Execute process with an intermediate catch event with a timer duration type.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Intermediate catch event", "User task" }, story = "Execute process with an intermediate catch event with a timer duration type.", jira = "")
     @Test
     public void timerIntermediateCatchEventDuration() throws Exception {
         final String step1Name = "step1";
@@ -80,7 +80,7 @@ public class TimerEventTest extends CommonAPITest {
         disableAndDeleteProcess(definition);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Intermediate catch event", "User task" }, story = "Execute process with an intermediate catch event with a timer date type.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Intermediate catch event", "User task" }, story = "Execute process with an intermediate catch event with a timer date type.", jira = "")
     @Test
     public void timerIntermediateCatchEventDate() throws Exception {
         final String step1Name = "step1";
@@ -110,7 +110,7 @@ public class TimerEventTest extends CommonAPITest {
         disableAndDeleteProcess(definition);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer date type.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer date type.", jira = "")
     @Test
     public void timerStartEventDate() throws Exception {
         final String stepName = "step1";
@@ -135,7 +135,7 @@ public class TimerEventTest extends CommonAPITest {
         disableAndDeleteProcess(definition);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer cycle type.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer cycle type.", jira = "")
     @Test
     public void timerStartEventCycle() throws Exception {
         final Expression timerExpression = new ExpressionBuilder().createConstantStringExpression("*/4 * * * * ?"); // new instance created every 3 seconds
@@ -172,7 +172,7 @@ public class TimerEventTest extends CommonAPITest {
         disableAndDeleteProcess(definition);
     }
 
-    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer duration type.")
+    @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer duration type.", jira = "")
     @Test
     public void timerStartEventDuration() throws Exception {
         final String stepName = "step1";

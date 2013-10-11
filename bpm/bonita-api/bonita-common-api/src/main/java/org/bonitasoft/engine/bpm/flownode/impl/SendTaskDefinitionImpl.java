@@ -20,6 +20,7 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTaskDefinition {
 
@@ -53,6 +54,36 @@ public class SendTaskDefinitionImpl extends TaskDefinitionImpl implements SendTa
     @Override
     public ThrowMessageEventTriggerDefinition getMessageTrigger() {
         return trigger;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (trigger == null ? 0 : trigger.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SendTaskDefinitionImpl other = (SendTaskDefinitionImpl) obj;
+        if (trigger == null) {
+            if (other.trigger != null) {
+                return false;
+            }
+        } else if (!trigger.equals(other.trigger)) {
+            return false;
+        }
+        return true;
     }
 
 }

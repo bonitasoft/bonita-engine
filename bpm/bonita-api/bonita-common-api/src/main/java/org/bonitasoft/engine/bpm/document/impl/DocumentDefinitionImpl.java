@@ -23,13 +23,6 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
 
     private static final long serialVersionUID = -2478390362777026410L;
 
-    /**
-     * @param name
-     */
-    public DocumentDefinitionImpl(final String name) {
-        super(name);
-    }
-
     private String url;
 
     private String file;
@@ -39,6 +32,13 @@ public class DocumentDefinitionImpl extends NamedElementImpl implements Document
     private String description;
 
     private String fileName;
+
+    /**
+     * @param name
+     */
+    public DocumentDefinitionImpl(final String name) {
+        super(name);
+    }
 
     @Override
     public String getUrl() {

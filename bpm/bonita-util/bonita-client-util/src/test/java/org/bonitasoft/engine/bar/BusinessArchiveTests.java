@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.bar.ActorMappingContribution;
@@ -426,8 +425,8 @@ public class BusinessArchiveTests {
         assertEquals(process.getProcessContainer().getIntermediateCatchEvents().get(0), result.getProcessContainer().getIntermediateCatchEvents().get(0));
         assertEquals(process.getProcessContainer().getEndEvents().size(), result.getProcessContainer().getEndEvents().size());
         assertEquals(process.getProcessContainer().getEndEvents().get(0), result.getProcessContainer().getEndEvents().get(0));
-        assertEquals(process.getActors().size(), result.getActors().size());
-        assertEquals(process.getActors().iterator().next(), result.getActors().iterator().next());
+        assertEquals(process.getActorsList().size(), result.getActorsList().size());
+        assertEquals(process.getActorsList().iterator().next(), result.getActorsList().iterator().next());
         assertEquals(process.getProcessContainer().getActivities().size(), result.getProcessContainer().getActivities().size());
         final Iterator<ActivityDefinition> iterator = result.getProcessContainer().getActivities().iterator();
         final Iterator<ActivityDefinition> iterator2 = process.getProcessContainer().getActivities().iterator();
@@ -483,8 +482,8 @@ public class BusinessArchiveTests {
         assertEquals(1, auto1.getOperations().size());
         assertEquals(auto1.getOperations().get(0), auto1.getOperations().get(0));
         assertTrue(procAct2.equals(resAct1) || procAct2.equals(resAct2) || procAct2.equals(resAct3));
-        assertEquals(process.getProcessContainer().getGateways().size(), result.getProcessContainer().getGateways().size());
-        assertEquals(process.getProcessContainer().getGateways().iterator().next(), result.getProcessContainer().getGateways().iterator().next());
+        assertEquals(process.getProcessContainer().getGatewaysList().size(), result.getProcessContainer().getGatewaysList().size());
+        assertEquals(process.getProcessContainer().getGatewaysList().iterator().next(), result.getProcessContainer().getGatewaysList().iterator().next());
         assertEquals(process.getProcessContainer().getTransitions().size(), result.getProcessContainer().getTransitions().size());
         boolean trWithConditionOk = false;
         final long startId = result.getProcessContainer().getFlowNode("start1").getId();
@@ -910,9 +909,9 @@ public class BusinessArchiveTests {
         assertEquals(expectedThrowMessage.getDataDefinitions(), actualThrowMessage.getDataDefinitions());
         assertEquals(1, actualThrowMessage.getDataDefinitions().size());
 
-        assertEquals(process.getActors().size(), result.getActors().size());
+        assertEquals(process.getActorsList().size(), result.getActorsList().size());
         assertEquals(process.getProcessContainer().getActivities().size(), result.getProcessContainer().getActivities().size());
-        assertEquals(process.getProcessContainer().getGateways().size(), result.getProcessContainer().getGateways().size());
+        assertEquals(process.getProcessContainer().getGatewaysList().size(), result.getProcessContainer().getGatewaysList().size());
         assertEquals(process.getProcessContainer().getTransitions().size(), result.getProcessContainer().getTransitions().size());
         assertEquals(process.getProcessContainer().getDataDefinitions().size(), result.getProcessContainer().getDataDefinitions().size());
     }
@@ -937,7 +936,7 @@ public class BusinessArchiveTests {
         builder.addUserTask("step", "Truck Driver");
 
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
-        final Set<ActorDefinition> actors = result.getActors();
+        final List<ActorDefinition> actors = result.getActorsList();
         assertEquals(1, actors.size());
         final ActorDefinition actor = actors.iterator().next();
         assertEquals("Truck Driver", actor.getName());
@@ -994,8 +993,8 @@ public class BusinessArchiveTests {
         assertEquals(process.getProcessContainer().getStartEvents().get(0), result.getProcessContainer().getStartEvents().get(0));
         assertEquals(process.getProcessContainer().getEndEvents().size(), result.getProcessContainer().getEndEvents().size());
         assertEquals(process.getProcessContainer().getEndEvents().get(0), result.getProcessContainer().getEndEvents().get(0));
-        assertEquals(process.getActors().size(), result.getActors().size());
-        assertEquals(process.getActors().iterator().next(), result.getActors().iterator().next());
+        assertEquals(process.getActorsList().size(), result.getActorsList().size());
+        assertEquals(process.getActorsList().iterator().next(), result.getActorsList().iterator().next());
         assertEquals(process.getProcessContainer().getActivities().size(), result.getProcessContainer().getActivities().size());
         final Iterator<ActivityDefinition> iterator = result.getProcessContainer().getActivities().iterator();
         final Iterator<ActivityDefinition> iterator2 = process.getProcessContainer().getActivities().iterator();
@@ -1005,8 +1004,8 @@ public class BusinessArchiveTests {
         final ActivityDefinition resAct2 = iterator.next();
         assertTrue(procAct1.equals(resAct1) || procAct1.equals(resAct2));
         assertTrue(procAct2.equals(resAct1) || procAct2.equals(resAct2));
-        assertEquals(process.getProcessContainer().getGateways().size(), result.getProcessContainer().getGateways().size());
-        assertEquals(process.getProcessContainer().getGateways().iterator().next(), result.getProcessContainer().getGateways().iterator().next());
+        assertEquals(process.getProcessContainer().getGatewaysList().size(), result.getProcessContainer().getGatewaysList().size());
+        assertEquals(process.getProcessContainer().getGatewaysList().iterator().next(), result.getProcessContainer().getGatewaysList().iterator().next());
         assertEquals(process.getProcessContainer().getTransitions().size(), result.getProcessContainer().getTransitions().size());
         assertEquals(process.getProcessContainer().getConnectors().size(), result.getProcessContainer().getConnectors().size());
         assertEquals(process.getProcessContainer().getConnectors().iterator().next(), result.getProcessContainer().getConnectors().iterator().next());
