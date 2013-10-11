@@ -430,7 +430,7 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance.getId());
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         disableAndDeleteProcess(receiveMessageProcess);
         disableAndDeleteProcess(sendMessageProcess);
@@ -563,7 +563,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
 
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId());
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
         // waitForStep(100, 5000, "userTask1", receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -800,7 +800,7 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance.getId());
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
         // waitForStep( "step1", receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
@@ -895,10 +895,10 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessDefinition sendAndReceiveMessageProcess = deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", CATCH_EVENT_NAME);
         final ProcessInstance sendAndReceiveMessageProcessInstance = getProcessAPI().startProcess(sendAndReceiveMessageProcess.getId());
 
-        final ActivityInstance step2 = waitForUserTask("userTask2", sendAndReceiveMessageProcessInstance.getId());
+        final ActivityInstance step2 = waitForUserTask("userTask2", sendAndReceiveMessageProcessInstance);
         waitForEventInWaitingState(sendAndReceiveMessageProcessInstance, CATCH_EVENT_NAME);
         assignAndExecuteStep(step2.getId(), user.getId());
-        waitForUserTask("userTask3", sendAndReceiveMessageProcessInstance.getId());
+        waitForUserTask("userTask3", sendAndReceiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendAndReceiveMessageProcess);
     }

@@ -169,7 +169,7 @@ public class APITestUtil {
 
     public static final int DEFAULT_REPEAT_EACH = 500;
 
-    public static final int DEFAULT_TIMEOUT = 15 * 60 * 1000;
+    public static final int DEFAULT_TIMEOUT = 7 * 60 * 1000;
 
     @After
     public void clearSynchroRepository() {
@@ -881,8 +881,16 @@ public class APITestUtil {
         return humanTaskInstance;
     }
 
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception {
+        return waitForUserTaskAndExecuteIt(taskName, processInstance.getId(), userId);
+    }
+
     public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final long processInstanceId, final User user) throws Exception {
         return waitForUserTaskAndExecuteIt(taskName, processInstanceId, user.getId());
+    }
+
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
+        return waitForUserTaskAndExecuteIt(taskName, processInstance.getId(), user.getId());
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final long processInstanceId, final long userId) throws Exception,
@@ -890,6 +898,16 @@ public class APITestUtil {
         final ActivityInstance activityInstance = waitForUserTask(taskName, processInstanceId);
         getProcessAPI().assignUserTask(activityInstance.getId(), userId);
         return activityInstance;
+    }
+
+    public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception,
+            UpdateException {
+        return waitForUserTaskAndAssigneIt(taskName, processInstance.getId(), userId);
+    }
+
+    public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception,
+            UpdateException {
+        return waitForUserTaskAndAssigneIt(taskName, processInstance.getId(), user.getId());
     }
 
     @Deprecated

@@ -405,8 +405,8 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         // execute process until step1
-        waitForUserTaskAndExecuteIt("tStep1", callingProcessInstance.getId(), cebolinha.getId());
-        waitForUserTask("step1", callingProcessInstance.getId());
+        waitForUserTaskAndExecuteIt("tStep1", callingProcessInstance, cebolinha.getId());
+        waitForUserTask("step1", callingProcessInstance);
 
         /*
          * check the data have the value of the clientNumber of the called process
@@ -473,7 +473,7 @@ public class CallActivityTest extends CommonAPITest {
         assertEquals(callingProcessInstance.getId(), targetPI.getRootProcessInstanceId());
         assertEquals(callActivityInstance.getId(), targetPI.getCallerId());
 
-        ActivityInstance activityInstance = waitForUserTask("tStep1", callingProcessInstance.getId());
+        ActivityInstance activityInstance = waitForUserTask("tStep1", callingProcessInstance);
         assertEquals(targetPI.getId(), activityInstance.getParentProcessInstanceId());
         assertEquals(callingProcessInstance.getId(), activityInstance.getRootContainerId());
         checkDataInputOperations(addInputOperations, targetPI);
@@ -481,7 +481,7 @@ public class CallActivityTest extends CommonAPITest {
         // execute step in the target process
         assignAndExecuteStep(activityInstance, cebolinha.getId());
 
-        activityInstance = waitForUserTask("step1", callingProcessInstance.getId());
+        activityInstance = waitForUserTask("step1", callingProcessInstance);
         checkOutputOperations(addOutputOperations, callingProcessInstance);
         assertTrue("target process was not archived", waitProcessToFinishAndBeArchived(targetPI));
         assertEquals(callingProcessInstance.getId(), activityInstance.getParentProcessInstanceId());
@@ -724,7 +724,7 @@ public class CallActivityTest extends CommonAPITest {
 
         final List<Operation> operations = getStartOperations();
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), operations, null);
-        final ActivityInstance waitForUserTask = waitForUserTask("tStep1", callingProcessInstance.getId());
+        final ActivityInstance waitForUserTask = waitForUserTask("tStep1", callingProcessInstance);
 
         try {
             getProcessAPI().deleteProcessInstance(waitForUserTask.getParentProcessInstanceId());
@@ -755,7 +755,7 @@ public class CallActivityTest extends CommonAPITest {
 
         final List<Operation> operations = getStartOperations();
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId(), operations, null);
-        waitForUserTask("tStep1", callingProcessInstance.getId());
+        waitForUserTask("tStep1", callingProcessInstance);
 
         getProcessAPI().disableProcess(targetProcessDef1.getId());
         try {
@@ -1019,7 +1019,7 @@ public class CallActivityTest extends CommonAPITest {
             processDefBuilder.addTransition("callActivity", "end");
             callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
-            final ActivityInstance activityInstance = waitForUserTask("tStep1", callingProcessInstance.getId());
+            final ActivityInstance activityInstance = waitForUserTask("tStep1", callingProcessInstance);
             assertEquals(callingProcessInstance.getId(), getProcessAPI().getActivityDataInstance("rootProcId", activityInstance.getId()).getValue());
         } finally {
             disableAndDeleteProcess(callingProcessDefinition);
@@ -1071,7 +1071,7 @@ public class CallActivityTest extends CommonAPITest {
             bizArchive.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
             callingProcessDefinition = deployAndEnableWithActor(bizArchive.done(), ACTOR_NAME, cascao);
             final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
-            final ActivityInstance activityInstance = waitForUserTask("end", callingProcessInstance.getId());
+            final ActivityInstance activityInstance = waitForUserTask("end", callingProcessInstance);
             assertEquals("parentDefault", getProcessAPI().getActivityDataInstance("valueOnCallOnEnter", activityInstance.getId()).getValue());
             assertEquals("subModified", getProcessAPI().getActivityDataInstance("valueOnCallOnFinish", activityInstance.getId()).getValue());
         } finally {

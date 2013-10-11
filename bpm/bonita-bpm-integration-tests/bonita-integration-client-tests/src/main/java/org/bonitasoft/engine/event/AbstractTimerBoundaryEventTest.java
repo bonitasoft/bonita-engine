@@ -296,11 +296,11 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployProcessWithTimerBoundaryEvent(timerDuration, isInterrupting, "step1", "exceptionStep", "step2");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), getUser().getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, getUser());
 
         Thread.sleep(timerDuration + 1000); // if step1 wasn't be executed the timer would triggered
 
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), getUser().getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
         assertTrue(waitProcessToFinishAndBeArchived(processInstance));
 
         // remove comments when boundary events are archived

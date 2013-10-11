@@ -87,7 +87,7 @@ public class ActivityCommandTest extends CommonAPITest {
         executeActionsAndTerminate("dataName", activityInstanceId, fieldValues, rightOperand);
 
         // Get value of updated data in connector
-        waitForUserTask("step2", processInstance.getId());
+        waitForUserTask("step2", processInstance);
         assertEquals(updatedValue + "a", getProcessAPI().getProcessDataInstance("application", processInstance.getId()).getValue());
 
         // Clean
@@ -129,7 +129,7 @@ public class ActivityCommandTest extends CommonAPITest {
         executeActionsAndTerminate("application", activityInstanceId, fieldValues, rightOperand);
 
         // check we have the other task ready and the operation was executed
-        waitForUserTask("step2", processInstance.getId());
+        waitForUserTask("step2", processInstance);
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("application", processInstance.getId());
         Assert.assertEquals("Excel", dataInstance.getValue().toString());
 

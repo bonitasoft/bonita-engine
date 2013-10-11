@@ -95,7 +95,7 @@ public class CommentTest extends CommonAPITest {
         for (int i = 0; i < 21; i++) {
             getProcessAPI().addProcessComment(pi.getId(), "myComment_" + i);
         }
-        waitForUserTaskAndExecuteIt(activityName, pi.getId(), user.getId());
+        waitForUserTaskAndExecuteIt(activityName, pi, user);
         waitForProcessToFinish(pi);
         final SearchResult<ArchivedComment> searchArchivedComments = getProcessAPI().searchArchivedComments(
                 new SearchOptionsBuilder(0, 30).filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID, pi.getId()).done());

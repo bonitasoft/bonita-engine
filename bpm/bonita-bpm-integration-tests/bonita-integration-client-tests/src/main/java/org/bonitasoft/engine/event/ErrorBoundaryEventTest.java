@@ -115,8 +115,8 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
         final FlowNodeInstance callActivity = waitForFlowNodeInExecutingState(processInstance, "callStep", false);
-        final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance.getId());
-        final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
+        final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance);
+        final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance);
         final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
         assignAndExecuteStep(calledStep1, donaBenta.getId());
 
@@ -133,7 +133,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
             }
             throw new Exception(archivedActivityInstances.toString(), e);
         }
-        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance.getId());
+        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance);
 
         assignAndExecuteStep(executionStep, donaBenta.getId());
 

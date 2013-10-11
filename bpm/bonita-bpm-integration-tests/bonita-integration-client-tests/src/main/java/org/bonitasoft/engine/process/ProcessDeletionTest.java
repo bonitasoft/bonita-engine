@@ -229,7 +229,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         assignAndExecuteStep(intermediateTask, pedro.getId());
 
         // execute root task: p3 will finish
-        waitForUserTaskAndExecuteIt(rootStepName, rootProcessInstance.getId(), pedro.getId());
+        waitForUserTaskAndExecuteIt(rootStepName, rootProcessInstance, pedro);
         waitForProcessToFinish(rootProcessInstance);
 
         // delete the processDefinition: all archived processes must be deleted
@@ -470,7 +470,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // start a process and execute it until end
         final ProcessInstance processInstanceToArchive = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(userTaskName, processInstanceToArchive.getId(), pedro.getId());
+        waitForUserTaskAndExecuteIt(userTaskName, processInstanceToArchive, pedro);
         waitForProcessToFinish(processInstanceToArchive);
 
         // start a process non completed process

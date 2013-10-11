@@ -252,7 +252,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(loopDataOutputName, process.getId());
         assertNotNull("unable to find the loop data output on the process", processDataInstance);
         final List<?> list = (List<?>) processDataInstance.getValue();
-        waitForUserTask("lastTask", process.getId());
+        waitForUserTask("lastTask", process);
         disableAndDeleteProcess(processDefinition);
         return list;
     }
@@ -429,7 +429,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = waitForUserTask("Step1");
-        waitForUserTaskAndExecuteIt("Step2", processInstance.getId(), john.getId());
+        waitForUserTaskAndExecuteIt("Step2", processInstance, john);
         waitForProcessToFinish(processInstance);
         final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1.getId());
         assertEquals(ActivityStates.ABORTED_STATE, archivedStep1.getState());
