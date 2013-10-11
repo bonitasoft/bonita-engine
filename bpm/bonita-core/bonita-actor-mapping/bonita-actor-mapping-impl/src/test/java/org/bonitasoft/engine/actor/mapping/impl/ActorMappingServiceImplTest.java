@@ -442,10 +442,14 @@ public class ActorMappingServiceImplTest {
         doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
-        // Let's call it for real:
         final SActor result = actorMappingServiceImpl.addActor(sActor);
         assertNotNull(result);
         assertEquals(sActor, result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public final void addNullActor() throws Exception {
+        actorMappingServiceImpl.addActor(null);
     }
 
     /**
