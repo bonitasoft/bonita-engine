@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.service;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +25,7 @@ import java.util.Map.Entry;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
+import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.actor.impl.ActorInstanceImpl;
@@ -194,8 +194,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UnknownElementType;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.Expression;
@@ -257,13 +255,9 @@ import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
-import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 
 /**
@@ -1286,7 +1280,7 @@ public class ModelConvertor {
         if (title != null) {
             userBuilder.setTitle(title);
         }
-        userBuilder.setCreatedBy(getCurrentUserId());
+        userBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
 
         final Long managerUserId = (Long) fields.get(UserField.MANAGER_ID);
         if (managerUserId != null) {
@@ -1384,7 +1378,7 @@ public class ModelConvertor {
         userBuilder.setIconPath(newUser.getIconPath());
         userBuilder.setJobTitle(newUser.getJobTitle());
         userBuilder.setTitle(newUser.getTitle());
-        userBuilder.setCreatedBy(newUser.getCreatedBy() == 0 ? getCurrentUserId() : newUser.getCreatedBy());
+        userBuilder.setCreatedBy(newUser.getCreatedBy() == 0 ? SessionInfos.getUserIdFromSession() : newUser.getCreatedBy());
         userBuilder.setManagerUserId(newUser.getManagerUserId());
         userBuilder.setEnabled(newUser.isEnabled());
         return userBuilder.done();
@@ -1452,7 +1446,7 @@ public class ModelConvertor {
         final long now = System.currentTimeMillis();
         final RoleBuilder roleBuilder = identityModelBuilder.getRoleBuilder();
         roleBuilder.createNewInstance();
-        roleBuilder.setCreatedBy(getCurrentUserId());
+        roleBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
         roleBuilder.setCreationDate(now).setLastUpdate(now);
         final Map<RoleField, Serializable> fields = creator.getFields();
         roleBuilder.setName((String) fields.get(RoleField.NAME));
@@ -1479,7 +1473,7 @@ public class ModelConvertor {
         final long now = System.currentTimeMillis();
         final GroupBuilder groupBuilder = identityModelBuilder.getGroupBuilder();
         groupBuilder.createNewInstance();
-        groupBuilder.setCreatedBy(getCurrentUserId());
+        groupBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
         groupBuilder.setCreationDate(now).setLastUpdate(now);
         final Map<GroupField, Serializable> fields = creator.getFields();
         groupBuilder.setName((String) fields.get(GroupField.NAME));
@@ -1839,31 +1833,6 @@ public class ModelConvertor {
                 throw new UnknownElementType(saFlowNode.getType().name());
         }
         return archiveFlowNodeInstance;
-    }
-
-    public static long getCurrentUserId() {
-        SessionAccessor sessionAccessor;
-        try {
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            return platformServiceAccessor.getSessionService().getSession(sessionAccessor.getSessionId()).getUserId();
-        } catch (final BonitaHomeNotSetException e) {
-            throw new RuntimeException(e);
-        } catch (final BonitaHomeConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (final InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (final IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (final ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        } catch (final SessionIdNotSetException e) {
-            throw new RuntimeException(e);
-        } catch (final SSessionNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static List<ConnectorInstance> toConnectorInstances(final List<SConnectorInstance> sConnectorInstances) {

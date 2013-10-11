@@ -82,9 +82,11 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -374,8 +376,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         NullCheckingUtil.checkArgsNotNull(definition);
         final ProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Process definition");
         try {
-            final long sessionId = sessionAccessor.getSessionId();
-            final SSession session = sessionService.getSession(sessionId);
+            final SSession session = getSession();
             final long tenantId = sessionAccessor.getTenantId();
             final long processId = setIdOnProcessDefinition(definition);
             // storeProcessDefinition(processId, tenantId, definition);// FIXME remove that to check the read of processes
@@ -420,6 +421,18 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             throw new SProcessDefinitionException(e);
         }
         return definition;
+    }
+
+    private SSession getSession() throws SSessionNotFoundException {
+        long sessionId;
+        try {
+            sessionId = sessionAccessor.getSessionId();
+        } catch (SessionIdNotSetException e) {
+            // system
+            return null;
+        }
+        final SSession session = sessionService.getSession(sessionId);
+        return session;
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {

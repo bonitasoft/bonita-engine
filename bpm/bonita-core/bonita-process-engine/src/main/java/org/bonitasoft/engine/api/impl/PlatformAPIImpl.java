@@ -706,7 +706,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected Long createSession(final long tenantId, final SessionService sessionService) throws SBonitaException {
-        return sessionService.createSession(tenantId, "system").getId();
+        return sessionService.createSession(tenantId, SessionService.SYSTEM).getId();
     }
 
     private void log(final PlatformServiceAccessor platformAccessor, final Exception e) {

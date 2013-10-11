@@ -43,6 +43,8 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
@@ -1452,4 +1454,47 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         return deployProcessWithDefaultTestConnector(delivery, johnUserId, builder, false);
     }
 
+    @Test
+    public void executeConnectorWithInputExpressionUsingAPI() throws Exception {
+        String definitionId = "connectorThatUseAPI";
+        String definitionVersion = "1.0";
+        byte[] connectorImplementationFile = getConnectorImplementationFile(definitionId, definitionVersion, "impl1", "1.0",
+                TestConnectorWithOutput.class.getName());
+
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithConnector", "1.12");
+        builder.addActor("actor");
+        builder.addLongData("numberOfUser", new ExpressionBuilder().createConstantLongExpression(-1));
+        ConnectorDefinitionBuilder connector = builder.addAutomaticTask("step1").addConnector("theConnector", definitionId, definitionVersion,
+                ConnectorEvent.ON_ENTER);
+
+        String script = "org.bonitasoft.engine.identity.User createUser = apiAccessor.getIdentityAPI().createUser(new org.bonitasoft.engine.identity.UserCreator(\"myUser\", \"password\"));\n";
+        script += "apiAccessor.getProcessAPI().attachDocument(processInstanceId, \"a\", \"a\", \"application/pdf\",\"test\".getBytes());";
+        script += "return apiAccessor.getIdentityAPI().getNumberOfUsers();";
+
+        connector.addInput(
+                "input1",
+                new ExpressionBuilder().createGroovyScriptExpression("script", script,
+                        Long.class.getName(), new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
+                        new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID)));
+        connector.addOutput(new OperationBuilder().createSetDataOperation("numberOfUser",
+                new ExpressionBuilder().createInputExpression("output1", Long.class.getName())));
+        builder.addUserTask("step2", "actor");
+        builder.addTransition("step1", "step2");
+
+        BusinessArchiveBuilder barBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
+        barBuilder.addConnectorImplementation(new BarResource("connector.impl", connectorImplementationFile));
+        barBuilder.addClasspathResource(new BarResource("connector.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
+        barBuilder.setProcessDefinition(builder.done());
+        ProcessDefinition processDefinition = deployAndEnableWithActor(barBuilder.done(), "actor", johnUser);
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step2", processInstance);
+        DataInstance numberOfUser = getProcessAPI().getProcessDataInstance("numberOfUser", processInstance.getId());
+        assertEquals(2l, numberOfUser.getValue());
+        SearchResult<Document> documents = getProcessAPI().searchDocuments(
+                new SearchOptionsBuilder(0, 10).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId()).done());
+        assertEquals(1, documents.getCount());
+        disableAndDeleteProcess(processDefinition);
+        getIdentityAPI().deleteUser("myUser");
+
+    }
 }

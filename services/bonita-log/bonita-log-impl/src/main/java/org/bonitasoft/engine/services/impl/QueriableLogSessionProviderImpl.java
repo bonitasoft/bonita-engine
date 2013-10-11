@@ -54,9 +54,8 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
                 localSession.set(session);
             }
         } catch (final SessionIdNotSetException e) {
-            if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
-            }
+            // system: no session
+            return null;
         } catch (final SSessionNotFoundException e) {
             if (technicalLoggerService.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                 technicalLoggerService.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
@@ -71,7 +70,7 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
         if (session != null) {
             return session.getUserName();
         }
-        return null;
+        return SessionService.SYSTEM;
     }
 
     @Override
@@ -80,7 +79,7 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
         if (session != null) {
             return session.getClusterNode();
         }
-        return null;
+        return "";
     }
 
     @Override
@@ -89,7 +88,7 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
         if (session != null) {
             return session.getProductVersion();
         }
-        return null;
+        return "";
     }
 
 }

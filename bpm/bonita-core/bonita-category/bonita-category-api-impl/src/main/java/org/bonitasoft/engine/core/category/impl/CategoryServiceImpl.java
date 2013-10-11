@@ -120,8 +120,6 @@ public class CategoryServiceImpl implements CategoryService {
             creator = getCreator();
         } catch (final SSessionNotFoundException e) {
             throw new SCategoryCreationException(e);
-        } catch (final SessionIdNotSetException e) {
-            throw new SCategoryCreationException(e);
         }
         final SCategory sCategory = categoryBuilder.createNewInstance(name, creator).setDescription(description).done();
         final InsertRecord insertRecord = new InsertRecord(sCategory);
@@ -139,8 +137,14 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    private long getCreator() throws SSessionNotFoundException, SessionIdNotSetException {
-        final SSession session = sessionService.getSession(sessionAccessor.getSessionId());
+    private long getCreator() throws SSessionNotFoundException {
+        SSession session;
+        try {
+            session = sessionService.getSession(sessionAccessor.getSessionId());
+        } catch (SessionIdNotSetException e) {
+            // no session, it is system
+            return -1;
+        }
         return session.getUserId();
     }
 

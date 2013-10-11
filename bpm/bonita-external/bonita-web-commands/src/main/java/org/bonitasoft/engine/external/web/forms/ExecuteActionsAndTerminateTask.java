@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
@@ -38,7 +39,6 @@ import org.bonitasoft.engine.operation.OperationExecutionException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.bonitasoft.engine.session.model.SSession;
 
 /**
  * @author Ruiheng Fan
@@ -125,14 +125,15 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         try {
-            final SSession session = getSession();
-            final long userId = session.getUserId();
+            SessionInfos sessionInfos = SessionInfos.getSessionInfos();
+            final long userId = sessionInfos.getUserId();
             final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
-    	    final boolean isFirstState = flowNodeInstance.getStateId() == 0;
-    	    // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
+            final boolean isFirstState = flowNodeInstance.getStateId() == 0;
+            // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
             processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, processDefinitionId, userId, userId);
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                final String message = "The user <" + session.getUserName() + "> has performed the task" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                final String message = "The user <" + sessionInfos.getUsername() + "> has performed the task"
+                        + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
                 logger.log(getClass(), TechnicalLogSeverity.INFO, message);
             }
         } catch (final SBonitaException e) {

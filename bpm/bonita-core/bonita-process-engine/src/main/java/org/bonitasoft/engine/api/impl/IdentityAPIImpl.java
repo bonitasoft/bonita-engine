@@ -1197,7 +1197,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityModelBuilder identityModelBuilder = tenantAccessor.getIdentityModelBuilder();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final long assignedBy = ModelConvertor.getCurrentUserId();
+        final long assignedBy = SessionInfos.getUserIdFromSession();
         try {
             final GetUserMembership getUserMembership = new GetUserMembership(userId, groupId, roleId, identityService);
             getUserMembership.execute();
@@ -1225,7 +1225,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final IdentityModelBuilder modelBuilder = tenantAccessor.getIdentityModelBuilder();
-        final long currentUserId = ModelConvertor.getCurrentUserId();
+        final long currentUserId = SessionInfos.getUserIdFromSession();
         try {
             final AddUserMemberships transactionContent = new AddUserMemberships(groupId, roleId, userIds, modelBuilder, identityService, currentUserId);
             transactionContent.execute();

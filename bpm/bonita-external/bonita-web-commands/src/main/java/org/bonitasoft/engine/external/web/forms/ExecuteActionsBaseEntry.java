@@ -51,11 +51,9 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
-import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
@@ -200,20 +198,6 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         } catch (final SBonitaException e) {
             throw new SProcessDefinitionNotFoundException(e);
         }
-    }
-
-    protected SSession getSession() {
-        SessionAccessor sessionAccessor = null;
-        SSession session;
-        try {
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long sessionId = sessionAccessor.getSessionId();
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            session = platformServiceAccessor.getSessionService().getSession(sessionId);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        return session;
     }
 
     protected SProcessDefinition getProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId)

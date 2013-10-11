@@ -27,7 +27,7 @@ public class TestConnectorWithOutput extends AbstractConnector {
 
     @Override
     protected void executeBusinessLogic() {
-        final String input1Value = (String) getInputParameter("input1");
+        Object input1Value = getInputParameter("input1");
         setOutputParameter("output1", input1Value);
     }
 

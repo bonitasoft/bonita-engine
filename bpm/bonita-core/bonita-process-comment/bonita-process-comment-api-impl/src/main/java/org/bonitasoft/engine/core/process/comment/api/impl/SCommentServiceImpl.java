@@ -161,8 +161,6 @@ public class SCommentServiceImpl implements SCommentService {
             throw new SCommentAddException("Imposible to create comment.", e);
         } catch (final SSessionNotFoundException e) {
             throw new SCommentAddException("Session is not found.", e);
-        } catch (final SessionIdNotSetException e) {
-            throw new SCommentAddException("Session id is not set.", e);
         }
     }
 
@@ -194,8 +192,15 @@ public class SCommentServiceImpl implements SCommentService {
         } while (sComments.size() > 0);
     }
 
-    private long getUserId() throws SSessionNotFoundException, SessionIdNotSetException {
-        final SSession session = sessionService.getSession(sessionAccessor.getSessionId());
+    private long getUserId() throws SSessionNotFoundException {
+        long sessionId;
+        try {
+            sessionId = sessionAccessor.getSessionId();
+        } catch (SessionIdNotSetException e) {
+            // system
+            return -1;
+        }
+        final SSession session = sessionService.getSession(sessionId);
         return session.getUserId();
     }
 

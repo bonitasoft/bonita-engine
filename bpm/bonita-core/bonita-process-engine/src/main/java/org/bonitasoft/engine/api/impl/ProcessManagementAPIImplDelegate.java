@@ -11,7 +11,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -21,7 +20,6 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 // Uncomment the "implements" when this delegate implements all the methods.
@@ -60,8 +58,9 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
 
         final File processFolder = new File(file, String.valueOf(processDefinitionId));
         IOUtil.deleteDir(processFolder);
-        if(logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + getUserNameFromSession() + "> has deleted process with id <" + processDefinitionId + ">");
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has deleted process with id <"
+                    + processDefinitionId + ">");
         }
     }
 
@@ -90,25 +89,8 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final TransactionContent transactionContent = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService, logger,
-                getUserNameFromSession());
+                SessionInfos.getUserNameFromSession());
         transactionContent.execute();
-    }
-
-    private SSession getSession() {
-        SSession session;
-        try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long sessionId = sessionAccessor.getSessionId();
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            session = platformServiceAccessor.getSessionService().getSession(sessionId);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        return session;
-    }
-
-    private String getUserNameFromSession() {
-        return getSession().getUserName();
     }
 
 }
