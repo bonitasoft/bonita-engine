@@ -85,6 +85,7 @@
 			FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl
 			WHERE containerId = :containerId
 			AND containerType = :containerType
+			AND name = sa.name
 			GROUP BY name
 		)
 		ORDER BY sa.archiveDate DESC
