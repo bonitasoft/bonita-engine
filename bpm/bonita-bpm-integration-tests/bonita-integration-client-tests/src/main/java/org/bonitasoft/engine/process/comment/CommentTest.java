@@ -87,7 +87,7 @@ public class CommentTest extends CommonAPITest {
         loginWith(USERNAME, PASSWORD);
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("allCommentsAreArchived", "0.2");
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        String activityName = "maTache";
+        final String activityName = "maTache";
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask(activityName, ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
 
@@ -95,9 +95,9 @@ public class CommentTest extends CommonAPITest {
         for (int i = 0; i < 21; i++) {
             getProcessAPI().addProcessComment(pi.getId(), "myComment_" + i);
         }
-        waitForUserTaskAndExecuteIt(activityName, pi, user.getId());
+        waitForUserTaskAndExecuteIt(activityName, pi.getId(), user.getId());
         waitForProcessToFinish(pi);
-        SearchResult<ArchivedComment> searchArchivedComments = getProcessAPI().searchArchivedComments(
+        final SearchResult<ArchivedComment> searchArchivedComments = getProcessAPI().searchArchivedComments(
                 new SearchOptionsBuilder(0, 30).filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID, pi.getId()).done());
         assertTrue("At least 21 comments should have been retrieved (+ possible automatic comments)", searchArchivedComments.getCount() >= 21);
 

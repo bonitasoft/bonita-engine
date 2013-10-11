@@ -158,7 +158,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         final int timerDuration = 6000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, john.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), john.getId());
         waitForProcessToFinish(processInstance);
         Thread.sleep(timerDuration);
 
@@ -232,7 +232,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, john.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess.getId());

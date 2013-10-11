@@ -268,10 +268,10 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         // throw error
         waitForUserTask("step1", processInstance1);
-        waitForUserTaskAndExecuteIt("step2", processInstance1, john.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance1.getId(), john.getId());
 
         waitForUserTask("step1", processInstance2);
-        waitForUserTaskAndExecuteIt("step2", processInstance2, john.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance2.getId(), john.getId());
 
         waitForUserTask("subStep", processInstance1);
         waitForUserTask("subStep", processInstance2);
@@ -287,7 +287,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         final ProcessDefinition process = deployAndEnableProcessWithErrorEventSubProcessAndData(errorCode, errorCode, subProcStartEventName);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
         waitForUserTask("step1", processInstance);
-        waitForUserTaskAndExecuteIt("step2", processInstance, john.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
 
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
@@ -314,7 +314,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         final ProcessDefinition process = deployAndEnableProcWithErrorEvSubProcAndDataOnlyInRoot(errorCode, subProcStartEventName, rootUserTaskName,
                 subProcUserTaskName, dataName, dataValue);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance, john.getId());
+        waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance.getId(), john.getId());
 
         final ActivityInstance subStep = waitForUserTask(subProcUserTaskName, processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
@@ -342,7 +342,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         final ProcessDefinition process = deployAndEnableProcWithErrorEvSubProcAndDataOnlyInSubProc(errorCode, subProcStartEventName, rootUserTaskName,
                 subProcUserTaskName, dataName, dataValue);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance, john.getId());
+        waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance.getId(), john.getId());
 
         final ActivityInstance subStep = waitForUserTask(subProcUserTaskName, processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
@@ -398,7 +398,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
                 targetProcess.getVersion());
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        waitForUserTaskAndExecuteIt("step2", processInstance, john.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
 
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
@@ -409,7 +409,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, john.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess.getId());

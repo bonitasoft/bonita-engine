@@ -501,7 +501,7 @@ public class OperationTest extends CommonAPITest {
         builder.setProcessDefinition(designProcessDefinition.done());
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), "Workers", john);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, john.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), john.getId());
         waitForUserTask("step2", startProcess);
         disableAndDeleteProcess(processDefinition);
     }

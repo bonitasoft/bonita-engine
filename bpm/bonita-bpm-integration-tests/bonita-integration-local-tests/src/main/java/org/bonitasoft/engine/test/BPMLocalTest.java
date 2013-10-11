@@ -499,9 +499,9 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final ProcessInstance pi1 = getProcessAPI().startProcess(p1.getId());
         final ProcessInstance pi2 = getProcessAPI().startProcess(p2.getId());
         final ProcessInstance pi3 = getProcessAPI().startProcess(p3.getId());
-        waitForUserTaskAndExecuteIt("step1", pi1, john.getId());
-        waitForUserTaskAndExecuteIt("step1", pi2, john.getId());
-        waitForUserTaskAndExecuteIt("step1", pi3, john.getId());
+        waitForUserTaskAndExecuteIt("step1", pi1.getId(), john.getId());
+        waitForUserTaskAndExecuteIt("step1", pi2.getId(), john.getId());
+        waitForUserTaskAndExecuteIt("step1", pi3.getId(), john.getId());
         System.out.println("executed step1");
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();

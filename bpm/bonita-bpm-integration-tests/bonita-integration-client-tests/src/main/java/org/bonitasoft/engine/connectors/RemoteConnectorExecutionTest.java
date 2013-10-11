@@ -166,7 +166,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition, false);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
-        waitForUserTaskAndExecuteIt("step0", startProcess, johnUserId);
+        waitForUserTaskAndExecuteIt("step0", startProcess.getId(), johnUserId);
 
         waitForUserTask("step2", startProcess);
 
@@ -190,7 +190,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for the first multi-instance and execute it: the connector must be executed
-        waitForUserTaskAndExecuteIt(multiTaskName, processInstance, johnUserId);
+        waitForUserTaskAndExecuteIt(multiTaskName, processInstance.getId(), johnUserId);
 
         // wait for the second multi-instance
         final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance);
@@ -216,9 +216,8 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    private ProcessDefinition deployProcessWithConnectorOnMutiInstance(final String localDataName, final String globalDataName,
-            final String localDataValue, final String userTaskName, final String multiTaskName, final String outputValue, final int nbOfInstances)
-            throws BonitaException, IOException {
+    private ProcessDefinition deployProcessWithConnectorOnMutiInstance(final String localDataName, final String globalDataName, final String localDataValue,
+            final String userTaskName, final String multiTaskName, final String outputValue, final int nbOfInstances) throws BonitaException, IOException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("connectorOnMultiInstance", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addShortTextData(globalDataName, new ExpressionBuilder().createConstantStringExpression("initial"));
@@ -276,7 +275,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition, false);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
-        waitForUserTaskAndExecuteIt("step0", startProcess, johnUserId);
+        waitForUserTaskAndExecuteIt("step0", startProcess.getId(), johnUserId);
         waitForUserTask("step2", startProcess);
 
         final String value = (String) getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue();
@@ -1112,7 +1111,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // start check value1,stop, check still value1, start, check value 2, check step2 is active
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector("actor", johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, johnUser.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), johnUser.getId());
         final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
@@ -1269,11 +1268,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
         final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor("actor")
-                // .addData(
-                // "data",
-                // "org.bonitasoft.dfgdfg.Restaurant",
-                // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
-                // "org.bonitasoft.dfgdfg.Restaurant"))
+        // .addData(
+        // "data",
+        // "org.bonitasoft.dfgdfg.Restaurant",
+        // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
+        // "org.bonitasoft.dfgdfg.Restaurant"))
                 .addUserTask("step1", "actor");
         addUserTask.addData("dataActivity", java.lang.Object.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));
@@ -1406,7 +1405,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         userIds.add(jack.getId());
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, userIds, designProcessDefinition, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, jack.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), jack.getId());
         waitForUserTask("step2", processInstance);
 
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
@@ -1425,7 +1424,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcWithConnectorEngineExecContext(dataName, step1, step2);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(step1, processInstance, johnUserId);
+        waitForUserTaskAndExecuteIt(step1, processInstance.getId(), johnUserId);
         waitForUserTask(step2, processInstance);
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());

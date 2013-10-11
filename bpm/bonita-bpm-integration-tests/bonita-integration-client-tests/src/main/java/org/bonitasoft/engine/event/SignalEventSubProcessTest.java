@@ -162,10 +162,10 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         waitForFlowNodeInExecutingState(processInstance, SUB_PROCESS_NAME, false);
         final ActivityInstance subStep = waitForUserTask(SUB_STEP, processInstance);
 
-        Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
-        String dataName = "content";
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
+        final String dataName = "content";
         expressions.put(new ExpressionBuilder().createDataExpression(dataName, String.class.getName()), new HashMap<String, Serializable>(0));
-        Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStep.getId(), expressions);
+        final Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStep.getId(), expressions);
         assertEquals("childActivityVar", expressionResults.get(dataName));
 
         disableAndDeleteProcess(process.getId());
@@ -319,7 +319,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, john.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess.getId());

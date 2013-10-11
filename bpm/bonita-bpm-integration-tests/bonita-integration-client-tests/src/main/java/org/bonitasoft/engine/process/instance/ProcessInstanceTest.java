@@ -563,12 +563,12 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
         // Start process instance first time, and complete it
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("initTask1", processInstance, pedro.getId());
+        waitForUserTaskAndExecuteIt("initTask1", processInstance.getId(), pedro.getId());
         waitForProcessToFinish(processInstance);
 
         // Start process instance second time
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("initTask1", processInstance2, pedro.getId());
+        waitForUserTaskAndExecuteIt("initTask1", processInstance2.getId(), pedro.getId());
         waitForProcessToFinish(processInstance2);
 
         disableAndDeleteProcess(processDefinition);

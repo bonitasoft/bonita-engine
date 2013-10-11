@@ -648,7 +648,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         // execute the process
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(taskName, processInstance, userId);
+        waitForUserTaskAndExecuteIt(taskName, processInstance.getId(), userId);
         waitForProcessToFinish(processInstance);
 
         // check there are no connector instances
@@ -950,44 +950,41 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
     @Test
     public void executeExpressionAtProcessInstantiationOnProcessInInitializing() throws Exception {
         // will block the connector
-        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithBlockingConnector", "1.0");
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithBlockingConnector", "1.0");
         processBuilder.addConnector("myConnector", "blocking-connector", "1.0", ConnectorEvent.ON_ENTER);
         processBuilder.addData("a", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("avalue"));
         processBuilder.addData("b", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("bvalue"));
         processBuilder.addData("c", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("cvalue"));
-        AutomaticTaskDefinitionBuilder addAutomaticTask = processBuilder.addAutomaticTask("step1");
+        final AutomaticTaskDefinitionBuilder addAutomaticTask = processBuilder.addAutomaticTask("step1");
         addAutomaticTask.addOperation(new OperationBuilder().createSetDataOperation("a", new ExpressionBuilder().createConstantStringExpression("changed")));
         addAutomaticTask.addOperation(new OperationBuilder().createSetDataOperation("b", new ExpressionBuilder().createConstantStringExpression("changed")));
         addAutomaticTask.addOperation(new OperationBuilder().createSetDataOperation("c", new ExpressionBuilder().createConstantStringExpression("changed")));
-        BusinessArchive businessArchive = new BusinessArchiveBuilder()
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder()
                 .createNewBusinessArchive()
                 .setProcessDefinition(processBuilder.done())
                 .addConnectorImplementation(
                         new BarResource("blocking-connector.impl", getConnectorImplementationFile("blocking-connector", "1.0", "blocking-connector-impl",
-                                "1.0",
-                                BlockingConnector.class.getName()))).done();
+                                "1.0", BlockingConnector.class.getName()))).done();
 
-        ProcessDefinition processDefinition = deployAndEnableProcess(businessArchive);
+        final ProcessDefinition processDefinition = deployAndEnableProcess(businessArchive);
 
         BlockingConnector.semaphore.acquire();
-        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
-        expressions.put(new ExpressionBuilder().createGroovyScriptExpression("ascripte", "a+b+c", String.class.getName(),
-                new ExpressionBuilder().createDataExpression("a", String.class.getName()),
-                new ExpressionBuilder().createDataExpression("b", String.class.getName()),
-                new ExpressionBuilder().createDataExpression("c", String.class.getName())),
-                Collections.<String, Serializable> emptyMap());
-        expressions.put(new ExpressionBuilder().createDataExpression("a", String.class.getName()),
-                Collections.<String, Serializable> emptyMap());
-        Map<String, Serializable> evaluateExpressionsAtProcessInstanciation = getProcessAPI().evaluateExpressionsAtProcessInstanciation(
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        expressions.put(
+                new ExpressionBuilder().createGroovyScriptExpression("ascripte", "a+b+c", String.class.getName(),
+                        new ExpressionBuilder().createDataExpression("a", String.class.getName()),
+                        new ExpressionBuilder().createDataExpression("b", String.class.getName()),
+                        new ExpressionBuilder().createDataExpression("c", String.class.getName())), Collections.<String, Serializable> emptyMap());
+        expressions.put(new ExpressionBuilder().createDataExpression("a", String.class.getName()), Collections.<String, Serializable> emptyMap());
+        final Map<String, Serializable> evaluateExpressionsAtProcessInstanciation = getProcessAPI().evaluateExpressionsAtProcessInstanciation(
                 processInstance.getId(), expressions);
         assertEquals("avaluebvaluecvalue", evaluateExpressionsAtProcessInstanciation.get("ascripte"));
         assertEquals("avalue", evaluateExpressionsAtProcessInstanciation.get("a"));
 
         BlockingConnector.semaphore.release();
         waitForProcessToFinish(processInstance.getId());
-        getProcessAPI().evaluateExpressionsAtProcessInstanciation(
-                processInstance.getId(), expressions);
+        getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions);
         assertEquals("avaluebvaluecvalue", evaluateExpressionsAtProcessInstanciation.get("ascripte"));
         assertEquals("avalue", evaluateExpressionsAtProcessInstanciation.get("a"));
 

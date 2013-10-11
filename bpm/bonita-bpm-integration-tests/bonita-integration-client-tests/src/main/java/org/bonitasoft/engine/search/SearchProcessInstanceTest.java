@@ -1277,7 +1277,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         getProcessAPI().sendSignal(signalName);
 
         // execute user task and wait the parent process to finish (state aborted)
-        waitForUserTaskAndExecuteIt(subProcTaskName, procInstWithEventSubProc, user.getId());
+        waitForUserTaskAndExecuteIt(subProcTaskName, procInstWithEventSubProc.getId(), user.getId());
         waitForProcessToFinish(procInstWithEventSubProc, TestStates.getAbortedState());
         return procWithEventSubProcess;
     }
@@ -1290,7 +1290,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessInstance processInstanceToComplete = getProcessAPI().startProcess(simpleProcess.getId());
 
         // execute user task and wait process to finish: the process will be in the state completed
-        waitForUserTaskAndExecuteIt(userTaskName, processInstanceToComplete, user.getId());
+        waitForUserTaskAndExecuteIt(userTaskName, processInstanceToComplete.getId(), user.getId());
         waitForProcessToFinish(processInstanceToComplete);
 
         // start another instance and cancel it: the process will be in the state canceled

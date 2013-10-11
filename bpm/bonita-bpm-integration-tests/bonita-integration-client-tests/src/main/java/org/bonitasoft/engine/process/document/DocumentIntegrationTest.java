@@ -24,6 +24,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.DocumentBuilder;
 import org.bonitasoft.engine.bpm.process.impl.DocumentDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -1232,6 +1234,66 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final List<Document> lastVersionOfDocuments = getProcessAPI().getLastVersionOfDocuments(processInstance.getId(), 0, 10, documentCriterion);
         assertThat("the order was not respected for " + documentCriterion, lastVersionOfDocuments,
                 nameAre("textFile" + one, "textFile" + two, "textFile" + three, "textFile" + four, "textFile" + five));
+    }
+
+    @Test
+    public void getMIDocumentOnProcess() throws Exception {
+        final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
+        final ProcessDefinitionBuilder miBuilder = new ProcessDefinitionBuilder().createNewInstance("MI", "0.8");
+        miBuilder.addData("urls", List.class.getName(),
+                expressionBuilder.createGroovyScriptExpression("urls", "[\"http://someurl\", \"http://someurl1\", \"http://someurl2\"]", List.class.getName()));
+        final CallActivityBuilder callActivityBuilder = miBuilder.addCallActivity("mi", expressionBuilder.createConstantStringExpression("DocSubProcess"),
+                expressionBuilder.createConstantStringExpression("0.4"));
+        callActivityBuilder.addShortTextData("url", null);
+        callActivityBuilder
+                .addDataInputOperation(
+                        new OperationBuilder().createSetDataOperation("url", expressionBuilder.createDataExpression("url", String.class.getName())))
+                .addMultiInstance(false, "urls")
+                .addDataInputItemRef("url")
+                .addCompletionCondition(
+                        expressionBuilder.createGroovyScriptExpression("urls", "numberOfCompletedInstances == urls.size();", Boolean.class.getName(),
+                                expressionBuilder.createDataExpression("urls", List.class.getName())));
+
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("DocSubProcess", "0.4");
+        builder.addDocumentDefinition("caseDocument").addUrl("toto");
+        builder.addShortTextData("url", null);
+        builder.addActor(ACTOR);
+        builder.addUserTask("step1", ACTOR)
+                .addOperation(
+                        new LeftOperandBuilder().createNewInstance("caseDocument").done(),
+                        OperatorType.DOCUMENT_CREATE_UPDATE,
+                        "=",
+                        null,
+                        expressionBuilder
+                                .createGroovyScriptExpression(
+                                        "addDocVersion",
+                                        "import org.bonitasoft.engine.bpm.document.Document;import org.bonitasoft.engine.bpm.document.Document;import org.bonitasoft.engine.bpm.document.DocumentValue;return new DocumentValue(url);",
+                                        DocumentValue.class.getName(), expressionBuilder.createDataExpression("url", String.class.getName())));
+        builder.addUserTask("step2", ACTOR).addTransition("step1", "step2");
+        final ProcessDefinition docDefinition = deployAndEnableWithActor(builder.done(), ACTOR, user);
+        final ProcessDefinition miDefinition = deployAndEnableProcess(miBuilder.done());
+        getProcessAPI().startProcess(miDefinition.getId());
+
+        for (int i = 0; i < 3; i++) {
+            final HumanTaskInstance userTask = waitForUserTask("step1");
+            getProcessAPI().assignUserTask(userTask.getId(), user.getId());
+            getProcessAPI().executeFlowNode(userTask.getId());
+        }
+
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(DocumentsSearchDescriptor.DOCUMENT_URL, Order.ASC);
+        final SearchResult<Document> searchDocuments = getProcessAPI().searchDocuments(searchOptionsBuilder.done());
+        assertEquals(3, searchDocuments.getCount());
+        final List<Document> documents = searchDocuments.getResult();
+        final List<String> urls = new ArrayList<String>();
+        urls.add(documents.get(0).getUrl());
+        urls.add(documents.get(1).getUrl());
+        urls.add(documents.get(2).getUrl());
+
+        assertEquals(Arrays.asList("http://someurl", "http://someurl1", "http://someurl2"), urls);
+
+        disableAndDeleteProcess(miDefinition);
+        disableAndDeleteProcess(docDefinition);
     }
 
 }

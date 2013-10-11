@@ -1978,7 +1978,7 @@ public interface ProcessRuntimeAPI {
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @throws ArchivedDataNotFoundException
-     *             if the specified data cannot be found.
+     *             If the specified data cannot be found.
      * @since 6.1
      */
     ArchivedDataInstance getArchivedProcessDataInstance(String dataName, long processInstanceId) throws ArchivedDataNotFoundException;
@@ -1994,13 +1994,13 @@ public interface ProcessRuntimeAPI {
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @throws ArchivedDataNotFoundException
-     *             if the specified data cannot be found
+     *             If the specified data cannot be found
      * @since 6.1
      */
     ArchivedDataInstance getArchivedActivityDataInstance(String dataName, long activityInstanceId) throws ArchivedDataNotFoundException;
 
     /**
-     * Lists the last archived data instances of the specified process instance.
+     * Lists the last archived instances of data of the specified process instance.
      * 
      * @param processInstanceId
      *            the identifier of the process instance
@@ -2012,13 +2012,13 @@ public interface ProcessRuntimeAPI {
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @throws RetrieveException
-     *             If an exception occurs during the archived data retrieving
+     *             If an exception occurs while retrieving the archived instances of data
      * @since 6.1
      */
     List<ArchivedDataInstance> getArchivedProcessDataInstances(long processInstanceId, int startIndex, int maxResults);
 
     /**
-     * Lists the last archived data instances of the specified activity instance.
+     * Lists the last archived instances of data of the specified activity instance.
      * 
      * @param activityInstanceId
      *            the identifier of the activity instance
@@ -2030,7 +2030,7 @@ public interface ProcessRuntimeAPI {
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @throws RetrieveException
-     *             If an exception occurs during the archived data retrieving
+     *             If an exception occurs while retrieving the archived instances of data
      * @since 6.1
      */
     List<ArchivedDataInstance> getArchivedActivityDataInstances(long activityInstanceId, int startIndex, int maxResults);
@@ -2049,7 +2049,7 @@ public interface ProcessRuntimeAPI {
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @throws RetrieveException
-     *             If an exception occurs during the user retrieving
+     *             If an exception occurs while retrieving the users
      * @since 6.1
      */
     List<User> getPossibleUsersOfPendingHumanTask(long humanTaskInstanceId, int startIndex, int maxResults);

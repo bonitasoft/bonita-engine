@@ -311,7 +311,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(processDefinition);
     }
@@ -656,10 +656,10 @@ public class GatewayExecutionTest extends CommonAPITest {
         // send signal to trigger boundary
         getProcessAPI().sendSignal("bip");
         // wait and execute exceptionStep
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user.getId());
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance.getId(), user.getId());
 
         // step3 should be ready
-        waitForUserTaskAndExecuteIt("step3", processInstance, user.getId());
+        waitForUserTaskAndExecuteIt("step3", processInstance.getId(), user.getId());
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }

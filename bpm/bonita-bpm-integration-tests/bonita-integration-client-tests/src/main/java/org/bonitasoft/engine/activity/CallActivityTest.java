@@ -405,7 +405,7 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         // execute process until step1
-        waitForUserTaskAndExecuteIt("tStep1", callingProcessInstance, cebolinha.getId());
+        waitForUserTaskAndExecuteIt("tStep1", callingProcessInstance.getId(), cebolinha.getId());
         waitForUserTask("step1", callingProcessInstance);
 
         /*
@@ -982,9 +982,9 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessDefinition callingProcessDefinition = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
-        ActivityInstance userTask = waitForUserTask("tStep1", callingProcessInstance);
+        final ActivityInstance userTask = waitForUserTask("tStep1", callingProcessInstance);
 
-        long processDefinitionId = getProcessAPI().getProcessDefinitionIdFromActivityInstanceId(userTask.getId());
+        final long processDefinitionId = getProcessAPI().getProcessDefinitionIdFromActivityInstanceId(userTask.getId());
         assertEquals(targetProcessDefinition.getId(), processDefinitionId);
 
         disableAndDeleteProcess(callingProcessDefinition);

@@ -105,31 +105,31 @@ public class EvaluateExpressionTest extends CommonAPITest {
         fieldValues.put("field_string", "Excel");
 
         final List<Expression> dateDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("dateData", Date.class.getName()));
-        final Expression dateExpression = new ExpressionBuilder()
-                .createGroovyScriptExpression("DateScript", "dateData.toString() + \"plop\"", String.class.getName(), dateDependencies);
+        final Expression dateExpression = new ExpressionBuilder().createGroovyScriptExpression("DateScript", "dateData.toString() + \"plop\"",
+                String.class.getName(), dateDependencies);
 
         final List<Expression> longDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("longData", Long.class.getName()));
-        final Expression longExpression = new ExpressionBuilder()
-                .createGroovyScriptExpression("LongScript", "String.valueOf(longData)+ \"plop\"", String.class.getName(), longDependencies);
+        final Expression longExpression = new ExpressionBuilder().createGroovyScriptExpression("LongScript", "String.valueOf(longData)+ \"plop\"",
+                String.class.getName(), longDependencies);
 
         final List<Expression> doubleDependencies = Collections
                 .singletonList(new ExpressionBuilder().createDataExpression("doubleData", Double.class.getName()));
-        final Expression doubleExpression = new ExpressionBuilder()
-                .createGroovyScriptExpression("DoubleScript", "String.valueOf(doubleData) + \"plop\"", String.class.getName(), doubleDependencies);
+        final Expression doubleExpression = new ExpressionBuilder().createGroovyScriptExpression("DoubleScript", "String.valueOf(doubleData) + \"plop\"",
+                String.class.getName(), doubleDependencies);
 
-        final List<Expression> booleanDependencies = Collections
-                .singletonList(new ExpressionBuilder().createDataExpression("booleanData", Boolean.class.getName()));
-        final Expression booleanExpression = new ExpressionBuilder()
-                .createGroovyScriptExpression("BooleanScript", "booleanData && false", Boolean.class.getName(), booleanDependencies);
+        final List<Expression> booleanDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("booleanData",
+                Boolean.class.getName()));
+        final Expression booleanExpression = new ExpressionBuilder().createGroovyScriptExpression("BooleanScript", "booleanData && false",
+                Boolean.class.getName(), booleanDependencies);
 
         final List<Expression> floatDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("floatData", Float.class.getName()));
-        final Expression floatExpression = new ExpressionBuilder()
-                .createGroovyScriptExpression("FloatScript", "String.valueOf(floatData) + \"plop\"", String.class.getName(), floatDependencies);
+        final Expression floatExpression = new ExpressionBuilder().createGroovyScriptExpression("FloatScript", "String.valueOf(floatData) + \"plop\"",
+                String.class.getName(), floatDependencies);
 
-        final List<Expression> integerDependencies = Collections
-                .singletonList(new ExpressionBuilder().createDataExpression("integerData", Integer.class.getName()));
-        final Expression integerExpression = new ExpressionBuilder()
-                .createGroovyScriptExpression("IntegerScript", "String.valueOf(integerData) + \"plop\"", String.class.getName(), integerDependencies);
+        final List<Expression> integerDependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("integerData",
+                Integer.class.getName()));
+        final Expression integerExpression = new ExpressionBuilder().createGroovyScriptExpression("IntegerScript", "String.valueOf(integerData) + \"plop\"",
+                String.class.getName(), integerDependencies);
 
         expressions = new HashMap<Expression, Map<String, Serializable>>();
         expressions.put(stringExpression, fieldValues);
@@ -228,7 +228,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed activity" }, story = "Evaluate an expression on completed activity instance.", jira = "")
     @Test
     public void evaluateExpressionsOnCompletedActivityInstance() throws Exception {
-        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
+        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(userTaskInstance.getId(), expressions);
         Assert.assertEquals("Word-Excel", result.get("StringScript"));
         Assert.assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
@@ -248,8 +248,8 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed process instance" }, story = "Evaluate an expression on completed process instance.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnCompletedProcessInstance() throws Exception {
-        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
-        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance, user);
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
+        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance.getId(), user);
         waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
@@ -265,9 +265,9 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed process instance", "Updated data" }, story = "Evaluate an expression on completed process instance with variable update.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnCompletedProcessInstanceAfterVariableUpdate() throws Exception {
-        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Plop");
-        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance, user);
+        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance.getId(), user);
         waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
@@ -305,7 +305,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "taskAssigneeId" }, story = "Evaluate engine constant expression taskAssigneeID.", jira = "ENGINE-1256")
     @Test
     public void evaluateAssigneeId() throws Exception {
-        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
+        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
 
         final Expression taskAssigneeExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.TASK_ASSIGNEE_ID);
         final Expression engineExecContextExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.ENGINE_EXECUTION_CONTEXT);
@@ -321,7 +321,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance", "Initial value" }, story = "Evalute an expression on process intance with initial values.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnProcessInstanceWithInitialValues() throws Exception {
-        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Excel");
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
@@ -338,7 +338,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance", "Current value" }, story = "Evalute an expression on process intance with current values.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnProcessInstanceWithCurrentValues() throws Exception {
-        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Excel");
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);

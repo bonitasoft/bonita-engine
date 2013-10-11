@@ -770,8 +770,7 @@ public class APITestUtil {
 
     @Deprecated
     public void waitForCompletedArchivedStep(final String value, final long id, final String displayName, final String displayDescription) throws Exception {
-        final WaitForCompletedArchivedStep waitUntil = new WaitForCompletedArchivedStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, value, id,
-                getProcessAPI());
+        final WaitForCompletedArchivedStep waitUntil = new WaitForCompletedArchivedStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, value, id, getProcessAPI());
         assertTrue(waitUntil.waitUntil());
         final ArchivedHumanTaskInstance saUserTaskInstance = waitUntil.getArchivedTask();
         assertEquals(displayName, saUserTaskInstance.getDisplayName());
@@ -873,14 +872,14 @@ public class APITestUtil {
         return getFlowNodeInstance(activityId);
     }
 
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception {
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstance);
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final long processInstanceId, final long userId) throws Exception {
+        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstanceId, DEFAULT_TIMEOUT);
         assignAndExecuteStep(humanTaskInstance, userId);
         return humanTaskInstance;
     }
 
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
-        return waitForUserTaskAndExecuteIt(taskName, processInstance, user.getId());
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final long processInstanceId, final User user) throws Exception {
+        return waitForUserTaskAndExecuteIt(taskName, processInstanceId, user.getId());
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception,
@@ -1327,8 +1326,8 @@ public class APITestUtil {
 
     @Deprecated
     public CheckNbOfProcessInstances checkNbOfProcessInstances(final int nbOfProcInst) throws Exception {
-        final CheckNbOfProcessInstances checkNbOfProcessInstances = new CheckNbOfProcessInstances(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT,
-                nbOfProcInst, getProcessAPI());
+        final CheckNbOfProcessInstances checkNbOfProcessInstances = new CheckNbOfProcessInstances(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbOfProcInst,
+                getProcessAPI());
         assertTrue(checkNbOfProcessInstances.waitUntil());
         return checkNbOfProcessInstances;
     }
@@ -1635,7 +1634,7 @@ public class APITestUtil {
 
     protected byte[] getConnectorImplementationFile(final String definitionId, final String definitionVersion, final String implementationId,
             final String implementationVersion, final String implementationClassname) {
-        StringBuilder stb = new StringBuilder();
+        final StringBuilder stb = new StringBuilder();
         stb.append("<connectorImplementation>");
         stb.append("");
         stb.append("<definitionId>" + definitionId + "</definitionId>");

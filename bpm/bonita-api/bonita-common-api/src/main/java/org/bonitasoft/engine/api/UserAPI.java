@@ -195,15 +195,15 @@ public interface UserAPI {
     User getUserByUserName(String userName) throws UserNotFoundException;
 
     /**
-     * Retrieves the user with his/her professional data.
+     * Retrieves the professional details of the user.
      * 
      * @param userId
      *            the identifier of the user
-     * @return the user
+     * @return the user and the professional details
      * @throws UserNotFoundException
-     *             If the user identifier does not refer to an existing user or the user identifier equals to the technical user identifier (-1)
+     *             If the user identifier does not refer to an existing user, or is -1 (the technical user identifier)
      * @throws RetrieveException
-     *             If an exception occurs during the user retrieving
+     *             If an exception occurs while retrieving the user
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.1

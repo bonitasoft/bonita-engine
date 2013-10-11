@@ -116,7 +116,7 @@ public class EndEventTest extends CommonAPITest {
         builder.addTransition("step1", "stop");
         final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(process);
     }
@@ -135,7 +135,7 @@ public class EndEventTest extends CommonAPITest {
         final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess);
-        waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         waitForArchivedActivity(userTask.getId(), TestStates.getAbortedState());
@@ -158,7 +158,7 @@ public class EndEventTest extends CommonAPITest {
         final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess);
-        waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         waitForArchivedActivity(userTask.getId(), TestStates.getAbortedState());
@@ -182,7 +182,7 @@ public class EndEventTest extends CommonAPITest {
         final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         checkNbOfHumanTasks(14);
-        waitForUserTaskAndExecuteIt("step1", startProcess, user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(process);

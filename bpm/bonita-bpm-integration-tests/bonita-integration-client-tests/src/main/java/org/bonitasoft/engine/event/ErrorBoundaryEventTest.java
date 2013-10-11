@@ -189,7 +189,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
 
         waitForArchivedActivity(calledStep2.getId(), TestStates.getAbortedState());
         // if there are no catch error able to handle the thrown error, the throw error event has the same behavior as a terminate event.
-        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), donaBenta.getId());
 
         waitForProcessToFinish(processInstance);
 
@@ -261,7 +261,7 @@ public class ErrorBoundaryEventTest extends CommonAPITest {
         assignAndExecuteStep(executionStep.getId(), donaBenta.getId());
         waitForProcessToFinish(calledProcessInstanceL1);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), donaBenta.getId());
         waitForProcessToFinish(processInstance);
 
         waitForArchivedActivity(callActivityL1.getId(), TestStates.getAbortedState());

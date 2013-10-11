@@ -1645,10 +1645,11 @@ public interface ProcessManagementAPI {
     /**
      * Lists the possible users (candidates) of the specified human task definition.
      * <b>
-     * If the task contains a user filter, this one is not executed.
+     * If the task contains a user filter, it is not executed.
      * Users are ordered by user name.
-     * If the task or the process do not exist the result will be an empty list.
-     * It is the same if the flow node is not a human task.
+     * An empty list is returned if:
+     * - the task or the process does not exist
+     * - the flow node is not a human task
      * 
      * @param processDefinitionId
      *            the identifier of process definition
@@ -1657,12 +1658,12 @@ public interface ProcessManagementAPI {
      * @param startIndex
      *            the start index
      * @param maxResults
-     *            the list of users.
+     *            the list of users
      * @return the list of users.
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @throws RetrieveException
-     *             If an exception occurs during the user retrieving
+     *             If an exception occurs while retrieving the users
      * @since 6.1
      */
     List<User> getPossibleUsersOfHumanTask(long processDefinitionId, String humanTaskName, int startIndex, int maxResults);

@@ -569,7 +569,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         assignAndExecuteStep(step1, user.getId());
-        waitForUserTaskAndExecuteIt("step2", processInstance, user.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), user.getId());
         waitForUserTask("step3", processInstance);
 
         final SearchResult<Comment> searchResult0 = getProcessAPI().searchComments(new SearchOptionsBuilder(0, 5).done());
@@ -641,7 +641,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
-        waitForUserTaskAndExecuteIt("step", processInstance, matti.getId());
+        waitForUserTaskAndExecuteIt("step", processInstance.getId(), matti.getId());
         waitForProcessToFinish(processInstance);
 
         try {

@@ -125,11 +125,11 @@ public class MessageEventSubProcessTest extends EventsAPITest {
     @Test
     public void messageEventSubProcessTransmitData() throws Exception {
         // create a process with a user step and an event subprocess that start with a start message event having an operation updating the data
-        ProcessDefinitionBuilder receiveProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
+        final ProcessDefinitionBuilder receiveProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         receiveProcessBuilder.addActor(ACTOR_NAME);
         receiveProcessBuilder.addShortTextData("aData", new ExpressionBuilder().createConstantStringExpression("defaultValue"));
         receiveProcessBuilder.addUserTask("waitHere", ACTOR_NAME);
-        SubProcessDefinitionBuilder subProcessBuilder = receiveProcessBuilder.addSubProcess("startWithMessage", true).getSubProcessBuilder();
+        final SubProcessDefinitionBuilder subProcessBuilder = receiveProcessBuilder.addSubProcess("startWithMessage", true).getSubProcessBuilder();
         subProcessBuilder.addUserTask("stepInSubProcess", ACTOR_NAME);
         subProcessBuilder
                 .addStartEvent("start")
@@ -137,21 +137,21 @@ public class MessageEventSubProcessTest extends EventsAPITest {
                 .addOperation(
                         new OperationBuilder().createSetDataOperation("aData", new ExpressionBuilder().createDataExpression("msgData", String.class.getName())));
         subProcessBuilder.addTransition("start", "stepInSubProcess");
-        ProcessDefinition receiveProcess = deployAndEnableWithActor(receiveProcessBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition receiveProcess = deployAndEnableWithActor(receiveProcessBuilder.done(), ACTOR_NAME, john);
 
         // create an other process that send a message
-        ProcessDefinitionBuilder sendProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("SendMsgProcess", "1.0");
-        ThrowMessageEventTriggerBuilder addMessageEventTrigger = sendProcessBuilder.addIntermediateThrowEvent("send").addMessageEventTrigger("msg",
+        final ProcessDefinitionBuilder sendProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("SendMsgProcess", "1.0");
+        final ThrowMessageEventTriggerBuilder addMessageEventTrigger = sendProcessBuilder.addIntermediateThrowEvent("send").addMessageEventTrigger("msg",
                 new ExpressionBuilder().createConstantStringExpression("ProcessWithEventSubProcess"));
         addMessageEventTrigger.addMessageContentExpression(new ExpressionBuilder().createConstantStringExpression("msgData"),
                 new ExpressionBuilder().createGroovyScriptExpression("msgVariable", "\"message variable OK\"", String.class.getName()));
-        ProcessDefinition sendProcess = deployAndEnableProcess(sendProcessBuilder.done());
+        final ProcessDefinition sendProcess = deployAndEnableProcess(sendProcessBuilder.done());
 
         getProcessAPI().startProcess(receiveProcess.getId());
         waitForUserTask("waitHere");
 
         getProcessAPI().startProcess(sendProcess.getId());
-        ActivityInstance stepInSubProcess = waitForUserTask("stepInSubProcess");
+        final ActivityInstance stepInSubProcess = waitForUserTask("stepInSubProcess");
 
         // data should be transmit from the message
         assertEquals("message variable OK", getProcessAPI().getActivityDataInstance("aData", stepInSubProcess.getId()).getValue());
@@ -413,7 +413,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, john.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess.getId());
