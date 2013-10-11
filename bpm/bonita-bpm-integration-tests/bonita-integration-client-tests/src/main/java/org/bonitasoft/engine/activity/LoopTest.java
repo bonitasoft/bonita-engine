@@ -113,7 +113,7 @@ public class LoopTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("evaluateExpressionsOnLoopUserTask", "1.0");
         builder.addActor(actorName).addDescription("For Golf players only");
-        String activityName = "launch";
+        final String activityName = "launch";
         builder.addStartEvent("dummy");
         builder.addUserTask(activityName, actorName).addLoop(false, new ExpressionBuilder().createConstantBooleanExpression(true));
         builder.addTransition("dummy", activityName);
@@ -121,8 +121,8 @@ public class LoopTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), actorName, john);
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            final ActivityInstance userTask = waitForUserTask(activityName, processInstance);
-            Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
+            final ActivityInstance userTask = waitForUserTask(activityName, processInstance.getId());
+            final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
             expressions.put(new ExpressionBuilder().createConstantBooleanExpression(true), new HashMap<String, Serializable>(0));
             getProcessAPI().evaluateExpressionsOnActivityInstance(userTask.getId(), expressions);
         } finally {

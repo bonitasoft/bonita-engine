@@ -38,7 +38,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance waitForStep1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance waitForStep1 = waitForUserTask("step1", processInstance.getId());
         assertNotNull(waitForStep1);
 
         // wait timer trigger
@@ -97,7 +97,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
 
         // start the root process and wait for boundary event trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance waitForStepCA = waitForUserTask(simpleTaskName, processInstance);
+        final ActivityInstance waitForStepCA = waitForUserTask(simpleTaskName, processInstance.getId());
         assertNotNull(waitForStepCA);
         // wait timer trigger
         // check that the exception flow was taken
@@ -133,7 +133,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
 
         // start the process and wait the timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance);
+        final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance.getId());
         // wait timer trigger
         // check that the exception flow was taken
         final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
@@ -203,11 +203,11 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
 
         // start the process and wait timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance activityInLoop = waitForUserTask(loopActivityName, processInstance);
+        final ActivityInstance activityInLoop = waitForUserTask(loopActivityName, processInstance.getId());
         Thread.sleep(timerDuration); // wait timer trigger
 
         // verify that the exception flow was taken
-        final ActivityInstance exceptionStep = waitForUserTask(exceptionFlowStepName, processInstance);
+        final ActivityInstance exceptionStep = waitForUserTask(exceptionFlowStepName, processInstance.getId());
         assignAndExecuteStep(exceptionStep, getUser().getId());
         waitForProcessToFinish(processInstance);
 
@@ -235,7 +235,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Wait and execute the step1 with a timer boundary event
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
         getProcessAPI().assignUserTask(step1.getId(), getUser().getId());
 
         // Wait timer trigger

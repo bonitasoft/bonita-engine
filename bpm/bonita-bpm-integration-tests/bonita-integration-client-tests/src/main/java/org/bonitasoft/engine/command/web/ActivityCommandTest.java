@@ -78,7 +78,7 @@ public class ActivityCommandTest extends CommonAPITest {
         final BusinessArchive businessArchive = buildBusinessArchiveWithDataTransientAndConnector();
         final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, ACTOR_NAME, businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId()).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance.getId(), getSession().getUserId()).getId();
 
         // Execute it with operation using the command to update data instance
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -87,7 +87,7 @@ public class ActivityCommandTest extends CommonAPITest {
         executeActionsAndTerminate("dataName", activityInstanceId, fieldValues, rightOperand);
 
         // Get value of updated data in connector
-        waitForUserTask("step2", processInstance).getId();
+        waitForUserTask("step2", processInstance.getId());
         assertEquals(updatedValue + "a", getProcessAPI().getProcessDataInstance("application", processInstance.getId()).getValue());
 
         // Clean
@@ -101,7 +101,7 @@ public class ActivityCommandTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // process is deployed here with a custom jar
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId()).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance.getId(), getSession().getUserId()).getId();
 
         // execute it with operation using the command
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -120,7 +120,7 @@ public class ActivityCommandTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, businessUser);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId()).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance.getId(), getSession().getUserId()).getId();
 
         // execute it with operation using the command
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -129,7 +129,7 @@ public class ActivityCommandTest extends CommonAPITest {
         executeActionsAndTerminate("application", activityInstanceId, fieldValues, rightOperand);
 
         // check we have the other task ready and the operation was executed
-        waitForUserTask("step2", processInstance);
+        waitForUserTask("step2", processInstance.getId());
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("application", processInstance.getId());
         Assert.assertEquals("Excel", dataInstance.getValue().toString());
 
@@ -152,8 +152,7 @@ public class ActivityCommandTest extends CommonAPITest {
                 designProcessDefinition);
         businessArchiveBuilder.addConnectorImplementation(getResource("/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl",
                 "TestConnectorWithOutput.impl"));
-        businessArchiveBuilder.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil
-                .generateJar(TestConnectorWithOutput.class)));
+        businessArchiveBuilder.addClasspathResource(new BarResource("TestConnectorWithOutput.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
 
         return businessArchiveBuilder.done();
     }
@@ -177,11 +176,15 @@ public class ActivityCommandTest extends CommonAPITest {
         final UserTaskDefinitionBuilder userTaskBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
         if (withConnector) {
             userTaskBuilder.addLongTextData("dataName", null).isTransient();
-            userTaskBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
-                    .addInput("input1", new ExpressionBuilder().createGroovyScriptExpression("concat", "dataName+\"a\"", String.class.getName(),
-                            new ExpressionBuilder().createDataExpression("dataName", String.class.getName())))
-                    .addOutput(new OperationBuilder().createSetDataOperation("application",
-                            new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
+            userTaskBuilder
+                    .addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
+                    .addInput(
+                            "input1",
+                            new ExpressionBuilder().createGroovyScriptExpression("concat", "dataName+\"a\"", String.class.getName(),
+                                    new ExpressionBuilder().createDataExpression("dataName", String.class.getName())))
+                    .addOutput(
+                            new OperationBuilder().createSetDataOperation("application",
+                                    new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
         }
 
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);

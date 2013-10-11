@@ -229,7 +229,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
 
             processDefinitionIds.add(processDefinitionId);
             processInstanceIds.add(processInstance.getId());
-            waitForUserTask("step2", processInstance);
+            waitForUserTask("step2", processInstance.getId());
         }
 
         final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(manu.getId(), processInstanceIds.get(0));
@@ -303,7 +303,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
         assignAndExecuteStep(pendingTask, user.getId());
-        waitForUserTask("step3", processInstance);
+        waitForUserTask("step3", processInstance.getId());
 
         // after execute
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));

@@ -134,7 +134,7 @@ public class EndEventTest extends CommonAPITest {
         builder.addTransition("step2", "stop");
         final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance userTask = waitForUserTask("step2", startProcess);
+        final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
@@ -157,7 +157,7 @@ public class EndEventTest extends CommonAPITest {
         builder.addTransition("step3", "stop");
         final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance userTask = waitForUserTask("step2", startProcess);
+        final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
@@ -219,7 +219,7 @@ public class EndEventTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
         for (int i = 0; i < 3; i++) {
-            final ActivityInstance task = waitForUserTask("step1", processInstance);
+            final ActivityInstance task = waitForUserTask("step1", processInstance.getId());
             assignAndExecuteStep(task, userId);
         }
 

@@ -147,7 +147,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), delivery, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance userTask = waitForUserTask("step1", processInstance);
+        final ActivityInstance userTask = waitForUserTask("step1", processInstance.getId());
         final SearchResult<ActivityInstance> searchActivities = getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
                         .filter(ActivityInstanceSearchDescriptor.STATE_NAME, "executing").done());
@@ -252,7 +252,7 @@ public class MultiInstanceTest extends CommonAPITest {
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(loopDataOutputName, process.getId());
         assertNotNull("unable to find the loop data output on the process", processDataInstance);
         final List<?> list = (List<?>) processDataInstance.getValue();
-        waitForUserTask("lastTask", process);
+        waitForUserTask("lastTask", process.getId());
         disableAndDeleteProcess(processDefinition);
         return list;
     }
@@ -949,9 +949,9 @@ public class MultiInstanceTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTask("step1", processInstance);
-        waitForUserTask("step1", processInstance);
-        waitForUserTask("step1", processInstance);
+        waitForUserTask("step1", processInstance.getId());
+        waitForUserTask("step1", processInstance.getId());
+        waitForUserTask("step1", processInstance.getId());
         assertEquals(1, getProcessAPI().getNumberOfPendingHumanTaskInstances(jack.getId()));
         assertEquals(1, getProcessAPI().getNumberOfPendingHumanTaskInstances(john.getId()));
         assertEquals(1, getProcessAPI().getNumberOfPendingHumanTaskInstances(jenny.getId()));

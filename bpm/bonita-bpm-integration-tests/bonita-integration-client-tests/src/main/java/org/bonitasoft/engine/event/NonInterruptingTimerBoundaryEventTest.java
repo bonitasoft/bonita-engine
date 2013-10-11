@@ -42,7 +42,7 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
 
         // start the process and wait for timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance waitForStep1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance waitForStep1 = waitForUserTask("step1", processInstance.getId());
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
@@ -87,15 +87,15 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
 
         // start the root process and wait for boundary event triggering
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance stepCA = waitForUserTask(simpleTaskName, processInstance);
+        final ActivityInstance stepCA = waitForUserTask(simpleTaskName, processInstance.getId());
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
-        final ActivityInstance exceptionFlowStep = waitForUserTask(exceptionFlowTaskName, processInstance);
+        final ActivityInstance exceptionFlowStep = waitForUserTask(exceptionFlowTaskName, processInstance.getId());
 
         // execute the user task of p1 and check that the normal flow also was taken
         assignAndExecuteStep(stepCA, getUser().getId());
-        final ActivityInstance normalFlowStep = waitForUserTask(normalUserTaskName, processInstance);
+        final ActivityInstance normalFlowStep = waitForUserTask(normalUserTaskName, processInstance.getId());
 
         // execute exception flow and normal flow and verify that the process completes
         assignAndExecuteStep(exceptionFlowStep, getUser().getId());

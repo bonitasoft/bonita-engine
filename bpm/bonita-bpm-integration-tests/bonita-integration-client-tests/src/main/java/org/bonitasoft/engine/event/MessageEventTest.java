@@ -430,7 +430,7 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance.getId());
 
         disableAndDeleteProcess(receiveMessageProcess);
         disableAndDeleteProcess(sendMessageProcess);
@@ -475,7 +475,7 @@ public class MessageEventTest extends CommonAPITest {
                         buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
 
-        assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1));
+        assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId()));
         waitForEventInWaitingState(receiveMessageProcessInstance2, CATCH_EVENT_NAME);
 
         // instantiate a process containing correlations matching with receiveMessageProcessInstance2
@@ -485,7 +485,7 @@ public class MessageEventTest extends CommonAPITest {
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance2));
 
-        assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance2));
+        assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance2.getId()));
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -517,9 +517,9 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
 
-        HumanTaskInstance waitForUserTask = waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
+        final HumanTaskInstance waitForUserTask = waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
-        long processInstance = waitForUserTask.getRootContainerId();
+        final long processInstance = waitForUserTask.getRootContainerId();
         assertTrue(processInstance == receiveMessageProcessInstance1.getId() || processInstance == receiveMessageProcessInstance2.getId());
         assertEquals(1, getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT).size());
 
@@ -563,7 +563,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
 
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId());
         // waitForStep(100, 5000, "userTask1", receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -601,8 +601,7 @@ public class MessageEventTest extends CommonAPITest {
                         buildAssignOperation("lastName", "Doe 2", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
         // 7 sec because it's an assert false
-        assertFalse(new WaitForStep(DEFAULT_REPEAT_EACH, 7000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(),
-                getProcessAPI()).waitUntil());
+        assertFalse(new WaitForStep(DEFAULT_REPEAT_EACH, 7000, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
 
         // instantiate a process having both two correlation keys matching, the process must go further
         final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(
@@ -801,7 +800,7 @@ public class MessageEventTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance.getId());
         // waitForStep( "step1", receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
@@ -896,10 +895,10 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessDefinition sendAndReceiveMessageProcess = deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", CATCH_EVENT_NAME);
         final ProcessInstance sendAndReceiveMessageProcessInstance = getProcessAPI().startProcess(sendAndReceiveMessageProcess.getId());
 
-        final ActivityInstance step2 = waitForUserTask("userTask2", sendAndReceiveMessageProcessInstance);
+        final ActivityInstance step2 = waitForUserTask("userTask2", sendAndReceiveMessageProcessInstance.getId());
         waitForEventInWaitingState(sendAndReceiveMessageProcessInstance, CATCH_EVENT_NAME);
         assignAndExecuteStep(step2.getId(), user.getId());
-        waitForUserTask("userTask3", sendAndReceiveMessageProcessInstance);
+        waitForUserTask("userTask3", sendAndReceiveMessageProcessInstance.getId());
 
         disableAndDeleteProcess(sendAndReceiveMessageProcess);
     }
@@ -1203,8 +1202,7 @@ public class MessageEventTest extends CommonAPITest {
                     .addMessageEventTrigger("msgKiller", targetProcess, targetFlowNode);
             final ArrayList<BEntry<Expression, Expression>> endCorrelations = new ArrayList<BEntry<Expression, Expression>>(1);
             final Expression endCorrelationKey = new ExpressionBuilder().createConstantStringExpression("key");
-            final Expression endCorrelationValue = new ExpressionBuilder().createConstantLongExpression(processToKillInstance
-                    .getId());
+            final Expression endCorrelationValue = new ExpressionBuilder().createConstantLongExpression(processToKillInstance.getId());
             endCorrelations.add(new BEntry<Expression, Expression>(endCorrelationKey, endCorrelationValue));
             addCorrelations(endCorrelations, throwMessageEventTriggerBuilder);
             // Transitions

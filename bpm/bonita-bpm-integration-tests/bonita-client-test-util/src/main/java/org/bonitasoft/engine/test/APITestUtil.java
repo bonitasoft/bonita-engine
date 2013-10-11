@@ -502,8 +502,7 @@ public class APITestUtil {
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorName, final User user)
-            throws BonitaException {
+    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorName, final User user) throws BonitaException {
         return deployAndEnableWithActor(businessArchive, Collections.singletonList(actorName), Collections.singletonList(user));
     }
 
@@ -691,6 +690,10 @@ public class APITestUtil {
         return waitForUserTask(taskName, processInstance.getId(), DEFAULT_TIMEOUT);
     }
 
+    public HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId) throws TimeoutException, Exception {
+        return waitForUserTask(taskName, processInstanceId, DEFAULT_TIMEOUT);
+    }
+
     private HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId, final int timeout) throws Exception {
         final Map<String, Serializable> readyTaskEvent;
         if (processInstanceId > 0) {
@@ -754,7 +757,7 @@ public class APITestUtil {
 
     protected StartProcessUntilStep startProcessAndWaitForTask(final long processDefinitionId, final String taskName) throws Exception {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
-        final ActivityInstance task = waitForUserTask(taskName, processInstance);
+        final ActivityInstance task = waitForUserTask(taskName, processInstance.getId());
         return new StartProcessUntilStep(processInstance, task);
     }
 
@@ -882,9 +885,9 @@ public class APITestUtil {
         return waitForUserTaskAndExecuteIt(taskName, processInstanceId, user.getId());
     }
 
-    public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception,
+    public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final long processInstanceId, final long userId) throws Exception,
             UpdateException {
-        final ActivityInstance activityInstance = waitForUserTask(taskName, processInstance);
+        final ActivityInstance activityInstance = waitForUserTask(taskName, processInstanceId);
         getProcessAPI().assignUserTask(activityInstance.getId(), userId);
         return activityInstance;
     }
