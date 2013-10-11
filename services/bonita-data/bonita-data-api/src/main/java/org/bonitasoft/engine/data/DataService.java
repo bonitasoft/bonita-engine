@@ -13,11 +13,7 @@
  **/
 package org.bonitasoft.engine.data;
 
-import java.util.Collection;
-
 import org.bonitasoft.engine.data.model.SDataSource;
-import org.bonitasoft.engine.data.model.SDataSourceParameter;
-import org.bonitasoft.engine.persistence.QueryOptions;
 
 /**
  * @author Matthieu Chaffotte
@@ -43,27 +39,6 @@ public interface DataService {
     void createDataSource(SDataSource dataSource) throws SDataSourceAlreadyExistException, SDataException;
 
     /**
-     * Create dataSourceParameter object by give dataSourceParameter.
-     * 
-     * @param dataSourceParameter
-     *            The dataSourceParameter object
-     * @throws SDataSourceParameterAlreadyExistException
-     *             Error thrown if dataSourceParameter is already existed
-     * @throws SDataException
-     */
-    void createDataSourceParameter(SDataSourceParameter dataSourceParameter) throws SDataSourceParameterAlreadyExistException, SDataException;
-
-    /**
-     * Create some dataSourceParameter objects by give dataSourceParameters.
-     * 
-     * @param parameters
-     * @throws SDataSourceParameterAlreadyExistException
-     *             Error thrown if dataSourceParameter is already existed
-     * @throws SDataException
-     */
-    void createDataSourceParameters(Collection<SDataSourceParameter> parameters) throws SDataSourceParameterAlreadyExistException, SDataException;
-
-    /**
      * Remove dataSource object by its id.
      * 
      * @param dataSourceId
@@ -82,41 +57,6 @@ public interface DataService {
      *             Error thrown if the specific dataSource not existed.
      */
     void removeDataSource(SDataSource dataSource) throws SDataSourceNotFoundException;
-
-    /**
-     * Remove dataSourceParameter object by its id.
-     * 
-     * @param dataSourceParameterId
-     * @throws SDataSourceParameterNotFoundException
-     *             Error thrown if no dataSourceParameter have an id corresponding to the parameter.
-     */
-    void removeDataSourceParameter(long dataSourceParameterId) throws SDataSourceParameterNotFoundException;
-
-    /**
-     * Remove the specific dataSourceParameter object.
-     * 
-     * @param dataSourceParameter
-     *            The dataSourceParameter object will be removed
-     * @throws SDataSourceParameterNotFoundException
-     *             Error thrown if the specific dataSource not existed.
-     */
-    void removeDataSourceParameter(SDataSourceParameter dataSourceParameter) throws SDataSourceParameterNotFoundException;
-
-    /**
-     * Remove dataSourceParameter object by given dataSource id.
-     * 
-     * @param dataSourceId
-     * @throws SDataException
-     */
-    void removeDataSourceParameters(long dataSourceId) throws SDataException;
-
-    /**
-     * Remove dataSourceParameter objects by their ids.
-     * 
-     * @param dataSourceParameterIds
-     * @throws SDataSourceParameterNotFoundException
-     */
-    void removeDataSourceParameters(Collection<Long> dataSourceParameterIds) throws SDataSourceParameterNotFoundException;
 
     /**
      * Get dataSource implementation for given dataSource id and type
@@ -159,51 +99,5 @@ public interface DataService {
      *             Error thrown if no dataSource have an name and version corresponding to the parameters.
      */
     SDataSource getDataSource(String name, String version) throws SDataSourceNotFoundException;
-
-    /**
-     * Get dataSourceParameter object by its id
-     * 
-     * @param dataSourceParameterId
-     *            Identifier of dataSourceParameter
-     * @return A SDataSourceParameter object
-     * @throws SDataSourceParameterNotFoundException
-     *             Error thrown if no dataSourceParameter have an id corresponding to the parameter.
-     */
-    SDataSourceParameter getDataSourceParameter(long dataSourceParameterId) throws SDataSourceParameterNotFoundException;
-
-    /**
-     * Get dataSourceParameter object by its name and dataSource id
-     * 
-     * @param name
-     *            The name of dataSourceParameter
-     * @param dataSourceId
-     *            The identifier of dataSource
-     * @return A SDataSourceParameter object
-     * @throws SDataSourceParameterNotFoundException
-     *             Error thrown if no corresponding dataSourceParameter found
-     */
-    SDataSourceParameter getDataSourceParameter(String name, long dataSourceId) throws SDataSourceParameterNotFoundException;
-
-    /**
-     * Get dataSourceParameter objects for given dataSource id
-     * 
-     * @param dataSourceId
-     *            The identifier of dataSource
-     * @param queryOptions
-     *            Options to the query
-     * @return a collection of SDataSourceParameter objects
-     * @throws SDataException
-     */
-    Collection<SDataSourceParameter> getDataSourceParameters(long dataSourceId, QueryOptions queryOptions) throws SDataException;
-
-    /**
-     * Get dataSource objects according to specific query options
-     * 
-     * @param queryOptions
-     *            Options to the query
-     * @return a collection of SDataSource objects
-     * @throws SDataException
-     */
-    Collection<SDataSource> getDataSources(QueryOptions queryOptions) throws SDataException;
 
 }
