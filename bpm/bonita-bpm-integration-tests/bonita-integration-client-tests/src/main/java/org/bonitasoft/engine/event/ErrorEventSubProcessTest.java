@@ -314,9 +314,9 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         final ProcessDefinition process = deployAndEnableProcWithErrorEvSubProcAndDataOnlyInRoot(errorCode, subProcStartEventName, rootUserTaskName,
                 subProcUserTaskName, dataName, dataValue);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance.getId(), john.getId());
+        waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance, john);
 
-        final ActivityInstance subStep = waitForUserTask(subProcUserTaskName, processInstance.getId());
+        final ActivityInstance subStep = waitForUserTask(subProcUserTaskName, processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         checkProcessDataInstance(dataName, subProcInst.getId(), dataValue);
         checkProcessDataInstance(dataName, processInstance.getId(), dataValue);

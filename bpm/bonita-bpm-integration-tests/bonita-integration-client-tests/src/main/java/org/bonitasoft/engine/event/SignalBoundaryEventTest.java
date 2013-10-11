@@ -89,7 +89,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployProcessWithBoundaryEvent("MySignal1");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance);
 
         // Thread.sleep(500);

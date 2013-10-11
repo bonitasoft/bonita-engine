@@ -92,8 +92,8 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("procData", p1.getId());
         assertNotNull(activityDataInstance);
         assignAndExecuteStep(step1, john.getId());
-        waitForUserTaskAndExecuteIt("step1", p2.getId(), john.getId());
-        waitForUserTaskAndExecuteIt("step1", p3.getId(), john.getId());
+        waitForUserTaskAndExecuteIt("step1", p2, john);
+        waitForUserTaskAndExecuteIt("step1", p3, john);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
         transactionService.begin();
         List<SADataInstance> saActDataInstances = dataInstanceService.getSADataInstances(activityDataInstance.getId());
@@ -198,8 +198,8 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         assertEquals(0, commentService.getNumberOfArchivedComments(null));
         transactionService.complete();
         assignAndExecuteStep(step1, john.getId());
-        waitForUserTaskAndExecuteIt("step1", p2.getId(), john.getId());
-        waitForUserTaskAndExecuteIt("step1", p3.getId(), john.getId());
+        waitForUserTaskAndExecuteIt("step1", p2, john);
+        waitForUserTaskAndExecuteIt("step1", p3, john);
         waitForProcessToFinish(p1);
         waitForProcessToFinish(p2);
         waitForProcessToFinish(p3);

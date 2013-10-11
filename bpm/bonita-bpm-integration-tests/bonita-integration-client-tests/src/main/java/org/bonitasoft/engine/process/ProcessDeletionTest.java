@@ -81,7 +81,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), pedro.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, pedro);
         getProcessAPI().deleteProcessInstance(processInstance.getId());
 
         Thread.sleep(1500);
@@ -96,7 +96,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), pedro.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, pedro);
         for (int i = 0; i < 30; i++) {
             waitForUserTask("step2" + i, processInstance);
         }
@@ -114,9 +114,9 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), pedro.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, pedro);
         for (int i = 0; i < 30; i++) {
-            waitForUserTaskAndExecuteIt("step2" + i, processInstance.getId(), pedro.getId());
+            waitForUserTaskAndExecuteIt("step2" + i, processInstance, pedro);
         }
         waitForProcessToFinish(processInstance);
         getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 50);
@@ -141,7 +141,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         }
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.done(), actorName, pedro);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), pedro.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, pedro);
         disableAndDeleteProcess(processDefinition.getId()); // will fail in CommonAPITest.succeeded if activities are created after delete
         Thread.sleep(1500);
     }
@@ -432,7 +432,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
         // start a process and execute it until end
         final ProcessInstance processInstanceToArchive = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(userTaskName, processInstanceToArchive.getId(), pedro.getId());
+        waitForUserTaskAndExecuteIt(userTaskName, processInstanceToArchive, pedro);
         waitForProcessToFinish(processInstanceToArchive);
 
         // start a process non completed process

@@ -648,7 +648,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         // execute the process
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(taskName, processInstance.getId(), userId);
+        waitForUserTaskAndExecuteIt(taskName, processInstance, userId);
         waitForProcessToFinish(processInstance);
 
         // check there are no connector instances

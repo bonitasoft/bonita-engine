@@ -95,7 +95,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployProcessWithBoundaryEvent("MyMessage1");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance.getId());
 
         getProcessAPI().sendMessage("MyMessage1", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
@@ -122,7 +122,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
         getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
 
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, donaBenta);
         waitForProcessToFinish(calledProcessInstance, TestStates.getAbortedState());
         waitForProcessToFinish(processInstance);
 
@@ -242,7 +242,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), donaBenta.getId());
+            waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         }
         final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance.getId());
 
@@ -265,7 +265,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(loopCardinality, isSequential);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(donaBenta.getId(), loopCardinality);
+        final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(donaBenta, loopCardinality);
         for (final HumanTaskInstance humanTaskInstance : pendingTasks) {
             assertEquals("step1", humanTaskInstance.getName());
         }
@@ -297,7 +297,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), donaBenta.getId());
+            waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         }
         final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance.getId());
 

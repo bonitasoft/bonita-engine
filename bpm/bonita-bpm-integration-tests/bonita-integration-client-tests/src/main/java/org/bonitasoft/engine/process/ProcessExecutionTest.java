@@ -641,7 +641,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.getProcess(), "actor", matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
-        waitForUserTaskAndExecuteIt("step", processInstance.getId(), matti.getId());
+        waitForUserTaskAndExecuteIt("step", processInstance, matti);
         waitForProcessToFinish(processInstance);
 
         try {

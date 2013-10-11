@@ -755,6 +755,11 @@ public class APITestUtil {
         return waitUntil.getResults();
     }
 
+    @Deprecated
+    protected List<HumanTaskInstance> waitForPendingTasks(final User user, final int nbPendingTasks) throws Exception {
+        return waitForPendingTasks(user.getId(), nbPendingTasks);
+    }
+
     protected StartProcessUntilStep startProcessAndWaitForTask(final long processDefinitionId, final String taskName) throws Exception {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
         final ActivityInstance task = waitForUserTask(taskName, processInstance.getId());

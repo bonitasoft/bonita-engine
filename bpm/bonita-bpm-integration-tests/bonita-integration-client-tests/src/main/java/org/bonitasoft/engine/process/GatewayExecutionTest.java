@@ -291,8 +291,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         // test execution
         getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 2 elements ready:
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, true, 1, user);
-        assertTrue("there was no pending task for john", checkNbPendingTaskOf.waitUntil());
+        waitForPendingTasks(user, 1);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -311,7 +310,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess, user);
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(processDefinition);
     }
@@ -656,10 +655,10 @@ public class GatewayExecutionTest extends CommonAPITest {
         // send signal to trigger boundary
         getProcessAPI().sendSignal("bip");
         // wait and execute exceptionStep
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance.getId(), user.getId());
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
 
         // step3 should be ready
-        waitForUserTaskAndExecuteIt("step3", processInstance.getId(), user.getId());
+        waitForUserTaskAndExecuteIt("step3", processInstance, user);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }

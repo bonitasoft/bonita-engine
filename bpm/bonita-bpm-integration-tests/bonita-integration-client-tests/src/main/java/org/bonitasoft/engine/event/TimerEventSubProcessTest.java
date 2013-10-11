@@ -154,11 +154,11 @@ public class TimerEventSubProcessTest extends CommonAPITest {
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")
     @Test
-    public void testTimerEventSubProcessNotTriggered() throws Exception {
+    public void timerEventSubProcessNotTriggered() throws Exception {
         final int timerDuration = 6000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance.getId(), john.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, john);
         waitForProcessToFinish(processInstance);
         Thread.sleep(timerDuration);
 
@@ -216,7 +216,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer", "call activity" }, jira = "ENGINE-536")
     @Test
-    public void testTimerEventSubProcInsideTargetCallActivity() throws Exception {
+    public void timerEventSubProcInsideTargetCallActivity() throws Exception {
         final int timerDuration = 2000;
         final ProcessDefinition targetProcess = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
         final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity("ProcessWithCallActivity", targetProcess.getName(),
@@ -232,7 +232,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
 
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance, john);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess.getId());
