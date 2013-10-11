@@ -113,11 +113,11 @@ public interface ProfileService {
      * 
      * @param userId
      * @return a list of sProfile
-     * @throws SProfileMemberNotFoundException
+     * @throws SProfileNotFoundException
      *             occurs when the identifier does not refer to an existing sProfile
      * @since 6.0
      */
-    List<SProfile> getProfilesOfUser(long userId) throws SProfileMemberNotFoundException;
+    List<SProfile> getProfilesOfUser(long userId) throws SProfileNotFoundException;
 
     /**
      * Get profile entry by its id
@@ -139,11 +139,11 @@ public interface ProfileService {
      *            the max number of profileEntry to be returned (>=0)
      * @param numberOfProfileEntry
      * @return all profile entries having the given value for the given int index
-     * @throws SProfileNotFoundException
+     * @throws SProfileEntryNotFoundException
      *             occurs when the identifier does not refer to an existing sProfileEntry
      * @since 6.0
      */
-    List<SProfileEntry> getEntriesOfProfile(long profileId, int fromIndex, int numberOfProfileEntry) throws SProfileNotFoundException;
+    List<SProfileEntry> getEntriesOfProfile(long profileId, int fromIndex, int numberOfProfileEntry) throws SProfileEntryNotFoundException;
 
     /**
      * Get all profile entries having the given value for the given int index by profileId
@@ -218,7 +218,8 @@ public interface ProfileService {
      * @param lastName
      * @param userName
      * @return sProfileMember
-     * @throws SProfileMemberCreationException TODO
+     * @throws SProfileMemberCreationException
+     *             TODO
      * @since 6.0
      */
     SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName) throws SProfileMemberCreationException;
@@ -233,7 +234,8 @@ public interface ProfileService {
      * @param groupName
      * @param parentPath
      * @return sProfileMember
-     * @throws SProfileMemberCreationException TODO
+     * @throws SProfileMemberCreationException
+     *             TODO
      * @since 6.0
      */
     SProfileMember addGroupToProfile(long profileId, long groupId, String groupName, String parentPath) throws SProfileMemberCreationException;
@@ -247,7 +249,8 @@ public interface ProfileService {
      *            the identifier of role
      * @param roleName
      * @return sProfileMember
-     * @throws SProfileMemberCreationException TODO
+     * @throws SProfileMemberCreationException
+     *             TODO
      * @since 6.0
      */
     SProfileMember addRoleToProfile(long profileId, long roleId, String roleName) throws SProfileMemberCreationException;
@@ -265,7 +268,8 @@ public interface ProfileService {
      * @param groupName
      * @param groupParentPath
      * @return sProfileMember
-     * @throws SProfileMemberCreationException TODO
+     * @throws SProfileMemberCreationException
+     *             TODO
      * @since 6.0
      */
     SProfileMember addRoleAndGroupToProfile(long profileId, long roleId, long groupId, String roleName, String groupName, String groupParentPath)

@@ -13,8 +13,17 @@
  **/
 package org.bonitasoft.engine.profile.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -23,128 +32,209 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.recorder.Recorder;
-import org.junit.Before;
+import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ProfileServiceImplForProfileTest {
 
-    Recorder recorder;
+    @Mock
+    private EventService eventService;
 
-    ReadPersistenceService persistence;
+    @Mock
+    private TechnicalLoggerService logger;
 
-    EventService eventService;
+    @Mock
+    private ReadPersistenceService persistenceService;
 
-    TechnicalLoggerService logger;
+    @Mock
+    private QueriableLoggerService queriableLoggerService;
 
-    @Before
-    public void setup() {
-        recorder = mock(Recorder.class);
-        persistence = mock(ReadPersistenceService.class);
-        eventService = mock(EventService.class);
-        logger = mock(TechnicalLoggerService.class);
-        // QueriableLoggerService queriableLoggerService
+    @Mock
+    private Recorder recorder;
 
-    }
+    @InjectMocks
+    private ProfileServiceImpl profileServiceImpl;
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getNumberOfProfiles(org.bonitasoft.engine.persistence.QueryOptions)}.
+     */
     @Test
     public void getNumberOfProfilesWithOptions() throws Exception {
-        final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistence.getNumberOfEntities(SProfile.class, options, Collections.<String, Object> emptyMap())).thenReturn(1L);
+        when(persistenceService.getNumberOfEntities(SProfile.class, options, Collections.<String, Object> emptyMap())).thenReturn(1L);
 
         assertEquals(1L, profileServiceImpl.getNumberOfProfiles(options));
     }
 
     @Test(expected = SBonitaSearchException.class)
     public void getNumberOfProfilesWithOptionsThrowException() throws Exception {
-        final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistence.getNumberOfEntities(SProfile.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.getNumberOfEntities(SProfile.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
 
         profileServiceImpl.getNumberOfProfiles(options);
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#searchProfiles(org.bonitasoft.engine.persistence.QueryOptions)}.
+     */
     @Test
     public void searchProfilesWithOptions() throws Exception {
-        final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistence.searchEntity(SProfile.class, options, Collections.<String, Object> emptyMap())).thenReturn(new ArrayList<SProfile>());
+        when(persistenceService.searchEntity(SProfile.class, options, Collections.<String, Object> emptyMap())).thenReturn(new ArrayList<SProfile>());
 
         assertNotNull(profileServiceImpl.searchProfiles(options));
     }
 
     @Test(expected = SBonitaSearchException.class)
     public void searchProfilesWithOptionsThrowException() throws Exception {
-        final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistence.searchEntity(SProfile.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.searchEntity(SProfile.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
 
         profileServiceImpl.searchProfiles(options);
     }
 
-    // @Test
-    // public void getProfile() throws Exception {
-    // final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
-    // final long groupId = 1;
-    // SProfile sProfile;
-    // when(persistence.selectById(any(SelectByIdDescriptor.class)).thenReturn(sProfile);
-    //
-    // assertEquals(3L, profileServiceImpl.getProfile(groupId));
-    // }
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getProfile(long)}.
+     */
+    @Test
+    public void getProfile() throws Exception {
+        final SProfile sProfile = mock(SProfile.class);
+
+        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+
+        assertEquals(sProfile, profileServiceImpl.getProfile(1));
+    }
 
     @Test(expected = SProfileNotFoundException.class)
     public void getNoProfile() throws Exception {
-        final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
-        when(persistence.selectById(any(SelectByIdDescriptor.class))).thenReturn(null);
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfile>> any())).thenReturn(null);
 
         profileServiceImpl.getProfile(1);
     }
 
     @Test(expected = SProfileNotFoundException.class)
     public void getProfileThrowException() throws Exception {
-        final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
-        when(persistence.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfile>> any())).thenThrow(new SBonitaReadException(""));
 
         profileServiceImpl.getProfile(1);
     }
 
-    // @Test
-    // public void getProfileByName() throws Exception {
-    // final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
-    // final String profileName = "plop";
-    // SProfile sProfile;
-    // when(persistence.selectOne(any(SelectOneDescriptor.class)).thenReturn(sProfile);
-    //
-    // assertEquals(3L, profileServiceImpl.getProfileByName(profileName));
-    // }
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getProfileByName(java.lang.String)}.
+     */
+    @Test
+    public void getProfileByName() throws Exception {
+        final String profileName = "plop";
+        final SProfile sProfile = mock(SProfile.class);
+
+        doReturn(sProfile).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SProfile>> any());
+
+        assertEquals(sProfile, profileServiceImpl.getProfileByName(profileName));
+    }
 
     @Test(expected = SProfileNotFoundException.class)
     public void getNoProfileByName() throws Exception {
-        final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
-        when(persistence.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SProfile>> any())).thenReturn(null);
 
         profileServiceImpl.getProfileByName("plop");
     }
 
     @Test(expected = SProfileNotFoundException.class)
     public void getProfileByNameThrowException() throws Exception {
-        final ProfileServiceImpl profileServiceImpl = new ProfileServiceImpl(persistence, recorder, eventService, logger, null);
-        when(persistence.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SProfile>> any())).thenThrow(new SBonitaReadException(""));
 
         profileServiceImpl.getProfileByName("plop");
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getProfiles(java.util.List)}.
+     * 
+     * @throws SProfileNotFoundException
+     * @throws SBonitaReadException
+     */
+    @Test
+    public final void getProfiles() throws SProfileNotFoundException, SBonitaReadException {
+        final List<Long> profileIds = new ArrayList<Long>();
+        profileIds.add(1L);
+        profileIds.add(2L);
+
+        final List<SProfile> sProfiles = new ArrayList<SProfile>();
+        final SProfile sProfile = mock(SProfile.class);
+        sProfiles.add(sProfile);
+        sProfiles.add(sProfile);
+
+        doReturn(sProfile).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+
+        assertEquals(sProfiles, profileServiceImpl.getProfiles(profileIds));
+    }
+
+    @Test(expected = SProfileNotFoundException.class)
+    public final void getNoProfiles() throws SProfileNotFoundException, SBonitaReadException {
+        final List<Long> profileIds = new ArrayList<Long>();
+        profileIds.add(1L);
+
+        doReturn(null).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfile>> any());
+
+        profileServiceImpl.getProfiles(profileIds);
+    }
+
+    @Test
+    public final void getProfilesWithEmptyList() throws SProfileNotFoundException {
+        final List<Long> profileIds = new ArrayList<Long>();
+
+        assertTrue(profileServiceImpl.getProfiles(profileIds).isEmpty());
+    }
+
+    @Test
+    public final void getProfilesWithNullList() throws SProfileNotFoundException {
+        assertTrue(profileServiceImpl.getProfiles(null).isEmpty());
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getProfilesOfUser(long)}.
+     * 
+     * @throws SBonitaReadException
+     * @throws SProfileNotFoundException
+     */
+    @Test
+    public final void getProfilesOfUser() throws SBonitaReadException, SProfileNotFoundException {
+        final List<SProfile> sProfiles = new ArrayList<SProfile>();
+        final SProfile sProfile = mock(SProfile.class);
+        sProfiles.add(sProfile);
+
+        doReturn(sProfiles).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfile>> any());
+
+        assertEquals(sProfiles, profileServiceImpl.getProfilesOfUser(1));
+    }
+
+    @Test
+    public final void getNoProfilesOfUser() throws SBonitaReadException, SProfileNotFoundException {
+        final List<SProfile> sProfiles = new ArrayList<SProfile>();
+
+        doReturn(sProfiles).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfile>> any());
+
+        assertEquals(sProfiles, profileServiceImpl.getProfilesOfUser(1));
+    }
+
+    @Test(expected = SProfileNotFoundException.class)
+    public final void getProfilesOfUserThrowException() throws SBonitaReadException, SProfileNotFoundException {
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfile>> any());
+
+        profileServiceImpl.getProfilesOfUser(1);
     }
 
 }

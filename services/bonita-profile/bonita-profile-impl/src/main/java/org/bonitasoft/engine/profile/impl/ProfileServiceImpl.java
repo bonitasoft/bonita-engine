@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -80,6 +81,8 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  */
 public class ProfileServiceImpl implements ProfileService {
 
+    private static final int BATCH_NUMBER = 1000;
+
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -110,9 +113,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public SProfile createProfile(final SProfile profile) throws SProfileCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createProfile"));
-        }
+        logBeforeMethod("createProfile");
         final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.CREATED, "Adding a new profile with name " + profile.getName());
         final InsertRecord insertRecord = new InsertRecord(profile);
         SInsertEvent insertEvent = null;
@@ -123,15 +124,10 @@ public class ProfileServiceImpl implements ProfileService {
         try {
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_OK, logBuilder, "createProfile");
-
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createProfile"));
-            }
+            logAfterMethod("createProfile");
             return profile;
         } catch (final SRecorderException re) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createProfile", re));
-            }
+            logOnExceptionMethod("createProfile", re);
             initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createProfile");
             throw new SProfileCreationException(re);
         }
@@ -139,71 +135,55 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public SProfile getProfile(final long profileId) throws SProfileNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfile"));
-        }
+        logBeforeMethod("getProfile");
         try {
             final SelectByIdDescriptor<SProfile> descriptor = SelectDescriptorBuilder.getElementById(SProfile.class, "Profile", profileId);
             final SProfile profile = persistenceService.selectById(descriptor);
             if (profile == null) {
                 throw new SProfileNotFoundException("No profile exists with id: " + profileId);
             }
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfile"));
-            }
+            logAfterMethod("getProfile");
             return profile;
-        } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfile", bre));
-            }
-            throw new SProfileNotFoundException(bre);
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod("getProfile", e);
+            throw new SProfileNotFoundException(e);
         }
     }
 
     @Override
     public SProfile getProfileByName(final String profileName) throws SProfileNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileByName"));
-        }
+        logBeforeMethod("getProfileByName");
         try {
             final SelectOneDescriptor<SProfile> descriptor = SelectDescriptorBuilder.getElementByNameDescriptor(SProfile.class, "Profile", profileName);
             final SProfile profile = persistenceService.selectOne(descriptor);
             if (profile == null) {
                 throw new SProfileNotFoundException("No profile exists with name: " + profileName);
             }
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfileByName"));
-            }
+            logAfterMethod("getProfileByName");
             return profile;
-        } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileByName", bre));
-            }
-            throw new SProfileNotFoundException(bre);
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod("getProfileByName", e);
+            throw new SProfileNotFoundException(e);
         }
     }
 
     @Override
     public List<SProfile> getProfiles(final List<Long> profileIds) throws SProfileNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfiles"));
-        }
+        logBeforeMethod("getProfiles");
         final List<SProfile> profiles = new ArrayList<SProfile>();
-        for (final Long profileId : profileIds) {
-            final SProfile profile = getProfile(profileId);
-            profiles.add(profile);
+        if (profileIds != null) {
+            for (final Long profileId : profileIds) {
+                final SProfile profile = getProfile(profileId);
+                profiles.add(profile);
+            }
         }
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfiles"));
-        }
+        logAfterMethod("getProfiles");
         return profiles;
     }
 
     @Override
     public void updateProfile(final SProfile profile, final EntityUpdateDescriptor descriptor) throws SProfileUpdateException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateProfile"));
-        }
+        logBeforeMethod("updateProfile");
         final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.UPDATED, "Updating profile with name " + profile.getName());
         final SProfileBuilder sProfileBuilder = profileBuilderAccessor.getSProfileBuilder();
         final SProfile oldUser = sProfileBuilder.createNewInstance(profile).done();
@@ -216,14 +196,9 @@ public class ProfileServiceImpl implements ProfileService {
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProfile");
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "updateProfile"));
-            }
+            logAfterMethod("updateProfile");
         } catch (final SRecorderException re) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateProfile", re));
-            }
-
+            logOnExceptionMethod("updateProfile", re);
             initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfile");
             throw new SProfileUpdateException(re);
         }
@@ -231,11 +206,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfile(final SProfile profile) throws SProfileNotFoundException, SProfileDeletionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteProfile"));
-        }
-        final int batchNumber = 1000;
-        List<SProfileEntry> entries;
+        logBeforeMethod("deleteProfile");
         final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.DELETED, "Deleting profile with name " + profile.getName());
         final DeleteRecord deleteRecord = new DeleteRecord(profile);
         SDeleteEvent deleteEvent = null;
@@ -244,140 +215,100 @@ public class ProfileServiceImpl implements ProfileService {
             deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PROFILE).setObject(profile).done();
         }
         try {
+            deleteAllProfileEntriesOfProfile(profile);
+            deleteAllProfileMembersOfProfile(profile);
+            recorder.recordDelete(deleteRecord, deleteEvent);
+            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfile");
+            logAfterMethod("deleteProfile");
+        } catch (final SRecorderException re) {
+            logOnExceptionMethod("deleteProfile", re);
+            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfile");
+            throw new SProfileDeletionException(re);
+        } catch (final SProfileEntryDeletionException e) {
+            logOnExceptionMethod("deleteProfile", e);
+            throw new SProfileDeletionException(e);
+        } catch (final SProfileMemberDeletionException e) {
+            logOnExceptionMethod("deleteProfile", e);
+            throw new SProfileDeletionException(e);
+        }
+    }
+
+    private void deleteAllProfileMembersOfProfile(final SProfile profile) throws SProfileNotFoundException, SProfileMemberDeletionException {
+        List<SProfileMember> sProfileMembers;
+        do {
+            sProfileMembers = getSProfileMembers(profile.getId());
+            for (final SProfileMember profileUser : sProfileMembers) {
+                deleteProfileMember(profileUser);
+            }
+        } while (!sProfileMembers.isEmpty());
+    }
+
+    private void deleteAllProfileEntriesOfProfile(final SProfile profile) throws SProfileEntryDeletionException {
+        try {
+            List<SProfileEntry> entries;
             do {
-                entries = getEntriesOfProfile(profile.getId(), 0, batchNumber);
+                entries = getEntriesOfProfile(profile.getId(), 0, BATCH_NUMBER);
                 for (final SProfileEntry entry : entries) {
                     deleteProfileEntry(entry);
                 }
             } while (!entries.isEmpty());
-
-            List<SProfileMember> profileUsers;
-            do {
-                profileUsers = getSProfileMembers(profile.getId());
-                for (final SProfileMember profileUser : profileUsers) {
-                    deleteProfileMember(profileUser);
-                }
-            } while (!profileUsers.isEmpty());
-            recorder.recordDelete(deleteRecord, deleteEvent);
-            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfile");
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteProfile"));
-            }
-        } catch (final SRecorderException re) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteProfile", re));
-            }
-            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfile");
-            throw new SProfileDeletionException(re);
-        } catch (final SProfileEntryDeletionException spede) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteProfile", spede));
-            }
-            throw new SProfileDeletionException(spede);
-        } catch (final SProfileMemberDeletionException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteProfile", e));
-            }
-            throw new SProfileDeletionException(e);
+        } catch (final SProfileEntryNotFoundException e) {
+            throw new SProfileEntryDeletionException(e);
         }
     }
 
     @Override
     public void deleteProfile(final long profileId) throws SProfileNotFoundException, SProfileDeletionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteProfile"));
-        }
+        logBeforeMethod("deleteProfile");
         final SProfile profile = getProfile(profileId);
-        this.deleteProfile(profile);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteProfile"));
-        }
-    }
-
-    private SProfileLogBuilder getSProfileLog(final ActionType actionType, final String message) {
-        final SProfileLogBuilder logBuilder = new SProfileLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        return logBuilder;
-    }
-
-    private SProfileMemberLogBuilder getProfileMemberLog(final ActionType actionType, final String message) {
-        final SProfileMemberLogBuilder logBuilder = new SProfileMemberLogBuilder();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        return logBuilder;
-    }
-
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
+        deleteProfile(profile);
+        logAfterMethod("deleteProfile");
     }
 
     @Override
     public SProfileEntry getProfileEntry(final long profileEntryId) throws SProfileEntryNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileEntry"));
-        }
+        logBeforeMethod("getProfileEntry");
         try {
             final SelectByIdDescriptor<SProfileEntry> descriptor = SelectDescriptorBuilder.getElementById(SProfileEntry.class, "ProfileEntry", profileEntryId);
             final SProfileEntry profileEntry = persistenceService.selectById(descriptor);
             if (profileEntry == null) {
                 throw new SProfileEntryNotFoundException("No entry exists with id: " + profileEntryId);
             }
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfileEntry"));
-            }
+            logAfterMethod("getProfileEntry");
             return profileEntry;
         } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileEntry", bre));
-            }
+            logOnExceptionMethod("getProfileEntry", bre);
             throw new SProfileEntryNotFoundException(bre);
         }
     }
 
     @Override
     public List<SProfileEntry> getEntriesOfProfile(final long profileId, final int fromIndex, final int numberOfProfileEntries)
-            throws SProfileNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getEntriesOfProfile"));
-        }
+            throws SProfileEntryNotFoundException {
+        logBeforeMethod("getEntriesOfProfile");
         try {
             final List<SProfileEntry> listsProfileEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, fromIndex,
                     numberOfProfileEntries));
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getEntriesOfProfile"));
-            }
+            logAfterMethod("getEntriesOfProfile");
             return listsProfileEntries;
         } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getEntriesOfProfile", bre));
-            }
-            throw new SProfileNotFoundException(bre);
+            logOnExceptionMethod("getEntriesOfProfile", bre);
+            throw new SProfileEntryNotFoundException(bre);
         }
     }
 
     @Override
     public List<SProfileEntry> getEntriesOfProfile(final long profileId, final int fromIndex, final int numberOfProfileEntries, final String field,
             final OrderByType order) throws SProfileNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getEntriesOfProfile"));
-        }
+        logBeforeMethod("getEntriesOfProfile");
         try {
             final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, field, order,
                     fromIndex,
                     numberOfProfileEntries));
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getEntriesOfProfile"));
-            }
+            logAfterMethod("getEntriesOfProfile");
             return listspEntries;
         } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getEntriesOfProfile", bre));
-            }
+            logOnExceptionMethod("getEntriesOfProfile", bre);
             throw new SProfileNotFoundException(bre);
         }
     }
@@ -385,30 +316,21 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public List<SProfileEntry> getEntriesOfProfileByParentId(final long profileId, final long parentId, final int fromIndex, final int numberOfProfileEntries,
             final String field, final OrderByType order) throws SProfileNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getEntriesOfProfileByParentId"));
-        }
+        logBeforeMethod("getEntriesOfProfileByParentId");
         try {
             final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, parentId, field,
-                    order,
-                    fromIndex, numberOfProfileEntries));
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getEntriesOfProfileByParentId"));
-            }
+                    order, fromIndex, numberOfProfileEntries));
+            logAfterMethod("getEntriesOfProfileByParentId");
             return listspEntries;
         } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getEntriesOfProfileByParentId", bre));
-            }
+            logOnExceptionMethod("getEntriesOfProfileByParentId", bre);
             throw new SProfileNotFoundException(bre);
         }
     }
 
     @Override
     public SProfileEntry createProfileEntry(final SProfileEntry profileEntry) throws SProfileEntryCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createProfileEntry"));
-        }
+        logBeforeMethod("createProfileEntry");
         final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.CREATED, "Adding a new pofile entry with name " + profileEntry.getName());
         final InsertRecord insertRecord = new InsertRecord(profileEntry);
         SInsertEvent insertEvent = null;
@@ -419,14 +341,10 @@ public class ProfileServiceImpl implements ProfileService {
         try {
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "createProfileEntry");
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createProfileEntry"));
-            }
+            logAfterMethod("createProfileEntry");
             return profileEntry;
         } catch (final SRecorderException re) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createProfileEntry", re));
-            }
+            logOnExceptionMethod("createProfileEntry", re);
             initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createProfileEntry");
             throw new SProfileEntryCreationException(re);
         }
@@ -434,9 +352,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void updateProfileEntry(final SProfileEntry profileEntry, final EntityUpdateDescriptor descriptor) throws SProfileEntryUpdateException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateProfileEntry"));
-        }
+        logBeforeMethod("updateProfileEntry");
         final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.UPDATED, "Updating profile entry with name " + profileEntry.getName());
         try {
             final SProfileEntryBuilder sProfileBuilder = profileBuilderAccessor.getSProfileEntryBuilder();
@@ -449,13 +365,9 @@ public class ProfileServiceImpl implements ProfileService {
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProfileEntry");
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "updateProfileEntry"));
-            }
+            logAfterMethod("updateProfileEntry");
         } catch (final SRecorderException re) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "updateProfileEntry", re));
-            }
+            logOnExceptionMethod("updateProfileEntry", re);
             initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfileEntry");
             throw new SProfileEntryUpdateException(re);
         }
@@ -463,9 +375,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfileEntry(final SProfileEntry profileEntry) throws SProfileEntryDeletionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteProfileEntry"));
-        }
+        logBeforeMethod("deleteProfileEntry");
         final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.DELETED, "Deleting profile entry with name " + profileEntry.getName());
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(profileEntry);
@@ -476,13 +386,9 @@ public class ProfileServiceImpl implements ProfileService {
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfileEntry");
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteProfileEntry"));
-            }
+            logAfterMethod("deleteProfileEntry");
         } catch (final SRecorderException re) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteProfileEntry", re));
-            }
+            logOnExceptionMethod("deleteProfileEntry", re);
             initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfileEntry");
             throw new SProfileEntryDeletionException(re);
         }
@@ -490,14 +396,10 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfileEntry(final long profileEntryId) throws SProfileEntryNotFoundException, SProfileEntryDeletionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteProfileEntry"));
-        }
+        logBeforeMethod("deleteProfileEntry");
         final SProfileEntry profileEntry = getProfileEntry(profileEntryId);
         deleteProfileEntry(profileEntry);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteProfileEntry"));
-        }
+        logAfterMethod("deleteProfileEntry");
     }
 
     private SProfileMemberImpl getProfileMember(final long profileId, final String displayNamePart1, final String displayNamePart2,
@@ -512,15 +414,11 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public SProfileMember addUserToProfile(final long profileId, final long userId, final String firstName, final String lastName, final String userName)
             throws SProfileMemberCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addUserToProfile"));
-        }
+        logBeforeMethod("addUserToProfile");
         final SProfileMemberImpl profileMember = getProfileMember(profileId, firstName, lastName, userName);
         profileMember.setUserId(userId);
         createProfileMember(profileMember);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addUserToProfile"));
-        }
+        logAfterMethod("addUserToProfile");
         return profileMember;
     }
 
@@ -546,58 +444,42 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public SProfileMember addGroupToProfile(final long profileId, final long groupId, final String groupName, final String parentPath)
             throws SProfileMemberCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addGroupToProfile"));
-        }
+        logBeforeMethod("addGroupToProfile");
         final SProfileMemberImpl profileMember = getProfileMember(profileId, groupName, parentPath, null);
         profileMember.setGroupId(groupId);
         createProfileMember(profileMember);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addGroupToProfile"));
-        }
+        logAfterMethod("addGroupToProfile");
         return profileMember;
     }
 
     @Override
     public SProfileMember addRoleToProfile(final long profileId, final long roleId, final String roleName) throws SProfileMemberCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addRoleToProfile"));
-        }
+        logBeforeMethod("addRoleToProfile");
         final SProfileMemberImpl profileMember = getProfileMember(profileId, roleName, null, null);
         profileMember.setRoleId(roleId);
         createProfileMember(profileMember);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addRoleToProfile"));
-        }
+        logAfterMethod("addRoleToProfile");
         return profileMember;
     }
 
     @Override
     public SProfileMember addRoleAndGroupToProfile(final long profileId, final long roleId, final long groupId, final String roleName, final String groupName,
             final String groupParentPath) throws SProfileMemberCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addRoleAndGroupToProfile"));
-        }
+        logBeforeMethod("addRoleAndGroupToProfile");
         final SProfileMemberImpl profileMember = getProfileMember(profileId, roleName, groupName, groupParentPath);
         profileMember.setGroupId(groupId);
         profileMember.setRoleId(roleId);
         createProfileMember(profileMember);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "addRoleAndGroupToProfile"));
-        }
+        logAfterMethod("addRoleAndGroupToProfile");
         return profileMember;
     }
 
     @Override
     public void deleteProfileMember(final long profileMemberId) throws SProfileMemberDeletionException, SProfileMemberNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteProfileMember"));
-        }
+        logBeforeMethod("deleteProfileMember");
         final SProfileMember profileMember = getProfileMemberWithoutDisplayName(profileMemberId);
         deleteProfileMember(profileMember);
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteProfileMember"));
-        }
+        logAfterMethod("deleteProfileMember");
     }
 
     private SProfileMember getProfileMemberWithoutDisplayName(final long profileMemberId) throws SProfileMemberNotFoundException {
@@ -615,9 +497,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfileMember(final SProfileMember profileMember) throws SProfileMemberDeletionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteProfileMember"));
-        }
+        logBeforeMethod("deleteProfileMember");
         final String message = "Deleting profile member for userId " + profileMember.getUserId() + " with roleId " + profileMember.getRoleId() + " in groupId "
                 + profileMember.getGroupId();
         final SProfileMemberLogBuilder logBuilder = getProfileMemberLog(ActionType.DELETED, message);
@@ -630,14 +510,9 @@ public class ProfileServiceImpl implements ProfileService {
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfileMember");
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteProfileMember"));
-            }
+            logAfterMethod("deleteProfileMember");
         } catch (final SRecorderException re) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteProfileMember", re));
-            }
-
+            logOnExceptionMethod("deleteProfileMember", re);
             initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteProfileMember");
             throw new SProfileMemberDeletionException(re);
         }
@@ -646,21 +521,15 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public List<SProfileMember> getProfileMembersOfUser(final long userId, final int fromIndex, final int numberOfElements, final String field,
             final OrderByType order) throws SProfileMemberReadException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileMembersOfUser"));
-        }
+        logBeforeMethod("getProfileMembersOfUser");
         try {
             final SelectListDescriptor<SProfileMember> descriptor = SelectDescriptorBuilder.getDirectProfileMembersOfUser(userId, field, order, fromIndex,
                     numberOfElements);
             final List<SProfileMember> listspProfileMembers = persistenceService.selectList(descriptor);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfileMembersOfUser"));
-            }
+            logAfterMethod("getProfileMembersOfUser");
             return listspProfileMembers;
         } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileMembersOfUser", bre));
-            }
+            logOnExceptionMethod("getProfileMembersOfUser", bre);
             throw new SProfileMemberReadException(bre);
         }
     }
@@ -668,21 +537,15 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public List<SProfileMember> getProfileMembersOfGroup(final long groupId, final int fromIndex, final int numberOfElements, final String field,
             final OrderByType order) throws SProfileMemberReadException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileMembersOfGroup"));
-        }
+        logBeforeMethod("getProfileMembersOfGroup");
         try {
             final SelectListDescriptor<SProfileMember> descriptor = SelectDescriptorBuilder.getDirectProfileMembersOfGroup(groupId, field, order, fromIndex,
                     numberOfElements);
             final List<SProfileMember> listspProfileMembers = persistenceService.selectList(descriptor);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfileMembersOfGroup"));
-            }
+            logAfterMethod("getProfileMembersOfGroup");
             return listspProfileMembers;
         } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileMembersOfGroup", bre));
-            }
+            logOnExceptionMethod("getProfileMembersOfGroup", bre);
             throw new SProfileMemberReadException(bre);
         }
     }
@@ -690,42 +553,30 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public List<SProfileMember> getProfileMembersOfRole(final long roleId, final int fromIndex, final int numberOfElements, final String field,
             final OrderByType order) throws SProfileMemberReadException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileMembersOfRole"));
-        }
+        logBeforeMethod("getProfileMembersOfRole");
         try {
             final SelectListDescriptor<SProfileMember> descriptor = SelectDescriptorBuilder.getDirectProfileMembersOfRole(roleId, field, order, fromIndex,
                     numberOfElements);
             final List<SProfileMember> listspProfileMembers = persistenceService.selectList(descriptor);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfileMembersOfRole"));
-            }
+            logAfterMethod("getProfileMembersOfRole");
             return listspProfileMembers;
         } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfileMembersOfRole", bre));
-            }
+            logOnExceptionMethod("getProfileMembersOfRole", bre);
             throw new SProfileMemberReadException(bre);
         }
     }
 
     @Override
-    public List<SProfile> getProfilesOfUser(final long userId) throws SProfileMemberNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfilesOfUser"));
-        }
+    public List<SProfile> getProfilesOfUser(final long userId) throws SProfileNotFoundException {
+        logBeforeMethod("getProfilesOfUser");
         final SelectListDescriptor<SProfile> descriptor = SelectDescriptorBuilder.getProfilesOfUser(userId);
         try {
-            final List<SProfile> listspProfiles = persistenceService.selectList(descriptor);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getProfilesOfUser"));
-            }
-            return listspProfiles;
+            final List<SProfile> sProfiles = persistenceService.selectList(descriptor);
+            logAfterMethod("getProfilesOfUser");
+            return sProfiles;
         } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getProfilesOfUser", bre));
-            }
-            throw new SProfileMemberNotFoundException(bre);
+            logOnExceptionMethod("getProfilesOfUser", bre);
+            throw new SProfileNotFoundException(bre);
         }
     }
 
@@ -741,19 +592,13 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<SProfileMember> searchProfileMembers(final String querySuffix, final QueryOptions queryOptions) throws SBonitaSearchException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "searchProfileMembers"));
-        }
+        logBeforeMethod("searchProfileMembers");
         try {
             final List<SProfileMember> listSProfileMembers = persistenceService.searchEntity(SProfileMember.class, querySuffix, queryOptions, null);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "searchProfileMembers"));
-            }
+            logAfterMethod("searchProfileMembers");
             return listSProfileMembers;
-        } catch (final Exception e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "searchProfileMembers", e));
-            }
+        } catch (final SBonitaException e) {
+            logOnExceptionMethod("searchProfileMembers", e);
             throw new SBonitaSearchException(e);
         }
 
@@ -761,19 +606,13 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public long getNumberOfProfileMembers(final String querySuffix, final QueryOptions countOptions) throws SBonitaSearchException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfProfileMembers"));
-        }
+        logBeforeMethod("getNumberOfProfileMembers");
         try {
             final long number = persistenceService.getNumberOfEntities(SProfileMember.class, querySuffix, countOptions, null);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getNumberOfProfileMembers"));
-            }
+            logAfterMethod("getNumberOfProfileMembers");
             return number;
-        } catch (final Exception e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfProfileMembers", e));
-            }
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod("getNumberOfProfileMembers", e);
             throw new SBonitaSearchException(e);
         }
 
@@ -781,25 +620,18 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<SProfileMember> getNumberOfProfileMembers(final List<Long> profileIds) throws SBonitaSearchException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfProfileMembers"));
-        }
+        logBeforeMethod("getNumberOfProfileMembers");
         if (profileIds == null || profileIds.size() == 0) {
             return Collections.emptyList();
         }
         try {
             final Map<String, Object> emptyMap = Collections.singletonMap("profileIds", (Object) profileIds);
             final List<SProfileMember> results = persistenceService.selectList(new SelectListDescriptor<SProfileMember>("getProfileMembersFromProfileIds",
-                    emptyMap,
-                    SProfileMember.class));
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getNumberOfProfileMembers"));
-            }
+                    emptyMap, SProfileMember.class));
+            logAfterMethod("getNumberOfProfileMembers");
             return results;
         } catch (final SBonitaReadException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfProfileMembers", e));
-            }
+            logOnExceptionMethod("getNumberOfProfileMembers", e);
             throw new SBonitaSearchException(e);
         }
     }
@@ -868,6 +700,48 @@ public class ProfileServiceImpl implements ProfileService {
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
+    }
+
+    private void logBeforeMethod(final String methodName) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
+        }
+    }
+
+    private void logAfterMethod(final String methodName) {
+        final Class<? extends ProfileServiceImpl> thisClass = this.getClass();
+        if (logger.isLoggable(thisClass, TechnicalLogSeverity.TRACE)) {
+            logger.log(thisClass, TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(thisClass, methodName));
+        }
+    }
+
+    private void logOnExceptionMethod(final String methodName, final SBonitaException e) {
+        final Class<? extends ProfileServiceImpl> thisClass = this.getClass();
+        if (logger.isLoggable(thisClass, TechnicalLogSeverity.TRACE)) {
+            logger.log(thisClass, TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(thisClass, methodName, e));
+        }
+    }
+
+    private SProfileLogBuilder getSProfileLog(final ActionType actionType, final String message) {
+        final SProfileLogBuilder logBuilder = new SProfileLogBuilder();
+        this.initializeLogBuilder(logBuilder, message);
+        this.updateLog(actionType, logBuilder);
+        return logBuilder;
+    }
+
+    private SProfileMemberLogBuilder getProfileMemberLog(final ActionType actionType, final String message) {
+        final SProfileMemberLogBuilder logBuilder = new SProfileMemberLogBuilder();
+        this.initializeLogBuilder(logBuilder, message);
+        this.updateLog(actionType, logBuilder);
+        return logBuilder;
+    }
+
+    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
+        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+    }
+
+    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
+        logBuilder.setActionType(actionType);
     }
 
 }
