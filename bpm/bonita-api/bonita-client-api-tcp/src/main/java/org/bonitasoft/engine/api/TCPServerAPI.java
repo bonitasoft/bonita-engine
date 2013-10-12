@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -35,22 +36,30 @@ public class TCPServerAPI implements ServerAPI {
 
     private static final long serialVersionUID = 1L;
 
-    private final Socket remoteServerAPI;
+    private static Socket remoteServerAPI;
+    private static InputStream socketInputStream;
+
+    private synchronized void initSocket(final Map<String, String> parameters) throws ServerAPIException {
+        if (remoteServerAPI == null) {
+            final String host = parameters.get("host");
+            final int port = Integer.parseInt(parameters.get("port"));
+            try {
+                System.err.println(this.getClass().getSimpleName() + " - building a clientSocket...");
+                remoteServerAPI = new Socket(host, port);
+                System.err.println(this.getClass().getSimpleName() + " - client socket buit: " + remoteServerAPI);
+                socketInputStream = remoteServerAPI.getInputStream();
+            } catch (UnknownHostException e) {
+                throw new ServerAPIException(e);
+            } catch (IOException e) {
+                throw new ServerAPIException(e);
+            }
+        }
+    }
 
     public TCPServerAPI(final Map<String, String> parameters) throws ServerAPIException {
         //build socket access to the server socket
         System.err.println(this.getClass().getSimpleName() + " - constructor...");
-        final String host = parameters.get("host");
-        final int port = Integer.parseInt(parameters.get("port"));
-        try {
-            System.err.println(this.getClass().getSimpleName() + " - building a clientSocket...");
-            remoteServerAPI = new Socket(host, port);
-            System.err.println(this.getClass().getSimpleName() + " - client socket buit: " + remoteServerAPI);
-        } catch (UnknownHostException e) {
-            throw new ServerAPIException(e);
-        } catch (IOException e) {
-            throw new ServerAPIException(e);
-        }
+        initSocket(parameters);
     }
 
     @Override
@@ -66,13 +75,13 @@ public class TCPServerAPI implements ServerAPI {
         ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         try {
-            oos = new ObjectOutputStream(this.remoteServerAPI.getOutputStream());
+            oos = new ObjectOutputStream(remoteServerAPI.getOutputStream());
             final MethodCall methodCall = new MethodCall(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
             System.err.println(this.getClass().getSimpleName() + " - invoking with methodCall: " + methodCall);
             oos.writeObject(methodCall);
             oos.flush();
             System.err.println(this.getClass().getSimpleName() + " - flushed, waiting for retun...");
-            ois = new ObjectInputStream(remoteServerAPI.getInputStream());
+            ois = new ObjectInputStream(socketInputStream);
             final Object callReturn = ois.readObject();
             System.err.println(this.getClass().getSimpleName() + " - received return: " + callReturn);
             return checkInvokeMethodReturn(callReturn);
@@ -90,7 +99,7 @@ public class TCPServerAPI implements ServerAPI {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            */
+             */
         }
     }
 
