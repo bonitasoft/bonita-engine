@@ -34,27 +34,35 @@ public class ServerAPITcpServer implements ServerAPI {
     private static final long serialVersionUID = 1L;
 
     private final ServerSocket serverSocket;
+    private final ServerAPIImpl apiImpl = new ServerAPIImpl();
 
     public ServerAPITcpServer(final int port) throws IOException, ClassNotFoundException, ServerWrappedException {
+        System.err.println(this.getClass().getSimpleName() + " - starting...");
         serverSocket = new ServerSocket(port);
-        final Socket clientSocket = serverSocket.accept();
+        System.err.println(this.getClass().getSimpleName() + " - serverSocket build: " + serverSocket);
         while (true) {
+            final Socket clientSocket = serverSocket.accept();
+            System.err.println(this.getClass().getSimpleName() + " - accepting data on serverSocket, clientSocket: " + clientSocket);
+            System.err.println(this.getClass().getSimpleName() + " - starting a new loop...");
             final ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
             ObjectOutputStream oos = null;
             try {
                 final MethodCall methodCall = (MethodCall) ois.readObject();
+                System.err.println(this.getClass().getSimpleName() + " - received methodCall: " + methodCall);
                 final Object callResult = invokeMethod(methodCall);
+                System.err.println(this.getClass().getSimpleName() + " - callResult: " + callResult);
                 oos = new ObjectOutputStream(clientSocket.getOutputStream());
                 oos.writeObject(callResult);
+                System.err.println(this.getClass().getSimpleName() + " - flushing callResult: " + callResult);
                 oos.flush();
             } catch (Throwable t) {
               t.printStackTrace();  
             } finally {
                 if (ois != null) {
-                    ois.close();
+                    //ois.close();
                 }
                 if (oos != null) {
-                    oos.close();
+                    //oos.close();
                 }
             }
         }
@@ -66,10 +74,17 @@ public class ServerAPITcpServer implements ServerAPI {
         final String methodName = methodCall.getMethodName();
         final List<String> classNameParameters = methodCall.getClassNameParameters();
         final Object[] parametersValues = methodCall.getParametersValues();
-        
+        System.err.println(this.getClass().getSimpleName() + " - invoking: with parameters: " 
+        + ", options: " + options
+        + ", apiInterfaceName: " + apiInterfaceName
+        + ", methodName: " + methodName
+        + ", classNameParameters: " + classNameParameters
+        + ", parametersValues: " + parametersValues
+        + "...");
         try {
             return this.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
         } catch (ServerWrappedException e) {
+            System.err.println(this.getClass().getSimpleName() + " - got an exception during the invokeMethod: " + e.getClass() + ": " + e.getMessage());
             return e;
         }
     }
@@ -77,7 +92,6 @@ public class ServerAPITcpServer implements ServerAPI {
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
-        final ServerAPIImpl apiImpl = new ServerAPIImpl();
         return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
     }
 

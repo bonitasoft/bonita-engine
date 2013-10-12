@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.api.tcp;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -42,4 +43,14 @@ public class MethodCall implements Serializable {
         return parametersValues;
     }
 
+    @Override
+    public String toString() {
+        return "MethodCall [options=" + options + ", apiInterfaceName="
+                + apiInterfaceName + ", methodName=" + methodName
+                + ", classNameParameters=" + classNameParameters
+                + ", parametersValues=" + Arrays.toString(parametersValues)
+                + "]";
+    }
+
+    
 }
