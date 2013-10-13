@@ -19,7 +19,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
@@ -35,36 +34,20 @@ import org.bonitasoft.engine.exception.ServerAPIException;
 public class TCPServerAPI implements ServerAPI {
 
     private static final long serialVersionUID = 1L;
-
-    private static Socket remoteServerAPI;
-    private static InputStream socketInputStream;
-
-    private synchronized void initSocket(final Map<String, String> parameters) throws ServerAPIException {
-        if (remoteServerAPI == null) {
-            final String host = parameters.get("host");
-            final int port = Integer.parseInt(parameters.get("port"));
-            try {
-                System.err.println(this.getClass().getSimpleName() + " - building a clientSocket...");
-                remoteServerAPI = new Socket(host, port);
-                System.err.println(this.getClass().getSimpleName() + " - client socket buit: " + remoteServerAPI);
-                socketInputStream = remoteServerAPI.getInputStream();
-            } catch (UnknownHostException e) {
-                throw new ServerAPIException(e);
-            } catch (IOException e) {
-                throw new ServerAPIException(e);
-            }
-        }
-    }
+    private Map<String, String> parameters;
 
     public TCPServerAPI(final Map<String, String> parameters) throws ServerAPIException {
-        //build socket access to the server socket
+        this.parameters = parameters;
         System.err.println(this.getClass().getSimpleName() + " - constructor...");
-        initSocket(parameters);
     }
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+
+        final String host = parameters.get("host");
+        final int port = Integer.parseInt(parameters.get("port"));
+
         System.err.println(this.getClass().getSimpleName() + " - invoking: with parameters: " 
                 + ", options: " + options
                 + ", apiInterfaceName: " + apiInterfaceName
@@ -75,6 +58,10 @@ public class TCPServerAPI implements ServerAPI {
         ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         try {
+            System.err.println(this.getClass().getSimpleName() + " - building a clientSocket...");
+            final Socket remoteServerAPI = new Socket(host, port);
+            System.err.println(this.getClass().getSimpleName() + " - client socket buit: " + remoteServerAPI);
+            final InputStream socketInputStream = remoteServerAPI.getInputStream();
             oos = new ObjectOutputStream(remoteServerAPI.getOutputStream());
             final MethodCall methodCall = new MethodCall(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
             System.err.println(this.getClass().getSimpleName() + " - invoking with methodCall: " + methodCall);
@@ -88,18 +75,18 @@ public class TCPServerAPI implements ServerAPI {
         } catch (Throwable e) {
             throw new ServerWrappedException(e);
         } finally {
-            /*
+
             try {
                 if (oos != null) {
-                    //oos.close();
+                    oos.close();
                 }
                 if (ois != null) {
-                    //ois.close();
+                    ois.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-             */
+
         }
     }
 

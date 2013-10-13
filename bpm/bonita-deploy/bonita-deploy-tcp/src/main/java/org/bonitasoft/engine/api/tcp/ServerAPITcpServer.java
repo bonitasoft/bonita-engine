@@ -59,10 +59,10 @@ public class ServerAPITcpServer implements ServerAPI {
               t.printStackTrace();  
             } finally {
                 if (ois != null) {
-                    //ois.close();
+                    ois.close();
                 }
                 if (oos != null) {
-                    //oos.close();
+                    oos.close();
                 }
             }
         }
