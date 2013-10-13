@@ -38,7 +38,7 @@ public class TCPServerAPI implements ServerAPI {
 
     public TCPServerAPI(final Map<String, String> parameters) throws ServerAPIException {
         this.parameters = parameters;
-        System.err.println(this.getClass().getSimpleName() + " - constructor...");
+        //System.out.println(this.getClass().getSimpleName() + " - constructor...");
     }
 
     @Override
@@ -48,30 +48,30 @@ public class TCPServerAPI implements ServerAPI {
         final String host = parameters.get("host");
         final int port = Integer.parseInt(parameters.get("port"));
 
-        System.err.println(this.getClass().getSimpleName() + " - invoking: with parameters: " 
-                + ", options: " + options
-                + ", apiInterfaceName: " + apiInterfaceName
-                + ", methodName: " + methodName
-                + ", classNameParameters: " + classNameParameters
-                + ", parametersValues: " + parametersValues
-                + "...");
+//        System.out.println(this.getClass().getSimpleName() + " - invoking: with parameters: " 
+//                + ", options: " + options
+//                + ", apiInterfaceName: " + apiInterfaceName
+//                + ", methodName: " + methodName
+//                + ", classNameParameters: " + classNameParameters
+//                + ", parametersValues: " + parametersValues
+//                + "...");
         Socket remoteServerAPI = null;
         ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         try {
-            System.err.println(this.getClass().getSimpleName() + " - building a clientSocket...");
+            //System.out.println(this.getClass().getSimpleName() + " - building a clientSocket...");
             remoteServerAPI = new Socket(host, port);
-            System.err.println(this.getClass().getSimpleName() + " - client socket buit: " + remoteServerAPI);
+            //System.out.println(this.getClass().getSimpleName() + " - client socket buit: " + remoteServerAPI);
             final InputStream socketInputStream = remoteServerAPI.getInputStream();
             oos = new ObjectOutputStream(remoteServerAPI.getOutputStream());
             final MethodCall methodCall = new MethodCall(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-            System.err.println(this.getClass().getSimpleName() + " - invoking with methodCall: " + methodCall);
+            //System.out.println(this.getClass().getSimpleName() + " - invoking with methodCall: " + methodCall);
             oos.writeObject(methodCall);
             oos.flush();
-            System.err.println(this.getClass().getSimpleName() + " - flushed, waiting for retun...");
+            //System.out.println(this.getClass().getSimpleName() + " - flushed, waiting for retun...");
             ois = new ObjectInputStream(socketInputStream);
             final Object callReturn = ois.readObject();
-            System.err.println(this.getClass().getSimpleName() + " - received return: " + callReturn);
+            //System.out.println(this.getClass().getSimpleName() + " - received return: " + callReturn);
             return checkInvokeMethodReturn(callReturn);
         } catch (Throwable e) {
             throw new ServerWrappedException(e);
@@ -95,13 +95,13 @@ public class TCPServerAPI implements ServerAPI {
     }
 
     private Object checkInvokeMethodReturn(final Object callReturn) throws Throwable {
-        System.err.println(this.getClass().getSimpleName() + " - checking calReturn...");
+        //System.out.println(this.getClass().getSimpleName() + " - checking calReturn...");
         if (callReturn != null && callReturn instanceof Throwable) {
             final Throwable throwable = (Throwable) callReturn; 
-            System.err.println(this.getClass().getSimpleName() + " - callReturn was an exception, throwing it: " + throwable.getClass() + ": " + throwable.getMessage());
+            //System.out.println(this.getClass().getSimpleName() + " - callReturn was an exception, throwing it: " + throwable.getClass() + ": " + throwable.getMessage());
             throw throwable;
         }
-        System.err.println(this.getClass().getSimpleName() + " - returning calReturn as it was received...");
+        //System.out.println(this.getClass().getSimpleName() + " - returning calReturn as it was received...");
         return callReturn;
     }
 

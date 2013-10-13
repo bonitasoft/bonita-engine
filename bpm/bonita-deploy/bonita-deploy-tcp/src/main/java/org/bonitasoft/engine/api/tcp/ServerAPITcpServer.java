@@ -37,23 +37,23 @@ public class ServerAPITcpServer implements ServerAPI {
     private final ServerAPIImpl apiImpl = new ServerAPIImpl();
 
     public ServerAPITcpServer(final int port) throws IOException, ClassNotFoundException, ServerWrappedException {
-        System.err.println(this.getClass().getSimpleName() + " - starting...");
+        //System.out.println(this.getClass().getSimpleName() + " - starting...");
         serverSocket = new ServerSocket(port);
-        System.err.println(this.getClass().getSimpleName() + " - serverSocket build: " + serverSocket);
+        //System.out.println(this.getClass().getSimpleName() + " - serverSocket build: " + serverSocket);
         while (true) {
             final Socket clientSocket = serverSocket.accept();
-            System.err.println(this.getClass().getSimpleName() + " - accepting data on serverSocket, clientSocket: " + clientSocket);
-            System.err.println(this.getClass().getSimpleName() + " - starting a new loop...");
+            //System.out.println(this.getClass().getSimpleName() + " - accepting data on serverSocket, clientSocket: " + clientSocket);
+            //System.out.println(this.getClass().getSimpleName() + " - starting a new loop...");
             final ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
             ObjectOutputStream oos = null;
             try {
                 final MethodCall methodCall = (MethodCall) ois.readObject();
-                System.err.println(this.getClass().getSimpleName() + " - received methodCall: " + methodCall);
+                //System.out.println(this.getClass().getSimpleName() + " - received methodCall: " + methodCall);
                 final Object callResult = invokeMethod(methodCall);
-                System.err.println(this.getClass().getSimpleName() + " - callResult: " + callResult);
+                //System.out.println(this.getClass().getSimpleName() + " - callResult: " + callResult);
                 oos = new ObjectOutputStream(clientSocket.getOutputStream());
                 oos.writeObject(callResult);
-                System.err.println(this.getClass().getSimpleName() + " - flushing callResult: " + callResult);
+                //System.out.println(this.getClass().getSimpleName() + " - flushing callResult: " + callResult);
                 oos.flush();
             } catch (Throwable t) {
               t.printStackTrace();  
@@ -74,17 +74,17 @@ public class ServerAPITcpServer implements ServerAPI {
         final String methodName = methodCall.getMethodName();
         final List<String> classNameParameters = methodCall.getClassNameParameters();
         final Object[] parametersValues = methodCall.getParametersValues();
-        System.err.println(this.getClass().getSimpleName() + " - invoking: with parameters: " 
-        + ", options: " + options
-        + ", apiInterfaceName: " + apiInterfaceName
-        + ", methodName: " + methodName
-        + ", classNameParameters: " + classNameParameters
-        + ", parametersValues: " + parametersValues
-        + "...");
+//        System.out.println(this.getClass().getSimpleName() + " - invoking: with parameters: " 
+//        + ", options: " + options
+//        + ", apiInterfaceName: " + apiInterfaceName
+//        + ", methodName: " + methodName
+//        + ", classNameParameters: " + classNameParameters
+//        + ", parametersValues: " + parametersValues
+//        + "...");
         try {
             return this.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
         } catch (ServerWrappedException e) {
-            System.err.println(this.getClass().getSimpleName() + " - got an exception during the invokeMethod: " + e.getClass() + ": " + e.getMessage());
+            //System.out.println(this.getClass().getSimpleName() + " - got an exception during the invokeMethod: " + e.getClass() + ": " + e.getMessage());
             return e;
         }
     }
