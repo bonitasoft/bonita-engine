@@ -55,11 +55,12 @@ public class TCPServerAPI implements ServerAPI {
                 + ", classNameParameters: " + classNameParameters
                 + ", parametersValues: " + parametersValues
                 + "...");
+        Socket remoteServerAPI = null;
         ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         try {
             System.err.println(this.getClass().getSimpleName() + " - building a clientSocket...");
-            final Socket remoteServerAPI = new Socket(host, port);
+            remoteServerAPI = new Socket(host, port);
             System.err.println(this.getClass().getSimpleName() + " - client socket buit: " + remoteServerAPI);
             final InputStream socketInputStream = remoteServerAPI.getInputStream();
             oos = new ObjectOutputStream(remoteServerAPI.getOutputStream());
@@ -82,6 +83,9 @@ public class TCPServerAPI implements ServerAPI {
                 }
                 if (ois != null) {
                     ois.close();
+                }
+                if (remoteServerAPI != null) {
+                    remoteServerAPI.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
