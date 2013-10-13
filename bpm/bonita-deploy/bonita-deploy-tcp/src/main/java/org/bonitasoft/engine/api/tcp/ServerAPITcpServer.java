@@ -14,85 +14,34 @@
 package org.bonitasoft.engine.api.tcp;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ServerAPIImpl;
-import org.bonitasoft.engine.api.internal.ServerAPI;
-import org.bonitasoft.engine.api.internal.ServerWrappedException;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Charles Souillard
  */
-public class ServerAPITcpServer implements ServerAPI {
+public class ServerAPITcpServer {
 
-    private static final long serialVersionUID = 1L;
-
-    private final ServerSocket serverSocket;
-    private final ServerAPIImpl apiImpl = new ServerAPIImpl();
-
-    public ServerAPITcpServer(final int port) throws IOException, ClassNotFoundException, ServerWrappedException {
+    private final List<ServerSocketThread> sockets = new ArrayList<ServerSocketThread>();
+    
+    public ServerAPITcpServer(final List<Integer> ports) throws InterruptedException, IOException {
+        final int nbOfPorts = ports.size(); 
+        int i = 1;
+        final ServerAPIImpl apiImpl = new ServerAPIImpl();
         //System.out.println(this.getClass().getSimpleName() + " - starting...");
-        serverSocket = new ServerSocket(port);
-        //System.out.println(this.getClass().getSimpleName() + " - serverSocket build: " + serverSocket);
-        while (true) {
-            final Socket clientSocket = serverSocket.accept();
-            //System.out.println(this.getClass().getSimpleName() + " - accepting data on serverSocket, clientSocket: " + clientSocket);
-            //System.out.println(this.getClass().getSimpleName() + " - starting a new loop...");
-            final ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-            ObjectOutputStream oos = null;
-            try {
-                final MethodCall methodCall = (MethodCall) ois.readObject();
-                //System.out.println(this.getClass().getSimpleName() + " - received methodCall: " + methodCall);
-                final Object callResult = invokeMethod(methodCall);
-                //System.out.println(this.getClass().getSimpleName() + " - callResult: " + callResult);
-                oos = new ObjectOutputStream(clientSocket.getOutputStream());
-                oos.writeObject(callResult);
-                //System.out.println(this.getClass().getSimpleName() + " - flushing callResult: " + callResult);
-                oos.flush();
-            } catch (Throwable t) {
-              t.printStackTrace();  
-            } finally {
-                if (ois != null) {
-                    ois.close();
-                }
-                if (oos != null) {
-                    oos.close();
-                }
-            }
+        for (final int port : ports) {
+            final String threadName = ServerSocketThread.class.getSimpleName() + "-" + String.format("%" + nbOfPorts + "d", i) + "-p" + port;
+            sockets.add(new ServerSocketThread(threadName, apiImpl, port));
+            i++;
         }
-    }
-
-    private Object invokeMethod(final MethodCall methodCall) throws ServerWrappedException {
-        final Map<String, Serializable> options = methodCall.getOptions();
-        final String apiInterfaceName = methodCall.getApiInterfaceName();
-        final String methodName = methodCall.getMethodName();
-        final List<String> classNameParameters = methodCall.getClassNameParameters();
-        final Object[] parametersValues = methodCall.getParametersValues();
-//        System.out.println(this.getClass().getSimpleName() + " - invoking: with parameters: " 
-//        + ", options: " + options
-//        + ", apiInterfaceName: " + apiInterfaceName
-//        + ", methodName: " + methodName
-//        + ", classNameParameters: " + classNameParameters
-//        + ", parametersValues: " + parametersValues
-//        + "...");
-        try {
-            return this.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-        } catch (ServerWrappedException e) {
-            //System.out.println(this.getClass().getSimpleName() + " - got an exception during the invokeMethod: " + e.getClass() + ": " + e.getMessage());
-            return e;
+        for (final ServerSocketThread socket : sockets) {
+            socket.start();
         }
-    }
-
-    @Override
-    public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
-        return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+        for (final ServerSocketThread socket : sockets) {
+            socket.join();
+        }
     }
 
 }
