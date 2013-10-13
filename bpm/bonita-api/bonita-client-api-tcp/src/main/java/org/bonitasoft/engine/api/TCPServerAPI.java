@@ -80,10 +80,10 @@ public class TCPServerAPI implements ServerAPI {
             final InputStream socketInputStream = remoteServerAPI.getInputStream();
             oos = new ObjectOutputStream(remoteServerAPI.getOutputStream());
             final MethodCall methodCall = new MethodCall(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-            //System.out.println(this.getClass().getSimpleName() + " - invoking with methodCall: " + methodCall);
+            //System.out.println(this.getClass().getSimpleName() + " - invoking " + tcpDestination + " with methodCall: " + methodCall);
             oos.writeObject(methodCall);
             oos.flush();
-            //System.out.println(this.getClass().getSimpleName() + " - flushed, waiting for retun...");
+            //System.out.println(this.getClass().getSimpleName() + " - flushed, waiting for return...");
             ois = new ObjectInputStream(socketInputStream);
             final Object callReturn = ois.readObject();
             //System.out.println(this.getClass().getSimpleName() + " - received return: " + callReturn);
