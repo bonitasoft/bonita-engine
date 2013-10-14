@@ -22,13 +22,24 @@ import org.bonitasoft.engine.data.instance.model.builder.SADataInstanceVisibilit
  */
 public class SADataInstanceVisibilityMappingBuilderImpl implements SADataInstanceVisibilityMappingBuilder {
 
-    private SADataInstanceVisibilityMappingImpl entity;
+    private final SADataInstanceVisibilityMappingImpl entity;
+
+    
+    private SADataInstanceVisibilityMappingBuilderImpl(final SADataInstanceVisibilityMappingImpl entity) {
+        super();
+        this.entity = entity;
+    }
+
+    public SADataInstanceVisibilityMappingBuilderImpl() {
+        this.entity = null;
+    }
 
     @Override
     public SADataInstanceVisibilityMappingBuilder createNewInstance(final long containerId, final String containerType, final String dataName,
             final long dataInstanceId, final long sourceObjectId) {
-        entity = new SADataInstanceVisibilityMappingImpl(containerId, containerType, dataName, dataInstanceId, sourceObjectId);
-        return this;
+        final SADataInstanceVisibilityMappingImpl entity = new SADataInstanceVisibilityMappingImpl(containerId, containerType, dataName, dataInstanceId, sourceObjectId);
+        final SADataInstanceVisibilityMappingBuilder builder = new SADataInstanceVisibilityMappingBuilderImpl(entity);
+        return builder;
     }
 
     @Override
