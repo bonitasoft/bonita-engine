@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -114,7 +115,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public SProfile createProfile(final SProfile profile) throws SProfileCreationException {
         logBeforeMethod("createProfile");
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.CREATED, "Adding a new profile with name " + profile.getName());
+        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.CREATED, "Adding a new profile");
         final InsertRecord insertRecord = new InsertRecord(profile);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(PROFILE, EventActionType.CREATED)) {
@@ -182,32 +183,34 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void updateProfile(final SProfile profile, final EntityUpdateDescriptor descriptor) throws SProfileUpdateException {
+    public SProfile updateProfile(final SProfile sProfile, final EntityUpdateDescriptor descriptor) throws SProfileUpdateException {
         logBeforeMethod("updateProfile");
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.UPDATED, "Updating profile with name " + profile.getName());
+        NullCheckingUtil.checkArgsNotNull(sProfile);
+        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.UPDATED, "Updating profile");
         final SProfileBuilder sProfileBuilder = profileBuilderAccessor.getSProfileBuilder();
-        final SProfile oldUser = sProfileBuilder.createNewInstance(profile).done();
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(profile, descriptor);
+        final SProfile oldUser = sProfileBuilder.createNewInstance(sProfile).done();
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sProfile, descriptor);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(PROFILE, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(PROFILE).setObject(profile).done();
+            updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(PROFILE).setObject(sProfile).done();
             updateEvent.setOldObject(oldUser);
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProfile");
+            initiateLogBuilder(sProfile.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProfile");
             logAfterMethod("updateProfile");
         } catch (final SRecorderException re) {
             logOnExceptionMethod("updateProfile", re);
-            initiateLogBuilder(profile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfile");
+            initiateLogBuilder(sProfile.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfile");
             throw new SProfileUpdateException(re);
         }
+        return sProfile;
     }
 
     @Override
     public void deleteProfile(final SProfile profile) throws SProfileNotFoundException, SProfileDeletionException {
         logBeforeMethod("deleteProfile");
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.DELETED, "Deleting profile with name " + profile.getName());
+        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.DELETED, "Deleting profile");
         final DeleteRecord deleteRecord = new DeleteRecord(profile);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(PROFILE, EventActionType.DELETED)) {

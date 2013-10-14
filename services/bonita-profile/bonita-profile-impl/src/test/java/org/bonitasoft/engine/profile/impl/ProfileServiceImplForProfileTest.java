@@ -16,6 +16,9 @@ package org.bonitasoft.engine.profile.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -25,7 +28,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -34,9 +40,17 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.SProfileNotFoundException;
+import org.bonitasoft.engine.profile.SProfileUpdateException;
+import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
+import org.bonitasoft.engine.profile.builder.impl.SProfileUpdateBuilderImpl;
 import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -237,4 +251,78 @@ public class ProfileServiceImplForProfileTest {
         profileServiceImpl.getProfilesOfUser(1);
     }
 
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#createProfile(org.bonitasoft.engine.profile.model.SProfile)}.
+     * 
+     * @throws SProfileCreationException
+     * @throws SRecorderException
+     */
+    @Test
+    public final void createProfile() throws SProfileCreationException, SRecorderException {
+        final SProfile sProfile = mock(SProfile.class);
+        doReturn(1L).when(sProfile).getId();
+
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+
+        final SProfile result = profileServiceImpl.createProfile(sProfile);
+        assertNotNull(result);
+        assertEquals(sProfile, result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public final void createNullProfile() throws Exception {
+        profileServiceImpl.createProfile(null);
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#updateProfile(org.bonitasoft.engine.profile.model.SProfile, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
+     * 
+     * @throws SBonitaReadException
+     * @throws SRecorderException
+     * @throws SProfileUpdateException
+     */
+    @Test
+    public final void updateProfile() throws SProfileUpdateException {
+        final SProfile sProfile = mock(SProfile.class);
+        doReturn(3L).when(sProfile).getId();
+        final SProfileUpdateBuilder SProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
+        SProfileUpdateBuilder.setDescription("newDescription").setName("newName");
+
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+
+        final SProfile result = profileServiceImpl.updateProfile(sProfile, SProfileUpdateBuilder.done());
+        assertNotNull(result);
+        assertEquals(sProfile, result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public final void updateNullProfile() throws SProfileUpdateException {
+        final SProfileUpdateBuilder SProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
+
+        profileServiceImpl.updateProfile(null, SProfileUpdateBuilder.done());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public final void updateProfileWithNullDescriptor() throws SProfileUpdateException {
+        final SProfile sProfile = mock(SProfile.class);
+        doReturn(3L).when(sProfile).getId();
+
+        profileServiceImpl.updateProfile(sProfile, null);
+    }
+
+    @Test(expected = SProfileUpdateException.class)
+    public final void updateActorThrowException() throws SRecorderException, SProfileUpdateException {
+        final SProfile sProfile = mock(SProfile.class);
+        doReturn(3L).when(sProfile).getId();
+        final SProfileUpdateBuilder SProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
+        SProfileUpdateBuilder.setDescription("newDescription").setName("newName");
+
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+
+        profileServiceImpl.updateProfile(sProfile, SProfileUpdateBuilder.done());
+    }
 }

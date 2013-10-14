@@ -78,11 +78,12 @@ public interface ProfileService {
      * 
      * @param profile
      * @param descriptor
+     * @return The updated profile
      * @throws SProfileUpdateException
      *             occurs when an exception is thrown during sProfile update
      * @since 6.0
      */
-    void updateProfile(SProfile profile, EntityUpdateDescriptor descriptor) throws SProfileUpdateException;
+    SProfile updateProfile(SProfile profile, EntityUpdateDescriptor descriptor) throws SProfileUpdateException;
 
     /**
      * Delete profile by given sProfile
