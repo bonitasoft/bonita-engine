@@ -82,18 +82,6 @@ public class NodeConfigurationImpl implements NodeConfiguration {
         return shouldStartEventHandlingJob;
     }
 
-    public boolean getShouldStartScheduler() {
-        return shouldStartScheduler;
-    }
-
-    public boolean getShouldRestartElements() {
-        return shouldRestartElements;
-    }
-
-    public boolean getShouldStartEventHandlingJob() {
-        return shouldStartEventHandlingJob;
-    }
-
     public void setShouldStartScheduler(final boolean shouldStartScheduler) {
         this.shouldStartScheduler = shouldStartScheduler;
     }

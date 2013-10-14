@@ -50,21 +50,21 @@ public class NodeConfigurationTest {
     @Cover(classes = NodeConfiguration.class, concept = BPMNConcept.NONE, keywords = { "NodeConfiguration", "Scheduler" }, story = "Check result of should start scheduler.", jira = "ENGINE-612")
     @Test
     public void getShouldStartScheduler() {
-        boolean startScheduler = ((NodeConfigurationImpl) nodeConfiguration).getShouldStartScheduler();
+        boolean startScheduler = ((NodeConfigurationImpl) nodeConfiguration).shouldStartScheduler();
         assertEquals(true, startScheduler);
     }
 
     @Cover(classes = NodeConfiguration.class, concept = BPMNConcept.NONE, keywords = { "NodeConfiguration", "Restart" }, story = "Check result of should restart element.", jira = "ENGINE-612")
     @Test
     public void getShouldRestartElements() {
-        boolean restartElements = ((NodeConfigurationImpl) nodeConfiguration).getShouldRestartElements();
+        boolean restartElements = ((NodeConfigurationImpl) nodeConfiguration).shouldResumeElements();
         assertEquals(true, restartElements);
     }
 
     @Cover(classes = NodeConfiguration.class, concept = BPMNConcept.NONE, keywords = { "NodeConfiguration", "Restart" }, story = "Check result of should start event handling job.", jira = "ENGINE-612")
     @Test
     public void getShouldStartEventHandlingJob() {
-        boolean startEvent = ((NodeConfigurationImpl) nodeConfiguration).getShouldStartEventHandlingJob();
+        boolean startEvent = ((NodeConfigurationImpl) nodeConfiguration).shouldStartEventHandlingJob();
         assertEquals(true, startEvent);
     }
 
