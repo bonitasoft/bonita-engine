@@ -19,7 +19,7 @@ import org.bonitasoft.engine.platform.session.model.builder.SPlatformSessionMode
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SPlatformSesssionModelBuilderImpl implements SPlatformSessionModelBuilder {
+public class SPlatformSessionModelBuilderImpl implements SPlatformSessionModelBuilder {
 
     @Override
     public SPlatformSessionBuilder getSessionBuilder() {
