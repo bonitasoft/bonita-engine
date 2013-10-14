@@ -63,7 +63,7 @@ public class MBeanUtil {
         return ManagementFactory.getThreadMXBean();
     }
 
-    public static long createSesssion(final TransactionService transactionSvc, final SessionAccessor sessionAccessor, final SessionService sessionService,
+    public static long createSession(final TransactionService transactionSvc, final SessionAccessor sessionAccessor, final SessionService sessionService,
             final long tenantId, final String username) throws Exception {
         SSession session = null;
         try {
