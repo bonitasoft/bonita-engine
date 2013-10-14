@@ -66,7 +66,7 @@ public class EngineInitializer {
     public void initializeEngine() throws Exception {
         LOGGER.log(Level.INFO, "Initializing Bonita Engine...");
         long before = System.currentTimeMillis();
-        LOGGER.log(Level.INFO, "Initializing spring context...");
+        LOGGER.log(Level.INFO, "Initializing Spring context...");
         // create a session to call the engine
         PlatformServiceAccessor platformAccessor = getPlatformAccessor();
         PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
@@ -122,13 +122,13 @@ public class EngineInitializer {
                 platformManager.stopPlatform(platformAPI);
             }
         } catch (PlatformNotFoundException e) {
-            LOGGER.log(Level.WARNING, "The platform cannot be stop because it does not exists!");
+            LOGGER.log(Level.WARNING, "The platform cannot be stopped because it does not exist!");
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
         // after that the engine is unloaded
         ServiceAccessorFactory.getInstance().destroyAccessors();
-        LOGGER.log(Level.INFO, "Bonita Engine Stopped!");
+        LOGGER.log(Level.INFO, "Bonita Engine stopped!");
 
     }
 
