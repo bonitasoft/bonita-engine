@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,26 +11,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.profile;
+package org.bonitasoft.engine.profile.exception.profilemember;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
-public class SProfileMemberException extends SBonitaException {
+public class SProfileMemberCreationException extends SBonitaException {
 
-    private static final long serialVersionUID = -4589920305652820696L;
+    private static final long serialVersionUID = 5352601047167402771L;
 
-    public SProfileMemberException(final String message) {
+    public SProfileMemberCreationException(final String message) {
         super(message);
     }
 
-    public SProfileMemberException(final Throwable cause) {
+    public SProfileMemberCreationException(final Throwable cause) {
         super(cause);
     }
 
-    public SProfileMemberException(final String message, final Throwable cause) {
+    public SProfileMemberCreationException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

@@ -11,26 +11,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.profile;
+package org.bonitasoft.engine.profile.exception.profileentry;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class SProfileMemberNotFoundException extends SBonitaException {
+public class SProfileEntryAlreadyExistsException extends SBonitaException {
 
-    private static final long serialVersionUID = -5699697434595954926L;
+    private static final long serialVersionUID = 259323549609957013L;
 
-    public SProfileMemberNotFoundException(final String message) {
+    public SProfileEntryAlreadyExistsException(final String message) {
         super(message);
     }
 
-    public SProfileMemberNotFoundException(final Throwable cause) {
+    public SProfileEntryAlreadyExistsException(final Throwable cause) {
         super(cause);
     }
 
-    public SProfileMemberNotFoundException(final String message, final Throwable cause) {
+    public SProfileEntryAlreadyExistsException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

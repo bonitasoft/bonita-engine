@@ -19,6 +19,20 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
+import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileDeletionException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileReadException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryReadException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberCreationException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberNotFoundException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberReadException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -114,11 +128,10 @@ public interface ProfileService {
      * 
      * @param userId
      * @return a list of sProfile
-     * @throws SProfileNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfile
+     * @throws SProfileReadException
      * @since 6.0
      */
-    List<SProfile> getProfilesOfUser(long userId) throws SProfileNotFoundException;
+    List<SProfile> getProfilesOfUser(long userId) throws SProfileReadException;
 
     /**
      * Get profile entry by its id
@@ -407,9 +420,9 @@ public interface ProfileService {
      * 
      * @param profileId
      * @return a list of profileMembers
-     * @throws SProfileNotFoundException
+     * @throws SProfileMemberNotFoundException
      */
-    List<SProfileMember> getSProfileMembers(long profileId) throws SProfileNotFoundException;
+    List<SProfileMember> getSProfileMembers(long profileId) throws SProfileMemberNotFoundException;
 
     /**
      * Get a list of profileEntries by the given profileId and parentId
@@ -421,10 +434,10 @@ public interface ProfileService {
      * @param field
      * @param order
      * @return a list of profileEntries
-     * @throws SProfileNotFoundException
+     * @throws SProfileEntryReadException
      */
     List<SProfileEntry> getEntriesOfProfileByParentId(long profileId, long parentId, int fromIndex, int numberOfProfileEntries, String field, OrderByType order)
-            throws SProfileNotFoundException;
+            throws SProfileEntryReadException;
 
     /**
      * Delete all profile members for the connected tenant

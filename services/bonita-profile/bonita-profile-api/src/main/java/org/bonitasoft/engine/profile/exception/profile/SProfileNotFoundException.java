@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,20 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.profile.impl;
+package org.bonitasoft.engine.profile.exception.profile;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
+public class SProfileNotFoundException extends SBonitaException {
 
-@RunWith(Suite.class)
-@SuiteClasses({
-        ProfileServiceImplForProfileTest.class, ProfileServiceImplForProfileEntryTest.class
-})
-public class ProfileServiceImplTests {
+    private static final long serialVersionUID = -6787110496892352279L;
+
+    public SProfileNotFoundException(final String message) {
+        super(message);
+    }
+
+    public SProfileNotFoundException(final Throwable cause) {
+        super(cause);
+    }
+
+    public SProfileNotFoundException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
 }

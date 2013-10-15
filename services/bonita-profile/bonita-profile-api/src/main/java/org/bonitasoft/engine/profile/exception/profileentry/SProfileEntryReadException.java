@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,27 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.profile;
+package org.bonitasoft.engine.profile.exception.profileentry;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
-public class SProfileDeletionException extends SBonitaException {
+public class SProfileEntryReadException extends SBonitaException {
 
-    private static final long serialVersionUID = 3465858452506324242L;
+    private static final long serialVersionUID = 799472045606191342L;
 
-    public SProfileDeletionException(final String message) {
-        super(message);
-    }
-
-    public SProfileDeletionException(final Throwable cause) {
-        super(cause);
-    }
-
-    public SProfileDeletionException(final String message, final Throwable cause) {
+    public SProfileEntryReadException(final String message, final Throwable cause) {
         super(message, cause);
+    }
+
+    public SProfileEntryReadException(final Throwable cause) {
+        super(cause);
     }
 
 }
