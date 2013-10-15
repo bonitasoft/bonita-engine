@@ -54,7 +54,6 @@ public class MemoryLockService implements LockService {
     private final int lockPoolSize;
 
     /**
-     * 
      * @param logger
      * @param sessionAccessor
      * @param lockTimeout
@@ -64,28 +63,28 @@ public class MemoryLockService implements LockService {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
-        this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
-        this.traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
+        debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
+        traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         this.lockPoolSize = lockPoolSize;
-        
-        //the goal of this map of mutexs is not to solve completely the competition between keys
-        //it is only improving the default "one lock" behavior by partitioning ids among a chosen pool size
-        //this a sharding approach
+
+        // the goal of this map of mutexs is not to solve completely the competition between keys
+        // it is only improving the default "one lock" behavior by partitioning ids among a chosen pool size
+        // this a sharding approach
         final Map<Integer, Object> tmpMutexs = new HashMap<Integer, Object>();
-        for (int i = 0 ; i < lockPoolSize ; i++) {
+        for (int i = 0; i < lockPoolSize; i++) {
             tmpMutexs.put(i, new Object());
         }
-        this.mutexs = Collections.unmodifiableMap(tmpMutexs);
+        mutexs = Collections.unmodifiableMap(tmpMutexs);
     }
 
     private Object getMutex(final long objectToLockId) {
         final int poolKeyForThisObjectId = Long.valueOf(objectToLockId % lockPoolSize).intValue();
-        if (!this.mutexs.containsKey(poolKeyForThisObjectId)) {
+        if (!mutexs.containsKey(poolKeyForThisObjectId)) {
             throw new RuntimeException("No mutex defined for objectToLockId '" + objectToLockId + "' with generated key '" + poolKeyForThisObjectId + "'");
         }
-        return this.mutexs.get(poolKeyForThisObjectId);
+        return mutexs.get(poolKeyForThisObjectId);
     }
-    
+
     protected ReentrantLock getLock(final String key) {
         if (!locks.containsKey(key)) {
             // use fair mode?
@@ -95,7 +94,7 @@ public class MemoryLockService implements LockService {
     }
 
     protected void removeLockFromMapIfnotUsed(final String key) {
-        ReentrantLock reentrantLock = locks.get(key);
+        final ReentrantLock reentrantLock = locks.get(key);
         /*
          * The reentrant lock must not have waiting thread that try to lock it, nor a lockservice.lock that locked it nor rejectedlockhandlers waiting for it
          */
@@ -110,7 +109,7 @@ public class MemoryLockService implements LockService {
     private String buildKey(final long objectToLockId, final String objectType) {
         try {
             return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
-        } catch (TenantIdNotSetException e) {
+        } catch (final TenantIdNotSetException e) {
             throw new IllegalStateException("Tenant not set");
         }
     }
@@ -135,9 +134,11 @@ public class MemoryLockService implements LockService {
 
     @Override
     public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) {
+        final String key;
+        final ReentrantLock lock;
         synchronized (getMutex(objectToLockId)) {
-            final String key = buildKey(objectToLockId, objectType);
-            final ReentrantLock lock = getLock(key);
+            key = buildKey(objectToLockId, objectType);
+            lock = getLock(key);
 
             if (traceEnable) {
                 logger.log(getClass(), TechnicalLogSeverity.TRACE, "tryLock " + lock.hashCode() + " id=" + key);
@@ -146,21 +147,21 @@ public class MemoryLockService implements LockService {
             if (lock.isHeldByCurrentThread()) {
                 return null;
             }
-            try {
-                if (lock.tryLock(timeout, timeUnit)) {
-                    if (traceEnable) {
-                        logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked " + lock.hashCode() + " id=" + key);
-                    }
-                    return new BonitaLock(lock, objectType, objectToLockId);
-                }
-            } catch (InterruptedException e) {
-                logger.log(getClass(), TechnicalLogSeverity.ERROR, "The trylock was interrupted " + lock.hashCode() + " id=" + key);
-            }
-            if (traceEnable) {
-                logger.log(getClass(), TechnicalLogSeverity.TRACE, "not locked " + lock.hashCode() + " id=" + key);
-            }
-            return null;
         }
+        try {
+            if (lock.tryLock(timeout, timeUnit)) {
+                if (traceEnable) {
+                    logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked " + lock.hashCode() + " id=" + key);
+                }
+                return new BonitaLock(lock, objectType, objectToLockId);
+            }
+        } catch (final InterruptedException e) {
+            logger.log(getClass(), TechnicalLogSeverity.ERROR, "The trylock was interrupted " + lock.hashCode() + " id=" + key);
+        }
+        if (traceEnable) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "not locked " + lock.hashCode() + " id=" + key);
+        }
+        return null;
     }
 
     @Override
@@ -180,11 +181,11 @@ public class MemoryLockService implements LockService {
         }
         // outside mutex because it's a long lock
         try {
-            boolean tryLock = lock.tryLock(lockTimeout, TimeUnit.SECONDS);
+            final boolean tryLock = lock.tryLock(lockTimeout, TimeUnit.SECONDS);
             if (!tryLock) {
                 throw new SLockException("Timeout trying to lock " + objectToLockId + ":" + objectType);
             }
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             throw new SLockException(e);
         }
 
