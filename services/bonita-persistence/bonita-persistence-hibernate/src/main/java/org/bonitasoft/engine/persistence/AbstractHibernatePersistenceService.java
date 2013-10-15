@@ -369,7 +369,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         final Query query = session.getNamedQuery(selectDescriptor.getQueryName());
         setQueryCache(query, selectDescriptor.getQueryName());
         if (parameters != null) {
-            setPramaters(query, parameters);
+            setParamaters(query, parameters);
         }
         query.setMaxResults(1);
         try {
@@ -592,7 +592,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             setQueryCache(query, selectDescriptor.getQueryName());
 
             if (selectDescriptor != null) {
-                setPramaters(query, selectDescriptor.getInputParameters());
+                setParamaters(query, selectDescriptor.getInputParameters());
             }
             query.setFirstResult(selectDescriptor.getStartIndex());
             query.setMaxResults(selectDescriptor.getPageSize());
@@ -616,7 +616,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected void setPramaters(final Query query, final Map<String, Object> inputParameters) {
+    protected void setParamaters(final Query query, final Map<String, Object> inputParameters) {
         for (final Map.Entry<String, Object> entry : inputParameters.entrySet()) {
             final Object value = entry.getValue();
             if (value instanceof Collection<?>) {
