@@ -138,12 +138,12 @@ public class ProfileEntryTest extends AbstractProfileTest {
         // Create Profile Entry 1
         final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("ProfileEntry1", profileId).setDescription("Description profileEntry1")
                 .setIndex(0L).setType("folder");
-        getProfileAPI().createProfileEntry(profileEntryCreator1);
+        final ProfileEntry profileEntry1 = getProfileAPI().createProfileEntry(profileEntryCreator1);
 
         // Create Profile entry 2
         final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("ProfileEntry2", profileId).setDescription("Description profileEntry2")
                 .setIndex(2L).setType("folder");
-        getProfileAPI().createProfileEntry(profileEntryCreator2);
+        final ProfileEntry profileEntry2 = getProfileAPI().createProfileEntry(profileEntryCreator2);
 
         // Create Profile entry 3 without Index
         final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("ProfileEntryWithoutIndex", profileId).setDescription(
@@ -153,6 +153,14 @@ public class ProfileEntryTest extends AbstractProfileTest {
         final ProfileEntry getProfileEntryResult = getProfileAPI().getProfileEntry(profileEntryWithoutIndex.getId());
         assertEquals(profileEntryWithoutIndex.getId(), getProfileEntryResult.getId());
         assertEquals(4L, getProfileEntryResult.getIndex());
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, profileId);
+        final List<ProfileEntry> profileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+        assertEquals(profileEntry1, profileEntries.get(0));
+        assertEquals(profileEntry2, profileEntries.get(1));
+        assertEquals(profileEntryWithoutIndex, profileEntries.get(2));
 
         // Delete profile1
         getProfileAPI().deleteProfile(profileId);
