@@ -32,9 +32,11 @@ import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-import static org.junit.Assert.assertTrue;
-
 public class MultiInstanceTest extends CommonAPISPTest {
+
+    private static final String JACK = "Daniela.Angelo";
+
+    private static final String JOHN = "Walter.Bates";
 
     private static final String JOHN = "john";
 
