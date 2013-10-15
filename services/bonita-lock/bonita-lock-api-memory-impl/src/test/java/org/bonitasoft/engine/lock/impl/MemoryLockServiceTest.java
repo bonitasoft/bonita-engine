@@ -4,6 +4,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -61,6 +64,50 @@ public class MemoryLockServiceTest {
         }
     }
 
+    private final class TryLockThread extends Thread {
+
+        private BonitaLock lock;
+
+        private final int id;
+
+        private final String type;
+
+        private final Semaphore semaphore;
+
+        private final String name2;
+
+        public TryLockThread(final String name, final int id, final String type, final Semaphore semaphore) {
+            name2 = name;
+            this.id = id;
+            this.type = type;
+            this.semaphore = semaphore;
+        }
+
+        @Override
+        public void run() {
+            try {
+                System.out.println(name2 + " wait to acquire the lock");
+                semaphore.acquire();
+                System.out.println(name2 + " will lock");
+                lock = memoryLockService.tryLock(id, type, 20, TimeUnit.SECONDS);
+                System.out.println(name2 + " lock obtained, wait to unlock");
+                semaphore.acquire();
+                System.out.println(name2 + " will unlock");
+                memoryLockService.unlock(lock);
+                lock = null;
+                System.out.println(name2 + " unlocked");
+            } catch (SLockException e) {
+                // NOTHING
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public boolean isLockObtained() {
+            return lock != null;
+        }
+    }
+
     private final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
 
     private final ReadSessionAccessor sessionAccessor = mock(ReadSessionAccessor.class);
@@ -106,6 +153,54 @@ public class MemoryLockServiceTest {
         lockThread.start();
         lockThread.join(1200);
         assertFalse("should not be able to lock", lockThread.isLockObtained());
+    }
+
+    /*
+     * Issue with lock removed from map too early: the lock is removed from the map but a thread have a reference on it
+     * T1 have the lock L1
+     * T2 fait trylock et est blocké
+     * T1 release
+     * T2 block L1
+     * T1 enleve de la map
+     * T3 appel tryLock
+     * T3 lock L2
+     */
+    @Test
+    public void testRemoveLockFromMap() throws Exception {
+        Semaphore s1 = new Semaphore(1);
+        Semaphore s2 = new Semaphore(1);
+        Semaphore s3 = new Semaphore(1);
+        TryLockThread t1 = new TryLockThread("t1", 1, "t", s1);
+        TryLockThread t2 = new TryLockThread("t2", 1, "t", s2);
+        TryLockThread t3 = new TryLockThread("t3", 1, "t", s3);
+        s1.acquire();
+        s2.acquire();
+        s3.acquire();
+        t1.start();
+        t2.start();
+        t3.start();
+        // t1 take the lock
+        s1.release();
+        Thread.sleep(5);
+        // t2 is locked
+        s2.release();
+        Thread.sleep(5);
+        // t1 unlock
+        s1.release();
+        Thread.sleep(5);
+        // t3 try acquire
+        s3.release();
+        Thread.sleep(5);
+        // t2 have the lock
+        assertTrue(t2.isLockObtained());
+        // t3 should not be able to lock
+        assertFalse(t3.isLockObtained());
+        s2.release();
+        Thread.sleep(5);
+        // now it should be able to have it
+        assertTrue(t3.isLockObtained());
+        s3.release();
+
     }
 
 }

@@ -1040,8 +1040,9 @@ public class APITestUtil {
     private static void createPlatformStructure(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
         if (platformAPI.isPlatformCreated()) {
             if (PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
-                stopAndCleanPlatformAndTenant(deployCommands);
+                stopPlatformAndTenant(platformAPI, deployCommands);
             }
+            platformAPI.cleanPlatform();
             platformAPI.deletePlatform();
         }
         platformAPI.createPlatform();

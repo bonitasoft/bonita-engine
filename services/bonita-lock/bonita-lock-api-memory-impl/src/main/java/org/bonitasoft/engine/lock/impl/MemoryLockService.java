@@ -121,13 +121,10 @@ public class MemoryLockService implements LockService {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + lock.getLock().hashCode() + " id=" + key);
         }
         synchronized (getMutex(lock.getObjectToLockId())) {
-            try {
-                lock.getLock().unlock();
-                if (traceEnable) {
-                    logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + lock.getLock().hashCode() + " id=" + key);
-                }
-            } finally {
-                removeLockFromMapIfnotUsed(key);
+            removeLockFromMapIfnotUsed(key);
+            lock.getLock().unlock();
+            if (traceEnable) {
+                logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + lock.getLock().hashCode() + " id=" + key);
             }
         }
     }
