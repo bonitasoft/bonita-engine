@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,6 +162,101 @@ public class ProfileEntryTest extends AbstractProfileTest {
         assertEquals(profileEntry1, profileEntries.get(0));
         assertEquals(profileEntry2, profileEntries.get(1));
         assertEquals(profileEntryWithoutIndex, profileEntries.get(2));
+
+        // Delete profile1
+        getProfileAPI().deleteProfile(profileId);
+    }
+
+    @Test
+    public void createProfileEntryNico() throws BonitaException {
+        // Create Profile1
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", null);
+        final long profileId = createdProfile.getId();
+
+        // Create Folder Profile Entry
+        final ProfileEntryCreator folderCreator = new ProfileEntryCreator("a", profileId).setType("folder");
+        final ProfileEntry folderProfileEntry = getProfileAPI().createProfileEntry(folderCreator);
+
+        final List<ProfileEntry> profileEntries = new ArrayList<ProfileEntry>();
+
+        // Create Profile entry 1
+        final ProfileEntryCreator profileEntryCreator1 = new ProfileEntryCreator("", profileId).setType("link").setPage("tasklistinguser")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator1));
+
+        // Create Profile entry 2
+        final ProfileEntryCreator profileEntryCreator2 = new ProfileEntryCreator("", profileId).setType("link").setPage("tasklistingadmin")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator2));
+
+        // Create Profile entry 3
+        final ProfileEntryCreator profileEntryCreator3 = new ProfileEntryCreator("", profileId).setType("link").setPage("caselistinguser")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator3));
+
+        // Create Profile entry 4
+        final ProfileEntryCreator profileEntryCreator4 = new ProfileEntryCreator("", profileId).setType("link").setPage("caselistingadmin")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator4));
+
+        // Create Profile entry 5
+        final ProfileEntryCreator profileEntryCreator5 = new ProfileEntryCreator("", profileId).setType("link").setPage("processlistinguser")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator5));
+
+        // Create Profile entry 6
+        final ProfileEntryCreator profileEntryCreator6 = new ProfileEntryCreator("", profileId).setType("link").setPage("processlistingadmin")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator6));
+
+        // Create Profile entry 7
+        final ProfileEntryCreator profileEntryCreator7 = new ProfileEntryCreator("", profileId).setType("link").setPage("userlistingadmin")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator7));
+
+        // Create Profile entry 8
+        final ProfileEntryCreator profileEntryCreator8 = new ProfileEntryCreator("", profileId).setType("link").setPage("grouplistingadmin")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator8));
+
+        // Create Profile entry 9
+        final ProfileEntryCreator profileEntryCreator9 = new ProfileEntryCreator("", profileId).setType("link").setPage("rolelistingadmin")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator9));
+
+        // Create Profile entry 10
+        final ProfileEntryCreator profileEntryCreator10 = new ProfileEntryCreator("", profileId).setType("link").setPage("importexportorganization")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator10));
+
+        // Create Profile entry 11
+        final ProfileEntryCreator profileEntryCreator11 = new ProfileEntryCreator("", profileId).setType("link").setPage("profilelisting")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator11));
+
+        // Create Profile entry 12
+        final ProfileEntryCreator profileEntryCreator12 = new ProfileEntryCreator("", profileId).setType("link").setPage("reportlistingadminext")
+                .setParentId(folderProfileEntry.getId());
+        profileEntries.add(getProfileAPI().createProfileEntry(profileEntryCreator12));
+
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 20);
+        builder.sort(ProfileEntrySearchDescriptor.INDEX, Order.ASC);
+        builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, profileId);
+        builder.filter(ProfileEntrySearchDescriptor.PARENT_ID, folderProfileEntry.getId());
+        final List<ProfileEntry> resultProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
+        assertEquals(profileEntries, resultProfileEntries);
+        assertEquals(0L, resultProfileEntries.get(0).getIndex());
+        assertEquals(2L, resultProfileEntries.get(1).getIndex());
+        assertEquals(4L, resultProfileEntries.get(2).getIndex());
+        assertEquals(6L, resultProfileEntries.get(3).getIndex());
+        assertEquals(8L, resultProfileEntries.get(4).getIndex());
+        assertEquals(10L, resultProfileEntries.get(5).getIndex());
+        assertEquals(12L, resultProfileEntries.get(6).getIndex());
+        assertEquals(14L, resultProfileEntries.get(7).getIndex());
+        assertEquals(16L, resultProfileEntries.get(8).getIndex());
+        assertEquals(18L, resultProfileEntries.get(9).getIndex());
+        assertEquals(20L, resultProfileEntries.get(10).getIndex());
+        assertEquals(22L, resultProfileEntries.get(11).getIndex());
 
         // Delete profile1
         getProfileAPI().deleteProfile(profileId);
