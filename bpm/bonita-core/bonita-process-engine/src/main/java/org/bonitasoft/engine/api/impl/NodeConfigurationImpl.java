@@ -23,10 +23,11 @@ import org.bonitasoft.engine.scheduler.JobRegister;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Laurent Vaills
  */
 public class NodeConfigurationImpl implements NodeConfiguration {
 
-    private boolean shouldStartScheduler = true;;
+    private boolean shouldStartScheduler = true;
 
     private boolean shouldRestartElements = true;
 
@@ -54,8 +55,7 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     @Override
     public List<RestartHandler> getRestartHandlers() {
-        final List<RestartHandler> emptyList = Collections.emptyList();
-        return restartHandlers == null ? emptyList : restartHandlers;
+        return emptyOrUnmodifiable(restartHandlers);
     }
 
     public void setRestartHandlers(final List<RestartHandler> restartHandlers) {
@@ -64,8 +64,7 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     @Override
     public List<TenantRestartHandler> getTenantRestartHandlers() {
-        final List<TenantRestartHandler> emptyList = Collections.emptyList();
-        return tenantRestartHandlers == null ? emptyList : tenantRestartHandlers;
+        return emptyOrUnmodifiable(tenantRestartHandlers);
     }
 
     public void setTenantRestartHandlers(final List<TenantRestartHandler> tenantRestartHandlers) {
@@ -104,11 +103,7 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     @Override
     public List<JobRegister> getJobsToRegister() {
-        if (jobsToRegister == null) {
-            return Collections.emptyList();
-        } else {
-            return jobsToRegister;
-        }
+        return emptyOrUnmodifiable(jobsToRegister);
     }
 
     @Override
@@ -123,6 +118,10 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     @Override
     public boolean shouldClearSessions() {
         return true;
+    }
+
+    private <T> List<T> emptyOrUnmodifiable(final List<T> list) {
+        return list == null ?Collections.<T>emptyList() :Collections.unmodifiableList(list);
     }
 
 }
