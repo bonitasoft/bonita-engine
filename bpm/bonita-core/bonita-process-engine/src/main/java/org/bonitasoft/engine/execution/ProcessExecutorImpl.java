@@ -215,10 +215,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         eventsHandler.setProcessExecutor(this);
         for (final Entry<String, SProcessInstanceHandler<SEvent>> handler : handlers.entrySet()) {
             try {
-                eventService.addHandler(handler.getKey(), handler.getValue());// TODO check if it's already here?
+                eventService.addHandler(handler.getKey(), handler.getValue());
             } catch (final HandlerRegistrationException e) {
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);// just log it
+                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
+                }
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
                 }
             }
         }
