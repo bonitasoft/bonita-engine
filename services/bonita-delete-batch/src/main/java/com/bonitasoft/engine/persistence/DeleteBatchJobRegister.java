@@ -23,7 +23,6 @@ import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Baptiste Mesta
@@ -54,7 +53,7 @@ public class DeleteBatchJobRegister implements JobRegister {
      *            e.g. * *\/2 * * * ? to run it every 2 minutes
      */
     public DeleteBatchJobRegister(final PersistenceService persistenceService, final SchedulerService schedulerService,
-            final TechnicalLoggerService loggerService, final TransactionService transactionService, final List<String> classesToPurge, final String repeat) {
+            final TechnicalLoggerService loggerService, final List<String> classesToPurge, final String repeat) {
         this.schedulerService = schedulerService;
         this.loggerService = loggerService;
         this.repeat = repeat;
@@ -81,13 +80,7 @@ public class DeleteBatchJobRegister implements JobRegister {
                 List<String> jobs;
                 jobs = schedulerService.getAllJobs();
                 if (!jobs.contains(DELETE_BATCH_JOB)) {
-                    System.err.println("Register delete batch job with repeat cron: " + repeat);
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Register delete batch job with repeat cron: " + repeat);
-                    final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
-                            .createNewInstance(DeleteBatchJob.class.getName(), DELETE_BATCH_JOB, true).done();
-                    final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-                    final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), repeat);
-                    schedulerService.schedule(jobDescriptor, jobParameters, trigger);
+                    scheduleDeleteJob();
                 } else {
                     loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "The delete job was already started");
                 }
@@ -96,9 +89,21 @@ public class DeleteBatchJobRegister implements JobRegister {
                 if (loggerService.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                     loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
                 }
+            } finally {
+                mustStartJob = false;
             }
-            mustStartJob = false;
         }
+    }
+
+    /**
+     * @throws SSchedulerException
+     */
+    private void scheduleDeleteJob() throws SSchedulerException {
+        loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Register delete batch job with repeat cron: " + repeat);
+        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(DeleteBatchJob.class.getName(), DELETE_BATCH_JOB, true).done();
+        final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
+        final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), repeat);
+        schedulerService.schedule(jobDescriptor, jobParameters, trigger);
     }
 
 }
