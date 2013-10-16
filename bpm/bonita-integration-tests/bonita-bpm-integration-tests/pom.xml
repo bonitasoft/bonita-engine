@@ -947,13 +947,11 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.16</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>8.4-702.jdbc3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

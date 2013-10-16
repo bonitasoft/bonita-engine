@@ -43,7 +43,6 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.18</version>
             <scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -54,9 +53,8 @@
             <systemPath>${basedir}/lib/ojdbc6.jar</systemPath>
         </dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc3</version>
             <scope>runtime</scope>
 		</dependency>
 		<dependency>

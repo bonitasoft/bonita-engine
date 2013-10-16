@@ -629,13 +629,13 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.16</version>
+			<version>5.1.26</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>8.4-702.jdbc3</version>
+			<version>9.2-1003-jdbc4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
