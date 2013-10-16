@@ -33,7 +33,6 @@ import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.impl.SServiceMXBeanImpl;
 import com.bonitasoft.services.CommonServiceSPTest;
 
-@SuppressWarnings("javadoc")
 public class SServiceMXBeanTest extends CommonServiceSPTest {
 
     private static SchedulerService schedulerService;
@@ -126,9 +125,15 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
         // check the transaction has been successfully counted
         assertEquals(1L, mbserver.getAttribute(serviceMB, numberOfActiveTransactions));
 
-        Thread.sleep(6000);// wait thread complete transaction
+        final WaitFor waitForNoActiveTransactions = new WaitFor(50, 10000) {
 
-        assertEquals(0L, mbserver.getAttribute(serviceMB, numberOfActiveTransactions));
+            @Override
+            boolean check() throws AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
+                return (Long) mbserver.getAttribute(serviceMB, numberOfActiveTransactions) == 0l;
+            }
+        };
+        // check the number of executing job has incremented
+        assertTrue(waitForNoActiveTransactions.waitFor());
         svcMB.stop();
     }
 
@@ -166,7 +171,7 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
             boolean check() throws AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
                 // return svcMB.getExecutingJobsNb() == (startNbOfExecutingJobs
                 // + 1);
-                return ((Long) mbserver.getAttribute(serviceMB, numberOfExecutingJobs)) == startNbOfExecutingJobs + 1;
+                return (Long) mbserver.getAttribute(serviceMB, numberOfExecutingJobs) == startNbOfExecutingJobs + 1;
             }
         };
 
@@ -204,7 +209,7 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
         public void run() {
             try {
                 txService.begin();
-                Thread.sleep(5000);
+                Thread.sleep(4000);
                 txService.complete();
             } catch (final Exception e) {
                 e.printStackTrace();
