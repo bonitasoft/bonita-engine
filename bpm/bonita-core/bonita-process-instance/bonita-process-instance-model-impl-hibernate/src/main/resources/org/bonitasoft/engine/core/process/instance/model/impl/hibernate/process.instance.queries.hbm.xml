@@ -448,6 +448,12 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
 		WHERE c.containerId = :id
 	</query>
+	
+	<query name="getConnectorInstanceWithFailureInfo">
+		SELECT cfi
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceWithFailureInfoImpl AS cfi
+		WHERE cfi.containerId = :id
+	</query>
 
 	<query name="getMessageInstancesByNameAndTarget">
 		SELECT m

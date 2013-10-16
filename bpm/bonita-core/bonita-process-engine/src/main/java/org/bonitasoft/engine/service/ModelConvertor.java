@@ -40,10 +40,12 @@ import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.impl.ArchivedConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceImpl;
+import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceWithFailureInfoImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -158,6 +160,7 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
@@ -1848,6 +1851,17 @@ public class ModelConvertor {
                 sConnectorInstance.getContainerType(), sConnectorInstance.getConnectorId(), sConnectorInstance.getVersion(),
                 ConnectorState.valueOf(sConnectorInstance.getState()), sConnectorInstance.getActivationEvent());
         connectorInstanceImpl.setId(sConnectorInstance.getId());
+        return connectorInstanceImpl;
+    }
+
+    public static ConnectorInstanceWithFailureInfo toConnectorInstanceWithFailureInfo(final SConnectorInstanceWithFailureInfo sConnectorInstanceWithFailureInfo) {
+        final ConnectorInstanceWithFailureInfoImpl connectorInstanceImpl = new ConnectorInstanceWithFailureInfoImpl(
+                sConnectorInstanceWithFailureInfo.getName(), sConnectorInstanceWithFailureInfo.getContainerId(),
+                sConnectorInstanceWithFailureInfo.getContainerType(), sConnectorInstanceWithFailureInfo.getConnectorId(),
+                sConnectorInstanceWithFailureInfo.getVersion(), ConnectorState.valueOf(sConnectorInstanceWithFailureInfo.getState()),
+                sConnectorInstanceWithFailureInfo.getActivationEvent(), sConnectorInstanceWithFailureInfo.getExceptionMessage(),
+                sConnectorInstanceWithFailureInfo.getStackTrace());
+        connectorInstanceImpl.setId(sConnectorInstanceWithFailureInfo.getId());
         return connectorInstanceImpl;
     }
 

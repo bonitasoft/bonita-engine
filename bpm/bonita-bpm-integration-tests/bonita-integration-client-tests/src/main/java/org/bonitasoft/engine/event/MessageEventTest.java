@@ -3,6 +3,7 @@ package org.bonitasoft.engine.event;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -1049,15 +1050,13 @@ public class MessageEventTest extends CommonAPITest {
     public void sendMessageTwiceTriggersTwoStartMessageEvents() throws Exception {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
         sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.<Expression, Expression> emptyMap());
-
-        // at the first test some time the cron job time some time before executing
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 20, 5000, true, 1, user);
-        assertTrue("There should be 1 pending task", checkNbPendingTaskOf.waitUntil());
+        ActivityInstance taskFirstProcInst = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.<Expression, Expression> emptyMap());
-        final CheckNbPendingTaskOf checkNbPendingTask2 = new CheckNbPendingTaskOf(getProcessAPI(), 20, 5000, true, 2, user);
-        assertTrue("There should be 2 pending tasks", checkNbPendingTask2.waitUntil());
-
+        ActivityInstance taskSecondProcInst = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
+        assertNotEquals(taskFirstProcInst.getId(), taskSecondProcInst.getId());
+        assertNotEquals(taskFirstProcInst.getParentProcessInstanceId(), taskSecondProcInst.getParentProcessInstanceId());
+        
         disableAndDeleteProcess(receiveMessageProcess);
     }
 

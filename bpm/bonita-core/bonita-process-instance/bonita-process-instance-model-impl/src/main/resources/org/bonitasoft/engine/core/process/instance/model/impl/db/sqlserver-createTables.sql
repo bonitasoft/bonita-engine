@@ -5,7 +5,7 @@ CREATE TABLE process_instance (
   processDefinitionId NUMERIC(19, 0) NOT NULL,
   description NVARCHAR(255),
   startDate NUMERIC(19, 0) NOT NULL,
-  startedBy NUMERIC(19, 0) NULL,
+  startedBy NUMERIC(19, 0) NOT NULL,
   startedByDelegate NUMERIC(19, 0) NOT NULL,
   endDate NUMERIC(19, 0) NOT NULL,
   stateId INT NOT NULL,
@@ -107,6 +107,8 @@ CREATE TABLE connector_instance (
   activationEvent NVARCHAR(30),
   state NVARCHAR(50),
   executionOrder INT,
+  exceptionMessage NVARCHAR(255),
+  stackTrace NVARCHAR(MAX),
   PRIMARY KEY (tenantid, id)
 )
 GO

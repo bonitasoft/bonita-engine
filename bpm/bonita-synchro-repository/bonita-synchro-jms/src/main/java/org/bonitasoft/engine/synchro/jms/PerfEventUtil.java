@@ -53,4 +53,13 @@ public class PerfEventUtil {
         return map;
     }
 
+    public static Map<String, Serializable> getFlowNodeReachStateEvent(final long processInstanceId, final String taskName, final int stateId) {
+        final HashMap<String, Serializable> map = new HashMap<String, Serializable>(4);
+        map.put(TYPE, FLOW_NODE);
+        map.put(ID, processInstanceId);
+        map.put(NAME, taskName);
+        map.put(STATE_ID, stateId);
+        return map;
+    }
+
 }
