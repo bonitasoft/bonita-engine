@@ -21,7 +21,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
- * 
  * A work that wrap an other work in a transaction
  * 
  * @author Baptiste Mesta
@@ -31,9 +30,6 @@ import org.bonitasoft.engine.work.BonitaWork;
  */
 public class TxBonitaWork extends WrappingBonitaWork {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     public TxBonitaWork(final BonitaWork wrappedWork) {
@@ -42,8 +38,8 @@ public class TxBonitaWork extends WrappingBonitaWork {
 
     @Override
     public void work(final Map<String, Object> context) throws Exception {
-        TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        TransactionService transactionService = tenantAccessor.getTransactionService();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
+        final TransactionService transactionService = tenantAccessor.getTransactionService();
 
         final Callable<Void> runWork = new Callable<Void>() {
 

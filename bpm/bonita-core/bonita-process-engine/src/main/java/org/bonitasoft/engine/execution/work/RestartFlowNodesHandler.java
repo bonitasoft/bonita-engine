@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -28,18 +27,13 @@ import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
- * 
- * Restart flow nodes for works:
- * 
- * {@link ExecuteFlowNodeWork} {@link ExecuteConnectorOfActivity} {@link NotifyChildFinishedWork}
- * 
- * 
+ * Restart flow nodes for works: {@link ExecuteFlowNodeWork} {@link ExecuteConnectorOfActivity} {@link NotifyChildFinishedWork}
  * 
  * @author Baptiste Mesta
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class RestartFlowsNodeHandler implements TenantRestartHandler {
+public class RestartFlowNodesHandler implements TenantRestartHandler {
 
     @Override
     public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
@@ -47,7 +41,6 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
         final WorkService workService = platformServiceAccessor.getWorkService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         try {
-            final BPMInstanceBuilders bpmInstanceBuilders = tenantServiceAccessor.getBPMInstanceBuilders();
             QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
             List<SFlowNodeInstance> sFlowNodeInstances;
             do {
@@ -65,16 +58,17 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
                             logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Notify...) " + sFlowNodeInstance.getName() + ":"
                                     + sFlowNodeInstance.getId());
                         }
-                        workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
-                                .getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
+                        workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(),
+                                sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(),
+                                sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
                     } else {
                         if (info) {
                             logger.log(getClass(), TechnicalLogSeverity.INFO, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":"
                                     + sFlowNodeInstance.getId());
                         }
                         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
-                        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null, sFlowNodeInstance
-                                .getParentProcessInstanceId()));
+                        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null,
+                                sFlowNodeInstance.getParentProcessInstanceId()));
                     }
                 }
             } while (sFlowNodeInstances.size() == queryOptions.getNumberOfResults());
@@ -89,4 +83,5 @@ public class RestartFlowsNodeHandler implements TenantRestartHandler {
     private void handleException(final Exception e, final String message) throws RestartException {
         throw new RestartException(message, e);
     }
+
 }

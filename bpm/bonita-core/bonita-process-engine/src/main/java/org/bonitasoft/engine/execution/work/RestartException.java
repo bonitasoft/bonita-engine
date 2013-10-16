@@ -22,10 +22,6 @@ public class RestartException extends BonitaException {
 
     private static final long serialVersionUID = 6724312254693245291L;
 
-    /**
-     * @param message
-     * @param cause
-     */
     public RestartException(final String message, final Throwable cause) {
         super(message, cause);
     }

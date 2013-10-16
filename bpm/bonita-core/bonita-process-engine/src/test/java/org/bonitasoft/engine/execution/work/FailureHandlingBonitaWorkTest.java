@@ -5,6 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,8 +14,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.SessionService;
@@ -131,6 +136,46 @@ public class FailureHandlingBonitaWorkTest {
     public void testToString() {
         when(wrappedWork.toString()).thenReturn("the to string");
         assertEquals("the to string", txBonitawork.toString());
+    }
+
+    @Test
+    public void doNotHandleFailureWhenGettingASFlowNodeNotFoundException() throws Exception {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final Exception e = new Exception(new SFlowNodeNotFoundException(83));
+        doThrow(e).when(wrappedWork).work(context);
+        txBonitawork.work(context);
+        verify(wrappedWork, never()).handleFailure(e, context);
+        verify(loggerService).isLoggable(FailureHandlingBonitaWorkExtended.class, TechnicalLogSeverity.DEBUG);
+    }
+
+    @Test
+    public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Exception {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final Exception e = new Exception(new SProcessInstanceNotFoundException(83));
+        doThrow(e).when(wrappedWork).work(context);
+        when(wrappedWork.getDescription()).thenReturn("");
+        txBonitawork.work(context);
+        verify(wrappedWork, never()).handleFailure(e, context);
+        verify(loggerService).isLoggable(FailureHandlingBonitaWorkExtended.class, TechnicalLogSeverity.DEBUG);
+    }
+
+    @Test
+    public void doNotHandleFailureWhenGettingASProcessDefinitionNotFoundException() throws Exception {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final Exception e = new Exception(new SProcessDefinitionNotFoundException("message"));
+        doThrow(e).when(wrappedWork).work(context);
+        txBonitawork.work(context);
+        verify(wrappedWork, never()).handleFailure(e, context);
+        verify(loggerService).isLoggable(FailureHandlingBonitaWorkExtended.class, TechnicalLogSeverity.DEBUG);
+    }
+
+    @Test
+    public void handleFailureForAllOtherExceptions() throws Exception {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final Exception e = new Exception();
+        doThrow(e).when(wrappedWork).work(context);
+        txBonitawork.work(context);
+        verify(wrappedWork, times(1)).handleFailure(e, context);
     }
 
 }

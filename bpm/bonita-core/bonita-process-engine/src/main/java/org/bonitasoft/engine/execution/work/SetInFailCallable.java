@@ -21,15 +21,9 @@ import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
 public class SetInFailCallable implements Callable<Void> {
-
-    /**
-     * 
-     */
 
     private final FlowNodeExecutor flowNodeExecutor;
 
@@ -39,8 +33,8 @@ public class SetInFailCallable implements Callable<Void> {
 
     private final long flowNodeInstanceId;
 
-    SetInFailCallable(FlowNodeExecutor flowNodeExecutor, ActivityInstanceService activityInstanceService,
-            FlowNodeStateManager flowNodeStateManager, long flowNodeInstanceId) {
+    SetInFailCallable(final FlowNodeExecutor flowNodeExecutor, final ActivityInstanceService activityInstanceService,
+            final FlowNodeStateManager flowNodeStateManager, final long flowNodeInstanceId) {
         this.flowNodeExecutor = flowNodeExecutor;
         this.activityInstanceService = activityInstanceService;
         this.flowNodeStateManager = flowNodeStateManager;
@@ -50,7 +44,7 @@ public class SetInFailCallable implements Callable<Void> {
     @Override
     public Void call() throws Exception {
         final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-        long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
+        final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
         flowNodeExecutor.archiveFlowNodeInstance(flowNodeInstance, false, processDefinitionId);
         activityInstanceService.setState(flowNodeInstance, flowNodeStateManager.getFailedState());
         return null;

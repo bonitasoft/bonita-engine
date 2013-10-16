@@ -34,7 +34,6 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * 
  * Restart handler for work {@link ExecuteConnectorOfProcess}
  * 
  * @author Baptiste Mesta
@@ -96,4 +95,5 @@ public class RestartProcessHandler implements TenantRestartHandler {
     private void handleException(final Exception e, final String message) throws RestartException {
         throw new RestartException(message, e);
     }
+
 }

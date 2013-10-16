@@ -15,6 +15,9 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -68,22 +71,28 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             }
             getWrappedWork().work(context);
         } catch (final Throwable e) {
-            // Edge case we cannot manage
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed, The failure will be handled, work is:  " + getDescription());
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage(), e);
+            final Throwable cause = e.getCause();
+            if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
+                    || cause instanceof SProcessDefinitionNotFoundException) {
+                if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work fails during its execution due to: " + getDescription(), cause);
+                }
+            } else {
+                // final Edge case we cannot manage
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed, The failure will be handled, work is:  " + getDescription());
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage(), e);
 
-            try {
-                getWrappedWork().handleFailure(e, context);
-            } catch (final Throwable e1) {
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work " + getDescription()
-                        + ". You may consider restarting the system. This will restart all works.", e);
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
-                logIncident(e, e1);
+                try {
+                    getWrappedWork().handleFailure(e, context);
+                } catch (final Throwable e1) {
+                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work " + getDescription()
+                            + ". You may consider restarting the system. This will restart all works.", e);
+                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
+                    logIncident(e, e1);
+                }
             }
-
         } finally {
             sessionAccessor.deleteTenantId();
         }
     }
-
 }

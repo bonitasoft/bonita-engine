@@ -21,32 +21,26 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
- * 
  * Factory to construct works
  * 
  * @author Baptiste Mesta
- * 
  */
 public class WorkFactory {
 
-    public static BonitaWork createExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId,
-            final long flowNodeInstanceId,
+    public static BonitaWork createExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
             final long connectorInstanceId, final String connectorDefinitionName) {
         return new FailureHandlingBonitaWork(new ExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId,
                 connectorDefinitionName));
     }
 
     public static BonitaWork createExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId,
-            final String connectorDefinitionName,
-            final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent) {
+            final String connectorDefinitionName, final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent) {
         return new FailureHandlingBonitaWork(new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName,
-                processInstanceId, rootProcessInstanceId,
-                activationEvent));
+                processInstanceId, rootProcessInstanceId, activationEvent));
     }
 
     public static BonitaWork createExecuteFlowNodeWork(final long flowNodeInstanceId, final List<SOperation> operations,
-            final SExpressionContext contextDependency,
-            final long processInstanceId) {
+            final SExpressionContext contextDependency, final long processInstanceId) {
         if (processInstanceId <= 0) {
             throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
         }
@@ -58,8 +52,7 @@ public class WorkFactory {
         return new FailureHandlingBonitaWork(new TxBonitaWork(new ExecuteMessageCoupleWork(messageInstanceId, waitingMessageId)));
     }
 
-    public static BonitaWork createNotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId,
-            final long flowNodeInstanceId,
+    public static BonitaWork createNotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
             final long parentId, final String parentType, final int stateId) {
         return new FailureHandlingBonitaWork(new LockProcessInstanceWork(new TxBonitaWork(new NotifyChildFinishedWork(processDefinitionId, processInstanceId,
                 flowNodeInstanceId, parentId, parentType, stateId)), processInstanceId));

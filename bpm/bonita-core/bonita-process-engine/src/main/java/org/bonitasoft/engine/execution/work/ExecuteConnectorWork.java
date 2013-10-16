@@ -115,8 +115,8 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(processClassloader);
-            final EvaluateParameterAndGetConnectorInstance callable = new EvaluateParameterAndGetConnectorInstance(connectorService,
-                    processDefinitionService, connectorInstanceService);
+            final EvaluateParameterAndGetConnectorInstance callable = new EvaluateParameterAndGetConnectorInstance(connectorService, processDefinitionService,
+                    connectorInstanceService);
             transactionService.executeInTransaction(callable);
             final SConnectorDefinition sConnectorDefinition = callable.getsConnectorDefinition();
             final SConnectorInstance connectorInstance = callable.getConnectorInstance();
@@ -140,8 +140,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     }
 
     private boolean handleError(final Map<String, Object> context, final TransactionService transactionService,
-            final ProcessDefinitionService processDefinitionService,
-            final Throwable e) throws Exception {
+            final ProcessDefinitionService processDefinitionService, final Throwable e) throws Exception {
         final HandleConnectorOnFailEventTxContent handleError = new HandleConnectorOnFailEventTxContent(e, processDefinitionService, context);
         return transactionService.executeInTransaction(handleError);
     }
@@ -262,11 +261,6 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
         private final Map<String, Object> context;
 
-        /**
-         * @param result
-         * @param sConnectorDefinition
-         * @param workService
-         */
         private EvaluateConnectorOutputsTxContent(final ConnectorResult result, final SConnectorDefinition sConnectorDefinition, final WorkService workService,
                 final Map<String, Object> context) {
             this.result = result;
