@@ -93,17 +93,18 @@ public class MemoryLockService implements LockService {
         return locks.get(key);
     }
 
-    protected void removeLockFromMapIfNotUsed(final String key) {
+    protected ReentrantLock removeLockFromMapIfNotUsed(final String key) {
         final ReentrantLock reentrantLock = locks.get(key);
         /*
          * The reentrant lock must not have waiting thread that tries to lock it, nor a lockservice.lock that locked it
          */
-        if (reentrantLock != null && !reentrantLock.hasQueuedThreads() && !reentrantLock.isLocked()) {
+        if (reentrantLock != null && !reentrantLock.hasQueuedThreads()) {
             if (debugEnable) {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "removed from map " + reentrantLock.hashCode() + " id=" + key);
             }
             locks.remove(key);
         }
+        return reentrantLock;
     }
 
     private String buildKey(final long objectToLockId, final String objectType) {
@@ -121,7 +122,11 @@ public class MemoryLockService implements LockService {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + lock.getLock().hashCode() + " id=" + key);
         }
         synchronized (getMutex(lock.getObjectToLockId())) {
-            removeLockFromMapIfNotUsed(key);
+            ReentrantLock removedLock = removeLockFromMapIfNotUsed(key);
+            // Compare the references
+            if (removedLock != lock.getLock()) {
+                throw new IllegalStateException("The lock held by the BonitaLock and the one associated to the key do not match.");
+            }
             lock.getLock().unlock();
             if (traceEnable) {
                 logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + lock.getLock().hashCode() + " id=" + key);
@@ -150,6 +155,26 @@ public class MemoryLockService implements LockService {
                 if (traceEnable) {
                     logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked " + lock.hashCode() + " id=" + key);
                 }
+
+                // Ensure the lock is still in the map : someone may have called unlock
+                // between the synchronized block and the tryLock call
+                synchronized (getMutex(objectToLockId)) {
+                    ReentrantLock previousLock = locks.get(key);
+
+                    if (previousLock == null) {
+                        // Someone unlocked the lock while we were tryLocking so it was removed from the Map.
+                        // Let's add it again
+                        locks.put(key, lock);
+                    } else if (previousLock != lock) {
+                        // Compare the 2 Locks by reference : if they are the same: fine, just continue as we locked on the correct lock.
+                        // Otherwise we have to release the lock just acquired : someone was faster than us to lock on the same key.
+                        lock.unlock();
+                        return null;
+                    } else {
+                        // everything is fine : this is the same lock. Go on !
+                    }
+                }
+
                 return new BonitaLock(lock, objectType, objectToLockId);
             }
         } catch (final InterruptedException e) {
@@ -163,42 +188,12 @@ public class MemoryLockService implements LockService {
 
     @Override
     public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
-        final String key = buildKey(objectToLockId, objectType);
-        final ReentrantLock lock;
-        synchronized (getMutex(objectToLockId)) {
-            lock = getLock(key);
+        BonitaLock lock = tryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS);
 
-            if (lock.isHeldByCurrentThread()) {
-                throw new SLockException("lock is own by current Thread: " + lock.hashCode() + " id=" + key);
-            }
+        if (lock == null) {
+            throw new SLockException("Unable (default timeout) to acquire the lock for " + objectToLockId + ":" + objectType);
         }
-        final long before = System.currentTimeMillis();
-        if (traceEnable) {
-            logger.log(getClass(), TechnicalLogSeverity.TRACE, "lock " + lock.hashCode() + " id=" + key);
-        }
-        // outside mutex because it's a long lock
-        try {
-            final boolean tryLock = lock.tryLock(lockTimeout, TimeUnit.SECONDS);
-            if (!tryLock) {
-                throw new SLockException("Timeout trying to lock " + objectToLockId + ":" + objectType);
-            }
-        } catch (final InterruptedException e) {
-            throw new SLockException(e);
-        }
-
-        if (traceEnable) {
-            logger.log(getClass(), TechnicalLogSeverity.TRACE, "locked " + lock.hashCode() + " id=" + key);
-        }
-        final long time = System.currentTimeMillis() - before;
-
-        final TechnicalLogSeverity severity = selectSeverity(time);
-        if (severity != null) {
-            logger.log(getClass(), severity, "The blocking call to lock for the key " + key + " took " + time + "ms.");
-            if (TechnicalLogSeverity.DEBUG.equals(severity)) {
-                logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
-            }
-        }
-        return new BonitaLock(lock, objectType, objectToLockId);
+        return lock;
     }
 
     TechnicalLogSeverity selectSeverity(final long time) {
