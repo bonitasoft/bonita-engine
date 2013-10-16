@@ -93,10 +93,10 @@ public class MemoryLockService implements LockService {
         return locks.get(key);
     }
 
-    protected void removeLockFromMapIfnotUsed(final String key) {
+    protected void removeLockFromMapIfNotUsed(final String key) {
         final ReentrantLock reentrantLock = locks.get(key);
         /*
-         * The reentrant lock must not have waiting thread that try to lock it, nor a lockservice.lock that locked it nor rejectedlockhandlers waiting for it
+         * The reentrant lock must not have waiting thread that tries to lock it, nor a lockservice.lock that locked it
          */
         if (reentrantLock != null && !reentrantLock.hasQueuedThreads() && !reentrantLock.isLocked()) {
             if (debugEnable) {
@@ -121,7 +121,7 @@ public class MemoryLockService implements LockService {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + lock.getLock().hashCode() + " id=" + key);
         }
         synchronized (getMutex(lock.getObjectToLockId())) {
-            removeLockFromMapIfnotUsed(key);
+            removeLockFromMapIfNotUsed(key);
             lock.getLock().unlock();
             if (traceEnable) {
                 logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + lock.getLock().hashCode() + " id=" + key);
@@ -131,10 +131,9 @@ public class MemoryLockService implements LockService {
 
     @Override
     public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) {
-        final String key;
+        final String key = buildKey(objectToLockId, objectType);
         final ReentrantLock lock;
         synchronized (getMutex(objectToLockId)) {
-            key = buildKey(objectToLockId, objectType);
             lock = getLock(key);
 
             if (traceEnable) {
@@ -142,6 +141,7 @@ public class MemoryLockService implements LockService {
             }
 
             if (lock.isHeldByCurrentThread()) {
+                // We do not want to support reentrant access
                 return null;
             }
         }
@@ -163,11 +163,11 @@ public class MemoryLockService implements LockService {
 
     @Override
     public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
-        final String key;
+        final String key = buildKey(objectToLockId, objectType);
         final ReentrantLock lock;
         synchronized (getMutex(objectToLockId)) {
-            key = buildKey(objectToLockId, objectType);
             lock = getLock(key);
+
             if (lock.isHeldByCurrentThread()) {
                 throw new SLockException("lock is own by current Thread: " + lock.hashCode() + " id=" + key);
             }
@@ -193,7 +193,7 @@ public class MemoryLockService implements LockService {
 
         final TechnicalLogSeverity severity = selectSeverity(time);
         if (severity != null) {
-            logger.log(getClass(), severity, "The bocking call to lock for the key " + key + " took " + time + "ms.");
+            logger.log(getClass(), severity, "The blocking call to lock for the key " + key + " took " + time + "ms.");
             if (TechnicalLogSeverity.DEBUG.equals(severity)) {
                 logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
             }
