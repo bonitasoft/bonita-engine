@@ -196,9 +196,18 @@ public class APITestSPUtil extends APITestUtil {
 
     public List<String> checkNoActiveTransactions() throws MonitoringException {
         final List<String> messages = new ArrayList<String>();
-        final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
+        long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
         if (numberOfActiveTransactions != 0) {
-            messages.add("There are " + numberOfActiveTransactions + " active transactions.");
+            // retry 50 ms after because the might still be some jobs/works that run
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new MonitoringException("interrupted while sleeping");
+            }
+            numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
+            if (numberOfActiveTransactions != 0) {
+                messages.add("There are " + numberOfActiveTransactions + " active transactions.");
+            }
         }
         return messages;
     }
