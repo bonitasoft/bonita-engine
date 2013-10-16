@@ -38,7 +38,6 @@ import org.mockito.MockitoAnnotations;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class PlatformCommandServiceImplTest {
 
@@ -101,51 +100,6 @@ public class PlatformCommandServiceImplTest {
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         platformCommandServiceImpl.getPlatformCommands(options);
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl#create(org.bonitasoft.engine.platform.command.model.SPlatformCommand)}.
-     */
-    @Test
-    public final void create() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl#deletePlatformCommand(org.bonitasoft.engine.platform.command.model.SPlatformCommand)}
-     * .
-     */
-    @Test
-    public final void deletePlatformCommand() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl#delete(java.lang.String)}.
-     */
-    @Test
-    public final void delete() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl#deleteAll()}.
-     */
-    @Test
-    public final void deleteAll() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.platform.command.impl.PlatformCommandServiceImpl#update(org.bonitasoft.engine.platform.command.model.SPlatformCommand, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * .
-     */
-    @Test
-    public final void update() {
-        // TODO : Not yet implemented
     }
 
 }

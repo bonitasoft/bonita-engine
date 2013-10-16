@@ -5,23 +5,24 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.bonitasoft.engine.command.api.impl;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.command.SCommandGettingException;
 import org.bonitasoft.engine.command.SCommandNotFoundException;
-import org.bonitasoft.engine.command.api.impl.CommandServiceImpl;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
@@ -40,13 +41,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
-
 /**
  * @author Celine Souchet
- * 
  */
 public class CommandServiceImplTest {
 
@@ -219,48 +215,6 @@ public class CommandServiceImplTest {
         when(persistence.searchEntity(SCommand.class, options, null)).thenThrow(new SBonitaReadException(""));
 
         commandServiceImpl.searchCommands(options);
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#create(org.bonitasoft.engine.command.model.SCommand)}.
-     */
-    @Test
-    public final void create() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#delete(long)}.
-     */
-    @Test
-    public final void deleteById() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#delete(java.lang.String)}.
-     */
-    @Test
-    public final void deleteByName() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#deleteAll()}.
-     */
-    @Test
-    public final void deleteAll() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#update(org.bonitasoft.engine.command.model.SCommand, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * .
-     */
-    @Test
-    public final void update() {
-        // TODO : Not yet implemented
     }
 
 }

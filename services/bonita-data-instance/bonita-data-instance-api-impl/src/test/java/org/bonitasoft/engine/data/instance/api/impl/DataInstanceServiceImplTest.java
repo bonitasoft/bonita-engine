@@ -83,34 +83,6 @@ public class DataInstanceServiceImplTest {
     }
 
     /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#createDataInstance(org.bonitasoft.engine.data.instance.model.SDataInstance)}.
-     */
-    @Test
-    public final void createDataInstance() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#updateDataInstance(org.bonitasoft.engine.data.instance.model.SDataInstance, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * .
-     */
-    @Test
-    public final void updateDataInstance() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#deleteDataInstance(org.bonitasoft.engine.data.instance.model.SDataInstance)}.
-     */
-    @Test
-    public final void deleteDataInstance() {
-        // TODO : Not yet implemented
-    }
-
-    /**
      * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstance(long)}.
      * 
      * @throws SDataInstanceException
@@ -172,107 +144,6 @@ public class DataInstanceServiceImplTest {
         dataInstanceServiceImpl.getDataInstance(dataInstanceId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstance(java.lang.String, long, java.lang.String)}.
-     */
-    @Test
-    public final void getDataInstanceByNameAndContainerIdAndType() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstances(long, java.lang.String, int, int)}.
-     */
-    @Test
-    public final void getPaginatedDataInstancesByContainerIdAndType() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getLocalDataInstance(java.lang.String, long, java.lang.String)}.
-     */
-    @Test
-    public final void getLocalDataInstance() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getLocalDataInstances(long, java.lang.String, int, int)}.
-     */
-    @Test
-    public final void getLocalDataInstances() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#addChildContainer(long, java.lang.String, long, java.lang.String)}.
-     */
-    @Test
-    public final void addChildContainer() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#removeContainer(long, java.lang.String)}.
-     */
-    @Test
-    public final void removeContainer() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#createDataContainer(long, java.lang.String)}.
-     */
-    @Test
-    public final void createDataContainer() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#insertMappingForLocalElement(long, java.lang.String)}.
-     */
-    @Test
-    public final void insertMappingForLocalElement() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#insertDataInstanceVisibilityMapping(long, java.lang.String, java.lang.String, long, long)}
-     * .
-     */
-    @Test
-    public final void insertDataInstanceVisibilityMapping() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getSADataInstance(long, java.lang.String, java.lang.String, long)}.
-     */
-    @Test
-    public final void getSADataInstanceByContainerIdAndTypeAndNameAndTime() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getSADataInstance(long, long)}.
-     */
-    @Test
-    public final void getSADataInstanceBySourceObjectIdAndTime() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getSADataInstances(long)}.
-     */
-    @Test
-    public final void getSADataInstancesByDataInstanceId() {
-        // TODO : Not yet implemented
-    }
-
     @Test
     public final void getLastSADataInstanceFromContainer() throws SBonitaException {
         final SADataInstance archiveInstance = mock(SADataInstance.class);
@@ -325,51 +196,6 @@ public class DataInstanceServiceImplTest {
 
         final List<SADataInstance> dataInstances = dataInstanceServiceImpl.getLastLocalSADataInstances(1, "PROCESS_INSTANCE", 0, 10);
         Assert.assertEquals(archiveInstances, dataInstances);
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getNumberOfDataInstances(long, org.bonitasoft.engine.data.instance.api.DataInstanceContainer)}
-     * .
-     */
-    @Test
-    public final void getNumberOfDataInstances() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstances(java.util.List, long, java.lang.String)}.
-     */
-    @Test
-    public final void getDataInstancesListOfStringLongString() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getSADataInstances(long, java.lang.String, java.util.List, long)}.
-     */
-    @Test
-    public final void getSADataInstancesByContainerIdAndTypeAndNamesAndTime() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getLocalSADataInstances(long, java.lang.String, int, int)}.
-     */
-    @Test
-    public final void getLocalSADataInstances() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#deleteSADataInstance(org.bonitasoft.engine.data.instance.model.archive.SADataInstance)}
-     * .
-     */
-    @Test
-    public final void deleteSADataInstance() {
-        // TODO : Not yet implemented
     }
 
 }

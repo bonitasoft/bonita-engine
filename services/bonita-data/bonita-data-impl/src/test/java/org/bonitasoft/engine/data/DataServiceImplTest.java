@@ -5,12 +5,10 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,7 +39,6 @@ import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class DataServiceImplTest {
 
@@ -131,38 +128,6 @@ public class DataServiceImplTest {
         when(persistence.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         dataServiceImpl.getDataSource("name", "version");
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#getDataSourceImplementation(java.lang.Class, long)}.
-     */
-    @Test
-    public final void getDataSourceImplementation() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#createDataSource(org.bonitasoft.engine.data.model.SDataSource)}.
-     */
-    @Test
-    public final void createDataSource() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#removeDataSource(org.bonitasoft.engine.data.model.SDataSource)}.
-     */
-    @Test
-    public final void removeDataSourceByObject() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.DataServiceImpl#removeDataSource(long)}.
-     */
-    @Test
-    public final void removeDataSourceById() {
-        // TODO : Not yet implemented
     }
 
 }

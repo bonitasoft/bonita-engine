@@ -7,21 +7,23 @@ package org.bonitasoft.engine.core.category.impl;
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.core.category.exception.SCategoryException;
 import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
-import org.bonitasoft.engine.core.category.impl.CategoryServiceImpl;
 import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
 import org.bonitasoft.engine.events.EventService;
@@ -38,19 +40,12 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Matchers.any;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class CategoryServiceImplTest {
 
@@ -357,71 +352,6 @@ public class CategoryServiceImplTest {
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         categoryServiceImpl.getCategoriesUnrelatedToProcessDefinition(54894L, 0, 10, OrderByType.ASC);
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#createCategory(java.lang.String, java.lang.String)}.
-     */
-    @Test
-    public final void createCategory() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#updateCategory(long, org.bonitasoft.engine.core.category.model.SCategory)}.
-     */
-    @Test
-    public final void updateCategory() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#deleteCategory(long)}.
-     */
-    @Test
-    public final void deleteCategory() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#addProcessDefinitionToCategory(long, long)}.
-     */
-    @Test
-    public final void addProcessDefinitionToCategory() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#addProcessDefinitionsToCategory(long, java.util.List)}.
-     */
-    @Test
-    public final void addProcessDefinitionsToCategory() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#removeCategoriesFromProcessDefinition(long, java.util.List)}.
-     */
-    @Test
-    public final void removeCategoriesFromProcessDefinition() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#removeProcessDefinitionsOfCategory(long)}.
-     */
-    @Test
-    public final void removeProcessDefinitionsOfCategory() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#removeProcessIdOfCategories(long)}.
-     */
-    @Test
-    public final void removeProcessIdOfCategories() {
-        // TODO : Not yet implemented
     }
 
 }

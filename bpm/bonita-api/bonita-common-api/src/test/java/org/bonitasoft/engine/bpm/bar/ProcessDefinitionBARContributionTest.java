@@ -29,7 +29,6 @@ import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class ProcessDefinitionBARContributionTest {
 
@@ -44,7 +43,6 @@ public class ProcessDefinitionBARContributionTest {
     /**
      * Test method for
      * {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#serializeProcessDefinition(java.io.File, org.bonitasoft.engine.bpm.process.DesignProcessDefinition)}
-     * 
      * Test method for {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#deserializeProcessDefinition(java.io.File)}.
      */
     @Test
@@ -75,12 +73,10 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addActor("actor2").addDescription(DESCRIPTION);
         processBuilder.addDescription(DESCRIPTION);
         processBuilder.addAutomaticTask("AutomaticTask").addCallActivity("CallActivity", targetProcessNameExpr, targetProcessVersionExpr)
-                .addManualTask("ManualTask", ACTOR_NAME)
-                .addBoundaryEvent("BoundaryEvent").addSignalEventTrigger("signalName");
+                .addManualTask("ManualTask", ACTOR_NAME).addBoundaryEvent("BoundaryEvent").addSignalEventTrigger("signalName");
         processBuilder.addUserTask("UserTask", ACTOR_NAME).addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0")
                 .addInput("userId", new ExpressionBuilder().createConstantLongExpression(3));
-        processBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0",
-                ConnectorEvent.ON_ENTER);
+        processBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER);
         processBuilder.addDocumentDefinition("Doc").addUrl("plop");
         processBuilder.addGateway("Gateway", GatewayType.PARALLEL).addDescription(DESCRIPTION);
         processBuilder.addBlobData("BlobData", null).addDescription("blolbDescription").addBooleanData("BooleanData", null);
@@ -90,86 +86,6 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addSendTask("SendTask", "messageName", targetProcessNameExpr);
         processBuilder.addTransition("BoundaryEvent", "ManualTask");
         return processBuilder.done();
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#isMandatory()}.
-     */
-    @Test
-    public final void isMandatory() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#readFromBarFolder(org.bonitasoft.engine.bpm.bar.BusinessArchive, java.io.File)}.
-     */
-    @Test
-    public final void readFromBarFolder() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#checkProcessInfos(java.io.File, org.bonitasoft.engine.bpm.process.DesignProcessDefinition)}
-     * .
-     */
-    @Test
-    public final void checkProcessInfos() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#deserializeProcessDefinition(java.io.File)}.
-     */
-    @Test
-    public final void deserializeProcessDefinition() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#saveToBarFolder(org.bonitasoft.engine.bpm.bar.BusinessArchive, java.io.File)}.
-     */
-    @Test
-    public final void saveToBarFolder() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#serializeProcessDefinition(java.io.File, org.bonitasoft.engine.bpm.process.DesignProcessDefinition)}
-     * .
-     */
-    @Test
-    public final void serializeProcessDefinition() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#generateInfosFromDefinition(org.bonitasoft.engine.bpm.process.DesignProcessDefinition)}
-     * .
-     */
-    @Test
-    public final void generateInfosFromDefinition() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#getProcessInfos(java.lang.String)}.
-     */
-    @Test
-    public final void getProcessInfos() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#getName()}.
-     */
-    @Test
-    public final void getName() {
-        // TODO : Not yet implemented
     }
 
 }

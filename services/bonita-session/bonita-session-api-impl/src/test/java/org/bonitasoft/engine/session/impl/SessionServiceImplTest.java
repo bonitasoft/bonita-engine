@@ -29,7 +29,6 @@ import org.mockito.MockitoAnnotations;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class SessionServiceImplTest {
 
@@ -67,70 +66,6 @@ public class SessionServiceImplTest {
     @Test
     public final void getSessionDuration() {
         assertEquals(3600000, sessionServiceImpl.getSessionDuration());
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.session.impl.SessionServiceImpl#getSession(long)}.
-     */
-    @Test
-    public final void getSession() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.session.impl.SessionServiceImpl#createSession(long, java.lang.String)}.
-     */
-    @Test
-    public final void createSessionByTenantIdAndUsername() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.session.impl.SessionServiceImpl#createSession(long, long, java.lang.String, boolean)}.
-     */
-    @Test
-    public final void createSessionByTenantIdAndUserIdAndUsernameAndIsTechnicalUser() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.session.impl.SessionServiceImpl#deleteSession(long)}.
-     */
-    @Test
-    public final void deleteSession() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.session.impl.SessionServiceImpl#isValid(long)}.
-     */
-    @Test
-    public final void isValid() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.session.impl.SessionServiceImpl#isAllowed(long, java.lang.String)}.
-     */
-    @Test
-    public final void isAllowed() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.session.impl.SessionServiceImpl#setSessionDuration(long)}.
-     */
-    @Test
-    public final void setSessionDuration() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.session.impl.SessionServiceImpl#renewSession(long)}.
-     */
-    @Test
-    public final void renewSession() {
-        // TODO : Not yet implemented
     }
 
     /**

@@ -369,46 +369,4 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getGroups(0, 10, "name", OrderByType.ASC);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#updateGroup(org.bonitasoft.engine.identity.model.SGroup, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * .
-     */
-    @Test
-    public final void updateGroup() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#deleteGroup(long)}.
-     */
-    @Test
-    public final void deleteGroupById() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#deleteGroup(org.bonitasoft.engine.identity.model.SGroup)}.
-     */
-    @Test
-    public final void deleteGroupByObject() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#deleteChildrenGroup(long)}.
-     */
-    @Test
-    public final void deleteChildrenGroup() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#createGroup(org.bonitasoft.engine.identity.model.SGroup)}.
-     */
-    @Test
-    public final void createGroup() {
-        // TODO : Not yet implemented
-    }
-
 }

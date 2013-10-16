@@ -37,8 +37,8 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -47,7 +47,6 @@ import com.thoughtworks.xstream.XStream;
 
 /**
  * @author Celine Souchet
- * 
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ HTTPServerAPI.class })
@@ -59,11 +58,6 @@ public class HTTPServerAPITest {
     @Before
     public void initialize() {
         MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    public final void invokeMethod() throws Exception {
-        // TODO : Not yet implemented
     }
 
     @Test(expected = ServerWrappedException.class)
@@ -87,9 +81,9 @@ public class HTTPServerAPITest {
             final HTTPServerAPI httpServerAPI = mock(HTTPServerAPI.class);
             final String response = "response";
             doReturn(response).when(httpServerAPI, "executeHttpPost", eq(options), eq(apiInterfaceName), eq(methodName), eq(classNameParameters),
-                    eq(parametersValues), Mockito.any(XStream.class));
+                    eq(parametersValues), Matchers.any(XStream.class));
             doThrow(new UndeclaredThrowableException(new BonitaException("Bonita exception"), "Exception plop")).when(httpServerAPI, "checkInvokeMethodReturn",
-                    eq(response), Mockito.any(XStream.class));
+                    eq(response), Matchers.any(XStream.class));
 
             // Let's call it for real:
             doCallRealMethod().when(httpServerAPI).invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
@@ -102,16 +96,6 @@ public class HTTPServerAPITest {
             assertTrue("should have written in logs an exception", logs.contains("BonitaException"));
             assertTrue("should have written in logs an exception", logs.contains("Exception plop"));
         }
-    }
-
-    @Test
-    public final void serialize() throws Exception {
-        // TODO : Not yet implemented
-    }
-
-    @Test
-    public final void deserialize() throws Exception {
-        // TODO : Not yet implemented
     }
 
 }

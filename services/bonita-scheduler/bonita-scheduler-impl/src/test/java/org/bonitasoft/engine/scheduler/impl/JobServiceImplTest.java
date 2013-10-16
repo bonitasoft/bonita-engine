@@ -49,7 +49,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class JobServiceImplTest {
@@ -71,31 +70,6 @@ public class JobServiceImplTest {
 
     @InjectMocks
     private JobServiceImpl jobServiceImpl;
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobDescriptor(org.bonitasoft.engine.scheduler.model.SJobDescriptor, long)}.
-     */
-    @Test
-    public void createJobDescriptor() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobDescriptor(long)}.
-     */
-    @Test
-    public void deleteJobDescriptorLong() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobDescriptor(org.bonitasoft.engine.scheduler.model.SJobDescriptor)}.
-     */
-    @Test
-    public void deleteJobDescriptorSJobDescriptor() {
-        // TODO : Not yet implemented
-    }
 
     /**
      * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#getJobDescriptor(long)}.
@@ -179,39 +153,6 @@ public class JobServiceImplTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobParameters(java.util.List, long, long)}.
-     */
-    @Test
-    public void createJobParameters() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobParameter(org.bonitasoft.engine.scheduler.model.SJobParameter, long, long)}.
-     */
-    @Test
-    public void createJobParameter() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobParameter(long)}.
-     */
-    @Test
-    public void deleteJobParameterLong() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobParameter(org.bonitasoft.engine.scheduler.model.SJobParameter)}.
-     */
-    @Test
-    public void deleteJobParameterSJobParameter() {
-        // TODO : Not yet implemented
-    }
-
-    /**
      * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#getJobParameter(long)}.
      * 
      * @throws SJobParameterReadException
@@ -266,30 +207,6 @@ public class JobServiceImplTest {
         doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobParameter.class, options, null);
 
         jobServiceImpl.searchJobParameters(options).get(0);
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobLog(org.bonitasoft.engine.scheduler.model.SJobLog)}.
-     */
-    @Test
-    public void createJobLog() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobLog(long)}.
-     */
-    @Test
-    public void deleteJobLogLong() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobLog(org.bonitasoft.engine.scheduler.model.SJobLog)}.
-     */
-    @Test
-    public void deleteJobLogSJobLog() {
-        // TODO : Not yet implemented
     }
 
     /**

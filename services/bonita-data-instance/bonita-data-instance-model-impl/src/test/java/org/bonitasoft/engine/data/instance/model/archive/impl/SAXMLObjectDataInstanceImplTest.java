@@ -21,7 +21,6 @@ import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class SAXMLObjectDataInstanceImplTest {
 
@@ -79,14 +78,6 @@ public class SAXMLObjectDataInstanceImplTest {
     public final void getDiscriminator() {
         final SAXMLObjectDataInstanceImpl saxmlObjectDataInstanceImpl = new SAXMLObjectDataInstanceImpl();
         assertEquals(SAXMLObjectDataInstanceImpl.class.getSimpleName(), saxmlObjectDataInstanceImpl.getDiscriminator());
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl#hashCode()}.
-     */
-    @Test
-    public final void testHashCode() {
-        // TODO : Not yet implemented
     }
 
     /**
@@ -197,22 +188,6 @@ public class SAXMLObjectDataInstanceImplTest {
         final SAXMLObjectDataInstanceImpl saxmlObjectDataInstanceImpl = new SAXMLObjectDataInstanceImpl();
         saxmlObjectDataInstanceImpl.setSourceObjectId(85);
         assertEquals(85, saxmlObjectDataInstanceImpl.getSourceObjectId());
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl#getPersistentObjectInterface()}.
-     */
-    @Test
-    public final void getPersistentObjectInterface() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl#equals(java.lang.Object)}.
-     */
-    @Test
-    public final void equalsObject() {
-        // TODO : Not yet implemented
     }
 
 }

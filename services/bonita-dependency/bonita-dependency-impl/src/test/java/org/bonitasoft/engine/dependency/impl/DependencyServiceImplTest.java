@@ -44,7 +44,6 @@ import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class DependencyServiceImplTest {
 
@@ -287,126 +286,6 @@ public class DependencyServiceImplTest {
 
         final QueryOptions options = new QueryOptions(0, 10);
         dependencyServiceImpl.getDisconnectedDependencyMappings(artifactAccessor, options);
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getLastUpdatedTimestamp(java.lang.String, long)}.
-     */
-    @Test
-    public final void getLastUpdatedTimestamp() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#createDependency(org.bonitasoft.engine.dependency.model.SDependency)}.
-     */
-    @Test
-    public final void createDependency() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#createDependencyMapping(org.bonitasoft.engine.dependency.model.SDependencyMapping)}.
-     */
-    @Test
-    public final void createDependencyMapping() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#deleteAllDependencies()}.
-     */
-    @Test
-    public final void deleteAllDependencies() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#deleteAllDependencyMappings()}.
-     */
-    @Test
-    public final void deleteAllDependencyMappings() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#deleteDependency(org.bonitasoft.engine.dependency.model.SDependency)}.
-     */
-    @Test
-    public final void deleteDependencyByObject() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#deleteDependency(long)}.
-     */
-    @Test
-    public final void deleteDependencyById() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#deleteDependency(java.lang.String)}.
-     */
-    @Test
-    public final void deleteDependencyByName() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#deleteDependencyMapping(long)}.
-     */
-    @Test
-    public final void deleteDependencyMappingById() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#deleteDependencyMapping(org.bonitasoft.engine.dependency.model.SDependencyMapping)}.
-     */
-    @Test
-    public final void deleteDependencyMappingByObject() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#updateDependency(org.bonitasoft.engine.dependency.model.SDependency, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * .
-     */
-    @Test
-    public final void updateDependency() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#updateDependencyMapping(org.bonitasoft.engine.dependency.model.SDependencyMapping, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * .
-     */
-    @Test
-    public final void updateDependencyMapping() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#removeDisconnectedDependencyMappings(org.bonitasoft.engine.dependency.ArtifactAccessor)}
-     * .
-     */
-    @Test
-    public final void removeDisconnectedDependencyMappings() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#deleteDependencies(long, java.lang.String)}.
-     */
-    @Test
-    public final void deleteDependencies() {
-        // TODO : Not yet implemented
     }
 
 }

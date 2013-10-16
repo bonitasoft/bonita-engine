@@ -32,7 +32,6 @@ import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class DocumentServiceImplTest {
 
@@ -80,23 +79,6 @@ public class DocumentServiceImplTest {
         when(persistence.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         documentServiceImpl.getContent("documentId");
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.document.impl.DocumentServiceImpl#storeDocumentContent(org.bonitasoft.engine.document.model.SDocument, byte[])}.
-     */
-    @Test
-    public final void storeDocumentContent() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.document.impl.DocumentServiceImpl#deleteDocumentContent(java.lang.String)}.
-     */
-    @Test
-    public final void deleteDocumentContent() {
-        // TODO : Not yet implemented
     }
 
 }

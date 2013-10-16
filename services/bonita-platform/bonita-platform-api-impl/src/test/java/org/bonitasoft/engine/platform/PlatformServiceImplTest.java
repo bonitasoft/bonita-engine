@@ -47,7 +47,6 @@ import org.mockito.MockitoAnnotations;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class PlatformServiceImplTest {
 
@@ -328,130 +327,6 @@ public class PlatformServiceImplTest {
         when(persistenceService.searchEntity(STenant.class, options, null)).thenThrow(new SBonitaReadException(""));
 
         platformServiceImpl.searchTenants(options);
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#createPlatformTables()}.
-     */
-    @Test
-    public final void createPlatformTables() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#createPlatform(org.bonitasoft.engine.platform.model.SPlatform)}.
-     */
-    @Test
-    public final void createPlatform() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#createTenant(org.bonitasoft.engine.platform.model.STenant)}.
-     */
-    @Test
-    public final void createTenant() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#createTenantTables()}.
-     */
-    @Test
-    public final void createTenantTables() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#initializePlatformStructure()}.
-     */
-    @Test
-    public final void initializePlatformStructure() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#deletePlatform()}.
-     */
-    @Test
-    public final void deletePlatform() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#deletePlatformTables()}.
-     */
-    @Test
-    public final void deletePlatformTables() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#deleteTenant(long)}.
-     */
-    @Test
-    public final void deleteTenant() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#deleteTenantTables()}.
-     */
-    @Test
-    public final void deleteTenantTables() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#deleteTenantObjects(long)}.
-     */
-    @Test
-    public final void deleteTenantObjects() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#updatePlatform(org.bonitasoft.engine.platform.model.SPlatform, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * .
-     */
-    @Test
-    public final void updatePlatform() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#updateTenant(org.bonitasoft.engine.platform.model.STenant, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * .
-     */
-    @Test
-    public final void updateTenant() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#activateTenant(long)}.
-     */
-    @Test
-    public final void activateTenant() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#deactiveTenant(long)}.
-     */
-    @Test
-    public final void deactiveTenant() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#cleanTenantTables()}.
-     */
-    @Test
-    public final void cleanTenantTables() {
-        // TODO : Not yet implemented
     }
 
 }

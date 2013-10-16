@@ -227,14 +227,6 @@ public class IdentityServiceImplForUserMembershipTest {
     }
 
     /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMemberships(java.util.List)}.
-     */
-    @Test
-    public final void getUserMembershipsByIds() {
-        // TODO : Not yet implemented
-    }
-
-    /**
      * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfGroup(long)}.
      */
     @Test
@@ -272,42 +264,6 @@ public class IdentityServiceImplForUserMembershipTest {
         when(persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(1l, 0, 20))).thenThrow(new SBonitaReadException(""));
 
         identityServiceImpl.getUserMembershipsOfRole(1l, 0, 20);
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfUser(long)}.
-     */
-    @Test
-    public final void getUserMembershipsOfUser() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfUser(long, int, int)}.
-     */
-    @Test
-    public final void getUserMembershipsOfUserPaginated() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfUser(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
-     * .
-     */
-    @Test
-    public final void getUserMembershipsOfUserPaginatedWithOrder() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfUser(long, int, int, org.bonitasoft.engine.persistence.OrderByOption)}
-     * .
-     */
-    @Test
-    public final void getUserMembershipsOfUserPaginatedWithOrderByOption() {
-        // TODO : Not yet implemented
     }
 
     /**
@@ -381,42 +337,6 @@ public class IdentityServiceImplForUserMembershipTest {
         doThrow(new SBonitaReadException("")).when(persistenceService).selectList(any(SelectListDescriptor.class));
 
         identityServiceImpl.getUserMemberships(0, 10);
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#updateUserMembership(org.bonitasoft.engine.identity.model.SUserMembership, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * .
-     */
-    @Test
-    public final void updateUserMembership() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#deleteUserMembership(long)}.
-     */
-    @Test
-    public final void deleteUserMembershipById() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#deleteUserMembership(org.bonitasoft.engine.identity.model.SUserMembership)}.
-     */
-    @Test
-    public final void deleteUserMembershipByObject() {
-        // TODO : Not yet implemented
-    }
-
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#createUserMembership(org.bonitasoft.engine.identity.model.SUserMembership)}.
-     */
-    @Test
-    public final void createUserMembership() {
-        // TODO : Not yet implemented
     }
 
 }

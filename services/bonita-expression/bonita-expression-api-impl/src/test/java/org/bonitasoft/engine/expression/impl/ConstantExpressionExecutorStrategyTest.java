@@ -28,7 +28,6 @@ import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class ConstantExpressionExecutorStrategyTest {
 
@@ -74,29 +73,6 @@ public class ConstantExpressionExecutorStrategyTest {
 
         final Date result = (Date) strategy.evaluate(sExpression, null, null);
         assertNotNull(result);
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy#evaluate(java.util.List, java.util.Map, java.util.Map)}.
-     */
-    @Test
-    public final void evaluateListOfSExpressionMapOfStringObjectMapOfIntegerObject() {
-        // TODO : not yet implemented
-    }
-
-    @Test
-    public final void validate() throws Exception {
-        // TODO : not yet implemented
-    }
-
-    @Test
-    public final void getExpressionKind() throws Exception {
-        // TODO : not yet implemented
-    }
-
-    @Test
-    public final void mustPutEvaluatedExpressionInContext() throws Exception {
-        // TODO : not yet implemented
     }
 
     private SExpression buildExpression(final String content, final String expressionType, final String returnType, final String interpreter,
