@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.connector.AbstractConnector;
@@ -34,6 +35,8 @@ import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.After;
 import org.junit.Before;
 
@@ -226,6 +229,14 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
                 baos.close();
             }
         }
+    }
+    
+    protected SearchOptionsBuilder getFirst100ConnectorInstanceSearchOptions(long containerId, String containerType) {
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
+        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, containerId);
+        searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE, containerType);
+        searchOptionsBuilder.sort(ConnectorInstancesSearchDescriptor.NAME, Order.ASC);
+        return searchOptionsBuilder;
     }
 
 }

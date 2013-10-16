@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceCriterion;
+import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
@@ -45,8 +47,10 @@ import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.connectors.TestConnector2;
+import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.TestExternalConnector;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
@@ -57,6 +61,7 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
@@ -68,6 +73,8 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
  * @author Baptiste Mesta
  */
 public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
+
+    private static final String FLOWNODE = "flowNode";
 
     private static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
 
@@ -443,6 +450,54 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         } finally {
             disableAndDeleteProcess(processDefinition);
         }
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector instance with failure information",
+            "exception on connector execution" }, jira="")
+    @Test
+    public void getConnectorWithFailureInformationOnConnectorExecution() throws Exception {
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithFaillingConnector();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
+        SearchResult<ConnectorInstance> searchResult = getProcessAPI().searchConnectorInstances(
+                getFirst100ConnectorInstanceSearchOptions(waitForTaskToFail.getId(), FLOWNODE).done());
+        assertEquals(1, searchResult.getCount());
+        final ConnectorInstance connectorInstance = searchResult.getResult().get(0);
+        final ConnectorInstanceWithFailureInfo connectorInstanceWithFailureInfo = getProcessAPI().getConnectorInstanceWithFailureInformation(
+                connectorInstance.getId());
+        assertEquals(ConnectorState.FAILED, connectorInstanceWithFailureInfo.getState());
+        assertEquals(TestConnectorThatThrowException.BUSINESS_LOGIC_EXCEPTION_MESSAGE, connectorInstanceWithFailureInfo.getExceptionMessage());
+        final String stackTrace = connectorInstanceWithFailureInfo.getStackTrace();
+        assertTrue(stackTrace
+                .contains("org.bonitasoft.engine.core.connector.exception.SConnectorException: org.bonitasoft.engine.connector.exception.SConnectorException: java.util.concurrent.ExecutionException: org.bonitasoft.engine.connector.exception.SConnectorException: org.bonitasoft.engine.connector.ConnectorException: "
+                        + TestConnectorThatThrowException.BUSINESS_LOGIC_EXCEPTION_MESSAGE));
+        assertTrue(stackTrace
+                .contains("at org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl.executeConnectorInClassloader(ConnectorServiceImpl.java:"));
+        assertTrue(stackTrace.contains("at org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl.executeConnector(ConnectorServiceImpl.java:"));
+        assertTrue(stackTrace.contains("at org.bonitasoft.engine.connector.ConnectorServiceDecorator.executeConnector(ConnectorServiceDecorator.java:"));
+        assertTrue(stackTrace.contains("at org.bonitasoft.engine.execution.work.ExecuteConnectorWork.work(ExecuteConnectorWork.java:"));
+        assertTrue(stackTrace.contains("at org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork.work(FailureHandlingBonitaWork.java:"));
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithFaillingConnector() throws InvalidExpressionException, BonitaException, IOException {
+        final Expression normal = new ExpressionBuilder().createConstantStringExpression(TestConnectorThatThrowException.NORMAL);
+        final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
+        final String dataName = "myVar";
+
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
+        designProcessDefinition
+                .addAutomaticTask("step1")
+                .addConnector("myConnector", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
+                .addInput("kind", normal)
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
+                        new ExpressionBuilder().createInputExpression("output1", String.class.getName()));
+
+        final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
+        return processDefinition;
     }
 
     @Test(expected = NotFoundException.class)
