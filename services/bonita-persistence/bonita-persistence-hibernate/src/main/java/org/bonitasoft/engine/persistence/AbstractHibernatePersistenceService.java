@@ -385,7 +385,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    protected <T> String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter) {
+    protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter) {
         final StringBuilder builder = new StringBuilder(query);
         final Set<String> specificFilters = new HashSet<String>(filters.size());
         FilterOption previousFilter = null;
@@ -580,14 +580,19 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             checkClassMapping(entityClass);
 
             final Session session = getSession(true);
+            
             Query query = session.getNamedQuery(selectDescriptor.getQueryName());
-
+            String builtQuery = query.getQueryString();
+            
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
-                query = session.createQuery(getQueryWithFilters(query.getQueryString(), queryOptions.getFilters(), queryOptions.getMultipleFilter()));
+                builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter());
             }
             if (selectDescriptor.hasOrderByParameters()) {
-                query = session.createQuery(getQueryWithOrderByClause(query.getQueryString(), selectDescriptor));
+                builtQuery = getQueryWithOrderByClause(builtQuery, selectDescriptor);
+            }
+            if (!builtQuery.equals(query.getQueryString())) {
+                query = session.createQuery(builtQuery);
             }
             setQueryCache(query, selectDescriptor.getQueryName());
 
