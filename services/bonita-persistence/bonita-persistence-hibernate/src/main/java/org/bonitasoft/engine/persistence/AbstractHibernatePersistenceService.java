@@ -580,10 +580,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             checkClassMapping(entityClass);
 
             final Session session = getSession(true);
-            
+
             Query query = session.getNamedQuery(selectDescriptor.getQueryName());
             String builtQuery = query.getQueryString();
-            
+
             if (selectDescriptor.hasAFilter()) {
                 final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
                 builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter());
@@ -593,8 +593,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             }
             if (!builtQuery.equals(query.getQueryString())) {
                 query = session.createQuery(builtQuery);
-                setQueryCache(query, selectDescriptor.getQueryName());
             }
+            setQueryCache(query, selectDescriptor.getQueryName());
 
             if (selectDescriptor != null) {
                 setParameters(query, selectDescriptor.getInputParameters());
