@@ -60,8 +60,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     private final boolean useOptimization;
 
-    private Field quartzSchedulerField;
-
     private QuartzScheduler quartzScheduler;
 
     private final List<AbstractJobListener> jobListeners;
@@ -220,7 +218,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
             try {
                 if (useOptimization) {
-                    quartzSchedulerField = scheduler.getClass().getDeclaredField("sched");
+                    Field quartzSchedulerField = scheduler.getClass().getDeclaredField("sched");
                     quartzSchedulerField.setAccessible(true);
                     quartzScheduler = (QuartzScheduler) quartzSchedulerField.get(scheduler);
                 }
