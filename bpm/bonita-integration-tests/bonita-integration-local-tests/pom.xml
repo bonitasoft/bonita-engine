@@ -255,6 +255,7 @@
 								</property>
 							</properties>
 							<systemPropertyVariables>
+								<bonita.version>${project.version}</bonita.version>
 								<bonita.home>${bonita.home}</bonita.home>
 							</systemPropertyVariables>
 							<includes>
