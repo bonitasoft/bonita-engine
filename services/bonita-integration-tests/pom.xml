@@ -528,9 +528,9 @@
 		<dependency>
 			<groupId>com.microsoft.jdbc</groupId>
 			<artifactId>sqlserver</artifactId>
-			<version>3.0</version>
+			<version>4.0.2206.100</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/lib/sqljdbc4.jar</systemPath>
+			<systemPath>${basedir}/lib/sqljdbc-4.0.2206.100.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -578,28 +578,23 @@
 			<version>2.1.3</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.bonitasoft.engine.test</groupId>
 			<artifactId>bonita-test-util</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-services-test-conf</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
-		
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
