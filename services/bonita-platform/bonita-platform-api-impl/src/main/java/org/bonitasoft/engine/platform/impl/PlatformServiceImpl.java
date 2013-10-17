@@ -608,7 +608,9 @@ public class PlatformServiceImpl implements PlatformService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "activateTenant"));
         }
         final STenant tenant = getTenant(tenantId);
-        if (!isTenantActivated(tenant)) {
+        if (isTenantActivated(tenant)) {
+            return false;
+        } else {
             final UpdateDescriptor desc = new UpdateDescriptor(tenant);
             desc.addField(tenantBuilder.getStatusKey(), ACTIVATED);
             try {
@@ -620,15 +622,15 @@ public class PlatformServiceImpl implements PlatformService {
                 if (trace) {
                     logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "activateTenant", e));
                 }
-                e.printStackTrace();
                 if (error) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
+                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e.getMessage());
+                }
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
                 }
                 throw new STenantActivationException("Problem while activating tenant: " + tenant, e);
             }
             return true;
-        } else {
-            return false;
         }
     }
 
