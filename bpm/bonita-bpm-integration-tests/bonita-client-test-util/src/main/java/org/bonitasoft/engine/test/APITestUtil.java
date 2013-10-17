@@ -581,6 +581,7 @@ public class APITestUtil {
     protected void disableAndDeleteProcess(final long processDefinitionId) throws BonitaException {
         // Delete all process instances
         long nbDeletedProcessInstances;
+        getProcessAPI().disableProcess(processDefinitionId);
         do {
             nbDeletedProcessInstances = getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 100);
         } while (nbDeletedProcessInstances > 0);
@@ -591,7 +592,7 @@ public class APITestUtil {
             nbDeletedArchivedProcessInstances = getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 100);
         } while (nbDeletedArchivedProcessInstances > 0);
 
-        getProcessAPI().disableAndDeleteProcessDefinition(processDefinitionId);
+        getProcessAPI().deleteProcessDefinition(processDefinitionId);
     }
 
     protected void disableAndDeleteProcess(final ProcessDefinition... processDefinitions) throws BonitaException {
