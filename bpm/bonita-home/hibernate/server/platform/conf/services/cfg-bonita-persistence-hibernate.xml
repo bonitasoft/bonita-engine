@@ -3,8 +3,8 @@
 
 	<bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" depends-on="dbProperties">
 		<constructor-arg name="name" value="platform" />
-		<constructor-arg ref="journalConfigurationProvider" />
-		<constructor-arg ref="dbConfigurationsProvider" />
+		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
+		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
@@ -14,9 +14,9 @@
 
 	<bean id="persistenceService" class="com.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties">
 		<constructor-arg name="name" value="journal" />
-		<constructor-arg ref="sessionAccessor" />
-		<constructor-arg ref="journalConfigurationProvider" />
-		<constructor-arg ref="dbConfigurationsProvider" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
+		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
@@ -24,10 +24,10 @@
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
 	</bean>
 
-
 	<bean id="journalConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
 		<constructor-arg name="properties">
 			<props>
+				<prop key="hibernate.session_factory_name">bonita</prop>
 				<prop key="hibernate.current_session_context_class">jta</prop>
 				<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>
 				<prop key="hibernate.transaction.manager_lookup_class">${hibernate.transaction.manager_lookup_class}</prop>
@@ -337,7 +337,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write" />
-                <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="read-write" />
 			</map>
 		</constructor-arg>
 	</bean>
