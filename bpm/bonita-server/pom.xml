@@ -1063,6 +1063,7 @@
                   <include>org.bonitasoft.engine.synchro:bonita-synchro-service-impl</include>
                   <include>com.bonitasoft.engine.synchro:bonita-synchro-service-clustered</include>
                   <include>org.bonitasoft.engine.synchro:bonita-synchro-register</include>
+                  <include>org.bonitasoft.engine.synchro:bonita-synchro-jms</include>
                   <!-- Transaction -->
                   <include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
                   <include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
