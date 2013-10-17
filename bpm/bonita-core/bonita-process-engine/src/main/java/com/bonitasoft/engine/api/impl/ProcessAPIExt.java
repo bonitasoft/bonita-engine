@@ -555,11 +555,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             // Reset connectors first:
             if (connectorsToReset != null) {
                 for (final Entry<Long, ConnectorStateReset> connEntry : connectorsToReset.entrySet()) {
-                    final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = connectorInstanceService.getConnectorInstanceWithFailureInfo(connEntry.getKey());
-                    //set state
+                    final SConnectorInstanceWithFailureInfo connectorInstanceWithFailure = connectorInstanceService
+                            .getConnectorInstanceWithFailureInfo(connEntry.getKey());
+                    // set state
                     final ConnectorStateReset state = connEntry.getValue();
                     connectorInstanceService.setState(connectorInstanceWithFailure, state.name());
-                    //clean stack trace
+                    // clean stack trace
                     if (connectorInstanceWithFailure.getStackTrace() != null) {
                         connectorInstanceService.setConnectorInstanceFailureException(connectorInstanceWithFailure, null);
                     }
@@ -1039,9 +1040,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         SConnectorInstanceWithFailureInfo serverObject;
         try {
             serverObject = connectorInstanceService.getConnectorInstanceWithFailureInfo(connectorInstanceId);
-        } catch (SConnectorInstanceNotFoundException e) {
+        } catch (final SConnectorInstanceNotFoundException e) {
             throw new ConnectorInstanceNotFoundException(e);
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
         return ModelConvertor.toConnectorInstanceWithFailureInfo(serverObject);

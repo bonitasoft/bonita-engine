@@ -60,9 +60,9 @@
 		<dependency>
 			<groupId>com.microsoft.jdbc</groupId>
 			<artifactId>sqlserver</artifactId>
-			<version>3.0</version> 
+			<version>4.0.2206.100</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/lib/sqljdbc4.jar</systemPath>
+			<systemPath>${basedir}/lib/sqljdbc-4.0.2206.100.jar</systemPath>
 		</dependency>
 
 		<!-- Local JNDI implementation -->
