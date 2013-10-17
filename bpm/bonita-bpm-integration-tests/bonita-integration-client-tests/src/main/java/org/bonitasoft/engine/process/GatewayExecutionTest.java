@@ -42,6 +42,7 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class GatewayExecutionTest extends CommonAPITest {
@@ -1034,4 +1035,40 @@ public class GatewayExecutionTest extends CommonAPITest {
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, builder.getProcess(), "step");
     }
 
+    @Ignore("see ENGINE-1353")
+    @Test
+    public void tooManyTokens() throws Exception
+    {
+        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
+        processDefinitionBuilder = processDefinitionBuilder.createNewInstance("tooManyTokens", PROCESS_VERSION);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addStartEvent("Start");
+        processDefinitionBuilder.addGateway("Gateway1", GatewayType.PARALLEL);
+        processDefinitionBuilder.addUserTask("Step1", ACTOR_NAME);
+        processDefinitionBuilder.addEndEvent("End1");
+        processDefinitionBuilder.addUserTask("Step3", ACTOR_NAME);
+        processDefinitionBuilder.addGateway("Gateway2", GatewayType.PARALLEL);
+        processDefinitionBuilder.addUserTask("Step2", ACTOR_NAME);
+        processDefinitionBuilder.addEndEvent("Terminate").addTerminateEventTrigger();
+        processDefinitionBuilder.addTransition("Start", "Gateway1");
+        processDefinitionBuilder.addTransition("Gateway1", "Step1");
+        processDefinitionBuilder.addTransition("Gateway1", "Step3");
+        processDefinitionBuilder.addTransition("Step3", "Gateway2");
+        processDefinitionBuilder.addTransition("Step1", "Gateway2");
+        processDefinitionBuilder.addTransition("Step1", "End1");
+        processDefinitionBuilder.addTransition("Gateway2", "Step2");
+        processDefinitionBuilder.addTransition("Step2", "Terminate");
+        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("Step1", processInstance);
+        List<HumanTaskInstance> taskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "Step1", 0, 1);
+        assignAndExecuteStep(taskInstances.get(0).getId(), user.getId());
+        waitForUserTaskAndExecuteIt("Step3", processInstance, user.getId());
+        waitForUserTask("Step2", processInstance);
+        taskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "Step2", 0, 1);
+        assignAndExecuteStep(taskInstances.get(0).getId(), user.getId());
+        waitForProcessToFinish(processInstance.getId());
+        disableAndDeleteProcess(processDefinition);
+    }
 }

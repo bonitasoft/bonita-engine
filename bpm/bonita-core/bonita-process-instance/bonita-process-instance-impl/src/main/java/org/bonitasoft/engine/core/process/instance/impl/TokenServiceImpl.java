@@ -205,7 +205,8 @@ public class TokenServiceImpl implements TokenService {
         try {
             final List<SToken> selectList = persistenceRead.selectList(SelectDescriptorBuilder.getToken(processInstanceId, refId));
             if (selectList.isEmpty()) {
-                throw new SObjectNotFoundException(processInstanceId, refId);
+                throw new SObjectNotFoundException("no token found for process " + processInstanceId + " and reference " + refId
+                        + " , the design may be invalid, check that all branches are correctly merged");
             } else {
                 return selectList.get(0);
             }
