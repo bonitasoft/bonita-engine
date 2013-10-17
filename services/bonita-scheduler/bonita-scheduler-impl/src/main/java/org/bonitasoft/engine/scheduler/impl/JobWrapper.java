@@ -39,8 +39,7 @@ public class JobWrapper implements StatelessJob {
 
         @Override
         public void beforeCommit() {
-            // TODO Auto-generated method stub
-
+            // Nothing to do
         }
 
         @Override
@@ -119,9 +118,9 @@ public class JobWrapper implements StatelessJob {
                 eventService.fireEvent(jobCompleted);
             }
             try {
-	            transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronizationImplementation());
+                transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronizationImplementation());
             } catch (STransactionNotFoundException e) {
-	            e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
