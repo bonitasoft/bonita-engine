@@ -23,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnecto
  */
 public class SAConnectorInstanceBuilderImpl extends SANamedElementBuilderImpl implements SAConnectorInstanceBuilder {
 
-    private SAConnectorInstanceImpl entity;
+    private final SAConnectorInstanceImpl entity;
 
     private static final String CONTAINER_ID_KEY = "containerId";
 
@@ -37,10 +37,17 @@ public class SAConnectorInstanceBuilderImpl extends SANamedElementBuilderImpl im
 
     private static final String STATE_KEY = "state";
 
+    public SAConnectorInstanceBuilderImpl() {
+        this(null);
+    }
+
+    private SAConnectorInstanceBuilderImpl(final SAConnectorInstanceImpl entity) {
+        this.entity = entity;
+    }
+
     @Override
     public SAConnectorInstanceBuilder createNewArchivedConnectorInstance(final SConnectorInstance connectorInstance) {
-        entity = new SAConnectorInstanceImpl(connectorInstance);
-        return this;
+        return new SAConnectorInstanceBuilderImpl(new SAConnectorInstanceImpl(connectorInstance));
     }
 
     @Override
