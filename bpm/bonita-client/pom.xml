@@ -115,6 +115,7 @@
 									<include>org.bonitasoft.engine.api:bonita-client-api-ejb2</include>
 									<include>org.bonitasoft.engine.api:bonita-client-api-ejb3</include>
 									<include>org.bonitasoft.engine.api:bonita-client-api-http</include>
+									<include>org.bonitasoft.engine.api:bonita-client-api-tcp</include>
 									<include>org.bonitasoft.engine.util:bonita-client-util</include>
 									<include>com.bonitasoft.engine.util:bonita-client-util-sp</include>
 								</includes>

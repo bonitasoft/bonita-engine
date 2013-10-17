@@ -23,7 +23,7 @@ import com.bonitasoft.engine.platform.SPProcessManagementTest;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-
+        TestShadesSP.class,
         // Same suites as in LocalIntegrationTestsSP below:
         BPMSPTests.class,
         BPMLocalSuiteTests.class,
