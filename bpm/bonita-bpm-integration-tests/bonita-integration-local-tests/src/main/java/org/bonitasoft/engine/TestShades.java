@@ -34,6 +34,7 @@ public class TestShades {
             File file2 = new File(file, "pom.xml");
             IOUtil.write(file2, thePom);
             System.out.println("building " + file2.getAbsolutePath());
+            System.out.println("Run mvn in " + file.getAbsolutePath());
             Process exec = Runtime.getRuntime().exec("mvn dependency:tree", new String[] {}, file);
             InputStream inputStream = exec.getInputStream();
             exec.getOutputStream().close();
@@ -41,7 +42,7 @@ public class TestShades {
             outputOfMaven = IOUtil.read(inputStream);
             System.out.println(outputOfMaven);
         } finally {
-            IOUtil.deleteDir(file);
+            // IOUtil.deleteDir(file);
         }
         assertTrue("build was not successfull", outputOfMaven.contains("BUILD SUCCESS"));
         outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-server", "");
