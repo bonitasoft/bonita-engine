@@ -16,6 +16,8 @@ public class TestShades {
 
     @Test
     public void testShades() throws IOException {
+        String mvn = System.getProperty("path.to.mvn", "mvn");// to be overwritten in CI
+
         String version = System.getProperty("bonita.version");// works in maven
         if (version == null) {
             // when running tests in eclipse get it from the pom.xml
@@ -35,14 +37,14 @@ public class TestShades {
             IOUtil.write(file2, thePom);
             System.out.println("building " + file2.getAbsolutePath());
             System.out.println("Run mvn in " + file.getAbsolutePath());
-            Process exec = Runtime.getRuntime().exec("mvn dependency:tree", new String[] {}, file);
+            Process exec = Runtime.getRuntime().exec(mvn + " dependency:tree", new String[] {}, file);
             InputStream inputStream = exec.getInputStream();
             exec.getOutputStream().close();
             exec.getErrorStream().close();
             outputOfMaven = IOUtil.read(inputStream);
             System.out.println(outputOfMaven);
         } finally {
-            // IOUtil.deleteDir(file);
+            IOUtil.deleteDir(file);
         }
         assertTrue("build was not successfull", outputOfMaven.contains("BUILD SUCCESS"));
         outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-server", "");
