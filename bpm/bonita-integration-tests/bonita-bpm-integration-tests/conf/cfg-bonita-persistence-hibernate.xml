@@ -26,7 +26,6 @@
 	<bean id="journalConfigurationProvider" class="com.bonitasoft.engine.persistence.HibernateConfigurationProviderExt">
 		<constructor-arg name="properties">
 			<props>
-				<prop key="hibernate.session_factory_name">bonita</prop>
 				<prop key="hibernate.current_session_context_class">jta</prop>
 				<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>
 				<prop key="hibernate.transaction.manager_lookup_class">${hibernate.transaction.manager_lookup_class}</prop>
