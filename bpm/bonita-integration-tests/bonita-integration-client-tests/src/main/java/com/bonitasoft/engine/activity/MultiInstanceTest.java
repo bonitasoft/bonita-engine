@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.activity;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +24,6 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivities;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.junit.After;
 import org.junit.Before;
@@ -33,10 +34,6 @@ import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 public class MultiInstanceTest extends CommonAPISPTest {
-
-    private static final String JACK = "Daniela.Angelo";
-
-    private static final String JOHN = "Walter.Bates";
 
     private static final String JOHN = "john";
 
@@ -80,9 +77,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
 
     private void checkPendingTaskWithChildrenInParallel(final int numberOfTask, final int numberOfTaskToCompleteMI, final ProcessInstance processInstance)
             throws Exception {
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, numberOfTask, john);
-        final boolean waitUntil = checkNbPendingTaskOf.waitUntil();
-        assertTrue("expected " + numberOfTask + " pending task but was " + checkNbPendingTaskOf.getPendingHumanTaskInstances().size(), waitUntil);
+        checkNbPendingTaskOf(numberOfTask, john);
         final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, numberOfTask, null);
         for (int i = 0; i < numberOfTask; i++) {
             final HumanTaskInstance pendingTask = pendingTasks.get(i);
@@ -100,7 +95,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
             executeFlowNodeUntilEnd(pendingTasks.get(i).getId());
         }
         Thread.sleep(200);
-        assertTrue("There was still pending task but no more was expected", new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, false, 0, john).waitUntil());
+        checkNbPendingTaskOf(0, john);
         final int nbAbortedActivities = (numberOfTask - numberOfTaskToCompleteMI) * 3 + numberOfTaskToCompleteMI * 2; // parent and 2 children for non completed
                                                                                                                       // tasks + 2 children for completed one
         assertTrue("process was not finished", new WaitProcessToFinishAndBeArchived(50, 7000, false, processInstance, getProcessAPI()).waitUntil());
