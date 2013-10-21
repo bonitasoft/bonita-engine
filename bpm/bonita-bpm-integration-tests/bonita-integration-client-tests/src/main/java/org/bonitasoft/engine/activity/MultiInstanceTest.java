@@ -43,7 +43,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
-import org.bonitasoft.engine.filter.user.TestFilter;
+import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
@@ -230,8 +230,11 @@ public class MultiInstanceTest extends CommonAPITest {
         final UserTaskDefinitionBuilder userTask = builder.addUserTask("step1", ACTOR_NAME);
         userTask.addData("dataInputItem_", Integer.class.getName(), new ExpressionBuilder().createConstantIntegerExpression(0));
         userTask.addData("dataOutputItem_", Integer.class.getName(), new ExpressionBuilder().createConstantIntegerExpression(0));
-        userTask.addOperation(new LeftOperandBuilder().createNewInstance("dataOutputItem_").done(),
-                OperatorType.ASSIGNMENT, "=", null,
+        userTask.addOperation(
+                new LeftOperandBuilder().createNewInstance("dataOutputItem_").done(),
+                OperatorType.ASSIGNMENT,
+                "=",
+                null,
                 new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceWithLoopDataInputAndOutput3", "dataInputItem_ + 1",
                         Integer.class.getName(), new ExpressionBuilder().createDataExpression("dataInputItem_", Integer.class.getName())));
         userTask.addMultiInstance(true, loopDataInputName).addDataInputItemRef("dataInputItem_").addDataOutputItemRef("dataOutputItem_")
@@ -306,7 +309,8 @@ public class MultiInstanceTest extends CommonAPITest {
         builder.addIntegerData("a", new ExpressionBuilder().createConstantIntegerExpression(1));
         builder.addIntegerData("b", new ExpressionBuilder().createConstantIntegerExpression(2));
         final int loopMax = 3;
-        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(false,
+        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(
+                false,
                 new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceParallelWithLoopCardinalityUsingGroovyAndData", "a + b",
                         Integer.class.getName(), new ExpressionBuilder().createDataExpression("a", Integer.class.getName()),
                         new ExpressionBuilder().createDataExpression("b", Integer.class.getName())));
@@ -326,7 +330,8 @@ public class MultiInstanceTest extends CommonAPITest {
         builder.addIntegerData("a", new ExpressionBuilder().createConstantIntegerExpression(16));
         builder.addIntegerData("b", new ExpressionBuilder().createConstantIntegerExpression(14));
         final int loopMax = 30;
-        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(false,
+        builder.addUserTask("step1", ACTOR_NAME).addMultiInstance(
+                false,
                 new ExpressionBuilder().createGroovyScriptExpression("executeAMultiInstanceParallelWithLoopCardinalityUsingGroovyAndData", "a + b",
                         Integer.class.getName(), new ExpressionBuilder().createDataExpression("a", Integer.class.getName()),
                         new ExpressionBuilder().createDataExpression("b", Integer.class.getName())));
@@ -340,8 +345,8 @@ public class MultiInstanceTest extends CommonAPITest {
 
     @Test
     public void executeAMultiInstanceParallelWithCompletionCondition() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
-                .createNewInstance("executeAMultiInstanceParallelWithCompletionCondition", PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceParallelWithCompletionCondition",
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         final int loopMax = 3;
         builder.addUserTask("step1", ACTOR_NAME)
@@ -359,8 +364,8 @@ public class MultiInstanceTest extends CommonAPITest {
 
     @Test
     public void remainingInstancesAreAbortedAfterCompletionCondition() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder()
-                .createNewInstance("remainingInstancesAreAbortedAfterCompletionCondition", PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("remainingInstancesAreAbortedAfterCompletionCondition",
+                PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         final int loopMax = 3;
         builder.addUserTask("step1", ACTOR_NAME)
@@ -816,8 +821,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
         // Sub-process definition
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("SubProcessInAMultiInstance", PROCESS_VERSION);
-        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("step1").addAutomaticTask("step2")
-                .addTransition("step1", "step2");
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("step1").addAutomaticTask("step2").addTransition("step1", "step2");
 
         final ProcessDefinition subProcess = deployAndEnableWithActor(builder.done(), ACTOR_NAME, john);
 
@@ -924,7 +928,7 @@ public class MultiInstanceTest extends CommonAPITest {
         userTaskBuilder.addMultiInstance(false, loopDataInputName).addDataInputItemRef("userIdValue");
         userTaskBuilder.addDisplayName(new ExpressionBuilder().createConstantStringExpression("displayName"));
         builder.addAutomaticTask("step2").addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, builder, "TestFilterWithAutoAssign");
+        final ProcessDefinition processDefinition = deployProcessWithTestFilter(ACTOR_NAME, builder);
 
         // Start process, and wait all multiinstancied user tasks
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -944,17 +948,17 @@ public class MultiInstanceTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private ProcessDefinition deployProcessWithTestFilter(final String actorName, final ProcessDefinitionBuilder designProcessDefinition,
-            final String filterName) throws BonitaException, IOException {
+    private ProcessDefinition deployProcessWithTestFilter(final String actorName, final ProcessDefinitionBuilder designProcessDefinition)
+            throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
-        final List<BarResource> impl = generateFilterImplementations(filterName);
+        final List<BarResource> impl = generateFilterImplementations("TestFilterWithAutoAssign");
         for (final BarResource barResource : impl) {
             businessArchiveBuilder.addUserFilters(barResource);
         }
         final List<BarResource> generateFilterDependencies = new ArrayList<BarResource>(1);
-        final byte[] data = IOUtil.generateJar(TestFilter.class);
-        generateFilterDependencies.add(new BarResource(filterName + ".jar", data));
+        final byte[] data = IOUtil.generateJar(TestFilterWithAutoAssign.class);
+        generateFilterDependencies.add(new BarResource("TestFilterWithAutoAssign.jar", data));
 
         for (final BarResource barResource : generateFilterDependencies) {
             businessArchiveBuilder.addClasspathResource(barResource);
