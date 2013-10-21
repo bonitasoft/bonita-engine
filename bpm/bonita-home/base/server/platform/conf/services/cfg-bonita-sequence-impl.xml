@@ -2,6 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean name="sequenceManager" class="org.bonitasoft.engine.sequence.SequenceManagerImpl">
+		<constructor-arg name="lockService" ref="lockService" />
 		<constructor-arg name="rangeSizes">
 			<map>
 				<!-- Most used objects: range size depends on process design -->
