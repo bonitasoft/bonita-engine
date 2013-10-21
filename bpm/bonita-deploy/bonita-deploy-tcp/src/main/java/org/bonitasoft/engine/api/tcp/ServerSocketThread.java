@@ -43,6 +43,7 @@ public class ServerSocketThread extends Thread {
             return this.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
         } catch (ServerWrappedException e) {
             //System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + "got an exception during the invokeMethod: " + e.getClass() + ": " + e.getMessage());
+            e.printStackTrace();
             return e;
         }
     }
