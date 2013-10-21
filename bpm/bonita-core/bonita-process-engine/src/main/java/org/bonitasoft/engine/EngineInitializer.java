@@ -73,13 +73,19 @@ public class EngineInitializer {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
         PlatformAPIImpl platformAPI = new PlatformAPIImpl();
-        // initialization of the platform
+
         try {
-            initAndStartPlatform(platformAPI);
+            // initialization of the platform
+            try {
+                initPlatform(platformAPI);
+            } catch (Exception e) {
+                //platform is already initialized.
+            }
+            // start of the platform (separated from previous call as in a cluster deployment, platform may already exist but the second node still has to start
+            startPlatform(platformAPI);
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
         }
-
         long after = System.currentTimeMillis();
         LOGGER.log(Level.INFO, "Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
     }
@@ -97,11 +103,14 @@ public class EngineInitializer {
         return sessionId;
     }
 
-    protected void initAndStartPlatform(final PlatformAPIImpl platformAPI) throws Exception {
+    protected void initPlatform(final PlatformAPIImpl platformAPI) throws Exception {
         if (platformProperties.shouldCreatePlatform()) {
             LOGGER.log(Level.INFO, "Creating platform...");
             platformManager.createPlatform(platformAPI);
         }
+    }
+
+    protected void startPlatform(final PlatformAPIImpl platformAPI) throws Exception {
         if (platformProperties.shouldStartPlatform()) {
             LOGGER.log(Level.INFO, "Starting platform...");
             platformManager.startPlatform(platformAPI);
