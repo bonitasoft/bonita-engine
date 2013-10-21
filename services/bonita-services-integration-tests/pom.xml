@@ -334,6 +334,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Lock -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.lock</groupId>
+			<artifactId>bonita-lock-api-memory-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- Monitoring -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.monitoring</groupId>

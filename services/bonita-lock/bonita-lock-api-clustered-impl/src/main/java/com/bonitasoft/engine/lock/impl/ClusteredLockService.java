@@ -16,8 +16,6 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
@@ -38,15 +36,13 @@ public class ClusteredLockService implements LockService {
 
     protected final int lockTimeout;
 
-    private final ReadSessionAccessor sessionAccessor;
-
     protected final boolean debugEnable;
 
     private final boolean traceEnable;
 
-    public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout) {
+    public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger,
+            final int lockTimeout) {
         this.logger = logger;
-        this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
         this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
         this.traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
@@ -57,21 +53,22 @@ public class ClusteredLockService implements LockService {
     }
 
     @Override
-    public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) {
+    public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit, final long tenantId) {
         try {
-            return innerTryLock(objectToLockId, objectType, timeout, timeUnit);
+            return innerTryLock(objectToLockId, objectType, timeout, timeUnit, tenantId);
         } catch (SLockException e) {
             return null;
         }
     }
 
     @Override
-    public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
-        return innerTryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS);
+    public BonitaLock lock(final long objectToLockId, final String objectType, final long tenantId) throws SLockException {
+        return innerTryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS, tenantId);
     }
 
-    public BonitaLock innerTryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) throws SLockException {
-        final String key = buildKey(objectToLockId, objectType);
+    public BonitaLock innerTryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit, final long tenantId)
+            throws SLockException {
+        final String key = buildKey(objectToLockId, objectType, tenantId);
         final long before = System.currentTimeMillis();
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "lock id=" + key);
@@ -104,8 +101,8 @@ public class ClusteredLockService implements LockService {
     }
 
     @Override
-    public void unlock(final BonitaLock bonitaLock) throws SLockException {
-        final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType());
+    public void unlock(final BonitaLock bonitaLock, final long tenantId) throws SLockException {
+        final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType(), tenantId);
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
         }
@@ -127,25 +124,19 @@ public class ClusteredLockService implements LockService {
         }
     }
 
-    protected String buildKey(final long objectToLockId, final String objectType) {
-        try {
-            return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
-        } catch (TenantIdNotSetException e) {
-            throw new IllegalStateException("Tenant not set");
-        }
+    protected String buildKey(final long objectToLockId, final String objectType, final long tenantId) {
+        return objectType + SEPARATOR + objectToLockId + SEPARATOR + tenantId;
     }
 
-
     /*
-	@Override
-	protected Lock getLock(final String key) {
-		return hazelcastInstance.getLock(key);
-	}
-
-	@Override
-	protected void innerUnLock(BonitaLock lock) {
-		lock.getLock().unlock();
-	}
+     * @Override
+     * protected Lock getLock(final String key) {
+     * return hazelcastInstance.getLock(key);
+     * }
+     * @Override
+     * protected void innerUnLock(BonitaLock lock) {
+     * lock.getLock().unlock();
+     * }
      */
 
 }
