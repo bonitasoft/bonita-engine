@@ -11,7 +11,7 @@
 		<constructor-arg ref="tenantBuilder" />
 		<constructor-arg ref="technicalLoggerService" />
 		<constructor-arg ref="platformCacheService" />
-		
+		<constructor-arg ref="platformProperties" />
 	</bean>
 
 </beans>

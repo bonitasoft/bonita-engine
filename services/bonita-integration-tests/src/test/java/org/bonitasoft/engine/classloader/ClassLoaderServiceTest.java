@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.bonitasoft.engine.CommonServiceTest;
-import org.bonitasoft.engine.commons.IOUtil;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;

@@ -4,6 +4,8 @@
 	<bean id="tenantBuilder" class="org.bonitasoft.engine.platform.model.builder.impl.STenantBuilderImpl" />
 
 	<bean id="platformBuilder" class="org.bonitasoft.engine.platform.model.builder.impl.SPlatformBuilderImpl" />
+	
+	<bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />
 
 	<bean id="db-bonita-platform-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/platform/db/${db.vendor}-createTables.sql" />

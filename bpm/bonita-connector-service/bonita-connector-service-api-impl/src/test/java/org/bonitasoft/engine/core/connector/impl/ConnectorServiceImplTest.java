@@ -217,7 +217,7 @@ public class ConnectorServiceImplTest {
             File[] jarFiles = classPathFolder.listFiles(jarFilenameFilter);
             assertEquals(1, jarFiles.length);
             assertTrue("Deployed connector jar is not the expected size + content",
-                    Arrays.equals(org.bonitasoft.engine.commons.IOUtil.getAllContentFrom(jarFiles[0]), originalConnectorJarContent));
+                    Arrays.equals(org.bonitasoft.engine.commons.io.IOUtil.getAllContentFrom(jarFiles[0]), originalConnectorJarContent));
 
             // now let's prepare the new connector implementation to replace:
             zipFileMap = new HashMap<String, byte[]>(1);
@@ -230,7 +230,7 @@ public class ConnectorServiceImplTest {
             jarFiles = classPathFolder.listFiles(jarFilenameFilter);
             assertEquals(1, jarFiles.length);
             assertTrue("Replaced connector jar is not the expected size + content",
-                    Arrays.equals(org.bonitasoft.engine.commons.IOUtil.getAllContentFrom(jarFiles[0]), newConnectorJarContent));
+                    Arrays.equals(org.bonitasoft.engine.commons.io.IOUtil.getAllContentFrom(jarFiles[0]), newConnectorJarContent));
         } finally {
             final boolean folderCleaned = IOUtil.deleteDir(processDefFolder);
             if (!folderCleaned) {

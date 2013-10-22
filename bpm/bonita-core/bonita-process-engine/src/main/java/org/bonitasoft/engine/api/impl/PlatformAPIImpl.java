@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -49,10 +48,10 @@ import org.bonitasoft.engine.command.SCommandAlreadyExistsException;
 import org.bonitasoft.engine.command.SCommandCreationException;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandBuilder;
-import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -152,8 +151,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
         } catch (final SBonitaException e) {
             throw new CreationException("Platform Creation failed.", e);
-        } catch (final IOException ioe) {
-            throw new CreationException("Platform Creation failed.", ioe);
         }
     }
 
@@ -203,13 +200,13 @@ public class PlatformAPIImpl implements PlatformAPI {
         return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }
 
-    private SPlatform constructPlatform(final PlatformServiceAccessor platformAccessor) throws IOException {
-        final URL resource = PlatformAPIImpl.class.getResource("platform.properties");
-        final Properties properties = PropertiesManager.getProperties(resource);
+    private SPlatform constructPlatform(final PlatformServiceAccessor platformAccessor) {
+        final PlatformService platformService = platformAccessor.getPlatformService();
+
         // FIXME construct platform object from a configuration file
-        final String version = (String) properties.get("version");
+        final String version = platformService.getSPlatformProperties().getPlatformVersion();
         final String previousVersion = "";
-        final String initialVersion = (String) properties.get("version");
+        final String initialVersion = version;
         // FIXME createdBy when PlatformSessionAccessor will exist
         final String createdBy = "platformAdmin";
         // FIXME do that in the builder
@@ -328,7 +325,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final StartNodeException e) {
             // If an exception is thrown, stop the platform that was started.
             try {
-                shutdownScheduler(platformAccessor, schedulerService);
+                shutdownScheduler(schedulerService);
             } catch (final Exception exp) {
                 throw new StartNodeException("Platform stoping failed : " + exp.getMessage(), e);
             }
@@ -352,7 +349,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
             if (plaformConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
-                shutdownScheduler(platformAccessor, schedulerService);
+                shutdownScheduler(schedulerService);
             }
             final WorkService workService = platformAccessor.getWorkService();
             workService.stop();
@@ -382,7 +379,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void shutdownScheduler(final PlatformServiceAccessor platformAccessor, final SchedulerService schedulerService) throws Exception {
+    private void shutdownScheduler(final SchedulerService schedulerService) throws Exception {
         if (isNodeStarted()) {
             schedulerService.stop();
         }
@@ -704,7 +701,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             log(platformAccessor, e);
             throw new STenantActivationException(e);
         } finally {
-            if (schedulerStarted) {
+            if (schedulerStarted && schedulerService != null) {
                 try {
                     // stop scheduler after scheduling global jobs
                     schedulerService.stop();
