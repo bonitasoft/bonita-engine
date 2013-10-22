@@ -16,6 +16,7 @@ package org.bonitasoft.engine.services;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface QueriableLogSessionProvider {
 
@@ -32,12 +33,5 @@ public interface QueriableLogSessionProvider {
      * @return the cluster node
      */
     String getClusterNode();
-
-    /**
-     * Get the product's version
-     * 
-     * @return the product's version
-     */
-    String getProductVersion();
 
 }

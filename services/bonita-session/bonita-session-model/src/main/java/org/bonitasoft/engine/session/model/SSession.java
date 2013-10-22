@@ -99,13 +99,6 @@ public interface SSession extends Serializable {
     String getClusterNode();
 
     /**
-     * get version
-     * 
-     * @return
-     */
-    String getProductVersion();
-
-    /**
      * Get the application's name. For instance, BPM, Case, RULES
      * 
      * @return

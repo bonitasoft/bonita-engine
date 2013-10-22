@@ -262,7 +262,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("variable_update", retrievedLog.getActionType());
         assertEquals("admin", retrievedLog.getUserId());
         assertEquals("node1", retrievedLog.getClusterNode());
-        assertEquals("BOS-6.0", retrievedLog.getProductVersion());
+        assertEquals("6.1.0-SNAPSHOT", retrievedLog.getProductVersion());
         getTransactionService().complete();
     }
 
@@ -1371,7 +1371,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
             // add attributes injected by the log service implementation
             sQueriableLog = logModelBuilder.getQueriableLogBuilder().fromInstance(sQueriableLog).userId(qlSessionProvider.getUserId())
-                    .clusterNode(qlSessionProvider.getClusterNode()).productVersion(qlSessionProvider.getProductVersion()).done();
+                    .clusterNode(qlSessionProvider.getClusterNode()).productVersion("BOS-6.0").done();
 
             persistenceService.insert(sQueriableLog);
         }
