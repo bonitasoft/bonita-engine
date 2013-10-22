@@ -217,6 +217,9 @@
 		                        <home>${tomcat.home}</home>
 		                        <properties>
 		                            <cargo.servlet.port>${provider.port}</cargo.servlet.port>
+		                            <cargo.jvmargs>
+									 -XX:+HeapDumpOnOutOfMemoryError
+									</cargo.jvmargs>
 		                        </properties>
 		                    </configuration>
 		                    <wait>false</wait>
