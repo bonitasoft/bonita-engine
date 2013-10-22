@@ -33,8 +33,8 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.EnumToObjectConvertible;
-import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.StringUtil;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.AbstractDBPersistenceService;
@@ -116,8 +116,7 @@ public abstract class AbstractMybatisPersistenceService extends AbstractDBPersis
 
     @Override
     protected void doExecuteSQL(final String sqlResource, final String statementDelimiter, final Map<String, String> replacements,
-            final boolean useDataSourceConnection)
-            throws SPersistenceException, IOException {
+            final boolean useDataSourceConnection) throws SPersistenceException {
         // TODO charles use the useDataSourceConnection parameter
         StringReader reader = null;
         try {
