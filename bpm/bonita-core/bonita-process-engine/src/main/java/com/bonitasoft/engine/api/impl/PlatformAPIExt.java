@@ -107,6 +107,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
 
+    private static final String PROFILES_FILE_SP = "profiles-sp.xml";
+
     @Override
     protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
             ClassNotFoundException, IOException, BonitaHomeConfigurationException {
@@ -786,6 +788,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final IOException ioe) {
             throw new StopNodeException(ioe);
         }
+    }
+
+    @Override
+    protected String getProfileFileName() {
+        return PROFILES_FILE_SP;
     }
 
 }
