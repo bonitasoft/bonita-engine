@@ -202,7 +202,7 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="nodeConfiguration" class="com.bonitasoft.engine.api.impl.NodeConfigurationExt" autowire="byType">
+	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
 		<property name="shouldStartScheduler" value="true" />
 		<property name="shouldRestartElements" value="true" />
 		<property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
