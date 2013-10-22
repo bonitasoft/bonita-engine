@@ -16,6 +16,7 @@ package org.bonitasoft.engine;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
@@ -72,14 +73,14 @@ public class EngineInitializer {
         PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
-        PlatformAPIImpl platformAPI = new PlatformAPIImpl();
+        PlatformAPI platformAPI = createPlatformAPI();
 
         try {
             // initialization of the platform
             try {
                 initPlatform(platformAPI);
             } catch (Exception e) {
-                //platform is already initialized.
+                // platform is already initialized.
             }
             // start of the platform (separated from previous call as in a cluster deployment, platform may already exist but the second node still has to start
             startPlatform(platformAPI);
@@ -88,6 +89,10 @@ public class EngineInitializer {
         }
         long after = System.currentTimeMillis();
         LOGGER.log(Level.INFO, "Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
+    }
+
+    protected PlatformAPIImpl createPlatformAPI() {
+        return new PlatformAPIImpl();
     }
 
     private void deletePlatformSession(final PlatformSessionService platformSessionService, final SessionAccessor sessionAccessor, final long sessionId)
@@ -103,14 +108,14 @@ public class EngineInitializer {
         return sessionId;
     }
 
-    protected void initPlatform(final PlatformAPIImpl platformAPI) throws Exception {
+    protected void initPlatform(final PlatformAPI platformAPI) throws Exception {
         if (platformProperties.shouldCreatePlatform()) {
             LOGGER.log(Level.INFO, "Creating platform...");
             platformManager.createPlatform(platformAPI);
         }
     }
 
-    protected void startPlatform(final PlatformAPIImpl platformAPI) throws Exception {
+    protected void startPlatform(final PlatformAPI platformAPI) throws Exception {
         if (platformProperties.shouldStartPlatform()) {
             LOGGER.log(Level.INFO, "Starting platform...");
             platformManager.startPlatform(platformAPI);
@@ -125,7 +130,7 @@ public class EngineInitializer {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         platformSessionService = platformAccessor.getPlatformSessionService();
         long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
-        PlatformAPIImpl platformAPI = new PlatformAPIImpl();
+        PlatformAPIImpl platformAPI = createPlatformAPI();
         try {
             if (platformProperties.shouldStopPlatform()) {
                 platformManager.stopPlatform(platformAPI);

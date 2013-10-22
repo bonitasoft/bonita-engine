@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -23,6 +24,7 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
@@ -113,6 +115,8 @@ import org.bonitasoft.engine.xml.Parser;
 public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
+
+    private static final String PROFILES_FILE = "profiles.xml";
 
     private static boolean isNodeStarted = false;
 
@@ -557,13 +561,17 @@ public class PlatformAPIImpl implements PlatformAPI {
     protected void createDefaultProfiles(final Long tenantId, final Parser parser, final ProfileService profileService, final IdentityService identityService,
             final TechnicalLoggerService logger)
             throws Exception {
-        File tenantProfilesFile = BonitaHomeServer.getInstance().getTenantProfilesFile(tenantId);
-        if (!tenantProfilesFile.exists()) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Default profile file not present, will not create the default profiles, file: "
-                    + tenantProfilesFile.getAbsolutePath());
+        InputStream profilesIS = Thread.currentThread().getContextClassLoader().getResourceAsStream(getProfileFileName());
+        if (profilesIS == null) {
+            // no default profiles
             return;
         }
-        final String xmlContent = IOUtil.getFileContent(tenantProfilesFile);
+        final String xmlContent;
+        try {
+            xmlContent = IOUtils.toString(profilesIS, org.bonitasoft.engine.io.IOUtil.fEncoding);
+        } finally {
+            profilesIS.close();
+        }
         StringReader reader = new StringReader(xmlContent);
         List<ExportedProfile> profiles;
         try {
@@ -577,6 +585,10 @@ public class PlatformAPIImpl implements PlatformAPI {
         } finally {
             reader.close();
         }
+    }
+
+    protected String getProfileFileName() {
+        return PROFILES_FILE;
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
