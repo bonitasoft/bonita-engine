@@ -855,7 +855,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         bindings.add(RoleNamesBinding.class);
         bindings.add(GroupPathsBinding.class);
         final Parser parser = getParserFactgory().createParser(bindings);
-        final InputStream resource = ImportActorMapping.class.getClassLoader().getResourceAsStream("profiles.xsd");
+        final InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("profiles.xsd");
         try {
             parser.setSchema(resource);
             return parser;
