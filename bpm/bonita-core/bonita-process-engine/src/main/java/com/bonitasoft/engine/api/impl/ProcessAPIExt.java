@@ -160,13 +160,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws ImportParameterException {
+    public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_PARAMETER);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         SProcessDefinition sDefinition = null;
-        if (pDefinitionId > 0) {
+        if (processDefinitionId > 0) {
             final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-            final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(pDefinitionId, processDefinitionService);
+            final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processDefinitionId, processDefinitionService);
             try {
                 getProcessDefinition.execute();
             } catch (final SBonitaException e) {
@@ -176,13 +176,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
 
         final ParameterService parameterService = tenantAccessor.getParameterService();
-        final Set<SParameterDefinition> parameters = sDefinition.getParameters();
+        final Set<SParameterDefinition> params = sDefinition.getParameters();
         final Map<String, String> defaultParamterValues = new HashMap<String, String>();
 
-        if (parametersXML != null) {
+        if (parameters != null) {
             final Properties property = new Properties();
             try {
-                property.load(new ByteArrayInputStream(parametersXML));
+                property.load(new ByteArrayInputStream(parameters));
             } catch (final IOException e1) {
                 throw new ImportParameterException(e1);
             }
@@ -193,7 +193,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
 
         final Map<String, String> storedParameters = new HashMap<String, String>();
-        for (final SParameterDefinition sParameterDefinition : parameters) {
+        for (final SParameterDefinition sParameterDefinition : params) {
             final String name = sParameterDefinition.getName();
             final String value = defaultParamterValues.get(name);
             if (value != null) {
