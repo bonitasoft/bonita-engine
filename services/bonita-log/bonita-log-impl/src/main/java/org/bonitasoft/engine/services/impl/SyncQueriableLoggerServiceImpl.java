@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.services.PersistenceService;
@@ -27,14 +28,16 @@ import org.bonitasoft.engine.services.SPersistenceException;
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SyncQueriableLoggerServiceImpl extends AbstractQueriableLoggerImpl {
 
     private final TechnicalLoggerService logger;
 
     public SyncQueriableLoggerServiceImpl(final PersistenceService persistenceService, final SQueriableLogModelBuilder builder,
-            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final TechnicalLoggerService logger) {
-        super(persistenceService, builder, loggerStrategy, sessionProvider);
+            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final TechnicalLoggerService logger,
+            final PlatformService platformService) {
+        super(persistenceService, builder, loggerStrategy, sessionProvider, platformService);
         this.logger = logger;
     }
 

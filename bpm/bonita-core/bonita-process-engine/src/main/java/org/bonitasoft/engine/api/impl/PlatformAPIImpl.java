@@ -110,6 +110,7 @@ import org.bonitasoft.engine.xml.Parser;
  * @author Zhang Bole
  * @author Yanyan Liu
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class PlatformAPIImpl implements PlatformAPI {
 

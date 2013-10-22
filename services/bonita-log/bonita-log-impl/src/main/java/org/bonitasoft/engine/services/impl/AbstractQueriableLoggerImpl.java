@@ -27,6 +27,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
@@ -42,6 +43,7 @@ import org.bonitasoft.engine.services.SQueriableLogNotFoundException;
  * @author Elias Ricken de Medeiros
  * @author Bole Zhang
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerService {
 
@@ -53,13 +55,16 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
 
     private final QueriableLogSessionProvider sessionProvider;
 
+    private final PlatformService platformService;
+
     public AbstractQueriableLoggerImpl(final PersistenceService persistenceService, final SQueriableLogModelBuilder builder,
-            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider) {
+            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final PlatformService platformService) {
         NullCheckingUtil.checkArgsNotNull(persistenceService, builder, loggerStrategy, sessionProvider);
         this.persistenceService = persistenceService;
         this.builder = builder;
         loggerConfiguration = loggerStrategy;
         this.sessionProvider = sessionProvider;
+        this.platformService = platformService;
     }
 
     @Override
@@ -111,7 +116,8 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
         for (SQueriableLog log : queriableLogs) {
             if (isLoggable(log.getActionType(), log.getSeverity())) {
                 log = getBuilder().getQueriableLogBuilder().fromInstance(log).callerClassName(callerClassName).callerMethodName(callerMethodName)
-                        .userId(sessionProvider.getUserId()).clusterNode(sessionProvider.getClusterNode()).productVersion(sessionProvider.getProductVersion())
+                        .userId(sessionProvider.getUserId()).clusterNode(sessionProvider.getClusterNode())
+                        .productVersion(platformService.getSPlatformProperties().getPlatformVersion())
                         .done();
 
                 loggableLogs.add(log);
