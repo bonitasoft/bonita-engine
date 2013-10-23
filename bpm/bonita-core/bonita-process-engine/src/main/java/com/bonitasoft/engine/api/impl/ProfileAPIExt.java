@@ -360,7 +360,8 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
         if (updatedName != null) {
             SearchResult<Profile> searchProfiles;
             try {
-                searchProfiles = searchProfiles(new SearchOptionsBuilder(0, 1).filter(ProfileSearchDescriptor.NAME, updatedName).done());
+                searchProfiles = searchProfiles(new SearchOptionsBuilder(0, 1).differentFrom(ProfileSearchDescriptor.ID, id)
+                        .filter(ProfileSearchDescriptor.NAME, updatedName).done());
                 if (searchProfiles.getCount() > 0) {
                     throw new AlreadyExistsException("A profile with the name '" + updatedName + "' already exists");
                 }

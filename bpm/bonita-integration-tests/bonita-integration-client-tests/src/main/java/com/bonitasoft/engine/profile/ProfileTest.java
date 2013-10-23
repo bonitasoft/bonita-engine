@@ -170,11 +170,27 @@ public class ProfileTest extends AbstractProfileTest {
         assertEquals(Long.valueOf(4), profileCount);
     }
 
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom", "Same", "Name" }, story = "Update name of custom profile with same value.", jira = "ENGINE-2011")
+    @Test
+    public void updateSameCustomProfileWithSameName() throws BonitaException {
+        final Profile createdProfile = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
+
+        // Update custom profile
+        final ProfileUpdater updateDescriptor = new ProfileUpdater();
+        updateDescriptor.name("Profile1");
+        getProfileAPI().updateProfile(createdProfile.getId(), updateDescriptor);
+        final Profile upDateProfileResult = getProfileAPI().getProfile(createdProfile.getId());
+        assertEquals("Profile1", upDateProfileResult.getName());
+
+        // Delete profile using id
+        getProfileAPI().deleteProfile(createdProfile.getId());
+    }
+
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom" }, story = "Update custom profile fails.", jira = "ENGINE-2011")
     @Test(expected = AlreadyExistsException.class)
     public void cannotUpdateProfileWithExistingName() throws BonitaException {
         final Profile profile1 = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
-        Profile profile2 = getProfileAPI().createProfile("Profile2", "Description profile2", "IconPath profile2");
+        final Profile profile2 = getProfileAPI().createProfile("Profile2", "Description profile2", "IconPath profile2");
 
         // Update custom profile
         final ProfileUpdater updateDescriptor = new ProfileUpdater();
@@ -182,7 +198,6 @@ public class ProfileTest extends AbstractProfileTest {
         try {
             getProfileAPI().updateProfile(profile1.getId(), updateDescriptor);
         } finally {
-
             // Delete profile using id
             getProfileAPI().deleteProfile(profile1.getId());
             getProfileAPI().deleteProfile(profile2.getId());
