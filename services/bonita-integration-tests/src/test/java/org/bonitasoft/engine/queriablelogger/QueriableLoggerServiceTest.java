@@ -3,17 +3,22 @@ package org.bonitasoft.engine.queriablelogger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.MockQueriableLogSessionProviderImpl;
+import org.bonitasoft.engine.commons.io.PropertiesManager;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
@@ -242,6 +247,8 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
     @Test
     public void testSessionProviderInformation() throws Exception {
+        final String platformVersion = getPlatformVersion();
+
         getTransactionService().begin();
         final SQueriableLog log1 = buildQueriableLog("variable_update", "booleanVar", SQueriableLogSeverity.BUSINESS, SQueriableLog.STATUS_OK, "sucessFull",
                 Collections.singletonMap(NUMERIC_INDEX1, 123L)).done();
@@ -262,8 +269,14 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("variable_update", retrievedLog.getActionType());
         assertEquals("admin", retrievedLog.getUserId());
         assertEquals("node1", retrievedLog.getClusterNode());
-        assertEquals("6.1.0-SNAPSHOT", retrievedLog.getProductVersion());
+        assertEquals(platformVersion, retrievedLog.getProductVersion());
         getTransactionService().complete();
+    }
+
+    private String getPlatformVersion() throws IOException {
+        final URL resource = SPlatformPropertiesImpl.class.getResource("platform.properties");
+        final Properties properties = PropertiesManager.getProperties(resource);
+        return (String) properties.get("version");
     }
 
     @Test
