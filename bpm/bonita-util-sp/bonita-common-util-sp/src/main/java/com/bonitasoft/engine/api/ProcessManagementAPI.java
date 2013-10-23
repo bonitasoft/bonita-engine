@@ -98,13 +98,13 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
 
     /**
      * Imports the parameters of the process definition.
-     * <b>
      * The parameters are stored in a properties file.
      * 
      * @param processDefinitionId
      *            the identifier of the process definition
      * @param parameters
-     *            The content of the properties file as a byte array
+     *            The content of the properties file as a byte array. If null or empty byte[], nothing is done, and the process does not reset to unresolved but
+     *            stays the same.
      * @throws ImportParameterException
      *             If an exception occurs while importing the parameters
      * @throws InvalidSessionException
