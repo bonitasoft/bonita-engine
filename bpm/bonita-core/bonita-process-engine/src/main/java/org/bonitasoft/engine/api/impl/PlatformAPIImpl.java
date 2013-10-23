@@ -27,6 +27,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
+import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.CleanPlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteAllTenants;
@@ -231,13 +232,20 @@ public class PlatformAPIImpl implements PlatformAPI {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         final WorkService workService = platformAccessor.getWorkService();
-        List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
+        final List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
         try {
             try {
-                for (ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
+                final PlatformService platformService = platformAccessor.getPlatformService();
+                final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
+                final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService);
+                executor.execute(checkPlatformVersion);
+                if (!checkPlatformVersion.sameVersion()) {
+                    throw new StartNodeException("The version of the platform is not the same: expected:" + checkPlatformVersion.getPlatform().getVersion()
+                            + " got: " + checkPlatformVersion.getPlatformProperties().getPlatformVersion());
+                }
+                for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
                     serviceWithLifecycle.start();
                 }
-                final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
                 final RefreshPlatformClassLoader refreshPlatformClassLoader = new RefreshPlatformClassLoader(platformAccessor);
                 executor.execute(refreshPlatformClassLoader);
                 final List<Long> tenantIds = refreshPlatformClassLoader.getResult();
@@ -273,7 +281,6 @@ public class PlatformAPIImpl implements PlatformAPI {
                         // * flow node that are completed and not deleted : call execute to make it create transitions and so on
                         // * all element that are in not stable state
 
-                        final PlatformService platformService = platformAccessor.getPlatformService();
                         final GetDefaultTenantInstance getDefaultTenantInstance = new GetDefaultTenantInstance(platformService);
                         platformAccessor.getTransactionExecutor().execute(getDefaultTenantInstance);
                         final STenant defaultTenant = getDefaultTenantInstance.getResult();
@@ -301,22 +308,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
             } catch (final SDependencyException e) {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
-            } catch (final SBonitaException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final BonitaHomeNotSetException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final BonitaHomeConfigurationException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final IOException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final NoSuchMethodException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final InstantiationException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final IllegalAccessException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final InvocationTargetException e) {
-                throw new StartNodeException("Platform starting failed.", e);
+            } catch (final StartNodeException sne) {
+                throw sne;
             } catch (final Exception e) {
                 throw new StartNodeException("Platform starting failed.", e);
             } finally {
@@ -345,7 +338,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     public void stopNode() throws StopNodeException {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
+            final List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
             if (plaformConfiguration.shouldStartScheduler()) {
@@ -357,7 +350,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (plaformConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
-            for (ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
+            for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
                 serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
@@ -542,10 +535,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             createDefaultDataSource(sDataSourceModelBuilder, dataService);
             final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
             createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
-            Parser profileParser = tenantServiceAccessor.getProfileParser();
-            ProfileService profileService = tenantServiceAccessor.getProfileService();
-            IdentityService identityService = tenantServiceAccessor.getIdentityService();
-            TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+            final Parser profileParser = tenantServiceAccessor.getProfileParser();
+            final ProfileService profileService = tenantServiceAccessor.getProfileService();
+            final IdentityService identityService = tenantServiceAccessor.getIdentityService();
+            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             createDefaultProfiles(tenantId, profileParser, profileService, identityService, logger);
             sessionService.deleteSession(session.getId());
         } catch (final Exception e) {
@@ -557,9 +550,8 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @SuppressWarnings("unchecked")
     protected void createDefaultProfiles(final Long tenantId, final Parser parser, final ProfileService profileService, final IdentityService identityService,
-            final TechnicalLoggerService logger)
-            throws Exception {
-        InputStream profilesIS = Thread.currentThread().getContextClassLoader().getResourceAsStream(getProfileFileName());
+            final TechnicalLoggerService logger) throws Exception {
+        final InputStream profilesIS = Thread.currentThread().getContextClassLoader().getResourceAsStream(getProfileFileName());
         if (profilesIS == null) {
             // no default profiles
             return;
@@ -664,7 +656,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
         SchedulerService schedulerService = null;
-        boolean schedulerStarted = false;
+        final boolean schedulerStarted = false;
         long platformSessionId = -1;
         try {
             platformAccessor = getPlatformAccessor();
