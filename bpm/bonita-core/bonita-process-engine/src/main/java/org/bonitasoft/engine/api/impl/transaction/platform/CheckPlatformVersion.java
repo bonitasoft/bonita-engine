@@ -40,7 +40,18 @@ public class CheckPlatformVersion implements TransactionContent {
     public void execute() throws SBonitaException {
         platform = platformService.getPlatform();
         platformProperties = platformService.getSPlatformProperties();
-        same = platform.getVersion().equals(platformProperties.getPlatformVersion());
+        final String platformMinorVersion = format(platform.getVersion());
+        final String propertiesMinorVersion = format(platformProperties.getPlatformVersion());
+        same = platformMinorVersion.equals(propertiesMinorVersion);
+    }
+
+    private String format(final String version) {
+        final String trimVersion = version.trim();
+        final int endIndex = trimVersion.indexOf(".", 2);
+        if (endIndex == -1) {
+            return trimVersion;
+        }
+        return trimVersion.substring(0, endIndex);
     }
 
     public Boolean sameVersion() {
