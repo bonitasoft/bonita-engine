@@ -749,9 +749,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessDefinition processDefinition = ModelConvertor.toProcessDefinition(sProcessDefinition);
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO,
-                    "The user <" + SessionInfos.getUserNameFromSession() + "> has installed process <" + sProcessDefinition.getName() + "> in version <"
-                            + sProcessDefinition.getVersion() + "> with id <" + sProcessDefinition.getId() + ">");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + SessionInfos.getUserNameFromSession() + "> has installed process <"
+                    + sProcessDefinition.getName() + "> in version <" + sProcessDefinition.getVersion() + "> with id <" + sProcessDefinition.getId() + ">");
         }
         return processDefinition;
     }
@@ -2610,6 +2609,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final Parser parser = tenantAccessor.getActorMappingParser();
         try {
             new ImportActorMapping(actorMappingService, identityService, parser, processDefinitionId, xmlContent).execute();
+            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
         } catch (final SBonitaException sbe) {
             throw new ActorMappingImportException(sbe);
         }
@@ -3560,8 +3560,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<BonitaLock> createLockProcessInstances(final LockService lockService, final String objectType, final List<SProcessInstance> sProcessInstances,
-            final long tenantId)
-            throws SLockException {
+            final long tenantId) throws SLockException {
         final List<BonitaLock> locks = new ArrayList<BonitaLock>();
         for (final SProcessInstance sProcessInstance : sProcessInstances) {
             final BonitaLock bonitaLock = lockService.lock(sProcessInstance.getId(), objectType, tenantId);

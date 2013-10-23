@@ -13,6 +13,7 @@ import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMappingImportException;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
@@ -28,7 +29,11 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.test.TestStates;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -187,6 +192,31 @@ public class ImportActorMappingTest extends CommonAPITest {
         getAndCheckActors(user, rd, role, processDefinition);
     }
 
+    @Cover(classes = { Problem.class, ProcessDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-1881", keywords = { "process resolution" })
+    @Test
+    public void importActorMappingComputesProcessResolution() throws BonitaException {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
+        builder.createNewInstance("resolve", "1.0").addActor("Leader", true).addUserTask("step1", "Leader");
+        final DesignProcessDefinition processDesignDefinition = builder.done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDesignDefinition).done();
+        processDefinition = getProcessAPI().deploy(businessArchive);
+        ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
+
+        // Let's resolve actor mapping by importing a valid file:
+        final User user = createUser("john", "bpm");
+        getProcessAPI()
+                .importActorMapping(
+                        processDefinition.getId(),
+                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><actormappings:actorMappings xmlns:actormappings=\"http://www.bonitasoft.org/ns/actormapping/6.0\"><actorMapping name=\"Leader\"><users><user>john</user></users></actorMapping></actormappings:actorMappings>"
+                                .getBytes());
+
+        deploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
+        Assert.assertEquals(TestStates.getProcessDepInfoResolvedState(), deploymentInfo.getConfigurationState());
+
+        deleteUser(user);
+    }
+
     /**
      * @param xmlFileName
      * @return ProcessDefinition
@@ -256,8 +286,7 @@ public class ImportActorMappingTest extends CommonAPITest {
      * @throws Exception
      * @since 6.0
      */
-    private void createProcessDefinitionAndCheckActorMappingImportException(final User user, final String xmlFileName)
-            throws Exception {
+    private void createProcessDefinitionAndCheckActorMappingImportException(final User user, final String xmlFileName) throws Exception {
         final ProcessDefinitionBuilder processBuilder = createProcessDefinitionBuilder();
         processDefinition = deployAndEnableWithActor(processBuilder.getProcess(), DELIVERY_MEN, user);
 
