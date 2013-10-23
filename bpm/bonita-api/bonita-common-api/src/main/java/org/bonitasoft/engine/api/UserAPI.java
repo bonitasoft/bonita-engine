@@ -275,20 +275,20 @@ public interface UserAPI {
     Map<Long, User> getUsers(List<Long> userIds);
 
     /**
-     * Retrieves the identifiers of the named users. The map contains the couples userName/userIdentifier.
+     * Retrieves the identifiers of the named users. The map contains the couples userName/User.
      * <b>
      * If a user does not exists, no exception is thrown and no value is added in the map.
      * 
      * @param userNames
      *            the names of the users
-     * @return the identifiers of the users
+     * @return the users
      * @throws RetrieveException
      *             If an exception occurs during the user retrieving
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.1
      */
-    Map<String, User> getUserIds(List<String> userNames);
+    Map<String, User> getUsersByUsernames(List<String> userNames);
 
     /**
      * Searches users according to the criteria containing in the options.

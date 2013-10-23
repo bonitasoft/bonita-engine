@@ -1083,7 +1083,7 @@ public class UserTest extends CommonAPITest {
         userNames.add("liisa");
         userNames.add("matti");
 
-        final Map<String, User> userIds = getIdentityAPI().getUserIds(userNames);
+        final Map<String, User> userIds = getIdentityAPI().getUsersByUsernames(userNames);
         assertEquals(2, userIds.size());
         assertEquals(jani, userIds.get("jani"));
         assertEquals(matti, userIds.get("matti"));
