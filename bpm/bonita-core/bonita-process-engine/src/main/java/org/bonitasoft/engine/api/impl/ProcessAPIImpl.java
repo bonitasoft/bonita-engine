@@ -2603,15 +2603,17 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void importActorMapping(final long processDefinitionId, final String xmlContent) throws ActorMappingImportException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        final IdentityService identityService = tenantAccessor.getIdentityService();
-        final Parser parser = tenantAccessor.getActorMappingParser();
-        try {
-            new ImportActorMapping(actorMappingService, identityService, parser, processDefinitionId, xmlContent).execute();
-            tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
-        } catch (final SBonitaException sbe) {
-            throw new ActorMappingImportException(sbe);
+        if (xmlContent != null) {
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+            final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+            final IdentityService identityService = tenantAccessor.getIdentityService();
+            final Parser parser = tenantAccessor.getActorMappingParser();
+            try {
+                new ImportActorMapping(actorMappingService, identityService, parser, processDefinitionId, xmlContent).execute();
+                tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
+            } catch (final SBonitaException sbe) {
+                throw new ActorMappingImportException(sbe);
+            }
         }
     }
 
