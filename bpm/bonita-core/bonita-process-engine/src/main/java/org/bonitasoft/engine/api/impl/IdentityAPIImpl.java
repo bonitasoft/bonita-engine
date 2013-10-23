@@ -482,12 +482,12 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public Map<String, User> getUserIds(final List<String> userNames) {
+    public Map<String, User> getUsersByUsernames(final List<String> userNames) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final Map<String, User> users = new HashMap<String, User>();
         try {
-            final List<SUser> sUsers = identityService.getUsersByName(userNames);
+            final List<SUser> sUsers = identityService.getUsersByUsername(userNames);
             for (final SUser sUser : sUsers) {
                 users.put(sUser.getUserName(), ModelConvertor.toUser(sUser));
             }
