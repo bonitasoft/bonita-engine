@@ -177,7 +177,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
         final ParameterService parameterService = tenantAccessor.getParameterService();
         final Set<SParameterDefinition> params = sDefinition.getParameters();
-        final Map<String, String> defaultParamterValues = new HashMap<String, String>();
+        final Map<String, String> defaultParameterValues = new HashMap<String, String>();
 
         if (parameters != null) {
             final Properties property = new Properties();
@@ -188,14 +188,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
 
             for (final Entry<Object, Object> entry : property.entrySet()) {
-                defaultParamterValues.put(entry.getKey().toString(), entry.getValue().toString());
+                defaultParameterValues.put(entry.getKey().toString(), entry.getValue().toString());
             }
         }
 
         final Map<String, String> storedParameters = new HashMap<String, String>();
         for (final SParameterDefinition sParameterDefinition : params) {
             final String name = sParameterDefinition.getName();
-            final String value = defaultParamterValues.get(name);
+            final String value = defaultParameterValues.get(name);
             if (value != null) {
                 storedParameters.put(name, value);
             }
@@ -206,6 +206,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SParameterProcessNotFoundException e) {
             throw new ImportParameterException(e);
         }
+
+        // update process resolution:
+        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
     }
 
     private void log(final TenantServiceAccessor tenantAccessor, final Exception e) {

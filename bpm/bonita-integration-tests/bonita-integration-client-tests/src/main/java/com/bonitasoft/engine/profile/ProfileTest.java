@@ -170,7 +170,7 @@ public class ProfileTest extends AbstractProfileTest {
         assertEquals(Long.valueOf(4), profileCount);
     }
 
-    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom" }, story = "Update custom profile fails.", jira = "ENGINE-XYZP")
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom" }, story = "Update custom profile fails.", jira = "ENGINE-2011")
     @Test(expected = AlreadyExistsException.class)
     public void cannotUpdateProfileWithExistingName() throws BonitaException {
         final Profile profile1 = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
