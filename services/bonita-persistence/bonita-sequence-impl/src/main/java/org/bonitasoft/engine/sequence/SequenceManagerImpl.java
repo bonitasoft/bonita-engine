@@ -57,8 +57,6 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private final Map<String, Long> sequencesMappings;
 
-    private static final Object newRangeMutex = new Object();
-
     private final int retries;
 
     private final int delay;
