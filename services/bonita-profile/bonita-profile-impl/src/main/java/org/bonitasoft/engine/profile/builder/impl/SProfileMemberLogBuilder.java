@@ -52,7 +52,7 @@ public class SProfileMemberLogBuilder extends CRUDELogBuilder implements SPersis
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(PROFILE_MEMBER_INDEX) == 0L) {
-            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Profile id");
+            throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Profile member id");
         }
     }
 

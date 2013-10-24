@@ -256,12 +256,12 @@ public class ProfileServiceImpl implements ProfileService {
         try {
             List<SProfileEntry> entries;
             do {
-                entries = getEntriesOfProfile(profile.getId(), 0, BATCH_NUMBER);
+                entries = getEntriesOfProfile(profile.getId(), 0, BATCH_NUMBER, "id", OrderByType.ASC);
                 for (final SProfileEntry entry : entries) {
                     deleteProfileEntry(entry);
                 }
             } while (!entries.isEmpty());
-        } catch (final SProfileEntryNotFoundException e) {
+        } catch (final SProfileEntryReadException e) {
             throw new SProfileEntryDeletionException(e);
         }
     }
@@ -292,33 +292,17 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public List<SProfileEntry> getEntriesOfProfile(final long profileId, final int fromIndex, final int numberOfProfileEntries)
-            throws SProfileEntryNotFoundException {
-        logBeforeMethod("getEntriesOfProfile");
-        try {
-            final List<SProfileEntry> listsProfileEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, fromIndex,
-                    numberOfProfileEntries));
-            logAfterMethod("getEntriesOfProfile");
-            return listsProfileEntries;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod("getEntriesOfProfile", bre);
-            throw new SProfileEntryNotFoundException(bre);
-        }
-    }
-
-    @Override
     public List<SProfileEntry> getEntriesOfProfile(final long profileId, final int fromIndex, final int numberOfProfileEntries, final String field,
-            final OrderByType order) throws SProfileNotFoundException {
+            final OrderByType order) throws SProfileEntryReadException {
         logBeforeMethod("getEntriesOfProfile");
         try {
             final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, field, order,
-                    fromIndex,
-                    numberOfProfileEntries));
+                    fromIndex, numberOfProfileEntries));
             logAfterMethod("getEntriesOfProfile");
             return listspEntries;
         } catch (final SBonitaReadException bre) {
             logOnExceptionMethod("getEntriesOfProfile", bre);
-            throw new SProfileNotFoundException(bre);
+            throw new SProfileEntryReadException(bre);
         }
     }
 
@@ -360,8 +344,9 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void updateProfileEntry(final SProfileEntry profileEntry, final EntityUpdateDescriptor descriptor) throws SProfileEntryUpdateException {
+    public SProfileEntry updateProfileEntry(final SProfileEntry profileEntry, final EntityUpdateDescriptor descriptor) throws SProfileEntryUpdateException {
         logBeforeMethod("updateProfileEntry");
+        NullCheckingUtil.checkArgsNotNull(profileEntry);
         final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.UPDATED, "Updating profile entry");
         try {
             final SProfileEntryBuilder sProfileBuilder = profileBuilderAccessor.getSProfileEntryBuilder();
@@ -380,6 +365,7 @@ public class ProfileServiceImpl implements ProfileService {
             initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "updateProfileEntry");
             throw new SProfileEntryUpdateException(re);
         }
+        return profileEntry;
     }
 
     @Override
@@ -411,7 +397,7 @@ public class ProfileServiceImpl implements ProfileService {
         logAfterMethod("deleteProfileEntry");
     }
 
-    private SProfileMemberImpl getProfileMember(final long profileId, final String displayNamePart1, final String displayNamePart2,
+    private SProfileMemberImpl buildProfileMember(final long profileId, final String displayNamePart1, final String displayNamePart2,
             final String displayNamePart3) {
         final SProfileMemberImpl profileMember = new SProfileMemberImpl(profileId);
         profileMember.setDisplayNamePart1(displayNamePart1);
@@ -424,7 +410,7 @@ public class ProfileServiceImpl implements ProfileService {
     public SProfileMember addUserToProfile(final long profileId, final long userId, final String firstName, final String lastName, final String userName)
             throws SProfileMemberCreationException {
         logBeforeMethod("addUserToProfile");
-        final SProfileMemberImpl profileMember = getProfileMember(profileId, firstName, lastName, userName);
+        final SProfileMemberImpl profileMember = buildProfileMember(profileId, firstName, lastName, userName);
         profileMember.setUserId(userId);
         createProfileMember(profileMember);
         logAfterMethod("addUserToProfile");
@@ -432,9 +418,8 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     private void createProfileMember(final SProfileMemberImpl profileMember) throws SProfileMemberCreationException {
-        final String message = "Adding a new profile member for userId " + profileMember.getUserId() + " with roleId " + profileMember.getRoleId()
-                + " in groupId " + profileMember.getGroupId();
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.CREATED, message);
+        final String message = "Adding a new profile member";
+        final SProfileMemberLogBuilder logBuilder = getProfileMemberLog(ActionType.CREATED, message);
         try {
             final InsertRecord insertRecord = new InsertRecord(profileMember);
             SInsertEvent insertEvent = null;
@@ -454,7 +439,7 @@ public class ProfileServiceImpl implements ProfileService {
     public SProfileMember addGroupToProfile(final long profileId, final long groupId, final String groupName, final String parentPath)
             throws SProfileMemberCreationException {
         logBeforeMethod("addGroupToProfile");
-        final SProfileMemberImpl profileMember = getProfileMember(profileId, groupName, parentPath, null);
+        final SProfileMemberImpl profileMember = buildProfileMember(profileId, groupName, parentPath, null);
         profileMember.setGroupId(groupId);
         createProfileMember(profileMember);
         logAfterMethod("addGroupToProfile");
@@ -464,7 +449,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public SProfileMember addRoleToProfile(final long profileId, final long roleId, final String roleName) throws SProfileMemberCreationException {
         logBeforeMethod("addRoleToProfile");
-        final SProfileMemberImpl profileMember = getProfileMember(profileId, roleName, null, null);
+        final SProfileMemberImpl profileMember = buildProfileMember(profileId, roleName, null, null);
         profileMember.setRoleId(roleId);
         createProfileMember(profileMember);
         logAfterMethod("addRoleToProfile");
@@ -475,7 +460,7 @@ public class ProfileServiceImpl implements ProfileService {
     public SProfileMember addRoleAndGroupToProfile(final long profileId, final long roleId, final long groupId, final String roleName, final String groupName,
             final String groupParentPath) throws SProfileMemberCreationException {
         logBeforeMethod("addRoleAndGroupToProfile");
-        final SProfileMemberImpl profileMember = getProfileMember(profileId, roleName, groupName, groupParentPath);
+        final SProfileMemberImpl profileMember = buildProfileMember(profileId, roleName, groupName, groupParentPath);
         profileMember.setGroupId(groupId);
         profileMember.setRoleId(roleId);
         createProfileMember(profileMember);

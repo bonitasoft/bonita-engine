@@ -24,29 +24,36 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
+import org.bonitasoft.engine.profile.builder.impl.SProfileEntryUpdateBuilderImpl;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryReadException;
-import org.bonitasoft.engine.profile.model.SProfile;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -199,17 +206,176 @@ public class ProfileServiceImplForProfileEntryTest {
 
     @Test
     public final void getNoEntriesOfProfileByParentId() throws SBonitaReadException, SProfileEntryReadException {
-        final List<SProfile> sProfiles = new ArrayList<SProfile>();
+        final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
 
-        doReturn(sProfiles).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfile>> any());
+        doReturn(sProfileEntries).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
 
-        assertEquals(sProfiles, profileServiceImpl.getEntriesOfProfileByParentId(1, 0, 0, 0, null, OrderByType.ASC));
+        assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfileByParentId(1, 0, 0, 0, null, OrderByType.ASC));
     }
 
     @Test(expected = SProfileEntryReadException.class)
     public final void getEntriesOfProfileByParentIdThrowException() throws SBonitaReadException, SProfileEntryReadException {
-        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfile>> any());
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
 
         profileServiceImpl.getEntriesOfProfileByParentId(1, 0, 0, 0, null, null);
     }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getEntriesOfProfile(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
+     * 
+     * @throws SProfileEntryReadException
+     * @throws SBonitaReadException
+     */
+    @Test
+    public final void getEntriesOfProfile() throws SProfileEntryReadException, SBonitaReadException {
+        final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
+        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
+        sProfileEntries.add(sProfileEntry);
+
+        doReturn(sProfileEntries).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
+
+        assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfile(1, 0, 0, null, OrderByType.ASC));
+    }
+
+    @Test
+    public final void getNoEntriesOfProfile() throws SBonitaReadException, SProfileEntryReadException {
+        final List<SProfileEntry> sProfileEntries = new ArrayList<SProfileEntry>();
+
+        doReturn(sProfileEntries).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
+
+        assertEquals(sProfileEntries, profileServiceImpl.getEntriesOfProfile(1, 0, 0, null, OrderByType.ASC));
+    }
+
+    @Test(expected = SProfileEntryReadException.class)
+    public final void getEntriesOfProfileThrowException() throws SBonitaReadException, SProfileEntryReadException {
+        doThrow(new SBonitaReadException("plop")).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SProfileEntry>> any());
+
+        profileServiceImpl.getEntriesOfProfile(1, 0, 0, null, null);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getNumberOfProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * 
+     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
+     */
+    @Test
+    public final void getNumberOfProfileEntries() throws SBonitaSearchException, SBonitaReadException {
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.getNumberOfEntities(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenReturn(1L);
+
+        assertEquals(1L, profileServiceImpl.getNumberOfProfileEntries(options));
+    }
+
+    @Test(expected = SBonitaSearchException.class)
+    public void getNumberOfProfilesThrowException() throws Exception {
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.getNumberOfEntities(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenThrow(
+                new SBonitaReadException(""));
+
+        profileServiceImpl.getNumberOfProfileEntries(options);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getProfileEntry(long)}.
+     * 
+     * @throws SProfileEntryNotFoundException
+     * @throws SBonitaReadException
+     */
+    @Test
+    public final void getProfileEntryById() throws SProfileEntryNotFoundException, SBonitaReadException {
+        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
+
+        doReturn(sProfileEntry).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any());
+
+        assertEquals(sProfileEntry, profileServiceImpl.getProfileEntry(1));
+    }
+
+    @Test(expected = SProfileEntryNotFoundException.class)
+    public void getNoProfileEntryById() throws Exception {
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenReturn(null);
+
+        profileServiceImpl.getProfileEntry(1);
+    }
+
+    @Test(expected = SProfileEntryNotFoundException.class)
+    public void getProfileEntryByIdThrowException() throws Exception {
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SProfileEntry>> any())).thenThrow(new SBonitaReadException(""));
+
+        profileServiceImpl.getProfileEntry(1);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#searchProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
+     * 
+     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
+     */
+    @Test
+    public final void searchProfileEntries() throws SBonitaSearchException, SBonitaReadException {
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.searchEntity(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenReturn(new ArrayList<SProfileEntry>());
+
+        assertNotNull(profileServiceImpl.searchProfileEntries(options));
+    }
+
+    @Test(expected = SBonitaSearchException.class)
+    public void searchProfileEntriesThrowException() throws Exception {
+        final QueryOptions options = new QueryOptions(0, 10);
+        when(persistenceService.searchEntity(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
+
+        profileServiceImpl.searchProfileEntries(options);
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#updateProfileEntry(org.bonitasoft.engine.profile.model.SProfileEntry, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
+     * .
+     * 
+     * @throws SProfileEntryUpdateException
+     */
+    @Test
+    public final void updateProfileEntry() throws SProfileEntryUpdateException {
+        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
+        doReturn(3L).when(sProfileEntry).getId();
+        final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
+        sProfileEntryUpdateBuilder.setDescription("description").setName("newName").setIndex(6).setPage("page").setParentId(5858).setProfileId(9)
+                .setType("type");
+
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+
+        final SProfileEntry result = profileServiceImpl.updateProfileEntry(sProfileEntry, sProfileEntryUpdateBuilder.done());
+        assertNotNull(result);
+        assertEquals(sProfileEntry, result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public final void updateNullProfileEntry() throws SProfileEntryUpdateException {
+        final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
+
+        profileServiceImpl.updateProfileEntry(null, sProfileEntryUpdateBuilder.done());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public final void updateProfileWithNullDescriptor() throws SProfileEntryUpdateException {
+        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
+        doReturn(3L).when(sProfileEntry).getId();
+
+        profileServiceImpl.updateProfileEntry(sProfileEntry, null);
+    }
+
+    @Test(expected = SProfileEntryUpdateException.class)
+    public final void updateProfileEntryThrowException() throws SRecorderException, SProfileEntryUpdateException {
+        final SProfileEntry sProfileEntry = mock(SProfileEntry.class);
+        doReturn(3L).when(sProfileEntry).getId();
+        final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
+        sProfileEntryUpdateBuilder.setDescription("newDescription").setName("newName");
+
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+
+        profileServiceImpl.updateProfileEntry(sProfileEntry, sProfileEntryUpdateBuilder.done());
+    }
+
 }

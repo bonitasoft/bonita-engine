@@ -24,6 +24,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
         ProfileServiceImplForProfileTest.class, ProfileServiceImplForProfileEntryTest.class
+// , ProfileServiceImplForProfileMemberTest.class
 })
 public class ProfileServiceImplTests {
 

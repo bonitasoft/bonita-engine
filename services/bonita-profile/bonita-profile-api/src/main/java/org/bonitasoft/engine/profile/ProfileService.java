@@ -145,21 +145,6 @@ public interface ProfileService {
     SProfileEntry getProfileEntry(long profileEntryId) throws SProfileEntryNotFoundException;
 
     /**
-     * Get all profile entries having the given value for the given int index
-     * 
-     * @param fromIndex
-     *            first result to be considered(>=0)
-     * @param numberOfProfileEntry
-     *            the max number of profileEntry to be returned (>=0)
-     * @param numberOfProfileEntry
-     * @return all profile entries having the given value for the given int index
-     * @throws SProfileEntryNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfileEntry
-     * @since 6.0
-     */
-    List<SProfileEntry> getEntriesOfProfile(long profileId, int fromIndex, int numberOfProfileEntry) throws SProfileEntryNotFoundException;
-
-    /**
      * Get all profile entries having the given value for the given int index by profileId
      * 
      * @param profileId
@@ -170,12 +155,11 @@ public interface ProfileService {
      * @param field
      * @param order
      * @return all profile entries having the given value for the given int index by profileId
-     * @throws SProfileNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfileEntry
+     * @throws SProfileEntryReadException
      * @since 6.0
      */
     List<SProfileEntry> getEntriesOfProfile(long profileId, int fromIndex, int numberOfProfileEntry, String field, OrderByType order)
-            throws SProfileNotFoundException;
+            throws SProfileEntryReadException;
 
     /**
      * Add new profile entry
@@ -193,11 +177,12 @@ public interface ProfileService {
      * 
      * @param profileEntry
      * @param descriptor
+     * @return The updated profile entry
      * @throws SProfileEntryUpdateException
      *             occurs when an exception is thrown during sProfileEntry update
      * @since 6.0
      */
-    void updateProfileEntry(SProfileEntry profileEntry, EntityUpdateDescriptor descriptor) throws SProfileEntryUpdateException;
+    SProfileEntry updateProfileEntry(SProfileEntry profileEntry, EntityUpdateDescriptor descriptor) throws SProfileEntryUpdateException;
 
     /**
      * Delete a profileEntry by given profileEntry

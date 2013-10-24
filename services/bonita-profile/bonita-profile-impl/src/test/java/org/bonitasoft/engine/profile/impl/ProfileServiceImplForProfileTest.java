@@ -295,22 +295,22 @@ public class ProfileServiceImplForProfileTest {
     public final void updateProfile() throws SProfileUpdateException {
         final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();
-        final SProfileUpdateBuilder SProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
-        SProfileUpdateBuilder.setDescription("newDescription").setName("newName");
+        final SProfileUpdateBuilder sProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
+        sProfileUpdateBuilder.setDescription("newDescription").setName("newName");
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
-        final SProfile result = profileServiceImpl.updateProfile(sProfile, SProfileUpdateBuilder.done());
+        final SProfile result = profileServiceImpl.updateProfile(sProfile, sProfileUpdateBuilder.done());
         assertNotNull(result);
         assertEquals(sProfile, result);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public final void updateNullProfile() throws SProfileUpdateException {
-        final SProfileUpdateBuilder SProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
+        final SProfileUpdateBuilder sProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
 
-        profileServiceImpl.updateProfile(null, SProfileUpdateBuilder.done());
+        profileServiceImpl.updateProfile(null, sProfileUpdateBuilder.done());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -325,12 +325,12 @@ public class ProfileServiceImplForProfileTest {
     public final void updateProfileThrowException() throws SRecorderException, SProfileUpdateException {
         final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();
-        final SProfileUpdateBuilder SProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
-        SProfileUpdateBuilder.setDescription("newDescription").setName("newName");
+        final SProfileUpdateBuilder sProfileEntryUpdateBuilder = new SProfileUpdateBuilderImpl();
+        sProfileEntryUpdateBuilder.setDescription("newDescription").setName("newName");
 
         doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
 
-        profileServiceImpl.updateProfile(sProfile, SProfileUpdateBuilder.done());
+        profileServiceImpl.updateProfile(sProfile, sProfileEntryUpdateBuilder.done());
     }
 
     /**
