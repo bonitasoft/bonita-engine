@@ -15,7 +15,5 @@
 
 	<modules>	
 		<module>bonita-persistence-hibernate</module>
-		<module>bonita-persistence-mybatis</module>
-		<module>bonita-persistence-mybatis-test</module>
 	</modules>
 </project>

@@ -33,13 +33,6 @@
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-home-sp</artifactId>
 			<version>${project.version}</version>
-			<classifier>performance-mybatis</classifier>
-			<type>zip</type>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-home-sp</artifactId>
-			<version>${project.version}</version>
 			<classifier>teamwork</classifier>
 			<type>zip</type>
 		</dependency>
@@ -98,7 +91,6 @@
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>assembly-mybatis-performance.xml</descriptor>
 								<descriptor>assembly-hibernate-teamwork.xml</descriptor>
 								<descriptor>assembly-hibernate-efficiency.xml</descriptor>
 								<descriptor>assembly-hibernate-performance.xml</descriptor>

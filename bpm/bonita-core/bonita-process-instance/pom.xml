@@ -19,6 +19,5 @@
 		<module>bonita-process-instance-model</module>
 		<module>bonita-process-instance-model-impl</module>
 		<module>bonita-process-instance-model-impl-hibernate</module>
-		<module>bonita-process-instance-model-impl-mybatis</module>
 	</modules>
 </project>

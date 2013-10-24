@@ -14,15 +14,9 @@
     <name>Bonita Engine Core Services</name>
 
 	<modules>
-		<module>bonita-actor-mapping</module>
-		<module>bonita-category</module>
 		<module>bonita-instance-migration</module>
 		<module>bonita-parameter</module>
-		<module>bonita-process-comment</module>
-		<module>bonita-process-definition</module>
-		<module>bonita-process-document-mapping</module>
 		<module>bonita-process-instance</module>
-		<module>bonita-supervisor-mapping</module>
 		<module>bonita-reporting</module>
 		<module>bonita-process-engine</module>
 		<module>bonita-bpm-monitoring</module>

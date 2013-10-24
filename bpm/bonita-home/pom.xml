@@ -76,7 +76,6 @@
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>assembly-performance-mybatis.xml</descriptor>
 								<descriptor>assembly-teamwork.xml</descriptor>
 								<descriptor>assembly-efficiency.xml</descriptor>
 								<descriptor>assembly-performance.xml</descriptor>
