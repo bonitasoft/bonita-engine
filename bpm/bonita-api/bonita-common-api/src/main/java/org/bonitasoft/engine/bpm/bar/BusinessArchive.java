@@ -89,14 +89,4 @@ public class BusinessArchive implements Serializable {
         return Collections.unmodifiableMap(resources);
     }
 
-    /**
-     * What is this method for?
-     * 
-     * @return
-     */
-    public Map<String, Object> getJarFiles() {
-        // FIXME: implement me !
-        return Collections.emptyMap();
-    }
-
 }
