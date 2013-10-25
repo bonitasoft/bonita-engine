@@ -196,4 +196,16 @@ public class ProfileMemberTest extends AbstractProfileTest {
         getProfileAPI().searchProfileMembers("plop", null);
     }
 
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-1989")
+    @Test
+    public void searchUserProfileMembersOfUser() throws BonitaException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileMemberSearchDescriptor.USER_ID, user1.getId());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user", builder.done());
+        assertEquals(1, searchedProfileMember.getResult().size());
+        assertEquals("User1FirstName", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
+        assertEquals("User1LastName", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
+        assertEquals("userName1", searchedProfileMember.getResult().get(0).getDisplayNamePart3());
+    }
+
 }
