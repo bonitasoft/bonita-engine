@@ -101,9 +101,6 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
                 throw new InvalidEvaluationConnectorConditionException(connectorInputParameters.size(), contextMap.size());
             }
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-            // final long processDefinitionId = getProcessInstance(tenantAccessor, getActivityInstance(tenantAccessor,
-            // sActivityInstanceID).getRootContainerId())
-            // .getProcessDefinitionId();
             final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
             final String connectorDefinitionId = connectorDefinition.getConnectorId();
