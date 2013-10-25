@@ -36,10 +36,12 @@ import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionWithInputValu
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestExternalConnector;
@@ -108,8 +110,6 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     private final String intDataName = "intVar";
 
-    private final String delivery = "Delivery men";
-
     @Before
     public void beforeTest() throws Exception {
         login();
@@ -127,13 +127,13 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     private void createAndDeployProcess() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addUserTask("step1", delivery);
-        designProcessDefinition.addUserTask("step2", delivery);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         designProcessDefinition.addIntegerData(dataName, null);
-        processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, delivery, businessUser.getId());
+        processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, ACTOR_NAME, businessUser.getId());
     }
 
     private void createAndDeployProcess2() throws Exception {
@@ -141,26 +141,25 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final Expression defaultExpression = new ExpressionBuilder().createConstantStringExpression("defaultString");
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
         designProcessDefinition.addShortTextData(dataName, defaultExpression);
         designProcessDefinition.addBooleanData(dataName2, new ExpressionBuilder().createConstantBooleanExpression(false));
         designProcessDefinition.addShortTextData(dataName3, defaultExpression);
         designProcessDefinition.addIntegerData(intDataName, new ExpressionBuilder().createConstantIntegerExpression(0));
-        designProcessDefinition.addUserTask("step1", delivery);
-        designProcessDefinition.addUserTask("step2", delivery);
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
-        processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, delivery, businessUser.getId());
+        processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, ACTOR_NAME, businessUser.getId());
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
     public void instantiateProcessWithDataConversionOperation() throws Exception {
         final String myDdataName = "mon_entier_1";
-        final String actorName = "Employee";
         final String userTaskName = "Étape1";
-        final ProcessDefinitionBuilder builder = deployProcessWithIntegerData(myDdataName, actorName, userTaskName);
+        final ProcessDefinitionBuilder builder = deployProcessWithIntegerData(myDdataName, ACTOR_NAME, userTaskName);
 
-        processDefinition = deployAndEnableWithActor(builder.done(), actorName, businessUser);
+        processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, businessUser);
 
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         final String fieldName = "field_entier";
@@ -200,26 +199,20 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndStartInstanceExt" }, jira = "ENGINE-732, ENGINE-726")
     @Test
     public void executeActionsAndStartInstanceExt() throws Exception {
-        final String userName = "first";
-        final String password = "user";
-        final User firstUser = createUser(userName, password);
+        final User firstUser = createUser("plop", PASSWORD);
 
         createAndDeployProcess();
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
         final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
         final String inputName1 = "valueOfInput1";
         final String inputName2 = "valueOfInput2";
         final String inputName3 = "valueOfInput3";
         final String mainInputName1 = "param1";
-        final String resContent = "welcome Lily and Lucy and Mett";
 
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "Ryan");
-        fieldValues.put(inputName1, valueOfInput1);
-        fieldValues.put(inputName2, valueOfInput2);
-        fieldValues.put(inputName3, valueOfInput3);
+        fieldValues.put(inputName1, "Lily");
+        fieldValues.put(inputName2, "Lucy");
+        fieldValues.put(inputName3, "Mett");
 
         // Input expression
         final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
@@ -256,7 +249,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final long processInstanceId = (Long) getCommandAPI().execute(COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT, parameters);
         final ProcessInstance processInstance = getProcessAPI().getProcessInstance(processInstanceId);
 
-        assertEquals(resContent, getProcessAPI().getProcessDataInstance("text", processInstanceId).getValue());
+        assertEquals("welcome Lily and Lucy and Mett", getProcessAPI().getProcessDataInstance("text", processInstanceId).getValue());
         assertEquals(2, getProcessAPI().getProcessDataInstance(dataName, processInstanceId).getValue());
 
         assertNotNull("User task step1 don't exist.", waitForUserTask("step1", processInstance));
@@ -278,25 +271,21 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
     @Test
     public void executeActionsAndTerminate() throws Exception {
         createAndDeployProcess2();
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
         final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
         final String inputName1 = "valueOfInput1";
         final String inputName2 = "valueOfInput2";
         final String inputName3 = "valueOfInput3";
         final String mainInputName1 = "param1";
-        final String resContent = "welcome Lily and Lucy and Mett";
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long processInstanceId = processInstance.getId();
-        waitForStep("step1", processInstance);
+        waitForUserTask("step1", processInstance);
 
         final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "Ryan");
-        fieldValues.put(inputName1, valueOfInput1);
-        fieldValues.put(inputName2, valueOfInput2);
-        fieldValues.put(inputName3, valueOfInput3);
+        fieldValues.put(inputName1, "Lily");
+        fieldValues.put(inputName2, "Lucy");
+        fieldValues.put(inputName3, "Mett");
 
         // Input expression
         final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
@@ -354,7 +343,80 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final DataInstance dataInstance2 = getProcessAPI().getProcessDataInstance(dataName2, processInstanceId);
         assertTrue(Boolean.valueOf(dataInstance2.getValue().toString()));
         final DataInstance dataInstance3 = getProcessAPI().getProcessDataInstance(dataName3, processInstanceId);
-        assertEquals(resContent, dataInstance3.getValue().toString());
+        assertEquals("welcome Lily and Lucy and Mett", dataInstance3.getValue().toString());
+    }
+
+    @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Connector",
+            "ExecuteActionsAndTerminateTaskExt" }, jira = "ENGINE-1918")
+    @Test
+    public void executeActionsAndTerminateOnSubProcessWithConnectorOnForm() throws Exception {
+        final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression("TargetProcess");
+        final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
+
+        // Process parent
+        final ProcessDefinitionBuilder parentProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("ParentProcess", PROCESS_VERSION);
+        parentProcessDefinitionBuilder.addActor(ACTOR_NAME);
+        parentProcessDefinitionBuilder.addShortTextData("parentProcessData", null);
+        final CallActivityBuilder callActivityBuilder = parentProcessDefinitionBuilder.addCallActivity("callActivity", targetProcessNameExpr,
+                targetProcessVersionExpr);
+        callActivityBuilder.addDataOutputOperation(new OperationBuilder().createSetDataOperation("parentProcessData",
+                new ExpressionBuilder().createDataExpression("subProcessData", String.class.getName())));
+        parentProcessDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+        parentProcessDefinitionBuilder.addTransition("callActivity", "step1");
+        final ProcessDefinition parentProcessDefinition = deployAndEnableWithActor(parentProcessDefinitionBuilder.done(), ACTOR_NAME, businessUser);
+
+        // Sub process
+        final ProcessDefinitionBuilder subProcessDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("TargetProcess", PROCESS_VERSION);
+        subProcessDefinitionBuilder.addActor(ACTOR_NAME);
+        subProcessDefinitionBuilder.addShortTextData("subProcessData", null);
+        subProcessDefinitionBuilder.addUserTask("step2", ACTOR_NAME).addEndEvent("end").addTerminateEventTrigger();
+        subProcessDefinitionBuilder.addTransition("step2", "end");
+        final ProcessDefinition subProcessDefinition = deployProcessWithExternalTestConnector(subProcessDefinitionBuilder, ACTOR_NAME, businessUser.getId());
+
+        final String inputName1 = "valueOfInput1";
+        final String mainInputName1 = "param1";
+
+        final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcessDefinition.getId());
+        final ActivityInstance step2 = waitForUserTask("step2");
+        getProcessAPI().assignUserTask(step2.getId(), businessUser.getId());
+
+        // Expressions
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
+        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, "'Welcome '+valueOfInput1",
+                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+                String.class.getName(), "GROOVY", Arrays.asList(input1Expression));
+
+        final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
+        fieldValues.put(inputName1, "Lily");
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, getInputValueNames(fieldValues),
+                getInputValueValues(fieldValues));
+
+        // Operations
+        final Expression rightOperand = new ExpressionBuilder().createInputExpression(mainInputName1, String.class.getName());
+        final Operation operation = createOperation("subProcessData", OperatorType.ASSIGNMENT, "=", rightOperand);
+
+        // Connectors
+        final ConnectorDefinitionImpl connectDefinition = new ConnectorDefinitionImpl("myConnector", "org.bonitasoft.connector.testExternalConnector", "1.0",
+                ConnectorEvent.ON_ENTER);
+        connectDefinition.addInput(mainInputName1, mainExp);
+        final ArrayList<ConnectorDefinitionWithInputValuesImpl> connectors = new ArrayList<ConnectorDefinitionWithInputValuesImpl>();
+        connectors.add(new ConnectorDefinitionWithInputValuesImpl(connectDefinition, inputValues));
+        connectDefinition.addInput(mainInputName1, mainExp);
+        connectDefinition.addOutput(operation);
+
+        // Parameters
+        final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(CONNECTORS_LIST_KEY, connectors);
+        parameters.put(ACTIVITY_INSTANCE_ID_KEY, step2.getId());
+        parameters.put(OPERATIONS_LIST_KEY, new ArrayList<Operation>(1));
+        parameters.put(OPERATIONS_INPUT_KEY, fieldValues);
+        getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
+
+        waitForUserTask("step1", parentProcessInstance);
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("parentProcessData", parentProcessInstance.getId());
+        assertEquals("Welcome Lily", dataInstance.getValue().toString());
+
+        disableAndDeleteProcess(parentProcessDefinition, subProcessDefinition);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "ExecuteActionsAndTerminateTaskExt" }, jira = "ENGINE-1053")
@@ -387,7 +449,6 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         // check that the variable was incremented
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(intDataName, processInstance.getId());
         assertEquals(1, dataInstance.getValue());
-
     }
 
     // Connector in Form: for Input parameter, try type_input for ExpressionType.TYPE_INPUT
@@ -398,7 +459,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final String mainInputName1 = "param1";
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long processInstanceId = processInstance.getId();
-        waitForStep("step1", processInstance);
+        waitForUserTask("step1", processInstance);
 
         // Main Expression
         final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -529,8 +590,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         // process is deployed here with a custom jar
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("firstProcess", "1.0");
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
-        final String content = "Word";
-        processBuilder.addData("Application", String.class.getName(), expressionBuilder.createConstantStringExpression(content));
+        processBuilder.addData("Application", String.class.getName(), expressionBuilder.createConstantStringExpression("Word"));
         processBuilder.addActor("myActor");
         processBuilder.addUserTask("Request", "myActor");
         processBuilder.addUserTask("Approval", "myActor");
