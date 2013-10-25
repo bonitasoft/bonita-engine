@@ -26,8 +26,6 @@ import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilder;
  */
 public class SJobQueriableLogBuilderImpl extends CRUDELogBuilder implements SJobQueriableLogBuilder {
 
-    private static final String JOB_INDEX_NAME = "numericIndex1";
-
     private static final int JOB_INDEX = 0;
 
     @Override
@@ -46,11 +44,6 @@ public class SJobQueriableLogBuilderImpl extends CRUDELogBuilder implements SJob
     public SPersistenceLogBuilder objectId(final long objectId) {
         queriableLogBuilder.numericIndex(JOB_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return JOB_INDEX_NAME;
     }
 
 }

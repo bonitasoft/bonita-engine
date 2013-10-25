@@ -34,7 +34,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.persistence.OrderByType;
 
 /**
@@ -47,12 +46,9 @@ public class ConnectorServiceDecorator implements ConnectorService {
 
     private final ConnectorService connectorService;
 
-    private final SExpressionBuilders expressionbuilders;
-
-    public ConnectorServiceDecorator(final ConnectorService connectorService, final SExpressionBuilders expressionbuilders) {
+    public ConnectorServiceDecorator(final ConnectorService connectorService) {
         super();
         this.connectorService = connectorService;
-        this.expressionbuilders = expressionbuilders;
     }
 
     @Override
@@ -62,7 +58,7 @@ public class ConnectorServiceDecorator implements ConnectorService {
             throws SConnectorException {
         final SExpression apiAccessorExpression;
         try {
-            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression(expressionbuilders.getExpressionBuilder());
+            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
         } catch (final SInvalidExpressionException e) {
             throw new SConnectorException("Error creation apiAccessor Expression", e);
         }
@@ -101,8 +97,8 @@ public class ConnectorServiceDecorator implements ConnectorService {
             SExpressionDependencyMissingException, SInvalidExpressionException {
         SExpression apiAccessorExpression;
         SExpression engineExecutionContext;
-        apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression(expressionbuilders.getExpressionBuilder());
-        engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext(expressionbuilders.getExpressionBuilder());
+        apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
+        engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext();
         final Map<String, SExpression> newParameters = new HashMap<String, SExpression>(parameters);
         newParameters.put("connectorApiAccessor", apiAccessorExpression);
         newParameters.put("engineExecutionContext", engineExecutionContext);

@@ -6,7 +6,6 @@
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="eventService" ref="eventService" />
-        <constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
@@ -17,7 +16,6 @@
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="activityService" ref="activityInstanceService" />
         <constructor-arg name="logger" ref="technicalLoggerService" />
-        <constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
         <constructor-arg name="bpmEventInstanceService" ref="eventInstanceService" />
         <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
         <constructor-arg name="archiveService" ref="archiveService" />
@@ -28,7 +26,6 @@
         <constructor-arg name="classLoaderService" ref="classLoaderService" />
         <constructor-arg name="processDocumentService" ref="processDocumentService" />
         <constructor-arg name="commentService" ref="commentService" />
-        <constructor-arg name="commentBuilders" ref="commentBuilders" />
         <constructor-arg name="tokenService" ref="tokenService" />
     </bean>
     
@@ -36,7 +33,6 @@
         <constructor-arg name="recorder" ref="recorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="eventService" ref="eventService" />
-        <constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>
 
@@ -44,17 +40,13 @@
         <constructor-arg name="recorder" ref="recorderSync" />
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="logger" ref="technicalLoggerService" />
         <constructor-arg name="tokenService" ref="tokenService" />
     </bean>
 
     <bean id="transitionService" class="org.bonitasoft.engine.core.process.instance.impl.TransitionServiceImpl">
-        <constructor-arg name="recorder" ref="recorderSync" />
-        <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
         <constructor-arg name="archiveService" ref="archiveService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
@@ -63,8 +55,6 @@
         <constructor-arg name="recorder" ref="recorderSync" />
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="instanceBuilders" ref="bpmInstanceBuilders" />
-        <constructor-arg name="eventBuilders" ref="eventBuilders" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
     </bean>

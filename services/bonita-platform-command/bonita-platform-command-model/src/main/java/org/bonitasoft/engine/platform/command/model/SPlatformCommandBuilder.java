@@ -18,18 +18,6 @@ package org.bonitasoft.engine.platform.command.model;
  */
 public interface SPlatformCommandBuilder {
 
-    SPlatformCommandBuilder createNewInstance(SPlatformCommand command);
-
-    SPlatformCommandBuilder createNewInstance(String name, String description, String implementationClass);
-
     SPlatformCommand done();
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getDescriptionKey();
-
-    String getImplementationClassKey();
 
 }

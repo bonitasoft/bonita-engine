@@ -14,7 +14,6 @@
  */
 package org.bonitasoft.engine.core.process.document.mapping.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
 
 /**
@@ -22,34 +21,6 @@ import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocum
  * @author Zhang Bole
  */
 public interface SADocumentMappingBuilder {
-
-    String getIdKey();
-
-    String getProcessInstanceIdKey();
-
-    String getSourceObjectIdKey();
-
-    String getArchiveDateKey();
-
-    String getDocumentNameKey();
-
-    String getDocumentAuthorKey();
-
-    String getDocumentCreationDateKey();
-
-    String getDocumentHasContentKey();
-
-    String getDocumentContentFileNameKey();
-
-    String getDocumentContentMimeTypeKey();
-
-    String getContentStorageIdKey();
-
-    String getDocumentURLKey();
-
-    SADocumentMappingBuilder createNewInstance();
-
-    SADocumentMappingBuilder createNewInstance(SDocumentMapping documentMapping);
 
     SADocumentMappingBuilder setProcessInstanceId(final long processInstanceId);
 

@@ -21,11 +21,9 @@ import org.bonitasoft.engine.data.definition.model.SDataDefinition;
  * @author Matthieu Chaffotte
  */
 public interface SDataDefinitionBuilder extends AbstractSDataDefinitionBuilder {
-
-    SDataDefinitionBuilder createNewInstance(String name, String className);
-
-    STextDataDefinitionBuilder createNewTextData(final String name);
-
+    
+    SDataDefinitionBuilder setAsLongText(boolean value);
+    
     SDataDefinition done();
 
 }

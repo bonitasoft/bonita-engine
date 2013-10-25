@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.impl;
 
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
@@ -21,33 +20,18 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STim
 /**
  * @author Elias Ricken de Medeiros
  */
-public class STimerEventTriggerInstanceBuilderImpl extends SEventTriggerInstanceBuilderImpl implements STimerEventTriggerInstanceBuilder {
+public class STimerEventTriggerInstanceBuilderImpl implements STimerEventTriggerInstanceBuilder {
 
-    private static final String TIMER_VALUE_KEY = "timerValue";
+    private final STimerEventTriggerInstanceImpl entity;
 
-    private static final String TIMER_TYPE_KEY = "timerType";
-
-    private STimerEventTriggerInstanceImpl entity;
-
-    @Override
-    public STimerEventTriggerInstanceBuilder createNewTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue) {
-        this.entity = new STimerEventTriggerInstanceImpl(eventInstanceId, timerType, timerValue);
-        return this;
+    public STimerEventTriggerInstanceBuilderImpl(final STimerEventTriggerInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
     public STimerEventTriggerInstance done() {
         return this.entity;
-    }
-
-    @Override
-    public String getTimerTypeKey() {
-        return TIMER_TYPE_KEY;
-    }
-
-    @Override
-    public String getTimerValueKey() {
-        return TIMER_VALUE_KEY;
     }
 
 }

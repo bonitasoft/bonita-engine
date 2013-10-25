@@ -22,6 +22,7 @@ import java.util.Map;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -36,12 +37,15 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
+import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceBuilderFactory;
+import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceVisibilityMappingBuilderFactory;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceVisibilityMappingBuilderFactory;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -79,11 +83,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     private final DataService dataSourceService;
 
-    private final SDataInstanceBuilders dataInstanceBuilders;
-
     private final Recorder recorder;
-
-    private final SEventBuilders eventBuilders;
 
     private final ReadPersistenceService persistenceService;
 
@@ -91,13 +91,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     private final TechnicalLoggerService logger;
 
-    public DataInstanceServiceImpl(final DataService dataSourceService, final SDataInstanceBuilders dataInstanceBuilders, final Recorder recorder,
-            final SEventBuilders eventBuilders, final ReadPersistenceService persistenceService, final ArchiveService archiveService,
+    public DataInstanceServiceImpl(final DataService dataSourceService, final Recorder recorder,
+            final ReadPersistenceService persistenceService, final ArchiveService archiveService,
             final TechnicalLoggerService logger) {
         this.dataSourceService = dataSourceService;
-        this.dataInstanceBuilders = dataInstanceBuilders;
         this.recorder = recorder;
-        this.eventBuilders = eventBuilders;
         this.persistenceService = persistenceService;
         this.archiveService = archiveService;
         this.logger = logger;
@@ -156,7 +154,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     private void archiveDataInstance(final SDataInstance sDataInstance, final long archiveDate) throws SDataInstanceException {
         if (!sDataInstance.isTransientData()) {
             try {
-                final SADataInstance saDataInstance = dataInstanceBuilders.getSADataInstanceBuilder().createNewInstance(sDataInstance).done();
+                final SADataInstance saDataInstance = BuilderFactory.get(SADataInstanceBuilderFactory.class).createNewInstance(sDataInstance).done();
                 final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance);
                 archiveService.recordInsert(archiveDate, archiveInsertRecord);
             } catch (final SDefinitiveArchiveNotFound e) {
@@ -418,7 +416,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
      */
     private void deleteDataInstanceVisibilityMapping(final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping) throws SDataInstanceException {
         final DeleteRecord record = new DeleteRecord(sDataInstanceVisibilityMapping);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) eventBuilders.getEventBuilder().createDeleteEvent(DATA_VISIBILITY_MAPPING).done();
+        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_VISIBILITY_MAPPING).done();
         try {
             recorder.recordDelete(record, deleteEvent);
         } catch (final SRecorderException e) {
@@ -474,13 +472,13 @@ public class DataInstanceServiceImpl implements DataInstanceService {
      */
     protected SDataInstanceVisibilityMapping insertDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
             final long dataInstanceId, final long archiveDate) throws SRecorderException, SDefinitiveArchiveNotFound {
-        final SDataInstanceVisibilityMapping mapping = dataInstanceBuilders.getDataInstanceVisibilityMappingBuilder()
+        final SDataInstanceVisibilityMapping mapping = BuilderFactory.get(SDataInstanceVisibilityMappingBuilderFactory.class)
                 .createNewInstance(containerId, containerType, dataName, dataInstanceId).done();
         final InsertRecord record = new InsertRecord(mapping);
-        final SInsertEvent insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(DATA_VISIBILITY_MAPPING).done();
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATA_VISIBILITY_MAPPING).done();
         recorder.recordInsert(record, insertEvent);
         // add archived mapping also because when the data change the archive mapping will be used to retrieve old value
-        final SADataInstanceVisibilityMapping archivedMapping = dataInstanceBuilders.getArchivedDataInstanceVisibilityMappingBuilder()
+        final SADataInstanceVisibilityMapping archivedMapping = BuilderFactory.get(SADataInstanceVisibilityMappingBuilderFactory.class)
                 .createNewInstance(containerId, containerType, dataName, dataInstanceId, mapping.getId()).done();
         archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping));
         return mapping;
@@ -533,7 +531,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             parameters.put("dataInstanceId", dataInstanceId);
             final List<SADataInstance> listSADataInstance = readPersistenceService.selectList(new SelectListDescriptor<SADataInstance>(
                     "getSADataInstanceByDataInstanceId", parameters, SADataInstance.class, new QueryOptions(Collections.singletonList(new OrderByOption(
-                            SADataInstance.class, dataInstanceBuilders.getDataInstanceBuilder().getArchiveDateKey(), OrderByType.DESC)))));
+                            SADataInstance.class, BuilderFactory.get(SDataInstanceBuilderFactory.class).getArchiveDateKey(), OrderByType.DESC)))));
             logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
             return listSADataInstance;
         } catch (final SBonitaReadException e) {
@@ -703,7 +701,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public void deleteSADataInstance(final SADataInstance dataInstance) throws SDeleteDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
         final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
-        final SEvent event = eventBuilders.getEventBuilder().createDeleteEvent(DataInstanceDataSource.DATA_INSTANCE).setObject(dataInstance).done();
+        final SEvent event = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DataInstanceDataSource.DATA_INSTANCE).setObject(dataInstance).done();
         final SDeleteEvent deleteEvent = (SDeleteEvent) event;
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);

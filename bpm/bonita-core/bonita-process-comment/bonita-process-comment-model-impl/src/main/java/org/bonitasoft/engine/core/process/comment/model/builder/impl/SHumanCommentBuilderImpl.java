@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model.builder.impl;
 
-import org.bonitasoft.engine.core.process.comment.model.SComment;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.builder.SHumanCommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl;
 
@@ -23,20 +21,8 @@ import org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl;
  */
 public class SHumanCommentBuilderImpl extends SCommentBuilderImpl implements SHumanCommentBuilder {
 
-    private SHumanCommentImpl sHumanCommentImpl;
-
-    @Override
-    public SCommentBuilder createNewInstance(final long processInstanceId, final String comment, final Long userId) {
-        sHumanCommentImpl = new SHumanCommentImpl(processInstanceId, comment);
-        final long postDate = System.currentTimeMillis();
-        sHumanCommentImpl.setPostDate(postDate);
-        sHumanCommentImpl.setUserId(userId);
-        return this;
-    }
-
-    @Override
-    public SComment done() {
-        return sHumanCommentImpl;
+    public SHumanCommentBuilderImpl(final SHumanCommentImpl sHumanCommentImpl) {
+        super(sHumanCommentImpl);
     }
 
 }

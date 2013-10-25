@@ -22,48 +22,16 @@ import org.bonitasoft.engine.platform.model.impl.SPlatformImpl;
  */
 public class SPlatformBuilderImpl implements SPlatformBuilder {
 
-    private SPlatformImpl object;
+    private final SPlatformImpl object;
 
-    @Override
-    public SPlatformBuilder createNewInstance(final String version, final String previousVersion, final String initialVersion, final String createdBy,
-            final long created) {
-        this.object = new SPlatformImpl(version, previousVersion, initialVersion, createdBy, created);
-        return this;
+    public SPlatformBuilderImpl(final SPlatformImpl object) {
+        super();
+        this.object = object;
     }
 
     @Override
     public SPlatform done() {
         return this.object;
-    }
-
-    @Override
-    public String getCreatedByKey() {
-        return "createdBy";
-    }
-
-    @Override
-    public String getCreatedKey() {
-        return "created";
-    }
-
-    @Override
-    public String getIdKey() {
-        return "id";
-    }
-
-    @Override
-    public String getInitialVersionKey() {
-        return "initialVersion";
-    }
-
-    @Override
-    public String getPreviousVersionKey() {
-        return "previousVersion";
-    }
-
-    @Override
-    public String getVersionKey() {
-        return "version";
     }
 
 }

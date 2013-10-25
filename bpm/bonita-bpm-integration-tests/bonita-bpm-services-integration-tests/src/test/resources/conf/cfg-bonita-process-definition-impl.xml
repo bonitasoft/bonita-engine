@@ -5,15 +5,11 @@
 		<constructor-arg name="cacheService" ref="cacheService" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
-		<constructor-arg name="definitionBuilders" ref="bpmDefinitionBuilders" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="sExpressionBuilders" ref="sExpressionBuilders" />
 		<constructor-arg name="parserFactory" ref="parserFactory" />
 		<constructor-arg name="xmlWriter" ref="xmlWriter" />
-		<constructor-arg name="sDataDefinitionBuilders" ref="sDataDefinitionBuilders" />
-		<constructor-arg name="sOperationBuilders" ref="sOperationBuilders" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="dependencyService" ref="dependencyService" />
     </bean>

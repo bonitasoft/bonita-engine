@@ -3,12 +3,9 @@
 
 	<bean class="org.bonitasoft.engine.document.impl.DocumentServiceImpl" id="documentService">
 		<constructor-arg name="recorder" ref="recorderSync" />
-		<constructor-arg name="eventBuilders" ref="eventBuilders" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="documentBuilders" ref="documentBuilders" />
 	</bean>
 	
-	<bean name="documentBuilders" class="org.bonitasoft.engine.document.model.impl.SDocumentBuildersImpl" />
 
 	<bean id="db-bonita-document-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/document/model/impl/db/${db.vendor}-createTables.sql" />

@@ -18,10 +18,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMes
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SThrowMessageEventTriggerInstanceBuilder extends SEventTriggerInstanceBuilder {
-
-    SThrowMessageEventTriggerInstanceBuilder createNewInstance(final long eventInstanceId, final String messageName, final String targetProcess,
-            final String targetFlowNode);
+public interface SThrowMessageEventTriggerInstanceBuilder {
 
     SThrowMessageEventTriggerInstance done();
 

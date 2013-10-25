@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SReceiveTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl;
 
 /**
@@ -23,26 +22,13 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstan
  */
 public class SReceiveTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SReceiveTaskInstanceBuilder {
 
-    private SReceiveTaskInstanceImpl activityInstanceImpl;
-
-    @Override
-    public SReceiveTaskInstanceBuilder createNewReceiveTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
-            final long parentProcessInstanceId) {
-        activityInstanceImpl = new SReceiveTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId,
-                processDefinitionId, rootProcessInstanceId);
-        activityInstanceImpl.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SReceiveTaskInstanceBuilderImpl(final SReceiveTaskInstanceImpl activityInstanceImpl) {
+        super(activityInstanceImpl);
     }
 
     @Override
     public SReceiveTaskInstance done() {
-        return activityInstanceImpl;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return activityInstanceImpl;
+        return (SReceiveTaskInstance) this.entity;
     }
 
 }

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -30,8 +31,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
-import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowErrorEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowErrorEventTriggerDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
@@ -51,7 +51,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
@@ -59,7 +58,6 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEven
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
@@ -100,17 +98,13 @@ public class EventsHandler {
 
     private final TechnicalLoggerService logger;
 
-    private final BPMDefinitionBuilders bpmDefinitionBuilders;
-
     private ProcessExecutor processExecutor;
 
     public EventsHandler(final SchedulerService schedulerService, final ExpressionResolverService expressionResolverService,
-            final SDataInstanceBuilders sDataInstanceBuilders, final BPMInstanceBuilders instanceBuilders, final BPMDefinitionBuilders bpmDefinitionBuilders,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
             final ProcessDefinitionService processDefinitionService, final ContainerRegistry containerRegistry,
             final ProcessInstanceService processInstanceService, final TokenService tokenService,
             final TechnicalLoggerService logger) {
-        this.bpmDefinitionBuilders = bpmDefinitionBuilders;
         this.eventInstanceService = eventInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.containerRegistry = containerRegistry;
@@ -120,12 +114,12 @@ public class EventsHandler {
         this.logger = logger;
         handlers = new HashMap<SEventTriggerType, EventHandlerStrategy>(4);
         handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, logger));
-        handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, instanceBuilders, eventInstanceService,
-                bpmInstancesCreator, dataInstanceService, sDataInstanceBuilders, processDefinitionService));
-        handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, instanceBuilders, eventInstanceService));
-        handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(instanceBuilders, processInstanceService, eventInstanceService,
+        handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
+                bpmInstancesCreator, dataInstanceService, processDefinitionService));
+        handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, eventInstanceService));
+        handlers.put(SEventTriggerType.TERMINATE, new TerminateEventHandlerStrategy(processInstanceService, eventInstanceService,
                 containerRegistry, logger));
-        handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(instanceBuilders, eventInstanceService, processInstanceService, containerRegistry,
+        handlers.put(SEventTriggerType.ERROR, new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, containerRegistry,
                 processDefinitionService, this, logger));
     }
 
@@ -255,9 +249,7 @@ public class EventsHandler {
              */
             final String errorCode = sThrowEventInstance.getName();
 
-            final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders
-                    .getThrowErrorEventTriggerDefinitionBuilder();
-            final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(errorCode).done();
+            final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory.get(SThrowErrorEventTriggerDefinitionBuilderFactory.class).createNewInstance(errorCode).done();
             hasActionsToExecute = handlers.get(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, null, sThrowEventInstance,
                     errorEventTriggerDefinition, sFlowNodeInstance);
         } else {
@@ -371,12 +363,11 @@ public class EventsHandler {
         if (triggerType.equals(SEventTriggerType.ERROR)) {
             // if error interrupt directly.
             final TransactionContainedProcessInstanceInterruptor interruptor = new TransactionContainedProcessInstanceInterruptor(
-                    bpmInstancesCreator.getBPMInstanceBuilders(), processInstanceService, eventInstanceService, containerRegistry, logger);
+                    processInstanceService, eventInstanceService, containerRegistry, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         } else if (isInterrupting) {
             // other interrupting catch
-            TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(bpmInstancesCreator.getBPMInstanceBuilders(),
-                    processInstanceService, eventInstanceService, processExecutor, logger);
+            TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(processInstanceService, eventInstanceService, processExecutor, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
         processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),

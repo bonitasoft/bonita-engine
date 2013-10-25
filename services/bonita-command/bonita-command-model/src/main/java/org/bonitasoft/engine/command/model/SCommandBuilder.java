@@ -18,22 +18,8 @@ package org.bonitasoft.engine.command.model;
  */
 public interface SCommandBuilder {
 
-    SCommandBuilder createNewInstance(SCommand command);
-
-    SCommandBuilder createNewInstance(String name, String description, String implementationClass);
-    
     SCommandBuilder setSystem(boolean system);
 
     SCommand done();
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getDescriptionKey();
-
-    String getImplementationClassKey();
-    
-    String getSystemKey();
 
 }

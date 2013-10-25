@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -38,8 +39,10 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
@@ -48,8 +51,8 @@ import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkRegisterException;
@@ -75,8 +78,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private final DataInstanceService dataInstanceService;
 
-    private final BPMInstanceBuilders bpmInstanceBuilders;
-
     private final ContainerRegistry containerRegistry;
 
     private final ProcessDefinitionService processDefinitionService;
@@ -93,7 +94,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
-            final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
+            final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
             final ProcessDefinitionService processDefinitionService, final SCommentService commentService, final ProcessInstanceService processInstanceService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
             final WorkService workService, final TransactionService transactionService) {
@@ -103,7 +104,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         this.operationService = operationService;
         this.archiveService = archiveService;
         this.dataInstanceService = dataInstanceService;
-        this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.containerRegistry = containerRegistry;
         this.processInstanceService = processInstanceService;
         this.connectorInstanceService = connectorInstanceService;
@@ -146,7 +146,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             long processDefinitionId = 0;
             try {
                 sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-                processDefinitionId = sFlowNodeInstance.getLogicalGroup(bpmInstanceBuilders.getSUserTaskInstanceBuilder().getProcessDefinitionIndex());
+                processDefinitionId = sFlowNodeInstance.getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).getProcessDefinitionIndex());
                 final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
                 Thread.currentThread().setContextClassLoader(localClassLoader);
 
@@ -207,7 +207,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     protected <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     protected <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -215,7 +215,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     protected SFlowNodeInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SFlowNodeInstanceLogBuilder logBuilder = bpmInstanceBuilders.getActivityInstanceLogBuilder();
+        final SFlowNodeInstanceLogBuilder logBuilder = BuilderFactory.get(SFlowNodeInstanceLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
@@ -273,7 +273,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             activityInstanceService.setTokenCount(activityInstance, tokenCount);
             if (!hasActionsToExecute) {
                 containerRegistry.executeFlowNode(activityInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
-                        activityInstance.getLogicalGroup(bpmInstanceBuilders.getSAAutomaticTaskInstanceBuilder().getParentProcessInstanceIndex()));
+                        activityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
             }
         }
 
@@ -299,7 +299,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId)
             throws SActivityExecutionException {
         ProcessArchiver.archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processDefinitionId, processInstanceService, processDefinitionService,
-                archiveService, bpmInstanceBuilders, dataInstanceService, activityInstanceService, connectorInstanceService);
+                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService);
     }
 
 }

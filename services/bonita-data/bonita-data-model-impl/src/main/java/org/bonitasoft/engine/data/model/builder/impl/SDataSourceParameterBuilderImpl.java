@@ -19,37 +19,16 @@ import org.bonitasoft.engine.data.model.impl.SDataSourceParameterImpl;
 
 public class SDataSourceParameterBuilderImpl implements SDataSourceParameterBuilder {
 
-    private SDataSourceParameterImpl object;
+    private final SDataSourceParameterImpl object;
 
-    @Override
-    public SDataSourceParameterBuilder createNewInstance(final long dataSourceId, final String name, final String value) {
-        this.object = new SDataSourceParameterImpl(dataSourceId, name, value);
-        return this;
+    public SDataSourceParameterBuilderImpl(final SDataSourceParameterImpl object) {
+        super();
+        this.object = object;
     }
 
     @Override
     public SDataSourceParameter done() {
         return this.object;
-    }
-
-    @Override
-    public String getDataSourceIdKey() {
-        return "dataSourceId";
-    }
-
-    @Override
-    public String getIdKey() {
-        return "id";
-    }
-
-    @Override
-    public String getNameKey() {
-        return "name";
-    }
-
-    @Override
-    public String getValueKey() {
-        return "value_";
     }
 
 }

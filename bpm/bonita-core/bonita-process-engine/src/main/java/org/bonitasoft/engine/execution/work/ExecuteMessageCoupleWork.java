@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
@@ -22,8 +23,8 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -51,25 +52,25 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
         return getClass().getSimpleName() + ": messageInstanceId: " + messageInstanceId + ", waitingMessageId: " + waitingMessageId;
     }
 
-    private void resetWaitingMessage(final long waitingMessageId, final EventInstanceService eventInstanceService,
-            final BPMInstanceBuilders instanceBuilders) throws SWaitingEventModificationException, SWaitingEventNotFoundException, SWaitingEventReadException {
+    private void resetWaitingMessage(final long waitingMessageId, final EventInstanceService eventInstanceService
+            ) throws SWaitingEventModificationException, SWaitingEventNotFoundException, SWaitingEventReadException {
         final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(instanceBuilders.getSWaitingMessageEventBuilder().getProgressKey(), SWaitingMessageEventBuilder.PROGRESS_FREE_KEY);
+        descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(), SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
     }
 
-    private void resetMessageInstance(final long messageInstanceId, final EventInstanceService eventInstanceService,
-            final BPMInstanceBuilders instanceBuilders) throws SMessageModificationException, SMessageInstanceNotFoundException, SMessageInstanceReadException {
+    private void resetMessageInstance(final long messageInstanceId, final EventInstanceService eventInstanceService
+            ) throws SMessageModificationException, SMessageInstanceNotFoundException, SMessageInstanceReadException {
         final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(instanceBuilders.getSMessageInstanceBuilder().getHandledKey(), false);
+        descriptor.addField(BuilderFactory.get(SMessageInstanceBuilderFactory.class).getHandledKey(), false);
         eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
     @Override
     public String getRecoveryProcedure() {
-        return "Change the 'progress' field of the waiting message having id " + waitingMessageId + " to " + SWaitingMessageEventBuilder.PROGRESS_FREE_KEY
+        return "Change the 'progress' field of the waiting message having id " + waitingMessageId + " to " + SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY
                 + " and "
                 + "the 'handled' field of the message instance  having id " + messageInstanceId + " to false";
     }
@@ -87,8 +88,8 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService(), tenantAccessor.getBPMInstanceBuilders());
-        resetMessageInstance(messageInstanceId, tenantAccessor.getEventInstanceService(), tenantAccessor.getBPMInstanceBuilders());
+        resetWaitingMessage(waitingMessageId, tenantAccessor.getEventInstanceService());
+        resetMessageInstance(messageInstanceId, tenantAccessor.getEventInstanceService());
     }
 
 }

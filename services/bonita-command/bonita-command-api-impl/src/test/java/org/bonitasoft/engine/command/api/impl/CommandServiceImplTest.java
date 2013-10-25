@@ -24,7 +24,6 @@ import java.util.List;
 import org.bonitasoft.engine.command.SCommandGettingException;
 import org.bonitasoft.engine.command.SCommandNotFoundException;
 import org.bonitasoft.engine.command.model.SCommand;
-import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -46,8 +45,6 @@ import org.junit.Test;
  */
 public class CommandServiceImplTest {
 
-    private SCommandBuilderAccessor commandBuilderAccessor;
-
     private Recorder recorder;
 
     private ReadPersistenceService persistence;
@@ -62,13 +59,12 @@ public class CommandServiceImplTest {
 
     @Before
     public final void setUp() throws Exception {
-        commandBuilderAccessor = mock(SCommandBuilderAccessor.class);
         recorder = mock(Recorder.class);
         persistence = mock(ReadPersistenceService.class);
         eventService = mock(EventService.class);
         logger = mock(TechnicalLoggerService.class);
         queriableLoggerService = mock(QueriableLoggerService.class);
-        commandServiceImpl = new CommandServiceImpl(commandBuilderAccessor, persistence, recorder, eventService, logger, queriableLoggerService);
+        commandServiceImpl = new CommandServiceImpl(persistence, recorder, eventService, logger, queriableLoggerService);
     }
 
     /**

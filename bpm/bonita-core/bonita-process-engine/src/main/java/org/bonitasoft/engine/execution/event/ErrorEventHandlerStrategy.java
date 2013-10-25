@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -44,12 +45,16 @@ import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SEventInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateThrowEventInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SEventInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateCatchEventInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateThrowEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingErrorEventBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingErrorEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
@@ -84,10 +89,10 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private final TechnicalLoggerService logger;
 
-    public ErrorEventHandlerStrategy(final BPMInstanceBuilders instanceBuilders, final EventInstanceService eventInstanceService,
+    public ErrorEventHandlerStrategy(final EventInstanceService eventInstanceService,
             final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, 
             final ProcessDefinitionService processDefinitionService, final EventsHandler eventsHandler, final TechnicalLoggerService logger) {
-        super(instanceBuilders, eventInstanceService);
+        super(eventInstanceService);
         this.processInstanceService = processInstanceService;
         this.containerRegistry = containerRegistry;
         this.processDefinitionService = processDefinitionService;
@@ -102,16 +107,15 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Error event is thrown, error code = "
                     + ((SErrorEventTriggerDefinition) sEventTriggerDefinition).getErrorCode() + " process instance = " + eventInstance.getRootContainerId());
         }
-        final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(
-                getInstanceBuilders(), processInstanceService, getEventInstanceService(), containerRegistry, logger);
+        final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(processInstanceService, getEventInstanceService(), containerRegistry, logger);
         updateInterruptorErrorEvent(eventInstance);
         processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, -1, eventInstance.getId());
     }
 
     private void updateInterruptorErrorEvent(final SThrowEventInstance eventInstance) throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
             SProcessInstanceModificationException {
-        final SIntermediateThrowEventInstanceBuilder throwEventKeyProvider = getInstanceBuilders().getSIntermediateThrowEventInstanceBuilder();
-        final SProcessInstanceUpdateBuilder updateBuilder = getInstanceBuilders().getProcessInstanceUpdateBuilder();
+        final SIntermediateThrowEventInstanceBuilderFactory throwEventKeyProvider = BuilderFactory.get(SIntermediateThrowEventInstanceBuilderFactory.class);
+        final SProcessInstanceUpdateBuilder updateBuilder = BuilderFactory.get(SProcessInstanceUpdateBuilderFactory.class).createNewInstance();
         final long parentProcessInstanceId = eventInstance.getLogicalGroup(throwEventKeyProvider.getParentProcessInstanceIndex());
         updateBuilder.updateInterruptingEventId(eventInstance.getId());
         final SProcessInstance processInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
@@ -129,7 +133,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             final SThrowEventInstance sThrowEventInstance, final SEventTriggerDefinition sEventTriggerDefinition, final SFlowNodeInstance sFlowNodeInstance)
             throws SBonitaException {
         boolean hasActionToExecute = false;
-        final SFlowNodeInstanceBuilder flowNodeKeyProvider = getInstanceBuilders().getSIntermediateThrowEventInstanceBuilder();
+        final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SIntermediateThrowEventInstanceBuilderFactory.class);
         final long parentProcessInstanceId = sThrowEventInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
         final SErrorEventTriggerDefinition errorTrigger = (SErrorEventTriggerDefinition) sEventTriggerDefinition;
         final SWaitingErrorEvent waitingErrorEvent = getWaitingErrorEvent(processDefinition.getProcessContainer(), parentProcessInstanceId, errorTrigger,
@@ -163,11 +167,10 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             throws SBonitaException {
         final SProcessInstance processInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
         final String errorCode = errorTrigger.getErrorCode();
-        final SFlowNodeInstanceBuilder flowNodeKeyProvider = getInstanceBuilders().getSIntermediateThrowEventInstanceBuilder();
         SWaitingErrorEvent waitingErrorEvent;
 
         // check on direct boundary
-        waitingErrorEvent = getWaitingErrorEventFromBoundary(flowNodeKeyProvider, eventInstance, errorCode, flowNodeInstance);
+        waitingErrorEvent = getWaitingErrorEventFromBoundary(eventInstance, errorCode, flowNodeInstance);
         // check on event sub-process
         if (waitingErrorEvent == null) {
             waitingErrorEvent = getWaitingErrorEventSubProcess(container, parentProcessInstanceId, errorCode);
@@ -175,15 +178,16 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         // check on call activities (recursive)
         if (waitingErrorEvent == null && processInstance.getCallerId() != -1 && SFlowNodeType.CALL_ACTIVITY.equals(processInstance.getCallerType())) {
             // check on call activities
-            waitingErrorEvent = getWaitingErrorEventFromCallActivity(errorTrigger, flowNodeKeyProvider, processInstance, eventInstance, errorCode,
+            waitingErrorEvent = getWaitingErrorEventFromCallActivity(errorTrigger, processInstance, eventInstance, errorCode,
                     flowNodeInstance);
         }
         return waitingErrorEvent;
 
     }
 
-    private SWaitingErrorEvent getWaitingErrorEventFromBoundary(final SFlowNodeInstanceBuilder flowNodeKeyProvider, final SThrowEventInstance eventInstance,
+    private SWaitingErrorEvent getWaitingErrorEventFromBoundary(final SThrowEventInstance eventInstance,
             final String errorCode, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
+        final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SBoundaryEventInstanceBuilderFactory.class);
         // get the parent activity of the boundary
         final long logicalGroup = eventInstance.getLogicalGroup(flowNodeKeyProvider.getParentActivityInstanceIndex());
         if (logicalGroup <= 0) {
@@ -199,8 +203,9 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     private SWaitingErrorEvent getWaitingErrorEventFromCallActivity(final SErrorEventTriggerDefinition errorTrigger,
-            final SFlowNodeInstanceBuilder flowNodeKeyProvider, final SProcessInstance processInstance, final SThrowEventInstance eventInstance,
+            final SProcessInstance processInstance, final SThrowEventInstance eventInstance,
             final String errorCode, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
+        final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SCallActivityInstanceBuilderFactory.class);
         final SCallActivityInstance callActivityInstance = (SCallActivityInstance) getEventInstanceService().getFlowNodeInstance(processInstance.getCallerId());
         final long processDefinitionId = callActivityInstance.getLogicalGroup(flowNodeKeyProvider.getProcessDefinitionIndex());
         final SProcessDefinition callActivityContainer = processDefinitionService.getProcessDefinition(processDefinitionId);
@@ -242,7 +247,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         }
         SWaitingErrorEvent waitingErrorEvent = null;
         if (canHandleError) {
-            final SWaitingErrorEventBuilder waitingErrorEventKeyProvider = getInstanceBuilders().getSWaitingErrorEventBuilder();
+            final SWaitingErrorEventBuilderFactory waitingErrorEventKeyProvider = BuilderFactory.get(SWaitingErrorEventBuilderFactory.class);
             final OrderByOption orderByOption = new OrderByOption(SWaitingEvent.class, waitingErrorEventKeyProvider.getFlowNodeNameKey(), OrderByType.ASC);
 
             final List<FilterOption> filters = new ArrayList<FilterOption>(3);
@@ -301,15 +306,15 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     @Override
     public void handleCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SCatchEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
-        final SWaitingErrorEventBuilder builder = getInstanceBuilders().getSWaitingErrorEventBuilder();
+        final SWaitingErrorEventBuilderFactory builderFact = BuilderFactory.get(SWaitingErrorEventBuilderFactory.class);
         final SErrorEventTriggerDefinition errorEventTriggerDefinition = (SErrorEventTriggerDefinition) sEventTriggerDefinition;
-        final SEventInstanceBuilder eventInstanceKeyProvider = getInstanceBuilders().getSIntermediateCatchEventInstanceBuilder();
+        final SEventInstanceBuilderFactory eventInstanceKeyProvider = BuilderFactory.get(SIntermediateCatchEventInstanceBuilderFactory.class);
         switch (eventDefinition.getType()) {
             case BOUNDARY_EVENT:
                 final SBoundaryEventInstance boundary = (SBoundaryEventInstance) eventInstance;
                 final long rootProcessInstanceId = eventInstance.getLogicalGroup(eventInstanceKeyProvider.getRootProcessInstanceIndex());
                 final long parentProcessInstanceId = eventInstance.getLogicalGroup(eventInstanceKeyProvider.getParentProcessInstanceIndex());
-                builder.createNewWaitingErrorBoundaryEventInstance(processDefinition.getId(), rootProcessInstanceId, parentProcessInstanceId,
+                final SWaitingErrorEventBuilder builder = builderFact.createNewWaitingErrorBoundaryEventInstance(processDefinition.getId(), rootProcessInstanceId, parentProcessInstanceId,
                         eventInstance.getId(), errorEventTriggerDefinition.getErrorCode(), processDefinition.getName(),
                         eventInstance.getFlowNodeDefinitionId(), eventInstance.getName(), boundary.getActivityInstanceId());
                 final SWaitingErrorEvent errorEvent = builder.done();
@@ -335,9 +340,9 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     public void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
             final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance)
             throws SBonitaException {
-        final SWaitingErrorEventBuilder builder = getInstanceBuilders().getSWaitingErrorEventBuilder();
+        final SWaitingErrorEventBuilderFactory builderFact = BuilderFactory.get(SWaitingErrorEventBuilderFactory.class);
         final SErrorEventTriggerDefinition trigger = (SErrorEventTriggerDefinition) sEventTriggerDefinition;
-        builder.createNewWaitingErrorEventSubProcInstance(processDefinition.getId(), parentProcessInstance.getId(),
+        final SWaitingErrorEventBuilder builder = builderFact.createNewWaitingErrorEventSubProcInstance(processDefinition.getId(), parentProcessInstance.getId(),
                 parentProcessInstance.getRootProcessInstanceId(), trigger.getErrorCode(), processDefinition.getName(), eventDefinition.getId(),
                 eventDefinition.getName(), subProcessId);
 

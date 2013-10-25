@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.impl;
 
-import java.util.UUID;
-
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SEndEventDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SEndEventDefinitionImpl;
@@ -25,15 +23,13 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowE
  */
 public class SEndEventDefinitionBuilderImpl implements SEndEventDefinitionBuilder {
 
-    private SEndEventDefinitionImpl entity;
+    private final SEndEventDefinitionImpl entity;
 
-    @Override
-    public SEndEventDefinitionBuilder createNewInstance(final String name) {
-        entity = new SEndEventDefinitionImpl(UUID.randomUUID().getLeastSignificantBits(), name);
-        return this;
+    public SEndEventDefinitionBuilderImpl(final SEndEventDefinitionImpl entity) {
+        super();
+        this.entity = entity;
     }
 
-    @Override
     public SEndEventDefinition done() {
         return entity;
     }

@@ -6,9 +6,6 @@ import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.EventServiceTest;
-import org.bonitasoft.engine.events.impl.EventServiceImpl;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
-import org.bonitasoft.engine.events.model.builders.impl.SEventBuildersImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -22,9 +19,7 @@ public class EventServiceImplTest extends EventServiceTest {
     @Override
     protected EventService instantiateEventServiceImplementation() {
         TechnicalLoggerService logger = mockTechnicalLoggerService();
-
-        SEventBuilders eventBuilders = new SEventBuildersImpl();
-        return new EventServiceImpl(eventBuilders, logger);
+        return new EventServiceImpl(logger);
     }
 
     /**

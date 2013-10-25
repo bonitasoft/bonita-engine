@@ -20,8 +20,6 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
  */
 public interface SLeftOperandBuilder {
 
-    SLeftOperandBuilder createNewInstance();
-
     SLeftOperandBuilder setName(final String dataName);
 
     SLeftOperandBuilder setExternal(final boolean external);

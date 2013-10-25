@@ -18,12 +18,13 @@ import java.util.Date;
 
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 
@@ -37,8 +38,6 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
 
     private final ProcessInstanceService processInstanceService;
 
-    private final SAProcessInstanceBuilder saProcessInstanceBuilder;
-
     private final SearchEntitiesDescriptor searchEntitiesDescriptor;
 
     private final long processInstanceId;
@@ -48,20 +47,19 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
     private final String documentName;
 
     public GetDocumentByNameAtProcessInstantiation(final ProcessDocumentService processDocumentService, final ProcessInstanceService processInstanceService,
-            final SAProcessInstanceBuilder saProcessInstanceBuilder, final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId,
+            final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId,
             final String documentName) {
         this.processDocumentService = processDocumentService;
         this.processInstanceId = processInstanceId;
         this.documentName = documentName;
         this.processInstanceService = processInstanceService;
-        this.saProcessInstanceBuilder = saProcessInstanceBuilder;
         this.searchEntitiesDescriptor = searchEntitiesDescriptor;
     }
 
     @Override
     public void execute() throws SBonitaException {
         final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                searchEntitiesDescriptor, processInstanceId, 0, 1, saProcessInstanceBuilder.getIdKey(), OrderByType.ASC);
+                searchEntitiesDescriptor, processInstanceId, 0, 1, BuilderFactory.get(SAProcessInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
         getArchivedProcessInstanceList.execute();
         final ArchivedProcessInstance saProcessInstance = getArchivedProcessInstanceList.getResult().get(0);
         final Date startDate = saProcessInstance.getStartDate();

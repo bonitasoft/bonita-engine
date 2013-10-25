@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
-import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 
 /**
@@ -21,29 +20,8 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
  */
 public interface SConnectorInstanceBuilder {
 
-    SConnectorInstanceBuilder createNewInstance(final String name, final long containerId, String containerType, final String connectorId,
-            final String version, final ConnectorEvent activationEvent, int executionOrder);
-
     SConnectorInstanceBuilder setState(final String state);
 
     SConnectorInstance done();
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getContainerIdKey();
-
-    String getConnectorIdKey();
-
-    String getContainerTypeKey();
-
-    String getVersionKey();
-
-    String getActivationEventKey();
-
-    String getStateKey();
-
-    String getExecutionOrderKey();
 
 }

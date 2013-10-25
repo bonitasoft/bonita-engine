@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Zhao Na
@@ -42,17 +41,14 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
 
     private final ProcessDefinitionService processDefinitionService;
 
-    private final SExpressionBuilders expBuilder;
-
     private final Map<String, Serializable> results = new HashMap<String, Serializable>(0);
 
     public EvaluateExpressionsDefinitionLevel(final Map<Expression, Map<String, Serializable>> expressions, final long processDefinitionId,
-            final ExpressionResolverService expressionResolverService, final SExpressionBuilders expBuilder,
+            final ExpressionResolverService expressionResolverService,
             final ProcessDefinitionService processDefinitionService) {
         expressionsAndTheirPartialContext = expressions;
         this.processDefinitionId = processDefinitionId;
         expressionResolver = expressionResolverService;
-        this.expBuilder = expBuilder;
         this.processDefinitionService = processDefinitionService;
     }
 
@@ -73,7 +69,7 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
                     inputValues.put(SExpressionContext.processDefinitionKey, processDefinition);
                     context.setProcessDefinitionId(processDefinitionId);
                     context.setSerializableInputValues(inputValues);
-                    final SExpression sexp = ServerModelConvertor.convertExpression(expBuilder, exp);
+                    final SExpression sexp = ServerModelConvertor.convertExpression(exp);
                     // maybe the context's not enough to delivery those parameters like ap<String, Serializable>.
                     final Serializable res = (Serializable) expressionResolver.evaluate(sexp, context);// evaluate(sexp, context);
                     results.put(buildName(exp), res);

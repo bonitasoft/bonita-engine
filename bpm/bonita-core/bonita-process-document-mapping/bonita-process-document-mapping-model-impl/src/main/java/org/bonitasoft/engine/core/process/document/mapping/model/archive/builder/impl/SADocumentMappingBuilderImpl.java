@@ -14,7 +14,6 @@
  */
 package org.bonitasoft.engine.core.process.document.mapping.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.builder.SADocumentMappingBuilder;
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl;
@@ -25,57 +24,11 @@ import org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SA
  */
 public class SADocumentMappingBuilderImpl implements SADocumentMappingBuilder {
 
-    private SADocumentMappingImpl documentMapping;
+    private final SADocumentMappingImpl documentMapping;
 
-    static final String ID = "id";
-
-    static final String PROCESS_INSTANCE_ID = "processInstanceId";
-
-    static final String ARCHIVEDATE = "archiveDate";
-
-    static final String SOURCE_OBJECT_ID = "sourceObjectId";
-
-    static final String CONTENT_STORAGE_ID = "contentStorageId";
-
-    static final String DOCUMENT_URL = "documentURL";
-
-    static final String DOCUMENT_NAME = "documentName";
-
-    static final String HAS_CONTENT = "documentHasContent";
-
-    static final String DOCUMENT_AUTHOR = "documentAuthor";
-
-    static final String DOCUMENT_CONTENT_FILENAME = "documentContentFileName";
-
-    static final String DOCUMENT_CONTENT_MIMETYPE = "documentContentMimeType";
-
-    static final String DOCUMENT_CREATIONDATE = "documentCreationDate";
-
-    @Override
-    public SADocumentMappingBuilder createNewInstance() {
-        documentMapping = new SADocumentMappingImpl();
-        return this;
-    }
-
-    @Override
-    public SADocumentMappingBuilder createNewInstance(final SDocumentMapping documentMapping) {
-        this.documentMapping = new SADocumentMappingImpl(documentMapping);
-        return this;
-    }
-
-    @Override
-    public String getIdKey() {
-        return ID;
-    }
-
-    @Override
-    public String getProcessInstanceIdKey() {
-        return PROCESS_INSTANCE_ID;
-    }
-
-    @Override
-    public String getDocumentNameKey() {
-        return DOCUMENT_NAME;
+    public SADocumentMappingBuilderImpl(final SADocumentMappingImpl documentMapping) {
+        super();
+        this.documentMapping = documentMapping;
     }
 
     @Override
@@ -141,51 +94,6 @@ public class SADocumentMappingBuilderImpl implements SADocumentMappingBuilder {
     @Override
     public SADocumentMapping done() {
         return documentMapping;
-    }
-
-    @Override
-    public String getSourceObjectIdKey() {
-        return SOURCE_OBJECT_ID;
-    }
-
-    @Override
-    public String getArchiveDateKey() {
-        return null;
-    }
-
-    @Override
-    public String getDocumentAuthorKey() {
-        return DOCUMENT_AUTHOR;
-    }
-
-    @Override
-    public String getDocumentCreationDateKey() {
-        return DOCUMENT_CREATIONDATE;
-    }
-
-    @Override
-    public String getDocumentHasContentKey() {
-        return HAS_CONTENT;
-    }
-
-    @Override
-    public String getDocumentContentFileNameKey() {
-        return DOCUMENT_CONTENT_FILENAME;
-    }
-
-    @Override
-    public String getDocumentContentMimeTypeKey() {
-        return DOCUMENT_CONTENT_MIMETYPE;
-    }
-
-    @Override
-    public String getContentStorageIdKey() {
-        return CONTENT_STORAGE_ID;
-    }
-
-    @Override
-    public String getDocumentURLKey() {
-        return DOCUMENT_URL;
     }
 
     @Override

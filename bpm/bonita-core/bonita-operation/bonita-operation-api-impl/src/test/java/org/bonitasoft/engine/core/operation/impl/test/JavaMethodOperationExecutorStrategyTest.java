@@ -36,7 +36,7 @@ public class JavaMethodOperationExecutorStrategyTest {
     @Test(expected = SOperationExecutionException.class)
     public void dontThrowNPEIfObjectDoesNotExist() throws Exception {
         final DataInstanceService dataInstanceService = mock(DataInstanceService.class);
-        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy(dataInstanceService, null);
+        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy(dataInstanceService);
         final SOperation operation = mock(SOperation.class);
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
         final SExpression rightOperand = mock(SExpression.class);

@@ -7,9 +7,6 @@
 		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="documentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
     </bean>
-
-	<bean name="documentMappingBuilderAccessor" class="org.bonitasoft.engine.core.process.document.mapping.model.builder.impl.SDocumentMappingBuilderAccessorImpl" />
 
 </beans>

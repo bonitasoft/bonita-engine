@@ -20,7 +20,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerE
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -33,10 +32,10 @@ public class STimerEventTriggerDefinitionImpl extends SEventTriggerDefinitionImp
 
     private final SExpression timerExpression;
 
-    public STimerEventTriggerDefinitionImpl(final TimerEventTriggerDefinition timerTrigger, final SExpressionBuilders sExpressionBuilders) {
+    public STimerEventTriggerDefinitionImpl(final TimerEventTriggerDefinition timerTrigger) {
         timerType = STimerType.valueOf(timerTrigger.getTimerType().name());
         final Expression expression = timerTrigger.getTimerExpression();
-        timerExpression = ServerModelConvertor.convertExpression(sExpressionBuilders, expression);
+        timerExpression = ServerModelConvertor.convertExpression(expression);
     }
 
     public STimerEventTriggerDefinitionImpl(final STimerType timerType, final SExpression timerExpression) {

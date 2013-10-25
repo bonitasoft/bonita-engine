@@ -22,12 +22,11 @@ import org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl;
  */
 public class SProfileMemberBuilderImpl implements SProfileMemberBuilder {
 
-    private SProfileMemberImpl profileMember;
-
-    @Override
-    public SProfileMemberBuilder createNewInstance(final long profileId) {
-        profileMember = new SProfileMemberImpl(profileId);
-        return this;
+    private final SProfileMemberImpl profileMember;
+    
+    public SProfileMemberBuilderImpl(final SProfileMemberImpl profileMember) {
+        super();
+        this.profileMember = profileMember;
     }
 
     @Override
@@ -77,8 +76,4 @@ public class SProfileMemberBuilderImpl implements SProfileMemberBuilder {
         return profileMember;
     }
 
-    @Override
-    public String getIdKey() {
-        return ID;
-    }
 }

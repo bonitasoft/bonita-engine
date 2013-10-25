@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SFlowNodeInstanceBuilderImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -22,18 +23,9 @@ import org.bonitasoft.engine.core.process.instance.model.builder.impl.SFlowNodeI
  */
 public abstract class SEventInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl implements SEventInstanceBuilder {
 
-    private static final String ID_KEY = "id";
-
-    private static final String NAME_KEY = "name";
-
-    @Override
-    public String getIdKey() {
-        return ID_KEY;
+    protected SEventInstanceBuilderImpl(SEventInstanceImpl entity) {
+        super(entity);
     }
 
-    @Override
-    public String getNameKey() {
-        return NAME_KEY;
-    }
 
 }

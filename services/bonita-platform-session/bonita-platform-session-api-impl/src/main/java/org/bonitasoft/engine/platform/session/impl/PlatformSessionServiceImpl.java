@@ -15,6 +15,7 @@ package org.bonitasoft.engine.platform.session.impl;
 
 import java.util.Date;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.ReflectException;
@@ -25,7 +26,7 @@ import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.platform.session.SSessionException;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
-import org.bonitasoft.engine.platform.session.model.builder.SPlatformSessionModelBuilder;
+import org.bonitasoft.engine.platform.session.model.builder.SPlatformSessionBuilderFactory;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -35,17 +36,14 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
 
     private final long DEFAULT_SESSION_DURATION = 3600000;
 
-    private final SPlatformSessionModelBuilder platformSessionModelBuilder;
-
     private final PlatformSessionProvider platformSessionProvider;
 
     private final TechnicalLoggerService logger;
 
     private long sessionDuration = DEFAULT_SESSION_DURATION;
 
-    public PlatformSessionServiceImpl(final PlatformSessionProvider platformSessionProvider, final SPlatformSessionModelBuilder platformSessionModelBuilder,
+    public PlatformSessionServiceImpl(final PlatformSessionProvider platformSessionProvider,
             final TechnicalLoggerService logger) {
-        this.platformSessionModelBuilder = platformSessionModelBuilder;
         this.platformSessionProvider = platformSessionProvider;
         this.logger = logger;
     }
@@ -57,7 +55,7 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
         }
         final long sessionId = PlatformSessionIdGenerator.getNextId();
         final long duration = getSessionsDuration();
-        final SPlatformSession session = platformSessionModelBuilder.getSessionBuilder().createNewInstance(sessionId, duration, username).done();
+        final SPlatformSession session = BuilderFactory.get(SPlatformSessionBuilderFactory.class).createNewInstance(sessionId, duration, username).done();
         platformSessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createSession"));
@@ -98,7 +96,7 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getSession"));
         }
-        return platformSessionModelBuilder.getSessionBuilder().copy(session);
+        return BuilderFactory.get(SPlatformSessionBuilderFactory.class).copy(session);
     }
 
     @Override

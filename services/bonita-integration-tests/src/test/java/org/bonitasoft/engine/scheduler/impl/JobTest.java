@@ -9,13 +9,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
+import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.job.ThrowsExceptionJob;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -38,15 +39,12 @@ public class JobTest extends CommonServiceTest {
 
     private static final JobService JOB_SERVICE;
 
-    private static STenantBuilder tenantBuilder;
-
     private long tenant1;
 
     private final VariableStorage storage = VariableStorage.getInstance();
 
     static {
         schedulerService = getServicesBuilder().buildSchedulerService();
-        tenantBuilder = getServicesBuilder().buildTenantBuilder();
         JOB_SERVICE = getServicesBuilder().getInstanceOf(JobService.class);
     }
 
@@ -57,7 +55,7 @@ public class JobTest extends CommonServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        tenant1 = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), tenantBuilder, "tenant1", PlatformUtil.DEFAULT_CREATED_BY,
+        tenant1 = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), "tenant1", PlatformUtil.DEFAULT_CREATED_BY,
                 PlatformUtil.DEFAULT_TENANT_STATUS);
         TestUtil.startScheduler(schedulerService);
         getTransactionService().begin();
@@ -89,11 +87,10 @@ public class JobTest extends CommonServiceTest {
         final Date now = new Date();
         getTransactionService().begin();
         final Trigger trigger = new OneExecutionTrigger("logevents", now, 10);
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(ThrowsExceptionJob.class.getName(), "ThowExceptionJob").done();
 
-        final SJobParameterBuilder parameterBuilder = schedulerService.getJobParameterBuilder();
-        final SJobParameter parameter = parameterBuilder.createNewInstance("throwException", Boolean.TRUE).done();
+        final SJobParameter parameter = BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", Boolean.TRUE).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>(2);
         parameters.add(parameter);
         schedulerService.schedule(jobDescriptor, parameters, trigger);
@@ -116,7 +113,7 @@ public class JobTest extends CommonServiceTest {
 
         getTransactionService().begin();
         parameters.clear();
-        parameters.add(parameterBuilder.createNewInstance("throwException", Boolean.FALSE).done());
+        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", Boolean.FALSE).done());
         schedulerService.executeAgain(jobDescriptors.get(0).getId(), parameters);
         getTransactionService().complete();
         Thread.sleep(1000);
@@ -132,11 +129,10 @@ public class JobTest extends CommonServiceTest {
         final Date now = new Date();
         getTransactionService().begin();
         final Trigger trigger = new OneExecutionTrigger("logevents", now, 10);
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(ThrowsExceptionJob.class.getName(), "ThowExceptionJob2").done();
 
-        final SJobParameterBuilder parameterBuilder = schedulerService.getJobParameterBuilder();
-        final SJobParameter parameter = parameterBuilder.createNewInstance("throwException", Boolean.TRUE).done();
+        final SJobParameter parameter = BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", Boolean.TRUE).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>(2);
         parameters.add(parameter);
         schedulerService.schedule(jobDescriptor, parameters, trigger);
@@ -159,7 +155,7 @@ public class JobTest extends CommonServiceTest {
 
         getTransactionService().begin();
         parameters.clear();
-        parameters.add(parameterBuilder.createNewInstance("throwException", Boolean.FALSE).done());
+        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", Boolean.FALSE).done());
         JOB_SERVICE.setJobParameters(getDefaultTenantId(), jobDescriptors.get(0).getId(), parameters);
         schedulerService.executeAgain(jobDescriptors.get(0).getId());
         getTransactionService().complete();
@@ -176,11 +172,10 @@ public class JobTest extends CommonServiceTest {
         final Date now = new Date();
         getTransactionService().begin();
         final Trigger trigger = new OneExecutionTrigger("logevents", now, 10);
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(ThrowsExceptionJob.class.getName(), "ThowExceptionJob").done();
 
-        final SJobParameterBuilder parameterBuilder = schedulerService.getJobParameterBuilder();
-        final SJobParameter parameter = parameterBuilder.createNewInstance("throwException", Boolean.TRUE).done();
+        final SJobParameter parameter = BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", Boolean.TRUE).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>(2);
         parameters.add(parameter);
         schedulerService.schedule(jobDescriptor, parameters, trigger);
@@ -224,11 +219,10 @@ public class JobTest extends CommonServiceTest {
         final Date now = new Date();
         getTransactionService().begin();
         final Trigger trigger = new UnixCronTrigger("events", now, 10, "0/1 * * * * ?");
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(ThrowsExceptionJob.class.getName(), "retriesAFailedCronJob").done();
 
-        final SJobParameterBuilder parameterBuilder = schedulerService.getJobParameterBuilder();
-        final SJobParameter parameter = parameterBuilder.createNewInstance("throwException", Boolean.TRUE).done();
+        final SJobParameter parameter = BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", Boolean.TRUE).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>(2);
         parameters.add(parameter);
         schedulerService.schedule(jobDescriptor, parameters, trigger);
@@ -251,7 +245,7 @@ public class JobTest extends CommonServiceTest {
 
         getTransactionService().begin();
         parameters.clear();
-        parameters.add(parameterBuilder.createNewInstance("throwException", Boolean.FALSE).done());
+        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", Boolean.FALSE).done());
 
         schedulerService.executeAgain(jobDescriptors.get(0).getId(), parameters);
         getTransactionService().complete();
@@ -264,7 +258,7 @@ public class JobTest extends CommonServiceTest {
 
         getTransactionService().begin();
         parameters.clear();
-        parameters.add(parameterBuilder.createNewInstance("throwException2", Boolean.TRUE).done());
+        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException2", Boolean.TRUE).done());
         JOB_SERVICE.setJobParameters(getDefaultTenantId(), jobDescriptors.get(0).getId(), parameters);
         getTransactionService().complete();
         Thread.sleep(1000);
@@ -280,11 +274,10 @@ public class JobTest extends CommonServiceTest {
         final Date now = new Date();
         getTransactionService().begin();
         final Trigger trigger = new OneExecutionTrigger("logevents", now, 10);
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(ThrowsExceptionJob.class.getName(), "ThowExceptionJob2").done();
 
-        final SJobParameterBuilder parameterBuilder = schedulerService.getJobParameterBuilder();
-        final SJobParameter parameter = parameterBuilder.createNewInstance("throwException", Boolean.TRUE).done();
+        final SJobParameter parameter = BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", Boolean.TRUE).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>(2);
         parameters.add(parameter);
         schedulerService.schedule(jobDescriptor, parameters, trigger);
@@ -305,7 +298,7 @@ public class JobTest extends CommonServiceTest {
 
         getTransactionService().begin();
         parameters.clear();
-        parameters.add(parameterBuilder.createNewInstance("throwException", Boolean.FALSE).done());
+        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", Boolean.FALSE).done());
         JOB_SERVICE.setJobParameters(getDefaultTenantId(), jobDescriptors.get(0).getId(), parameters);
         schedulerService.executeAgain(jobDescriptors.get(0).getId());
         getTransactionService().complete();

@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.SActivityInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.impl.SActivityInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -22,44 +23,21 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SActivityInstan
  */
 public abstract class SActivityInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl implements SActivityInstanceBuilder {
 
-    private static final String ID_KEY = "id";
-
-    private static final String NAME_KEY = "name";
-
-    private static final String TOKEN_COUNT_KEY = "tokenCount";
-
-    private static final String ABORTED_BY_BOUNDARY_KEY = "abortedByBoundary";
-
-    @Override
-    public String getIdKey() {
-        return ID_KEY;
+    protected SActivityInstanceBuilderImpl(final SActivityInstanceImpl entity) {
+        super(entity);
     }
-
-    @Override
-    public String getNameKey() {
-        return NAME_KEY;
-    }
-
-    @Override
-    public String getTokenCountKey() {
-        return TOKEN_COUNT_KEY;
-    }
-
+    
     @Override
     public SActivityInstanceBuilder setName(final String name) {
-        getEntity().setName(name);
+        this.entity.setName(name);
         return this;
     }
 
     @Override
     public SActivityInstanceBuilder setDescription(final String description) {
-        getEntity().setDescription(description);
+        this.entity.setDescription(description);
         return this;
     }
 
-    @Override
-    public String getAbortedByBoundaryEventIdKey() {
-        return ABORTED_BY_BOUNDARY_KEY;
-    }
 
 }

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
@@ -27,8 +28,8 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
@@ -59,8 +60,6 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
     private static final long serialVersionUID = 8929044925208984537L;
 
     private transient EventInstanceService eventInstanceService;
-
-    private transient BPMInstanceBuilders instanceBuilders;
 
     private WorkService workService;
 
@@ -132,7 +131,6 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
         eventInstanceService = getTenantServiceAccessor().getEventInstanceService();
-        instanceBuilders = getTenantServiceAccessor().getBPMInstanceBuilders();
         workService = getTenantServiceAccessor().getWorkService();
     }
 
@@ -140,7 +138,7 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
             SMessageInstanceNotFoundException, SMessageInstanceReadException {
         final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceIdToUpdate);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(instanceBuilders.getSMessageInstanceBuilder().getHandledKey(), true);
+        descriptor.addField(BuilderFactory.get(SMessageInstanceBuilderFactory.class).getHandledKey(), true);
         eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
@@ -148,7 +146,7 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
             SWaitingEventNotFoundException, SWaitingEventReadException {
         final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageInstanceIdToUpdate);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(instanceBuilders.getSWaitingMessageEventBuilder().getProgressKey(), SWaitingMessageEventBuilder.PROGRESS_IN_TREATMENT_KEY);
+        descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(), SWaitingMessageEventBuilderFactory.PROGRESS_IN_TREATMENT_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
     }
 

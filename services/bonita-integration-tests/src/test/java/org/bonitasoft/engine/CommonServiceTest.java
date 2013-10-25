@@ -50,10 +50,6 @@ public class CommonServiceTest {
 
     private static SessionService sessionService;
 
-    private static STenantBuilder tenantBuilder;
-
-    private static SPlatformBuilder platformBuilder;
-
     private static long defaultTenantId;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonServiceTest.class);
@@ -109,8 +105,6 @@ public class CommonServiceTest {
         txService = servicesBuilder.buildTransactionService();
         sessionAccessor = servicesBuilder.buildSessionAccessor();
         sessionService = servicesBuilder.buildSessionService();
-        tenantBuilder = servicesBuilder.buildTenantBuilder();
-        platformBuilder = servicesBuilder.buildPlatformBuilder();
     }
 
     public static void setupSpringContextIfNeeded() {
@@ -123,7 +117,7 @@ public class CommonServiceTest {
     @BeforeClass
     public static void initPlatform() throws Exception {
         setupSpringContextIfNeeded();
-        defaultTenantId = TestUtil.createDefaultTenant(txService, platformService, sessionAccessor, tenantBuilder, sessionService, platformBuilder);
+        defaultTenantId = TestUtil.createDefaultTenant(txService, platformService, sessionAccessor, sessionService);
     }
 
     @AfterClass
@@ -135,10 +129,6 @@ public class CommonServiceTest {
     @After
     public void tearDown() throws Exception {
         TestUtil.closeTransactionIfOpen(txService);
-    }
-
-    public static SPlatformBuilder getPlatformBuilder() {
-        return platformBuilder;
     }
 
     public static ServicesBuilder getServicesBuilder() {
@@ -163,10 +153,6 @@ public class CommonServiceTest {
 
     protected static SessionService getSessionService() {
         return sessionService;
-    }
-
-    protected static STenantBuilder getTenantBuilder() {
-        return tenantBuilder;
     }
 
     protected long getDefaultTenantId() {

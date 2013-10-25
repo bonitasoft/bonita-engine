@@ -13,28 +13,9 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive.builder.impl;
 
-import java.util.Date;
-
-import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceBuilder;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SADateDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SADoubleDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SAFloatDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SALongDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SALongTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SAShortTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl;
 
 /**
  * @author Feng Hui
@@ -42,37 +23,11 @@ import org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl;
  */
 public class SADataInstanceBuilderImpl implements SADataInstanceBuilder {
 
-    private SADataInstanceImpl saDataInstanceImpl;
-
-    @Override
-    public SADataInstanceBuilderImpl createNewInstance(final SDataInstance sDataInstance) {
-        final String className = sDataInstance.getClassName();
-        if (sDataInstance instanceof SShortTextDataInstanceImpl) {
-            saDataInstanceImpl = new SAShortTextDataInstanceImpl(sDataInstance);
-        } else if (sDataInstance instanceof SLongTextDataInstanceImpl) {
-            saDataInstanceImpl = new SALongTextDataInstanceImpl(sDataInstance);
-        } else if (sDataInstance instanceof SXMLDataInstanceImpl) {
-            saDataInstanceImpl = new SAXMLDataInstanceImpl(sDataInstance);
-        } else if (sDataInstance instanceof SBlobDataInstanceImpl) {
-            saDataInstanceImpl = new SABlobDataInstanceImpl(sDataInstance);
-        } else if (sDataInstance instanceof SXMLObjectDataInstanceImpl) {
-            saDataInstanceImpl = new SAXMLObjectDataInstanceImpl(sDataInstance);
-        } else {
-            if (Integer.class.getName().equals(className)) {
-                saDataInstanceImpl = new SAIntegerDataInstanceImpl(sDataInstance);
-            } else if (Long.class.getName().equals(className)) {
-                saDataInstanceImpl = new SALongDataInstanceImpl(sDataInstance);
-            } else if (Boolean.class.getName().equals(className)) {
-                saDataInstanceImpl = new SABooleanDataInstanceImpl(sDataInstance);
-            } else if (Date.class.getName().equals(className)) {
-                saDataInstanceImpl = new SADateDataInstanceImpl(sDataInstance);
-            } else if (Double.class.getName().equals(className)) {
-                saDataInstanceImpl = new SADoubleDataInstanceImpl(sDataInstance);
-            } else if (Float.class.getName().equals(className)) {
-                saDataInstanceImpl = new SAFloatDataInstanceImpl(sDataInstance);
-            }
-        }
-        return this;
+    private final SADataInstanceImpl saDataInstanceImpl;
+    
+    public SADataInstanceBuilderImpl(final SADataInstanceImpl saDataInstanceImpl) {
+        super();
+        this.saDataInstanceImpl = saDataInstanceImpl;
     }
 
     @Override

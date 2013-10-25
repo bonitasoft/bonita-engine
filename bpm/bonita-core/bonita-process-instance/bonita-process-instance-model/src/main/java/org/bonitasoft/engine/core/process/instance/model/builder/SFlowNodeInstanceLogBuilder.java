@@ -23,6 +23,4 @@ public interface SFlowNodeInstanceLogBuilder extends SPersistenceLogBuilder, Has
 
     SFlowNodeInstanceLogBuilder processInstanceId(final long processInstanceId);
 
-    String getProcessInstanceIdKey();
-
 }

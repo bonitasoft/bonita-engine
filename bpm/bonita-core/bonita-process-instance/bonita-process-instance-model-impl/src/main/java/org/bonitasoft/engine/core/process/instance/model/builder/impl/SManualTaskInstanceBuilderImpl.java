@@ -14,9 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl;
 
 /**
@@ -26,27 +24,13 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanc
  */
 public class SManualTaskInstanceBuilderImpl extends SHumanTaskInstanceBuilderImpl implements SManualTaskInstanceBuilder {
 
-    private SManualTaskInstanceImpl activityInst;
-
-    @Override
-    public SManualTaskInstanceBuilder createNewManualTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long actorId, final long processDefinitionId, final long rootProcessInstanceId,
-            final long parentProcessInstanceId) {
-        activityInst = new SManualTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId, STaskPriority.NORMAL,
-                processDefinitionId,
-                rootProcessInstanceId);
-        activityInst.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SManualTaskInstanceBuilderImpl(final SManualTaskInstanceImpl activityInst) {
+        super(activityInst);
     }
 
     @Override
     public SManualTaskInstance done() {
-        return activityInst;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return activityInst;
+        return (SManualTaskInstance) this.entity;
     }
 
 }

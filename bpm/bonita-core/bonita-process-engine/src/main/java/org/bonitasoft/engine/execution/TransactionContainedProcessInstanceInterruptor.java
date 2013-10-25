@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution;
 
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -22,8 +23,8 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -41,10 +42,10 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
 
     private final ContainerRegistry containerRegistry;
 
-    public TransactionContainedProcessInstanceInterruptor(final BPMInstanceBuilders bpmInstanceBuilders, final ProcessInstanceService processInstanceService,
+    public TransactionContainedProcessInstanceInterruptor(final ProcessInstanceService processInstanceService,
             final FlowNodeInstanceService flowNodeInstanceService, final ContainerRegistry containerRegistry,
             final TechnicalLoggerService logger) {
-        super(bpmInstanceBuilders, logger);
+        super(logger);
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.containerRegistry = containerRegistry;
@@ -59,7 +60,7 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
     @Override
     protected void resumeStableChildExecution(final long childId, final long processInstanceId, final long userId) throws SBonitaException {
         final SFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(childId);
-        final SFlowNodeInstanceBuilder flowNodeKeyProvider = getBpmInstanceBuilders().getSUserTaskInstanceBuilder();
+        final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
         String containerType = SFlowElementsContainerType.PROCESS.name();
         final long parentActivity = flowNodeInstance.getLogicalGroup(flowNodeKeyProvider.getParentActivityInstanceIndex());
@@ -87,15 +88,13 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
 
     @Override
     protected long getNumberOfChildren(final long processInstanceId) throws SBonitaSearchException {
-        final QueryOptions countOptions = new QueryOptions(0, 1, null, getFilterOptions(processInstanceId, getBpmInstanceBuilders()
-                .getSUserTaskInstanceBuilder()), null);
+        final QueryOptions countOptions = new QueryOptions(0, 1, null, getFilterOptions(processInstanceId), null);
         return flowNodeInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions);
     }
 
     @Override
     protected long getNumberOfChildrenExcept(final long processInstanceId, final long childExceptionId) throws SBonitaSearchException {
-        final QueryOptions countOptions = new QueryOptions(0, 1, null, getFilterOptions(processInstanceId, childExceptionId, getBpmInstanceBuilders()
-                .getSUserTaskInstanceBuilder()), null);
+        final QueryOptions countOptions = new QueryOptions(0, 1, null, getFilterOptions(processInstanceId, childExceptionId), null);
         return flowNodeInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions);
     }
 

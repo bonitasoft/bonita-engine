@@ -20,20 +20,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public interface SWaitingSignalEventBuilder extends SWaitingEventKeyProvider {
-
-    SWaitingSignalEventBuilder createNewWaitingSignalStartEventInstance(final long processdefinitionId, final String signalName, final String processName,
-            final long flowNodeDefinitionId, final String flowNodeName);
-
-    SWaitingSignalEventBuilder createNewWaitingSignalEventSubProcInstance(final long processdefinitionId, final long parentProcessInstanceId,
-            final long rootProcessInstanceId, final String signalName, final String processName, final long flowNodeDefinitionId, final String flowNodeName,
-            final long subProcessId);
-
-    SWaitingSignalEventBuilder createNewWaitingSignalIntermediateEventInstance(long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
-            final long flowNodeInstanceId, final String signalName, final String processName, final long flowNodeDefinitionId, final String flowNodeName);
-
-    SWaitingSignalEventBuilder createNewWaitingSignalBoundaryEventInstance(long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
-            final long flowNodeInstanceId, final String signalName, final String processName, final long flowNodeDefinitionId, final String flowNodeName);
+public interface SWaitingSignalEventBuilder {
 
     SWaitingSignalEvent done();
 

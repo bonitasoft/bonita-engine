@@ -3,11 +3,12 @@ package org.bonitasoft.engine.bpm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Test;
 
@@ -16,8 +17,6 @@ import org.junit.Test;
  * @author Zhao Na
  */
 public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest {
-
-    private static BPMServicesBuilder bpmServicesBuilder;
 
     @Override
     protected GatewayInstanceService gatewayInstanceService() {
@@ -28,13 +27,9 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
         return getServicesBuilder().getTransactionService();
     }
 
-    static {
-        bpmServicesBuilder = new BPMServicesBuilder();
-    }
-
     @Test
     public void testCreateAndGetGatewayInstance() throws SBonitaException {
-        final SGatewayInstance gatewayInstance = bpmServicesBuilder.getBPMInstanceBuilders().getSGatewayInstanceBuilder()
+        final SGatewayInstance gatewayInstance = BuilderFactory.get(SGatewayInstanceBuilderFactory.class)
                 .createNewInstance("Gateway1", 1, 1, 1, SGatewayType.EXCLUSIVE, 2, 3, 3).setStateId(1).setHitBys("a,b,c").done();
 
         insertGatewayInstance(gatewayInstance);
@@ -54,9 +49,9 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
     private void checkGateway(final SGatewayInstance gatewayInstance, final SGatewayInstance gatewayInstanceRes, final long expectedProcessDefinitionId,
             final long expectedProcessInstanceId) {
         assertNotNull(gatewayInstance);
-        final SGatewayInstanceBuilder gatewayInstanceBuilder = bpmServicesBuilder.getBPMInstanceBuilders().getSGatewayInstanceBuilder();
-        final long actualProcessDefinitionId = gatewayInstanceRes.getLogicalGroup(gatewayInstanceBuilder.getProcessDefinitionIndex());
-        final long actualProcessInstanceId = gatewayInstanceRes.getLogicalGroup(gatewayInstanceBuilder.getRootProcessInstanceIndex());
+        final SGatewayInstanceBuilderFactory gatewayInstanceBuilderFact = BuilderFactory.get(SGatewayInstanceBuilderFactory.class);
+        final long actualProcessDefinitionId = gatewayInstanceRes.getLogicalGroup(gatewayInstanceBuilderFact.getProcessDefinitionIndex());
+        final long actualProcessInstanceId = gatewayInstanceRes.getLogicalGroup(gatewayInstanceBuilderFact.getRootProcessInstanceIndex());
         assertEquals(expectedProcessDefinitionId, actualProcessDefinitionId);
         assertEquals(expectedProcessInstanceId, actualProcessInstanceId);
         assertEquals(gatewayInstance, gatewayInstanceRes);
@@ -83,7 +78,7 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
     @Test
     public void testSetState() throws SBonitaException {
-        final SGatewayInstance gatewayInstance = bpmServicesBuilder.getBPMInstanceBuilders().getSGatewayInstanceBuilder()
+        final SGatewayInstance gatewayInstance = BuilderFactory.get(SGatewayInstanceBuilderFactory.class)
                 .createNewInstance("Gateway1", 1, 1, 1, SGatewayType.EXCLUSIVE, 2, 3, 3).setStateId(1).setHitBys("a,b,c").done();
 
         insertGatewayInstance(gatewayInstance);
@@ -101,7 +96,7 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
 
     @Test
     public void testHitTransition() throws SBonitaException {
-        final SGatewayInstance gatewayInstance = bpmServicesBuilder.getBPMInstanceBuilders().getSGatewayInstanceBuilder()
+        final SGatewayInstance gatewayInstance = BuilderFactory.get(SGatewayInstanceBuilderFactory.class)
                 .createNewInstance("Gateway1", 1, 1, 1, SGatewayType.EXCLUSIVE, 2, 3, 3).setStateId(1).setHitBys("1,2,3").done();
 
         insertGatewayInstance(gatewayInstance);

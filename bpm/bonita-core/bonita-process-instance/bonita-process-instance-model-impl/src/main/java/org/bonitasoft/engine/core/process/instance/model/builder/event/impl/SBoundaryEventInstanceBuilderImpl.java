@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -24,27 +23,13 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
  */
 public class SBoundaryEventInstanceBuilderImpl extends SEventInstanceBuilderImpl implements SBoundaryEventInstanceBuilder {
 
-    private SBoundaryEventInstanceImpl entity = null;
-
-    @Override
-    public SBoundaryEventInstanceBuilder createNewBoundaryEventInstance(final String name, final boolean isInterrupting, final long flowNodeDefinitionId,
-            final long rootContainerId, final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
-            final long parentProcessInstanceId, final long activityInstanceId) {
-        entity = new SBoundaryEventInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId);
-        entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        entity.setActivityInstanceId(activityInstanceId);
-        entity.setInterrupting(isInterrupting);
-        return this;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return entity;
+    protected SBoundaryEventInstanceBuilderImpl(final SBoundaryEventInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SEventInstance done() {
-        return entity;
+        return (SEventInstance) entity;
     }
 
 }

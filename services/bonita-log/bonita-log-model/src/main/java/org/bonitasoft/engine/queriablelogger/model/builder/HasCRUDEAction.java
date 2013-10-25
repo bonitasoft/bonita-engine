@@ -20,12 +20,6 @@ package org.bonitasoft.engine.queriablelogger.model.builder;
  */
 public interface HasCRUDEAction {
 
-    public enum ActionType {
-        CREATED, UPDATED, DELETED, EXECUTED, STARTED, STOPPED, SCHEDULED, PAUSED, RESUMED, RESCHEDULED
-    }
-
-    SLogBuilder setActionType(final HasCRUDEAction.ActionType actionType);
-
-    String getActionTypeKey();
+    SLogBuilder setActionType(final ActionType actionType);
 
 }

@@ -33,11 +33,6 @@ public class SProcessSupervisorLogBuilderImpl extends CRUDELogBuilder implements
     }
 
     @Override
-    public String getObjectIdKey() {
-        return SProcessSupervisorLogIndexesMapper.SUPERVISOR_INDEX_NAME;
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return PREFIX;
     }

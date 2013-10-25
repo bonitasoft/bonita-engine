@@ -23,5 +23,4 @@ public interface SPendingActivityMappingLogBuilder extends SPersistenceLogBuilde
 
     SPendingActivityMappingLogBuilder activityInstanceId(final long activityInstanceId);
 
-    String getActivityInstanceIdKey();
 }

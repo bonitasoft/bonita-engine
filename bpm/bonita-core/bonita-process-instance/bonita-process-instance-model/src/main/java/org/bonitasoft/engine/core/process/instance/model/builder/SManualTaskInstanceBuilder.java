@@ -22,9 +22,6 @@ import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
  */
 public interface SManualTaskInstanceBuilder extends SHumanTaskInstanceBuilder {
 
-    SManualTaskInstanceBuilder createNewManualTaskInstance(String name, long flowNodeDefinitionId, long rootContainerId,
-            long parentContainerId, long actorId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
-
     @Override
     SManualTaskInstance done();
 

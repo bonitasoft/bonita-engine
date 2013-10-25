@@ -21,12 +21,11 @@ import org.bonitasoft.engine.actor.mapping.model.SActorBuilder;
  */
 public class SActorBuilderImpl implements SActorBuilder {
 
-    private SActorImpl sActor;
+    private final SActorImpl sActor;
 
-    @Override
-    public SActorBuilder create(final String name, final long scopeId, final boolean initiator) {
-        sActor = new SActorImpl(name, scopeId, initiator);
-        return this;
+    public SActorBuilderImpl(final SActorImpl sActor) {
+        super();
+        this.sActor = sActor;
     }
 
     @Override

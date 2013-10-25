@@ -13,16 +13,11 @@
  **/
 package org.bonitasoft.engine.core.migration.model.impl.xml;
 
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
  */
 public class SEnablementExpressionBinding extends SExpressionBinding {
-
-    public SEnablementExpressionBinding(final SExpressionBuilders sExpressionBuilders) {
-        super(sExpressionBuilders);
-    }
 
     @Override
     public String getElementTag() {

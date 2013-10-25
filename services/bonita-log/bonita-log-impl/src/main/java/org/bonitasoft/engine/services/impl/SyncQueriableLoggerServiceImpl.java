@@ -19,7 +19,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerStrategy;
@@ -34,10 +33,10 @@ public class SyncQueriableLoggerServiceImpl extends AbstractQueriableLoggerImpl 
 
     private final TechnicalLoggerService logger;
 
-    public SyncQueriableLoggerServiceImpl(final PersistenceService persistenceService, final SQueriableLogModelBuilder builder,
+    public SyncQueriableLoggerServiceImpl(final PersistenceService persistenceService,
             final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final TechnicalLoggerService logger,
             final PlatformService platformService) {
-        super(persistenceService, builder, loggerStrategy, sessionProvider, platformService);
+        super(persistenceService, loggerStrategy, sessionProvider, platformService);
         this.logger = logger;
     }
 

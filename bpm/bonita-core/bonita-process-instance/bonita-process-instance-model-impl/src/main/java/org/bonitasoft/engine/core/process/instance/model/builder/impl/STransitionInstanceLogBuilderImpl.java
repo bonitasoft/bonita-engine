@@ -28,24 +28,14 @@ public class STransitionInstanceLogBuilderImpl extends CRUDELogBuilder implement
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        this.queriableLogBuilder.numericIndex(ProcessInstanceLogIndexesMapper.TRANSITION_INSTANCE_INDEX, objectId);
+        this.queriableLogBuilder.numericIndex(SProcessInstanceLogIndexesMapper.TRANSITION_INSTANCE_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return ProcessInstanceLogIndexesMapper.TRANSITION_INSTANCE_NAME;
     }
 
     @Override
     public STransitionInstanceLogBuilder processInstanceId(final long processInstanceId) {
-        this.queriableLogBuilder.numericIndex(ProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_INDEX, processInstanceId);
+        this.queriableLogBuilder.numericIndex(SProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_INDEX, processInstanceId);
         return this;
-    }
-
-    @Override
-    public String getProcessInstanceIdKey() {
-        return ProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_NAME;
     }
 
     @Override
@@ -56,11 +46,11 @@ public class STransitionInstanceLogBuilderImpl extends CRUDELogBuilder implement
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
-            if (log.getNumericIndex(ProcessInstanceLogIndexesMapper.TRANSITION_INSTANCE_INDEX) == 0L) {
+            if (log.getNumericIndex(SProcessInstanceLogIndexesMapper.TRANSITION_INSTANCE_INDEX) == 0L) {
                 throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "TransitionInstance Id");
             }
         }
-        if (log.getNumericIndex(ProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_INDEX) == 0L) {
+        if (log.getNumericIndex(SProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "ProcessInstance Id");
         }
     }

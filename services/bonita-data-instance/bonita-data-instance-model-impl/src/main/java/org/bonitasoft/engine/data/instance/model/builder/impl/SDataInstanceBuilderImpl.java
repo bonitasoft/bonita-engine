@@ -15,24 +15,10 @@ package org.bonitasoft.engine.data.instance.model.builder.impl;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.data.definition.model.STextDataDefinition;
-import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
-import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl;
-import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Zhao Na
@@ -41,56 +27,17 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class SDataInstanceBuilderImpl implements SDataInstanceBuilder {
 
-    private SDataInstanceImpl dataInstanceImpl;
-
-    public SDataInstanceBuilderImpl() {
-    }
-
-    @Override
-    public SDataInstanceBuilder createNewInstance(final SDataDefinition dataDefinition) {
-        final SExpression expression = dataDefinition.getDefaultValueExpression();
-        final String className = dataDefinition.getClassName();
-        if (dataDefinition instanceof STextDataDefinition) {
-            dataInstanceImpl = getTextDataInstance((STextDataDefinition) dataDefinition, expression);
-        } else if (dataDefinition instanceof SXMLDataDefinition) {
-            dataInstanceImpl = new SXMLDataInstanceImpl((SXMLDataDefinition) dataDefinition);
-        } else {
-            if (Integer.class.getName().equals(className)) {
-                dataInstanceImpl = new SIntegerDataInstanceImpl(dataDefinition);
-            } else if (Long.class.getName().equals(className)) {
-                dataInstanceImpl = new SLongDataInstanceImpl(dataDefinition);
-            } else if (String.class.getName().equals(className)) {
-                dataInstanceImpl = new SShortTextDataInstanceImpl(dataDefinition);
-            } else if (Boolean.class.getName().equals(className)) {
-                dataInstanceImpl = new SBooleanDataInstanceImpl(dataDefinition);
-            } else if (Double.class.getName().equals(className)) {
-                dataInstanceImpl = new SDoubleDataInstanceImpl(dataDefinition);
-            } else if (Float.class.getName().equals(className)) {
-                dataInstanceImpl = new SFloatDataInstanceImpl(dataDefinition);
-            } else if (byte[].class.getName().equals(className)) {
-                dataInstanceImpl = new SBlobDataInstanceImpl(dataDefinition);
-            } else {
-                dataInstanceImpl = new SXMLObjectDataInstanceImpl(dataDefinition);
-            }
-        }
-        return this;
+    private final SDataInstanceImpl dataInstanceImpl;
+    
+    public SDataInstanceBuilderImpl(final SDataInstanceImpl dataInstanceImpl) {
+        super();
+        this.dataInstanceImpl = dataInstanceImpl;
     }
 
     @Override
     public SDataInstanceBuilder setValue(final Serializable value) {
         dataInstanceImpl.setValue(value);
         return this;
-    }
-
-    private SDataInstanceImpl getTextDataInstance(final STextDataDefinition dataDefinition, final SExpression expression) {
-        SDataInstanceImpl dataInstance = null;
-        if (dataDefinition.isLongText()) {
-            dataInstance = new SLongTextDataInstanceImpl(dataDefinition);
-        } else {
-            dataInstance = new SShortTextDataInstanceImpl(dataDefinition);
-        }
-        dataInstance.setValue(null);
-        return dataInstance;
     }
 
     @Override
@@ -109,56 +56,6 @@ public class SDataInstanceBuilderImpl implements SDataInstanceBuilder {
     public SDataInstance done() throws SDataInstanceNotWellFormedException {
         dataInstanceImpl.validate();
         return dataInstanceImpl;
-    }
-
-    @Override
-    public String getIdKey() {
-        return "id";
-    }
-
-    @Override
-    public String getNameKey() {
-        return "name";
-    }
-
-    @Override
-    public String getLabelKey() {
-        return "label";
-    }
-
-    @Override
-    public String getDescriptionKey() {
-        return "description";
-    }
-
-    @Override
-    public String getTransientDataKey() {
-        return "transientData";
-    }
-
-    @Override
-    public String getclassNameKey() {
-        return "classname";
-    }
-
-    @Override
-    public String getValueKey() {
-        return "value";
-    }
-
-    @Override
-    public String getContainerIdKey() {
-        return "containerId";
-    }
-
-    @Override
-    public String getContainerTypeKey() {
-        return "containerType";
-    }
-
-    @Override
-    public String getArchiveDateKey() {
-        return "archiveDate";
     }
 
 }

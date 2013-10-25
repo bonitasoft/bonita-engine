@@ -17,19 +17,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingCreationException;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingDeletionException;
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingNotFoundException;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping;
-import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingLogBuilder;
+import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingLogBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -39,8 +40,8 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -64,19 +65,16 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
 
     private final EventService eventService;
 
-    private final SExternalIdentityMappingBuilders sExternalIdentityMappingBuilders;
-
     private final TechnicalLoggerService logger;
 
     private final QueriableLoggerService queriableLoggerService;
 
     public ExternalIdentityMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final SExternalIdentityMappingBuilders sExternalIdentityMappingBuilders, final TechnicalLoggerService logger,
+            final TechnicalLoggerService logger,
             final QueriableLoggerService queriableLoggerService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
-        this.sExternalIdentityMappingBuilders = sExternalIdentityMappingBuilders;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
     }
@@ -93,8 +91,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             final InsertRecord insertRecord = new InsertRecord(externalIdentityMapping);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(EXTERNAL_IDENTITY_MAPPING, EventActionType.CREATED)) {
-                final SEventBuilder eventBuilder = eventService.getEventBuilder();
-                insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(EXTERNAL_IDENTITY_MAPPING).setObject(externalIdentityMapping).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EXTERNAL_IDENTITY_MAPPING).setObject(externalIdentityMapping).done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(externalIdentityMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "createExternalIdentityMapping");
@@ -192,8 +189,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
         }
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(EXTERNAL_IDENTITY_MAPPING, EventActionType.DELETED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(EXTERNAL_IDENTITY_MAPPING).setObject(externalIdentityMapping).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EXTERNAL_IDENTITY_MAPPING).setObject(externalIdentityMapping).done();
         }
         final DeleteRecord record = new DeleteRecord(externalIdentityMapping);
         final SExternalIdentityMappingLogBuilder queriableLog = getQueriableLog(ActionType.DELETED, "deleting external identity mapping");
@@ -223,14 +219,14 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
     }
 
     private SExternalIdentityMappingLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SExternalIdentityMappingLogBuilder logBuilder = sExternalIdentityMappingBuilders.getSExternalIdentityMappingLogBuilder();
+        final SExternalIdentityMappingLogBuilder logBuilder = BuilderFactory.get(SExternalIdentityMappingLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {

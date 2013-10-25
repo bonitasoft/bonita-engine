@@ -33,11 +33,6 @@ public class SDataSourceLogBuilderImpl extends CRUDELogBuilder implements SDataS
     }
 
     @Override
-    public String getObjectIdKey() {
-        return SDataSourceLogIndexesMapper.DATA_SOURCE_INDEX_NAME;
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return DATA_SOURCE;
     }

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SSendTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SSendTaskInstanceImpl;
 
 /**
@@ -23,25 +22,13 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SSendTaskInstanceI
  */
 public class SSendTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SSendTaskInstanceBuilder {
 
-    private SSendTaskInstanceImpl activityInstanceImpl;
-
-    @Override
-    public SSendTaskInstanceBuilder createNewSendTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        activityInstanceImpl = new SSendTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
-                rootProcessInstanceId);
-        activityInstanceImpl.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SSendTaskInstanceBuilderImpl(final SSendTaskInstanceImpl activityInstanceImpl) {
+        super(activityInstanceImpl);
     }
 
     @Override
     public SSendTaskInstance done() {
-        return activityInstanceImpl;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return activityInstanceImpl;
+        return (SSendTaskInstance) this.entity;
     }
 
 }

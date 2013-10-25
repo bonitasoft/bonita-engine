@@ -23,10 +23,6 @@ import org.bonitasoft.engine.identity.model.SUser;
  */
 public interface SUserBuilder {
 
-    SUserBuilder createNewInstance();
-
-    SUserBuilder createNewInstance(final SUser user);
-
     SUserBuilder setUserName(final String userName);
 
     SUserBuilder setPassword(final String password);
@@ -58,37 +54,5 @@ public interface SUserBuilder {
     SUserBuilder setEnabled(final boolean enabled);
 
     SUser done();
-
-    String getIdKey();
-
-    String getUserNameKey();
-
-    String getPasswordKey();
-
-    String getFirstNameKey();
-
-    String getLastNameKey();
-
-    String getTitleKey();
-
-    String getJobTitleKey();
-
-    String getIconNameKey();
-
-    String getIconPathKey();
-
-    String getLastUpdateKey();
-
-    String getLastConnectionKey();
-
-    String getCreatedByKey();
-
-    String getCreationDateKey();
-
-    String getManagerUserIdKey();
-
-    String getDelegeeUserNameKey();
-
-    String getEnabledKey();
 
 }

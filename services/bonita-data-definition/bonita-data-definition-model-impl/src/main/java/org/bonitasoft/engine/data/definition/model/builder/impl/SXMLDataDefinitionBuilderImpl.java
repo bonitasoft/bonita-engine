@@ -24,14 +24,12 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class SXMLDataDefinitionBuilderImpl implements SXMLDataDefinitionBuilder {
 
-    private SXMLDataDefinitionImpl dataDefinitionImpl;
+    private final SXMLDataDefinitionImpl dataDefinitionImpl;
 
-    @Override
-    public SXMLDataDefinitionBuilder createNewXMLData(final String name) {
-        dataDefinitionImpl = new SXMLDataDefinitionImpl();
-        dataDefinitionImpl.setName(name);
-        dataDefinitionImpl.setClassName(String.class.getName());
-        return this;
+    public SXMLDataDefinitionBuilderImpl(
+            SXMLDataDefinitionImpl dataDefinitionImpl) {
+        super();
+        this.dataDefinitionImpl = dataDefinitionImpl;
     }
 
     @Override

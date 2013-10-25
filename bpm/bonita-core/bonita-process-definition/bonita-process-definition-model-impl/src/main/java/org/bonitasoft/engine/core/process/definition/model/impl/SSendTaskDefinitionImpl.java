@@ -16,14 +16,11 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.impl.SendTaskDefinitionImpl;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SThrowMessageEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
@@ -35,11 +32,10 @@ public class SSendTaskDefinitionImpl extends SActivityDefinitionImpl implements 
 
     private final SThrowMessageEventTriggerDefinition trigger;
 
-    public SSendTaskDefinitionImpl(final SendTaskDefinitionImpl activityDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
-        trigger = new SThrowMessageEventTriggerDefinitionImpl(activityDefinition.getMessageTrigger(), sDataDefinitionBuilders, sExpressionBuilders);
+    public SSendTaskDefinitionImpl(final SendTaskDefinitionImpl activityDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(activityDefinition, transitionsMap);
+        trigger = new SThrowMessageEventTriggerDefinitionImpl(activityDefinition.getMessageTrigger());
     }
 
     public SSendTaskDefinitionImpl(final long id, final String name, final SThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition) {

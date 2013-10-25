@@ -24,27 +24,7 @@ import org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentIm
  */
 public class SACommentBuilderImpl implements SACommentBuilder {
 
-    private static final String ID_KEY = "id";
-
-    private static final String TENANTID_KEY = "tenantId";
-
-    private static final String USERID_KEY = "userId";
-
-    private static final String PROCESSINSTANCEID_KEY = "processInstanceId";
-
-    private static final String POSTDATE_KEY = "postDate";
-
-    private static final String CONTENT_KEY = "content";
-
-    private static final String ARCHIVEDATE_KEY = "archiveDate";
-
-    private static final String SOURCEOBJECTID_KEY = "sourceObjectId";
-
     private final SACommentImpl saCommentImpl;
-
-    public SACommentBuilderImpl() {
-        this(new SACommentImpl());
-    }
 
     public SACommentBuilderImpl(final SComment sComment) {
         this(new SACommentImpl(sComment));
@@ -54,54 +34,8 @@ public class SACommentBuilderImpl implements SACommentBuilder {
         this.saCommentImpl = saCommentImpl;
     }
 
-    @Deprecated
-    @Override
-    public SACommentBuilder createNewInstance(final SComment sComment) {
-        return new SACommentBuilderImpl(sComment);
-    }
-
     @Override
     public SAComment done() {
         return saCommentImpl;
-    }
-
-    @Override
-    public String getIdKey() {
-        return ID_KEY;
-    }
-
-    @Override
-    public String getTenantIdKey() {
-        return TENANTID_KEY;
-    }
-
-    @Override
-    public String getUserIdKey() {
-        return USERID_KEY;
-    }
-
-    @Override
-    public String getProcessInstanceIdKey() {
-        return PROCESSINSTANCEID_KEY;
-    }
-
-    @Override
-    public String getPostDateKey() {
-        return POSTDATE_KEY;
-    }
-
-    @Override
-    public String getContentKey() {
-        return CONTENT_KEY;
-    }
-
-    @Override
-    public String getArchiveDate() {
-        return ARCHIVEDATE_KEY;
-    }
-
-    @Override
-    public String getSourceObjectId() {
-        return SOURCEOBJECTID_KEY;
     }
 }

@@ -43,7 +43,6 @@ import org.bonitasoft.engine.bpm.flownode.impl.SendTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.UserTaskDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
@@ -66,9 +65,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.impl.SIntermedi
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SIntermediateThrowEventDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.impl.SStartEventDefinitionImpl;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Matthieu Chaffotte
@@ -141,13 +138,12 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         sBoundaryEvents = new ArrayList<SBoundaryEventDefinition>();
     }
 
-    public SFlowElementContainerDefinitionImpl(final SNamedElement elementContainer, final FlowElementContainerDefinition container,
-            final SExpressionBuilders sExpressionBuilders, final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
+    public SFlowElementContainerDefinitionImpl(final SNamedElement elementContainer, final FlowElementContainerDefinition container) {
         this.elementContainer = elementContainer;
         transitions = new HashSet<STransitionDefinition>();
         transitionsMap = new HashMap<String, STransitionDefinition>();
         for (final TransitionDefinition transition : container.getTransitions()) {
-            final STransitionDefinitionImpl sTransitionDefinitionImpl = new STransitionDefinitionImpl(transition, sExpressionBuilders);
+            final STransitionDefinitionImpl sTransitionDefinitionImpl = new STransitionDefinitionImpl(transition);
             addTransition(sTransitionDefinitionImpl);
         }
 
@@ -157,7 +153,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         final List<ActivityDefinition> activities2 = container.getActivities();
         sBoundaryEvents = new ArrayList<SBoundaryEventDefinition>();
         activities = new HashSet<SActivityDefinition>(activities2.size());
-        initializeActivities(activities2, sExpressionBuilders, sOperationBuilders, sDataDefinitionBuilders);
+        initializeActivities(activities2);
 
         final List<GatewayDefinition> gateways2 = container.getGatewaysList();
         gateways = new HashSet<SGatewayDefinition>(gateways2.size());
@@ -166,7 +162,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         while (iterator1.hasNext()) {
             final GatewayDefinition gatewayDefinition = iterator1.next();
             final SGatewayDefinitionImpl gateway;
-            gateway = new SGatewayDefinitionImpl(gatewayDefinition, sExpressionBuilders, transitionsMap, sOperationBuilders);
+            gateway = new SGatewayDefinitionImpl(gatewayDefinition, transitionsMap);
             addGateway(gateway);
         }
 
@@ -176,24 +172,22 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         connectorsMap.put(ConnectorEvent.ON_ENTER, new ArrayList<SConnectorDefinition>());
         connectorsMap.put(ConnectorEvent.ON_FINISH, new ArrayList<SConnectorDefinition>());
         for (final ConnectorDefinition connector : connectors2) {
-            final SConnectorDefinitionImpl e = new SConnectorDefinitionImpl(connector, sExpressionBuilders, sOperationBuilders);
+            final SConnectorDefinitionImpl e = new SConnectorDefinitionImpl(connector);
             mConnectors.add(e);
             connectorsMap.get(e.getActivationEvent()).add(e);
         }
         allConnectorsMap = new HashMap<String, SConnectorDefinition>(2);
         connectors = Collections.unmodifiableList(mConnectors);
 
-        sStartEvents = initializeStartEvents(sExpressionBuilders, container.getStartEvents(), transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
-        sIntermediateCatchEvents = initializeIntermediateCatchEvents(sExpressionBuilders, container.getIntermediateCatchEvents(), transitionsMap,
-                sDataDefinitionBuilders, sOperationBuilders);
-        sIntermediateThrowEvents = initializeIntermediateThrowEvents(container.getIntermediateThrowEvents(), sExpressionBuilders, transitionsMap,
-                sDataDefinitionBuilders, sOperationBuilders);
-        sEndEvents = initializeEndEvents(sExpressionBuilders, container.getEndEvents(), transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+        sStartEvents = initializeStartEvents(container.getStartEvents(), transitionsMap);
+        sIntermediateCatchEvents = initializeIntermediateCatchEvents(container.getIntermediateCatchEvents(), transitionsMap);
+        sIntermediateThrowEvents = initializeIntermediateThrowEvents(container.getIntermediateThrowEvents(), transitionsMap);
+        sEndEvents = initializeEndEvents(container.getEndEvents(), transitionsMap);
 
         final List<DataDefinition> processDataDefinitions = container.getDataDefinitions();
         final ArrayList<SDataDefinition> mDataDefinitions = new ArrayList<SDataDefinition>(processDataDefinitions.size());
         for (final DataDefinition dataDefinition : processDataDefinitions) {
-            mDataDefinitions.add(ServerModelConvertor.convertDataDefinition(dataDefinition, sDataDefinitionBuilders, sExpressionBuilders));
+            mDataDefinitions.add(ServerModelConvertor.convertDataDefinition(dataDefinition));
         }
         sDataDefinitions = Collections.unmodifiableList(mDataDefinitions);
         final List<DocumentDefinition> documentDefinitions2 = container.getDocumentDefinitions();
@@ -205,43 +199,35 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     }
 
-    private void initializeActivities(final List<ActivityDefinition> activities2, final SExpressionBuilders sExpressionBuilders,
-            final SOperationBuilders sOperationBuilders, final SDataDefinitionBuilders sDataDefinitionBuilders) {
+    private void initializeActivities(final List<ActivityDefinition> activities2) {
         final Iterator<ActivityDefinition> iterator = activities2.iterator();
         while (iterator.hasNext()) {
             final ActivityDefinition activityDefinition = iterator.next();
             final SActivityDefinitionImpl activity;
             if (activityDefinition instanceof AutomaticTaskDefinitionImpl) {
-                activity = new SAutomaticTaskDefinitionImpl(activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders,
-                        sOperationBuilders);
+                activity = new SAutomaticTaskDefinitionImpl(activityDefinition, transitionsMap);
             } else if (activityDefinition instanceof HumanTaskDefinitionImpl) {
                 if (activityDefinition instanceof UserTaskDefinitionImpl) {
-                    activity = new SUserTaskDefinitionImpl((UserTaskDefinitionImpl) activityDefinition, sExpressionBuilders, transitionsMap,
-                            sDataDefinitionBuilders, sOperationBuilders);
+                    activity = new SUserTaskDefinitionImpl((UserTaskDefinitionImpl) activityDefinition, transitionsMap);
                 } else {
-                    activity = new SManualTaskDefinitionImpl((ManualTaskDefinitionImpl) activityDefinition, sExpressionBuilders, transitionsMap,
-                            sDataDefinitionBuilders, sOperationBuilders);
+                    activity = new SManualTaskDefinitionImpl((ManualTaskDefinitionImpl) activityDefinition, transitionsMap);
                 }
                 final HumanTaskDefinitionImpl humanTaskDefinitionImpl = (HumanTaskDefinitionImpl) activityDefinition;
                 final UserFilterDefinition userFilter = humanTaskDefinitionImpl.getUserFilter();
                 final SHumanTaskDefinitionImpl sHumanTaskDefinitionImpl = (SHumanTaskDefinitionImpl) activity;
                 if (userFilter != null) {
-                    sHumanTaskDefinitionImpl.setUserFilter(new SUserFilterDefinitionImpl(userFilter, sExpressionBuilders));
+                    sHumanTaskDefinitionImpl.setUserFilter(new SUserFilterDefinitionImpl(userFilter));
                 }
                 sHumanTaskDefinitionImpl.setPriority(humanTaskDefinitionImpl.getPriority());
                 sHumanTaskDefinitionImpl.setExpectedDuration(humanTaskDefinitionImpl.getExpectedDuration());
             } else if (activityDefinition instanceof ReceiveTaskDefinitionImpl) {
-                activity = new SReceiveTaskDefinitionImpl((ReceiveTaskDefinitionImpl) activityDefinition, sExpressionBuilders, transitionsMap,
-                        sDataDefinitionBuilders, sOperationBuilders);
+                activity = new SReceiveTaskDefinitionImpl((ReceiveTaskDefinitionImpl) activityDefinition, transitionsMap);
             } else if (activityDefinition instanceof SendTaskDefinitionImpl) {
-                activity = new SSendTaskDefinitionImpl((SendTaskDefinitionImpl) activityDefinition, sExpressionBuilders, transitionsMap,
-                        sDataDefinitionBuilders, sOperationBuilders);
+                activity = new SSendTaskDefinitionImpl((SendTaskDefinitionImpl) activityDefinition, transitionsMap);
             } else if (activityDefinition instanceof CallActivityDefinition) {
-                activity = new SCallActivityDefinitionImpl((CallActivityDefinition) activityDefinition, sExpressionBuilders, transitionsMap,
-                        sDataDefinitionBuilders, sOperationBuilders);
+                activity = new SCallActivityDefinitionImpl((CallActivityDefinition) activityDefinition, transitionsMap);
             } else if (activityDefinition instanceof SubProcessDefinition) {
-                activity = new SSubProcessDefinitionImpl((SubProcessDefinition) activityDefinition, sExpressionBuilders, sDataDefinitionBuilders,
-                        sOperationBuilders);
+                activity = new SSubProcessDefinitionImpl((SubProcessDefinition) activityDefinition);
             } else {
                 throw new BonitaRuntimeException("Can't find the client type for " + activityDefinition.getClass().getName());
             }
@@ -249,13 +235,11 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         }
     }
 
-    private List<SEndEventDefinition> initializeEndEvents(final SExpressionBuilders sExpressionBuilders, final List<EndEventDefinition> endEvents,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
+    private List<SEndEventDefinition> initializeEndEvents(final List<EndEventDefinition> endEvents,
+            final Map<String, STransitionDefinition> transitionsMap) {
         final List<SEndEventDefinition> sEndEvents = new ArrayList<SEndEventDefinition>(endEvents.size());
         for (final EndEventDefinition endEventDefinition : endEvents) {
-            final SEndEventDefinitionImpl sEndEvent = new SEndEventDefinitionImpl(endEventDefinition, sExpressionBuilders, transitionsMap,
-                    sDataDefinitionBuilders, sOperationBuilders);
+            final SEndEventDefinitionImpl sEndEvent = new SEndEventDefinitionImpl(endEventDefinition, transitionsMap);
             sEndEvents.add(sEndEvent);
             allElements.add(sEndEvent);
             allElementsMap.put(sEndEvent.getId(), sEndEvent);
@@ -264,13 +248,11 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         return sEndEvents;
     }
 
-    private List<SStartEventDefinition> initializeStartEvents(final SExpressionBuilders sExpressionBuilders, final List<StartEventDefinition> startEvents,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
+    private List<SStartEventDefinition> initializeStartEvents(final List<StartEventDefinition> startEvents,
+            final Map<String, STransitionDefinition> transitionsMap) {
         final ArrayList<SStartEventDefinition> sStartEvents = new ArrayList<SStartEventDefinition>(startEvents.size());
         for (final StartEventDefinition startEventDefinition : startEvents) {
-            final SStartEventDefinitionImpl sStartEvent = new SStartEventDefinitionImpl(startEventDefinition, sExpressionBuilders, transitionsMap,
-                    sDataDefinitionBuilders, sOperationBuilders);
+            final SStartEventDefinitionImpl sStartEvent = new SStartEventDefinitionImpl(startEventDefinition, transitionsMap);
             sStartEvents.add(sStartEvent);
             allElements.add(sStartEvent);
             allElementsMap.put(sStartEvent.getId(), sStartEvent);
@@ -279,14 +261,12 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         return sStartEvents;
     }
 
-    private List<SIntermediateCatchEventDefinition> initializeIntermediateCatchEvents(final SExpressionBuilders sExpressionBuilders,
-            final List<IntermediateCatchEventDefinition> intermediateCatchEvents, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
+    private List<SIntermediateCatchEventDefinition> initializeIntermediateCatchEvents(final List<IntermediateCatchEventDefinition> intermediateCatchEvents, final Map<String, STransitionDefinition> transitionsMap) {
         final List<SIntermediateCatchEventDefinition> sIntermediateCatchEvents = new ArrayList<SIntermediateCatchEventDefinition>(
                 intermediateCatchEvents.size());
         for (final IntermediateCatchEventDefinition intermediateCatchEventDefinition : intermediateCatchEvents) {
             final SIntermediateCatchEventDefinitionImpl sIntermediateCatchEvent = new SIntermediateCatchEventDefinitionImpl(intermediateCatchEventDefinition,
-                    sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+                    transitionsMap);
             sIntermediateCatchEvents.add(sIntermediateCatchEvent);
             allElements.add(sIntermediateCatchEvent);
             allElementsMap.put(sIntermediateCatchEvent.getId(), sIntermediateCatchEvent);
@@ -296,13 +276,12 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     }
 
     private List<SIntermediateThrowEventDefinition> initializeIntermediateThrowEvents(final List<IntermediateThrowEventDefinition> intermediateThrowEvents,
-            final SExpressionBuilders sExpressionBuilders, final Map<String, STransitionDefinition> transitionsMap,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
+            final Map<String, STransitionDefinition> transitionsMap) {
         final List<SIntermediateThrowEventDefinition> sIntermediateThrowEvents = new ArrayList<SIntermediateThrowEventDefinition>(
                 intermediateThrowEvents.size());
         for (final IntermediateThrowEventDefinition intermediateThrowEventDefinition : intermediateThrowEvents) {
             final SIntermediateThrowEventDefinitionImpl sIntermediateThrowEvent = new SIntermediateThrowEventDefinitionImpl(intermediateThrowEventDefinition,
-                    sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+                    transitionsMap);
             sIntermediateThrowEvents.add(sIntermediateThrowEvent);
             allElements.add(sIntermediateThrowEvent);
             allElementsMap.put(sIntermediateThrowEvent.getId(), sIntermediateThrowEvent);

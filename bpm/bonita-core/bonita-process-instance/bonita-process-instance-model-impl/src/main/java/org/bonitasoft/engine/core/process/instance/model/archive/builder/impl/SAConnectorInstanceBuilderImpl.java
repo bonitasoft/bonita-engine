@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl;
@@ -21,33 +20,12 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnecto
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SAConnectorInstanceBuilderImpl extends SANamedElementBuilderImpl implements SAConnectorInstanceBuilder {
+public class SAConnectorInstanceBuilderImpl implements SAConnectorInstanceBuilder {
 
     private final SAConnectorInstanceImpl entity;
-
-    private static final String CONTAINER_ID_KEY = "containerId";
-
-    private static final String CONTAINER_TYPE_KEY = "containerType";
-
-    private static final String CONNECTOR_ID_KEY = "connectorId";
-
-    private static final String VERSION_KEY = "version";
-
-    private static final String ACTIVATION_EVENT_KEY = "activationEvent";
-
-    private static final String STATE_KEY = "state";
-
-    public SAConnectorInstanceBuilderImpl() {
-        this(null);
-    }
-
-    private SAConnectorInstanceBuilderImpl(final SAConnectorInstanceImpl entity) {
+    
+    public SAConnectorInstanceBuilderImpl(final SAConnectorInstanceImpl entity) {
         this.entity = entity;
-    }
-
-    @Override
-    public SAConnectorInstanceBuilder createNewArchivedConnectorInstance(final SConnectorInstance connectorInstance) {
-        return new SAConnectorInstanceBuilderImpl(new SAConnectorInstanceImpl(connectorInstance));
     }
 
     @Override
@@ -55,33 +33,4 @@ public class SAConnectorInstanceBuilderImpl extends SANamedElementBuilderImpl im
         return entity;
     }
 
-    @Override
-    public String getContainerIdKey() {
-        return CONTAINER_ID_KEY;
-    }
-
-    @Override
-    public String getContainerTypeKey() {
-        return CONTAINER_TYPE_KEY;
-    }
-
-    @Override
-    public String getConnectorIdKey() {
-        return CONNECTOR_ID_KEY;
-    }
-
-    @Override
-    public String getVersionKey() {
-        return VERSION_KEY;
-    }
-
-    @Override
-    public String getActivationEventKey() {
-        return ACTIVATION_EVENT_KEY;
-    }
-
-    @Override
-    public String getStateKey() {
-        return STATE_KEY;
-    }
 }

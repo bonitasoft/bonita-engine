@@ -15,22 +15,17 @@ package org.bonitasoft.engine.events.model.builders.impl;
 
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
-import org.bonitasoft.engine.events.model.impl.SDeleteEventImpl;
-import org.bonitasoft.engine.events.model.impl.SEventImpl;
-import org.bonitasoft.engine.events.model.impl.SInsertEventImpl;
-import org.bonitasoft.engine.events.model.impl.SUpdateEventImpl;
 
 /**
  * @author Christophe Havard
  */
 public class SEventBuilderImpl implements SEventBuilder {
 
-    private SEvent event;
-
-    @Override
-    public SEventBuilder createNewInstance(final String type) {
-        this.event = new SEventImpl(type);
-        return this;
+    private final SEvent event;
+    
+    public SEventBuilderImpl(final SEvent event) {
+        super();
+        this.event = event;
     }
 
     @Override
@@ -41,24 +36,6 @@ public class SEventBuilderImpl implements SEventBuilder {
     @Override
     public SEventBuilder setObject(final Object ob) {
         this.event.setObject(ob);
-        return this;
-    }
-
-    @Override
-    public SEventBuilder createInsertEvent(final String type) {
-        this.event = new SInsertEventImpl(type);
-        return this;
-    }
-
-    @Override
-    public SEventBuilder createDeleteEvent(final String type) {
-        this.event = new SDeleteEventImpl(type);
-        return this;
-    }
-
-    @Override
-    public SEventBuilder createUpdateEvent(final String type) {
-        this.event = new SUpdateEventImpl(type);
         return this;
     }
 

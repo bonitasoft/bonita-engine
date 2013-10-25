@@ -21,14 +21,13 @@ import java.util.Set;
 
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 /**
  * @author Julien Mege
@@ -41,43 +40,42 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> humanTaskInstanceDescriptorAllFields;
 
-    public SearchHumanTaskInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders, final SProcessSupervisorBuilders sSupervisorBuilders) {
-        final SUserTaskInstanceBuilder sUserTaskInstanceBuilder = bpmInstanceBuilders.getSUserTaskInstanceBuilder();
-        final SProcessSupervisorBuilder sSupervisorBuilder = sSupervisorBuilders.getSSupervisorBuilder();
+    public SearchHumanTaskInstanceDescriptor() {
+        final SUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         humanTaskInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(13);
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.NAME,
-                new FieldDescriptor(SHumanTaskInstance.class, sUserTaskInstanceBuilder.getNameKey()));
+                new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getNameKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PRIORITY,
-                new FieldDescriptor(SHumanTaskInstance.class, sUserTaskInstanceBuilder.getPriorityKey()));
+                new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getPriorityKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.DUE_DATE,
-                new FieldDescriptor(SHumanTaskInstance.class, sUserTaskInstanceBuilder.getExpectedEndDateKey()));
+                new FieldDescriptor(SHumanTaskInstance.class, keyProvider.getExpectedEndDateKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SHumanTaskInstance.class,
-                sUserTaskInstanceBuilder.getStateNameKey()));
+                keyProvider.getStateNameKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                sUserTaskInstanceBuilder.getAssigneeIdKey()));
+                keyProvider.getAssigneeIdKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                sUserTaskInstanceBuilder.getProcessDefinitionKey()));
+                keyProvider.getProcessDefinitionKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                sUserTaskInstanceBuilder.getRootProcessInstanceKey()));
+                keyProvider.getRootProcessInstanceKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                sUserTaskInstanceBuilder.getParentActivityInstanceKey()));
+                keyProvider.getParentActivityInstanceKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.PARENT_CONTAINER_ID, new FieldDescriptor(SHumanTaskInstance.class,
-                sUserTaskInstanceBuilder.getParentContainerIdKey()));
+                keyProvider.getParentContainerIdKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SHumanTaskInstance.class,
-                sUserTaskInstanceBuilder.getDisplayNameKey()));
+                keyProvider.getDisplayNameKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE, new FieldDescriptor(SHumanTaskInstance.class,
-                sUserTaskInstanceBuilder.getReachStateDateKey()));
+                keyProvider.getReachStateDateKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.USER_ID,
-                new FieldDescriptor(SProcessSupervisor.class, sSupervisorBuilder.getUserIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.GROUP_ID,
-                new FieldDescriptor(SProcessSupervisor.class, sSupervisorBuilder.getGroupIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
         humanTaskInstanceDescriptorKeys.put(HumanTaskInstanceSearchDescriptor.ROLE_ID,
-                new FieldDescriptor(SProcessSupervisor.class, sSupervisorBuilder.getRoleIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
 
         humanTaskInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> tasksInstanceFields = new HashSet<String>(3);
-        tasksInstanceFields.add(sUserTaskInstanceBuilder.getNameKey());
-        tasksInstanceFields.add(sUserTaskInstanceBuilder.getDisplayNameKey());
+        tasksInstanceFields.add(keyProvider.getNameKey());
+        tasksInstanceFields.add(keyProvider.getDisplayNameKey());
         humanTaskInstanceDescriptorAllFields.put(SHumanTaskInstance.class, tasksInstanceFields);
     }
 

@@ -10,11 +10,16 @@ import java.util.Collection;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
+import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
+import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
@@ -32,7 +37,7 @@ public class PlatformServiceTest extends CommonServiceTest {
 
     private void createDefaultPlatform() throws Exception {
         getTransactionService().begin();
-        final SPlatform platform = getPlatformBuilder().createNewInstance("defaultVersion", "previousVersion", "initialVersion", "defaultUser",
+        final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance("defaultVersion", "previousVersion", "initialVersion", "defaultUser",
                 System.currentTimeMillis()).done();
         getPlatformService().createPlatformTables();
         getTransactionService().complete();
@@ -49,9 +54,9 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String initialVersion = "initialVersion";
         final String previousVersion = "previousVersion";
 
-        getPlatformBuilder().createNewInstance(version, previousVersion, initialVersion, createdBy, created);
+        final SPlatformBuilder sPlatformBuilder = BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance(version, previousVersion, initialVersion, createdBy, created);
 
-        final SPlatform platform = getPlatformBuilder().done();
+        final SPlatform platform = sPlatformBuilder.done();
 
         assertEquals(version, platform.getVersion());
         assertEquals(createdBy, platform.getCreatedBy());
@@ -70,7 +75,7 @@ public class PlatformServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        final SPlatform platform = getPlatformBuilder().createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
+        final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
         getPlatformService().createPlatformTables();
 
         getTransactionService().complete();
@@ -116,7 +121,7 @@ public class PlatformServiceTest extends CommonServiceTest {
             // OK
         }
 
-        final SPlatform platform = getPlatformBuilder().createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
+        final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
         getPlatformService().createPlatformTables();
         getTransactionService().complete();
         getTransactionService().begin();
@@ -141,7 +146,7 @@ public class PlatformServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        SPlatform platform = getPlatformBuilder().createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
+        SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
         final EntityUpdateDescriptor dummyDescriptor = new EntityUpdateDescriptor();
         try {
             getPlatformService().updatePlatform(platform, dummyDescriptor);
@@ -165,12 +170,14 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String newVersion = "newVersion";
         final long newCreated = System.currentTimeMillis();
 
+        final SPlatformBuilderFactory fact = BuilderFactory.get(SPlatformBuilderFactory.class);
+        
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        updateDescriptor.addField(getPlatformBuilder().getCreatedByKey(), newCreatedBy);
-        updateDescriptor.addField(getPlatformBuilder().getInitialVersionKey(), newInitialVersion);
-        updateDescriptor.addField(getPlatformBuilder().getPreviousVersionKey(), newPreviousVersion);
-        updateDescriptor.addField(getPlatformBuilder().getVersionKey(), newVersion);
-        updateDescriptor.addField(getPlatformBuilder().getCreatedKey(), newCreated);
+        updateDescriptor.addField(fact.getCreatedByKey(), newCreatedBy);
+        updateDescriptor.addField(fact.getInitialVersionKey(), newInitialVersion);
+        updateDescriptor.addField(fact.getPreviousVersionKey(), newPreviousVersion);
+        updateDescriptor.addField(fact.getVersionKey(), newVersion);
+        updateDescriptor.addField(fact.getCreatedKey(), newCreated);
 
         getPlatformService().updatePlatform(platform, updateDescriptor);
 
@@ -202,10 +209,10 @@ public class PlatformServiceTest extends CommonServiceTest {
         final long created = System.currentTimeMillis();
         final String description = "description";
 
-        getTenantBuilder().createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false);
-        getTenantBuilder().setDescription(description);
+        final STenantBuilder sTenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false);
+        sTenantBuilder.setDescription(description);
 
-        final STenant tenant = getTenantBuilder().done();
+        final STenant tenant = sTenantBuilder.done();
 
         assertEquals(name, tenant.getName());
         assertEquals(createdBy, tenant.getCreatedBy());
@@ -221,7 +228,7 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = getTenantBuilder().createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
 
@@ -245,7 +252,7 @@ public class PlatformServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
         // check the tenant was well deleted and try to recreate it
-        getPlatformService().createTenant(getTenantBuilder().createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done());
+        getPlatformService().createTenant(BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done());
         getTransactionService().complete();
 
         deleteTenant(tenant.getId());
@@ -267,7 +274,7 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = getTenantBuilder().createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
 
@@ -283,11 +290,13 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String newDescription = "newDescription";
         final String newName = "newName";
 
+        final STenantBuilderFactory sTenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
+                
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        updateDescriptor.addField(getTenantBuilder().getCreatedByKey(), newCreatedBy);
-        updateDescriptor.addField(getTenantBuilder().getCreatedKey(), newCreated);
-        updateDescriptor.addField(getTenantBuilder().getDescriptionKey(), newDescription);
-        updateDescriptor.addField(getTenantBuilder().getNameKey(), newName);
+        updateDescriptor.addField(sTenantBuilderFact.getCreatedByKey(), newCreatedBy);
+        updateDescriptor.addField(sTenantBuilderFact.getCreatedKey(), newCreated);
+        updateDescriptor.addField(sTenantBuilderFact.getDescriptionKey(), newDescription);
+        updateDescriptor.addField(sTenantBuilderFact.getNameKey(), newName);
 
         getPlatformService().updateTenant(tenant, updateDescriptor);
 
@@ -322,7 +331,7 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = getTenantBuilder().createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
 
@@ -352,8 +361,8 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant1 = getTenantBuilder().createNewInstance(tenant1Name, createdBy, created, STATUS_DEACTIVATED, false).done();
-        final STenant tenant2 = getTenantBuilder().createNewInstance(tenant2Name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant1 = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenant1Name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant2 = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenant2Name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
 
@@ -361,7 +370,7 @@ public class PlatformServiceTest extends CommonServiceTest {
         getPlatformService().createTenant(tenant2);
 
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        updateDescriptor.addField(getTenantBuilder().getNameKey(), tenant1Name);
+        updateDescriptor.addField(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), tenant1Name);
 
         try {
             getPlatformService().updateTenant(tenant2, updateDescriptor);
@@ -385,7 +394,7 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = getTenantBuilder().createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
 
@@ -417,8 +426,8 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant1 = getTenantBuilder().createNewInstance(tenant1Name, createdBy, created, STATUS_DEACTIVATED, false).done();
-        final STenant tenant2 = getTenantBuilder().createNewInstance(tenant2Name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant1 = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenant1Name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant2 = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenant2Name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
 
@@ -426,7 +435,7 @@ public class PlatformServiceTest extends CommonServiceTest {
         getPlatformService().createTenant(tenant2);
 
         final List<OrderByOption> orderbyOptions = new ArrayList<OrderByOption>();
-        orderbyOptions.add(new OrderByOption(STenant.class, getTenantBuilder().getNameKey(), OrderByType.DESC));
+        orderbyOptions.add(new OrderByOption(STenant.class, BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), OrderByType.DESC));
         final QueryOptions queryOptions = new QueryOptions(0, 20, orderbyOptions);
 
         List<STenant> readTenants = null;
@@ -488,8 +497,8 @@ public class PlatformServiceTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant1 = getTenantBuilder().createNewInstance(tenant1Name, createdBy, created, STATUS_DEACTIVATED, false).done();
-        final STenant tenant2 = getTenantBuilder().createNewInstance(tenant2Name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant1 = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenant1Name, createdBy, created, STATUS_DEACTIVATED, false).done();
+        final STenant tenant2 = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenant2Name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
 
@@ -498,7 +507,7 @@ public class PlatformServiceTest extends CommonServiceTest {
 
         // sort
         final List<OrderByOption> orderbyOptions = new ArrayList<OrderByOption>();
-        orderbyOptions.add(new OrderByOption(STenant.class, getTenantBuilder().getNameKey(), OrderByType.DESC));
+        orderbyOptions.add(new OrderByOption(STenant.class, BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), OrderByType.DESC));
         final QueryOptions queryOptions = new QueryOptions(0, 10, orderbyOptions);
 
         final List<STenant> readTenants = getPlatformService().searchTenants(queryOptions);

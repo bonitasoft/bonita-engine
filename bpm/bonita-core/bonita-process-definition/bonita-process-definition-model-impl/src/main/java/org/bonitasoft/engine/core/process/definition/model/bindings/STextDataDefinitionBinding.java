@@ -15,9 +15,10 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 
 /**
  * @author Matthieu Chaffotte
@@ -25,10 +26,6 @@ import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilde
 public class STextDataDefinitionBinding extends SDataDefinitionBinding {
 
     private boolean longText;
-
-    public STextDataDefinitionBinding(final SDataDefinitionBuilders builder) {
-        super(builder);
-    }
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
@@ -38,8 +35,7 @@ public class STextDataDefinitionBinding extends SDataDefinitionBinding {
 
     @Override
     public SDataDefinition getObject() {
-        final SDataDefinitionBuilder dataDefinitionBuilder = builder.getDataDefinitionBuilder();
-        final SDataDefinitionBuilder dataDefinitionImpl = dataDefinitionBuilder.createNewTextData(name).setAsLongText(longText);
+        final SDataDefinitionBuilder dataDefinitionImpl = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewTextData(name).setAsLongText(longText);
         if (description != null) {
             dataDefinitionImpl.setDescription(description);
         }

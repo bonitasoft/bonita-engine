@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.identity;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -20,7 +21,7 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.UserMembershipBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
 
 /**
  * @author Bole Zhang
@@ -29,8 +30,6 @@ import org.bonitasoft.engine.identity.model.builder.UserMembershipBuilder;
 public class AddUserMembership implements TransactionContentWithResult<SUserMembership> {
 
     private final IdentityService identityService;
-
-    private final UserMembershipBuilder userMembershipBuilder;
 
     private final long userId;
 
@@ -42,11 +41,9 @@ public class AddUserMembership implements TransactionContentWithResult<SUserMemb
 
     private SUserMembership userMembership;
 
-    public AddUserMembership(final long userId, final long groupId, final long roleId, final long assignedBy, final IdentityService identityService,
-            final UserMembershipBuilder userMembershipBuilder) {
+    public AddUserMembership(final long userId, final long groupId, final long roleId, final long assignedBy, final IdentityService identityService) {
         this.assignedBy = assignedBy;
         this.identityService = identityService;
-        this.userMembershipBuilder = userMembershipBuilder;
         this.userId = userId;
         this.groupId = groupId;
         this.roleId = roleId;
@@ -58,7 +55,7 @@ public class AddUserMembership implements TransactionContentWithResult<SUserMemb
         final SUser user = identityService.getUser(userId);
         final SRole role = identityService.getRole(roleId);
         final SGroup group = identityService.getGroup(groupId);
-        userMembership = userMembershipBuilder.createNewInstance(user.getId(), group.getId(), role.getId()).setAssignedBy(assignedBy)
+        userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), group.getId(), role.getId()).setAssignedBy(assignedBy)
                 .setAssignedDate(System.currentTimeMillis()).done();
         identityService.createUserMembership(userMembership);
     }

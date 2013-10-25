@@ -19,8 +19,6 @@ package org.bonitasoft.engine.actor.mapping.model;
  */
 public interface SActorBuilder {
 
-    SActorBuilder create(String name, long scopeId, boolean initiator);
-
     SActorBuilder addDescription(String description);
 
     SActorBuilder addDisplayName(String displayName);

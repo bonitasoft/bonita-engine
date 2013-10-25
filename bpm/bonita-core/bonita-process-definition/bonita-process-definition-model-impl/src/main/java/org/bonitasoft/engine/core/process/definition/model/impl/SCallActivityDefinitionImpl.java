@@ -20,15 +20,12 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SCallableElementType;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -54,14 +51,13 @@ public class SCallActivityDefinitionImpl extends SActivityDefinitionImpl impleme
         dataOutputOperations = new ArrayList<SOperation>(3);
     }
 
-    public SCallActivityDefinitionImpl(final CallActivityDefinition activityDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
-        callableElement = ServerModelConvertor.convertExpression(sExpressionBuilders, activityDefinition.getCallableElement());
-        callableElementVersion = ServerModelConvertor.convertExpression(sExpressionBuilders, activityDefinition.getCallableElementVersion());
-        dataInputOperations = ServerModelConvertor.convertOperations(sOperationBuilders, sExpressionBuilders, activityDefinition.getDataInputOperations());
-        dataOutputOperations = ServerModelConvertor.convertOperations(sOperationBuilders, sExpressionBuilders, activityDefinition.getDataOutputOperations());
+    public SCallActivityDefinitionImpl(final CallActivityDefinition activityDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(activityDefinition, transitionsMap);
+        callableElement = ServerModelConvertor.convertExpression(activityDefinition.getCallableElement());
+        callableElementVersion = ServerModelConvertor.convertExpression(activityDefinition.getCallableElementVersion());
+        dataInputOperations = ServerModelConvertor.convertOperations(activityDefinition.getDataInputOperations());
+        dataOutputOperations = ServerModelConvertor.convertOperations(activityDefinition.getDataOutputOperations());
         callableElementType = SCallableElementType.valueOf(activityDefinition.getCallableElementType().name());
 
     }

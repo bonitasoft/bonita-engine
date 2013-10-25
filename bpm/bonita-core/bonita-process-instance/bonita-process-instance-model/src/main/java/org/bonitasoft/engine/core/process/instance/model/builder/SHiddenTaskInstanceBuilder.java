@@ -20,11 +20,5 @@ import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
  */
 public interface SHiddenTaskInstanceBuilder {
 
-    String getUserIdKey();
-
-    String getActivityInstanceIdKey();
-
-    SHiddenTaskInstanceBuilder createNewInstance(final long activityId, final long userId);
-
     SHiddenTaskInstance done();
 }

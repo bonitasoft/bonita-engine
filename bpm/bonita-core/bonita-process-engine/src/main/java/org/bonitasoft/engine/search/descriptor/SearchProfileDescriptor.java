@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfile;
 
 /**
@@ -37,12 +37,12 @@ public class SearchProfileDescriptor extends SearchEntityDescriptor {
 
     public SearchProfileDescriptor() {
         searchEntityKeys = new HashMap<String, FieldDescriptor>(1);
-        searchEntityKeys.put(ProfileSearchDescriptor.ID, new FieldDescriptor(SProfile.class, SProfileBuilder.ID));
-        searchEntityKeys.put(ProfileSearchDescriptor.NAME, new FieldDescriptor(SProfile.class, SProfileBuilder.NAME));
+        searchEntityKeys.put(ProfileSearchDescriptor.ID, new FieldDescriptor(SProfile.class, SProfileBuilderFactory.ID));
+        searchEntityKeys.put(ProfileSearchDescriptor.NAME, new FieldDescriptor(SProfile.class, SProfileBuilderFactory.NAME));
 
         profileAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> fields = new HashSet<String>(3);
-        fields.add(SProfileBuilder.NAME);
+        fields.add(SProfileBuilderFactory.NAME);
         profileAllFields.put(SProfile.class, fields);
     }
 

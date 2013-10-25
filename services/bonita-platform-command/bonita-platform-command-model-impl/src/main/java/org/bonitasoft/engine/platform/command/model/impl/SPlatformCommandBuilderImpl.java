@@ -21,51 +21,15 @@ import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilder;
  */
 public class SPlatformCommandBuilderImpl implements SPlatformCommandBuilder {
 
-    private static final String ID = "id";
+    private final SPlatformCommandImpl command;
 
-    static final String NAME = "name";
-
-    static final String DESCRIPTION = "description";
-
-    static final String IMPLEMENTATION = "implementation";
-
-    private SPlatformCommandImpl command;
-
-    @Override
-    public SPlatformCommandBuilder createNewInstance(final SPlatformCommand command) {
-        this.command = new SPlatformCommandImpl(command);
-        return this;
-    }
-
-    @Override
-    public SPlatformCommandBuilder createNewInstance(final String name, final String description, final String implementationClass) {
-        this.command = new SPlatformCommandImpl(name, description, implementationClass);
-        return this;
+    public SPlatformCommandBuilderImpl(final SPlatformCommandImpl command) {
+        super();
+        this.command = command;
     }
 
     @Override
     public SPlatformCommand done() {
         return command;
     }
-
-    @Override
-    public String getIdKey() {
-        return ID;
-    }
-
-    @Override
-    public String getNameKey() {
-        return NAME;
-    }
-
-    @Override
-    public String getDescriptionKey() {
-        return DESCRIPTION;
-    }
-
-    @Override
-    public String getImplementationClassKey() {
-        return IMPLEMENTATION;
-    }
-
 }

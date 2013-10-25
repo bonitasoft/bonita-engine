@@ -14,12 +14,9 @@
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Matthieu Chaffotte
@@ -33,12 +30,10 @@ public class SSubProcessDefinitionImpl extends SActivityDefinitionImpl implement
 
     private SFlowElementContainerDefinition subProcessContainer;
 
-    public SSubProcessDefinitionImpl(final SubProcessDefinition subProcess, final SExpressionBuilders sExpressionBuilders,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
+    public SSubProcessDefinitionImpl(final SubProcessDefinition subProcess) {
         super(subProcess.getId(), subProcess.getName());
         triggeredByEvent = subProcess.isTriggeredByEvent();
-        subProcessContainer = new SFlowElementContainerDefinitionImpl(this, subProcess.getSubProcessContainer(), sExpressionBuilders, sDataDefinitionBuilders,
-                sOperationBuilders);
+        subProcessContainer = new SFlowElementContainerDefinitionImpl(this, subProcess.getSubProcessContainer());
     }
 
     public SSubProcessDefinitionImpl(final long id, final String name, final boolean triggeredByEvent) {

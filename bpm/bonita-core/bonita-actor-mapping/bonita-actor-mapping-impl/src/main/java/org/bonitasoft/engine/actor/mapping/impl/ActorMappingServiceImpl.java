@@ -28,15 +28,18 @@ import org.bonitasoft.engine.actor.mapping.SActorMemberNotFoundException;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.SActorUpdateException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
+import org.bonitasoft.engine.actor.mapping.model.SActorLogBuilder;
+import org.bonitasoft.engine.actor.mapping.model.SActorLogBuilderFactory;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
 import org.bonitasoft.engine.actor.mapping.persistence.SelectDescriptorBuilder;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -49,8 +52,8 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -107,7 +110,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         final InsertRecord insertRecord = new InsertRecord(actor);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(ACTOR, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) eventService.getEventBuilder().createInsertEvent(ACTOR).setObject(actor).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ACTOR).setObject(actor).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -120,14 +123,14 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     }
 
     private SActorLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SActorLogBuilder logBuilder = new SActorLogBuilder();
+        final SActorLogBuilder logBuilder = BuilderFactory.get(SActorLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -214,8 +217,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(actor, descriptor);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(ACTOR, EventActionType.UPDATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            updateEvent = (SUpdateEvent) eventBuilder.createUpdateEvent(ACTOR).setObject(actor).done();
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTOR).setObject(actor).done();
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -256,8 +258,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         final DeleteRecord deleteRecord = new DeleteRecord(actor);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(ACTOR, EventActionType.DELETED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(ACTOR).setObject(actor).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ACTOR).setObject(actor).done();
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
@@ -287,8 +288,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         final InsertRecord insertRecord = new InsertRecord(actorMember);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(ACTOR_MEMBER, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(ACTOR_MEMBER).setObject(actorMember).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ACTOR_MEMBER).setObject(actorMember).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -388,8 +388,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
             final DeleteRecord deleteRecord = new DeleteRecord(sActorMember);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(ACTOR_MEMBER, EventActionType.DELETED)) {
-                final SEventBuilder eventBuilder = eventService.getEventBuilder();
-                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(ACTOR_MEMBER).setObject(sActorMember).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ACTOR_MEMBER).setObject(sActorMember).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(actorMemberId, SQueriableLog.STATUS_OK, logBuilder, "removeActorMember");

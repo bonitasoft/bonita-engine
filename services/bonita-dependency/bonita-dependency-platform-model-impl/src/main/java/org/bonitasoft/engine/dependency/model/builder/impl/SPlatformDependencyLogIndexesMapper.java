@@ -17,14 +17,6 @@ package org.bonitasoft.engine.dependency.model.builder.impl;
 /**
  * @author Matthieu Chaffotte
  */
-public class SPlatformDependencyLogIndexesMapper {
-
-    public static final int DEPENDENCY_INDEX = 0;
-
-    public static final int DEPENDENCY_MAPPING_INDEX = 1;
-
-    public static final String DEPENDENCY_INDEX_NAME = "numericIndex1";
-
-    public static final String DEPENDENCY_MAPPING_INDEX_NAME = "numericIndex2";
+public class SPlatformDependencyLogIndexesMapper extends SDependencyLogIndexesMapper {
 
 }

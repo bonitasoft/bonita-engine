@@ -13,16 +13,11 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
  */
 public class SDefaultValueBinding extends SExpressionBinding {
-
-    public SDefaultValueBinding(final SExpressionBuilders sExpressionBuilders) {
-        super(sExpressionBuilders);
-    }
 
     @Override
     public String getElementTag() {

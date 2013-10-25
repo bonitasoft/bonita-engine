@@ -21,157 +21,92 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
 /**
  * @author Baptiste Mesta
  */
-public abstract class SFlowNodeInstanceBuilderImpl extends SFlowElementInstanceBuilderImpl implements SFlowNodeInstanceBuilder {
+public abstract class SFlowNodeInstanceBuilderImpl implements SFlowNodeInstanceBuilder {
 
-    private static final String DISPLAY_DESCRIPTION = "displayDescription";
+    protected final SFlowNodeInstanceImpl entity;
 
-    private static final String DISPLAY_NAME = "displayName";
-
-    private static final String STATE_ID_KEY = "stateId";
-
-    private static final String STATE_NAME_KEY = "stateName";
-
-    private static final String PREVIOUS_STATE_ID_KEY = "previousStateId";
-
-    private static final String LAST_UPDATE_KEY = "lastUpdateDate";
-
-    private static final String REACHED_STATE_DATE_KEY = "reachedStateDate";
-
-    private static final String EXECUTE_BY_KEY = "executedBy";
-
-    private static final String EXECUTE_BY_DELEGATE_KEY = "executedByDelegate";
-
-    private static final String STATE_EXECUTING_KEY = "stateExecuting";
-
-    protected abstract SFlowNodeInstanceImpl getEntity();
+    public SFlowNodeInstanceBuilderImpl(final SFlowNodeInstanceImpl entity) {
+        super();
+        this.entity = entity;
+    }
 
     @Override
     public SFlowNodeInstanceBuilder setState(final int stateId, final boolean stable, final boolean terminal, final String stateName) {
-        getEntity().setStateId(stateId);
-        getEntity().setStable(stable);
-        getEntity().setTerminal(terminal);
-        getEntity().setStateName(stateName);
+        this.entity.setStateId(stateId);
+        this.entity.setStable(stable);
+        this.entity.setTerminal(terminal);
+        this.entity.setStateName(stateName);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setLastUpdateDate(final long lastUpdateDate) {
-        getEntity().setLastUpdateDate(lastUpdateDate);
+        this.entity.setLastUpdateDate(lastUpdateDate);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setReachedStateDate(final long reachedStateDate) {
-        getEntity().setReachedStateDate(reachedStateDate);
+        this.entity.setReachedStateDate(reachedStateDate);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setRootContainerId(final long containerId) {
-        getEntity().setRootContainerId(containerId);
+        this.entity.setRootContainerId(containerId);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setParentContainerId(final long processInstanceId) {
-        getEntity().setParentContainerId(processInstanceId);
+        this.entity.setParentContainerId(processInstanceId);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setProcessDefinitionId(final long processDefinitionId) {
-        getEntity().setLogicalGroup(PROCESS_DEFINITION_INDEX, processDefinitionId);
+        this.entity.setLogicalGroup(SFlowNodeInstanceBuilderFactoryImpl.PROCESS_DEFINITION_INDEX, processDefinitionId);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setRootProcessInstanceId(final long processInstanceId) {
-        getEntity().setLogicalGroup(ROOT_PROCESS_INSTANCE_INDEX, processInstanceId);
+        this.entity.setLogicalGroup(SFlowNodeInstanceBuilderFactoryImpl.ROOT_PROCESS_INSTANCE_INDEX, processInstanceId);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setParentProcessInstanceId(final long parentProcessInstanceId) {
-        getEntity().setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
+        this.entity.setLogicalGroup(SFlowNodeInstanceBuilderFactoryImpl.PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setParentActivityInstanceId(final long activityInstanceId) {
-        getEntity().setLogicalGroup(PARENT_ACTIVITY_INSTANCE_INDEX, activityInstanceId);
+        this.entity.setLogicalGroup(SFlowNodeInstanceBuilderFactoryImpl.PARENT_ACTIVITY_INSTANCE_INDEX, activityInstanceId);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setTokenRefId(final Long tokenRefId) {
-        getEntity().setTokenRefId(tokenRefId);
+        this.entity.setTokenRefId(tokenRefId);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setLoopCounter(final int loopCounter) {
-        getEntity().setLoopCounter(loopCounter);
+        this.entity.setLoopCounter(loopCounter);
         return this;
     }
 
     @Override
     public SFlowNodeInstanceBuilder setStateCategory(final SStateCategory stateCategory) {
-        getEntity().setStateCategory(stateCategory);
+        this.entity.setStateCategory(stateCategory);
         return this;
     }
 
     @Override
     public SFlowNodeType getFlowNodeType() {
-        return getEntity().getType();
-    }
-
-    @Override
-    public String getDisplayDescriptionKey() {
-        return DISPLAY_DESCRIPTION;
-    }
-
-    @Override
-    public String getDisplayNameKey() {
-        return DISPLAY_NAME;
-    }
-
-    @Override
-    public String getStateExecutingKey() {
-        return STATE_EXECUTING_KEY;
-    }
-
-    @Override
-    public String getExecutedBy() {
-        return EXECUTE_BY_KEY;
-    }
-
-    @Override
-    public String getExecutedByDelegate() {
-        return EXECUTE_BY_DELEGATE_KEY;
-    }
-
-    @Override
-    public String getStateIdKey() {
-        return STATE_ID_KEY;
-    }
-
-    @Override
-    public String getStateNameKey() {
-        return STATE_NAME_KEY;
-    }
-
-    @Override
-    public String getPreviousStateIdKey() {
-        return PREVIOUS_STATE_ID_KEY;
-    }
-
-    @Override
-    public String getLastUpdateDateKey() {
-        return LAST_UPDATE_KEY;
-    }
-
-    @Override
-    public String getReachStateDateKey() {
-        return REACHED_STATE_DATE_KEY;
+        return this.entity.getType();
     }
 }

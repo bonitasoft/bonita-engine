@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -39,10 +38,10 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
 
     private long count;
 
-    public TransactionalProcessInstanceInterruptor(final BPMInstanceBuilders bpmInstanceBuilders, final ProcessInstanceService processInstanceService,
+    public TransactionalProcessInstanceInterruptor(final ProcessInstanceService processInstanceService,
             final FlowNodeInstanceService flowNodeInstanceService, final ProcessExecutor processExecutor,
             final TechnicalLoggerService logger) {
-        super(bpmInstanceBuilders, logger);
+        super(logger);
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processExecutor = processExecutor;

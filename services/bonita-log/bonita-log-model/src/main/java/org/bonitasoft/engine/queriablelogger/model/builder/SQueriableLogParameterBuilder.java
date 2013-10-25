@@ -22,8 +22,6 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter;
  */
 public interface SQueriableLogParameterBuilder {
 
-    SQueriableLogParameterBuilder createNewInstance(final String name, final String valueType);
-
     SQueriableLogParameterBuilder stringValue(final String stringValue);
 
     SQueriableLogParameterBuilder blobValue(final Serializable blobValue);

@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonServiceTest;
-import org.bonitasoft.engine.archive.model.TestLogBuilder;
+import org.bonitasoft.engine.archive.model.TestLogBuilderFactory;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -71,14 +73,12 @@ public class RecorderTest extends CommonServiceTest {
 
     protected static QueriableLoggerService loggerService;
 
-    private TestLogBuilder logModelBuilder;
+    private TestLogBuilderFactory logModelBuilderFactory;
 
     static {
         persitenceService = getServicesBuilder().buildTenantPersistenceService();
         recorder = getServicesBuilder().buildRecorder();
         scheduler = getServicesBuilder().buildSchedulerService();
-        platformBuilder = getServicesBuilder().buildPlatformBuilder();
-        tenantBuilder = getServicesBuilder().buildTenantBuilder();
         eventService = getServicesBuilder().buildEventService();
         loggerService = getServicesBuilder().buildQueriableLogger();
     }
@@ -110,13 +110,13 @@ public class RecorderTest extends CommonServiceTest {
     private List<SQueriableLog> getLogs(final long indexValue, final String actionType) throws SBonitaSearchException {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(getActionTypeFilterOption(actionType));
-        filters.add(new FilterOption(SQueriableLog.class, getLogModelBuilder().getObjectIdKey(), indexValue));
+        filters.add(new FilterOption(SQueriableLog.class, getLogModelBuilderFactory().getObjectIdKey(), indexValue));
         final QueryOptions opts = new QueryOptions(0, 10, null, filters, null);
         return loggerService.searchLogs(opts);
     }
 
     private FilterOption getActionTypeFilterOption(final String actionType) {
-        return new FilterOption(SQueriableLog.class, getLogModelBuilder().getActionTypeKey(), actionType);
+        return new FilterOption(SQueriableLog.class, getLogModelBuilderFactory().getActionTypeKey(), actionType);
     }
 
     private List<SQueriableLog> getLogs(final String actionType) throws SBonitaSearchException {
@@ -176,7 +176,7 @@ public class RecorderTest extends CommonServiceTest {
                 try {
                     txService.begin();
                     final Human human = buildHuman(firstName, "Vaills", 20);
-                    final SInsertEvent insertEvent = (SInsertEvent) eventService.getEventBuilder().createInsertEvent(HUMAN).setObject(human).done();
+                    final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(HUMAN).setObject(human).done();
                     recorder.recordInsert(new InsertRecord(human), insertEvent);
                     foo.insertCompleted = true;
 
@@ -275,7 +275,7 @@ public class RecorderTest extends CommonServiceTest {
 
         final String firstName = "Laurent";
         final Human human = buildHuman(firstName, "Vaills", 20);
-        final SInsertEvent insertEvent = (SInsertEvent) eventService.getEventBuilder().createInsertEvent(HUMAN).setObject(human).done();
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(HUMAN).setObject(human).done();
         recorder.recordInsert(new InsertRecord(human), insertEvent);
 
         // set rollback
@@ -310,7 +310,7 @@ public class RecorderTest extends CommonServiceTest {
 
         final Human humanToUpdate = getHumanByFirstName("firstName");
         assertNotNull(humanToUpdate);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(HUMAN).setObject(human).done();
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(HUMAN).setObject(human).done();
         recorder.recordUpdate(
                 UpdateRecord.buildSetField(humanToUpdate, "firstName", "firstName", "firstNameUpdate", "Update human", HumanRecordType.updateHuman),
                 updateEvent);
@@ -348,7 +348,7 @@ public class RecorderTest extends CommonServiceTest {
 
         final Human humanToDelete = getHumanByFirstName("firstName");
         assertNotNull(humanToDelete);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) eventService.getEventBuilder().createDeleteEvent(HUMAN).setObject(human).done();
+        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(HUMAN).setObject(human).done();
         recorder.recordDelete(new DeleteRecord(humanToDelete), deleteEvent);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
@@ -376,11 +376,11 @@ public class RecorderTest extends CommonServiceTest {
         return persitenceService;
     }
 
-    protected synchronized TestLogBuilder getLogModelBuilder() {
-        if (logModelBuilder == null) {
-            logModelBuilder = getServicesBuilder().getInstanceOf(TestLogBuilder.class);
+    protected synchronized TestLogBuilderFactory getLogModelBuilderFactory() {
+        if (logModelBuilderFactory == null) {
+            logModelBuilderFactory = new TestLogBuilderFactory();
         }
-        return logModelBuilder;
+        return logModelBuilderFactory;
     }
 
     private enum HumanRecordType {

@@ -24,22 +24,11 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
  */
 public class SProcessSupervisorBuilderImpl implements SProcessSupervisorBuilder {
 
-    private static final String ID_KEY = "id";
+    private final SProcessSupervisorImpl supervisor;
 
-    private static final String USER_ID_KEY = "userId";
-
-    private static final String GROUP_ID_KEY = "groupId";
-
-    private static final String ROLE_ID_KEY = "roleId";
-
-    private static final String PROCESS_DEF_ID_KEY = "processDefId";
-
-    private SProcessSupervisorImpl supervisor;
-
-    @Override
-    public SProcessSupervisorBuilder createNewInstance(final long processDefId) {
-        this.supervisor = new SProcessSupervisorImpl(processDefId);
-        return this;
+    public SProcessSupervisorBuilderImpl(final SProcessSupervisorImpl supervisor) {
+        super();
+        this.supervisor = supervisor;
     }
 
     @Override
@@ -66,31 +55,6 @@ public class SProcessSupervisorBuilderImpl implements SProcessSupervisorBuilder 
             throw new MissingMandatoryFieldsException("you must set at least one of the following fields: userId, groupId, roleId");
         }
         return supervisor;
-    }
-
-    @Override
-    public String getIdKey() {
-        return ID_KEY;
-    }
-
-    @Override
-    public String getUserIdKey() {
-        return USER_ID_KEY;
-    }
-
-    @Override
-    public String getProcessDefIdKey() {
-        return PROCESS_DEF_ID_KEY;
-    }
-
-    @Override
-    public String getGroupIdKey() {
-        return GROUP_ID_KEY;
-    }
-
-    @Override
-    public String getRoleIdKey() {
-        return ROLE_ID_KEY;
     }
 
 }

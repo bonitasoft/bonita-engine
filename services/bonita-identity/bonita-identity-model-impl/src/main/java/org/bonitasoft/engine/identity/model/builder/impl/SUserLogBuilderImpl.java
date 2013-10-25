@@ -27,19 +27,10 @@ public class SUserLogBuilderImpl extends CRUDELogBuilder implements SUserLogBuil
 
     private static final String PREFIX = "IDENTITY_USER";
 
-    public static final int USER_INDEX = 1;
-
-    public static final String USER_INDEX_NAME = "numericIndex2";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(USER_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SUserLogBuilderFactoryImpl.USER_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return USER_INDEX_NAME;
     }
 
     @Override
@@ -49,9 +40,13 @@ public class SUserLogBuilderImpl extends CRUDELogBuilder implements SUserLogBuil
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(USER_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SUserLogBuilderFactoryImpl.USER_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: Identity User Id");
         }
+    }
+
+    public static SUserLogBuilder getInstance() {
+        return new SUserLogBuilderImpl();
     }
 
 }

@@ -18,9 +18,6 @@ package org.bonitasoft.engine.bpm.bar.xml;
  */
 public class CorrelationKeyBinding extends ExpressionBinding {
 
-    /**
-     * @param sExpressionBuilders
-     */
     public CorrelationKeyBinding() {
         super();
     }

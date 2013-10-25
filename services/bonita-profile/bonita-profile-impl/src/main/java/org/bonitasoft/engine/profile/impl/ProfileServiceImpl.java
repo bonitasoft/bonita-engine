@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -26,7 +27,7 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -38,12 +39,10 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
-import org.bonitasoft.engine.profile.builder.impl.SProfileBuilderAccessorImpl;
-import org.bonitasoft.engine.profile.builder.impl.SProfileLogBuilder;
-import org.bonitasoft.engine.profile.builder.impl.SProfileMemberLogBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
+import org.bonitasoft.engine.profile.builder.impl.SProfileLogBuilderImpl;
+import org.bonitasoft.engine.profile.builder.impl.SProfileMemberLogBuilderImpl;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileDeletionException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
@@ -65,8 +64,8 @@ import org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl;
 import org.bonitasoft.engine.profile.persistence.SelectDescriptorBuilder;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -92,8 +91,6 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final EventService eventService;
 
-    private final SProfileBuilderAccessor profileBuilderAccessor;
-
     private final TechnicalLoggerService logger;
 
     private final QueriableLoggerService queriableLoggerService;
@@ -104,25 +101,19 @@ public class ProfileServiceImpl implements ProfileService {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
-        profileBuilderAccessor = new SProfileBuilderAccessorImpl();
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
     }
 
-    @Override
-    public SProfileBuilderAccessor getSProfileBuilderAccessor() {
-        return profileBuilderAccessor;
-    }
 
     @Override
     public SProfile createProfile(final SProfile profile) throws SProfileCreationException {
         logBeforeMethod("createProfile");
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.CREATED, "Adding a new profile");
+        final SProfileLogBuilderImpl logBuilder = getSProfileLog(ActionType.CREATED, "Adding a new profile");
         final InsertRecord insertRecord = new InsertRecord(profile);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(PROFILE, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(PROFILE).setObject(profile).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROFILE).setObject(profile).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -188,13 +179,12 @@ public class ProfileServiceImpl implements ProfileService {
     public SProfile updateProfile(final SProfile sProfile, final EntityUpdateDescriptor descriptor) throws SProfileUpdateException {
         logBeforeMethod("updateProfile");
         NullCheckingUtil.checkArgsNotNull(sProfile);
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.UPDATED, "Updating profile");
-        final SProfileBuilder sProfileBuilder = profileBuilderAccessor.getSProfileBuilder();
-        final SProfile oldUser = sProfileBuilder.createNewInstance(sProfile).done();
+        final SProfileLogBuilderImpl logBuilder = getSProfileLog(ActionType.UPDATED, "Updating profile");
+        final SProfile oldUser = BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance(sProfile).done();
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sProfile, descriptor);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(PROFILE, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(PROFILE).setObject(sProfile).done();
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROFILE).setObject(sProfile).done();
             updateEvent.setOldObject(oldUser);
         }
         try {
@@ -212,12 +202,11 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void deleteProfile(final SProfile profile) throws SProfileDeletionException {
         logBeforeMethod("deleteProfile");
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.DELETED, "Deleting profile");
+        final SProfileLogBuilderImpl logBuilder = getSProfileLog(ActionType.DELETED, "Deleting profile");
         final DeleteRecord deleteRecord = new DeleteRecord(profile);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(PROFILE, EventActionType.DELETED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PROFILE).setObject(profile).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROFILE).setObject(profile).done();
         }
         try {
             deleteAllProfileEntriesOfProfile(profile);
@@ -324,12 +313,11 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public SProfileEntry createProfileEntry(final SProfileEntry profileEntry) throws SProfileEntryCreationException {
         logBeforeMethod("createProfileEntry");
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.CREATED, "Adding a new pofile entry");
+        final SProfileLogBuilderImpl logBuilder = getSProfileLog(ActionType.CREATED, "Adding a new pofile entry");
         final InsertRecord insertRecord = new InsertRecord(profileEntry);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(PROFILE, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(ENTRY_PROFILE).setObject(profileEntry).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ENTRY_PROFILE).setObject(profileEntry).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -347,14 +335,13 @@ public class ProfileServiceImpl implements ProfileService {
     public SProfileEntry updateProfileEntry(final SProfileEntry profileEntry, final EntityUpdateDescriptor descriptor) throws SProfileEntryUpdateException {
         logBeforeMethod("updateProfileEntry");
         NullCheckingUtil.checkArgsNotNull(profileEntry);
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.UPDATED, "Updating profile entry");
+        final SProfileLogBuilderImpl logBuilder = getSProfileLog(ActionType.UPDATED, "Updating profile entry");
         try {
-            final SProfileEntryBuilder sProfileBuilder = profileBuilderAccessor.getSProfileEntryBuilder();
-            final SProfileEntry oldProfileEntry = sProfileBuilder.createNewInstance(profileEntry).done();
+            final SProfileEntry oldProfileEntry = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(profileEntry).done();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(profileEntry, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(ENTRY_PROFILE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ENTRY_PROFILE).setObject(profileEntry).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ENTRY_PROFILE).setObject(profileEntry).done();
                 updateEvent.setOldObject(oldProfileEntry);
             }
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -371,13 +358,12 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void deleteProfileEntry(final SProfileEntry profileEntry) throws SProfileEntryDeletionException {
         logBeforeMethod("deleteProfileEntry");
-        final SProfileLogBuilder logBuilder = getSProfileLog(ActionType.DELETED, "Deleting profile entry");
+        final SProfileLogBuilderImpl logBuilder = getSProfileLog(ActionType.DELETED, "Deleting profile entry");
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(profileEntry);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(ENTRY_PROFILE, EventActionType.DELETED)) {
-                final SEventBuilder eventBuilder = eventService.getEventBuilder();
-                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(ENTRY_PROFILE).setObject(profileEntry).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ENTRY_PROFILE).setObject(profileEntry).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(profileEntry.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfileEntry");
@@ -419,13 +405,12 @@ public class ProfileServiceImpl implements ProfileService {
 
     private void createProfileMember(final SProfileMemberImpl profileMember) throws SProfileMemberCreationException {
         final String message = "Adding a new profile member";
-        final SProfileMemberLogBuilder logBuilder = getProfileMemberLog(ActionType.CREATED, message);
+        final SProfileMemberLogBuilderImpl logBuilder = getProfileMemberLog(ActionType.CREATED, message);
         try {
             final InsertRecord insertRecord = new InsertRecord(profileMember);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(PROFILE, EventActionType.CREATED)) {
-                final SEventBuilder eventBuilder = eventService.getEventBuilder();
-                insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(PROFILE_MEMBER).setObject(profileMember).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROFILE_MEMBER).setObject(profileMember).done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_OK, logBuilder, "insertProfileMember");
@@ -494,13 +479,12 @@ public class ProfileServiceImpl implements ProfileService {
         logBeforeMethod("deleteProfileMember");
         final String message = "Deleting profile member for userId " + profileMember.getUserId() + " with roleId " + profileMember.getRoleId() + " in groupId "
                 + profileMember.getGroupId();
-        final SProfileMemberLogBuilder logBuilder = getProfileMemberLog(ActionType.DELETED, message);
+        final SProfileMemberLogBuilderImpl logBuilder = getProfileMemberLog(ActionType.DELETED, message);
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(profileMember);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROFILE_MEMBER, EventActionType.DELETED)) {
-                final SEventBuilder eventBuilder = eventService.getEventBuilder();
-                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PROFILE_MEMBER).setObject(profileMember).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROFILE_MEMBER).setObject(profileMember).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(profileMember.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteProfileMember");
@@ -716,22 +700,22 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    private SProfileLogBuilder getSProfileLog(final ActionType actionType, final String message) {
-        final SProfileLogBuilder logBuilder = new SProfileLogBuilder();
+    private SProfileLogBuilderImpl getSProfileLog(final ActionType actionType, final String message) {
+        final SProfileLogBuilderImpl logBuilder = new SProfileLogBuilderImpl();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
-    private SProfileMemberLogBuilder getProfileMemberLog(final ActionType actionType, final String message) {
-        final SProfileMemberLogBuilder logBuilder = new SProfileMemberLogBuilder();
+    private SProfileMemberLogBuilderImpl getProfileMemberLog(final ActionType actionType, final String message) {
+        final SProfileMemberLogBuilderImpl logBuilder = new SProfileMemberLogBuilderImpl();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {

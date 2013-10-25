@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
@@ -32,15 +33,15 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -51,8 +52,8 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -67,9 +68,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  */
 public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceService {
 
-    private final SUserTaskInstanceBuilder activityInstanceKeyProvider;
-
-    protected final BPMInstanceBuilders instanceBuilders;
+    private final SUserTaskInstanceBuilderFactory activityInstanceKeyProvider;
 
     private final EventService eventService;
 
@@ -80,17 +79,16 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     private final TechnicalLoggerService logger;
 
     public FlowNodeInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger) {
+            final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
-        this.instanceBuilders = instanceBuilders;
         this.logger = logger;
-        activityInstanceKeyProvider = instanceBuilders.getSUserTaskInstanceBuilder();
+        activityInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         this.eventService = eventService;
     }
 
     protected <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     protected <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -98,7 +96,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     }
 
     protected SFlowNodeInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message, final SFlowElementInstance flowElementInstance) {
-        final SFlowNodeInstanceLogBuilder logBuilder = instanceBuilders.getActivityInstanceLogBuilder();
+        final SFlowNodeInstanceLogBuilder logBuilder = BuilderFactory.get(SFlowNodeInstanceLogBuilderFactory.class).createNewInstance();
         initializeLogBuilder(logBuilder, message);
         updateLog(actionType, logBuilder);
         logBuilder.processInstanceId(flowElementInstance.getRootContainerId());
@@ -126,7 +124,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         }
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE)
                 .setObject(flowNodeInstance)
                 .done();
         try {
@@ -151,7 +149,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         }
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE)
                 .setObject(flowNodeInstance)
                 .done();
         try {
@@ -176,7 +174,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         descriptor.addField(lastUpdateKey, displayDescription);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(event).setObject(flowNodeInstance).done();
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(event).setObject(flowNodeInstance).done();
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
         } catch (final SRecorderException e) {
@@ -199,7 +197,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         descriptor.addField(activityInstanceKeyProvider.getPriorityKey(), priority);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE)
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE)
                 .setObject(flowNodeInstance)
                 .done();
         try {
@@ -279,7 +277,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         descriptor.addField(activityInstanceKeyProvider.getStateCategoryKey(), stateCategory);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowElementInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(STATE_CATEGORY).setObject(flowElementInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(STATE_CATEGORY).setObject(flowElementInstance)
                 .done();
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);
@@ -313,7 +311,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
     protected void updateFlowNode(final SFlowNodeInstance flowNodeInstance, final String eventName, final EntityUpdateDescriptor descriptor)
             throws SFlowNodeModificationException {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(eventName).setObject(flowNodeInstance).done();
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(eventName).setObject(flowNodeInstance).done();
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);
         } catch (final SRecorderException sre) {
@@ -382,10 +380,6 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         return persistenceRead;
     }
 
-    protected BPMInstanceBuilders getInstanceBuilders() {
-        return instanceBuilders;
-    }
-
     protected TechnicalLoggerService getLogger() {
         return logger;
     }
@@ -396,8 +390,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
             final DeleteRecord deleteRecord = new DeleteRecord(sFlowNodeInstance);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(FLOWNODE_INSTANCE, EventActionType.DELETED)) {
-                final SEventBuilder eventBuilder = eventService.getEventBuilder();
-                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(FLOWNODE_INSTANCE).setObject(sFlowNodeInstance).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(FLOWNODE_INSTANCE).setObject(sFlowNodeInstance).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SBonitaException e) {
@@ -410,8 +403,7 @@ public abstract class FlowNodeInstanceServiceImpl implements FlowNodeInstanceSer
         final DeleteRecord deleteRecord = new DeleteRecord(saFlowNodeInstance);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(ARCHIVED_FLOWNODE_INSTANCE, EventActionType.DELETED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(ARCHIVED_FLOWNODE_INSTANCE).setObject(saFlowNodeInstance).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ARCHIVED_FLOWNODE_INSTANCE).setObject(saFlowNodeInstance).done();
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);

@@ -23,7 +23,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
@@ -39,8 +38,6 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
 
     private static final OperationsWithContext EMPTY = new OperationsWithContext(null, null);
 
-    private final BPMInstanceBuilders bpmInstanceBuilders;
-
     private final ProcessInstanceService processInstanceService;
 
     private final FlowNodeInstanceService activityInstanceService;
@@ -49,11 +46,10 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
 
     private final TechnicalLoggerService logger;
 
-    public TerminateEventHandlerStrategy(final BPMInstanceBuilders bpmInstanceBuilders, final ProcessInstanceService processInstanceService,
+    public TerminateEventHandlerStrategy(final ProcessInstanceService processInstanceService,
             final FlowNodeInstanceService activityInstanceService, final ContainerRegistry containerRegistry,
             final TechnicalLoggerService logger) {
         super();
-        this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.processInstanceService = processInstanceService;
         this.activityInstanceService = activityInstanceService;
         this.containerRegistry = containerRegistry;
@@ -64,7 +60,7 @@ public class TerminateEventHandlerStrategy extends EventHandlerStrategy {
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition, final SThrowEventInstance eventInstance,
             final SEventTriggerDefinition sEventTriggerDefinition) throws SBonitaException {
         final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(
-                bpmInstanceBuilders, processInstanceService, activityInstanceService, containerRegistry, logger);
+                processInstanceService, activityInstanceService, containerRegistry, logger);
         processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, -1, eventInstance.getId());
         // Parent should always be process for event (but must change that id it's not the case anymore
     }

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatewayInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl;
@@ -22,18 +21,14 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayI
  * @author Hongwen Zang
  * 
  */
-public class SAGatewayInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAGatewayInstanceBuilder {
+public class SAGatewayInstanceBuilderImpl extends SAFlowNodeInstanceBuilderImpl implements SAGatewayInstanceBuilder {
 
-    private SAGatewayInstanceImpl entity;
-
-    @Override
-    public SAGatewayInstanceBuilder createNewGatewayInstance(final SGatewayInstance sGatewayInstance) {
-        entity = new SAGatewayInstanceImpl(sGatewayInstance);
-        return this;
+    public SAGatewayInstanceBuilderImpl(final SAGatewayInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SAGatewayInstance done() {
-        return entity;
+        return (SAGatewayInstance) entity;
     }
 }

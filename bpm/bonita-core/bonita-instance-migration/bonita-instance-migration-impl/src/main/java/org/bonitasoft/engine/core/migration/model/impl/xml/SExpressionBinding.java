@@ -17,17 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
  * @author Baptiste Mesta
  */
 public class SExpressionBinding extends ElementBinding {
-
-    private final SExpressionBuilders sExpressionBuilders;
 
     private String content;
 
@@ -41,10 +40,6 @@ public class SExpressionBinding extends ElementBinding {
 
     private String name;
 
-    public SExpressionBinding(final SExpressionBuilders sExpressionBuilders) {
-        this.sExpressionBuilders = sExpressionBuilders;
-    }
-
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         name = attributes.get(XMLSMigrationPlan.NAME);
@@ -57,7 +52,7 @@ public class SExpressionBinding extends ElementBinding {
     public Object getObject() {
         SExpression expression;
         try {
-            expression = sExpressionBuilders.getExpressionBuilder().createNewInstance().setName(name).setContent(content).setExpressionType(type)
+            expression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(name).setContent(content).setExpressionType(type)
                     .setInterpreter(interpreter).setReturnType(returnType).setDependencies(dependencies).done();
         } catch (final SInvalidExpressionException e) {
             throw new IllegalArgumentException("Error building SExpression", e);

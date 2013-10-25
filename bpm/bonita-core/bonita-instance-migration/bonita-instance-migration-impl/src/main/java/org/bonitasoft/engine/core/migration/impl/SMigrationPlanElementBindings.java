@@ -26,8 +26,6 @@ import org.bonitasoft.engine.core.migration.model.impl.xml.SMigrationMappingBind
 import org.bonitasoft.engine.core.migration.model.impl.xml.SMigrationPlanBinding;
 import org.bonitasoft.engine.core.migration.model.impl.xml.SOperationBinding;
 import org.bonitasoft.engine.core.migration.model.impl.xml.SRightOperandBinding;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 
@@ -38,24 +36,18 @@ final class SMigrationPlanElementBindings implements ElementBindingsFactory {
 
     private final List<ElementBinding> list;
 
-    private final SExpressionBuilders expressionBuilders;
-
-    private final SOperationBuilders sOperationBuilders;
-
-    public SMigrationPlanElementBindings(final SExpressionBuilders expressionBuilders, final SOperationBuilders sOperationBuilders) {
-        this.expressionBuilders = expressionBuilders;
-        this.sOperationBuilders = sOperationBuilders;
+    public SMigrationPlanElementBindings() {
         list = new ArrayList<ElementBinding>();
         list.add(new SConnectorDefinitionBinding());
         list.add(new SConnectorDefinitionInputBinding());
-        list.add(new SEnablementExpressionBinding(expressionBuilders));
-        list.add(new SExpressionBinding(expressionBuilders));
-        list.add(new SLeftOperandBinding(sOperationBuilders));
+        list.add(new SEnablementExpressionBinding());
+        list.add(new SExpressionBinding());
+        list.add(new SLeftOperandBinding());
         list.add(new SMigrationMappingBinding());
         list.add(new SMigrationPlanBinding());
-        list.add(new SMappingOperationBinding(sOperationBuilders));
-        list.add(new SRightOperandBinding(expressionBuilders));
-        list.add(new SOperationBinding(sOperationBuilders));
+        list.add(new SMappingOperationBinding());
+        list.add(new SRightOperandBinding());
+        list.add(new SOperationBinding());
     }
 
     @Override
@@ -72,13 +64,13 @@ final class SMigrationPlanElementBindings implements ElementBindingsFactory {
             return new SConnectorDefinitionInputBinding();
         }
         if (SEnablementExpressionBinding.class.equals(binderClass)) {
-            return new SEnablementExpressionBinding(expressionBuilders);
+            return new SEnablementExpressionBinding();
         }
         if (SExpressionBinding.class.equals(binderClass)) {
-            return new SExpressionBinding(expressionBuilders);
+            return new SExpressionBinding();
         }
         if (SLeftOperandBinding.class.equals(binderClass)) {
-            return new SLeftOperandBinding(sOperationBuilders);
+            return new SLeftOperandBinding();
         }
         if (SMigrationMappingBinding.class.equals(binderClass)) {
             return new SMigrationMappingBinding();
@@ -87,13 +79,13 @@ final class SMigrationPlanElementBindings implements ElementBindingsFactory {
             return new SMigrationPlanBinding();
         }
         if (SOperationBinding.class.equals(binderClass)) {
-            return new SOperationBinding(sOperationBuilders);
+            return new SOperationBinding();
         }
         if (SMappingOperationBinding.class.equals(binderClass)) {
-            return new SMappingOperationBinding(sOperationBuilders);
+            return new SMappingOperationBinding();
         }
         if (SRightOperandBinding.class.equals(binderClass)) {
-            return new SRightOperandBinding(expressionBuilders);
+            return new SRightOperandBinding();
         }
         return null;
     }

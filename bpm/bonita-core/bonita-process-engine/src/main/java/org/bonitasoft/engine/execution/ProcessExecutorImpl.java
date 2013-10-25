@@ -34,6 +34,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -45,7 +46,6 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -65,7 +65,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefi
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -86,10 +86,9 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
@@ -108,7 +107,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -128,8 +126,6 @@ import org.bonitasoft.engine.work.WorkService;
  * @author Celine Souchet
  */
 public class ProcessExecutorImpl implements ProcessExecutor {
-
-    private final BPMInstanceBuilders instanceBuilders;
 
     protected final ActivityInstanceService activityInstanceService;
 
@@ -161,8 +157,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final ProcessDocumentService processDocumentService;
 
-    private final SProcessDocumentBuilders processDocumentBuilders;
-
     private final ReadSessionAccessor sessionAccessor;
 
     protected final BPMInstancesCreator bpmInstancesCreator;
@@ -171,27 +165,21 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final ConnectorInstanceService connectorInstanceService;
 
-    private final SExpressionBuilders expressionBuilders;
-
-    private final SOperationBuilders operationBuilders;
-
-    public ProcessExecutorImpl(final BPMInstanceBuilders instanceBuilders, final ActivityInstanceService activityInstanceService,
+    public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor,
             final WorkService workService, final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
-            final SExpressionBuilders expressionBuilders, final ExpressionResolverService expressionResolverService, final EventService eventService,
+            final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
-            final SProcessDocumentBuilders processDocumentBuilders, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
+            final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
             final BPMInstancesCreator bpmInstancesCreator, final TokenService tokenService,
-            final EventsHandler eventsHandler, final SOperationBuilders operationBuilders, final TransactionService transactionService,
+            final EventsHandler eventsHandler, final TransactionService transactionService,
             final FlowNodeStateManager flowNodeStateManager) {
         super();
-        this.instanceBuilders = instanceBuilders;
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
         this.connectorInstanceService = connectorInstanceService;
-        this.expressionBuilders = expressionBuilders;
         this.tokenService = tokenService;
         this.logger = logger;
         this.flowNodeExecutor = flowNodeExecutor;
@@ -203,10 +191,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.connectorService = connectorService;
         this.classLoaderService = classLoaderService;
         this.operationService = operationService;
-        this.operationBuilders = operationBuilders;
         this.expressionResolverService = expressionResolverService;
         this.processDocumentService = processDocumentService;
-        this.processDocumentBuilders = processDocumentBuilders;
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -487,7 +473,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private SProcessInstance createProcessInstance(final SProcessDefinition sDefinition, final long starterId, final long starterDelegateId,
             final long callerId, final SFlowNodeType callerType, final long rootProcessInstanceId) throws SProcessInstanceCreationException {
-        final SProcessInstanceBuilder processInstanceBuilder = instanceBuilders.getSProcessInstanceBuilder().createNewInstance(sDefinition)
+        final SProcessInstanceBuilder processInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class).createNewInstance(sDefinition)
                 .setStartedBy(starterId).setStartedByDelegate(starterDelegateId).setCallerId(callerId, callerType)
                 .setRootProcessInstanceId(rootProcessInstanceId);
         final SProcessInstance sProcessInstance = processInstanceBuilder.done();
@@ -571,7 +557,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SFlowNodeDefinition flowNodeDefinition, final SStateCategory stateCategory, final Long tokenRefId, final long parentProcessInstanceId,
             final long rootProcessInstanceId, final STransitionDefinition transitionDefinition)
             throws SBonitaException {
-        final SGatewayInstanceBuilder gatewayInstanceBuilder = instanceBuilders.getSGatewayInstanceBuilder();
         SGatewayInstance gatewayInstance = null;
         try {
             gatewayInstance = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(parentProcessInstanceId, flowNodeDefinition.getName());
@@ -590,13 +575,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (gatewayInstance != null) {
             return gatewayInstance;
         } else {
-            return createGateway(processDefinitionId, flowNodeDefinition, stateCategory, gatewayInstanceBuilder, parentProcessInstanceId,
+            return createGateway(processDefinitionId, flowNodeDefinition, stateCategory, parentProcessInstanceId,
                     tokenRefId, rootProcessInstanceId);
         }
     }
 
     private SGatewayInstance createGateway(final Long processDefinitionId,
-            final SFlowNodeDefinition flowNodeDefinition, final SStateCategory stateCategory, final SGatewayInstanceBuilder gatewayInstanceBuilder,
+            final SFlowNodeDefinition flowNodeDefinition, final SStateCategory stateCategory,
             final long parentProcessInstanceId, final Long tokenRefId, final long rootProcessInstanceId) throws SBonitaException {
         return (SGatewayInstance) bpmInstancesCreator
                 .createFlowNodeInstance(processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, SFlowElementsContainerType.PROCESS,
@@ -677,50 +662,49 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final String url, final long authorId) throws SBonitaException {
-        final SProcessDocument attachment = buildExternalProcessDocumentReference(processDocumentBuilders, processInstanceId, documentName, fileName, mimeType,
+        final SProcessDocument attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType,
                 authorId, url);
         return processDocumentService.attachDocumentToProcessInstance(attachment);
     }
 
     protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final byte[] documentContent, final long authorId) throws SBonitaException {
-        final SProcessDocument attachment = buildProcessDocument(processDocumentBuilders, processInstanceId, documentName, fileName, mimeType, authorId);
+        final SProcessDocument attachment = buildProcessDocument(processInstanceId, documentName, fileName, mimeType, authorId);
         return processDocumentService.attachDocumentToProcessInstance(attachment, documentContent);
     }
 
-    private SProcessDocument buildExternalProcessDocumentReference(final SProcessDocumentBuilders documentBuilders, final long processInstanceId,
+    private SProcessDocument buildExternalProcessDocumentReference(final long processInstanceId,
             final String documentName, final String fileName, final String mimeType, final long authorId, final String url) {
-        SProcessDocumentBuilder documentBuilder = documentBuilders.getSProcessDocumentBuilder();
-        initDocumentBuilder(documentBuilder, processInstanceId, documentName, fileName, mimeType, authorId);
+        SProcessDocumentBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimeType, authorId);
         documentBuilder.setURL(url);
         documentBuilder.setHasContent(false);
         return documentBuilder.done();
     }
 
-    private SProcessDocument buildProcessDocument(final SProcessDocumentBuilders documentBuilders, final long processInstanceId, final String documentName,
+    private SProcessDocument buildProcessDocument(final long processInstanceId, final String documentName,
             final String fileName, final String mimetype, final long authorId) {
-        SProcessDocumentBuilder documentBuilder = documentBuilders.getSProcessDocumentBuilder();
-        initDocumentBuilder(documentBuilder, processInstanceId, documentName, fileName, mimetype, authorId);
+        SProcessDocumentBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimetype, authorId);
         documentBuilder.setHasContent(true);
         return documentBuilder.done();
     }
 
-    private void initDocumentBuilder(final SProcessDocumentBuilder documentBuilder, final long processInstanceId, final String documentName,
+    private SProcessDocumentBuilder initDocumentBuilder(final long processInstanceId, final String documentName,
             final String fileName, final String mimetype, final long authorId) {
-        documentBuilder.createNewInstance();
+        final SProcessDocumentBuilder documentBuilder = BuilderFactory.get(SProcessDocumentBuilderFactory.class).createNewInstance();
         documentBuilder.setName(documentName);
         documentBuilder.setFileName(fileName);
         documentBuilder.setContentMimeType(mimetype);
         documentBuilder.setProcessInstanceId(processInstanceId);
         documentBuilder.setAuthor(authorId);
         documentBuilder.setCreationDate(System.currentTimeMillis());
+        return documentBuilder;
     }
 
     @Override
     public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final int stateId, final long parentId) throws SBonitaException {
         final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        final SUserTaskInstanceBuilder flowNodeKeyProvider = bpmInstancesCreator.getBPMInstanceBuilders().getUserTaskInstanceBuilder();
+        final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
 
         SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
@@ -1098,7 +1082,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             if (contextInputValues.size() != inputs.size()) {
                 throw new InvalidEvaluationConnectorConditionException(contextInputValues.size(), inputs.size());
             }
-            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(expressionBuilders, inputs);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(inputs);
 
             // we use the context classloader because the process classloader is already set
             final ConnectorResult result = connectorService.executeMutipleEvaluation(processDefinition.getId(), connectorId, version, connectorsExps,
@@ -1106,7 +1090,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final List<Operation> outputs = connectorDefinition.getOutputs();
             final List<SOperation> sOperations = new ArrayList<SOperation>(outputs.size());
             for (final Operation operation : outputs) {
-                sOperations.add(ModelConvertor.constructSOperation(operation, operationBuilders, expressionBuilders));
+                sOperations.add(ModelConvertor.constructSOperation(operation));
             }
             connectorService.executeOutputOperation(sOperations, expcontext, result);
         }

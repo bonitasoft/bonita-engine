@@ -26,6 +26,7 @@ import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformCommand;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetSPlatformCommand;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetSPlatformCommands;
 import org.bonitasoft.engine.api.impl.transaction.platform.UpdateSPlatformCommand;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandCriterion;
 import org.bonitasoft.engine.command.CommandDescriptor;
@@ -41,7 +42,6 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -50,8 +50,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.command.SPlatformCommandNotFoundException;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilder;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandUpdateBuilder;
+import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilderFactory;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -74,12 +73,11 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
     @Override
     public void addDependency(final String name, final byte[] jar) throws AlreadyExistsException, CreationException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
-        final DependencyBuilderAccessor dependencyBuilderAccessor = platformAccessor.getDependencyBuilderAccessor();
         final DependencyService dependencyService = platformAccessor.getDependencyService();
         final ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
         final long artifactId = classLoaderService.getGlobalClassLoaderId();
         final String artifactType = classLoaderService.getGlobalClassLoaderType();
-        final AddSPlatformCommandDependency addSDependency = new AddSPlatformCommandDependency(dependencyService, dependencyBuilderAccessor, name, jar,
+        final AddSPlatformCommandDependency addSDependency = new AddSPlatformCommandDependency(dependencyService, name, jar,
                 artifactId, artifactType);
         try {
             addSDependency.execute();
@@ -118,8 +116,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
 
-        final SPlatformCommandBuilder platformCommandBuilder = platformAccessor.getSPlatformCommandBuilderAccessor().getSPlatformCommandBuilder();
-        final SPlatformCommand sPlatformCommand = platformCommandBuilder.createNewInstance(name, description, implementation).done();
+        final SPlatformCommand sPlatformCommand = BuilderFactory.get(SPlatformCommandBuilderFactory.class).createNewInstance(name, description, implementation).done();
         try {
             final CreateSPlatformCommand createPlatformCommand = new CreateSPlatformCommand(platformCommandService, sPlatformCommand);
             createPlatformCommand.execute();
@@ -209,10 +206,8 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
 
-        final SPlatformCommandUpdateBuilder platformCommandUpdateBuilder = platformAccessor.getSPlatformCommandBuilderAccessor()
-                .getSPlatformCommandUpdateBuilder();
         try {
-            final UpdateSPlatformCommand updatePlatformCommand = new UpdateSPlatformCommand(platformCommandService, platformCommandUpdateBuilder,
+            final UpdateSPlatformCommand updatePlatformCommand = new UpdateSPlatformCommand(platformCommandService,
                     platformCommandName, updater);
             updatePlatformCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {

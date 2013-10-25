@@ -20,15 +20,12 @@ import java.util.Set;
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Matthieu Chaffotte
@@ -73,8 +70,7 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
 
     private SExpression stringIndexValue5;
 
-    public SProcessDefinitionImpl(final DesignProcessDefinition processDefinition, final SExpressionBuilders sExpressionBuilders,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SOperationBuilders sOperationBuilders) {
+    public SProcessDefinitionImpl(final DesignProcessDefinition processDefinition) {
         super(processDefinition.getName());
         description = processDefinition.getDescription();
         version = processDefinition.getVersion();
@@ -84,11 +80,11 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
         stringIndexLabel3 = processDefinition.getStringIndexLabel(3);
         stringIndexLabel4 = processDefinition.getStringIndexLabel(4);
         stringIndexLabel5 = processDefinition.getStringIndexLabel(5);
-        stringIndexValue1 = ServerModelConvertor.convertExpression(sExpressionBuilders, processDefinition.getStringIndexValue(1));
-        stringIndexValue2 = ServerModelConvertor.convertExpression(sExpressionBuilders, processDefinition.getStringIndexValue(2));
-        stringIndexValue3 = ServerModelConvertor.convertExpression(sExpressionBuilders, processDefinition.getStringIndexValue(3));
-        stringIndexValue4 = ServerModelConvertor.convertExpression(sExpressionBuilders, processDefinition.getStringIndexValue(4));
-        stringIndexValue5 = ServerModelConvertor.convertExpression(sExpressionBuilders, processDefinition.getStringIndexValue(5));
+        stringIndexValue1 = ServerModelConvertor.convertExpression(processDefinition.getStringIndexValue(1));
+        stringIndexValue2 = ServerModelConvertor.convertExpression(processDefinition.getStringIndexValue(2));
+        stringIndexValue3 = ServerModelConvertor.convertExpression(processDefinition.getStringIndexValue(3));
+        stringIndexValue4 = ServerModelConvertor.convertExpression(processDefinition.getStringIndexValue(4));
+        stringIndexValue5 = ServerModelConvertor.convertExpression(processDefinition.getStringIndexValue(5));
         for (final ActorDefinition actor : processDefinition.getActorsList()) {
             actors.add(new SActorDefinitionImpl(actor));
         }
@@ -103,8 +99,7 @@ public class SProcessDefinitionImpl extends SNamedElementImpl implements SProces
             sActorInitiator = new SActorDefinitionImpl(actorInitiator);
         }
 
-        container = new SFlowElementContainerDefinitionImpl(this, processDefinition.getProcessContainer(), sExpressionBuilders, sDataDefinitionBuilders,
-                sOperationBuilders);
+        container = new SFlowElementContainerDefinitionImpl(this, processDefinition.getProcessContainer());
     }
 
     public SProcessDefinitionImpl(final String name, final String version) {

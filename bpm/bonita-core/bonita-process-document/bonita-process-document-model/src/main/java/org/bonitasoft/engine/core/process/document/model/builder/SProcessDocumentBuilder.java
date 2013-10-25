@@ -21,8 +21,6 @@ import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
  */
 public interface SProcessDocumentBuilder {
 
-    SProcessDocumentBuilder createNewInstance();
-
     SProcessDocumentBuilder setId(long id);
 
     SProcessDocumentBuilder setProcessInstanceId(final long processInstanceId);

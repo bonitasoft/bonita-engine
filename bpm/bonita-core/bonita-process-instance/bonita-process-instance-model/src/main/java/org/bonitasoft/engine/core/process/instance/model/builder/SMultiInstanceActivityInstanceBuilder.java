@@ -21,9 +21,6 @@ import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityI
  */
 public interface SMultiInstanceActivityInstanceBuilder extends SActivityInstanceBuilder {
 
-    SMultiInstanceActivityInstanceBuilder createNewOuterTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId, boolean isSequential);
-
     @Override
     SMultiInstanceActivityInstance done();
 
@@ -35,11 +32,4 @@ public interface SMultiInstanceActivityInstanceBuilder extends SActivityInstance
 
     SMultiInstanceActivityInstanceBuilder setDataOutputItemRef(String dataOutputItemRef);
 
-    String getLoopCardinalityKey();
-
-    String getNumberOfActiveInstancesKey();
-
-    String getNumberOfCompletedInstancesKey();
-
-    String getNumberOfTerminatedInstancesKey();
 }

@@ -20,18 +20,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource;
 import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
 import org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceState;
-import org.bonitasoft.engine.data.model.builder.SDataSourceBuilder;
+import org.bonitasoft.engine.data.model.builder.SDataSourceBuilderFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
@@ -39,7 +38,7 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
@@ -52,21 +51,15 @@ import org.junit.BeforeClass;
  */
 public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
 
-    protected static SExpressionBuilders sExpressionBuilders;
-
     private static SDataSource dataSource;
 
     private static SDataSource transientDataSource;
 
     private static DataService dataSourceService;
 
-    private static SDataSourceBuilder dataSourceBuilder;
+    private static SDataSourceBuilderFactory dataSourceBuilderFactory;
 
     protected static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.emptyMap();
-
-    protected abstract SDataDefinitionBuilders getSDataDefinitionBuilders();
-
-    protected abstract SDataInstanceBuilders getSDataInstanceBuilders();
 
     protected abstract DataInstanceService getDataInstanceService();
 
@@ -76,8 +69,7 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
 
     static {
         dataSourceService = getServicesBuilder().buildDataService();
-        dataSourceBuilder = getServicesBuilder().buildDataSourceModelBuilder();
-        sExpressionBuilders = getServicesBuilder().getInstanceOf(SExpressionBuilders.class);
+        dataSourceBuilderFactory = BuilderFactory.get(SDataSourceBuilderFactory.class);
     }
 
     @BeforeClass
@@ -91,7 +83,7 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
     private static SDataSource createDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion,
             final Class<? extends DataInstanceDataSource> clazz) throws Exception {
         getTransactionService().begin();
-        final SDataSource dataSource = dataSourceBuilder.createNewInstance(dataSourceName, dataSourceVersion, SDataSourceState.ACTIVE, clazz.getName()).done();
+        final SDataSource dataSource = dataSourceBuilderFactory.createNewInstance(dataSourceName, dataSourceVersion, SDataSourceState.ACTIVE, clazz.getName()).done();
         dataSourceService.createDataSource(dataSource);
         getTransactionService().complete();
         return dataSource;
@@ -114,7 +106,7 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
 
     protected SExpression buildExpression(final String content, final String expressionType, final String returnType, final String interpreter,
             final List<SExpression> dependencies) {
-        final SExpressionBuilder eb = sExpressionBuilders.getExpressionBuilder().createNewInstance();
+        final SExpressionBuilder eb = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
         eb.setName(content);
         eb.setContent(content);
         eb.setExpressionType(expressionType);

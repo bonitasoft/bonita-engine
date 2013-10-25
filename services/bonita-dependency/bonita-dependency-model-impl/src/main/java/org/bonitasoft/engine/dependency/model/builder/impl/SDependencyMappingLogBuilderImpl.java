@@ -33,11 +33,6 @@ public class SDependencyMappingLogBuilderImpl extends CRUDELogBuilder implements
     }
 
     @Override
-    public String getObjectIdKey() {
-        return SDependencyLogIndexesMapper.DEPENDENCY_MAPPING_INDEX_NAME;
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return PREFIX;
     }
@@ -58,11 +53,6 @@ public class SDependencyMappingLogBuilderImpl extends CRUDELogBuilder implements
     public SDependencyMappingLogBuilder dependencyId(final long dependencyId) {
         queriableLogBuilder.numericIndex(SDependencyLogIndexesMapper.DEPENDENCY_INDEX, dependencyId);
         return this;
-    }
-
-    @Override
-    public String getDependencyIdKey() {
-        return SDependencyLogIndexesMapper.DEPENDENCY_INDEX_NAME;
     }
 
 }

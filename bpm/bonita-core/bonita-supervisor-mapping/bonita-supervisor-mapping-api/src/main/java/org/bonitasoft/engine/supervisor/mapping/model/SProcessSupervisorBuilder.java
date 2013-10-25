@@ -20,8 +20,6 @@ package org.bonitasoft.engine.supervisor.mapping.model;
  */
 public interface SProcessSupervisorBuilder {
 
-    SProcessSupervisorBuilder createNewInstance(long processDefId);
-
     SProcessSupervisorBuilder setUserId(long userId);
 
     SProcessSupervisorBuilder setGroupId(long groupId);
@@ -29,15 +27,5 @@ public interface SProcessSupervisorBuilder {
     SProcessSupervisorBuilder setRoleId(long roleId);
 
     SProcessSupervisor done();
-
-    String getIdKey();
-
-    String getUserIdKey();
-
-    String getGroupIdKey();
-
-    String getRoleIdKey();
-
-    String getProcessDefIdKey();
 
 }

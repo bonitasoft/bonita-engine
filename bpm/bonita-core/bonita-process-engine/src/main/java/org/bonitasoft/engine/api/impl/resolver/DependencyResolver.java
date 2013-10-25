@@ -28,15 +28,16 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.transaction.dependency.AddSDependency;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyCreationException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -91,14 +92,13 @@ public class DependencyResolver {
         final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
         try {
             boolean resolved = true;
             for (final ProcessDependencyResolver dependencyResolver : resolvers) {
                 final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
                 resolved &= dependencyResolver.checkResolution(tenantAccessor, processDefinition).isEmpty();
             }
-            changeResolutionStatus(processDefinitionId, tenantAccessor, processDefinitionService, dependencyService, dependencyBuilderAccessor, resolved);
+            changeResolutionStatus(processDefinitionId, tenantAccessor, processDefinitionService, dependencyService, resolved);
         } catch (final SBonitaException e) {
             final Class<DependencyResolver> clazz = DependencyResolver.class;
             if (loggerService.isLoggable(clazz, TechnicalLogSeverity.DEBUG)) {
@@ -115,17 +115,17 @@ public class DependencyResolver {
 
     private void changeResolutionStatus(final long processDefinitionId, final TenantServiceAccessor tenantAccessor,
             final ProcessDefinitionService processDefinitionService, final DependencyService dependencyService,
-            final DependencyBuilderAccessor dependencyBuilderAccessor, final boolean resolved) throws SBonitaException, BonitaHomeNotSetException {
+            final boolean resolved) throws SBonitaException, BonitaHomeNotSetException {
         final SProcessDefinitionDeployInfo processDefinitionDeployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
         if (resolved) {
             if (ConfigurationState.UNRESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
                 resolveAndCreateDependencies(
                         new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId())), String.valueOf(processDefinitionId)),
-                        processDefinitionService, dependencyService, dependencyBuilderAccessor, processDefinitionId);
+                        processDefinitionService, dependencyService, processDefinitionId);
             }
         } else {
             if (ConfigurationState.RESOLVED.name().equals(processDefinitionDeployInfo.getConfigurationState())) {
-                final EntityUpdateDescriptor updateDescriptor = tenantAccessor.getBPMDefinitionBuilders().getProcessDefinitionDeployInfoUpdateBuilder()
+                final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance()
                         .updateConfigurationState(ConfigurationState.UNRESOLVED).done();
                 processDefinitionService.updateProcessDefinitionDeployInfo(processDefinitionId, updateDescriptor);
             }
@@ -143,7 +143,7 @@ public class DependencyResolver {
      * @throws SBonitaException
      */
     public void resolveAndCreateDependencies(final File processFolder, final ProcessDefinitionService processDefinitionService,
-            final DependencyService dependencyService, final DependencyBuilderAccessor dependencyBuilderAccessor, final long processDefinitionId)
+            final DependencyService dependencyService, final long processDefinitionId)
             throws SBonitaException {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
 
@@ -160,7 +160,7 @@ public class DependencyResolver {
                 }
             }
         }
-        addDependencies(resources, dependencyService, dependencyBuilderAccessor, processDefinitionId);
+        addDependencies(resources, dependencyService, processDefinitionId);
         processDefinitionService.resolveProcess(processDefinitionId);
     }
 
@@ -169,7 +169,7 @@ public class DependencyResolver {
     }
 
     private void addDependencies(final Map<String, byte[]> resources, final DependencyService dependencyService,
-            final DependencyBuilderAccessor dependencyBuilderAccessor, final long processDefinitionId) throws SBonitaException {
+            final long processDefinitionId) throws SBonitaException {
         final List<Long> dependencyIds = getDependencyMappingsOfProcess(dependencyService, processDefinitionId);
         final List<String> dependencies = getDependenciesOfProcess(dependencyService, dependencyIds);
 
@@ -177,7 +177,7 @@ public class DependencyResolver {
         while (iterator.hasNext()) {
             final Map.Entry<java.lang.String, byte[]> entry = iterator.next();
             if (!dependencies.contains(entry.getKey())) {
-                addDependency(entry.getKey(), entry.getValue(), dependencyService, dependencyBuilderAccessor, processDefinitionId);
+                addDependency(entry.getKey(), entry.getValue(), dependencyService, processDefinitionId);
             }
         }
 
@@ -218,7 +218,7 @@ public class DependencyResolver {
      * @throws SBonitaException
      */
     public void resolveAndCreateDependencies(final BusinessArchive businessArchive, final ProcessDefinitionService processDefinitionService,
-            final DependencyService dependencyService, final DependencyBuilderAccessor dependencyBuilderAccessor, final SProcessDefinition sDefinition)
+            final DependencyService dependencyService, final SProcessDefinition sDefinition)
             throws SBonitaException {
         final Long processDefinitionId = sDefinition.getId();
         if (businessArchive != null) {
@@ -231,14 +231,14 @@ public class DependencyResolver {
                 final byte[] jarContent = resource.getValue();
                 resourcesWithRealName.put(getDependencyName(processDefinitionId, name), jarContent);
             }
-            addDependencies(resourcesWithRealName, dependencyService, dependencyBuilderAccessor, sDefinition.getId());
+            addDependencies(resourcesWithRealName, dependencyService, sDefinition.getId());
         }
         processDefinitionService.resolveProcess(processDefinitionId);
     }
 
     private void addDependency(final String name, final byte[] jarContent, final DependencyService dependencyService,
-            final DependencyBuilderAccessor dependencyBuilderAccessor, final long processdefinitionId) throws SDependencyException {
-        final AddSDependency addSDependency = new AddSDependency(dependencyService, dependencyBuilderAccessor, name, jarContent, processdefinitionId, "process");
+            final long processdefinitionId) throws SDependencyException {
+        final AddSDependency addSDependency = new AddSDependency(dependencyService, name, jarContent, processdefinitionId, "process");
         addSDependency.execute();
     }
 

@@ -23,5 +23,6 @@
 		<module>bonita-dependency-platform-model-impl</module>
 		<module>bonita-dependency-platform-model-impl-hibernate</module>
 		<module>bonita-dependency-platform-impl</module>
+		<module>bonita-dependency-platform-model</module>
 	</modules>
 </project>

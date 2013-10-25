@@ -27,10 +27,8 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -40,13 +38,11 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -66,9 +62,6 @@ public class ProcessExecutorImplTest {
 
     @Mock
     private ArchiveService archiveService;
-
-    @Mock
-    private BPMDefinitionBuilders bpmDefinitionBuilders;
 
     @Mock
     private BPMInstancesCreator bpmInstancesCreator;
@@ -98,9 +91,6 @@ public class ProcessExecutorImplTest {
     private EventsHandler eventsHandler;
 
     @Mock
-    private SExpressionBuilders expressionBuilders;
-
-    @Mock
     private ExpressionResolverService expressionResolverService;
 
     @Mock
@@ -116,16 +106,10 @@ public class ProcessExecutorImplTest {
     private Map<String, SProcessInstanceHandler<SEvent>> handlers;
 
     @Mock
-    private BPMInstanceBuilders instanceBuilders;
-
-    @Mock
     private LockService lockService;
 
     @Mock
     private TechnicalLoggerService logger;
-
-    @Mock
-    private SOperationBuilders operationBuilders;
 
     @Mock
     private OperationService operationService;

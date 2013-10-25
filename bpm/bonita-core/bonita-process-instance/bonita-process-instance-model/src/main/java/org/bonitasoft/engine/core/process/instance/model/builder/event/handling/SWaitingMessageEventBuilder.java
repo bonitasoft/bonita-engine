@@ -19,33 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public interface SWaitingMessageEventBuilder extends SWaitingEventKeyProvider, SCorrelationContainerBuilder {
-
-    public static final int PROGRESS_FREE_KEY = 0;
-
-    public static final int PROGRESS_IN_TREATMENT_KEY = 1;
-
-    SWaitingMessageEventBuilder createNewWaitingMessageStartEventInstance(long processdefinitionId, final String messageName, final String processName,
-            final long flowNodeDefinitionId, final String flowNodeName);
-
-    SWaitingMessageEventBuilder createNewWaitingMessageEventSubProcInstance(final long processdefinitionId, final long parentProcessInstanceId,
-            final long rootProcessInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName,
-            final long subProcessId);
-
-    SWaitingMessageEventBuilder createNewWaitingMessageIntermediateEventInstance(long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
-            final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName);
-
-    SWaitingMessageEventBuilder createNewWaitingMessageBoundaryEventInstance(long processdefinitionId, final long rootProcessInstanceId, final long processInstanceId,
-            final long flowNodeInstanceId, final String messageName, final String processName, final long flowNodeDefinitionId, final String flowNodeName);
-
-    SWaitingMessageEventBuilder createNewInstance(SWaitingMessageEvent waitingMessage);
+public interface SWaitingMessageEventBuilder extends SCorrelationContainerBuilder {
 
     SWaitingMessageEvent done();
-
-    String getMessageNameKey();
-
-    String getLockedKey();
-
-    String getProgressKey();
 
 }

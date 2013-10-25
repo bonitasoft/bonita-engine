@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -34,36 +34,36 @@ public class SearchArchivedActivityInstanceDescriptor extends SearchEntityDescri
 
     private final Map<Class<? extends PersistentObject>, Set<String>> archivedActivityInstanceDescriptorAllFields;
 
-    public SearchArchivedActivityInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders) {
-        final SAUserTaskInstanceBuilder instanceBuilder = bpmInstanceBuilders.getSAUserTaskInstanceBuilder();
+    public SearchArchivedActivityInstanceDescriptor() {
+        final SAUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class);
         archivedActivityInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(10);
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.NAME,
-                new FieldDescriptor(SAActivityInstance.class, instanceBuilder.getNameKey()));
+                new FieldDescriptor(SAActivityInstance.class, keyProvider.getNameKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PRIORITY, new FieldDescriptor(SAActivityInstance.class,
-                instanceBuilder.getPriorityKey()));
+                keyProvider.getPriorityKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(
-                SAActivityInstance.class, instanceBuilder.getProcessDefinitionKey()));
+                SAActivityInstance.class, keyProvider.getProcessDefinitionKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, new FieldDescriptor(
-                SAActivityInstance.class, instanceBuilder.getRootProcessInstanceKey()));
+                SAActivityInstance.class, keyProvider.getRootProcessInstanceKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, new FieldDescriptor(
-                SAActivityInstance.class, instanceBuilder.getParentProcessInstanceKey()));
+                SAActivityInstance.class, keyProvider.getParentProcessInstanceKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(
-                SAActivityInstance.class, instanceBuilder.getParentActivityInstanceKey()));
+                SAActivityInstance.class, keyProvider.getParentActivityInstanceKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SAActivityInstance.class,
-                instanceBuilder.getStateNameKey()));
+                keyProvider.getStateNameKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.ASSIGNEE_ID, new FieldDescriptor(SAActivityInstance.class,
-                instanceBuilder.getAssigneeIdKey()));
+                keyProvider.getAssigneeIdKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SAActivityInstance.class,
-                instanceBuilder.getDisplayNameKey()));
+                keyProvider.getDisplayNameKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.REACHED_STATE_DATE, new FieldDescriptor(SAActivityInstance.class,
-                instanceBuilder.getReachedStateDateKey()));
+                keyProvider.getReachedStateDateKey()));
         archivedActivityInstanceDescriptorKeys.put(ArchivedActivityInstanceSearchDescriptor.SOURCE_OBJECT_ID, new FieldDescriptor(SAActivityInstance.class,
-                instanceBuilder.getSourceObjectIdKey()));
+                keyProvider.getSourceObjectIdKey()));
 
         archivedActivityInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> humanFields = new HashSet<String>(2);
-        humanFields.add(instanceBuilder.getNameKey());
-        humanFields.add(instanceBuilder.getDisplayNameKey());
+        humanFields.add(keyProvider.getNameKey());
+        humanFields.add(keyProvider.getDisplayNameKey());
         archivedActivityInstanceDescriptorAllFields.put(SAActivityInstance.class, humanFields);
     }
 

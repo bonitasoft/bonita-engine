@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -42,7 +43,7 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
-import org.bonitasoft.engine.profile.builder.impl.SProfileUpdateBuilderImpl;
+import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileDeletionException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
@@ -295,7 +296,7 @@ public class ProfileServiceImplForProfileTest {
     public final void updateProfile() throws SProfileUpdateException {
         final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();
-        final SProfileUpdateBuilder sProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
+        final SProfileUpdateBuilder sProfileUpdateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
         sProfileUpdateBuilder.setDescription("newDescription").setName("newName");
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
@@ -308,7 +309,7 @@ public class ProfileServiceImplForProfileTest {
 
     @Test(expected = IllegalArgumentException.class)
     public final void updateNullProfile() throws SProfileUpdateException {
-        final SProfileUpdateBuilder sProfileUpdateBuilder = new SProfileUpdateBuilderImpl();
+        final SProfileUpdateBuilder sProfileUpdateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
 
         profileServiceImpl.updateProfile(null, sProfileUpdateBuilder.done());
     }
@@ -325,12 +326,12 @@ public class ProfileServiceImplForProfileTest {
     public final void updateProfileThrowException() throws SRecorderException, SProfileUpdateException {
         final SProfile sProfile = mock(SProfile.class);
         doReturn(3L).when(sProfile).getId();
-        final SProfileUpdateBuilder sProfileEntryUpdateBuilder = new SProfileUpdateBuilderImpl();
-        sProfileEntryUpdateBuilder.setDescription("newDescription").setName("newName");
+        final SProfileUpdateBuilder sProfileUpdateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
+        sProfileUpdateBuilder.setDescription("newDescription").setName("newName");
 
         doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
 
-        profileServiceImpl.updateProfile(sProfile, sProfileEntryUpdateBuilder.done());
+        profileServiceImpl.updateProfile(sProfile, sProfileUpdateBuilder.done());
     }
 
     /**

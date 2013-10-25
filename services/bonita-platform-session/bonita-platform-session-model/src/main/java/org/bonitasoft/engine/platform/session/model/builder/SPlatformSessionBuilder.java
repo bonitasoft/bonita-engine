@@ -22,10 +22,6 @@ import org.bonitasoft.engine.platform.session.model.SPlatformSession;
  */
 public interface SPlatformSessionBuilder {
 
-    SPlatformSession copy(SPlatformSession session);
-
-    SPlatformSessionBuilder createNewInstance(final long id, final long duration, final String username);
-
     SPlatformSessionBuilder lastRenewDate(final Date lastRenewDate);
 
     SPlatformSession done();

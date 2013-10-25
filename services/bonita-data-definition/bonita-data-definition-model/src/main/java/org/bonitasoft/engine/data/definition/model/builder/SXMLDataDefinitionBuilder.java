@@ -23,8 +23,6 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public interface SXMLDataDefinitionBuilder {
 
-    SXMLDataDefinitionBuilder createNewXMLData(final String name);
-
     SXMLDataDefinitionBuilder setDescription(String description);
 
     SXMLDataDefinitionBuilder setTransient(boolean transientData);

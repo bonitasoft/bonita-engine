@@ -23,6 +23,4 @@ public interface STransitionInstanceLogBuilder extends SPersistenceLogBuilder, H
 
     STransitionInstanceLogBuilder processInstanceId(final long processInstanceId);
 
-    String getProcessInstanceIdKey();
-
 }

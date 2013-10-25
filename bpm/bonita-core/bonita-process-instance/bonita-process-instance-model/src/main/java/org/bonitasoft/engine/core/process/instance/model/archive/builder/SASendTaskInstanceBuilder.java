@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInstance;
 
 /**
@@ -21,8 +20,5 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SASendTaskInsta
  */
 public interface SASendTaskInstanceBuilder extends SAActivityInstanceBuilder {
 
-    SASendTaskInstanceBuilder createNewSendTaskInstance(SSendTaskInstance sSendTaskInstance);
-
-    @Override
     SASendTaskInstance done();
 }

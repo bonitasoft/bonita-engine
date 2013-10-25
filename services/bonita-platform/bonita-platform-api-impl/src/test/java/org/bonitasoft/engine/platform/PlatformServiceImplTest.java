@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -37,17 +38,25 @@ import org.bonitasoft.engine.platform.impl.PlatformServiceImpl;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Celine Souchet
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(BuilderFactory.class)
 public class PlatformServiceImplTest {
 
     @Mock
@@ -67,9 +76,15 @@ public class PlatformServiceImplTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        PowerMockito.mockStatic(BuilderFactory.class);
+        STenantBuilder sTenantBuilder = mock(STenantBuilder.class);
+        STenantBuilderFactory sTenantFactory = mock(STenantBuilderFactory.class);
+        Mockito.when(BuilderFactory.get(STenantBuilderFactory.class)).thenReturn(sTenantFactory);
+        when(sTenantFactory.createNewInstance(anyString(), anyString(), any(Long.class), anyString(), any(Boolean.class))).thenReturn(sTenantBuilder);
+        when(sTenantFactory.getNameKey()).thenReturn("name");
+        when(sTenantFactory.getStatusKey()).thenReturn("status");
     }
-
+    
     /**
      * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getDefaultTenant()}.
      */

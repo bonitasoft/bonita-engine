@@ -25,21 +25,20 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
 public class SCategoryLogBuilderImpl extends CRUDELogBuilder implements SCategoryLogBuilder {
 
     private static final String PREFIX = "CATEGORY";
-
+    
+    public SCategoryLogBuilderImpl() {
+        super();
+    }
+    
+    @Override
+    protected String getActionTypePrefix() {
+        return PREFIX;
+    }
+    
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
         this.queriableLogBuilder.numericIndex(SCategoryLogIndexesMapper.CATEGORY_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return SCategoryLogIndexesMapper.CATEGORY_INDEX_NAME;
-    }
-
-    @Override
-    protected String getActionTypePrefix() {
-        return PREFIX;
     }
 
     @Override

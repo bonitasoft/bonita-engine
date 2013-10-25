@@ -27,32 +27,13 @@ public class SUserMembershipLogBuilderImpl extends CRUDELogBuilder implements SU
 
     private static final String PREFIX = "IDENTITY_USER_MEMBERSHIP";
 
-    public static final int USER_MEMBERSHIP_INDEX = 4;
-
-    public static final String USER_MEMBERSHIP_INDEX_NAME = "numericIndex5";
-
-    public static final int ROLE_INDEX = 3;
-
-    public static final String ROLE_INDEX_NAME = "textualIndex4";
-
-    public static final int USER_INDEX = 1;
-
-    public static final String USER_INDEX_NAME = "textualIndex2";
-
-    public static final int GROUP_INDEX = 2;
-
-    public static final String GROUP_INDEX_NAME = "textualIndex3";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(USER_MEMBERSHIP_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SUserMembershipLogBuilderFactoryImpl.USER_MEMBERSHIP_INDEX, objectId);
         return this;
     }
 
-    @Override
-    public String getObjectIdKey() {
-        return USER_MEMBERSHIP_INDEX_NAME;
-    }
+    
 
     @Override
     protected String getActionTypePrefix() {
@@ -61,50 +42,35 @@ public class SUserMembershipLogBuilderImpl extends CRUDELogBuilder implements SU
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(USER_MEMBERSHIP_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SUserMembershipLogBuilderFactoryImpl.USER_MEMBERSHIP_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "UserMembership Id");
         }
 
-        if (log.getNumericIndex(ROLE_INDEX) == 0L) {
+        if (log.getNumericIndex(SUserMembershipLogBuilderFactoryImpl.ROLE_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Role Id");
         }
 
-        if (log.getNumericIndex(USER_INDEX) == 0L) {
+        if (log.getNumericIndex(SUserMembershipLogBuilderFactoryImpl.USER_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "User Id");
         }
     }
 
     @Override
     public SUserMembershipLogBuilder roleID(final long roleId) {
-        queriableLogBuilder.numericIndex(ROLE_INDEX, roleId);
+        queriableLogBuilder.numericIndex(SUserMembershipLogBuilderFactoryImpl.ROLE_INDEX, roleId);
         return this;
     }
 
     @Override
     public SUserMembershipLogBuilder identityUserId(final long userId) {
-        queriableLogBuilder.numericIndex(USER_INDEX, userId);
+        queriableLogBuilder.numericIndex(SUserMembershipLogBuilderFactoryImpl.USER_INDEX, userId);
         return this;
     }
 
     @Override
     public SUserMembershipLogBuilder groupId(final long groupId) {
-        queriableLogBuilder.numericIndex(GROUP_INDEX, groupId);
+        queriableLogBuilder.numericIndex(SUserMembershipLogBuilderFactoryImpl.GROUP_INDEX, groupId);
         return this;
-    }
-
-    @Override
-    public String getRoleNameKey() {
-        return ROLE_INDEX_NAME;
-    }
-
-    @Override
-    public String getIdentityUserNameKey() {
-        return USER_INDEX_NAME;
-    }
-
-    @Override
-    public String getGroupPathKey() {
-        return GROUP_INDEX_NAME;
     }
 
 }

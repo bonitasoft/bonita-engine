@@ -24,7 +24,6 @@ import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.SignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchErrorEventTriggerDefinition;
@@ -35,8 +34,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SC
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SCatchMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SCatchSignalEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.STimerEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -57,19 +54,17 @@ public abstract class SCatchEventDefinitionImpl extends SEventDefinitionImpl imp
 
     private boolean isInterrupting = true;
 
-    public SCatchEventDefinitionImpl(final CatchEventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(eventDefinition, sExpressionBuilders, transitionsMap, sOperationBuilders);
+    public SCatchEventDefinitionImpl(final CatchEventDefinition eventDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(eventDefinition, transitionsMap);
         isInterrupting = eventDefinition.isInterrupting();
         timerEventTriggers = new ArrayList<STimerEventTriggerDefinition>(eventDefinition.getTimerEventTriggerDefinitions().size());
         for (final TimerEventTriggerDefinition timerTrigger : eventDefinition.getTimerEventTriggerDefinitions()) {
-            addTimerEventTrigger(new STimerEventTriggerDefinitionImpl(timerTrigger, sExpressionBuilders));
+            addTimerEventTrigger(new STimerEventTriggerDefinitionImpl(timerTrigger));
         }
         messageEventTriggers = new ArrayList<SCatchMessageEventTriggerDefinition>(eventDefinition.getMessageEventTriggerDefinitions().size());
         for (final CatchMessageEventTriggerDefinition catchMessageTrigger : eventDefinition.getMessageEventTriggerDefinitions()) {
-            addMessageEventTrigger(new SCatchMessageEventTriggerDefinitionImpl(catchMessageTrigger, sDataDefinitionBuilders, sExpressionBuilders,
-                    sOperationBuilders));
+            addMessageEventTrigger(new SCatchMessageEventTriggerDefinitionImpl(catchMessageTrigger));
         }
         signalEventTriggers = new ArrayList<SCatchSignalEventTriggerDefinition>(eventDefinition.getSignalEventTriggerDefinitions().size());
         for (final SignalEventTriggerDefinition signalTrigger : eventDefinition.getSignalEventTriggerDefinitions()) {

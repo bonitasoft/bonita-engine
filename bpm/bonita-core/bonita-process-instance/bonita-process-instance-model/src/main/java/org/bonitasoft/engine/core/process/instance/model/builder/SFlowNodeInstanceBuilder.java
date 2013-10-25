@@ -21,7 +21,7 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public interface SFlowNodeInstanceBuilder extends SFlowElementInstanceBuilder {
+public interface SFlowNodeInstanceBuilder {
 
     SFlowNodeInstanceBuilder setState(final int stateId, final boolean stable, final boolean terminal, String stateName);
 
@@ -47,28 +47,8 @@ public interface SFlowNodeInstanceBuilder extends SFlowElementInstanceBuilder {
 
     SFlowNodeInstanceBuilder setTokenRefId(Long tokenRefId);
 
-    String getStateIdKey();
-
-    String getStateNameKey();
-
-    String getPreviousStateIdKey();
-
-    String getReachStateDateKey();
-
-    String getLastUpdateDateKey();
-
-    String getDisplayNameKey();
-
-    String getDisplayDescriptionKey();
-
-    String getStateExecutingKey();
-
     SFlowNodeInstance done();
-
+    
     SFlowNodeType getFlowNodeType();
-
-    String getExecutedBy();
-
-    String getExecutedByDelegate();
 
 }

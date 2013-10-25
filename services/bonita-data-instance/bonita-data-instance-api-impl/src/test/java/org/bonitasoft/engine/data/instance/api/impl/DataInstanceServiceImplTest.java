@@ -36,9 +36,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.data.model.SDataSource;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -56,11 +54,7 @@ public class DataInstanceServiceImplTest {
 
     private DataService dataSourceService;
 
-    private SDataInstanceBuilders dataInstanceBuilders;
-
     private Recorder recorder;
-
-    private SEventBuilders eventBuilders;
 
     private ReadPersistenceService persistenceService;
 
@@ -75,10 +69,9 @@ public class DataInstanceServiceImplTest {
         dataSourceService = mock(DataService.class);
         persistenceService = mock(ReadPersistenceService.class);
         recorder = mock(Recorder.class);
-        eventBuilders = mock(SEventBuilders.class);
         logger = mock(TechnicalLoggerService.class);
         archiveService = mock(ArchiveService.class);
-        dataInstanceServiceImpl = new DataInstanceServiceImpl(dataSourceService, dataInstanceBuilders, recorder, eventBuilders, persistenceService,
+        dataInstanceServiceImpl = new DataInstanceServiceImpl(dataSourceService, recorder, persistenceService,
                 archiveService, logger);
     }
 

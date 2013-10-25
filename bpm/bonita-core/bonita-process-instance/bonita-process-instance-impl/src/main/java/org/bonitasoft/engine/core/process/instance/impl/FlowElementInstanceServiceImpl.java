@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.instance.api.FlowElementInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -32,19 +31,13 @@ import org.bonitasoft.engine.recorder.Recorder;
  */
 public abstract class FlowElementInstanceServiceImpl implements FlowElementInstanceService {
 
-    protected final BPMInstanceBuilders instanceBuilders;
-
-    // private final EventService eventService;
-
     private final Recorder recorder;
 
     private final ReadPersistenceService persistenceRead;
 
-    public FlowElementInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final BPMInstanceBuilders instanceBuilders) {
+    public FlowElementInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
-        this.instanceBuilders = instanceBuilders;
-        // this.eventService = eventService;
     }
 
     @Override
@@ -74,10 +67,6 @@ public abstract class FlowElementInstanceServiceImpl implements FlowElementInsta
 
     protected ReadPersistenceService getPersistenceRead() {
         return persistenceRead;
-    }
-
-    protected BPMInstanceBuilders getInstanceBuilders() {
-        return instanceBuilders;
     }
 
     @Override

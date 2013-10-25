@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
@@ -23,17 +22,13 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTask
  */
 public class SAUserTaskInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAUserTaskInstanceBuilder {
 
-    private SAUserTaskInstanceImpl entity;
-
-    @Override
-    public SAUserTaskInstanceBuilder createNewUserTaskInstance(final SUserTaskInstance sUserTaskInstance) {
-        entity = new SAUserTaskInstanceImpl(sUserTaskInstance);
-        return this;
+    public SAUserTaskInstanceBuilderImpl(final SAUserTaskInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SAUserTaskInstance done() {
-        return entity;
+        return (SAUserTaskInstance) entity;
     }
 
 }

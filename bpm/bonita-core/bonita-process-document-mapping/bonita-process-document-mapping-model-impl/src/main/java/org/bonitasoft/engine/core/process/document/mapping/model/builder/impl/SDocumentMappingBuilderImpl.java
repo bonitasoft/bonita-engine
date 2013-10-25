@@ -25,88 +25,11 @@ import org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentM
  */
 public class SDocumentMappingBuilderImpl implements SDocumentMappingBuilder {
 
-    private SDocumentMappingImpl documentMapping;
+    private final SDocumentMappingImpl documentMapping;
 
-    static final String ID = "id";
-
-    static final String PROCESS_INSTANCE_ID = "processInstanceId";
-
-    static final String DOCUMENT_NAME = "documentName";
-
-    static final String DOCUMENT_AUTHOR = "documentAuthor";
-
-    static final String DOCUMENT_CREATION_DATE = "documentCreationDate";
-
-    static final String DOCUMENT_HAS_CONTENT = "documentHasContent";
-
-    static final String DOCUMENT_CONTENT_FILENAME = "documentContentFileName";
-
-    static final String DOCUMENT_CONTENT_MIMETYPE = "documentContentMimeType";
-
-    static final String DOCUMENT_CONTENT_STORAGE_ID = "contentStorageId";
-
-    static final String DOCUMENT_URL = "documentURL";
-
-    @Override
-    public SDocumentMappingBuilder createNewInstance() {
-        this.documentMapping = new SDocumentMappingImpl();
-        return this;
-    }
-
-    @Override
-    public SDocumentMappingBuilder createNewInstance(final SDocumentMapping documentMapping) {
-        this.documentMapping = new SDocumentMappingImpl(documentMapping);
-        return this;
-    }
-
-    @Override
-    public String getIdKey() {
-        return ID;
-    }
-
-    @Override
-    public String getProcessInstanceIdKey() {
-        return PROCESS_INSTANCE_ID;
-    }
-
-    @Override
-    public String getDocumentNameKey() {
-        return DOCUMENT_NAME;
-    }
-
-    @Override
-    public String getDocumentAuthorKey() {
-        return DOCUMENT_AUTHOR;
-    }
-
-    @Override
-    public String getDocumentCreationDateKey() {
-        return DOCUMENT_CREATION_DATE;
-    }
-
-    @Override
-    public String getDocumentHasContent() {
-        return DOCUMENT_HAS_CONTENT;
-    }
-
-    @Override
-    public String getDocumentContentFileNameKey() {
-        return DOCUMENT_CONTENT_FILENAME;
-    }
-
-    @Override
-    public String getDocumentContentMimeTypeKey() {
-        return DOCUMENT_CONTENT_MIMETYPE;
-    }
-
-    @Override
-    public String geContentStorageIdKey() {
-        return DOCUMENT_CONTENT_STORAGE_ID;
-    }
-
-    @Override
-    public String getDocumentURLKey() {
-        return DOCUMENT_URL;
+    public SDocumentMappingBuilderImpl(final SDocumentMappingImpl documentMapping) {
+        super();
+        this.documentMapping = documentMapping;
     }
 
     @Override

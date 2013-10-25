@@ -23,8 +23,6 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public interface SExpressionBuilder {
 
-    SExpressionBuilder createNewInstance();
-
     SExpressionBuilder setName(String name);
 
     SExpressionBuilder setContent(String content);

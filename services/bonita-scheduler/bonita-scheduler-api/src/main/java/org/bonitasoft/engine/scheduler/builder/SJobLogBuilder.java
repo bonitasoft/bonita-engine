@@ -20,8 +20,6 @@ import org.bonitasoft.engine.scheduler.model.SJobLog;
  */
 public interface SJobLogBuilder {
 
-    SJobLogBuilder createNewInstance(long jobDescriptorId);
-
     SJobLogBuilder setLastUpdateDate(Long lastUpdateDate);
 
     SJobLogBuilder setLastMessage(String lastMessage);

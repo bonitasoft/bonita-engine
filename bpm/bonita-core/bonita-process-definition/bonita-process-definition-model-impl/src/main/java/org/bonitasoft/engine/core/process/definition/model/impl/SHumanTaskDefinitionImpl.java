@@ -16,12 +16,9 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.impl.HumanTaskDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
@@ -39,10 +36,9 @@ public abstract class SHumanTaskDefinitionImpl extends SActivityDefinitionImpl i
 
     private Long expectedDuration;
 
-    public SHumanTaskDefinitionImpl(final HumanTaskDefinition userTaskDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(userTaskDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SHumanTaskDefinitionImpl(final HumanTaskDefinition userTaskDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(userTaskDefinition, transitionsMap);
         actorName = userTaskDefinition.getActorName();
     }
 

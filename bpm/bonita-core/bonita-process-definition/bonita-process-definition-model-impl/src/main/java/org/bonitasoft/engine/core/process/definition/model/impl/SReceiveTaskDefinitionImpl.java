@@ -16,14 +16,11 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.impl.ReceiveTaskDefinitionImpl;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SCatchMessageEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Julien Molinaro
@@ -35,11 +32,10 @@ public class SReceiveTaskDefinitionImpl extends SActivityDefinitionImpl implemen
 
     private final SCatchMessageEventTriggerDefinitionImpl trigger;
 
-    public SReceiveTaskDefinitionImpl(final ReceiveTaskDefinitionImpl activityDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
-        trigger = new SCatchMessageEventTriggerDefinitionImpl(activityDefinition.getTrigger(), sDataDefinitionBuilders, sExpressionBuilders, sOperationBuilders);
+    public SReceiveTaskDefinitionImpl(final ReceiveTaskDefinitionImpl activityDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(activityDefinition, transitionsMap);
+        trigger = new SCatchMessageEventTriggerDefinitionImpl(activityDefinition.getTrigger());
     }
 
     public SReceiveTaskDefinitionImpl(final long id, final String name, final SCatchMessageEventTriggerDefinition catchMessageEventTriggerDefinition) {

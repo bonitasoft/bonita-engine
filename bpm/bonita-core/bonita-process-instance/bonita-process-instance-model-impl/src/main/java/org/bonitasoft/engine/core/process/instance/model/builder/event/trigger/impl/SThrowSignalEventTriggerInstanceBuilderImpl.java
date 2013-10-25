@@ -20,14 +20,13 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThr
 /**
  * @author Matthieu Chaffotte
  */
-public class SThrowSignalEventTriggerInstanceBuilderImpl extends SEventTriggerInstanceBuilderImpl implements SThrowSignalEventTriggerInstanceBuilder {
+public class SThrowSignalEventTriggerInstanceBuilderImpl implements SThrowSignalEventTriggerInstanceBuilder {
 
-    private SThrowSignalEventTriggerInstanceImpl entity;
+    private final SThrowSignalEventTriggerInstanceImpl entity;
 
-    @Override
-    public SThrowSignalEventTriggerInstanceBuilder createNewInstance(final long eventInstanceId, final String signalName) {
-        entity = new SThrowSignalEventTriggerInstanceImpl(eventInstanceId, signalName);
-        return this;
+    protected SThrowSignalEventTriggerInstanceBuilderImpl(final SThrowSignalEventTriggerInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override

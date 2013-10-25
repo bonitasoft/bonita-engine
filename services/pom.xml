@@ -52,6 +52,7 @@
 		<module>bonita-work</module>
 		<module>bonita-services-test-conf</module>
 		<module>bonita-incident</module>
+		<module>bonita-builder</module>
 	</modules>
 	
 	<profiles>

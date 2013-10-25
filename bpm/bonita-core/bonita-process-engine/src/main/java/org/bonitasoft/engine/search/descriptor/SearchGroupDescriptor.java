@@ -18,10 +18,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.GroupSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.builder.GroupBuilder;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
+import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -33,21 +33,20 @@ public class SearchGroupDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> groupAllFields;
 
-    SearchGroupDescriptor(final IdentityModelBuilder identityModelBuilder) {
-        final GroupBuilder groupBuilder = identityModelBuilder.getGroupBuilder();
+    SearchGroupDescriptor() {
         groupKeys = new HashMap<String, FieldDescriptor>(4);
-        groupKeys.put(GroupSearchDescriptor.ID, new FieldDescriptor(SGroup.class, groupBuilder.getIdKey()));
-        groupKeys.put(GroupSearchDescriptor.NAME, new FieldDescriptor(SGroup.class, groupBuilder.getNameKey()));
-        groupKeys.put(GroupSearchDescriptor.PARENT_PATH, new FieldDescriptor(SGroup.class, groupBuilder.getParentPathKey()));
-        groupKeys.put(GroupSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SGroup.class, groupBuilder.getDisplayNameKey()));
+        groupKeys.put(GroupSearchDescriptor.ID, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getIdKey()));
+        groupKeys.put(GroupSearchDescriptor.NAME, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey()));
+        groupKeys.put(GroupSearchDescriptor.PARENT_PATH, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getParentPathKey()));
+        groupKeys.put(GroupSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getDisplayNameKey()));
 
         groupAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> groupFields = new HashSet<String>(6);
-        groupFields.add(groupBuilder.getNameKey());
-        groupFields.add(groupBuilder.getDisplayNameKey());
-        groupFields.add(groupBuilder.getDescriptionKey());
-        groupFields.add(groupBuilder.getIconNameKey());
-        groupFields.add(groupBuilder.getIconPathKey());
+        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getNameKey());
+        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getDisplayNameKey());
+        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getDescriptionKey());
+        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getIconNameKey());
+        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getIconPathKey());
         groupAllFields.put(SGroup.class, groupFields);
     }
 

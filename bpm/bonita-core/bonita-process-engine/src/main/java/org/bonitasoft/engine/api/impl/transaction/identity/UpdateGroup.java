@@ -16,13 +16,13 @@ package org.bonitasoft.engine.api.impl.transaction.identity;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.builder.GroupBuilder;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
+import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -43,14 +43,10 @@ public class UpdateGroup implements TransactionContent {
 
     private SGroup sGroup;
 
-    private final IdentityModelBuilder modelBuilder;
-
-    public UpdateGroup(final long groupId, final EntityUpdateDescriptor changeDescriptor, final IdentityService identityService,
-            final IdentityModelBuilder modelBuilder) {
+    public UpdateGroup(final long groupId, final EntityUpdateDescriptor changeDescriptor, final IdentityService identityService) {
         this.groupId = groupId;
         this.changeDescriptor = changeDescriptor;
         this.identityService = identityService;
-        this.modelBuilder = modelBuilder;
     }
 
     @Override
@@ -61,15 +57,15 @@ public class UpdateGroup implements TransactionContent {
     }
 
     private void updateGroup(final SGroup group, final EntityUpdateDescriptor changeDescriptor) throws SIdentityException {
-        final GroupBuilder groupBuilder = modelBuilder.getGroupBuilder();
+        final SGroupBuilderFactory sGroupFactiry = BuilderFactory.get(SGroupBuilderFactory.class);
         // if the parent path changes it's also necessary to change the children's parent path
-        final String parentPathKey = groupBuilder.getParentPathKey();
-        final String nameKey = groupBuilder.getNameKey();
+        final String parentPathKey = sGroupFactiry.getParentPathKey();
+        final String nameKey = sGroupFactiry.getNameKey();
         final Map<String, Object> fields = changeDescriptor.getFields();
         if (fields.containsKey(parentPathKey) || fields.containsKey(nameKey)) {
             final String parentPath = ((fields.containsKey(parentPathKey) ? (String) fields.get(parentPathKey) : group.getParentPath()));
             final String groupName = (fields.containsKey(nameKey) ? (String) fields.get(nameKey) : group.getName());
-            updateChildren(group, parentPath, groupBuilder.getIdKey(), parentPathKey, groupName);
+            updateChildren(group, parentPath, sGroupFactiry.getIdKey(), parentPathKey, groupName);
         }
         identityService.updateGroup(group, changeDescriptor);
     }

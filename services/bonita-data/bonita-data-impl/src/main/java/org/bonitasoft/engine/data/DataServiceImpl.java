@@ -16,25 +16,27 @@ package org.bonitasoft.engine.data;
 import java.lang.reflect.Proxy;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceState;
 import org.bonitasoft.engine.data.model.builder.SDataSourceLogBuilder;
-import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
+import org.bonitasoft.engine.data.model.builder.SDataSourceLogBuilderFactory;
 import org.bonitasoft.engine.data.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -48,8 +50,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  * @author Matthieu Chaffotte
  */
 public class DataServiceImpl implements DataService {
-
-    private final SDataSourceModelBuilder logModelBuilder;
 
     private final Recorder recorder;
 
@@ -67,10 +67,9 @@ public class DataServiceImpl implements DataService {
 
     protected static final String DATA_SOURCE_TYPE = "___datasource___";
 
-    public DataServiceImpl(final SDataSourceModelBuilder modelBuilder, final Recorder recorder, final ReadPersistenceService persistenceService,
+    public DataServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
             final ClassLoaderService classLoaderService, final EventService eventService, final List<DataSourceConfiguration> dataSourceConfigurations,
             final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
-        logModelBuilder = modelBuilder;
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.classLoaderService = classLoaderService;
@@ -81,14 +80,14 @@ public class DataServiceImpl implements DataService {
     }
 
     private SDataSourceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SDataSourceLogBuilder logBuilder = logModelBuilder.getDataSourceLogBuilder();
+        final SDataSourceLogBuilder logBuilder = BuilderFactory.get(SDataSourceLogBuilderFactory.class).createNewInstance();
         initializeLogBuilder(logBuilder, message);
         updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -167,7 +166,7 @@ public class DataServiceImpl implements DataService {
         final SDataSourceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new datasource");
         try {
             final InsertRecord insertRecord = new InsertRecord(dataSource);
-            final SInsertEvent insertEvent = (SInsertEvent) eventService.getEventBuilder().createInsertEvent(DATASOURCE).setObject(dataSource).done();
+            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATASOURCE).setObject(dataSource).done();
             recorder.recordInsert(insertRecord, insertEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createDataSource"));
@@ -240,7 +239,7 @@ public class DataServiceImpl implements DataService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeDataSource"));
             }
             final DeleteRecord deleteRecord = new DeleteRecord(dataSource);
-            final SDeleteEvent deleteEvent = (SDeleteEvent) eventService.getEventBuilder().createDeleteEvent(DATASOURCE).setObject(dataSource).done();
+            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATASOURCE).setObject(dataSource).done();
             recorder.recordDelete(deleteRecord, deleteEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeDataSource"));

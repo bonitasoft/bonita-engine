@@ -23,14 +23,11 @@ package org.bonitasoft.engine.identity;
  */
 public class ExportedUserBuilder {
 
-    private ExportedUserImpl user;
+    private final ExportedUserImpl user;
 
-    public ExportedUserBuilder createNewInstance(final String userName, final String password) {
-        user = new ExportedUserImpl();
-        user.setUserName(userName);
-        user.setPassword(password);
-        user.setEnabled(false);
-        return this;
+    public ExportedUserBuilder(final ExportedUserImpl user) {
+        super();
+        this.user = user;
     }
 
     public ExportedUserBuilder setPasswordEncrypted(final boolean passwordEncrypted) {

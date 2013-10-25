@@ -13,16 +13,11 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class SMultiInstanceLoopCardinalityBinding extends SExpressionBinding {
-
-    public SMultiInstanceLoopCardinalityBinding(final SExpressionBuilders sExpressionBuilders) {
-        super(sExpressionBuilders);
-    }
 
     @Override
     public String getElementTag() {

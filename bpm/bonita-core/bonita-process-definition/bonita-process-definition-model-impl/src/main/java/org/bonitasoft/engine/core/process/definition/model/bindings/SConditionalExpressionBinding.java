@@ -15,16 +15,10 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
-
 /**
  * @author Baptiste Mesta
  */
 public class SConditionalExpressionBinding extends SExpressionBinding {
-
-    public SConditionalExpressionBinding(final SExpressionBuilders expressionBuilders) {
-        super(expressionBuilders);
-    }
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {

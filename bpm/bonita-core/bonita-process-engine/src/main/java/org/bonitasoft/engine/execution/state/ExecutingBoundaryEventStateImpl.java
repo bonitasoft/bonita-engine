@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -25,8 +26,8 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 
@@ -39,15 +40,12 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
 
     private final ContainerRegistry containerRegistry;
 
-    private final BPMInstanceBuilders bpmInstanceBuilders;
-
     private final TokenService tokenService;
 
     public ExecutingBoundaryEventStateImpl(final ActivityInstanceService activityInstanceService, final ContainerRegistry containerRegistry,
-            final BPMInstanceBuilders bpmInstanceBuilders, TokenService tokenService) {
+            final TokenService tokenService) {
         this.activityInstanceService = activityInstanceService;
         this.containerRegistry = containerRegistry;
-        this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.tokenService = tokenService;
     }
 
@@ -101,7 +99,7 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
     }
 
     private void aborteRelatedActivity(final SBoundaryEventInstance boundaryEventInstance) throws SActivityStateExecutionException {
-        final SFlowNodeInstanceBuilder flowNodeKeyProvider = bpmInstanceBuilders.getSUserTaskInstanceBuilder();
+        final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         if (SStateCategory.NORMAL.equals(boundaryEventInstance.getStateCategory())) {
             try {
                 final SActivityInstance relatedActivityInst = activityInstanceService.getActivityInstance(boundaryEventInstance.getActivityInstanceId());

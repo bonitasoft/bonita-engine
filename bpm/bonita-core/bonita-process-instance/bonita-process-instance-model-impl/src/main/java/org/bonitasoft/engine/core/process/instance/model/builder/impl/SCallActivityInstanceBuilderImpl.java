@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SCallActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -24,24 +23,12 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
  */
 public class SCallActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SCallActivityInstanceBuilder {
 
-    private SCallActivityInstanceImpl callActivityInstance;
-
-    @Override
-    public SCallActivityInstanceBuilder createNewCallActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        callActivityInstance = new SCallActivityInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
-                rootProcessInstanceId);
-        callActivityInstance.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SCallActivityInstanceBuilderImpl(final SCallActivityInstanceImpl callActivityInstance) {
+        super(callActivityInstance);
     }
 
     @Override
     public SCallActivityInstance done() {
-        return callActivityInstance;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return callActivityInstance;
+        return (SCallActivityInstance) this.entity;
     }
 }

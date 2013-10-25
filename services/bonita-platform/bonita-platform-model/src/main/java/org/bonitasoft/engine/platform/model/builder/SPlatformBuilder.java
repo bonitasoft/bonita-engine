@@ -20,20 +20,6 @@ import org.bonitasoft.engine.platform.model.SPlatform;
  */
 public interface SPlatformBuilder {
 
-    SPlatformBuilder createNewInstance(String version, String previousVersion, String initialVersion, String createdBy, long created);
-
     SPlatform done();
-
-    String getIdKey();
-
-    String getVersionKey();
-
-    String getPreviousVersionKey();
-
-    String getInitialVersionKey();
-
-    String getCreatedKey();
-
-    String getCreatedByKey();
 
 }

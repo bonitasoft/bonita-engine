@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.events.EventActionType;
@@ -27,7 +28,7 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SGroupCreationException;
 import org.bonitasoft.engine.identity.SGroupDeletionException;
@@ -48,15 +49,20 @@ import org.bonitasoft.engine.identity.model.SProfileMetadataValue;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilder;
+import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoLogBuilder;
+import org.bonitasoft.engine.identity.model.builder.SContactInfoLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupLogBuilder;
+import org.bonitasoft.engine.identity.model.builder.SGroupLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionLogBuilder;
+import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleLogBuilder;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
+import org.bonitasoft.engine.identity.model.builder.SRoleLogBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserLogBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilderFactory;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -70,8 +76,8 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -98,10 +104,6 @@ public class IdentityServiceImpl implements IdentityService {
 
     private final Recorder recorder;
 
-    private final SEventBuilder eventBuilder;
-
-    private final IdentityModelBuilder identityModelBuilder;
-
     private final TechnicalLoggerService logger;
 
     private final QueriableLoggerService queriableLoggerService;
@@ -111,13 +113,11 @@ public class IdentityServiceImpl implements IdentityService {
     private final CredentialsEncrypter encrypter;
 
     public IdentityServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final IdentityModelBuilder identityModelBuilder, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
             final CredentialsEncrypter encrypter) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
-        eventBuilder = eventService.getEventBuilder();
-        this.identityModelBuilder = identityModelBuilder;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
         this.encrypter = encrypter;
@@ -153,7 +153,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     private SInsertEvent getInsertEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.CREATED)) {
-            return (SInsertEvent) eventBuilder.createInsertEvent(type).setObject(object).done();
+            return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
         } else {
             return null;
         }
@@ -161,7 +161,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     private SDeleteEvent getDeleteEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.DELETED)) {
-            return (SDeleteEvent) eventBuilder.createDeleteEvent(type).setObject(object).done();
+            return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
         } else {
             return null;
         }
@@ -244,7 +244,7 @@ public class IdentityServiceImpl implements IdentityService {
         final SUserLogBuilder logBuilder = getUserLog(ActionType.CREATED, message);
 
         final String hash = encrypter.hash(user.getPassword());
-        final SUser hashedUser = identityModelBuilder.getUserBuilder().createNewInstance(user).setPassword(hash).done();
+        final SUser hashedUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).setPassword(hash).done();
         try {
             final InsertRecord insertRecord = new InsertRecord(hashedUser);
             final SInsertEvent insertEvent = getInsertEvent(hashedUser, USER);
@@ -384,7 +384,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -392,35 +392,35 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private SGroupLogBuilder getGroupLog(final ActionType actionType, final String message) {
-        final SGroupLogBuilder logBuilder = identityModelBuilder.getSIdentityGroupLogBuilder();
+        final SGroupLogBuilder logBuilder = BuilderFactory.get(SGroupLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private SRoleLogBuilder getRoleLog(final ActionType actionType, final String message) {
-        final SRoleLogBuilder logBuilder = identityModelBuilder.getSIdentityRoleLogBuilder();
+        final SRoleLogBuilder logBuilder = BuilderFactory.get(SRoleLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private SProfileMetadataDefinitionLogBuilder getSProfileMetadataDefinitionLog(final ActionType actionType, final String message) {
-        final SProfileMetadataDefinitionLogBuilder logBuilder = identityModelBuilder.getSIdentitySProfileMetadataDefinitionLogBuilder();
+        final SProfileMetadataDefinitionLogBuilder logBuilder = BuilderFactory.get(SProfileMetadataDefinitionLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private SUserLogBuilder getUserLog(final ActionType actionType, final String message) {
-        final SUserLogBuilder logBuilder = identityModelBuilder.getSIdentityUserLogBuilder();
+        final SUserLogBuilder logBuilder = BuilderFactory.get(SUserLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private SContactInfoLogBuilder getUserContactInfoLog(final ActionType actionType, final String message, final SContactInfo contactInfo) {
-        final SContactInfoLogBuilder logBuilder = identityModelBuilder.getSIdentityUserContactInfoLogBuilder();
+        final SContactInfoLogBuilder logBuilder = BuilderFactory.get(SContactInfoLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         logBuilder.setContactInfoUserId(contactInfo.getUserId());
@@ -428,7 +428,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private SUserMembershipLogBuilder getUserMembershipLog(final ActionType actionType, final String message, final SUserMembership userMemberShip) {
-        final SUserMembershipLogBuilder logBuilder = identityModelBuilder.getSIdentityUserMembershipLogBuilder();
+        final SUserMembershipLogBuilder logBuilder = BuilderFactory.get(SUserMembershipLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         logBuilder.identityUserId(userMemberShip.getUserId());
@@ -1714,7 +1714,7 @@ public class IdentityServiceImpl implements IdentityService {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(group, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(GROUP, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventBuilder.createUpdateEvent(GROUP).setObject(group).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(GROUP).setObject(group).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(group.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateGroup");
@@ -1741,7 +1741,7 @@ public class IdentityServiceImpl implements IdentityService {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(metadata, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(METADATA, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventBuilder.createUpdateEvent(METADATA).setObject(metadata).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(METADATA).setObject(metadata).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateProfileMetadataDefinition");
@@ -1766,7 +1766,7 @@ public class IdentityServiceImpl implements IdentityService {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(metadataValue, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(METADATAVALUE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventBuilder.createUpdateEvent(METADATAVALUE).setObject(metadataValue).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(METADATAVALUE).setObject(metadataValue).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1790,7 +1790,7 @@ public class IdentityServiceImpl implements IdentityService {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(role, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(ROLE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventBuilder.createUpdateEvent(ROLE).setObject(role).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ROLE).setObject(role).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1833,12 +1833,11 @@ public class IdentityServiceImpl implements IdentityService {
         }
         final SUserLogBuilder logBuilder = getUserLog(ActionType.UPDATED, sb.toString());
         try {
-            final SUserBuilder userBuilder = identityModelBuilder.getUserBuilder();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(user, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(USER, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventBuilder.createUpdateEvent(USER).setObject(user).done();
-                final SUser oldUser = userBuilder.createNewInstance(user).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(USER).setObject(user).done();
+                final SUser oldUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).done();
                 updateEvent.setOldObject(oldUser);
             }
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -1865,12 +1864,11 @@ public class IdentityServiceImpl implements IdentityService {
         sb.append(contactInfo.getUserId());
         final SContactInfoLogBuilder logBuilder = getUserContactInfoLog(ActionType.UPDATED, sb.toString(), contactInfo);
         try {
-            final SContactInfoBuilder contactInfoBuilder = identityModelBuilder.getUserContactInfoBuilder();
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(contactInfo, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(USER_CONTACT_INFO, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventBuilder.createUpdateEvent(USER_CONTACT_INFO).setObject(contactInfo).done();
-                final SContactInfo oldContactInfo = contactInfoBuilder.createNewInstance(contactInfo).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(USER_CONTACT_INFO).setObject(contactInfo).done();
+                final SContactInfo oldContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(contactInfo).done();
                 updateEvent.setOldObject(oldContactInfo);
             }
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -1904,7 +1902,7 @@ public class IdentityServiceImpl implements IdentityService {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(userMembership, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(USERMEMBERSHIP, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventBuilder.createUpdateEvent(USERMEMBERSHIP).setObject(userMembership).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(USERMEMBERSHIP).setObject(userMembership).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -2231,7 +2229,7 @@ public class IdentityServiceImpl implements IdentityService {
                 + user.getLastName();
         final SUserLogBuilder logBuilder = getUserLog(ActionType.CREATED, message);
 
-        final SUser hashedUser = identityModelBuilder.getUserBuilder().createNewInstance(user).done();
+        final SUser hashedUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).done();
         try {
             final InsertRecord insertRecord = new InsertRecord(hashedUser);
             final SInsertEvent insertEvent = getInsertEvent(hashedUser, USER);

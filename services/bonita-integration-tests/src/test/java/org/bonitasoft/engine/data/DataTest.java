@@ -4,22 +4,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.data.model.Address;
 import org.bonitasoft.engine.data.model.Employee;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceState;
-import org.bonitasoft.engine.data.model.builder.SDataSourceBuilder;
+import org.bonitasoft.engine.data.model.builder.SDataSourceBuilderFactory;
 import org.junit.Test;
 
 public class DataTest extends CommonServiceTest {
 
     private static DataService dataService;
 
-    private static SDataSourceBuilder dataSourceModelBuilder;
+    private static SDataSourceBuilderFactory dataSourceBuilderFactory;
 
     static {
         dataService = getServicesBuilder().buildDataService();
-        dataSourceModelBuilder = getServicesBuilder().buildDataSourceModelBuilder();
+        dataSourceBuilderFactory = BuilderFactory.get(SDataSourceBuilderFactory.class);
     }
 
     // tester a tout prix
@@ -31,7 +32,7 @@ public class DataTest extends CommonServiceTest {
 
     @Test
     public void testInsertEmployee() throws Exception {
-        final SDataSource dataSource = dataSourceModelBuilder.createNewInstance("employee", "1.0", SDataSourceState.ACTIVE,
+        final SDataSource dataSource = dataSourceBuilderFactory.createNewInstance("employee", "1.0", SDataSourceState.ACTIVE,
                 EmployeeDataSourceImpl.class.getName()).done();
         getTransactionService().begin();
 
@@ -57,7 +58,7 @@ public class DataTest extends CommonServiceTest {
     public void testGetDataSource() throws Exception {
         getTransactionService().begin();
 
-        final SDataSource dataSource = dataSourceModelBuilder.createNewInstance("employee", "1.0", SDataSourceState.ACTIVE,
+        final SDataSource dataSource = dataSourceBuilderFactory.createNewInstance("employee", "1.0", SDataSourceState.ACTIVE,
                 EmployeeDataSourceImpl.class.getName()).done();
         dataService.createDataSource(dataSource);
 
@@ -77,7 +78,7 @@ public class DataTest extends CommonServiceTest {
     public void testRemoveDataSource() throws Exception {
         getTransactionService().begin();
 
-        final SDataSource dataSource1 = dataSourceModelBuilder.createNewInstance("employee", "1.0", SDataSourceState.ACTIVE,
+        final SDataSource dataSource1 = dataSourceBuilderFactory.createNewInstance("employee", "1.0", SDataSourceState.ACTIVE,
                 EmployeeDataSourceImpl.class.getName()).done();
         dataService.createDataSource(dataSource1);
         dataService.removeDataSource(dataSource1.getId());
@@ -87,7 +88,7 @@ public class DataTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        final SDataSource dataSource2 = dataSourceModelBuilder.createNewInstance("employee", "1.1", SDataSourceState.ACTIVE,
+        final SDataSource dataSource2 = dataSourceBuilderFactory.createNewInstance("employee", "1.1", SDataSourceState.ACTIVE,
                 EmployeeDataSourceImpl.class.getName()).done();
         dataService.createDataSource(dataSource2);
         dataService.removeDataSource(dataSource2);

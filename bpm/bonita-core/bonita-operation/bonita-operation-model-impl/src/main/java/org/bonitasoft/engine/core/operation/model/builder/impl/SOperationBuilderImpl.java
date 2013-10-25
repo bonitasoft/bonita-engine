@@ -25,12 +25,11 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class SOperationBuilderImpl implements SOperationBuilder {
 
-    private SOperationImpl operation;
-
-    @Override
-    public SOperationBuilder createNewInstance() {
-        operation = new SOperationImpl();
-        return this;
+    private final SOperationImpl operation;
+    
+    public SOperationBuilderImpl(final SOperationImpl operation) {
+        super();
+        this.operation = operation;
     }
 
     @Override

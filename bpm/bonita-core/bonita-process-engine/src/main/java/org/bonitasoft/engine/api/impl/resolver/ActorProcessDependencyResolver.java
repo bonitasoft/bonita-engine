@@ -22,6 +22,7 @@ import java.util.Set;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilder;
+import org.bonitasoft.engine.actor.mapping.model.SActorBuilderFactory;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
@@ -31,6 +32,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.Problem.Level;
 import org.bonitasoft.engine.bpm.process.impl.ProblemImpl;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SActorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -49,7 +51,7 @@ public class ActorProcessDependencyResolver extends ProcessDependencyResolver {
     public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
             final SProcessDefinition sDefinition) throws ActorMappingImportException {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        final SActorBuilder sActorBuilder = tenantAccessor.getSActorBuilders().getSActorBuilder();
+        final SActorBuilderFactory sActorBuilderFactory = BuilderFactory.getInstance().get(SActorBuilderFactory.class);
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Parser parser = null;
         try {
@@ -63,13 +65,13 @@ public class ActorProcessDependencyResolver extends ProcessDependencyResolver {
         String initiatorName = null;
         if (actorInitiator != null) {
             initiatorName = actorInitiator.getName();
-            sActorBuilder.create(initiatorName, sDefinition.getId(), true);
+            final SActorBuilder sActorBuilder = sActorBuilderFactory.create(initiatorName, sDefinition.getId(), true);
             sActorBuilder.addDescription(actorInitiator.getDescription());
             sActors.add(sActorBuilder.getActor());
         }
         for (final SActorDefinition actor : actors) {
             if (initiatorName == null || !initiatorName.equals(actor.getName())) {
-                sActorBuilder.create(actor.getName(), sDefinition.getId(), false);
+                final SActorBuilder sActorBuilder = sActorBuilderFactory.create(actor.getName(), sDefinition.getId(), false);
                 sActorBuilder.addDescription(actor.getDescription());
                 sActors.add(sActorBuilder.getActor());
             }

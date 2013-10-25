@@ -17,17 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
 public class SExpressionBinding extends SNamedElementBinding {
-
-    private final SExpressionBuilders sExpressionBuilders;
 
     private String content;
 
@@ -38,10 +37,6 @@ public class SExpressionBinding extends SNamedElementBinding {
     private String type;
 
     private final List<SExpression> dependencies = new ArrayList<SExpression>();
-
-    public SExpressionBinding(final SExpressionBuilders sExpressionBuilders) {
-        this.sExpressionBuilders = sExpressionBuilders;
-    }
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
@@ -55,7 +50,7 @@ public class SExpressionBinding extends SNamedElementBinding {
     public Object getObject() {
         SExpression expression;
         try {
-            expression = sExpressionBuilders.getExpressionBuilder().createNewInstance().setName(name).setContent(content).setExpressionType(type)
+            expression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(name).setContent(content).setExpressionType(type)
                     .setInterpreter(interpreter).setReturnType(returnType).setDependencies(dependencies).done();
         } catch (final SInvalidExpressionException e) {
             throw new IllegalArgumentException("Error building SExpression", e);

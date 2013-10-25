@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.CommandUpdater;
 import org.bonitasoft.engine.command.CommandUpdater.CommandField;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -24,6 +25,7 @@ import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommandUpdateBuilder;
+import org.bonitasoft.engine.platform.command.model.SPlatformCommandUpdateBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -33,16 +35,13 @@ public class UpdateSPlatformCommand implements TransactionContent {
 
     private final PlatformCommandService platformCommandService;
 
-    private final SPlatformCommandUpdateBuilder platformCommandUpdateBuilder;
-
     private final String name;
 
     private final CommandUpdater updateDescriptor;
 
-    public UpdateSPlatformCommand(final PlatformCommandService platformCommandService, final SPlatformCommandUpdateBuilder platformCommandUpdateBuilder,
+    public UpdateSPlatformCommand(final PlatformCommandService platformCommandService,
             final String name, final CommandUpdater updateDescriptor) {
         this.platformCommandService = platformCommandService;
-        this.platformCommandUpdateBuilder = platformCommandUpdateBuilder;
         this.name = name;
         this.updateDescriptor = updateDescriptor;
     }
@@ -55,6 +54,7 @@ public class UpdateSPlatformCommand implements TransactionContent {
     }
 
     private EntityUpdateDescriptor getCommandUpdateDescriptor() {
+        final SPlatformCommandUpdateBuilder platformCommandUpdateBuilder = BuilderFactory.get(SPlatformCommandUpdateBuilderFactory.class).createNewInstance();
         final Map<CommandField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<CommandField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {

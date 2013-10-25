@@ -16,11 +16,12 @@ package org.bonitasoft.engine.execution;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -36,13 +37,11 @@ import org.bonitasoft.engine.persistence.search.FilterOperationType;
  */
 public abstract class AbstractProcessInstanceInterruptor {
 
-	private final BPMInstanceBuilders bpmInstanceBuilders;
 
 	private final TechnicalLoggerService logger;
 
-	public AbstractProcessInstanceInterruptor(final BPMInstanceBuilders bpmInstanceBuilders, final TechnicalLoggerService technicalLoggerService) {
+	public AbstractProcessInstanceInterruptor(final TechnicalLoggerService technicalLoggerService) {
 		super();
-		this.bpmInstanceBuilders = bpmInstanceBuilders;
 		logger = technicalLoggerService;
 	}
 
@@ -143,28 +142,27 @@ public abstract class AbstractProcessInstanceInterruptor {
 	protected abstract void setChildStateCategory(long flowNodeInstanceId, SStateCategory stateCategory) throws SBonitaException;
 
 	protected QueryOptions getQueryOptions(final long processInstanceId) {
-		final SFlowNodeInstanceBuilder flowNodeInstanceKeyProvider = bpmInstanceBuilders.getSUserTaskInstanceBuilder();
 		final int numberOfResults = 100;
 
 		final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(1);
-		orderByOptions.add(new OrderByOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getNameKey(), OrderByType.ASC));
+		orderByOptions.add(new OrderByOption(SFlowNodeInstance.class, BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC));
 
-		final List<FilterOption> filterOptions = getFilterOptions(processInstanceId, flowNodeInstanceKeyProvider);
+		final List<FilterOption> filterOptions = getFilterOptions(processInstanceId);
 		return new QueryOptions(0, numberOfResults, orderByOptions, filterOptions, null);
 	}
 
 	protected QueryOptions getQueryOptions(final long processInstanceId, final long childExceptionId) {
-		final SFlowNodeInstanceBuilder flowNodeInstanceKeyProvider = bpmInstanceBuilders.getSUserTaskInstanceBuilder();
 		final int numberOfResults = 100;
 
 		final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(1);
-		orderByOptions.add(new OrderByOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getNameKey(), OrderByType.ASC));
+		orderByOptions.add(new OrderByOption(SFlowNodeInstance.class, BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC));
 
-		final List<FilterOption> filterOptions = getFilterOptions(processInstanceId, childExceptionId, flowNodeInstanceKeyProvider);
+		final List<FilterOption> filterOptions = getFilterOptions(processInstanceId, childExceptionId);
 		return new QueryOptions(0, numberOfResults, orderByOptions, filterOptions, null);
 	}
 
-	protected List<FilterOption> getFilterOptions(final long processInstanceId, final SFlowNodeInstanceBuilder flowNodeInstanceKeyProvider) {
+	protected List<FilterOption> getFilterOptions(final long processInstanceId) {
+	    final SFlowNodeInstanceBuilderFactory flowNodeInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 		final List<FilterOption> filterOptions = new ArrayList<FilterOption>(3);
 		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getParentProcessInstanceKey(), processInstanceId));
 		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getTerminalKey(), false));
@@ -172,18 +170,14 @@ public abstract class AbstractProcessInstanceInterruptor {
 		return filterOptions;
 	}
 
-	protected List<FilterOption> getFilterOptions(final long processInstanceId, final long childExceptionId,
-			final SFlowNodeInstanceBuilder flowNodeInstanceKeyProvider) {
+	protected List<FilterOption> getFilterOptions(final long processInstanceId, final long childExceptionId) {
+	    final SFlowNodeInstanceBuilderFactory flowNodeInstanceKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 		final List<FilterOption> filterOptions = new ArrayList<FilterOption>(3);
 		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getParentProcessInstanceKey(), processInstanceId));
 		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getTerminalKey(), false));
 		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
 		filterOptions.add(new FilterOption(SFlowNodeInstance.class, flowNodeInstanceKeyProvider.getIdKey(), childExceptionId, FilterOperationType.DIFFERENT));
 		return filterOptions;
-	}
-
-	protected BPMInstanceBuilders getBpmInstanceBuilders() {
-		return bpmInstanceBuilders;
 	}
 
 }

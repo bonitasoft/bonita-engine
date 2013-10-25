@@ -22,12 +22,11 @@ import org.bonitasoft.engine.document.model.SDocumentContentBuilder;
  */
 public class SDocumentContentBuilderImpl implements SDocumentContentBuilder {
 
-    private SDocumentContentImpl document;
-
-    @Override
-    public SDocumentContentBuilderImpl createNewInstance() {
-        document = new SDocumentContentImpl();
-        return this;
+    private final SDocumentContentImpl document;
+    
+    public SDocumentContentBuilderImpl(final SDocumentContentImpl document) {
+        super();
+        this.document = document;
     }
 
     @Override
@@ -47,19 +46,8 @@ public class SDocumentContentBuilderImpl implements SDocumentContentBuilder {
         return this;
     }
 
-    @Override
-    public String getIdKey() {
-        return "id";
-    }
-
-    @Override
-    public String getDocumentIdKey() {
-        return "documentId";
-    }
-
-    @Override
-    public String getContentKey() {
-        return "content";
+    public static SDocumentContentBuilder getInstance() {
+        return new SDocumentContentBuilderImpl(null);
     }
 
 }

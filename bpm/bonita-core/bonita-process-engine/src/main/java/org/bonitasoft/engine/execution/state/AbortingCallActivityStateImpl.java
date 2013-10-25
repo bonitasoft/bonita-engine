@@ -16,14 +16,12 @@ package org.bonitasoft.engine.execution.state;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -34,12 +32,12 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class AbortingCallActivityStateImpl extends EndingCallActivityExceptionStateImpl {
 
-    public AbortingCallActivityStateImpl(final BPMInstanceBuilders bpmInstanceBuilders, final ActivityInstanceService activityInstanceService,
+    public AbortingCallActivityStateImpl(final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
-            final SCommentService commentService, final SCommentBuilders commentBuilders, final DataInstanceService dataInstanceService,
+            final SCommentService commentService, final DataInstanceService dataInstanceService,
             final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
             final ConnectorInstanceService connectorInstanceService) {
-        super(bpmInstanceBuilders, activityInstanceService, processInstanceService, containerRegistry, archiveService, commentService, commentBuilders,
+        super(activityInstanceService, processInstanceService, containerRegistry, archiveService, commentService,
                 dataInstanceService, documentMappingService, logger, processDefinitionService, connectorInstanceService);
     }
 

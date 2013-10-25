@@ -18,16 +18,16 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.CatchMessageEventTriggerDefinition;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCorrelationDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 
@@ -49,13 +49,12 @@ public class SCatchMessageEventTriggerDefinitionImpl extends SMessageEventTrigge
         sOperations = new ArrayList<SOperation>();
     }
 
-    public SCatchMessageEventTriggerDefinitionImpl(final CatchMessageEventTriggerDefinition messageEventTrigger,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SExpressionBuilders sExpressionBuilders, final SOperationBuilders sOperationBuilders) {
-        super(messageEventTrigger, sDataDefinitionBuilders, sExpressionBuilders);
+    public SCatchMessageEventTriggerDefinitionImpl(final CatchMessageEventTriggerDefinition messageEventTrigger) {
+        super(messageEventTrigger);
         final List<Operation> operations = messageEventTrigger.getOperations();
         sOperations = new ArrayList<SOperation>(operations.size());
         for (final Operation operation : operations) {
-            sOperations.add(toSOperation(operation, sOperationBuilders, sExpressionBuilders));
+            sOperations.add(toSOperation(operation));
         }
     }
 
@@ -64,17 +63,17 @@ public class SCatchMessageEventTriggerDefinitionImpl extends SMessageEventTrigge
         sOperations = catchMessageEventTriggerDefinition.getOperations();
     }
 
-    private SOperation toSOperation(final Operation operation, final SOperationBuilders sOperationBuilders, final SExpressionBuilders sExpressionBuilders) {
-        final SExpression rightOperand = ServerModelConvertor.convertExpression(sExpressionBuilders, operation.getRightOperand());
+    private SOperation toSOperation(final Operation operation) {
+        final SExpression rightOperand = ServerModelConvertor.convertExpression(operation.getRightOperand());
         final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand(), sOperationBuilders);
-        final SOperation sOperation = sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator(operation.getOperator())
+        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
+        final SOperation sOperation = BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
                 .setRightOperand(rightOperand).setType(operatorType).setLeftOperand(sLeftOperand).done();
         return sOperation;
     }
 
-    private SLeftOperand toSLeftOperand(final LeftOperand variableToSet, final SOperationBuilders sOperationBuilders) {
-        return sOperationBuilders.getSLeftOperandBuilder().createNewInstance().setName(variableToSet.getName()).done();
+    private SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
+        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
     }
 
     @Override

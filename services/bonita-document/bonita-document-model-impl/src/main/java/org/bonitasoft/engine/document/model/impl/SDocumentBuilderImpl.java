@@ -22,12 +22,11 @@ import org.bonitasoft.engine.document.model.SDocumentBuilder;
  */
 public class SDocumentBuilderImpl implements SDocumentBuilder {
 
-    private SDocumentImpl document;
-
-    @Override
-    public SDocumentBuilder createNewInstance() {
-        document = new SDocumentImpl();
-        return this;
+    private final SDocumentImpl document;
+    
+    public SDocumentBuilderImpl(final SDocumentImpl document) {
+        super();
+        this.document = document;
     }
 
     @Override

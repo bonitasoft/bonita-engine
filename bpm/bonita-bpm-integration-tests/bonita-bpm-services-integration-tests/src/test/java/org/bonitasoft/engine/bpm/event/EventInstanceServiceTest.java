@@ -8,27 +8,25 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SEventInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateCatchEventInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateThrowEventInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingErrorEventBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingSignalEventBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SEventTriggerInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowErrorEventTriggerInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowMessageEventTriggerInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowSignalEventTriggerInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SEventInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingErrorEventBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingSignalEventBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowErrorEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowMessageEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowSignalEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
@@ -60,15 +58,12 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private final EventInstanceService eventInstanceService;
 
-    private final BPMInstanceBuilders bpmInstanceBuilders;
-
     private final BPMServicesBuilder servicesBuilder;
 
     public EventInstanceServiceTest() {
         servicesBuilder = getServicesBuilder();
         transactionService = servicesBuilder.getTransactionService();
         eventInstanceService = servicesBuilder.getEventInstanceService();
-        bpmInstanceBuilders = servicesBuilder.getBPMInstanceBuilders();
     }
 
     private void checkStartEventInstance(final SEventInstance expectedEventInstance, final SEventInstance actualEventInstance) {
@@ -100,9 +95,9 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     private void checkEventInstance(final SEventInstance expectedEventInstance, final SEventInstance actualEventInstance) {
-        final SEndEventInstanceBuilder eventInstanceBuilder = bpmInstanceBuilders.getSEndEventInstanceBuilder();
-        final int processDefinitionIndex = eventInstanceBuilder.getProcessDefinitionIndex();
-        final int processInstanceIndex = eventInstanceBuilder.getRootProcessInstanceIndex();
+        final SEndEventInstanceBuilderFactory eventInstanceBuilderFact = BuilderFactory.get(SEndEventInstanceBuilderFactory.class);
+        final int processDefinitionIndex = eventInstanceBuilderFact.getProcessDefinitionIndex();
+        final int processInstanceIndex = eventInstanceBuilderFact.getRootProcessInstanceIndex();
 
         assertEquals(expectedEventInstance.getId(), actualEventInstance.getId());
         assertEquals(expectedEventInstance.getName(), actualEventInstance.getName());
@@ -112,9 +107,9 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         assertEquals(expectedEventInstance.getLogicalGroup(processInstanceIndex), actualEventInstance.getLogicalGroup(processInstanceIndex));
     }
 
-    private List<SEventInstance> getEventInstances(final SEventInstanceBuilder startEventInstanceBuilder, final long processInstanceId, final int fromIndex,
+    private List<SEventInstance> getEventInstances(final long processInstanceId, final int fromIndex,
             final int maxResult) throws SBonitaException {
-        return getEventInstances(processInstanceId, fromIndex, maxResult, startEventInstanceBuilder.getNameKey(), OrderByType.ASC);
+        return getEventInstances(processInstanceId, fromIndex, maxResult, BuilderFactory.get(SStartEventInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC);
     }
 
     private List<SEventInstance> getEventInstances(final long processInstanceId, final int fromIndex, final int maxResult, final String fieldName,
@@ -153,32 +148,28 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         assertEquals(expectedTriggerInstance.getEventInstanceId(), retrievedEventTriggerInstance.getEventInstanceId());
     }
 
-    private STimerEventTriggerInstance createTimerEventTriggerInstance(final STimerEventTriggerInstanceBuilder timerEventTriggerInstanceBuilder,
-            final long eventInstanceId, final STimerType timerType, final long timerValue) throws SBonitaException {
-        final STimerEventTriggerInstance triggerInstance = timerEventTriggerInstanceBuilder.createNewTimerEventTriggerInstance(eventInstanceId, timerType,
+    private STimerEventTriggerInstance createTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue) throws SBonitaException {
+        final STimerEventTriggerInstance triggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class).createNewTimerEventTriggerInstance(eventInstanceId, timerType,
                 timerValue).done();
         createEventTriggerInstance(triggerInstance);
         return triggerInstance;
     }
 
-    private SThrowMessageEventTriggerInstance createThrowMessageEventTriggerInstance(final SThrowMessageEventTriggerInstanceBuilder messageTriggerBuilder,
-            final long eventInstanceId, final String messageName, final String targetProcess, final String targetFlowNode) throws SBonitaException {
-        final SThrowMessageEventTriggerInstance messageTrigger = messageTriggerBuilder.createNewInstance(eventInstanceId, messageName, targetProcess,
+    private SThrowMessageEventTriggerInstance createThrowMessageEventTriggerInstance(final long eventInstanceId, final String messageName, final String targetProcess, final String targetFlowNode) throws SBonitaException {
+        final SThrowMessageEventTriggerInstance messageTrigger = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, messageName, targetProcess,
                 targetFlowNode).done();
         createEventTriggerInstance(messageTrigger);
         return messageTrigger;
     }
 
-    private SThrowSignalEventTriggerInstance createThrowSignalEventTriggerInstance(final SThrowSignalEventTriggerInstanceBuilder signalTriggerBuilder,
-            final long eventInstanceId, final String signalName) throws SBonitaException {
-        final SThrowSignalEventTriggerInstance signalTrigger = signalTriggerBuilder.createNewInstance(eventInstanceId, signalName).done();
+    private SThrowSignalEventTriggerInstance createThrowSignalEventTriggerInstance(final long eventInstanceId, final String signalName) throws SBonitaException {
+        final SThrowSignalEventTriggerInstance signalTrigger = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, signalName).done();
         createEventTriggerInstance(signalTrigger);
         return signalTrigger;
     }
 
-    private SThrowErrorEventTriggerInstance createThrowErrorEventTriggerInstance(final SThrowErrorEventTriggerInstanceBuilder errorTriggerBuilder,
-            final long eventInstanceId, final String errorCode) throws SBonitaException {
-        final SThrowErrorEventTriggerInstance errorTriggerInstance = errorTriggerBuilder.createNewInstance(eventInstanceId, errorCode).done();
+    private SThrowErrorEventTriggerInstance createThrowErrorEventTriggerInstance(final long eventInstanceId, final String errorCode) throws SBonitaException {
+        final SThrowErrorEventTriggerInstance errorTriggerInstance = BuilderFactory.get(SThrowErrorEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, errorCode).done();
         createEventTriggerInstance(errorTriggerInstance);
         return errorTriggerInstance;
     }
@@ -195,10 +186,10 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         transactionService.complete();
     }
 
-    private SEventInstance createBoundaryEventInstance(final SBoundaryEventInstanceBuilder eventInstanceBuilder, final String eventName,
+    private SEventInstance createBoundaryEventInstance(final String eventName,
             final long flowNodeDefinitionId, final long rootProcessInstanceId, final long processDefinitionId, final long parentProcessInstanceId,
             final long activityInstanceId, boolean isInterrupting) throws SBonitaException {
-        final SEventInstance eventInstance = eventInstanceBuilder.createNewBoundaryEventInstance(eventName, isInterrupting, flowNodeDefinitionId,
+        final SEventInstance eventInstance = BuilderFactory.get(SBoundaryEventInstanceBuilderFactory.class).createNewBoundaryEventInstance(eventName, isInterrupting, flowNodeDefinitionId,
                 rootProcessInstanceId, parentProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, activityInstanceId).done();
         createSEventInstance(eventInstance);
         return eventInstance;
@@ -206,105 +197,100 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void testCreateAndRetrieveStartEventInstanceFromRootContainer() throws Exception {
-        final SStartEventInstanceBuilder startEventInstanceBuilder = bpmInstanceBuilders.getSStartEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
 
-        List<SEventInstance> eventInstances = getEventInstances(startEventInstanceBuilder, processInstance.getId(), 0, 5);
+        List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
 
-        final SEventInstance startEventInstance = createSStartEventInstance(startEventInstanceBuilder, "startEvent", 1, processInstance.getId(), 5,
+        final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
-        eventInstances = getEventInstances(startEventInstanceBuilder, processInstance.getId(), 0, 5);
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
 
         assertEquals(1, eventInstances.size());
         checkStartEventInstance(startEventInstance, eventInstances.get(0));
 
         deleteSProcessInstance(processInstance);
 
-        eventInstances = getEventInstances(startEventInstanceBuilder, processInstance.getId(), 0, 5);
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
     }
 
     @Test
     public void testCreateAndRetrieveEndEventInstance() throws Exception {
-        final SEndEventInstanceBuilder eventInstanceBuilder = bpmInstanceBuilders.getSEndEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
 
-        List<SEventInstance> eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
 
-        final SEventInstance eventInstance = createSEndEventInstance(eventInstanceBuilder, "EndEvent", 1, processInstance.getId(), 5, processInstance.getId());
-        eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        final SEventInstance eventInstance = createSEndEventInstance("EndEvent", 1, processInstance.getId(), 5, processInstance.getId());
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
 
         assertEquals(1, eventInstances.size());
         checkEndEventInstance(eventInstance, eventInstances.get(0));
 
         deleteSProcessInstance(processInstance);
 
-        eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
     }
 
     @Test
     public void testCreateAndRetrieveIntermediateCatchEventInstance() throws Exception {
-        final SIntermediateCatchEventInstanceBuilder eventInstanceBuilder = bpmInstanceBuilders.getSIntermediateCatchEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
 
-        List<SEventInstance> eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
 
-        final SEventInstance eventInstance = createSIntermediateCatchEventInstance(eventInstanceBuilder, "IntermediateCatchEvent", 1, processInstance.getId(),
+        final SEventInstance eventInstance = createSIntermediateCatchEventInstance("IntermediateCatchEvent", 1, processInstance.getId(),
                 5,
                 processInstance.getId());
-        eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
 
         assertEquals(1, eventInstances.size());
         checkIntermediateCatchEventInstance(eventInstance, eventInstances.get(0));
 
         deleteSProcessInstance(processInstance);
 
-        eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
     }
 
     @Test
     public void testCreateAndRetrieveBoundaryEventInstance() throws Exception {
-        final SBoundaryEventInstanceBuilder eventInstanceBuilder = bpmInstanceBuilders.getSBoundaryEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
 
-        List<SEventInstance> eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
 
         final int activityInstanceId = 10;
-        final SEventInstance eventInstance = createBoundaryEventInstance(eventInstanceBuilder, "BoundaryEvent", 1, processInstance.getId(), 5,
+        final SEventInstance eventInstance = createBoundaryEventInstance("BoundaryEvent", 1, processInstance.getId(), 5,
                 processInstance.getId(), activityInstanceId, true);
-        eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
 
         assertEquals(1, eventInstances.size());
         checkBoundaryEventInstance(eventInstance, eventInstances.get(0));
 
         deleteSProcessInstance(processInstance);
 
-        eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
     }
 
     @Test
     public void testGetActivityBoundaryEventInstances() throws Exception {
-        final SBoundaryEventInstanceBuilder eventInstanceBuilder = bpmInstanceBuilders.getSBoundaryEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
         final long processDefinitionId = 5;
-        final SActivityInstance automaticTaskInstance = createSAutomaticTaskInstance(bpmInstanceBuilders.getSAutomaticTaskInstanceBuilder(), "auto1",
+        final SActivityInstance automaticTaskInstance = createSAutomaticTaskInstance("auto1",
                 1, processInstance.getId(), processDefinitionId, processInstance.getId());
         final long activityInstanceId = automaticTaskInstance.getId();
 
         List<SBoundaryEventInstance> boundaryEventInstances = getActiviyBoundaryEventInstances(activityInstanceId);
         assertTrue(boundaryEventInstances.isEmpty());
 
-        final SEventInstance eventInstance1 = createBoundaryEventInstance(eventInstanceBuilder, "BoundaryEvent1", 2, processInstance.getId(),
+        final SEventInstance eventInstance1 = createBoundaryEventInstance("BoundaryEvent1", 2, processInstance.getId(),
                 processDefinitionId,
                 processInstance.getId(), activityInstanceId, true);
-        final SEventInstance eventInstance2 = createBoundaryEventInstance(eventInstanceBuilder, "BoundaryEvent2", 3, processInstance.getId(),
+        final SEventInstance eventInstance2 = createBoundaryEventInstance("BoundaryEvent2", 3, processInstance.getId(),
                 processDefinitionId,
                 processInstance.getId(), activityInstanceId, true);
 
@@ -321,31 +307,29 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void testCreateAndRetrieveIntermediateThrowEventInstance() throws Exception {
-        final SIntermediateThrowEventInstanceBuilder eventInstanceBuilder = bpmInstanceBuilders.getSIntermediateThrowEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
 
-        List<SEventInstance> eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
 
-        final SEventInstance eventInstance = createSIntermediateThrowEventInstance(eventInstanceBuilder, "IntermediateThrowEvent", 1, processInstance.getId(),
+        final SEventInstance eventInstance = createSIntermediateThrowEventInstance("IntermediateThrowEvent", 1, processInstance.getId(),
                 5,
                 processInstance.getId());
-        eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
 
         assertEquals(1, eventInstances.size());
         checkIntermediateThrowEventInstance(eventInstance, eventInstances.get(0));
 
         deleteSProcessInstance(processInstance);
 
-        eventInstances = getEventInstances(eventInstanceBuilder, processInstance.getId(), 0, 5);
+        eventInstances = getEventInstances(processInstance.getId(), 0, 5);
         assertTrue(eventInstances.isEmpty());
     }
 
     @Test
     public void testGetEventInstanceById() throws SBonitaException {
-        final SStartEventInstanceBuilder startEventInstanceBuilder = bpmInstanceBuilders.getSStartEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
-        final SEventInstance startEventInstance = createSStartEventInstance(startEventInstanceBuilder, "startEvent", 1, processInstance.getId(), 5,
+        final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
 
         final SEventInstance retrievedEventInstance = getEventInstance(startEventInstance.getId());
@@ -362,12 +346,11 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void testGetEventInstancesOrderByNameAsc() throws SBonitaException {
-        final SEndEventInstanceBuilder eventInstanceBuilder = bpmInstanceBuilders.getSEndEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
 
-        final SEventInstance eventInstance1 = createSEndEventInstance(eventInstanceBuilder, "EndEvent1", 1, processInstance.getId(), 5, processInstance.getId());
-        final SEventInstance eventInstance2 = createSEndEventInstance(eventInstanceBuilder, "EndEvent2", 1, processInstance.getId(), 5, processInstance.getId());
-        final List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5, eventInstanceBuilder.getNameKey(), OrderByType.ASC);
+        final SEventInstance eventInstance1 = createSEndEventInstance("EndEvent1", 1, processInstance.getId(), 5, processInstance.getId());
+        final SEventInstance eventInstance2 = createSEndEventInstance("EndEvent2", 1, processInstance.getId(), 5, processInstance.getId());
+        final List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5, BuilderFactory.get(SEndEventInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC);
 
         assertEquals(2, eventInstances.size());
         checkEndEventInstance(eventInstance1, eventInstances.get(0));
@@ -378,12 +361,11 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void testGetEventInstancesOrderByNameDesc() throws SBonitaException {
-        final SEndEventInstanceBuilder eventInstanceBuilder = bpmInstanceBuilders.getSEndEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
 
-        final SEventInstance eventInstance1 = createSEndEventInstance(eventInstanceBuilder, "EndEvent1", 1, processInstance.getId(), 5, processInstance.getId());
-        final SEventInstance eventInstance2 = createSEndEventInstance(eventInstanceBuilder, "EndEvent2", 1, processInstance.getId(), 5, processInstance.getId());
-        final List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5, eventInstanceBuilder.getNameKey(), OrderByType.DESC);
+        final SEventInstance eventInstance1 = createSEndEventInstance("EndEvent1", 1, processInstance.getId(), 5, processInstance.getId());
+        final SEventInstance eventInstance2 = createSEndEventInstance("EndEvent2", 1, processInstance.getId(), 5, processInstance.getId());
+        final List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5, BuilderFactory.get(SEndEventInstanceBuilderFactory.class).getNameKey(), OrderByType.DESC);
 
         assertEquals(2, eventInstances.size());
         checkEndEventInstance(eventInstance2, eventInstances.get(0));
@@ -394,9 +376,8 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     @Test(expected = SEventInstanceNotFoundException.class)
     public void testDeleteProcessInstanceAlsoDeleteEventInstance() throws SBonitaException {
-        final SStartEventInstanceBuilder startEventInstanceBuilder = bpmInstanceBuilders.getSStartEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
-        final SEventInstance startEventInstance = createSStartEventInstance(startEventInstanceBuilder, "startEvent", 1, processInstance.getId(), 5,
+        final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
 
         final SEventInstance retrievedEventInstance = getEventInstance(startEventInstance.getId());
@@ -410,19 +391,16 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void testCreateAndRetrieveEventTriggerInstance() throws SBonitaException {
-        final SStartEventInstanceBuilder startEventInstanceBuilder = bpmInstanceBuilders.getSStartEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
-        final SEventInstance startEventInstance = createSStartEventInstance(startEventInstanceBuilder, "startEvent", 1, processInstance.getId(), 5,
+        final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
 
-        final STimerEventTriggerInstanceBuilder timerEventTriggerInstanceBuilder = bpmInstanceBuilders.getSTimerEventTriggerInstanceBuilder();
-
-        List<SEventTriggerInstance> triggerInstances = getEventTriggerInstances(startEventInstance.getId(), 0, 5, timerEventTriggerInstanceBuilder);
+        List<SEventTriggerInstance> triggerInstances = getEventTriggerInstances(startEventInstance.getId(), 0, 5);
         assertTrue(triggerInstances.isEmpty());
 
-        final STimerEventTriggerInstance triggerInstance = createTimerEventTriggerInstance(timerEventTriggerInstanceBuilder, startEventInstance.getId(),
+        final STimerEventTriggerInstance triggerInstance = createTimerEventTriggerInstance(startEventInstance.getId(),
                 STimerType.DURATION, 1000);
-        triggerInstances = getEventTriggerInstances(startEventInstance.getId(), 0, 5, timerEventTriggerInstanceBuilder);
+        triggerInstances = getEventTriggerInstances(startEventInstance.getId(), 0, 5);
         assertEquals(1, triggerInstances.size());
         checkTimerEventTriggerInstance(triggerInstance, triggerInstances.get(0));
 
@@ -430,11 +408,10 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     }
 
-    private List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final int fromIndex, final int maxResults,
-            final SEventTriggerInstanceBuilder eventTriggerInstanceBuilder) throws SBonitaException {
+    private List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final int fromIndex, final int maxResults) throws SBonitaException {
         transactionService.begin();
         final List<SEventTriggerInstance> eventTriggerInstances = eventInstanceService.getEventTriggerInstances(eventInstanceId, fromIndex, maxResults,
-                eventTriggerInstanceBuilder.getIdKey(), OrderByType.ASC);
+                BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
         transactionService.complete();
         return eventTriggerInstances;
     }
@@ -469,14 +446,11 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     @Test
     public void testRetrieveEventTriggerInstanceById() throws SBonitaException {
-        final SStartEventInstanceBuilder startEventInstanceBuilder = bpmInstanceBuilders.getSStartEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
-        final SEventInstance startEventInstance = createSStartEventInstance(startEventInstanceBuilder, "startEvent", 1, processInstance.getId(), 5,
+        final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
 
-        final STimerEventTriggerInstanceBuilder timerEventTriggerInstanceBuilder = bpmInstanceBuilders.getSTimerEventTriggerInstanceBuilder();
-
-        final STimerEventTriggerInstance triggerInstance = createTimerEventTriggerInstance(timerEventTriggerInstanceBuilder, startEventInstance.getId(),
+        final STimerEventTriggerInstance triggerInstance = createTimerEventTriggerInstance(startEventInstance.getId(),
                 STimerType.DURATION, 1000);
         final SEventTriggerInstance retrievedEventTrigger = getEventTrigger(triggerInstance.getId());
         checkTimerEventTriggerInstance(triggerInstance, retrievedEventTrigger);
@@ -501,34 +475,28 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     public void testDeleteEventInstanceAlsoDeleteEventTriggerInstance() throws SBonitaException {
-        final SStartEventInstanceBuilder startEventInstanceBuilder = bpmInstanceBuilders.getSStartEventInstanceBuilder();
         final SProcessInstance processInstance = createSProcessInstance();
-        final SEventInstance startEventInstance = createSStartEventInstance(startEventInstanceBuilder, "startEvent", 1, processInstance.getId(), 5,
+        final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
 
-        final STimerEventTriggerInstanceBuilder timerEventTriggerInstanceBuilder = bpmInstanceBuilders.getSTimerEventTriggerInstanceBuilder();
+        createTimerEventTriggerInstance(startEventInstance.getId(), STimerType.DURATION, 1000);
 
-        createTimerEventTriggerInstance(timerEventTriggerInstanceBuilder, startEventInstance.getId(), STimerType.DURATION, 1000);
-
-        final SEventTriggerInstanceBuilder eventTriggerKeyProvider = bpmInstanceBuilders.getSThrowMessageEventTriggerInstanceBuilder();
-
-        List<SEventTriggerInstance> eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10, eventTriggerKeyProvider.getEventInstanceIdKey(),
+        List<SEventTriggerInstance> eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10, BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getEventInstanceIdKey(),
                 OrderByType.ASC);
         assertEquals(1, eventTriggers.size());
 
         deleteSProcessInstance(processInstance);
 
-        eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10, eventTriggerKeyProvider.getEventInstanceIdKey(), OrderByType.ASC);
+        eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10, BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getEventInstanceIdKey(), OrderByType.ASC);
         assertEquals(0, eventTriggers.size());
     }
 
     @Test
     public void testSearchWaitingEvents() throws SBonitaException {
         final SProcessInstance processInstance = createSProcessInstance();
-        final SWaitingErrorEventBuilder waitingErrorEventBuilder = bpmInstanceBuilders.getSWaitingErrorEventBuilder();
+        final SWaitingErrorEventBuilderFactory waitingErrorEventBuilder = BuilderFactory.get(SWaitingErrorEventBuilderFactory.class);
 
-        final SEventInstance eventInstance = createSIntermediateCatchEventInstance(bpmInstanceBuilders.getSIntermediateCatchEventInstanceBuilder(),
-                "itermediate", 1, processInstance.getId(), 5, processInstance.getId());
+        final SEventInstance eventInstance = createSIntermediateCatchEventInstance("itermediate", 1, processInstance.getId(), 5, processInstance.getId());
 
         final Class<SWaitingEvent> waitingEventClass = SWaitingEvent.class;
         final String processDefinitionIdKey = waitingErrorEventBuilder.getProcessDefinitionIdKey();
@@ -536,13 +504,11 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         final long eventInstanceId = eventInstance.getId();
         checkWaitingEvents(0, waitingEventClass, processDefinitionIdKey, flowNodeInstanceIdKey, eventInstanceId);
 
-        final SWaitingMessageEventBuilder waitingMessageBuilder = bpmInstanceBuilders.getSWaitingMessageEventBuilder();
-        final SWaitingMessageEvent messageWaitingEvent = waitingMessageBuilder.createNewWaitingMessageIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
+        final SWaitingMessageEvent messageWaitingEvent = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
                 eventInstanceId, "m1", processInstance.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName()).done();
         createWaitingEvent(messageWaitingEvent);
 
-        final SWaitingSignalEventBuilder waitingSignalEventBuilder = bpmInstanceBuilders.getSWaitingSignalEventBuilder();
-        final SWaitingSignalEvent waitingSignalEvent = waitingSignalEventBuilder.createNewWaitingSignalIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
+        final SWaitingSignalEvent waitingSignalEvent = BuilderFactory.get(SWaitingSignalEventBuilderFactory.class).createNewWaitingSignalIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
                 eventInstanceId, "go", processInstance.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName()).done();
         createWaitingEvent(waitingSignalEvent);
 
@@ -599,20 +565,19 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     @Test
     public void testSearchEventTriggerInstances() throws SBonitaException {
         final SProcessInstance processInstance = createSProcessInstance();
-        final STimerEventTriggerInstanceBuilder timerTriggerBuilder = bpmInstanceBuilders.getSTimerEventTriggerInstanceBuilder();
 
-        final SEventInstance eventInstance = createSEndEventInstance(bpmInstanceBuilders.getSEndEventInstanceBuilder(), "end", 1, processInstance.getId(), 5,
+        final SEventInstance eventInstance = createSEndEventInstance("end", 1, processInstance.getId(), 5,
                 processInstance.getId());
         final long eventInstanceId = eventInstance.getId();
 
         final Class<SEventTriggerInstance> triggerInstanceClass = SEventTriggerInstance.class;
-        final String eventInstanceIdKey = timerTriggerBuilder.getEventInstanceIdKey();
+        final String eventInstanceIdKey = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class).getEventInstanceIdKey();
         checkEventTriggerInstances(0, triggerInstanceClass, eventInstanceIdKey, eventInstanceId);
 
-        createTimerEventTriggerInstance(timerTriggerBuilder, eventInstanceId, STimerType.DURATION, 1000);
-        createThrowMessageEventTriggerInstance(bpmInstanceBuilders.getSThrowMessageEventTriggerInstanceBuilder(), eventInstanceId, "m1", "p2", "start1");
-        createThrowSignalEventTriggerInstance(bpmInstanceBuilders.getSThrowSignalEventTriggerInstanceBuilder(), eventInstanceId, "s1");
-        createThrowErrorEventTriggerInstance(bpmInstanceBuilders.getSThrowErrorEventTriggerInstanceBuilder(), eventInstanceId, "e1");
+        createTimerEventTriggerInstance(eventInstanceId, STimerType.DURATION, 1000);
+        createThrowMessageEventTriggerInstance(eventInstanceId, "m1", "p2", "start1");
+        createThrowSignalEventTriggerInstance(eventInstanceId, "s1");
+        createThrowErrorEventTriggerInstance(eventInstanceId, "e1");
 
         // search with STriggerEventInstance
         checkEventTriggerInstances(4, triggerInstanceClass, eventInstanceIdKey, eventInstanceId);

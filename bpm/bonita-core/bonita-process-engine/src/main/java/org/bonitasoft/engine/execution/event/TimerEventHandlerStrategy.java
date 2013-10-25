@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -42,7 +43,8 @@ import org.bonitasoft.engine.jobs.TriggerTimerEventJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
+import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
@@ -151,17 +153,16 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
     private List<SJobParameter> getJobParameters(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
             final SCatchEventInstance eventInstance) {
         final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-        final SJobParameterBuilder jobParameterBuilder = schedulerService.getJobParameterBuilder();
-        jobParameters.add(jobParameterBuilder.createNewInstance("processDefinitionId", processDefinition.getId()).done());
-        jobParameters.add(jobParameterBuilder.createNewInstance("containerType", SFlowElementsContainerType.PROCESS.name()).done());
-        jobParameters.add(jobParameterBuilder.createNewInstance("eventType", eventDefinition.getType().name()).done());
-        jobParameters.add(jobParameterBuilder.createNewInstance("targetSFlowNodeDefinitionId", eventDefinition.getId()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("processDefinitionId", processDefinition.getId()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("containerType", SFlowElementsContainerType.PROCESS.name()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("eventType", eventDefinition.getType().name()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("targetSFlowNodeDefinitionId", eventDefinition.getId()).done());
         if (SFlowNodeType.START_EVENT.equals(eventDefinition.getType())) {
             final SStartEventDefinition startEvent = (SStartEventDefinition) eventDefinition;
-            jobParameters.add(jobParameterBuilder.createNewInstance("isInterrupting", startEvent.isInterrupting()).done());
+            jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("isInterrupting", startEvent.isInterrupting()).done());
         }
         if (eventInstance != null) {
-            jobParameters.add(jobParameterBuilder.createNewInstance("flowNodeInstanceId", eventInstance.getId()).done());
+            jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("flowNodeInstanceId", eventInstance.getId()).done());
         }
         return jobParameters;
     }
@@ -170,15 +171,14 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
             final SCatchEventInstance eventInstance, final long subProcessId, final SProcessInstance parentProcessInstance) {
         final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
         jobParameters.addAll(getJobParameters(processDefinition, eventDefinition, eventInstance));
-        final SJobParameterBuilder jobParameterBuilder = schedulerService.getJobParameterBuilder();
-        jobParameters.add(jobParameterBuilder.createNewInstance("subProcessId", subProcessId).done());
-        jobParameters.add(jobParameterBuilder.createNewInstance("processInstanceId", parentProcessInstance.getId()).done());
-        jobParameters.add(jobParameterBuilder.createNewInstance("rootProcessInstanceId", parentProcessInstance.getRootProcessInstanceId()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("subProcessId", subProcessId).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("processInstanceId", parentProcessInstance.getId()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("rootProcessInstanceId", parentProcessInstance.getRootProcessInstanceId()).done());
         return jobParameters;
     }
 
     private SJobDescriptor getJobDescriptor(final String jobName) {
-        return schedulerService.getJobDescriptorBuilder().createNewInstance(TriggerTimerEventJob.class.getName(), jobName, false).done();
+        return BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(TriggerTimerEventJob.class.getName(), jobName, false).done();
     }
 
     @Override
