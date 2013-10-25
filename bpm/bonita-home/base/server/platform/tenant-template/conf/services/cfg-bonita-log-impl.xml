@@ -73,7 +73,12 @@
         		<entry key="PROFILE_CREATED:INTERNAL" value="true" />
         		<entry key="PROFILE_DELETED:INTERNAL" value="true" />
         		<entry key="PROFILE_UPDATED:INTERNAL" value="true" />
+        		<entry key="PROFILE_MEMBER_CREATED:INTERNAL" value="true" />
         		<entry key="PROFILE_MEMBER_DELETED:INTERNAL" value="true" />
+        		<entry key="PROFILE_MEMBER_UPDATED:INTERNAL" value="true" />
+        		<entry key="PROFILE_ENTRY_CREATED:INTERNAL" value="true" />
+        		<entry key="PROFILE_ENTRY_DELETED:INTERNAL" value="true" />
+        		<entry key="PROFILE_ENTRY_UPDATED:INTERNAL" value="true" />
         		<entry key="REPORT_CREATED:INTERNAL" value="true" />
         		<entry key="REPORT_DELETED:INTERNAL" value="true" />
         		<entry key="SCHEDULER_SCHEDULED:INTERNAL" value="false" />
