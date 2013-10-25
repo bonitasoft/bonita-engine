@@ -19,7 +19,6 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
@@ -30,9 +29,7 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
 import org.bonitasoft.engine.execution.event.EventsHandler;
@@ -57,15 +54,15 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
     public FlowNodeStateManagerExt(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
             final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ClassLoaderService classLoaderService, final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
-            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService, final SDataInstanceBuilders sDataInstanceBuilders,
-            final BPMInstanceBuilders instanceBuilders, final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator,
+            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService,
+            final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator,
             final ContainerRegistry containerRegistry, final ArchiveService archiveService, final TechnicalLoggerService logger,
-            final DocumentMappingService documentMappingService, final SCommentService commentService, final SCommentBuilders commentBuilders,
+            final DocumentMappingService documentMappingService, final SCommentService commentService,
             final BreakpointService breakpointService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
             final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService, final IdentityService identityService) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
-                expressionResolverService, schedulerService, dataInstanceService, eventInstanceService, sDataInstanceBuilders, instanceBuilders,
-                operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService, commentBuilders,
+                expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
+                operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService,
                 eventsHandler, userFilterService, actorMappingService, workService, tokenService, identityService);
         this.breakpointService = breakpointService;
     }

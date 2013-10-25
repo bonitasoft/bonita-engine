@@ -13,9 +13,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
@@ -30,26 +31,27 @@ public class SearchTenantDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> tenantAllFields;
 
-    SearchTenantDescriptor(final STenantBuilder tenantBuilder) {
+    SearchTenantDescriptor() {
+        final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
         tenantKeys = new HashMap<String, FieldDescriptor>(9);
-        tenantKeys.put(TenantSearchDescriptor.ID, new FieldDescriptor(STenant.class, tenantBuilder.getIdKey()));
-        tenantKeys.put(TenantSearchDescriptor.STATUS, new FieldDescriptor(STenant.class, tenantBuilder.getStatusKey()));
-        tenantKeys.put(TenantSearchDescriptor.NAME, new FieldDescriptor(STenant.class, tenantBuilder.getNameKey()));
-        tenantKeys.put(TenantSearchDescriptor.CREATION_DATE, new FieldDescriptor(STenant.class, tenantBuilder.getCreatedKey()));
-        tenantKeys.put(TenantSearchDescriptor.CREATED_BY, new FieldDescriptor(STenant.class, tenantBuilder.getCreatedByKey()));
-        tenantKeys.put(TenantSearchDescriptor.ICON_NAME, new FieldDescriptor(STenant.class, tenantBuilder.getIconNameKey()));
-        tenantKeys.put(TenantSearchDescriptor.ICON_PATH, new FieldDescriptor(STenant.class, tenantBuilder.getIconPathKey()));
-        tenantKeys.put(TenantSearchDescriptor.DEFAULT_TENANT, new FieldDescriptor(STenant.class, tenantBuilder.getDefaultTenantKey()));
-        tenantKeys.put(TenantSearchDescriptor.DESCRIPTION, new FieldDescriptor(STenant.class, tenantBuilder.getDescriptionKey()));
+        tenantKeys.put(TenantSearchDescriptor.ID, new FieldDescriptor(STenant.class, tenantBuilderFact.getIdKey()));
+        tenantKeys.put(TenantSearchDescriptor.STATUS, new FieldDescriptor(STenant.class, tenantBuilderFact.getStatusKey()));
+        tenantKeys.put(TenantSearchDescriptor.NAME, new FieldDescriptor(STenant.class, tenantBuilderFact.getNameKey()));
+        tenantKeys.put(TenantSearchDescriptor.CREATION_DATE, new FieldDescriptor(STenant.class, tenantBuilderFact.getCreatedKey()));
+        tenantKeys.put(TenantSearchDescriptor.CREATED_BY, new FieldDescriptor(STenant.class, tenantBuilderFact.getCreatedByKey()));
+        tenantKeys.put(TenantSearchDescriptor.ICON_NAME, new FieldDescriptor(STenant.class, tenantBuilderFact.getIconNameKey()));
+        tenantKeys.put(TenantSearchDescriptor.ICON_PATH, new FieldDescriptor(STenant.class, tenantBuilderFact.getIconPathKey()));
+        tenantKeys.put(TenantSearchDescriptor.DEFAULT_TENANT, new FieldDescriptor(STenant.class, tenantBuilderFact.getDefaultTenantKey()));
+        tenantKeys.put(TenantSearchDescriptor.DESCRIPTION, new FieldDescriptor(STenant.class, tenantBuilderFact.getDescriptionKey()));
 
         tenantAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> tenantFields = new HashSet<String>(6);
-        tenantFields.add(tenantBuilder.getStatusKey());
-        tenantFields.add(tenantBuilder.getNameKey());
-        tenantFields.add(tenantBuilder.getCreatedByKey());
-        tenantFields.add(tenantBuilder.getDescriptionKey());
-        tenantFields.add(tenantBuilder.getIconNameKey());
-        tenantFields.add(tenantBuilder.getIconPathKey());
+        tenantFields.add(tenantBuilderFact.getStatusKey());
+        tenantFields.add(tenantBuilderFact.getNameKey());
+        tenantFields.add(tenantBuilderFact.getCreatedByKey());
+        tenantFields.add(tenantBuilderFact.getDescriptionKey());
+        tenantFields.add(tenantBuilderFact.getIconNameKey());
+        tenantFields.add(tenantBuilderFact.getIconPathKey());
         tenantAllFields.put(STenant.class, tenantFields);
     }
 

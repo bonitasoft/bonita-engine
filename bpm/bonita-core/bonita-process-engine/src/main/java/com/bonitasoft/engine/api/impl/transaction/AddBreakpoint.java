@@ -8,12 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.transaction;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilderFactory;
 
 /**
  * @author Baptiste Mesta
@@ -24,17 +25,17 @@ public class AddBreakpoint implements TransactionContentWithResult<SBreakpoint> 
 
     private SBreakpoint breakpoint;
 
-    public AddBreakpoint(final BreakpointService breakpointService, final BPMInstanceBuilders breakpointBuilder, final long definitionId,
+    public AddBreakpoint(final BreakpointService breakpointService, final long definitionId,
             final long instanceId, final String elementName, final int idOfTheStateToInterrupt, final int idOfTheInterruptingState) {
         this.breakpointService = breakpointService;
-        breakpoint = breakpointBuilder.getSBreakpointBuilder()
+        breakpoint = BuilderFactory.get(SBreakpointBuilderFactory.class)
                 .createNewInstance(definitionId, instanceId, elementName, idOfTheStateToInterrupt, idOfTheInterruptingState).done();
     }
 
-    public AddBreakpoint(final BreakpointService breakpointService, final BPMInstanceBuilders breakpointBuilder, final long definitionId,
+    public AddBreakpoint(final BreakpointService breakpointService, final long definitionId,
             final String elementName, final int idOfTheStateToInterrupt, final int idOfTheInterruptingState) {
         this.breakpointService = breakpointService;
-        breakpoint = breakpointBuilder.getSBreakpointBuilder().createNewInstance(definitionId, elementName, idOfTheStateToInterrupt, idOfTheInterruptingState)
+        breakpoint = BuilderFactory.get(SBreakpointBuilderFactory.class).createNewInstance(definitionId, elementName, idOfTheStateToInterrupt, idOfTheInterruptingState)
                 .done();
     }
 

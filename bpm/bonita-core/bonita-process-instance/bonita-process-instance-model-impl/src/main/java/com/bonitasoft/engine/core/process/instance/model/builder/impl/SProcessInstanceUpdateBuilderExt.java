@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SProcessInstanceUpdateBuilderImpl;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 
@@ -17,34 +18,42 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
  */
 public class SProcessInstanceUpdateBuilderExt extends SProcessInstanceUpdateBuilderImpl implements SProcessInstanceUpdateBuilder {
 
+    public SProcessInstanceUpdateBuilderExt(final EntityUpdateDescriptor descriptor) {
+        super(descriptor);
+    }
+    
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex1(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderExt.STRING_INDEX_1_KEY, stringIndex);
+        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_1_KEY, stringIndex);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex2(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderExt.STRING_INDEX_2_KEY, stringIndex);
+        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_2_KEY, stringIndex);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex3(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderExt.STRING_INDEX_3_KEY, stringIndex);
+        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_3_KEY, stringIndex);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex4(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderExt.STRING_INDEX_4_KEY, stringIndex);
+        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_4_KEY, stringIndex);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateStringIndex5(final String stringIndex) {
-        descriptor.addField(SProcessInstanceBuilderExt.STRING_INDEX_5_KEY, stringIndex);
+        descriptor.addField(SProcessInstanceBuilderFactoryExt.STRING_INDEX_5_KEY, stringIndex);
         return this;
+    }
+    
+    public static SProcessInstanceUpdateBuilderExt getInstance() {
+        return new SProcessInstanceUpdateBuilderExt(null);
     }
 
 }

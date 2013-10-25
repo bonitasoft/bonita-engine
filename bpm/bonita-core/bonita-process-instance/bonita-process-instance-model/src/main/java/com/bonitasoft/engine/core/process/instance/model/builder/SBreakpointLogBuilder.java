@@ -18,5 +18,4 @@ public interface SBreakpointLogBuilder extends SPersistenceLogBuilder, HasCRUDEA
 
     SBreakpointLogBuilder definitionId(final long definitionId);
 
-    String getDefinitionIdKey();
 }

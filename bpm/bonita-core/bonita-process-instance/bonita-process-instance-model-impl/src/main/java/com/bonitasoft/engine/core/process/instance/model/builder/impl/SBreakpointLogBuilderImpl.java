@@ -29,11 +29,6 @@ public class SBreakpointLogBuilderImpl extends CRUDELogBuilder implements SBreak
     }
 
     @Override
-    public String getObjectIdKey() {
-        return "numericIndex2";
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return BREAKPOINT;
     }
@@ -49,11 +44,6 @@ public class SBreakpointLogBuilderImpl extends CRUDELogBuilder implements SBreak
     public SBreakpointLogBuilder definitionId(final long definitionId) {
         queriableLogBuilder.numericIndex(0, definitionId);
         return this;
-    }
-
-    @Override
-    public String getDefinitionIdKey() {
-        return "numericIndex1";
     }
 
 }

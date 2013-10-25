@@ -12,11 +12,13 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -36,17 +38,14 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
 
     private final ProfileEntryUpdater updateDescriptor;
 
-    private final SProfileEntryUpdateBuilder updateBuilder;
-
     private SProfileEntry sProfileEntry = null;
 
-    public UpdateProfileEntry(final ProfileService profileService, final SProfileEntryUpdateBuilder updateBuilder, final Long profileEntryId,
+    public UpdateProfileEntry(final ProfileService profileService, final Long profileEntryId,
             final ProfileEntryUpdater updateDescriptor) {
         super();
         this.profileService = profileService;
         this.profileEntryId = profileEntryId;
         this.updateDescriptor = updateDescriptor;
-        this.updateBuilder = updateBuilder;
     }
 
     @Override
@@ -54,8 +53,8 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
         sProfileEntry = profileService.getProfileEntry(profileEntryId);
         final EntityUpdateDescriptor profileEntryUpdateDescriptor = getProfileEntryUpdateDescriptor();
         final Map<String, Object> fields = profileEntryUpdateDescriptor.getFields();
-        final String type = (String) fields.get(SProfileEntryBuilder.TYPE);
-        final String page = (String) fields.get(SProfileEntryBuilder.PAGE);
+        final String type = (String) fields.get(SProfileEntryBuilderFactory.TYPE);
+        final String page = (String) fields.get(SProfileEntryBuilderFactory.PAGE);
         if ("link".equalsIgnoreCase(type) && (page == null || "".equals(page))) {
             throw new SProfileEntryUpdateException("For a link, the page is mandatory.");
         }
@@ -70,6 +69,7 @@ public class UpdateProfileEntry implements TransactionContentWithResult<SProfile
     }
 
     private EntityUpdateDescriptor getProfileEntryUpdateDescriptor() {
+        final SProfileEntryUpdateBuilder updateBuilder = BuilderFactory.get(SProfileEntryUpdateBuilderFactory.class).createNewInstance(); 
         final Map<ProfileEntryUpdateField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<ProfileEntryUpdateField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {

@@ -14,26 +14,11 @@ package com.bonitasoft.engine.core.reporting;
  */
 public class SReportBuilderImpl implements SReportBuilder {
 
-    private SReportImpl report;
+    private final SReportImpl report;
 
-    @Override
-    public SReportBuilder createNewInstance(final String name, final long installationDate, final long installedBy, final boolean provided) {
-        report = new SReportImpl(name, installationDate, installedBy, provided);
-        report.setLastModificationDate(installationDate);
-        return this;
-    }
-
-    @Override
-    public SReportBuilder createNewInstance(final String name, final long installationDate, final long installedBy, final boolean provided,
-            final String description, final byte[] screenshot) {
-        report = new SReportImpl(name, installationDate, installedBy, provided, description, installationDate, screenshot);
-        return this;
-    }
-
-    @Override
-    public SReportBuilder createNewInstance(final String name, final long installedBy, final boolean provided, final String description, final byte[] screenshot) {
-        report = new SReportImpl(name, System.currentTimeMillis(), installedBy, provided, description, System.currentTimeMillis(), screenshot);
-        return this;
+    public SReportBuilderImpl(final SReportImpl report) {
+        super();
+        this.report = report;
     }
 
     @Override
@@ -49,38 +34,8 @@ public class SReportBuilderImpl implements SReportBuilder {
     }
 
     @Override
-    public String getNameKey() {
-        return "name";
-    }
-
-    @Override
-    public String getDescriptionKey() {
-        return "description";
-    }
-
-    @Override
-    public String getInstallationDateKey() {
-        return "installationDate";
-    }
-
-    @Override
-    public String getInstalledByKey() {
-        return "installedBy";
-    }
-
-    @Override
     public SReport done() {
         return report;
-    }
-
-    @Override
-    public String getIdKey() {
-        return "id";
-    }
-
-    @Override
-    public String getProvidedKey() {
-        return "provided";
     }
 
 }

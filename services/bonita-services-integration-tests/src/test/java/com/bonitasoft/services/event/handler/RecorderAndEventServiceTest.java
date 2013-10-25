@@ -15,8 +15,10 @@ import java.util.Map;
 
 import org.bonitasoft.engine.archive.model.Employee;
 import org.bonitasoft.engine.archive.model.SEmployeeHandlerImpl;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
@@ -68,7 +70,7 @@ public class RecorderAndEventServiceTest extends CommonServiceSPTest {
 
         // Make SUpdateEvent parameter
         final String eventType = getEventType(employee);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(eventType).setObject(updateRecord.getEntity()).done();
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(eventType).setObject(updateRecord.getEntity()).done();
 
         final Employee oldEmployee = new Employee(employee);
         updateEvent.setOldObject(oldEmployee);
@@ -101,7 +103,7 @@ public class RecorderAndEventServiceTest extends CommonServiceSPTest {
 
         // Make SUpdateEvent parameter
         final String eventType = getEventType(employee);
-        final SUpdateEvent updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(eventType).setObject(updateRecord.getEntity()).done();
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(eventType).setObject(updateRecord.getEntity()).done();
 
         final Employee oldEmployee = new Employee(employee);
         updateEvent.setOldObject(oldEmployee);

@@ -11,6 +11,7 @@ package com.bonitasoft.engine.core.process.instance.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -18,7 +19,7 @@ import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -26,8 +27,8 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -44,8 +45,9 @@ import com.bonitasoft.engine.core.process.instance.api.exceptions.SBreakpointCre
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SBreakpointDeletionException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SBreakpointNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilderFactory;
 import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointLogBuilder;
+import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointLogBuilderFactory;
 import com.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilderExt;
 
 /**
@@ -86,8 +88,6 @@ public class BreakpointServiceImpl implements BreakpointService {
 
     private static final Serializable BREAKPOINTS_ACTIVE = "BREAKPOINTS_ACTIVE";
 
-    private final BPMInstanceBuilders instanceBuilders;
-
     private final EventService eventService;
 
     private final Recorder recorder;
@@ -107,16 +107,15 @@ public class BreakpointServiceImpl implements BreakpointService {
     private final TransactionService transactionService;
 
     public BreakpointServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final BPMInstanceBuilders instanceBuilders, final CacheService cacheService, final QueriableLoggerService queriableLoggerService,
+            final CacheService cacheService, final QueriableLoggerService queriableLoggerService,
             final TransactionService transactionService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
-        this.instanceBuilders = instanceBuilders;
         this.eventService = eventService;
         this.cacheService = cacheService;
         this.queriableLoggerService = queriableLoggerService;
         this.transactionService = transactionService;
-        this.defaultSortingField = instanceBuilders.getSBreakpointBuilder().getDefinitionIdKey();
+        this.defaultSortingField = BuilderFactory.get(SBreakpointBuilderFactory.class).getDefinitionIdKey();
         this.defaulOrder = OrderByType.ASC;
     }
 
@@ -126,8 +125,7 @@ public class BreakpointServiceImpl implements BreakpointService {
         final InsertRecord insertRecord = new InsertRecord(breakpoint);
         SInsertEvent insertEvent = null;
         if (this.eventService.hasHandlers(BREAKPOINT, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = this.eventService.getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(BREAKPOINT).setObject(breakpoint).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(BREAKPOINT).setObject(breakpoint).done();
         }
         try {
             this.recorder.recordInsert(insertRecord, insertEvent);
@@ -146,7 +144,7 @@ public class BreakpointServiceImpl implements BreakpointService {
         final SBreakpoint sBreakpoint = getBreakpoint(id);
         SDeleteEvent deleteEvent = null;
         if (this.eventService.hasHandlers(BREAKPOINT, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) this.eventService.getEventBuilder().createDeleteEvent(BREAKPOINT).setObject(sBreakpoint).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(BREAKPOINT).setObject(sBreakpoint).done();
         }
         final DeleteRecord deleteRecord = new DeleteRecord(sBreakpoint);
         final SBreakpointLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, REMOVING_BREAKPOINT, sBreakpoint);
@@ -170,7 +168,7 @@ public class BreakpointServiceImpl implements BreakpointService {
     }
 
     protected <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     protected <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -178,7 +176,7 @@ public class BreakpointServiceImpl implements BreakpointService {
     }
 
     protected SBreakpointLogBuilder getQueriableLog(final ActionType actionType, final String message, final SBreakpoint breakpoint) {
-        final SBreakpointLogBuilder logBuilder = this.instanceBuilders.getSBreakpointLogBuilder();
+        final SBreakpointLogBuilder logBuilder = BuilderFactory.get(SBreakpointLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         logBuilder.definitionId(breakpoint.getDefinitionId());

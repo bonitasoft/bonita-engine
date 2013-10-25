@@ -8,32 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.process.instance.model.builder;
 
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 
 /**
  * @author Celine Souchet
  */
 public interface SProcessInstanceBuilder extends org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder {
 
-    String getStringIndex1Key();
-
-    String getStringIndex2Key();
-
-    String getStringIndex3Key();
-
-    String getStringIndex4Key();
-
-    String getStringIndex5Key();
-
     SProcessInstanceBuilder setStringIndex(int index, String value);
-
-    @Override
-    SProcessInstanceBuilder createNewInstance(String name, long processDefinitionId);
-
-    @Override
-    SProcessInstanceBuilder createNewInstance(String name, long processDefinitionId, String description);
-
-    @Override
-    SProcessInstanceBuilder createNewInstance(SProcessDefinition definition);
 
 }

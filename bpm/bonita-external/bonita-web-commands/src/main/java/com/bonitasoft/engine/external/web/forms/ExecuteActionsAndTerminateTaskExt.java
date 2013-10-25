@@ -30,7 +30,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
@@ -101,8 +100,9 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
                 throw new InvalidEvaluationConnectorConditionException(connectorInputParameters.size(), contextMap.size());
             }
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-            final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
-            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+
+
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final String connectorDefinitionId = connectorDefinition.getConnectorId();
             final ConnectorService connectorService = tenantAccessor.getConnectorService();
             final SExpressionContext expcontext = new SExpressionContext();

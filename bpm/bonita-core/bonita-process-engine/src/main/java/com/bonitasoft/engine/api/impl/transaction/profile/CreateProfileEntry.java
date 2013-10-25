@@ -11,7 +11,6 @@ package com.bonitasoft.engine.api.impl.transaction.profile;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 
 import com.bonitasoft.engine.profile.ProfileEntryCreator;
@@ -27,20 +26,17 @@ public class CreateProfileEntry implements TransactionContentWithResult<SProfile
 
     private final ProfileEntryCreator creator;
 
-    private final SProfileEntryBuilder sProfileEntryBuilder;
-
     private SProfileEntry profileEntry;
 
-    public CreateProfileEntry(final ProfileService profileService, final SProfileEntryBuilder sProfileEntryBuilder, final ProfileEntryCreator creator) {
+    public CreateProfileEntry(final ProfileService profileService, final ProfileEntryCreator creator) {
         super();
         this.profileService = profileService;
-        this.sProfileEntryBuilder = sProfileEntryBuilder;
         this.creator = creator;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        profileEntry = profileService.createProfileEntry(SPModelConvertor.constructSProfileEntry(creator, sProfileEntryBuilder));
+        profileEntry = profileService.createProfileEntry(SPModelConvertor.constructSProfileEntry(creator));
     }
 
     @Override

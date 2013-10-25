@@ -20,19 +20,10 @@ public class SReportLogBuilderImpl extends CRUDELogBuilder implements SReportLog
 
     private static final String PREFIX = "REPORT";
 
-    public static final int REPORT_INDEX = 1;
-
-    public static final String REPORT_INDEX_NAME = "numericIndex2";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(REPORT_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SReportLogBuilderFactoryImpl.REPORT_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return REPORT_INDEX_NAME;
     }
 
     @Override
@@ -42,7 +33,7 @@ public class SReportLogBuilderImpl extends CRUDELogBuilder implements SReportLog
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(REPORT_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SReportLogBuilderFactoryImpl.REPORT_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFields are missing: report identifier");
         }
     }

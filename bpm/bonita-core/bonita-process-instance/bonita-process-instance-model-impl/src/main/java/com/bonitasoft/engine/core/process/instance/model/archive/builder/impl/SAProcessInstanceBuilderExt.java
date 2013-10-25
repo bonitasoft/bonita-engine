@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.impl.SAProcessInstanceBuilderImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 
 import com.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 
@@ -17,39 +18,9 @@ import com.bonitasoft.engine.core.process.instance.model.archive.builder.SAProce
  */
 public class SAProcessInstanceBuilderExt extends SAProcessInstanceBuilderImpl implements SAProcessInstanceBuilder {
 
-    private static final String STRING_INDEX_1 = "stringIndex1";
-
-    private static final String STRING_INDEX_2 = "stringIndex2";
-
-    private static final String STRING_INDEX_3 = "stringIndex3";
-
-    private static final String STRING_INDEX_4 = "stringIndex4";
-
-    private static final String STRING_INDEX_5 = "stringIndex5";
-
-    @Override
-    public String getStringIndex1Key() {
-        return STRING_INDEX_1;
+    public SAProcessInstanceBuilderExt(final SAProcessInstanceImpl entity) {
+        super(entity);
     }
 
-    @Override
-    public String getStringIndex2Key() {
-        return STRING_INDEX_2;
-    }
-
-    @Override
-    public String getStringIndex3Key() {
-        return STRING_INDEX_3;
-    }
-
-    @Override
-    public String getStringIndex4Key() {
-        return STRING_INDEX_4;
-    }
-
-    @Override
-    public String getStringIndex5Key() {
-        return STRING_INDEX_5;
-    }
-
+    
 }

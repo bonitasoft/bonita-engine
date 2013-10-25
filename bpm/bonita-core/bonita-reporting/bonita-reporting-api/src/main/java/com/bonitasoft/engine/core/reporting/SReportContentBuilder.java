@@ -15,8 +15,6 @@ package com.bonitasoft.engine.core.reporting;
  */
 public interface SReportContentBuilder {
 
-    SReportContentBuilder createNewInstance(byte[] content);
-
     SReportContent done();
 
 }

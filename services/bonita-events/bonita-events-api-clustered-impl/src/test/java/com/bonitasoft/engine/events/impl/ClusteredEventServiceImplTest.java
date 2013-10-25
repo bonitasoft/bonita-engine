@@ -16,8 +16,6 @@ import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.events.model.SHandlerExecutionException;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
-import org.bonitasoft.engine.events.model.builders.impl.SEventBuildersImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.After;
@@ -66,12 +64,11 @@ public class ClusteredEventServiceImplTest extends EventServiceTest {
     }
 
     protected EventService instantiateEventServiceImplementation(final Map<String, SHandler<SEvent>> handlers) {
-        SEventBuilders eventBuilders = new SEventBuildersImpl();
         TechnicalLoggerService logger = mockTechnicalLoggerService();
         Manager manager = mock(Manager.class);
         when(manager.isFeatureActive(Features.ENGINE_CLUSTERING)).thenReturn(true);
         try {
-            eventService = new ClusteredEventServiceImpl("PLATFORM", eventBuilders, handlers, logger, hazelcastInstance, manager);
+            eventService = new ClusteredEventServiceImpl("PLATFORM", handlers, logger, hazelcastInstance, manager);
             return eventService;
         } catch (HandlerRegistrationException e) {
             throw new RuntimeException(e);

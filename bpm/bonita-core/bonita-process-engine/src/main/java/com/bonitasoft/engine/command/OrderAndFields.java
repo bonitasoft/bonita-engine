@@ -8,11 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.command;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByType;
 
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
-import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilder;
+import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilderFactory;
 
 /**
  * @author Baptiste Mesta
@@ -20,40 +21,41 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuil
  */
 public class OrderAndFields extends org.bonitasoft.engine.api.impl.OrderAndFields {
 
-    static OrderAndField getOrderAndFieldForBreakpoints(final BreakpointCriterion sort, final SBreakpointBuilder builder) {
+    static OrderAndField getOrderAndFieldForBreakpoints(final BreakpointCriterion sort) {
+        final SBreakpointBuilderFactory keyProvider = BuilderFactory.get(SBreakpointBuilderFactory.class);
         String field;
         OrderByType type;
         switch (sort) {
             case DEFINITION_ID_ASC:
-                field = builder.getDefinitionIdKey();
+                field = keyProvider.getDefinitionIdKey();
                 type = OrderByType.ASC;
                 break;
             case DEFINITION_ID_DESC:
-                field = builder.getDefinitionIdKey();
+                field = keyProvider.getDefinitionIdKey();
                 type = OrderByType.DESC;
                 break;
             case ELEMENT_NAME_ASC:
-                field = builder.getElementNameKey();
+                field = keyProvider.getElementNameKey();
                 type = OrderByType.ASC;
                 break;
             case ELEMENT_NAME_DESC:
-                field = builder.getElementNameKey();
+                field = keyProvider.getElementNameKey();
                 type = OrderByType.DESC;
                 break;
             case INSTANCE_ID_ASC:
-                field = builder.getInstanceIdKey();
+                field = keyProvider.getInstanceIdKey();
                 type = OrderByType.ASC;
                 break;
             case INSTANCE_ID_DESC:
-                field = builder.getInstanceIdKey();
+                field = keyProvider.getInstanceIdKey();
                 type = OrderByType.DESC;
                 break;
             case STATE_ID_ASC:
-                field = builder.getStateIdKey();
+                field = keyProvider.getStateIdKey();
                 type = OrderByType.ASC;
                 break;
             case STATE_ID_DESC:
-                field = builder.getStateIdKey();
+                field = keyProvider.getStateIdKey();
                 type = OrderByType.DESC;
                 break;
             default:

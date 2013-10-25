@@ -18,12 +18,13 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -34,8 +35,8 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -57,8 +58,6 @@ public class ReportingServiceImpl implements ReportingService {
 
     private final EventService eventService;
 
-    private final SEventBuilder eventBuilder;
-
     private final TechnicalLoggerService logger;
 
     private final QueriableLoggerService queriableLoggerService;
@@ -68,7 +67,6 @@ public class ReportingServiceImpl implements ReportingService {
         this.dataSource = dataSource;
         this.persistenceService = persistenceService;
         this.eventService = eventService;
-        eventBuilder = eventService.getEventBuilder();
         this.recorder = recorder;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
@@ -263,7 +261,7 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -272,7 +270,7 @@ public class ReportingServiceImpl implements ReportingService {
 
     private SInsertEvent getInsertEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.CREATED)) {
-            return (SInsertEvent) eventBuilder.createInsertEvent(type).setObject(object).done();
+            return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
         } else {
             return null;
         }
@@ -280,7 +278,7 @@ public class ReportingServiceImpl implements ReportingService {
 
     private SDeleteEvent getDeleteEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.DELETED)) {
-            return (SDeleteEvent) eventBuilder.createDeleteEvent(type).setObject(object).done();
+            return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
         } else {
             return null;
         }
@@ -294,15 +292,6 @@ public class ReportingServiceImpl implements ReportingService {
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), methodName, log);
         }
-    }
-
-    @Override
-    public SReportBuilder getReportBuilder() {
-        return new SReportBuilderImpl();
-    }
-
-    protected SReportContentBuilder getReportContentBuilder() {
-        return new SReportContentBuilderImpl();
     }
 
     @Override

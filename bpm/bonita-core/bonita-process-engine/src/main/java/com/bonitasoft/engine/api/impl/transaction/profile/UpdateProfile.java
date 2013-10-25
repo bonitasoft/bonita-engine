@@ -12,10 +12,12 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -35,19 +37,17 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
 
     private final ProfileUpdater updateDescriptor;
 
-    private final SProfileUpdateBuilder updateBuilder;
 
     private final long lastUpdatorId;
 
     private SProfile sProfile = null;
 
-    public UpdateProfile(final ProfileService profileService, final SProfileUpdateBuilder updateBuilder, final Long profileId,
+    public UpdateProfile(final ProfileService profileService, final Long profileId,
             final ProfileUpdater updateDescriptor, final long lastUpdatorId) {
         super();
         this.profileService = profileService;
         this.profileId = profileId;
         this.updateDescriptor = updateDescriptor;
-        this.updateBuilder = updateBuilder;
         this.lastUpdatorId = lastUpdatorId;
     }
 
@@ -68,6 +68,7 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
     }
 
     private EntityUpdateDescriptor getProfileUpdateDescriptor() {
+        final SProfileUpdateBuilder updateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
         final Map<ProfileField, Serializable> fields = updateDescriptor.getFields();
         for (final Entry<ProfileField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {

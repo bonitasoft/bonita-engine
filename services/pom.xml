@@ -39,6 +39,7 @@
 		<module>bonita-session</module>
 		<module>bonita-platform-session</module>
 		<module>bonita-monitoring</module>
+		<module>bonita-builder-sp</module>
 	</modules>
 
 	<profiles>

@@ -11,13 +11,13 @@ package com.bonitasoft.engine.api.impl.transaction.profile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
@@ -98,10 +98,8 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
     }
 
     private long insertProfile(final ExportedProfile exportedProfile) throws SProfileCreationException {
-        final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
-        final SProfileBuilder profileBuilder = builders.getSProfileBuilder();
         final long creationDate = System.currentTimeMillis();
-        final SProfile sProfile = profileBuilder
+        final SProfile sProfile = BuilderFactory.get(SProfileBuilderFactory.class)
                 .createNewInstance(exportedProfile.getName(), exportedProfile.isDefault(), creationDate, importerId, creationDate, importerId)
                 .setDescription(exportedProfile.getDescription())
                 .setIconPath(exportedProfile.getIconPath()).done();
@@ -109,10 +107,7 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
     }
 
     private void insertParentProfileEntry(final long profileId, final ExportedParentProfileEntry parentprofileEntry) throws SProfileEntryCreationException {
-        final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
-        final SProfileEntryBuilder proEntryBuilder = builders.getSProfileEntryBuilder();
-
-        final SProfileEntry sproEntry = proEntryBuilder.createNewInstance(parentprofileEntry.getName(), profileId)
+        final SProfileEntry sproEntry = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(parentprofileEntry.getName(), profileId)
                 .setDescription(parentprofileEntry.getDescription()).setIndex(parentprofileEntry.getIndex()).setPage(parentprofileEntry.getPage())
                 .setParentId(0).setType(parentprofileEntry.getType()).done();
         final SProfileEntry parentEntry = profileService.createProfileEntry(sproEntry);
@@ -127,10 +122,8 @@ public class ImportAndHandleSameNameProfiles implements TransactionContentWithRe
 
     private void insertChildProfileEntry(final long profileId, final long parentId, final ExportedProfileEntry childProfileEntry)
             throws SProfileEntryCreationException {
-        final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
-        final SProfileEntryBuilder proEntryBuilder = builders.getSProfileEntryBuilder();
 
-        final SProfileEntry sproEntrytp = proEntryBuilder.createNewInstance(childProfileEntry.getName(), profileId)
+        final SProfileEntry sproEntrytp = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(childProfileEntry.getName(), profileId)
                 .setDescription(childProfileEntry.getDescription()).setIndex(childProfileEntry.getIndex()).setPage(childProfileEntry.getPage())
                 .setParentId(parentId).setType(childProfileEntry.getType()).done();
         profileService.createProfileEntry(sproEntrytp);
