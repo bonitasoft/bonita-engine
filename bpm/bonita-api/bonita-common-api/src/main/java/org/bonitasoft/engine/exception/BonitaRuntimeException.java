@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.exception;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,42 +26,11 @@ public class BonitaRuntimeException extends RuntimeException {
     }
 
     public BonitaRuntimeException(final String message, final Throwable cause) {
-        super(message);
-        this.mergeStacks(cause);
+        super(message, cause);
     }
 
     public BonitaRuntimeException(final Throwable cause) {
-        super(cause.getMessage());
-        this.mergeStacks(cause);
+        super(cause);
     }
 
-    /**
-     * @param cause
-     */
-    private void mergeStacks(final Throwable cause) {
-        final StackTraceElement[] currentStack = this.getStackTrace();
-        final List<StackTraceElement[]> causesStacks = new ArrayList<StackTraceElement[]>();
-        final List<Throwable> exceptions = new ArrayList<Throwable>();
-        Throwable subCause = cause;
-        int causeslength = 0;
-        do {
-            final StackTraceElement[] stackTrace = subCause.getStackTrace();
-            causesStacks.add(stackTrace);
-            exceptions.add(subCause);
-            causeslength += stackTrace.length + 1;
-        } while ((subCause = subCause.getCause()) != null);
-        final StackTraceElement[] mergedStackTrace = new StackTraceElement[currentStack.length + causeslength + 1];
-        System.arraycopy(currentStack, 0, mergedStackTrace, 0, currentStack.length);
-        mergedStackTrace[currentStack.length] = new StackTraceElement("══════════════════════════", "<server stack trace>", "", -3);
-        int current = currentStack.length + 1;
-        int i = 0;
-        for (final StackTraceElement[] stackTraceElements : causesStacks) {
-            System.arraycopy(stackTraceElements, 0, mergedStackTrace, current, stackTraceElements.length);
-            current += stackTraceElements.length;
-            mergedStackTrace[current] = new StackTraceElement("", "Caused By:", exceptions.get(i).getMessage(), -3);
-            current += 1;
-            i++;
-        }
-        this.setStackTrace(mergedStackTrace);
-    }
 }

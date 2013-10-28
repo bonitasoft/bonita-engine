@@ -88,9 +88,14 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static DefaultHttpClient httpclient = null;
 
-    private static final XStream xstream = new XStream();
+    private static final XStream xstream;
 
     private static final ResponseHandler<String> responseHandler = new BonitaResponseHandler();
+
+    static {
+        xstream = new XStream();
+        xstream.registerConverter(new BonitaStackTraceElementConverter(), XStream.PRIORITY_VERY_HIGH);
+    }
 
     public HTTPServerAPI(final Map<String, String> parameters) {
         // initialize httpclient in the constructor to avoid incompatibility when running tests:

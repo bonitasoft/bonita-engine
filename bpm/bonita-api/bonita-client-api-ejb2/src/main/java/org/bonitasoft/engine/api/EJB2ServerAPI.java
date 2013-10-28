@@ -27,6 +27,7 @@ import javax.rmi.PortableRemoteObject;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.StackTraceTransformer;
 
 /**
  * @author Matthieu Chaffotte
@@ -64,7 +65,12 @@ public class EJB2ServerAPI implements ServerAPI {
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
-        return remoteServAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+        try {
+            return remoteServAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+        } catch (ServerWrappedException e) {
+            // merge stack trace of the server exception
+            throw StackTraceTransformer.mergeStackTraces(e);
+        }
     }
 
 }

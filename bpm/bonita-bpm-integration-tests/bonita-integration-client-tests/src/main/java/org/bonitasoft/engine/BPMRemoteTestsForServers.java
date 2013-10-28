@@ -6,7 +6,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({ BPMRemoteTests.class })
+@SuiteClasses({
+        RemoteEngineTests.class,// this class is only in remote (we test that server stack trace are reported in client side)
+        BPMRemoteTests.class })
 @Initializer(BPMRemoteTestsForServers.class)
 public class BPMRemoteTestsForServers {
 
