@@ -1439,15 +1439,14 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flowNodeInstanceId);// FIXME
         try {
-            getFlowNodeInstance.execute();
+            SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+            return ModelConvertor.toFlowNodeInstance(flowNodeInstance, flowNodeStateManager);
         } catch (final SFlowNodeNotFoundException e) {
             throw new FlowNodeInstanceNotFoundException(e);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
-        return ModelConvertor.toFlowNodeInstance(getFlowNodeInstance.getResult(), flowNodeStateManager);
     }
 
     @Override
