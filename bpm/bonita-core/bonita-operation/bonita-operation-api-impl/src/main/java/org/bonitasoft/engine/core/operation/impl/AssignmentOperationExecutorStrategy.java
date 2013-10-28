@@ -69,9 +69,9 @@ public class AssignmentOperationExecutorStrategy extends UpdateOperationExecutor
             if (object != null) {
                 final Class<?> dataEffectiveType = object.getClass();
                 final Class<?> evaluatedReturnedType = value.getClass();
-                if (!dataEffectiveType.isAssignableFrom(evaluatedReturnedType)) {
-                    throw new SOperationExecutionException("Incompatible assignment operation type: Left operand " + dataEffectiveType +
-                            " is not compatible with right operand " + evaluatedReturnedType + " for expression with name '" + expressionContext + "'");
+                if (!(dataEffectiveType.isAssignableFrom(evaluatedReturnedType) || dataEffectiveType.equals(evaluatedReturnedType))) {
+                    throw new SOperationExecutionException("Incompatible assignment operation type: Left operand " + dataEffectiveType
+                            + " is not compatible with right operand " + evaluatedReturnedType + " for expression with name '" + expressionContext + "'");
                 }
             }
         }
