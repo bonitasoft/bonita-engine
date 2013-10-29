@@ -19,9 +19,6 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.SPlatformNotFoundException;
-import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.session.SSessionException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
@@ -43,18 +40,14 @@ public class SessionServiceImpl implements SessionService {
 
     private final SessionProvider sessionProvider;
 
-    private final PlatformService platformService;
-
     private final String applicationName;
 
     private final TechnicalLoggerService logger;
 
-    public SessionServiceImpl(final SessionProvider sessionProvider, final SSessionBuilders sessionModelBuilder, final PlatformService platformService,
-            final String applicationName,
+    public SessionServiceImpl(final SessionProvider sessionProvider, final SSessionBuilders sessionModelBuilder, final String applicationName,
             final TechnicalLoggerService logger) {
         this.sessionModelBuilders = sessionModelBuilder;
         this.sessionProvider = sessionProvider;
-        this.platformService = platformService;
         this.applicationName = applicationName;
         this.logger = logger;
     }
@@ -68,24 +61,14 @@ public class SessionServiceImpl implements SessionService {
     public SSession createSession(final long tenantId, final long userId, final String userName, final boolean isTechnicalUser) throws SSessionException {
         final long id = SessionIdGenerator.getNextId();
         final long duration = getSessionDuration();
-        final String platformVersion = getPlatformVersion();
 
         final SSession session = sessionModelBuilders.getSessionBuilder()
-                .createNewInstance(id, tenantId, duration, userName, platformVersion, applicationName, userId).technicalUser(isTechnicalUser).done();
+                .createNewInstance(id, tenantId, duration, userName, applicationName, userId).technicalUser(isTechnicalUser).done();
         sessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "createSession with tenantId=" + tenantId + " username = " + userName + " Id = " + id);
         }
         return session;
-    }
-
-    private String getPlatformVersion() throws SSessionException {
-        try {
-            final SPlatform platform = platformService.getPlatform();
-            return platform.getVersion();
-        } catch (final SPlatformNotFoundException e) {
-            throw new SSessionException("Unable to retrieve the platform");
-        }
     }
 
     @Override
@@ -106,7 +89,7 @@ public class SessionServiceImpl implements SessionService {
             session = sessionProvider.getSession(sessionId);
         } catch (SSessionNotFoundException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Session with id '" + sessionId +"' is invalid because it does not exist.");
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Session with id '" + sessionId + "' is invalid because it does not exist.");
             }
             throw e;
         }

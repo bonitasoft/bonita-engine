@@ -24,8 +24,6 @@ import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * This service must be configured as a singleton.
@@ -43,8 +41,6 @@ public class MemoryLockService implements LockService {
 
     protected final int lockTimeout;
 
-    private final ReadSessionAccessor sessionAccessor;
-
     private final Map<Integer, Object> mutexs;
 
     protected final boolean debugEnable;
@@ -59,9 +55,8 @@ public class MemoryLockService implements LockService {
      * @param lockTimeout
      *            timeout to obtain a lock in seconds
      */
-    public MemoryLockService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout, final int lockPoolSize) {
+    public MemoryLockService(final TechnicalLoggerService logger, final int lockTimeout, final int lockPoolSize) {
         this.logger = logger;
-        this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
         debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
         traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
@@ -107,17 +102,13 @@ public class MemoryLockService implements LockService {
         return reentrantLock;
     }
 
-    private String buildKey(final long objectToLockId, final String objectType) {
-        try {
-            return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
-        } catch (final TenantIdNotSetException e) {
-            throw new IllegalStateException("Tenant not set");
-        }
+    private String buildKey(final long objectToLockId, final String objectType, final long tenantId) {
+        return objectType + SEPARATOR + objectToLockId + SEPARATOR + tenantId;
     }
 
     @Override
-    public void unlock(final BonitaLock lock) throws SLockException {
-        final String key = buildKey(lock.getObjectToLockId(), lock.getObjectType());
+    public void unlock(final BonitaLock lock, final long tenantId) throws SLockException {
+        final String key = buildKey(lock.getObjectToLockId(), lock.getObjectType(), tenantId);
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + lock.getLock().hashCode() + " id=" + key);
         }
@@ -135,8 +126,8 @@ public class MemoryLockService implements LockService {
     }
 
     @Override
-    public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) {
-        final String key = buildKey(objectToLockId, objectType);
+    public BonitaLock tryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit, final long tenantId) {
+        final String key = buildKey(objectToLockId, objectType, tenantId);
         final ReentrantLock lock;
         synchronized (getMutex(objectToLockId)) {
             lock = getLock(key);
@@ -187,8 +178,8 @@ public class MemoryLockService implements LockService {
     }
 
     @Override
-    public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
-        BonitaLock lock = tryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS);
+    public BonitaLock lock(final long objectToLockId, final String objectType, final long tenantId) throws SLockException {
+        BonitaLock lock = tryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS, tenantId);
 
         if (lock == null) {
             throw new SLockException("Unable (default timeout) to acquire the lock for " + objectToLockId + ":" + objectType);

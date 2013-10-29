@@ -17,9 +17,8 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,25 +68,6 @@ public class ProfileServiceTest extends CommonServiceTest {
         } catch (final SProfileNotFoundException spnfe) {
             getTransactionService().complete();
         }
-    }
-
-    @Test
-    public void getEntries() throws SBonitaException {
-        getTransactionService().begin();
-        final SProfileBuilderAccessor sProfileBuilderAccessor = profileService.getSProfileBuilderAccessor();
-        final SProfileBuilder sProfileBuilder = sProfileBuilderAccessor.getSProfileBuilder();
-        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1", false, 0, 0, 0, 0).done());
-        final SProfileEntryBuilder sProfileEntryBuilder = sProfileBuilderAccessor.getSProfileEntryBuilder();
-        final SProfileEntry profileEntry = profileService.createProfileEntry(sProfileEntryBuilder.createNewInstance("entry1", profile.getId()).done());
-        List<SProfileEntry> entries = profileService.getEntriesOfProfile(profile.getId(), 0, 10);
-        Assert.assertEquals(1, entries.size());
-        final SProfileEntry sProfileEntry = entries.get(0);
-        Assert.assertEquals(profileEntry, sProfileEntry);
-        profileService.deleteProfileEntry(profileEntry.getId());
-        entries = profileService.getEntriesOfProfile(profile.getId(), 0, 10);
-        Assert.assertEquals(0, entries.size());
-        profileService.deleteProfile(profile);
-        getTransactionService().complete();
     }
 
     @Test

@@ -63,7 +63,7 @@ public class ProfileTest extends AbstractProfileTest {
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Wrong parameter" }, jira = "ENGINE-548")
     @Test(expected = ProfileNotFoundException.class)
     public void getProfileWithWrongParameter() throws Exception {
-        getProfileAPI().getProfile(6);
+        getProfileAPI().getProfile(855);
     }
 
 }

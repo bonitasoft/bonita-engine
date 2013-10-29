@@ -967,9 +967,9 @@ public class GatewayExecutionTest extends CommonAPITest {
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, designProcessDefinition, "step2");
     }
 
-    private void assertJohnHasGotTheExpectedTaskPending(final String ACTOR_NAME, final DesignProcessDefinition designProcessDefinition,
+    private void assertJohnHasGotTheExpectedTaskPending(final String actorName, final DesignProcessDefinition designProcessDefinition,
             final String... expected) throws Exception {
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition, actorName, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 

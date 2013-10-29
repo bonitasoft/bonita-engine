@@ -14,11 +14,17 @@
  */
 package org.bonitasoft.engine.bpm;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActorBuilders;
+import org.bonitasoft.engine.actor.xml.GroupPathsBinding;
+import org.bonitasoft.engine.actor.xml.RoleNamesBinding;
+import org.bonitasoft.engine.actor.xml.UserNamesBinding;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -71,6 +77,7 @@ import org.bonitasoft.engine.dependency.model.builder.DependencyBuilder;
 import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.dependency.model.builder.DependencyMappingBuilder;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exceptions.ExceptionsManager;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
@@ -96,6 +103,15 @@ import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
+import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
+import org.bonitasoft.engine.profile.xml.MembershipBinding;
+import org.bonitasoft.engine.profile.xml.MembershipsBinding;
+import org.bonitasoft.engine.profile.xml.ParentProfileEntryBinding;
+import org.bonitasoft.engine.profile.xml.ProfileBinding;
+import org.bonitasoft.engine.profile.xml.ProfileEntriesBinding;
+import org.bonitasoft.engine.profile.xml.ProfileEntryBinding;
+import org.bonitasoft.engine.profile.xml.ProfileMappingBinding;
+import org.bonitasoft.engine.profile.xml.ProfilesBinding;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -115,8 +131,10 @@ import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.test.util.ServicesAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
+import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.XMLWriter;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
@@ -587,7 +605,35 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
 
     @Override
     public Parser getProfileParser() {
-        return getInstanceOf(Parser.class);
+        // TODO is duplicated in SpringTenantServiceAccessor, must not, but profile service does not have dep on Parser..
+        final List<Class<? extends ElementBinding>> bindings = new ArrayList<Class<? extends ElementBinding>>();
+        bindings.add(ProfileBinding.class);
+        bindings.add(ProfilesBinding.class);
+        bindings.add(ProfileEntryBinding.class);
+        bindings.add(ParentProfileEntryBinding.class);
+        bindings.add(ChildrenEntriesBinding.class);
+        bindings.add(ProfileEntriesBinding.class);
+        bindings.add(ProfileMappingBinding.class);
+        bindings.add(MembershipsBinding.class);
+        bindings.add(MembershipBinding.class);
+        bindings.add(UserNamesBinding.class);
+        bindings.add(RoleNamesBinding.class);
+        bindings.add(RoleNamesBinding.class);
+        bindings.add(GroupPathsBinding.class);
+        final Parser parser = getParserFactgory().createParser(bindings);
+        final InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("profiles.xsd");
+        try {
+            parser.setSchema(resource);
+            return parser;
+        } catch (final SInvalidSchemaException ise) {
+            throw new BonitaRuntimeException(ise);
+        } finally {
+            try {
+                resource.close();
+            } catch (final IOException ioe) {
+                throw new BonitaRuntimeException(ioe);
+            }
+        }
     }
 
     @Override

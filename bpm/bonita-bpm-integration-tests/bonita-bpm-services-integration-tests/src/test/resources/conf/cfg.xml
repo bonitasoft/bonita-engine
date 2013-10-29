@@ -18,6 +18,7 @@
         <constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
         <constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
         <constructor-arg name="logger" ref="technicalLoggerService" />
+        <constructor-arg name="platformService" ref="platformService" />
     </bean>
 
 	<bean id="queriableLogSessionProvider" class="org.bonitasoft.engine.services.impl.QueriableLogSessionProviderImpl">
@@ -142,6 +143,7 @@
 		<constructor-arg name="actorMappingService" ref="actorMappingService" />
 		<constructor-arg name="workService" ref="workService"/>
 		<constructor-arg name="tokenService" ref="tokenService"/>
+		<constructor-arg name="identityService" ref="identityService"/>
 	</bean>
 
 	<bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">

@@ -1525,7 +1525,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SUser> getUsersByName(final List<String> userNames) throws SIdentityException {
+    public List<SUser> getUsersByUsername(final List<String> userNames) throws SIdentityException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByName"));
         }

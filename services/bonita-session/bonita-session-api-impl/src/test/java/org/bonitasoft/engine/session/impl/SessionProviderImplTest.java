@@ -14,13 +14,13 @@ public class SessionProviderImplTest {
 
     @Test
     public void testAddSession() throws Exception {
-        sessionProvider.addSession(new SSessionImpl(12, 2, "john", "TEST", "app", 12));
+        sessionProvider.addSession(new SSessionImpl(12, 2, "john", "TEST", 12));
         assertNotNull(sessionProvider.getSession(12));
     }
 
     @Test(expected = SSessionNotFoundException.class)
     public void testRemoveSession() throws Exception {
-        sessionProvider.addSession(new SSessionImpl(13, 2, "john", "TEST", "app", 12));
+        sessionProvider.addSession(new SSessionImpl(13, 2, "john", "TEST", 12));
         sessionProvider.removeSession(12);
         sessionProvider.getSession(12);
     }
@@ -32,8 +32,8 @@ public class SessionProviderImplTest {
 
     @Test
     public void testDeleteSessionsOfTenant() throws Exception {
-        sessionProvider.addSession(new SSessionImpl(54, 3, "john", "TEST", "app", 12));
-        sessionProvider.addSession(new SSessionImpl(55, 4, "john", "TEST", "app", 12));
+        sessionProvider.addSession(new SSessionImpl(54, 3, "john", "TEST", 12));
+        sessionProvider.addSession(new SSessionImpl(55, 4, "john", "TEST", 12));
         sessionProvider.deleteSessionsOfTenant(3);
         sessionProvider.getSession(55);
         try {

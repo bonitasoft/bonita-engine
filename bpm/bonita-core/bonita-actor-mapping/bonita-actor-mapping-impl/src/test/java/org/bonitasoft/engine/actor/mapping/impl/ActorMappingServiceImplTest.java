@@ -50,6 +50,7 @@ import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -63,6 +64,7 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -484,7 +486,6 @@ public class ActorMappingServiceImplTest {
 
         doReturn(sActor).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SActor>> any());
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final SActor result = actorMappingServiceImpl.updateActor(3, sActorUpdateBuilder.done());
@@ -498,6 +499,21 @@ public class ActorMappingServiceImplTest {
         doReturn(null).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SActor>> any());
 
         actorMappingServiceImpl.updateActor(4, sActorUpdateBuilder.done());
+    }
+
+    @Test(expected = SActorUpdateException.class)
+    public final void updateActorThrowException() throws SActorUpdateException, SActorNotFoundException, SBonitaReadException, SRecorderException {
+        final SActor sActor = mock(SActor.class);
+        doReturn(3L).when(sActor).getId();
+
+        final SActorUpdateBuilder sActorUpdateBuilder = new SActorUpdateBuilderImpl();
+        sActorUpdateBuilder.updateDescription("newDescription");
+        sActorUpdateBuilder.updateDisplayName("newDisplayName");
+
+        doReturn(sActor).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SActor>> any());
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+
+        actorMappingServiceImpl.updateActor(3, sActorUpdateBuilder.done());
     }
 
     /**

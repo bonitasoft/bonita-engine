@@ -43,6 +43,7 @@ public class SearchCommentDescriptor extends SearchEntityDescriptor {
         commentKeys.put(SearchCommentsDescriptor.POSTED_BY_ID, new FieldDescriptor(SComment.class, sCommentBuilder.getUserIdKey()));
         commentKeys.put(SearchCommentsDescriptor.ID, new FieldDescriptor(SComment.class, sCommentBuilder.getIdKey()));
         commentKeys.put(SearchCommentsDescriptor.POSTDATE, new FieldDescriptor(SComment.class, sCommentBuilder.getPostDateKey()));
+        commentKeys.put(SearchCommentsDescriptor.CONTENT, new FieldDescriptor(SComment.class, sCommentBuilder.getContentKey()));
         commentKeys.put(SearchCommentsDescriptor.USER_NAME, new FieldDescriptor(SUser.class, userBuilder.getUserNameKey()));
         commentAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> commentFields = new HashSet<String>(1);

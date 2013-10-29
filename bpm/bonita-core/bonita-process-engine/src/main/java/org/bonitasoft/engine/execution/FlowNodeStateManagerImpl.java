@@ -83,6 +83,7 @@ import org.bonitasoft.engine.execution.state.InterruptedFlowNodeState;
 import org.bonitasoft.engine.execution.state.ReadyActivityStateImpl;
 import org.bonitasoft.engine.execution.state.SkippedFlowNodeStateImpl;
 import org.bonitasoft.engine.execution.state.WaitingFlowNodeStateImpl;
+import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.work.WorkService;
@@ -195,11 +196,11 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final ArchiveService archiveService, final TechnicalLoggerService logger, final DocumentMappingService documentMappingService,
             final SCommentService commentService, final SCommentBuilders commentBuilders, final EventsHandler eventsHandler,
             final UserFilterService userFilterService, final ActorMappingService actorMappingService, final WorkService workService,
-            final TokenService tokenService) {
+            final TokenService tokenService, final IdentityService identityService) {
         initStates(connectorInstanceService, classLoaderService, expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
                 sDataInstanceBuilders, instanceBuilders, operationService, activityInstanceService, bpmInstancesCreator, containerRegistry,
                 processDefinitionService, processInstanceService, archiveService, logger, documentMappingService, commentService,
-                commentBuilders, eventsHandler, userFilterService, actorMappingService, workService, tokenService);
+                commentBuilders, eventsHandler, userFilterService, actorMappingService, workService, tokenService, identityService);
         defineTransitionsForAllNodesType();
         initializeFirstStatesIdsOnBPMInstanceCreator(bpmInstancesCreator);
     }
@@ -341,10 +342,10 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final TechnicalLoggerService logger,
             final DocumentMappingService documentMappingService, final SCommentService commentService, final SCommentBuilders commentBuilders,
             final EventsHandler eventsHandler, final UserFilterService userFilterService,
-            final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService) {
+            final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService, final IdentityService identityService) {
         stateBehaviors = new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService,
                 instanceBuilders, actorMappingService, connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService,
-                operationService, workService, containerRegistry, eventInstanceService, schedulerService, logger);
+                operationService, workService, containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger);
         failed = new FailedActivityStateImpl();
         initializing = new InitializingActivityStateImpl(stateBehaviors);
         initializingActivityWithBoundary = new InitializingActivityWithBoundaryEventsStateImpl(stateBehaviors);

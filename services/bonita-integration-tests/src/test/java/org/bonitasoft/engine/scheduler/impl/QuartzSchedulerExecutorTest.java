@@ -594,11 +594,18 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
 
-        Thread.sleep(2500);
+        Integer value;
+        final int timeout = 5000;
+        final Date time = new Date();
+        do {
+            value = (Integer) storage.getVariableValue(variableName);
+            if (value == null) {
+                value = 0;
+            }
+            Thread.sleep(50);
+        } while (value != 3 || time.getTime() + timeout > System.currentTimeMillis());
 
-        final Integer value = (Integer) storage.getVariableValue(variableName);
-
-        assertTrue("expected 2 or 3, got: " + value, value == 2 || value == 3);
+        assertEquals(Integer.valueOf(3), value);
         Thread.sleep(2000);
         assertEquals(value, storage.getVariableValue(variableName));
     }

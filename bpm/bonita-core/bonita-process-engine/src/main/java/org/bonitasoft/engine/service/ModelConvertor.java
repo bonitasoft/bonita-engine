@@ -1193,7 +1193,7 @@ public class ModelConvertor {
         } else {
             dataInstance = new BlobDataInstanceImpl();
         }
-
+        dataInstance.setTransientData(sDataInstance.isTransientData());
         dataInstance.setClassName(sDataInstance.getClassName());
         dataInstance.setContainerId(sDataInstance.getContainerId());
         dataInstance.setContainerType(sDataInstance.getContainerType());

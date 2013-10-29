@@ -28,9 +28,9 @@ public class SSessionBuilderImpl implements SSessionBuilder {
     private SSessionImpl entity;
 
     @Override
-    public SSessionBuilder createNewInstance(final long id, final long tenantId, final long duration, final String username, final String productVersion,
-            final String applicationName, final long userId) {
-        entity = new SSessionImpl(id, tenantId, username, productVersion, applicationName, userId);
+    public SSessionBuilder createNewInstance(final long id, final long tenantId, final long duration, final String username, final String applicationName,
+            final long userId) {
+        entity = new SSessionImpl(id, tenantId, username, applicationName, userId);
         entity.setDuration(duration);
         return this;
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.api.exceptions;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.persistence.AbstractSelectDescriptor;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
@@ -25,8 +26,19 @@ public class SProcessInstanceReadException extends SBonitaException {
 
     private static final long serialVersionUID = -5549277707760652364L;
 
+    private static final String formatMessage(final Throwable cause) {
+        String message = null;
+        if (cause instanceof SBonitaReadException) {
+            final AbstractSelectDescriptor<?> descriptor = ((SBonitaReadException) cause).getselectDescriptor();
+            if (descriptor != null) {
+                message = descriptor.toString();
+            }
+        }
+        return message;
+    }
+
     public SProcessInstanceReadException(final Throwable cause) {
-        super(cause instanceof SBonitaReadException ? ((SBonitaReadException) cause).getselectDescriptor().toString() : null, cause);
+        super(formatMessage(cause), cause);
     }
 
 }

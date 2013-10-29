@@ -16,7 +16,7 @@ CREATE TABLE arch_data_instance (
 	doubleValue NUMERIC(19,5),
 	floatValue REAL,
 	blobValue BLOB,
-	clobValue VARCHAR2(1024),
+	clobValue CLOB,
 	discriminant VARCHAR2(50) NOT NULL,
 	archiveDate NUMBER(19, 0) NOT NULL,
 	sourceObjectId NUMBER(19, 0) NOT NULL,

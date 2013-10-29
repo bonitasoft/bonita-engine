@@ -627,7 +627,7 @@ public interface ProcessManagementAPI {
      * @param processDefinitionId
      *            the identifier of the process.
      * @param xmlContent
-     *            the XML content of the mapping.
+     *            the XML content of the mapping. If null, nothing is performed.
      * @throws ActorMappingImportException
      *             if an exception occurs when importing the actor mapping.
      * @since 6.0
@@ -640,7 +640,7 @@ public interface ProcessManagementAPI {
      * @param processDefinitionId
      *            the identifier of the process.
      * @param actorMappingXML
-     *            the XML content of the mapping as a byte array.
+     *            the XML content of the mapping as a byte array. If null, nothing is performed.
      * @throws ActorMappingImportException
      *             if an exception occurs when importing the actor mapping.
      * @since 6.0

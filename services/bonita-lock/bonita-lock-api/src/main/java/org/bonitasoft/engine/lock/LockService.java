@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public interface LockService {
 
-    void unlock(BonitaLock lock) throws SLockException;
+    void unlock(BonitaLock lock, long tenantId) throws SLockException;
 
     /**
      * Acquire the lock for the object having type and id in parameters<br>
@@ -36,10 +36,11 @@ public interface LockService {
      * 
      * @param objectToLockId
      * @param objectType
+     * @param tenantId TODO
      * @return
      * @throws SLockException
      */
-    BonitaLock lock(long objectToLockId, String objectType) throws SLockException;
+    BonitaLock lock(long objectToLockId, String objectType, long tenantId) throws SLockException;
 
     /**
      * Acquire the lock for the object having type and id in parameters waiting maximum timeout<br>
@@ -50,7 +51,8 @@ public interface LockService {
      * @param objectType
      * @param timeout
      * @param timeUnit
+     * @param tenantId TODO
      * @return the obtained lock if it has been acquired before the timeout expires or null if the timeout has expired.
      */
-    BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit);
+    BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId);
 }

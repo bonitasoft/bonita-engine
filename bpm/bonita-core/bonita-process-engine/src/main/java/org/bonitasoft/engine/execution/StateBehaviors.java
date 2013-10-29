@@ -37,6 +37,9 @@ import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
+import org.bonitasoft.engine.core.process.comment.api.SCommentService;
+import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -98,6 +101,9 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SUserNotFoundException;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -168,13 +174,18 @@ public class StateBehaviors {
 
     private ProcessExecutor processExecutor;
 
+    private final SCommentService commentService;
+
+    private final IdentityService identityService;
+
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
             final BPMInstanceBuilders instanceBuilders, final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice,
-            final SchedulerService schedulerService, final TechnicalLoggerService logger) {
+            final SchedulerService schedulerService, final SCommentService commentService, final IdentityService identityService,
+            final TechnicalLoggerService logger) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -192,6 +203,8 @@ public class StateBehaviors {
         this.containerRegistry = containerRegistry;
         eventInstanceService = eventInstanceSevice;
         this.schedulerService = schedulerService;
+        this.commentService = commentService;
+        this.identityService = identityService;
         this.logger = logger;
     }
 
@@ -282,7 +295,8 @@ public class StateBehaviors {
 
     private void mapUsingUserFilters(final SFlowNodeInstance flowNodeInstance, final SHumanTaskDefinition humanTaskDefinition, final String actorName,
             final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition) throws ClassLoaderException, SUserFilterExecutionException,
-            SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException {
+            SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException,
+            SCommentAddException, SUserNotFoundException {
         final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
         final SExpressionContext expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 flowNodeInstance.getLogicalGroup(0));
@@ -299,7 +313,14 @@ public class StateBehaviors {
             activityInstanceService.addPendingActivityMappings(mapping);
         }
         if (userIds.size() == 1 && result.shouldAutoAssignTaskIfSingleResult()) {
-            activityInstanceService.assignHumanTask(flowNodeInstance.getId(), userIds.get(0));
+            final Long userId = userIds.get(0);
+            activityInstanceService.assignHumanTask(flowNodeInstance.getId(), userId);
+
+            final SUser user = identityService.getUser(userId);
+            if (commentService.isCommentEnabled(SystemCommentType.STATE_CHANGE)) {
+                commentService.addSystemComment(flowNodeInstance.getRootContainerId(), "The task \"" + flowNodeInstance.getName()
+                        + "\" is now assigned to " + user.getUserName());
+            }
         }
     }
 

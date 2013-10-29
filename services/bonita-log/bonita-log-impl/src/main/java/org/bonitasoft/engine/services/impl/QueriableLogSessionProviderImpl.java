@@ -82,13 +82,4 @@ public class QueriableLogSessionProviderImpl implements QueriableLogSessionProvi
         return "";
     }
 
-    @Override
-    public String getProductVersion() {
-        final SSession session = getSession();
-        if (session != null) {
-            return session.getProductVersion();
-        }
-        return "";
-    }
-
 }

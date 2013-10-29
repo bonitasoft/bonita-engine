@@ -15,7 +15,7 @@ import org.bonitasoft.engine.api.internal.ServerWrappedException;
 public class ServerSocketThread extends Thread {
 
     private final ServerSocket serverSocket;
-    private ServerAPIImpl apiImpl;
+    private final ServerAPIImpl apiImpl;
 
     public ServerSocketThread(final String name, final ServerAPIImpl apiImpl, final int port) throws IOException {
         super(name);
@@ -32,7 +32,7 @@ public class ServerSocketThread extends Thread {
         final String methodName = methodCall.getMethodName();
         final List<String> classNameParameters = methodCall.getClassNameParameters();
         final Object[] parametersValues = methodCall.getParametersValues();
-//                System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + " - invoking: with parameters: " 
+//                System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + " - invoking: with parameters: "
 //                + ", options: " + options
 //                + ", apiInterfaceName: " + apiInterfaceName
 //                + ", methodName: " + methodName
@@ -43,14 +43,15 @@ public class ServerSocketThread extends Thread {
             return this.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
         } catch (ServerWrappedException e) {
             //System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + "got an exception during the invokeMethod: " + e.getClass() + ": " + e.getMessage());
+            e.printStackTrace();
             return e;
         }
     }
 
     @Override
     public void run() {
-        try {
-            while (true) {
+        while (true) {
+            try {
                 final Socket clientSocket = serverSocket.accept();
                 //System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + "accepting data on serverSocket, clientSocket: " + clientSocket);
                 //System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + "starting a new loop...");
@@ -66,7 +67,7 @@ public class ServerSocketThread extends Thread {
                     //System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + "flushing callResult: " + callResult);
                     oos.flush();
                 } catch (Throwable t) {
-                    t.printStackTrace();  
+                    t.printStackTrace();
                 } finally {
                     if (ois != null) {
                         ois.close();
@@ -75,9 +76,9 @@ public class ServerSocketThread extends Thread {
                         oos.close();
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

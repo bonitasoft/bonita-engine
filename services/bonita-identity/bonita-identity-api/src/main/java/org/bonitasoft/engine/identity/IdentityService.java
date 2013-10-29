@@ -312,7 +312,7 @@ public interface IdentityService {
      * @throws SIdentityException
      *             If an exception occurs when retrieving the users
      */
-    List<SUser> getUsersByName(List<String> userNames) throws SIdentityException;
+    List<SUser> getUsersByUsername(List<String> userNames) throws SIdentityException;
 
     /**
      * Get users in a specific interval, this is used for pagination

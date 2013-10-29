@@ -16,11 +16,13 @@ package org.bonitasoft.engine.recorder.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Charles Souillard
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class UpdateRecord extends Record {
 
@@ -35,6 +37,7 @@ public final class UpdateRecord extends Record {
     }
 
     public static UpdateRecord buildSetFields(final PersistentObject entity, final EntityUpdateDescriptor descriptor) {
+        NullCheckingUtil.checkArgsNotNull(descriptor);
         final UpdateRecord updateRecord = new UpdateRecord(entity, null);
         updateRecord.addFields(descriptor.getFields());
         return updateRecord;

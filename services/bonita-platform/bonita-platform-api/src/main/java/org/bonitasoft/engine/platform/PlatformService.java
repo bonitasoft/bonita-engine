@@ -19,12 +19,14 @@ import java.util.List;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.platform.model.SPlatform;
+import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Charles Souillard
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface PlatformService {
 
@@ -286,5 +288,13 @@ public interface PlatformService {
      * @throws SPlatformCreationException
      */
     void initializePlatformStructure() throws SPlatformCreationException;
+
+    /**
+     * Return the platform properties
+     * 
+     * @return The platform properties
+     * @since 6.1
+     */
+    SPlatformProperties getSPlatformProperties();
 
 }

@@ -56,26 +56,30 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         BonitaLock lock = null;
         try {
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " trying to get lock for instance " + processInstanceId + ": " + getWorkStack());
+                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " trying to get lock for instance "
+                        + processInstanceId + ": " + getWorkStack());
             }
-            lock = lockService.tryLock(processInstanceId, objectType, timeout, timeUnit);
+            lock = lockService.tryLock(processInstanceId, objectType, timeout, timeUnit, getTenantId());
             if (lock == null) {
-                //lock has not been obtained
+                // lock has not been obtained
                 if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " did not get lock for instance " + processInstanceId + ": " + getWorkStack());
-                }                
+                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " did not get lock for instance "
+                            + processInstanceId + ": " + getWorkStack());
+                }
                 rescheduleWork(getTenantAccessor(context).getWorkService(), getRootWork());
                 return;
             }
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " obtained lock for instance " + processInstanceId + ": " + getWorkStack());
+                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " obtained lock for instance " + processInstanceId
+                        + ": " + getWorkStack());
             }
             getWrappedWork().work(context);
         } finally {
             if (lock != null) {
-                lockService.unlock(lock);
+                lockService.unlock(lock, getTenantId());
                 if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " has unlocked lock for instance " + processInstanceId + ": " + getWorkStack());
+                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " has unlocked lock for instance "
+                            + processInstanceId + ": " + getWorkStack());
                 }
             }
         }
@@ -91,10 +95,9 @@ public class LockProcessInstanceWork extends WrappingBonitaWork {
         return "nothing";
     }
 
-
     private void rescheduleWork(final WorkService workService, final BonitaWork rootWork) throws SLockException {
         try {
-            //executeWork is called and not registerWork because the registerWork is relying on transaction
+            // executeWork is called and not registerWork because the registerWork is relying on transaction
             workService.executeWork(rootWork);
         } catch (WorkRegisterException e) {
             throw new SLockException(e);

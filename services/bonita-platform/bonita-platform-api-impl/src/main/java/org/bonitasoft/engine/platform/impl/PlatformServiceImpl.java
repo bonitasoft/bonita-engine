@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -47,6 +47,7 @@ import org.bonitasoft.engine.platform.STenantException;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.SPlatform;
+import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -77,13 +78,17 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final PlatformCacheService platformCacheService;
 
+    private final SPlatformProperties sPlatformProperties;
+
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final List<TenantPersistenceService> tenantPersistenceServices,
-            final STenantBuilder tenantBuilder, final TechnicalLoggerService logger, final PlatformCacheService platformCacheService) {
+            final STenantBuilder tenantBuilder, final TechnicalLoggerService logger, final PlatformCacheService platformCacheService,
+            final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.tenantBuilder = tenantBuilder;
         this.logger = logger;
         this.platformCacheService = platformCacheService;
+        this.sPlatformProperties = sPlatformProperties;
         trace = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
         error = logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR);
     }
@@ -757,6 +762,11 @@ public class PlatformServiceImpl implements PlatformService {
             }
             throw new STenantUpdateException("Unable to clean tenant tables: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public SPlatformProperties getSPlatformProperties() {
+        return sPlatformProperties;
     }
 
 }

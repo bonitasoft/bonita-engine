@@ -15,17 +15,19 @@ package org.bonitasoft.engine.api.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
+import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.CleanPlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteAllTenants;
@@ -47,10 +49,10 @@ import org.bonitasoft.engine.command.SCommandAlreadyExistsException;
 import org.bonitasoft.engine.command.SCommandCreationException;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandBuilder;
-import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -109,10 +111,13 @@ import org.bonitasoft.engine.xml.Parser;
  * @author Zhang Bole
  * @author Yanyan Liu
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
+
+    private static final String PROFILES_FILE = "profiles.xml";
 
     private static boolean isNodeStarted = false;
 
@@ -148,8 +153,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             }
         } catch (final SBonitaException e) {
             throw new CreationException("Platform Creation failed.", e);
-        } catch (final IOException ioe) {
-            throw new CreationException("Platform Creation failed.", ioe);
         }
     }
 
@@ -199,13 +202,13 @@ public class PlatformAPIImpl implements PlatformAPI {
         return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }
 
-    private SPlatform constructPlatform(final PlatformServiceAccessor platformAccessor) throws IOException {
-        final URL resource = PlatformAPIImpl.class.getResource("platform.properties");
-        final Properties properties = PropertiesManager.getProperties(resource);
+    private SPlatform constructPlatform(final PlatformServiceAccessor platformAccessor) {
+        final PlatformService platformService = platformAccessor.getPlatformService();
+
         // FIXME construct platform object from a configuration file
-        final String version = (String) properties.get("version");
+        final String version = platformService.getSPlatformProperties().getPlatformVersion();
         final String previousVersion = "";
-        final String initialVersion = (String) properties.get("version");
+        final String initialVersion = version;
         // FIXME createdBy when PlatformSessionAccessor will exist
         final String createdBy = "platformAdmin";
         // FIXME do that in the builder
@@ -229,13 +232,20 @@ public class PlatformAPIImpl implements PlatformAPI {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         final WorkService workService = platformAccessor.getWorkService();
-        List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
+        final List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
         try {
             try {
-                for (ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
+                final PlatformService platformService = platformAccessor.getPlatformService();
+                final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
+                final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService);
+                executor.execute(checkPlatformVersion);
+                if (!checkPlatformVersion.sameVersion()) {
+                    throw new StartNodeException("The version of the platform is not the same: expected:" + checkPlatformVersion.getPlatform().getVersion()
+                            + " got: " + checkPlatformVersion.getPlatformProperties().getPlatformVersion());
+                }
+                for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
                     serviceWithLifecycle.start();
                 }
-                final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
                 final RefreshPlatformClassLoader refreshPlatformClassLoader = new RefreshPlatformClassLoader(platformAccessor);
                 executor.execute(refreshPlatformClassLoader);
                 final List<Long> tenantIds = refreshPlatformClassLoader.getResult();
@@ -271,7 +281,6 @@ public class PlatformAPIImpl implements PlatformAPI {
                         // * flow node that are completed and not deleted : call execute to make it create transitions and so on
                         // * all element that are in not stable state
 
-                        final PlatformService platformService = platformAccessor.getPlatformService();
                         final GetDefaultTenantInstance getDefaultTenantInstance = new GetDefaultTenantInstance(platformService);
                         platformAccessor.getTransactionExecutor().execute(getDefaultTenantInstance);
                         final STenant defaultTenant = getDefaultTenantInstance.getResult();
@@ -299,22 +308,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
             } catch (final SDependencyException e) {
                 throw new StartNodeException("Platform starting failed while initializing platform classloaders.", e);
-            } catch (final SBonitaException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final BonitaHomeNotSetException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final BonitaHomeConfigurationException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final IOException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final NoSuchMethodException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final InstantiationException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final IllegalAccessException e) {
-                throw new StartNodeException("Platform starting failed.", e);
-            } catch (final InvocationTargetException e) {
-                throw new StartNodeException("Platform starting failed.", e);
+            } catch (final StartNodeException sne) {
+                throw sne;
             } catch (final Exception e) {
                 throw new StartNodeException("Platform starting failed.", e);
             } finally {
@@ -324,7 +319,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         } catch (final StartNodeException e) {
             // If an exception is thrown, stop the platform that was started.
             try {
-                shutdownScheduler(platformAccessor, schedulerService);
+                shutdownScheduler(schedulerService);
             } catch (final Exception exp) {
                 throw new StartNodeException("Platform stoping failed : " + exp.getMessage(), e);
             }
@@ -343,19 +338,19 @@ public class PlatformAPIImpl implements PlatformAPI {
     public void stopNode() throws StopNodeException {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
+            final List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
             if (plaformConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
-                shutdownScheduler(platformAccessor, schedulerService);
+                shutdownScheduler(schedulerService);
             }
             final WorkService workService = platformAccessor.getWorkService();
             workService.stop();
             if (plaformConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
-            for (ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
+            for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
                 serviceWithLifecycle.stop();
             }
             isNodeStarted = false;
@@ -378,7 +373,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void shutdownScheduler(final PlatformServiceAccessor platformAccessor, final SchedulerService schedulerService) throws Exception {
+    private void shutdownScheduler(final SchedulerService schedulerService) throws Exception {
         if (isNodeStarted()) {
             schedulerService.stop();
         }
@@ -540,10 +535,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             createDefaultDataSource(sDataSourceModelBuilder, dataService);
             final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
             createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
-            Parser profileParser = tenantServiceAccessor.getProfileParser();
-            ProfileService profileService = tenantServiceAccessor.getProfileService();
-            IdentityService identityService = tenantServiceAccessor.getIdentityService();
-            TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+            final Parser profileParser = tenantServiceAccessor.getProfileParser();
+            final ProfileService profileService = tenantServiceAccessor.getProfileService();
+            final IdentityService identityService = tenantServiceAccessor.getIdentityService();
+            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             createDefaultProfiles(tenantId, profileParser, profileService, identityService, logger);
             sessionService.deleteSession(session.getId());
         } catch (final Exception e) {
@@ -555,15 +550,18 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     @SuppressWarnings("unchecked")
     protected void createDefaultProfiles(final Long tenantId, final Parser parser, final ProfileService profileService, final IdentityService identityService,
-            final TechnicalLoggerService logger)
-            throws Exception {
-        File tenantProfilesFile = BonitaHomeServer.getInstance().getTenantProfilesFile(tenantId);
-        if (!tenantProfilesFile.exists()) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Default profile file not present, will not create the default profiles, file: "
-                    + tenantProfilesFile.getAbsolutePath());
+            final TechnicalLoggerService logger) throws Exception {
+        final InputStream profilesIS = Thread.currentThread().getContextClassLoader().getResourceAsStream(getProfileFileName());
+        if (profilesIS == null) {
+            // no default profiles
             return;
         }
-        final String xmlContent = IOUtil.getFileContent(tenantProfilesFile);
+        final String xmlContent;
+        try {
+            xmlContent = IOUtils.toString(profilesIS, org.bonitasoft.engine.io.IOUtil.fEncoding);
+        } finally {
+            profilesIS.close();
+        }
         StringReader reader = new StringReader(xmlContent);
         List<ExportedProfile> profiles;
         try {
@@ -577,6 +575,10 @@ public class PlatformAPIImpl implements PlatformAPI {
         } finally {
             reader.close();
         }
+    }
+
+    protected String getProfileFileName() {
+        return PROFILES_FILE;
     }
 
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
@@ -654,7 +656,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
         SchedulerService schedulerService = null;
-        boolean schedulerStarted = false;
+        final boolean schedulerStarted = false;
         long platformSessionId = -1;
         try {
             platformAccessor = getPlatformAccessor();
@@ -692,7 +694,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             log(platformAccessor, e);
             throw new STenantActivationException(e);
         } finally {
-            if (schedulerStarted) {
+            if (schedulerStarted && schedulerService != null) {
                 try {
                     // stop scheduler after scheduling global jobs
                     schedulerService.stop();

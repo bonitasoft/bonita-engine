@@ -17,9 +17,4 @@ public class MockQueriableLogSessionProviderImpl implements QueriableLogSessionP
         return "node1";
     }
 
-    @Override
-    public String getProductVersion() {
-        return "BOS-6.0";
-    }
-
 }
