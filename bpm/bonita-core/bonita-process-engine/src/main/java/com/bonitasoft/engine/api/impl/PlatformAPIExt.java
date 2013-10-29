@@ -33,7 +33,6 @@ import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
 import org.bonitasoft.engine.command.model.SCommandBuilder;
-import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -51,6 +50,7 @@ import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -106,6 +106,8 @@ import com.bonitasoft.manager.Features;
 public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
+
+    private static final String PROFILES_FILE_SP = "profiles-sp.xml";
 
     @Override
     protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
@@ -786,6 +788,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final IOException ioe) {
             throw new StopNodeException(ioe);
         }
+    }
+
+    @Override
+    protected String getProfileFileName() {
+        return PROFILES_FILE_SP;
     }
 
 }

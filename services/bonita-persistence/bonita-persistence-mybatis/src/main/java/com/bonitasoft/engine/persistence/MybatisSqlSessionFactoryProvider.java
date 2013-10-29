@@ -26,7 +26,7 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.bonitasoft.engine.commons.IOUtil;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.services.SPersistenceException;
 
 /**

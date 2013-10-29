@@ -29,23 +29,27 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
+import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.SProfileCreationException;
-import org.bonitasoft.engine.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.SValidationException;
@@ -346,13 +350,25 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Profile updateProfile(final long id, final ProfileUpdater updateDescriptor) throws UpdateException {
+    public Profile updateProfile(final long id, final ProfileUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
-
+        Serializable updatedName = updateDescriptor.getFields().get(ProfileUpdater.ProfileField.NAME);
+        if (updatedName != null) {
+            SearchResult<Profile> searchProfiles;
+            try {
+                searchProfiles = searchProfiles(new SearchOptionsBuilder(0, 1).differentFrom(ProfileSearchDescriptor.ID, id)
+                        .filter(ProfileSearchDescriptor.NAME, updatedName).done());
+                if (searchProfiles.getCount() > 0) {
+                    throw new AlreadyExistsException("A profile with the name '" + updatedName + "' already exists");
+                }
+            } catch (SearchException e) {
+                throw new UpdateException("Cannot check if a profile with the name '" + updatedName + "' already exists", e);
+            }
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 

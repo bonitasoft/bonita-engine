@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.process;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +43,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-import static org.junit.Assert.assertNotNull;
-
 public class ProcessResolutionTest extends CommonAPISPTest {
 
     @After
@@ -72,6 +72,27 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         Assert.assertEquals(Problem.Level.ERROR, problem.getLevel());
         Assert.assertEquals("parameter", problem.getResource());
         Assert.assertNotNull(problem.getDescription());
+
+        deleteProcess(definition.getId());
+    }
+
+    @Cover(classes = { Problem.class, ProcessDefinition.class, ParameterDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-1881", keywords = { "process resolution" })
+    @Test
+    public void importParametersComputesProcessResolution() throws BonitaException {
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt();
+        builder.createNewInstance("resolve", "1.0").addParameter("param1", String.class.getName()).addActor("Leader", true).addUserTask("step1", "Leader");
+        final DesignProcessDefinition processDefinition = builder.done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
+        final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
+        final ActorInstance initiator = getProcessAPI().getActorInitiator(definition.getId());
+        getProcessAPI().addUserToActor(initiator.getId(), getSession().getUserId());
+
+        ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
+
+        getProcessAPI().importParameters(definition.getId(), "param1=toto".getBytes());
+        deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        Assert.assertEquals(TestStates.getProcessDepInfoResolvedState(), deploymentInfo.getConfigurationState());
 
         deleteProcess(definition.getId());
     }

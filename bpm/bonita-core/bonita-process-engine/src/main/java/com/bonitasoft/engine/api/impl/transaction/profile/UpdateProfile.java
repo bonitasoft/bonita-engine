@@ -15,8 +15,8 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
+import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 

@@ -1,0 +1,19 @@
+<project name="bpm-services-sp" default="cleantarget">
+
+	<property name="target.dir" value="${basedir}/target"/>
+	
+	<target name="cleantarget">
+		<delete dir="${target.dir}" includes="*.db" />
+		<delete dir="${target.dir}/server" />
+		<delete dir="${target.dir}/home" />
+		
+		<copy todir="${target.dir}/home">
+			<fileset dir="${basedir}/home" />
+		</copy>
+
+		<copy todir="${target.dir}/home/server/licenses" overwrite="true">
+			<fileset dir="${user.home}/lic" includes="*.lic" />
+		</copy>
+	</target>
+
+</project>
