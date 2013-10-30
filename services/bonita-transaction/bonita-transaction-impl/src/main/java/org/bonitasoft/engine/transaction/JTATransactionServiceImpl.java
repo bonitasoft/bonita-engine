@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.transaction;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
@@ -37,7 +36,7 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final TransactionManager txManager;
 
-    private final ThreadLocal<List<BonitaTransactionSynchronization>> synchronizations = new ThreadLocal<List<BonitaTransactionSynchronization>>();
+    private List<BonitaTransactionSynchronization> synchronizations;
 
     private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
 
@@ -70,11 +69,10 @@ public class JTATransactionServiceImpl implements TransactionService {
                     }
 
                     // Reset the synchronizations each time we begin a new transaction
-                    List<BonitaTransactionSynchronization> synchros = synchronizations.get();
-                    if (synchros != null) {
-                        synchros.clear();
+                    if (synchronizations != null) {
+                        synchronizations.clear();
                     }
-                    synchronizations.set(new ArrayList<BonitaTransactionSynchronization>());
+                    synchronizations = new ArrayList<BonitaTransactionSynchronization>();
                 } catch (final NotSupportedException e) {
                     // Should never happen as we do not want to support nested transaction
                     throw new STransactionCreationException(e);
@@ -148,18 +146,18 @@ public class JTATransactionServiceImpl implements TransactionService {
             final int status = txManager.getStatus();
 
             switch (status) {
-            case Status.STATUS_ACTIVE:
-                return TransactionState.ACTIVE;
-            case Status.STATUS_COMMITTED:
-                return TransactionState.COMMITTED;
-            case Status.STATUS_MARKED_ROLLBACK:
-                return TransactionState.ROLLBACKONLY;
-            case Status.STATUS_ROLLEDBACK:
-                return TransactionState.ROLLEDBACK;
-            case Status.STATUS_NO_TRANSACTION:
-                return TransactionState.NO_TRANSACTION;
-            default:
-                throw new STransactionException("Can't map the JTA status : " + status);
+                case Status.STATUS_ACTIVE:
+                    return TransactionState.ACTIVE;
+                case Status.STATUS_COMMITTED:
+                    return TransactionState.COMMITTED;
+                case Status.STATUS_MARKED_ROLLBACK:
+                    return TransactionState.ROLLBACKONLY;
+                case Status.STATUS_ROLLEDBACK:
+                    return TransactionState.ROLLEDBACK;
+                case Status.STATUS_NO_TRANSACTION:
+                    return TransactionState.NO_TRANSACTION;
+                default:
+                    throw new STransactionException("Can't map the JTA status : " + status);
             }
         } catch (final SystemException e) {
             throw new STransactionException("", e);
@@ -203,7 +201,7 @@ public class JTATransactionServiceImpl implements TransactionService {
                 throw new STransactionNotFoundException("No active transaction");
             }
             transaction.registerSynchronization(new JTATransactionWrapper(txSync));
-            synchronizations.get().add(txSync);
+            synchronizations.add(txSync);
         } catch (final IllegalStateException e) {
             throw new STransactionNotFoundException(e.getMessage());
         } catch (final RollbackException e) {
@@ -215,7 +213,7 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     @Override
     public List<BonitaTransactionSynchronization> getBonitaSynchronizations() {
-        return Collections.unmodifiableList(synchronizations.get());
+        return synchronizations;
     }
 
     @Override
