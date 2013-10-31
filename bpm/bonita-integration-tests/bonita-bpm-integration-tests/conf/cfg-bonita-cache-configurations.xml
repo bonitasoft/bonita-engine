@@ -42,6 +42,7 @@
 		<property name="maxElementsInMemory" value="10000" />
 		<property name="inMemoryOnly" value="true" />
 		<property name="eternal" value="true" />
+		<property name="persistent" value="true" />
 	</bean>
 	
 	<bean id="platformCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
