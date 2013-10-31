@@ -140,8 +140,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         builder.setId(docMapping.getId());
         builder.setName(docMapping.getDocumentName());
         builder.setProcessInstanceId(docMapping.getProcessInstanceId());
-        // Needs to be done here because we don't have the documentId before it was saved:
-        builder.setURL(docMapping.getDocumentURL() + "&documentId=" + docMapping.getId());
+        builder.setURL(docMapping.getDocumentURL());
         builder.setContentStorageId(docMapping.getContentStorageId());
         return builder.done();
     }
@@ -156,7 +155,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         builder.setId(docMapping.getSourceObjectId());
         builder.setName(docMapping.getDocumentName());
         builder.setProcessInstanceId(docMapping.getProcessInstanceId());
-        builder.setURL(docMapping.getDocumentURL() + "&documentId=" + docMapping.getId());
+        builder.setURL(docMapping.getDocumentURL());
         builder.setContentStorageId(docMapping.getContentStorageId());
         return builder.done();
     }
@@ -398,7 +397,8 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     }
 
     @Override
-    public List<SAProcessDocument> searchArchivedDocuments(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SAProcessDocument> searchArchivedDocuments(final QueryOptions queryOptions)
+            throws SBonitaSearchException {
         final List<SADocumentMapping> docMappings = documentMappingService.searchArchivedDocuments(queryOptions);
         final List<SAProcessDocument> result = new ArrayList<SAProcessDocument>(docMappings.size());
         if (!docMappings.isEmpty()) {
