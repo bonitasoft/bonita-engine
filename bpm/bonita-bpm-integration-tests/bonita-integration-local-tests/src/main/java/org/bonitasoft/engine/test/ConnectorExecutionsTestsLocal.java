@@ -57,6 +57,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -959,6 +960,14 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         addAutomaticTask.addOperation(new OperationBuilder().createSetDataOperation("a", new ExpressionBuilder().createConstantStringExpression("changed")));
         addAutomaticTask.addOperation(new OperationBuilder().createSetDataOperation("b", new ExpressionBuilder().createConstantStringExpression("changed")));
         addAutomaticTask.addOperation(new OperationBuilder().createSetDataOperation("c", new ExpressionBuilder().createConstantStringExpression("changed")));
+
+        // Add user task for confirmation form evaluation:
+        String actorName = "actorForUserTaskWithOnFinishConnector";
+        processBuilder.addActor(actorName);
+        String userTaskName = "userTaskWithOnFinishConnector";
+        UserTaskDefinitionBuilder userTaskDef = processBuilder.addUserTask(userTaskName, actorName);
+        userTaskDef.addConnector("myConnector2", "blocking-connector", "1.0", ConnectorEvent.ON_FINISH);
+
         final BusinessArchive businessArchive = new BusinessArchiveBuilder()
                 .createNewBusinessArchive()
                 .setProcessDefinition(processBuilder.done())
@@ -966,7 +975,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
                         new BarResource("blocking-connector.impl", getConnectorImplementationFile("blocking-connector", "1.0", "blocking-connector-impl",
                                 "1.0", BlockingConnector.class.getName()))).done();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcess(businessArchive);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(businessArchive, actorName, johnUser);
 
         BlockingConnector.semaphore.acquire();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -983,6 +992,19 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         assertEquals("avalue", evaluateExpressionsAtProcessInstanciation.get("a"));
 
         BlockingConnector.semaphore.release();
+
+        HumanTaskInstance userTask = waitForUserTask(userTaskName, processInstance.getId());
+        BlockingConnector.semaphore.acquire();
+        assignAndExecuteStep(userTask, johnUserId);
+        // Try to evaluate expression on non-completed activity:
+        Expression engineConstantExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID);
+        final Map<Expression, Map<String, Serializable>> exprToEvaluate = new HashMap<Expression, Map<String, Serializable>>(1);
+        exprToEvaluate.put(engineConstantExpr, Collections.<String, Serializable> emptyMap());
+        Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(userTask.getId(), exprToEvaluate);
+        assertEquals(processInstance.getId(), ((Long) evaluatedExpressions.get("processInstanceId")).longValue());
+        // Release the connector for the user task to complete:
+        BlockingConnector.semaphore.release();
+
         waitForProcessToFinish(processInstance.getId());
         getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions);
         assertEquals("avaluebvaluecvalue", evaluateExpressionsAtProcessInstanciation.get("ascripte"));

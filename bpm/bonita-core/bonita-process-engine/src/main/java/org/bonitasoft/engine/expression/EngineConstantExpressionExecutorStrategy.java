@@ -216,7 +216,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         try {
             if (dependencyValues.get("time") != null) {
                 // Get completed (state == 2) state only:
-                SAActivityInstance aActivityInstance = activityInstanceService.getArchivedActivityInstance(flowNodeInstanceId, 2);
+                SAActivityInstance aActivityInstance = activityInstanceService.getMostRecentArchivedActivityInstance(flowNodeInstanceId);
                 dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), aActivityInstance.getLogicalGroup(3));
                 dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), aActivityInstance.getLogicalGroup(1));
                 if (isHumanTask(aActivityInstance)) {
