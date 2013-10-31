@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -20,6 +21,7 @@ import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -42,7 +44,6 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class GatewayExecutionTest extends CommonAPITest {
@@ -1032,10 +1033,13 @@ public class GatewayExecutionTest extends CommonAPITest {
         builder.addEndEvent("end");
         builder.addTransition("sem", "step");
         builder.addTransition("step", "end");
+        Set<TransitionDefinition> transitions = builder.done().getProcessContainer().getTransitions();
+        for (TransitionDefinition transitionDefinition : transitions) {
+            System.out.println(transitionDefinition.getName());
+        }
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, builder.getProcess(), "step");
     }
 
-    @Ignore("see ENGINE-1353")
     @Test
     public void tooManyTokens() throws Exception
     {
@@ -1065,10 +1069,8 @@ public class GatewayExecutionTest extends CommonAPITest {
         List<HumanTaskInstance> taskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "Step1", 0, 1);
         assignAndExecuteStep(taskInstances.get(0).getId(), user.getId());
         waitForUserTaskAndExecuteIt("Step3", processInstance, user.getId());
-        waitForUserTask("Step2", processInstance);
-        taskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "Step2", 0, 1);
-        assignAndExecuteStep(taskInstances.get(0).getId(), user.getId());
-        waitForProcessToFinish(processInstance.getId());
+        waitForTaskToFail(processInstance);
+        // should also get the exception...not yet in the task
         disableAndDeleteProcess(processDefinition);
     }
 }
