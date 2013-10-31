@@ -220,7 +220,7 @@ public class EngineConstantExpressionExecutorStrategyTest {
     public void fillDependenciesOnArchivedFlowNodeDoesNotThrowException() throws Exception {
         final SAActivityInstance saai = mock(SAActivityInstance.class);
 
-        when(activityInstanceService.getArchivedActivityInstance(anyLong(), anyInt())).thenReturn(saai);
+        when(activityInstanceService.getMostRecentArchivedActivityInstance(anyLong())).thenReturn(saai);
         when(saai.getType()).thenReturn(SFlowNodeType.AUTOMATIC_TASK);
         long arbitraryValue = 123456L;
         when(saai.getLogicalGroup(anyInt())).thenReturn(arbitraryValue);

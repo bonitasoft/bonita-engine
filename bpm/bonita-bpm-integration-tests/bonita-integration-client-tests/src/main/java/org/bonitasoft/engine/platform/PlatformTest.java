@@ -97,7 +97,7 @@ public class PlatformTest {
     public void getPlatform() throws BonitaException {
         final Platform platform = platformAPI.getPlatform();
 
-        final String platformVersionToTest = "6.1.0";
+        final String platformVersionToTest = "6.1.1";
 
         assertNotNull("can't find the platform", platform);
         assertEquals("platformAdmin", platform.getCreatedBy());
@@ -105,13 +105,13 @@ public class PlatformTest {
         assertTrue(
                 version,
                 version.equals(platformVersionToTest + "-SNAPSHOT") || version.equals(platformVersionToTest + "")
-                        || version.startsWith(platformVersionToTest + "-rc"));
+                        || version.startsWith(platformVersionToTest + "-rc") || version.startsWith(platformVersionToTest + "-alpha"));
 
         final String initialVersion = platform.getInitialVersion();
         assertTrue(
                 version,
                 initialVersion.equals(platformVersionToTest + "-SNAPSHOT") || initialVersion.equals(platformVersionToTest + "")
-                        || initialVersion.startsWith(platformVersionToTest + "-rc"));
+                        || initialVersion.startsWith(platformVersionToTest + "-rc") || initialVersion.startsWith(platformVersionToTest + "-alpha"));
     }
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Delete platform.", jira = "")
