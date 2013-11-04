@@ -165,16 +165,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final ConnectorInstanceService connectorInstanceService;
 
-    public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService,
-            final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor,
-            final WorkService workService, final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
+    public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
+            final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
+            final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
-            final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
-            final BPMInstancesCreator bpmInstancesCreator, final TokenService tokenService,
-            final EventsHandler eventsHandler, final TransactionService transactionService,
+            final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
+            final TokenService tokenService, final EventsHandler eventsHandler, final TransactionService transactionService,
             final FlowNodeStateManager flowNodeStateManager) {
         super();
         this.activityInstanceService = activityInstanceService;
@@ -406,8 +405,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 && !(SFlowNodeType.SUB_PROCESS.equals(sFlowNodeDefinition.getType()) && ((SSubProcessDefinition) sFlowNodeDefinition).isTriggeredByEvent())
                 && !SFlowNodeType.BOUNDARY_EVENT.equals(sFlowNodeDefinition.getType())
                 // is not a start event or if it is, is not triggered by an event
-                && (!SFlowNodeType.START_EVENT.equals(sFlowNodeDefinition.getType()) || ((SStartEventDefinition) sFlowNodeDefinition)
-                        .getEventTriggers()
+                && (!SFlowNodeType.START_EVENT.equals(sFlowNodeDefinition.getType()) || ((SStartEventDefinition) sFlowNodeDefinition).getEventTriggers()
                         .isEmpty());
     }
 
@@ -461,8 +459,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 rootProcessInstanceId = sProcessInstance.getId();
             }
             return bpmInstancesCreator.createFlowNodeInstances(sProcessDefinition.getId(), rootProcessInstanceId, sProcessInstance.getId(),
-                    flownNodeDefinitions,
-                    rootProcessInstanceId, sProcessInstance.getId(), SStateCategory.NORMAL, sProcessDefinition.getId());
+                    flownNodeDefinitions, rootProcessInstanceId, sProcessInstance.getId(), SStateCategory.NORMAL, sProcessDefinition.getId());
         } catch (final SBonitaException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
@@ -530,10 +527,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 }
             } else {
                 final SFlowNodeInstance flowNodeInstance = bpmInstancesCreator.toFlowNodeInstance(processDefinitionId,
-                        flowNodeThatTriggeredTheTransition.getRootContainerId(),
-                        flowNodeThatTriggeredTheTransition.getParentContainerId(), SFlowElementsContainerType.PROCESS, sFlowNodeDefinition,
-                        rootProcessInstanceId,
-                        parentProcessInstanceId, true, -1, stateCategory, -1, tokenRefId);
+                        flowNodeThatTriggeredTheTransition.getRootContainerId(), flowNodeThatTriggeredTheTransition.getParentContainerId(),
+                        SFlowElementsContainerType.PROCESS, sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, true, -1, stateCategory, -1,
+                        tokenRefId);
                 new CreateEventInstance((SEventInstance) flowNodeInstance, eventInstanceService).call();
                 nextFlowNodeInstanceId = flowNodeInstance.getId();
                 toExecute = true;
@@ -553,10 +549,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * try to gate active gateway.
      * if the gateway is already hit by this transition or by the same token, we create a new gateway
      */
-    private SGatewayInstance createOrRetreiveGateway(final Long processDefinitionId,
-            final SFlowNodeDefinition flowNodeDefinition, final SStateCategory stateCategory, final Long tokenRefId, final long parentProcessInstanceId,
-            final long rootProcessInstanceId, final STransitionDefinition transitionDefinition)
-            throws SBonitaException {
+    private SGatewayInstance createOrRetreiveGateway(final Long processDefinitionId, final SFlowNodeDefinition flowNodeDefinition,
+            final SStateCategory stateCategory, final Long tokenRefId, final long parentProcessInstanceId, final long rootProcessInstanceId,
+            final STransitionDefinition transitionDefinition) throws SBonitaException {
         SGatewayInstance gatewayInstance = null;
         try {
             gatewayInstance = gatewayInstanceService.getActiveGatewayInstanceOfTheProcess(parentProcessInstanceId, flowNodeDefinition.getName());
@@ -572,26 +567,19 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             gatewayInstance = null;// already hit we create a new one
         }
         if (gatewayInstance != null && !tokenRefId.equals(gatewayInstance.getTokenRefId())) {
-            throw new SFlowNodeExecutionException(
-                    "Error while executing the join on gateway <"
-                            + gatewayInstance.getName()
-                            + "> of process instance <"
-                            + gatewayInstance.getParentProcessInstanceId()
-                            + "> of process definition <"
-                            + gatewayInstance.getProcessDefinitionId()
-                            + ">, this can happen when you try to join branches that are not from the same split level "
-                            + "(some branches were split more times than others). Check if your design is valid in the Bonita Studio."
-                            + " token is: <" + tokenRefId + "> expected <" + gatewayInstance.getTokenRefId() + ">");
+            throw new SFlowNodeExecutionException("Error while executing the join on gateway <" + gatewayInstance.getName() + "> of process instance <"
+                    + gatewayInstance.getParentProcessInstanceId() + "> of process definition <" + gatewayInstance.getProcessDefinitionId()
+                    + ">, this can happen when you try to join branches that are not from the same split level "
+                    + "(some branches were split more times than others). Check if your design is valid in the Bonita Studio." + " token is: <" + tokenRefId
+                    + "> expected <" + gatewayInstance.getTokenRefId() + ">");
         }
         if (gatewayInstance != null) {
             return gatewayInstance;
         }
-        return createGateway(processDefinitionId, flowNodeDefinition, stateCategory, gatewayInstanceBuilder, parentProcessInstanceId,
-                tokenRefId, rootProcessInstanceId);
+        return createGateway(processDefinitionId, flowNodeDefinition, stateCategory, parentProcessInstanceId, tokenRefId, rootProcessInstanceId);
     }
 
-    private SGatewayInstance createGateway(final Long processDefinitionId,
-            final SFlowNodeDefinition flowNodeDefinition, final SStateCategory stateCategory,
+    private SGatewayInstance createGateway(final Long processDefinitionId, final SFlowNodeDefinition flowNodeDefinition, final SStateCategory stateCategory,
             final long parentProcessInstanceId, final Long tokenRefId, final long rootProcessInstanceId) throws SBonitaException {
         return (SGatewayInstance) bpmInstancesCreator
                 .createFlowNodeInstance(processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, SFlowElementsContainerType.PROCESS,
@@ -599,8 +587,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     protected void executeOperations(final List<SOperation> operations, Map<String, Object> context, final SExpressionContext expressionContext,
-            final SProcessInstance sProcessInstance)
-            throws SBonitaException {
+            final SProcessInstance sProcessInstance) throws SBonitaException {
         if (operations != null && !operations.isEmpty()) {
             // Execute operation
             final long processInstanceId = sProcessInstance.getId();
@@ -672,8 +659,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final String url, final long authorId) throws SBonitaException {
-        final SProcessDocument attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType,
-                authorId, url);
+        final SProcessDocument attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType, authorId, url);
         return processDocumentService.attachDocumentToProcessInstance(attachment);
     }
 
@@ -683,23 +669,23 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return processDocumentService.attachDocumentToProcessInstance(attachment, documentContent);
     }
 
-    private SProcessDocument buildExternalProcessDocumentReference(final long processInstanceId,
-            final String documentName, final String fileName, final String mimeType, final long authorId, final String url) {
+    private SProcessDocument buildExternalProcessDocumentReference(final long processInstanceId, final String documentName, final String fileName,
+            final String mimeType, final long authorId, final String url) {
         SProcessDocumentBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimeType, authorId);
         documentBuilder.setURL(url);
         documentBuilder.setHasContent(false);
         return documentBuilder.done();
     }
 
-    private SProcessDocument buildProcessDocument(final long processInstanceId, final String documentName,
-            final String fileName, final String mimetype, final long authorId) {
+    private SProcessDocument buildProcessDocument(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
+            final long authorId) {
         SProcessDocumentBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimetype, authorId);
         documentBuilder.setHasContent(true);
         return documentBuilder.done();
     }
 
-    private SProcessDocumentBuilder initDocumentBuilder(final long processInstanceId, final String documentName,
-            final String fileName, final String mimetype, final long authorId) {
+    private SProcessDocumentBuilder initDocumentBuilder(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
+            final long authorId) {
         final SProcessDocumentBuilder documentBuilder = BuilderFactory.get(SProcessDocumentBuilderFactory.class).createNewInstance();
         documentBuilder.setName(documentName);
         documentBuilder.setFileName(fileName);
@@ -960,8 +946,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
 
         // execute transition/activities
-        createAndExecuteActivities(sProcessDefinition.getId(), child, parentProcessInstanceId, chosenFlowNode, rootProcessInstanceId,
-                outputTokenRefId);
+        createAndExecuteActivities(sProcessDefinition.getId(), child, parentProcessInstanceId, chosenFlowNode, rootProcessInstanceId, outputTokenRefId);
         for (STransitionDefinition sTransitionDefinition : chosenGatewaysTransitions) {
             executeGateway(sProcessDefinition, sTransitionDefinition, child, outputTokenRefId);
         }
