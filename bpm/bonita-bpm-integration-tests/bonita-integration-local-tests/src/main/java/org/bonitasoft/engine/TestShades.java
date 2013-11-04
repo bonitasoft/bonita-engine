@@ -6,10 +6,9 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.bonitasoft.engine.io.IOUtil;
+import org.bonitasoft.engine.test.BPMLocalTest;
 import org.junit.Test;
 
 public class TestShades {
@@ -18,16 +17,7 @@ public class TestShades {
     public void testShades() throws IOException {
         String mvn = System.getProperty("path.to.mvn", "mvn");// to be overwritten in CI
 
-        String version = System.getProperty("bonita.version");// works in maven
-        if (version == null) {
-            // when running tests in eclipse get it from the pom.xml
-            File file = new File("pom.xml");
-            String pomContent = IOUtil.read(file);
-            Pattern pattern = Pattern.compile("<version>(.*)</version>");
-            Matcher matcher = pattern.matcher(pomContent);
-            matcher.find();
-            version = matcher.group(1);
-        }
+        String version = BPMLocalTest.getBonitaVersion();
         String thePom = getPom(version);
         File file = new File("shadeTester");
         file.mkdir();

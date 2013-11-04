@@ -5,11 +5,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
@@ -42,10 +45,12 @@ import org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
@@ -561,6 +566,37 @@ public class BPMLocalTest extends CommonAPILocalTest {
         semaphore2.tryAcquire(15, TimeUnit.SECONDS);
         semaphore2.release();
         System.out.println("release semaphore2");
+    }
+
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "The platform version must be the same than the project version.", jira = "")
+    @Test
+    public void getPlatformVersion() throws BonitaException, IOException {
+        logout();
+        PlatformSession platformSession = loginPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
+        Platform platform = platformAPI.getPlatform();
+        logoutPlatform(platformSession);
+        loginWith(JOHN_USERNAME, JOHN_PASSWORD);
+        final String platformVersionToTest = getBonitaVersion();
+
+        assertNotNull("can't find the platform", platform);
+        assertEquals("platformAdmin", platform.getCreatedBy());
+        assertEquals(platformVersionToTest, platform.getVersion());
+        assertEquals(platformVersionToTest, platform.getInitialVersion());
+    }
+
+    public static String getBonitaVersion() throws IOException {
+        String version = System.getProperty("bonita.version");// works in maven
+        if (version == null) {
+            // when running tests in eclipse get it from the pom.xml
+            File file = new File("pom.xml");
+            String pomContent = IOUtil.read(file);
+            Pattern pattern = Pattern.compile("<version>(.*)</version>");
+            Matcher matcher = pattern.matcher(pomContent);
+            matcher.find();
+            version = matcher.group(1);
+        }
+        return version;
     }
 
 }
