@@ -568,16 +568,26 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (gatewayInstance != null
                 && gatewayInstance.getHitBys() != null
                 && (gatewayInstance.getHitBys().contains(GatewayInstanceService.FINISH) || Arrays.asList(gatewayInstance.getHitBys().split(",")).contains(
-                        flowNodeDefinition.getTransitionIndex(transitionDefinition.getName())))
-                && gatewayInstance.getTokenRefId().equals(tokenRefId)) {
+                        flowNodeDefinition.getTransitionIndex(transitionDefinition.getName())))) {
             gatewayInstance = null;// already hit we create a new one
+        }
+        if (gatewayInstance != null && !tokenRefId.equals(gatewayInstance.getTokenRefId())) {
+            throw new SFlowNodeExecutionException(
+                    "Error while executing the join on gateway <"
+                            + gatewayInstance.getName()
+                            + "> of process instance <"
+                            + gatewayInstance.getParentProcessInstanceId()
+                            + "> of process definition <"
+                            + gatewayInstance.getProcessDefinitionId()
+                            + ">, this can happen when you try to join branches that are not from the same split level "
+                            + "(some branches were split more times than others). Check if your design is valid in the Bonita Studio."
+                            + " token is: <" + tokenRefId + "> expected <" + gatewayInstance.getTokenRefId() + ">");
         }
         if (gatewayInstance != null) {
             return gatewayInstance;
-        } else {
-            return createGateway(processDefinitionId, flowNodeDefinition, stateCategory, parentProcessInstanceId,
-                    tokenRefId, rootProcessInstanceId);
         }
+        return createGateway(processDefinitionId, flowNodeDefinition, stateCategory, gatewayInstanceBuilder, parentProcessInstanceId,
+                tokenRefId, rootProcessInstanceId);
     }
 
     private SGatewayInstance createGateway(final Long processDefinitionId,

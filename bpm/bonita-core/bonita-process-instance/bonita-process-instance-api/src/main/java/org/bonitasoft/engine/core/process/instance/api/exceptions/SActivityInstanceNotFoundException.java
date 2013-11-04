@@ -26,4 +26,8 @@ public class SActivityInstanceNotFoundException extends SBonitaException {
         super("Activity instance with id " + activityInstanceId + " not found");
     }
 
+    public SActivityInstanceNotFoundException(final long activityInstanceId, final int stateId) {
+        super("Activity instance with id " + activityInstanceId + " and stateId " + stateId + " not found");
+    }
+
 }
