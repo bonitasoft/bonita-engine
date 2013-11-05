@@ -50,6 +50,7 @@ import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
+import sun.misc.BASE64Encoder;
 
 /**
  * @author Baptiste Mesta
@@ -79,6 +80,12 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static final String SERVER_URL = "server.url";
 
+    private static final String BASIC_AUTHENTICATION_ACTIVE = "basicAuthentication.active";
+
+    private static final String BASIC_AUTHENTICATION_USERNAME = "basicAuthentication.username";
+
+    private static final String BASIC_AUTHENTICATION_PASSWORD = "basicAuthentication.password";
+
     private static final String APPLICATION_NAME = "application.name";
 
     private static final Logger LOGGER = Logger.getLogger(HTTPServerAPI.class.getName());
@@ -86,6 +93,12 @@ public class HTTPServerAPI implements ServerAPI {
     private String serverUrl = null;
 
     private String applicationName = null;
+
+    private boolean basicAuthenticationActive = false;
+
+    private String basicAuthenticationUserName = null;
+
+    private String basicAuthenticationPassword = null;
 
     private static DefaultHttpClient httpclient;
 
@@ -101,6 +114,9 @@ public class HTTPServerAPI implements ServerAPI {
         }
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
+        basicAuthenticationActive  = "true".equalsIgnoreCase(parameters.get(BASIC_AUTHENTICATION_ACTIVE));
+        basicAuthenticationUserName  = parameters.get(BASIC_AUTHENTICATION_USERNAME);
+        basicAuthenticationPassword  = parameters.get(BASIC_AUTHENTICATION_PASSWORD);
     }
 
     @Override
@@ -145,6 +161,16 @@ public class HTTPServerAPI implements ServerAPI {
         sBuilder.append(SLASH).append(applicationName).append(SERVER_API).append(apiInterfaceName).append(SLASH).append(methodName);
         final HttpPost httpost = new HttpPost(sBuilder.toString());
         httpost.setEntity(httpEntity);
+
+        // Basic authentication
+        if (basicAuthenticationActive) {
+            StringBuilder credentials = new StringBuilder();
+            credentials.append(basicAuthenticationUserName).append(":").append(basicAuthenticationPassword);
+            BASE64Encoder encoder = new BASE64Encoder();
+            String encodedCredentials = encoder.encode(credentials.toString().getBytes());
+            httpost.setHeader("Authorization", "Basic " + encodedCredentials);
+        }
+
         return httpost;
     }
 

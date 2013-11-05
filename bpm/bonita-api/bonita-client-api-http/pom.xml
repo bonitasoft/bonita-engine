@@ -12,6 +12,11 @@
 
 	<name>Bonita Client API: HTTP</name>
 
+    <properties>
+        <jetty.version>9.0.6.v20130930</jetty.version>
+    </properties>
+
+
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
@@ -58,5 +63,34 @@
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>${jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-jndi</artifactId>
+            <version>${jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-plus</artifactId>
+            <version>${jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
+
+
 	</dependencies>
 </project>
