@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -50,7 +51,6 @@ import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
-import sun.misc.BASE64Encoder;
 
 /**
  * @author Baptiste Mesta
@@ -166,8 +166,8 @@ public class HTTPServerAPI implements ServerAPI {
         if (basicAuthenticationActive) {
             StringBuilder credentials = new StringBuilder();
             credentials.append(basicAuthenticationUserName).append(":").append(basicAuthenticationPassword);
-            BASE64Encoder encoder = new BASE64Encoder();
-            String encodedCredentials = encoder.encode(credentials.toString().getBytes());
+            Base64 encoder = new Base64();
+            String encodedCredentials = encoder.encodeAsString(credentials.toString().getBytes());
             httpost.setHeader("Authorization", "Basic " + encodedCredentials);
         }
 
