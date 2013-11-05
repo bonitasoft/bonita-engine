@@ -15,7 +15,6 @@
   <name>Bonita Data</name>
 
   <modules>
-    <module>bonita-data-model-impl-mybatis</module>
     <module>bonita-data-cached-impl</module>
   </modules>
 </project>

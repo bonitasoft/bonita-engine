@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.search.descriptor;
 
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 
 /**
  * @author Zhao Na
@@ -17,8 +16,8 @@ public final class SearchPlatformEntitiesDescriptor {
 
     private final SearchTenantDescriptor searchTenantDescriptor;
 
-    public SearchPlatformEntitiesDescriptor(final STenantBuilder tenantBuilder) {
-        searchTenantDescriptor = new SearchTenantDescriptor(tenantBuilder);
+    public SearchPlatformEntitiesDescriptor() {
+        searchTenantDescriptor = new SearchTenantDescriptor();
     }
 
     public SearchTenantDescriptor getSearchTenantDescriptor() {

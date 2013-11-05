@@ -14,7 +14,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerStrategy;
@@ -39,9 +38,9 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     private final boolean delayable;
 
     public BatchQueriableLoggerImpl(final PersistenceService persistenceService, final TransactionService transactionService,
-            final SQueriableLogModelBuilder builder, final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider,
+            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider,
             final TechnicalLoggerService logger, final PlatformService platformService, final Boolean delayable) {
-        super(persistenceService, builder, loggerStrategy, sessionProvider, platformService);
+        super(persistenceService, loggerStrategy, sessionProvider, platformService);
         this.persistenceService = persistenceService;
         this.transactionService = transactionService;
         this.logger = logger;

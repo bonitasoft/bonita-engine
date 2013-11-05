@@ -13,14 +13,5 @@ package com.bonitasoft.engine.core.process.instance.model.archive.builder;
  */
 public interface SAProcessInstanceBuilder extends org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder {
 
-    String getStringIndex1Key();
-
-    String getStringIndex2Key();
-
-    String getStringIndex3Key();
-
-    String getStringIndex4Key();
-
-    String getStringIndex5Key();
 
 }

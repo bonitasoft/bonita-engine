@@ -20,7 +20,6 @@ import org.bonitasoft.engine.persistence.OrderAndField;
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
-import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilder;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -36,9 +35,8 @@ public class GetBreakpointsCommand extends TenantCommand {
         final int maxResults = getIntegerMandadoryParameter(parameters, "maxResults");
         final BreakpointCriterion sort = getParameter(parameters, "sort", "");
         final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
-        final SBreakpointBuilder builder = tenantAccessor.getBPMInstanceBuilders().getSBreakpointBuilder();
         try {
-            final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForBreakpoints(sort, builder);
+            final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForBreakpoints(sort);
             final List<SBreakpoint> breakpoints = breakpointService.getBreakpoints(startIndex, maxResults, orderAndField.getField(),
                     orderAndField.getOrder());
             return (Serializable) SPModelConvertor.toBreakpoints(breakpoints);

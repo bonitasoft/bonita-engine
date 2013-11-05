@@ -17,71 +17,16 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuil
  */
 public class SBreakpointBuilderImpl implements SBreakpointBuilder {
 
-    private static final String DEFINITION_ID = "definitionId";
-
-    private static final String INSTANCE_ID = "instanceId";
-
-    private static final String ELEMENT_NAME = "elementName";
-
-    private static final String STATE_ID = "stateId";
-
-    private static final String INTERRUPTED_STATE_ID = "interruptedSateId";
-
-    private SBreakpointImpl entity;
+    private final SBreakpointImpl entity;
+    
+    public SBreakpointBuilderImpl(final SBreakpointImpl entity) {
+        super();
+        this.entity = entity;
+    }
 
     @Override
     public SBreakpoint done() {
         return entity;
-    }
-
-    @Override
-    public SBreakpointBuilder createNewInstance(final long definitionId, final long instanceId, final String elementName, final int idOfTheStateToInterrupt,
-            final int idOfTheInterruptingState) {
-        entity = new SBreakpointImpl();
-        entity.setDefinitionId(definitionId);
-        entity.setInstanceId(instanceId);
-        entity.setElementName(elementName);
-        entity.setStateId(idOfTheStateToInterrupt);
-        entity.setInterruptedStateId(idOfTheInterruptingState);
-        entity.setInstanceScope(true);
-        return this;
-    }
-
-    @Override
-    public SBreakpointBuilder createNewInstance(final long definitionId, final String elementName, final int idOfTheStateToInterrupt,
-            final int idOfTheInterruptingState) {
-        entity = new SBreakpointImpl();
-        entity.setDefinitionId(definitionId);
-        entity.setElementName(elementName);
-        entity.setStateId(idOfTheStateToInterrupt);
-        entity.setInterruptedStateId(idOfTheInterruptingState);
-        entity.setInstanceScope(false);
-        return this;
-    }
-
-    @Override
-    public String getDefinitionIdKey() {
-        return DEFINITION_ID;
-    }
-
-    @Override
-    public String getInstanceIdKey() {
-        return INSTANCE_ID;
-    }
-
-    @Override
-    public String getElementNameKey() {
-        return ELEMENT_NAME;
-    }
-
-    @Override
-    public String getStateIdKey() {
-        return STATE_ID;
-    }
-
-    @Override
-    public String getInterruptedStateIdKey() {
-        return INTERRUPTED_STATE_ID;
     }
 
 }

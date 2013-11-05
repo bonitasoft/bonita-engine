@@ -15,19 +15,5 @@ import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
  */
 public interface SBreakpointBuilder {
 
-    SBreakpointBuilder createNewInstance(long definitionId, long instanceId, String elementName, int idOfTheStateToInterrupt, int idOfTheInterruptingState);
-
-    SBreakpointBuilder createNewInstance(long definitionId, String elementName, int idOfTheStateToInterrupt, int idOfTheInterruptingState);
-
     SBreakpoint done();
-
-    String getDefinitionIdKey();
-
-    String getInstanceIdKey();
-
-    String getElementNameKey();
-
-    String getStateIdKey();
-
-    String getInterruptedStateIdKey();
 }

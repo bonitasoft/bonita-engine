@@ -8,41 +8,40 @@
  *******************************************************************************/
 package com.bonitasoft.engine.search.descriptor;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchArchivedProcessInstancesDescriptor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 
 import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
-import com.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import com.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 
 /**
  * @author Celine Souchet
  */
 public class SearchArchivedProcessInstancesDescriptorExt extends SearchArchivedProcessInstancesDescriptor {
 
-    public SearchArchivedProcessInstancesDescriptorExt(final BPMInstanceBuilders instanceBuilders, final SProcessSupervisorBuilders sSupervisorBuilders) {
-        super(instanceBuilders, sSupervisorBuilders);
+    public SearchArchivedProcessInstancesDescriptorExt() {
+        super();
 
-        final SAProcessInstanceBuilder instanceBuilder = instanceBuilders.getSAProcessInstanceBuilder();
+        final SAProcessInstanceBuilderFactory keyProvider = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
 
         searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_1,
-                new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStringIndex1Key()));
+                new FieldDescriptor(SAProcessInstance.class, keyProvider.getStringIndex1Key()));
         searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_2,
-                new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStringIndex2Key()));
+                new FieldDescriptor(SAProcessInstance.class, keyProvider.getStringIndex2Key()));
         searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_3,
-                new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStringIndex3Key()));
+                new FieldDescriptor(SAProcessInstance.class, keyProvider.getStringIndex3Key()));
         searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_4,
-                new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStringIndex4Key()));
+                new FieldDescriptor(SAProcessInstance.class, keyProvider.getStringIndex4Key()));
         searchEntityKeys.put(ArchivedProcessInstancesSearchDescriptor.STRING_INDEX_5,
-                new FieldDescriptor(SAProcessInstance.class, instanceBuilder.getStringIndex5Key()));
+                new FieldDescriptor(SAProcessInstance.class, keyProvider.getStringIndex5Key()));
 
-        processInstanceFields.add(instanceBuilder.getStringIndex1Key());
-        processInstanceFields.add(instanceBuilder.getStringIndex2Key());
-        processInstanceFields.add(instanceBuilder.getStringIndex3Key());
-        processInstanceFields.add(instanceBuilder.getStringIndex4Key());
-        processInstanceFields.add(instanceBuilder.getStringIndex5Key());
+        processInstanceFields.add(keyProvider.getStringIndex1Key());
+        processInstanceFields.add(keyProvider.getStringIndex2Key());
+        processInstanceFields.add(keyProvider.getStringIndex3Key());
+        processInstanceFields.add(keyProvider.getStringIndex4Key());
+        processInstanceFields.add(keyProvider.getStringIndex5Key());
         // archivedProcessInstanceAllFields.put(SAProcessInstance.class, processInstanceFields);
     }
 

@@ -8,13 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import org.bonitasoft.engine.identity.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class LocalLogTest extends CommonAPISPTest {
 

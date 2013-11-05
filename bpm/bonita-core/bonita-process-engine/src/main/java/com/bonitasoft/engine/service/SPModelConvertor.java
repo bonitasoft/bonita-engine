@@ -17,10 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -31,6 +35,7 @@ import com.bonitasoft.engine.bpm.breakpoint.impl.BreakpointImpl;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.core.reporting.SReport;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
+import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
 import com.bonitasoft.engine.log.Log;
 import com.bonitasoft.engine.log.SeverityLevel;
 import com.bonitasoft.engine.log.impl.LogImpl;
@@ -95,9 +100,9 @@ public final class SPModelConvertor extends ModelConvertor {
         return tenant;
     }
 
-    public static STenant constructTenant(final TenantCreator tCreator, final STenantBuilder sTenantBuilder) {
+    public static STenant constructTenant(final TenantCreator tCreator) {
         final Map<TenantField, Serializable> fields = tCreator.getFields();
-        sTenantBuilder.createNewInstance((String) fields.get(TenantField.NAME), "defaultUser", System.currentTimeMillis(), PLATFORM_STATUS_DEACTIVATED,
+        final STenantBuilder sTenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance((String) fields.get(TenantField.NAME), "defaultUser", System.currentTimeMillis(), PLATFORM_STATUS_DEACTIVATED,
                 (Boolean) fields.get(TenantField.DEFAULT_TENANT));
         sTenantBuilder.setDescription((String) fields.get(TenantField.DESCRIPTION));
         sTenantBuilder.setIconName((String) fields.get(TenantField.ICON_NAME));
@@ -133,10 +138,10 @@ public final class SPModelConvertor extends ModelConvertor {
         return breakpoints;
     }
 
-    public static SProfile constructSProfile(final ProfileCreator creator, final SProfileBuilder sProfileBuilder, final boolean isDefault, final long createdBy) {
+    public static SProfile constructSProfile(final ProfileCreator creator, final boolean isDefault, final long createdBy) {
         final long creationDate = System.currentTimeMillis();
         final Map<ProfileField, Serializable> fields = creator.getFields();
-        final SProfileBuilder newSProfileBuilder = sProfileBuilder.createNewInstance((String) fields.get(ProfileField.NAME), isDefault, creationDate,
+        final SProfileBuilder newSProfileBuilder = BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance((String) fields.get(ProfileField.NAME), isDefault, creationDate,
                 createdBy, creationDate, createdBy);
         final String description = (String) fields.get(ProfileField.DESCRIPTION);
         if (description != null) {
@@ -149,9 +154,9 @@ public final class SPModelConvertor extends ModelConvertor {
         return newSProfileBuilder.done();
     }
 
-    public static SProfileEntry constructSProfileEntry(final ProfileEntryCreator creator, final SProfileEntryBuilder sProfileEntryBuilder) {
+    public static SProfileEntry constructSProfileEntry(final ProfileEntryCreator creator) {
         final Map<ProfileEntryField, Serializable> fields = creator.getFields();
-        final SProfileEntryBuilder newSProfileEntryBuilder = sProfileEntryBuilder.createNewInstance((String) fields.get(ProfileEntryField.NAME),
+        final SProfileEntryBuilder newSProfileEntryBuilder = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance((String) fields.get(ProfileEntryField.NAME),
                 (Long) fields.get(ProfileEntryField.PROFILE_ID));
         final String description = (String) fields.get(ProfileEntryField.DESCRIPTION);
         if (description != null) {
@@ -231,14 +236,14 @@ public final class SPModelConvertor extends ModelConvertor {
         return reports;
     }
 
-    public static SReport constructSReport(final ReportCreator creator, final SReportBuilder sReportBuilder, final long creatorUserId) {
+    public static SReport constructSReport(final ReportCreator creator, final long creatorUserId) {
         final Map<ReportField, Serializable> fields = creator.getFields();
         final String name = (String) fields.get(ReportField.NAME);
         // Boolean isProvided = (Boolean) fields.get(ReportField.PROVIDED);
         // if (isProvided == null) {
         // isProvided = false;
         // }
-        final SReportBuilder newSReportBuilder = sReportBuilder.createNewInstance(name, System.currentTimeMillis(), creatorUserId, false);
+        final SReportBuilder newSReportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, System.currentTimeMillis(), creatorUserId, false);
         final String description = (String) fields.get(ReportField.DESCRIPTION);
         if (description != null) {
             newSReportBuilder.setDescription(description);

@@ -16,8 +16,10 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
+import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
@@ -157,11 +159,10 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
         storage.setVariable(theResponse, 42);
 
         final Date now = new Date();
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance("com.bonitasoft.services.monitoring.IncrementAVariable", "IncrementAVariable").setDescription("increment a variable").done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        final SJobParameterBuilder jobParameterBuilder = schedulerService.getJobParameterBuilder();
-        parameters.add(jobParameterBuilder.createNewInstance("variableName", theResponse).done());
+        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", theResponse).done());
         final Trigger trigger = new OneShotTrigger("events", now, 10);
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();

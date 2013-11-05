@@ -20,6 +20,13 @@
       <version>${project.version}</version>
     </dependency>
 
+        <!-- Builder Factory -->
+        <dependency>
+            <groupId>com.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder-sp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     <!-- Actor Mapping -->
     <dependency>
       <groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
@@ -804,6 +811,14 @@
       <groupId>com.hazelcast</groupId>
       <artifactId>hazelcast-spring</artifactId>
     </dependency>
+
+        <!-- Builder Factory -->
+        <dependency>
+            <groupId>com.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder-sp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
   </dependencies>
 
   <build>
@@ -820,6 +835,9 @@
             <configuration>
               <artifactSet>
                 <includes>
+                                    <!-- Builder Factory -->
+                                    <include>org.bonitasoft.engine:bonita-builder</include>
+                                    <include>com.bonitasoft.engine:bonita-builder-sp</include>
                   <!-- Actor Mapping -->
                   <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-api</include>
                   <include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl</include>
@@ -979,6 +997,7 @@
                   <include>org.bonitasoft.engine.platform.command:bonita-platform-command-api</include>
                   <include>org.bonitasoft.engine.platform.command:bonita-platform-command-api-impl</include>
                   <!-- Platform Dependency -->
+                  <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model</include>
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl</include>
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl-hibernate</include>
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-impl</include>

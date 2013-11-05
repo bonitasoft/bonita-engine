@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.service.impl;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.parameter.ParameterService;
@@ -31,8 +30,6 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     private TenantMonitoringService tenantMonitoringServie;
 
     private SearchEntitiesDescriptor searchEntitiesDescriptor;
-
-    private BPMInstanceBuilders bpmInstanceBuilders;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         super(tenantId);
@@ -60,14 +57,6 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
             searchEntitiesDescriptor = lookupService(SearchEntitiesDescriptor.class);
         }
         return searchEntitiesDescriptor;
-    }
-
-    @Override
-    public BPMInstanceBuilders getBPMInstanceBuilders() {
-        if (bpmInstanceBuilders == null) {
-            bpmInstanceBuilders = lookupService(BPMInstanceBuilders.class);
-        }
-        return bpmInstanceBuilders;
     }
 
     @Override

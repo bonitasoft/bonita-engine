@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -22,6 +23,7 @@ import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater.ProcessInstanceField;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
+import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
 
 /**
  * @author Baptiste Mesta
@@ -34,27 +36,23 @@ public class UpdateProcessInstance implements TransactionContent {
 
     private final long processInstanceId;
 
-    private final SProcessInstanceUpdateBuilder updateBuilder;
-
     private Index index;
 
     private String value;
 
     public UpdateProcessInstance(final ProcessInstanceService instanceService, final ProcessInstanceUpdater descriptor,
-            final SProcessInstanceUpdateBuilder updateBuilder, final long processInstanceId) {
+            final long processInstanceId) {
         super();
         this.instanceService = instanceService;
         this.descriptor = descriptor;
         this.processInstanceId = processInstanceId;
-        this.updateBuilder = updateBuilder;
     }
 
-    public UpdateProcessInstance(final ProcessInstanceService instanceService, final SProcessInstanceUpdateBuilder updateBuilder, final long processInstanceId,
+    public UpdateProcessInstance(final ProcessInstanceService instanceService, final long processInstanceId,
             final Index index, final String value) {
         super();
         this.instanceService = instanceService;
         this.processInstanceId = processInstanceId;
-        this.updateBuilder = updateBuilder;
         descriptor = null;
         this.index = index;
         this.value = value;
@@ -68,6 +66,7 @@ public class UpdateProcessInstance implements TransactionContent {
     }
 
     private EntityUpdateDescriptor getProcessInstanceUpdateDescriptor() {
+        final SProcessInstanceUpdateBuilder updateBuilder = BuilderFactory.get(SProcessInstanceUpdateBuilderFactory.class).createNewInstance();
         if (descriptor == null) {
             switch (index) {
                 case FIRST:

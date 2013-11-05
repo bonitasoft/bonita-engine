@@ -13,18 +13,15 @@ package com.bonitasoft.engine.core.reporting;
  */
 public class SReportContentBuilderImpl implements SReportContentBuilder {
 
-    private SReportContentImpl reportContent;
+    private final SReportContentImpl reportContent;
 
-    @Override
-    public SReportContentBuilder createNewInstance(final byte[] content) {
-        reportContent = new SReportContentImpl();
-        reportContent.setContent(content);
-        return this;
+    public SReportContentBuilderImpl(final SReportContentImpl reportContent) {
+        super();
+        this.reportContent = reportContent;
     }
 
     @Override
     public SReportContent done() {
         return reportContent;
     }
-
 }

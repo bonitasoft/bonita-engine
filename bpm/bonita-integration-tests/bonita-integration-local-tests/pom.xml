@@ -231,12 +231,6 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>mybatis</id>
-			<properties>
-				<bonita.home.classifier>performance-mybatis</bonita.home.classifier>
-			</properties>
-		</profile>
-		<profile>
 			<id>slow</id>
 			<properties>
 				<bonita.home.classifier>performance-cluster</bonita.home.classifier>

@@ -13,10 +13,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -100,7 +102,7 @@ public class DeleteBatchJobRegister implements JobRegister {
      */
     private void scheduleDeleteJob() throws SSchedulerException {
         loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Register delete batch job with repeat cron: " + repeat);
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(DeleteBatchJob.class.getName(), DELETE_BATCH_JOB, true).done();
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(DeleteBatchJob.class.getName(), DELETE_BATCH_JOB, true).done();
         final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
         final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), repeat);
         schedulerService.schedule(jobDescriptor, jobParameters, trigger);

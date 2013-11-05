@@ -13,10 +13,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -75,7 +77,7 @@ public class InsertBatchLogsJobRegister implements JobRegister {
                     if (loggerService.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
                         loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Register insert batch logs with repeat cron: " + cronExpression);
                     }
-                    final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+                    final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                             .createNewInstance(InsertBatchLogsJob.class.getName(), INSERT_BATCH_LOGS_JOB, true).done();
                     final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                     final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cronExpression);

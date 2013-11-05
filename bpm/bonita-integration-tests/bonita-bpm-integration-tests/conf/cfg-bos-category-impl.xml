@@ -7,11 +7,8 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="sessionService" ref="sessionService"/>
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="categoryBuilderAccessor" ref="categoryBuilderAccessor" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
-
-	<bean name="categoryBuilderAccessor" class="org.bonitasoft.engine.core.category.model.builder.impl.SCategoryBuilderAccessorImpl" />
 
 	<bean id="db-bos-category-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/core/category/db/${db.vendor}-createTables.sql" />

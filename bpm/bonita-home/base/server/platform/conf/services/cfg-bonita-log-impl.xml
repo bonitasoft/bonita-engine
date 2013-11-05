@@ -92,7 +92,6 @@
 	<bean id="syncQueriableLoggerService" class="com.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
-		<constructor-arg name="builder" ref="logModelBuilder" />
 		<constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />

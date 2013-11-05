@@ -30,15 +30,14 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
-import org.bonitasoft.engine.command.model.SCommandBuilder;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -62,7 +61,7 @@ import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -82,6 +81,7 @@ import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
+import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
@@ -223,8 +223,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TransactionService transactionService = platformAccessor.getTransactionService();
 
             // add tenant to database
-            final STenantBuilder sTenantBuilder = platformAccessor.getSTenantBuilder();
-            final STenant tenant = SPModelConvertor.constructTenant(creator, sTenantBuilder);
+            final STenant tenant = SPModelConvertor.constructTenant(creator);
 
             final Long tenantId = transactionService.executeInTransaction(new Callable<Long>() {
 
@@ -265,7 +264,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final SDataSourceModelBuilder sDataSourceModelBuilder = tenantServiceAccessor.getSDataSourceModelBuilder();
             final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final CommandService commandService = tenantServiceAccessor.getCommandService();
@@ -288,10 +286,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-                        createDefaultDataSource(sDataSourceModelBuilder, dataService);
+                        createDefaultDataSource(dataService);
                         final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
-                        final SCommandBuilder commandBuilder = tenantServiceAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
-                        createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
+                        createDefaultCommands(commandService, defaultCommandProvider);
                         deployTenantReports(tenantId, tenantServiceAccessor);
                         createDefaultProfiles(tenantId, profileParser, profileService, identityService, logger);
                         sessionService.deleteSession(session.getId());
@@ -323,8 +320,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final byte[] screenshot = getReportScreenshot(reportFolder, reportName);
 
             final ReportingService reportingService = tenantAccessor.getReportingService();
-            final SReportBuilder reportBuilder = reportingService.getReportBuilder();
-            reportBuilder.createNewInstance(reportName, /* system user */-1, true, reportDescription, screenshot);
+            final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(reportName, /* system user */-1, true, reportDescription, screenshot);
             final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
             // Here we are already in a transaction, so we can call execute() directly:
             addReport.execute();
@@ -528,44 +524,44 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         try {
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final STenantBuilder tenantBuilder = platformAccessor.getSTenantBuilder();
+            final STenantBuilderFactory tenantBuildeFactr = BuilderFactory.get(STenantBuilderFactory.class);
             String field = null;
             OrderByType order = null;
             switch (pagingCriterion) {
                 case NAME_ASC:
-                    field = tenantBuilder.getNameKey();
+                    field = tenantBuildeFactr.getNameKey();
                     order = OrderByType.ASC;
                     break;
                 case DESCRIPTION_ASC:
-                    field = tenantBuilder.getDescriptionKey();
+                    field = tenantBuildeFactr.getDescriptionKey();
                     order = OrderByType.ASC;
                     break;
                 case CREATION_ASC:
-                    field = tenantBuilder.getCreatedKey();
+                    field = tenantBuildeFactr.getCreatedKey();
                     order = OrderByType.ASC;
                     break;
                 case STATE_ASC:
-                    field = tenantBuilder.getStatusKey();
+                    field = tenantBuildeFactr.getStatusKey();
                     order = OrderByType.ASC;
                     break;
                 case NAME_DESC:
-                    field = tenantBuilder.getNameKey();
+                    field = tenantBuildeFactr.getNameKey();
                     order = OrderByType.DESC;
                     break;
                 case DESCRIPTION_DESC:
-                    field = tenantBuilder.getDescriptionKey();
+                    field = tenantBuildeFactr.getDescriptionKey();
                     order = OrderByType.DESC;
                     break;
                 case CREATION_DESC:
-                    field = tenantBuilder.getCreatedKey();
+                    field = tenantBuildeFactr.getCreatedKey();
                     order = OrderByType.DESC;
                     break;
                 case STATE_DESC:
-                    field = tenantBuilder.getStatusKey();
+                    field = tenantBuildeFactr.getStatusKey();
                     order = OrderByType.DESC;
                     break;
                 case DEFAULT:
-                    field = tenantBuilder.getCreatedKey();
+                    field = tenantBuildeFactr.getCreatedKey();
                     order = OrderByType.DESC;
                     break;
             }
@@ -711,27 +707,26 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private EntityUpdateDescriptor getTenantUpdateDescriptor(final TenantUpdater udpateDescriptor) throws BonitaHomeNotSetException,
             BonitaHomeConfigurationException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-        final PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        final STenantBuilder tenantBuilder = platformAccessor.getSTenantBuilder();
+        final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         final Map<TenantField, Serializable> fields = udpateDescriptor.getFields();
         for (final Entry<TenantField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
                 case NAME:
-                    descriptor.addField(tenantBuilder.getNameKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getNameKey(), field.getValue());
                     break;
                 case DESCRIPTION:
-                    descriptor.addField(tenantBuilder.getDescriptionKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getDescriptionKey(), field.getValue());
                     break;
                 case ICON_NAME:
-                    descriptor.addField(tenantBuilder.getIconNameKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getIconNameKey(), field.getValue());
                     break;
                 case ICON_PATH:
-                    descriptor.addField(tenantBuilder.getIconPathKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getIconPathKey(), field.getValue());
                     break;
                 case STATUS:
-                    descriptor.addField(tenantBuilder.getStatusKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getStatusKey(), field.getValue());
                     break;
                 default:
                     break;

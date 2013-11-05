@@ -41,58 +41,10 @@
 			</exclusions>
 		</dependency>
 
-		<!-- Actor Mapping -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.actor.mapping</groupId>
-			<artifactId>bonita-actor-mapping-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Archive -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.archive</groupId>
 			<artifactId>bonita-archive-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Category -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.category</groupId>
-			<artifactId>bonita-category-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Command -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.command</groupId>
-			<artifactId>bonita-command-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Comment -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.process.comment</groupId>
-			<artifactId>bonita-process-comment-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Data -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Data Instance -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-model-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -103,86 +55,10 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Dependency -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-platform-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Document -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.process.document.mapping</groupId>
-			<artifactId>bonita-process-document-mapping-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- External Identity -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.external.identity.mapping</groupId>
-			<artifactId>bonita-external-identity-mapping-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Identity -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Logs -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Parameter -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.parameter</groupId>
 			<artifactId>bonita-parameter-propertyfile</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Platform -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Persistence -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-persistence-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Profile -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.profile</groupId>
-			<artifactId>bonita-profile-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -197,22 +73,6 @@
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-sequence-impl</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-
-		<!-- Scheduler -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Supervisor Mapping -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.supervisor.mapping</groupId>
-			<artifactId>bonita-supervisor-mapping-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- Actor Mapping -->
@@ -671,12 +531,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.bonitasoft.engine.platform.command</groupId>
-			<artifactId>bonita-platform-command-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.platform.command</groupId>
 			<artifactId>bonita-platform-command-api-impl</artifactId>
 			<version>${project.version}</version>
@@ -737,12 +591,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
@@ -762,23 +610,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model-impl-mybatis</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 
 		<!-- Process Migration -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-instance-migration-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-instance-migration-impl-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -1020,23 +857,6 @@
 		</dependency>
 	</dependencies>
 
-	<profiles>
-		<profile>
-			<id>hibernate</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<bonita.file.filter>com.bonitasoft.engine.bpm.util.HibernateServicesFileFilter</bonita.file.filter>
-			</properties>
-		</profile>
-		<profile>
-			<id>mybatis</id>
-			<properties>
-				<bonita.file.filter>com.bonitasoft.engine.bpm.util.MyBatisServicesFileFilter</bonita.file.filter>
-			</properties>
-		</profile>
-	</profiles>
 
 	<build>
 		<pluginManagement>
@@ -1105,7 +925,6 @@
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
 						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
-						<bonita.file.filter>${bonita.file.filter}</bonita.file.filter>
 					</systemPropertyVariables>
 					<includes>
 						<include>com/bonitasoft/engine/bpm/test/AllBPMSPTestsWithJNDI.java</include>

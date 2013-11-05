@@ -13,9 +13,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilderFactory;
 import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
@@ -31,24 +32,25 @@ public class SearchLogDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> logAllFields;
 
-    public SearchLogDescriptor(final SIndexedLogBuilder sIndexedLogBuilder) {
+    public SearchLogDescriptor() {
+        final SQueriableLogBuilderFactory fact = BuilderFactory.get(SQueriableLogBuilderFactory.class);
         searchEntityKeys = new HashMap<String, FieldDescriptor>(5);
-        searchEntityKeys.put(LogSearchDescriptor.ACTION_SCOPE, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getActionScopeKey()));
-        searchEntityKeys.put(LogSearchDescriptor.ACTION_TYPE, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getActionTypeKey()));
-        searchEntityKeys.put(LogSearchDescriptor.CREATED_BY, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getUserIdKey()));
-        searchEntityKeys.put(LogSearchDescriptor.MESSAGE, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getRawMessageKey()));
-        searchEntityKeys.put(LogSearchDescriptor.SEVERITY, new FieldDescriptor(SQueriableLog.class, sIndexedLogBuilder.getSeverityKey()));
+        searchEntityKeys.put(LogSearchDescriptor.ACTION_SCOPE, new FieldDescriptor(SQueriableLog.class, fact.getActionScopeKey()));
+        searchEntityKeys.put(LogSearchDescriptor.ACTION_TYPE, new FieldDescriptor(SQueriableLog.class, fact.getActionTypeKey()));
+        searchEntityKeys.put(LogSearchDescriptor.CREATED_BY, new FieldDescriptor(SQueriableLog.class, fact.getUserIdKey()));
+        searchEntityKeys.put(LogSearchDescriptor.MESSAGE, new FieldDescriptor(SQueriableLog.class, fact.getRawMessageKey()));
+        searchEntityKeys.put(LogSearchDescriptor.SEVERITY, new FieldDescriptor(SQueriableLog.class, fact.getSeverityKey()));
 
         logAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> logFields = new HashSet<String>(8);
-        logFields.add(sIndexedLogBuilder.getUserIdKey());
-        logFields.add(sIndexedLogBuilder.getClusterNodeKey());
-        logFields.add(sIndexedLogBuilder.getProductVersionKey());
-        logFields.add(sIndexedLogBuilder.getActionTypeKey());
-        logFields.add(sIndexedLogBuilder.getActionScopeKey());
-        logFields.add(sIndexedLogBuilder.getRawMessageKey());
-        logFields.add(sIndexedLogBuilder.getCallerClassNameKey());
-        logFields.add(sIndexedLogBuilder.getCallerMethodNameKey());
+        logFields.add(fact.getUserIdKey());
+        logFields.add(fact.getClusterNodeKey());
+        logFields.add(fact.getProductVersionKey());
+        logFields.add(fact.getActionTypeKey());
+        logFields.add(fact.getActionScopeKey());
+        logFields.add(fact.getRawMessageKey());
+        logFields.add(fact.getCallerClassNameKey());
+        logFields.add(fact.getCallerMethodNameKey());
         logAllFields.put(SQueriableLog.class, logFields);
     }
 

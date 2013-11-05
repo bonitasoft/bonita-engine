@@ -12,6 +12,5 @@
 
 	<modules>
 		<module>bonita-instance-migration-impl</module>
-		<module>bonita-instance-migration-impl-mybatis</module>
 	</modules>
 </project>

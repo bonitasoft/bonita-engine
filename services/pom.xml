@@ -16,22 +16,12 @@
 		<module>bonita-archive</module>
         <module>bonita-cache</module>
         <module>bonita-classloader</module>
-		<module>bonita-command</module>
 		<module>bonita-data</module>
-		<module>bonita-data-instance</module>
 		<module>bonita-delete-batch</module>
-		<module>bonita-dependency</module>
-		<module>bonita-document</module>
 		<module>bonita-events</module>
-		<module>bonita-expression</module>
-		<module>bonita-external-identity-mapping</module>
-		<module>bonita-identity</module>
         <module>bonita-lock</module>
 		<module>bonita-log</module>
 		<module>bonita-persistence</module>
-		<module>bonita-platform</module>
-		<module>bonita-platform-command</module>
-		<module>bonita-profile</module>
 		<module>bonita-scheduler</module>
 		<module>bonita-work</module>
 		<module>bonita-connector-executor-timedout</module>
@@ -39,6 +29,7 @@
 		<module>bonita-session</module>
 		<module>bonita-platform-session</module>
 		<module>bonita-monitoring</module>
+		<module>bonita-builder-sp</module>
 	</modules>
 
 	<profiles>

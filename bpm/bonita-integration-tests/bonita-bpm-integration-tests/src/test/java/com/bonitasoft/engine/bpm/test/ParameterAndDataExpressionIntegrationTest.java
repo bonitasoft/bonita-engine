@@ -21,18 +21,17 @@ import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
-import org.bonitasoft.engine.data.model.builder.SDataSourceBuilder;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -79,24 +78,8 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
         return getServicesBuilder().getExpressionService();
     }
 
-    protected SExpressionBuilder getExpressionBuilder() {
-        return getServicesBuilder().getExpressionBuilders().getExpressionBuilder();
-    }
-
-    // protected ParameterService getParameterService() {
-    // return getServicesBuilder().getParameterService();
-    // }
-
     protected ProcessDefinitionService getProcessDefinitionService() {
         return getServicesBuilder().getProcessDefinitionService();
-    }
-
-    protected SDataDefinitionBuilders getSDataDefinitionBuilders() {
-        return getServicesBuilder().getSDataDefinitionBuilders();
-    }
-
-    protected SDataInstanceBuilders getSDataInstanceBuilders() {
-        return getServicesBuilder().getSDataInstanceBuilders();
     }
 
     protected DataInstanceService getDataInstanceService() {
@@ -105,10 +88,6 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
 
     protected static TransactionService getTransactionService() {
         return getServicesBuilder().getTransactionService();
-    }
-
-    protected static SDataSourceBuilder getDataSourceBuilder() {
-        return getServicesBuilder().getDataSourceModelBuilder();
     }
 
     protected static DataService getDataService() {
@@ -125,7 +104,7 @@ public class ParameterAndDataExpressionIntegrationTest extends CommonBPMServices
 
     private SExpression newExpression(final String content, final String expressionType, final String returnType, final String interpreter,
             final List<SExpression> dependencies) throws SInvalidExpressionException {
-        final SExpressionBuilder eb = getExpressionBuilder().createNewInstance();
+        final SExpressionBuilder eb = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
         eb.setContent(content);
         eb.setExpressionType(expressionType);
         eb.setInterpreter(interpreter);

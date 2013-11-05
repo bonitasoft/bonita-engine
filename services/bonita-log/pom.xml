@@ -12,7 +12,6 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>bonita-log-model-impl-mybatis</module>
 		<module>bonita-log-api-impl</module>
 	</modules>
 </project>

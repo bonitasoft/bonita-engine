@@ -90,5 +90,4 @@ public class MonitoringAPIImpl implements MonitoringAPI {
         final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
         return tenantServiceAccessor.getTechnicalLoggerService();
     }
-
 }

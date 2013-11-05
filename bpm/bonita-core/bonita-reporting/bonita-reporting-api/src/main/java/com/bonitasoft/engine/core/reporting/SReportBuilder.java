@@ -13,28 +13,10 @@ package com.bonitasoft.engine.core.reporting;
  */
 public interface SReportBuilder {
 
-    SReportBuilder createNewInstance(String name, long installationDate, long installedBy, boolean provided);
-
-    SReportBuilder createNewInstance(String name, long installationDate, long installedBy, boolean provided, String description, byte[] screenshot);
-
-    SReportBuilder createNewInstance(String name, long installedBy, boolean provided, String description, byte[] screenshot);
-
     SReport done();
 
-    String getIdKey();
+    SReportBuilder setDescription(final String description);
 
-    String getNameKey();
-
-    String getDescriptionKey();
-
-    String getProvidedKey();
-
-    String getInstallationDateKey();
-
-    String getInstalledByKey();
-
-    public SReportBuilder setDescription(final String description);
-
-    public SReportBuilder setScreenshot(final byte[] screenshot);
+    SReportBuilder setScreenshot(final byte[] screenshot);
 
 }
