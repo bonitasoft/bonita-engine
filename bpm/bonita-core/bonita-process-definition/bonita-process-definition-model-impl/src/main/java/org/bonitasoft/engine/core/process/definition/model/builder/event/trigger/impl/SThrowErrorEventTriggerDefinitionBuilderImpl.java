@@ -15,23 +15,22 @@ package org.bonitasoft.engine.core.process.definition.model.builder.event.trigge
 
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowErrorEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SThrowErrorEventTriggerDefinitionImpl;
 
 /**
  * @author Baptiste Mesta
  */
 public class SThrowErrorEventTriggerDefinitionBuilderImpl implements SThrowErrorEventTriggerDefinitionBuilder {
 
-    private SThrowErrorEventTriggerDefinition entity = null;
+    private final SThrowErrorEventTriggerDefinition entity;
+
+    public SThrowErrorEventTriggerDefinitionBuilderImpl(final SThrowErrorEventTriggerDefinition entity) {
+        super();
+        this.entity = entity;
+    }
 
     @Override
     public SThrowErrorEventTriggerDefinition done() {
         return entity;
     }
 
-    @Override
-    public SThrowErrorEventTriggerDefinitionBuilder createNewInstance(final String errorCode) {
-        entity = new SThrowErrorEventTriggerDefinitionImpl(errorCode);
-        return this;
-    }
 }

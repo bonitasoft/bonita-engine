@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.data.DataSourceConfiguration;
@@ -26,12 +27,11 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundExcept
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -51,24 +51,20 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
  */
 public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
 
-    private SDataInstanceBuilders dataInstanceBuilders;
-
     private Recorder recorder;
 
     private ReadPersistenceService persistenceRead;
 
-    private SEventBuilders eventBuilders;
-
     private SInsertEvent getInsertEvent(final Object obj) {
-        return (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(DATA_INSTANCE).setObject(obj).done();
+        return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATA_INSTANCE).setObject(obj).done();
     }
 
     private SUpdateEvent getUpdateEvent(final Object obj) {
-        return (SUpdateEvent) eventBuilders.getEventBuilder().createUpdateEvent(DATA_INSTANCE).setObject(obj).done();
+        return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DATA_INSTANCE).setObject(obj).done();
     }
 
     private SDeleteEvent getDeleteEvent(final Object obj) {
-        return (SDeleteEvent) eventBuilders.getEventBuilder().createDeleteEvent(DATA_INSTANCE).setObject(obj).done();
+        return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_INSTANCE).setObject(obj).done();
     }
 
     @Override
@@ -138,8 +134,6 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
         final Map<String, Object> resources = dataSourceConfiguration.getResources();
         persistenceRead = getResource(resources, ReadPersistenceService.class, PersistentDataInstanceDataSourceConfiguration.PERSISTENCE_READ_KEY);
         recorder = getResource(resources, Recorder.class, PersistentDataInstanceDataSourceConfiguration.RECORDER_KEY);
-        dataInstanceBuilders = getResource(resources, SDataInstanceBuilders.class, PersistentDataInstanceDataSourceConfiguration.DATA_INSTANCE_BUILDERS_KEY);
-        eventBuilders = getResource(resources, SEventBuilders.class, PersistentDataInstanceDataSourceConfiguration.EVENT_BUILDERS_KEY);
     }
 
     private <T> T getResource(final Map<String, Object> resources, final Class<T> clazz, final String key) {
@@ -157,11 +151,10 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     @Override
     public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataName, containerType);
-
-        final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder();
-        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(dataInstanceBuilder.getNameKey(), dataName);
-        paraMap.put(dataInstanceBuilder.getContainerIdKey(), containerId);
-        paraMap.put(dataInstanceBuilder.getContainerTypeKey(), containerType);
+        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
+        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getNameKey(), dataName);
+        paraMap.put(fact.getContainerIdKey(), containerId);
+        paraMap.put(fact.getContainerTypeKey(), containerType);
 
         try {
             final SDataInstance dataInstance = persistenceRead.selectOne(new SelectOneDescriptor<SDataInstance>("getDataInstancesByNameAndContainer", paraMap,
@@ -179,10 +172,9 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     public List<SDataInstance> getDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
             throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(containerType);
-
-        final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder();
-        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(dataInstanceBuilder.getContainerIdKey(), containerId);
-        paraMap.put(dataInstanceBuilder.getContainerTypeKey(), containerType);
+        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
+        final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getContainerIdKey(), containerId);
+        paraMap.put(fact.getContainerTypeKey(), containerType);
 
         try {
             return persistenceRead.selectList(new SelectListDescriptor<SDataInstance>("getDataInstancesByContainer", paraMap, SDataInstance.class,

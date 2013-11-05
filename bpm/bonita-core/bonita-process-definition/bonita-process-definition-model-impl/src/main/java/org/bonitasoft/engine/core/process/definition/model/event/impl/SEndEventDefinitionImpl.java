@@ -21,7 +21,6 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.TerminateEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowErrorEventTriggerDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
@@ -29,8 +28,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.STermin
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.STerminateEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SThrowErrorEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -45,10 +42,9 @@ public class SEndEventDefinitionImpl extends SThrowEventDefinitionImpl implement
 
     private final List<SThrowErrorEventTriggerDefinition> sErrorEventTriggerDefinitions;
 
-    public SEndEventDefinitionImpl(final EndEventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(eventDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SEndEventDefinitionImpl(final EndEventDefinition eventDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(eventDefinition, transitionsMap);
         final TerminateEventTriggerDefinition terminateEventTriggerDefinition = eventDefinition.getTerminateEventTriggerDefinition();
         if (terminateEventTriggerDefinition != null) {
             setTerminateEventTriggerDefinition(new STerminateEventTriggerDefinitionImpl());

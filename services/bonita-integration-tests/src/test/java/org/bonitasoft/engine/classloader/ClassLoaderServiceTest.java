@@ -12,14 +12,20 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilder;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
-import org.bonitasoft.engine.dependency.model.builder.DependencyMappingBuilder;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilder;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilder;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilder;
+import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilder;
+import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -31,23 +37,11 @@ import org.junit.Test;
  */
 public class ClassLoaderServiceTest extends CommonServiceTest {
 
-    private static DependencyMappingBuilder dependencyMappingModelBuilder;
-
-    private static DependencyBuilder dependencyModelBuilder;
-
-    private static DependencyBuilderAccessor platformDependencyBuilderAccessor;
-
     private DependencyService dependencyService;
 
     private DependencyService platformDependencyService;
 
     private ClassLoaderService classLoaderService;
-
-    static {
-        dependencyMappingModelBuilder = getServicesBuilder().buildDependencyMappingModelBuilder();
-        dependencyModelBuilder = getServicesBuilder().buildDependencyModelBuilder();
-        platformDependencyBuilderAccessor = getServicesBuilder().buildPlatformDependencyBuilderAccessor();
-    }
 
     private static final String TYPE1 = "type1";
 
@@ -124,15 +118,14 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     }
 
     private long createDependency(final String name, final String version, final String fileName, final byte[] value) throws SDependencyException {
-        final DependencyBuilder builder = dependencyModelBuilder.createNewInstance(name, version, fileName, value);
+        final SDependencyBuilder builder = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, version, fileName, value);
         final SDependency dependency = builder.done();
         dependencyService.createDependency(dependency);
         return dependency.getId();
     }
 
     private long createPlatformDependency(final String name, final String version, final String fileName, final byte[] value) throws SDependencyException {
-        final DependencyBuilder dependencyBuilder = platformDependencyBuilderAccessor.getDependencyBuilder();
-        final DependencyBuilder builder = dependencyBuilder.createNewInstance(name, version, fileName, value);
+        final SPlatformDependencyBuilder builder = BuilderFactory.get(SPlatformDependencyBuilderFactory.class).createNewInstance(name, version, fileName, value);
         final SDependency dependency = builder.done();
         platformDependencyService.createDependency(dependency);
         return dependency.getId();
@@ -163,15 +156,14 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     }
 
     private long createPlatformDependencyMapping(final long dependencyId, final String artifactType, final long artifactId) throws SDependencyException {
-        final DependencyMappingBuilder dependencyMappingBuilder = platformDependencyBuilderAccessor.getDependencyMappingBuilder();
-        final DependencyMappingBuilder builder = dependencyMappingBuilder.createNewInstance(dependencyId, artifactId, artifactType);
+        final SPlatformDependencyMappingBuilder builder = BuilderFactory.get(SPlatformDependencyMappingBuilderFactory.class).createNewInstance(dependencyId, artifactId, artifactType);
         final SDependencyMapping dependencyMapping = builder.done();
         platformDependencyService.createDependencyMapping(dependencyMapping);
         return dependencyMapping.getId();
     }
 
     private long createDependencyMapping(final long dependencyId, final String artifactType, final long artifactId) throws SDependencyException {
-        final DependencyMappingBuilder builder = dependencyMappingModelBuilder.createNewInstance(dependencyId, artifactId, artifactType);
+        final SDependencyMappingBuilder builder = BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(dependencyId, artifactId, artifactType);
         final SDependencyMapping dependencyMapping = builder.done();
         dependencyService.createDependencyMapping(dependencyMapping);
         return dependencyMapping.getId();

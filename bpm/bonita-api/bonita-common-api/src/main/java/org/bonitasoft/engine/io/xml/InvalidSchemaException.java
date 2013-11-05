@@ -26,4 +26,8 @@ public class InvalidSchemaException extends BonitaException {
         super(cause);
     }
 
+    public InvalidSchemaException(final String message) {
+        super(message);
+    }
+
 }

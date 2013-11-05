@@ -41,6 +41,7 @@ import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
 import org.bonitasoft.engine.api.impl.transaction.platform.RefreshPlatformClassLoader;
 import org.bonitasoft.engine.api.impl.transaction.platform.RefreshTenantClassLoaders;
 import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandService;
@@ -48,7 +49,7 @@ import org.bonitasoft.engine.command.DefaultCommandProvider;
 import org.bonitasoft.engine.command.SCommandAlreadyExistsException;
 import org.bonitasoft.engine.command.SCommandCreationException;
 import org.bonitasoft.engine.command.model.SCommand;
-import org.bonitasoft.engine.command.model.SCommandBuilder;
+import org.bonitasoft.engine.command.model.SCommandBuilderFactory;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -61,7 +62,7 @@ import org.bonitasoft.engine.data.SDataException;
 import org.bonitasoft.engine.data.SDataSourceAlreadyExistException;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceState;
-import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
+import org.bonitasoft.engine.data.model.builder.SDataSourceBuilderFactory;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -87,8 +88,8 @@ import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -213,8 +214,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         final String createdBy = "platformAdmin";
         // FIXME do that in the builder
         final long created = System.currentTimeMillis();
-        final SPlatformBuilder platformBuilder = platformAccessor.getSPlatformBuilder();
-        return platformBuilder.createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
+        return BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
     }
 
     @Override
@@ -485,8 +485,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             // add tenant to database
             final String createdBy = "defaultUser";
-            final STenantBuilder sTenantBuilder = platformAccessor.getSTenantBuilder();
-            final STenant tenant = sTenantBuilder.createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true)
+            final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true)
                     .setDescription(description).done();
             final Long tenantId = platformService.createTenant(tenant);
 
@@ -520,11 +519,9 @@ public class PlatformAPIImpl implements PlatformAPI {
                 throw new STenantCreationException("Access File Exception!");
             }
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final SDataSourceModelBuilder sDataSourceModelBuilder = tenantServiceAccessor.getSDataSourceModelBuilder();
             final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final CommandService commandService = tenantServiceAccessor.getCommandService();
-            final SCommandBuilder commandBuilder = tenantServiceAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
 
@@ -532,9 +529,9 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
-            createDefaultDataSource(sDataSourceModelBuilder, dataService);
+            createDefaultDataSource(dataService);
             final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
-            createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
+            createDefaultCommands(commandService, defaultCommandProvider);
             final Parser profileParser = tenantServiceAccessor.getProfileParser();
             final ProfileService profileService = tenantServiceAccessor.getProfileService();
             final IdentityService identityService = tenantServiceAccessor.getIdentityService();
@@ -590,24 +587,24 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void createDefaultCommands(final CommandService commandService, final SCommandBuilder commandBuilder, final DefaultCommandProvider provider)
+    protected void createDefaultCommands(final CommandService commandService, final DefaultCommandProvider provider)
             throws SCommandAlreadyExistsException, SCommandCreationException {
+        final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
         for (final CommandDescriptor command : provider.getDefaultCommands()) {
-            final SCommand sCommand = commandBuilder.createNewInstance(command.getName(), command.getDescription(), command.getImplementation())
+            final SCommand sCommand = fact.createNewInstance(command.getName(), command.getDescription(), command.getImplementation())
                     .setSystem(true).done();
             commandService.create(sCommand);
         }
     }
 
-    protected void createDefaultDataSource(final SDataSourceModelBuilder sDataSourceModelBuilder, final DataService dataService)
+    protected void createDefaultDataSource(final DataService dataService)
             throws SDataSourceAlreadyExistException, SDataException {
-        final SDataSource bonitaDataSource = sDataSourceModelBuilder.getDataSourceBuilder()
+        final SDataSource bonitaDataSource = BuilderFactory.get(SDataSourceBuilderFactory.class)
                 .createNewInstance("bonita_data_source", "6.0", SDataSourceState.ACTIVE, "org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl")
                 .done();
         dataService.createDataSource(bonitaDataSource);
 
-        final SDataSource transientDataSource = sDataSourceModelBuilder
-                .getDataSourceBuilder()
+        final SDataSource transientDataSource = BuilderFactory.get(SDataSourceBuilderFactory.class)
                 .createNewInstance("bonita_transient_data_source", "6.0", SDataSourceState.ACTIVE,
                         "org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource").done();
         dataService.createDataSource(transientDataSource);

@@ -20,7 +20,6 @@ import static org.mockito.Mockito.verify;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.session.SessionProvider;
-import org.bonitasoft.engine.session.model.builder.SSessionBuilders;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -31,9 +30,6 @@ import org.mockito.MockitoAnnotations;
  * @author Celine Souchet
  */
 public class SessionServiceImplTest {
-
-    @Mock
-    private SSessionBuilders sessionModelBuilder;
 
     @Mock
     private PlatformService platformService;

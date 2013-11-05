@@ -23,10 +23,6 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
  */
 public interface SLogBuilder {
 
-    SLogBuilder createNewInstance();
-
-    SLogBuilder fromInstance(SQueriableLog log);
-
     SLogBuilder userId(String userId);
 
     SLogBuilder clusterNode(String clusterNode);
@@ -44,38 +40,6 @@ public interface SLogBuilder {
     SLogBuilder callerClassName(String callerClassName);
 
     SLogBuilder callerMethodName(String callerMethodName);
-
-    Class<? extends SQueriableLog> getModelClass();
-
-    String getTimeStampKey();
-
-    String getYearKey();
-
-    String getMonthKey();
-
-    String getDayOfYearKey();
-
-    String getWeekOfYearKey();
-
-    String getUserIdKey();
-
-    String getThreadNumberKey();
-
-    String getClusterNodeKey();
-
-    String getProductVersionKey();
-
-    String getSeverityKey();
-
-    String getActionScopeKey();
-
-    String getActionStatusKey();
-
-    String getRawMessageKey();
-
-    String getCallerClassNameKey();
-
-    String getCallerMethodNameKey();
 
     SQueriableLog done();
 

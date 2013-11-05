@@ -15,19 +15,14 @@ package org.bonitasoft.engine.core.migration.model.impl.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
  * @author Baptiste Mesta
  */
 public class SLeftOperandBinding extends ElementBinding {
-
-    private final SOperationBuilders sOperationBuilders;
-
-    public SLeftOperandBinding(final SOperationBuilders sOperationBuilders) {
-        this.sOperationBuilders = sOperationBuilders;
-    }
 
     private String dataName;
 
@@ -53,7 +48,7 @@ public class SLeftOperandBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        return sOperationBuilders.getSLeftOperandBuilder().createNewInstance().setName(dataName).done();
+        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(dataName).done();
     }
 
 }

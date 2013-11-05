@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.core.operation.impl;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -30,17 +30,14 @@ public abstract class UpdateOperationExecutorStrategy implements OperationExecut
 
     private final DataInstanceService dataInstanceService;
 
-    private final SDataInstanceBuilders sDataInstanceBuilders;
-
-    public UpdateOperationExecutorStrategy(final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders) {
+    public UpdateOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
         this.dataInstanceService = dataInstanceService;
-        this.sDataInstanceBuilders = sDataInstanceBuilders;
     }
 
     protected void update(final SDataInstance sDataInstance, final Object content) throws SDataInstanceException {
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        final SDataInstanceBuilder sDataInstanceBuilder = sDataInstanceBuilders.getDataInstanceBuilder();
-        updateDescriptor.addField(sDataInstanceBuilder.getValueKey(), content);
+        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
+        updateDescriptor.addField(fact.getValueKey(), content);
 
         dataInstanceService.updateDataInstance(sDataInstance, updateDescriptor);
     }

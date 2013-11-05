@@ -15,13 +15,15 @@ package org.bonitasoft.engine.test.util;
 
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
+import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -34,13 +36,13 @@ public class PlatformUtil {
 
     public static final String DEFAULT_TENANT_STATUS = "DEACTIVATED";
 
-    public static long createTenant(final TransactionService transactionService, final PlatformService platformService, final STenantBuilder tenantBuilder,
+    public static long createTenant(final TransactionService transactionService, final PlatformService platformService,
             final String tenantName, final String createdBy, final String status) throws Exception {
         try {
             transactionService.begin();
             final long created = System.currentTimeMillis();
 
-            tenantBuilder.createNewInstance(tenantName, createdBy, created, status, false);
+            final STenantBuilder tenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenantName, createdBy, created, status, false);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
             platformService.activateTenant(tenant.getId());
@@ -51,12 +53,12 @@ public class PlatformUtil {
     }
 
     public static long createDefaultTenant(final TransactionService transactionService, final PlatformService platformService,
-            final STenantBuilder tenantBuilder, final String tenantName, final String createdBy, final String status) throws Exception {
+            final String tenantName, final String createdBy, final String status) throws Exception {
         try {
             transactionService.begin();
             final long created = System.currentTimeMillis();
 
-            tenantBuilder.createNewInstance(tenantName, createdBy, created, status, true);
+            final STenantBuilder tenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenantName, createdBy, created, status, true);
             final STenant tenant = tenantBuilder.done();
             platformService.createTenant(tenant);
             platformService.activateTenant(tenant.getId());
@@ -93,7 +95,7 @@ public class PlatformUtil {
         }
     }
 
-    public static void createPlatform(final TransactionService transactionService, final PlatformService platformService, final SPlatformBuilder platformBuilder)
+    public static void createPlatform(final TransactionService transactionService, final PlatformService platformService)
             throws Exception {
         final String version = "myVersion";
         final String previousVersion = "previousVersion";
@@ -113,8 +115,7 @@ public class PlatformUtil {
             transactionService.complete();
         }
 
-        platformBuilder.createNewInstance(version, previousVersion, initialVersion, createdBy, created);
-        final SPlatform platform = platformBuilder.done();
+        final SPlatform platform = BuilderFactory.get(SPlatformBuilderFactory.class).createNewInstance(version, previousVersion, initialVersion, createdBy, created).done();
         try {
             transactionService.begin();
             platformService.createPlatform(platform);
@@ -160,9 +161,8 @@ public class PlatformUtil {
         return DEFAULT_CREATED_BY;
     }
 
-    public static long createDefaultTenant(final TransactionService transactionService, final PlatformService platformService,
-            final STenantBuilder tenantBuilder) throws Exception {
-        return createDefaultTenant(transactionService, platformService, tenantBuilder, DEFAULT_TENANT_NAME, DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
+    public static long createDefaultTenant(final TransactionService transactionService, final PlatformService platformService) throws Exception {
+        return createDefaultTenant(transactionService, platformService, DEFAULT_TENANT_NAME, DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
     }
 
     public static void deleteDefaultTenant(final TransactionService transactionService, final PlatformService platformService,

@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.data.DataSourceConfiguration;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -27,10 +25,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  * @author Elias Ricken de Medeiros
  */
 public class PersistentDataInstanceDataSourceConfiguration implements DataSourceConfiguration {
-
-    public static final String EVENT_BUILDERS_KEY = "eventBuilders";
-
-    public static final String DATA_INSTANCE_BUILDERS_KEY = "dataInstanceBuilders";
 
     public static final String RECORDER_KEY = "recorder";
 
@@ -41,13 +35,10 @@ public class PersistentDataInstanceDataSourceConfiguration implements DataSource
     private final Map<String, Object> resources;
 
     public PersistentDataInstanceDataSourceConfiguration(final ReadPersistenceService persistenceRead, final Recorder recorder,
-            final SDataInstanceBuilders dataInstanceBuilders, final SEventBuilders eventBuilders,
             final QueriableLoggerService queriableLoggerService) {
         resources = new HashMap<String, Object>();
         resources.put(PERSISTENCE_READ_KEY, persistenceRead);
         resources.put(RECORDER_KEY, recorder);
-        resources.put(DATA_INSTANCE_BUILDERS_KEY, dataInstanceBuilders);
-        resources.put(EVENT_BUILDERS_KEY, eventBuilders);
         resources.put(QUERIABLE_LOGGER_SERVICE, queriableLoggerService);
     }
 

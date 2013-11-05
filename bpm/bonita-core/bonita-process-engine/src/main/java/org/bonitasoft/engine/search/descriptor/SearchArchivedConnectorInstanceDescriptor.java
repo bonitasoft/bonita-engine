@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.connector.ArchiveConnectorInstancesSearchDescriptor;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -33,26 +33,26 @@ public class SearchArchivedConnectorInstanceDescriptor extends SearchEntityDescr
 
     private final Map<Class<? extends PersistentObject>, Set<String>> archivedConnectorssAllFields;
 
-    SearchArchivedConnectorInstanceDescriptor(final BPMInstanceBuilders instanceBuilders) {
-        final SAConnectorInstanceBuilder builder = instanceBuilders.getSAConnectorInstanceBuilder();
+    SearchArchivedConnectorInstanceDescriptor() {
+        final SAConnectorInstanceBuilderFactory keyProvider = BuilderFactory.get(SAConnectorInstanceBuilderFactory.class);
         searchEntityKeys = new HashMap<String, FieldDescriptor>(7);
-        searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.NAME, new FieldDescriptor(SAConnectorInstance.class, builder.getNameKey()));
+        searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.NAME, new FieldDescriptor(SAConnectorInstance.class, keyProvider.getNameKey()));
         searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.ACTIVATION_EVENT,
-                new FieldDescriptor(SAConnectorInstance.class, builder.getActivationEventKey()));
+                new FieldDescriptor(SAConnectorInstance.class, keyProvider.getActivationEventKey()));
         searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_ID,
-                new FieldDescriptor(SAConnectorInstance.class, builder.getConnectorIdKey()));
+                new FieldDescriptor(SAConnectorInstance.class, keyProvider.getConnectorIdKey()));
         searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.CONNECTOR_DEFINITION_VERSION,
-                new FieldDescriptor(SAConnectorInstance.class, builder.getVersionKey()));
+                new FieldDescriptor(SAConnectorInstance.class, keyProvider.getVersionKey()));
         searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.CONTAINER_ID,
-                new FieldDescriptor(SAConnectorInstance.class, builder.getContainerIdKey()));
+                new FieldDescriptor(SAConnectorInstance.class, keyProvider.getContainerIdKey()));
         searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.CONTAINER_TYPE,
-                new FieldDescriptor(SAConnectorInstance.class, builder.getContainerTypeKey()));
-        searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.STATE, new FieldDescriptor(SAConnectorInstance.class, builder.getStateKey()));
+                new FieldDescriptor(SAConnectorInstance.class, keyProvider.getContainerTypeKey()));
+        searchEntityKeys.put(ArchiveConnectorInstancesSearchDescriptor.STATE, new FieldDescriptor(SAConnectorInstance.class, keyProvider.getStateKey()));
 
         archivedConnectorssAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> connectorFields = new HashSet<String>(2);
-        connectorFields.add(builder.getNameKey());
-        connectorFields.add(builder.getConnectorIdKey());
+        connectorFields.add(keyProvider.getNameKey());
+        connectorFields.add(keyProvider.getConnectorIdKey());
 
         archivedConnectorssAllFields.put(SAConnectorInstance.class, connectorFields);
     }

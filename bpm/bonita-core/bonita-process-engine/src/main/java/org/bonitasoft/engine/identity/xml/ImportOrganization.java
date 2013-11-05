@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
@@ -44,8 +45,9 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
-import org.bonitasoft.engine.identity.model.builder.UserUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -58,8 +60,6 @@ import org.bonitasoft.engine.xml.Parser;
 public class ImportOrganization implements TransactionContentWithResult<List<String>> {
 
     final IdentityService identityService;
-
-    final IdentityModelBuilder identityModelBuilder;
 
     private final Parser parser;
 
@@ -75,7 +75,6 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             throws OrganizationImportException {
         identityService = serviceAccessor.getIdentityService();
         this.organizationContent = organizationContent;
-        identityModelBuilder = serviceAccessor.getIdentityModelBuilder();
         parser = serviceAccessor.getParserFactgory().createParser(OrganizationNodeBuilder.BINDINGS);
         logger = serviceAccessor.getTechnicalLoggerService();
         warnings = new ArrayList<String>();
@@ -87,7 +86,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
                 strategy = new ImportOrganizationIgnoreDuplicatesStrategy();
                 break;
             case MERGE_DUPLICATES:
-                strategy = new ImportOrganizationMergeDuplicatesStrategy(identityService, identityModelBuilder);
+                strategy = new ImportOrganizationMergeDuplicatesStrategy(identityService);
                 break;
             default:
                 throw new OrganizationImportException("No import strategy found for " + policy);
@@ -251,7 +250,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
                 final SUser sUser = userNameToSUsers.get(user.getUserName());
                 final Long managerId = userNameToSUsers.get(managerUserName).getId();
                 if (managerId != null) {
-                    final UserUpdateBuilder userUpdateBuilder = identityModelBuilder.getUserUpdateBuilder();
+                    final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
                     identityService.updateUser(sUser, userUpdateBuilder.updateManagerUserId(managerId).done());
                 } else {
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
@@ -281,7 +280,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     private void addMembership(final UserMembership newMembership, final Long userId, final Long groupId, final Long roleId, final Long assignedBy)
             throws SUserMembershipCreationException {
         final long assignedDateAsLong = getAssignedDate(newMembership);
-        final SUserMembership sUserMembership = identityModelBuilder.getUserMembershipBuilder().createNewInstance(userId, groupId, roleId)
+        final SUserMembership sUserMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(userId, groupId, roleId)
                 .setAssignedBy(assignedBy).setAssignedDate(assignedDateAsLong).done();
         identityService.createUserMembership(sUserMembership);
     }
@@ -296,13 +295,13 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     }
 
     private SGroup addGroup(final GroupCreator creator) throws SGroupCreationException {
-        final SGroup sGroup = ModelConvertor.constructSGroup(creator, identityModelBuilder);
+        final SGroup sGroup = ModelConvertor.constructSGroup(creator);
         identityService.createGroup(sGroup);
         return sGroup;
     }
 
     private SRole addRole(final RoleCreator creator) throws SIdentityException {
-        final SRole sRole = ModelConvertor.constructSRole(creator, identityModelBuilder);
+        final SRole sRole = ModelConvertor.constructSRole(creator);
         identityService.createRole(sRole);
         return sRole;
     }
@@ -310,13 +309,13 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     private SUser addUser(final ExportedUser user) throws SUserCreationException {
         SUser sUser;
         if (user.isPasswordEncrypted()) {
-            sUser = identityService.createUserWithoutEncryptingPassword(ModelConvertor.constructSUser(user, identityModelBuilder));
+            sUser = identityService.createUserWithoutEncryptingPassword(ModelConvertor.constructSUser(user));
         } else {
-            sUser = identityService.createUser(ModelConvertor.constructSUser(user, identityModelBuilder));
+            sUser = identityService.createUser(ModelConvertor.constructSUser(user));
         }
-        final SContactInfo persoSContactInfo = ModelConvertor.constructSUserContactInfo(user, true, identityModelBuilder, sUser.getId());
+        final SContactInfo persoSContactInfo = ModelConvertor.constructSUserContactInfo(user, true, sUser.getId());
         identityService.createUserContactInfo(persoSContactInfo);
-        final SContactInfo professSContactInfo = ModelConvertor.constructSUserContactInfo(user, false, identityModelBuilder, sUser.getId());
+        final SContactInfo professSContactInfo = ModelConvertor.constructSUserContactInfo(user, false, sUser.getId());
         identityService.createUserContactInfo(professSContactInfo);
         return sUser;
     }

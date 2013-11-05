@@ -20,8 +20,6 @@ import org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping;
  */
 public interface SDataInstanceVisibilityMappingBuilder {
 
-    SDataInstanceVisibilityMappingBuilder createNewInstance(long containerId, String containerType, String dataName, long dataInstanceId);
-
     SDataInstanceVisibilityMapping done();
 
 }

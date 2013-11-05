@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance;
 
 /**
@@ -22,8 +21,5 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskIns
  */
 public interface SAManualTaskInstanceBuilder extends SAActivityInstanceBuilder {
 
-    SAManualTaskInstanceBuilder createNewManualTaskInstance(SManualTaskInstance sManualTaskInstance);
-
-    @Override
     SAManualTaskInstance done();
 }

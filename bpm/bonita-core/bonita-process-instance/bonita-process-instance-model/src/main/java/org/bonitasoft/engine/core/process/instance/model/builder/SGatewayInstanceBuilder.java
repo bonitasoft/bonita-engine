@@ -23,9 +23,6 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
  */
 public interface SGatewayInstanceBuilder extends SFlowNodeInstanceBuilder {
 
-    SGatewayInstanceBuilder createNewInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId, long parentContainerId,
-            final SGatewayType gatewayType, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
-
     SGatewayInstanceBuilder setStateId(final int stateId);
 
     SGatewayInstanceBuilder setGatewayType(final SGatewayType gatewayType);
@@ -36,9 +33,5 @@ public interface SGatewayInstanceBuilder extends SFlowNodeInstanceBuilder {
 
     @Override
     SGatewayInstance done();
-
-    String getGatewayTypeKey();
-
-    String getHitBysKey();
 
 }

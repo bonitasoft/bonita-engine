@@ -1,12 +1,12 @@
 package org.bonitasoft.engine.home;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Baptiste Mesta

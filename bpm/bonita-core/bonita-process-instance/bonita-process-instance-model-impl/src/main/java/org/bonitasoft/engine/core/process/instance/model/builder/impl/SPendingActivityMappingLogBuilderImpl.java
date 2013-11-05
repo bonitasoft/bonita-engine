@@ -33,19 +33,9 @@ public class SPendingActivityMappingLogBuilderImpl extends CRUDELogBuilder imple
     }
 
     @Override
-    public String getObjectIdKey() {
-        return "numericIndex2";
-    }
-
-    @Override
     public SPendingActivityMappingLogBuilder activityInstanceId(final long activityInstanceId) {
         queriableLogBuilder.numericIndex(0, activityInstanceId);
         return this;
-    }
-
-    @Override
-    public String getActivityInstanceIdKey() {
-        return "numericIndex1";
     }
 
     @Override

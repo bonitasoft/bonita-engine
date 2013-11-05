@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
 
 /**
@@ -22,8 +21,5 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTask
  */
 public interface SAAutomaticTaskInstanceBuilder extends SAActivityInstanceBuilder {
 
-    SAAutomaticTaskInstanceBuilder createNewAutomaticTaskInstance(SAutomaticTaskInstance sAutomaticTaskInstance);
-
-    @Override
     SAAutomaticTaskInstance done();
 }

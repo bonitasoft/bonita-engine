@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 
 /**
@@ -21,10 +20,6 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
  *
  */
 public class SCallableElementBinding extends SExpressionBinding {
-
-    public SCallableElementBinding(final SExpressionBuilders sExpressionBuilders) {
-        super(sExpressionBuilders);
-    }
 
     @Override
     public String getElementTag() {

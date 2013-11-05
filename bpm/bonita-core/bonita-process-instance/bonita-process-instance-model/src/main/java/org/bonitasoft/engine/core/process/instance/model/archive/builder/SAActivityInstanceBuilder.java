@@ -17,13 +17,7 @@ package org.bonitasoft.engine.core.process.instance.model.archive.builder;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SAActivityInstanceBuilder extends SAFlowNodeInstanceBuilder {
-
-    String getPriorityKey();
-
-    String getActivityInstanceIdKey();
-
-    String getAssigneeIdKey();
+public interface SAActivityInstanceBuilder {
 
     SAActivityInstanceBuilder setProcessDefinitionId(long processDefinitionId);
 

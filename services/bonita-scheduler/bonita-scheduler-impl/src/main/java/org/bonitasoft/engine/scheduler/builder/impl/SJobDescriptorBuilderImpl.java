@@ -19,26 +19,11 @@ import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
 
 public class SJobDescriptorBuilderImpl implements SJobDescriptorBuilder {
 
-    private static final String JOB_NAME = "jobName";
+    private final SJobDescriptorImpl entity;
 
-    private static final String JOB_CLASS_NAME = "jobClassName";
-
-    private static final String ID = "id";
-
-    private static final String DESCRIPTION = "description";
-
-    private SJobDescriptorImpl entity;
-
-    @Override
-    public SJobDescriptorBuilder createNewInstance(final String jobClassName, final String jobName, final boolean disallowConcurrentExecution) {
-        entity = new SJobDescriptorImpl(jobClassName, jobName, disallowConcurrentExecution);
-        return this;
-    }
-    
-    @Override
-    public SJobDescriptorBuilder createNewInstance(final String jobClassName, final String jobName) {
-        entity = new SJobDescriptorImpl(jobClassName, jobName, false);
-        return this;
+    public SJobDescriptorBuilderImpl(final SJobDescriptorImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
@@ -50,26 +35,6 @@ public class SJobDescriptorBuilderImpl implements SJobDescriptorBuilder {
     @Override
     public SJobDescriptor done() {
         return entity;
-    }
-
-    @Override
-    public String getIdKey() {
-        return ID;
-    }
-
-    @Override
-    public String getJobClassNameKey() {
-        return JOB_CLASS_NAME;
-    }
-
-    @Override
-    public String getJobNameKey() {
-        return JOB_NAME;
-    }
-
-    @Override
-    public String getDescriptionKey() {
-        return DESCRIPTION;
     }
 
 }

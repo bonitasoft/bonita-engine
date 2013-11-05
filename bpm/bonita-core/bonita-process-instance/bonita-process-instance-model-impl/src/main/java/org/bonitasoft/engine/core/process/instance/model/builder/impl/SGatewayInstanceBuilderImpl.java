@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 
 /**
@@ -25,26 +24,8 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceIm
  */
 public class SGatewayInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl implements SGatewayInstanceBuilder {
 
-    private static final String ID_KEY = "id";
-
-    private static final String NAME_KEY = "name";
-
-    private static final String STATE_ID_KEY = "stateId";
-
-    private static final String GATEWAY_TYPE_KEY = "gatewayType";
-
-    private static final String HITBYS = "hitBys";
-
-    private SGatewayInstanceImpl entity;
-
-    @Override
-    public SGatewayInstanceBuilder createNewInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final SGatewayType gatewayType, final long processDefinitionId, final long rootProcessInstanceId,
-            final long parentProcessInstanceId) {
-        entity = new SGatewayInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, gatewayType, processDefinitionId,
-                rootProcessInstanceId);
-        entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SGatewayInstanceBuilderImpl(final SGatewayInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
@@ -55,13 +36,13 @@ public class SGatewayInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl im
 
     @Override
     public SGatewayInstanceBuilder setGatewayType(final SGatewayType gatewayType) {
-        entity.setGatewayType(gatewayType);
+        ((SGatewayInstanceImpl)entity).setGatewayType(gatewayType);
         return this;
     }
 
     @Override
     public SGatewayInstanceBuilder setHitBys(final String hitBys) {
-        entity.setHitBys(hitBys);
+        ((SGatewayInstanceImpl)entity).setHitBys(hitBys);
         return this;
     }
 
@@ -79,55 +60,25 @@ public class SGatewayInstanceBuilderImpl extends SFlowNodeInstanceBuilderImpl im
 
     @Override
     public SGatewayInstanceBuilder setProcessDefinitionId(final long processDefinitionId) {
-        entity.setLogicalGroup(PROCESS_DEFINITION_INDEX, processDefinitionId);
+        entity.setLogicalGroup(SGatewayInstanceBuilderFactoryImpl.PROCESS_DEFINITION_INDEX, processDefinitionId);
         return this;
     }
 
     @Override
     public SGatewayInstanceBuilder setProcessInstanceId(final long processInstanceId) {
-        entity.setLogicalGroup(ROOT_PROCESS_INSTANCE_INDEX, processInstanceId);
+        entity.setLogicalGroup(SGatewayInstanceBuilderFactoryImpl.ROOT_PROCESS_INSTANCE_INDEX, processInstanceId);
         return this;
     }
 
     @Override
     public SGatewayInstance done() {
-        return entity;
-    }
-
-    @Override
-    public String getIdKey() {
-        return ID_KEY;
-    }
-
-    @Override
-    public String getNameKey() {
-        return NAME_KEY;
-    }
-
-    @Override
-    public String getStateIdKey() {
-        return STATE_ID_KEY;
-    }
-
-    @Override
-    public String getGatewayTypeKey() {
-        return GATEWAY_TYPE_KEY;
-    }
-
-    @Override
-    public String getHitBysKey() {
-        return HITBYS;
+        return (SGatewayInstance) entity;
     }
 
     @Override
     public SGatewayInstanceBuilder setParentActivityInstanceId(final long logicalGroup3) {
         entity.setLogicalGroup(2, logicalGroup3);
         return this;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return entity;
     }
 
 }

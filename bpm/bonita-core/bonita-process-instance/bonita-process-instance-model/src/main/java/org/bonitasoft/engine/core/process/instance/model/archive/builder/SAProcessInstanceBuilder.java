@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 
 /**
@@ -23,39 +22,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstan
  */
 public interface SAProcessInstanceBuilder {
 
-    /**
-     * create a new Server Archived Process Instance from a Server Process Instance
-     * the id is kept
-     * 
-     * @param processInstance
-     * @return
-     */
-    SAProcessInstanceBuilder createNewInstance(SProcessInstance processInstance);
-
     SAProcessInstance done();
-
-    String getArchiveDateKey();
-
-    String getProcessDefinitionIdKey();
-
-    String getIdKey();
-
-    String getSourceObjectIdKey();
-
-    String getEndDateKey();
-
-    String getStartDateKey();
-
-    String getLastUpdateKey();
-
-    String getStartedByKey();
-
-    String getStartedByDelegateKey();
-
-    String getStateIdKey();
-
-    String getNameKey();
-
-    String getCallerIdKey();
 
 }

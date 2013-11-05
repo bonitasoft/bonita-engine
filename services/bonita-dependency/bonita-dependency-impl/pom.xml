@@ -18,6 +18,11 @@
 			<artifactId>bonita-dependency-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 		  <groupId>org.bonitasoft.engine.classloader</groupId>
       <artifactId>bonita-classloader-api</artifactId>

@@ -19,6 +19,7 @@ import org.bonitasoft.engine.api.impl.transaction.identity.UpdateUser;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.Logout;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -26,8 +27,8 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
-import org.bonitasoft.engine.identity.model.builder.UserUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.LogoutException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -93,10 +94,9 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(localTenantId);
         final LoginService loginService = serviceAccessor.getLoginService();
         final IdentityService identityService = serviceAccessor.getIdentityService();
-        final IdentityModelBuilder identityModelBuilder = serviceAccessor.getIdentityModelBuilder();
         final TransactionExecutor tenantTransactionExecutor = serviceAccessor.getTransactionExecutor();
 
-        final LoginAndRetrieveUser txContent = new LoginAndRetrieveUser(loginService, identityService, identityModelBuilder, localTenantId, userName, password);
+        final LoginAndRetrieveUser txContent = new LoginAndRetrieveUser(loginService, identityService, localTenantId, userName, password);
         try {
             tenantTransactionExecutor.execute(txContent);
         } catch (final BonitaRuntimeException e) {
@@ -118,15 +118,12 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
         private final String password;
 
-        private final IdentityModelBuilder identityModelBuilder;
-
         private SSession session;
 
-        public LoginAndRetrieveUser(final LoginService loginService, final IdentityService identityService, final IdentityModelBuilder identityModelBuilder,
+        public LoginAndRetrieveUser(final LoginService loginService, final IdentityService identityService,
                 final long tenantId, final String userName, final String password) {
             this.loginService = loginService;
             this.identityService = identityService;
-            this.identityModelBuilder = identityModelBuilder;
             this.tenantId = tenantId;
             this.userName = userName;
             this.password = password;
@@ -150,10 +147,10 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                     if (!sUser.isEnabled()) {
                         throw new LoginException("Unable to login: the user is disable");
                     }
-                    final UserUpdateBuilder userUpdateBuilder = identityModelBuilder.getUserUpdateBuilder();
+                    final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
                     final long lastConnection = System.currentTimeMillis();
                     final EntityUpdateDescriptor updateDescriptor = userUpdateBuilder.updateLastConnection(lastConnection).done();
-                    final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null, null);
+                    final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null);
                     updateUser.execute();
                 }
             } catch (final Exception e) {

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -32,13 +33,13 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModifi
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayReadException;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -64,21 +65,21 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private final ReadPersistenceService persistenceRead;
 
-    private final SGatewayInstanceBuilder sGatewayInstanceBuilder;
+    private final SGatewayInstanceBuilderFactory sGatewayInstanceBuilderFactory;
 
     private final TokenService tokenService;
 
     private final TechnicalLoggerService logger;
 
     public GatewayInstanceServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
-            final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger,
+            final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger,
             final TokenService tokenService) {
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceRead = persistenceRead;
         this.logger = logger;
         this.tokenService = tokenService;
-        sGatewayInstanceBuilder = instanceBuilders.getSGatewayInstanceBuilder();
+        sGatewayInstanceBuilderFactory = BuilderFactory.get(SGatewayInstanceBuilderFactory.class);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         final InsertRecord insertRecord = new InsertRecord(gatewayInstance);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(GATEWAYINSTANCE, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) eventService.getEventBuilder().createInsertEvent(GATEWAYINSTANCE).setObject(gatewayInstance).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(GATEWAYINSTANCE).setObject(gatewayInstance).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -179,7 +180,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public void setState(final SGatewayInstance gatewayInstance, final int stateId) throws SGatewayModificationException {
-        updateOneColum(gatewayInstance, sGatewayInstanceBuilder.getStateIdKey(), stateId, GATEWAYINSTANCE_STATE);
+        updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getStateIdKey(), stateId, GATEWAYINSTANCE_STATE);
     }
 
     @Override
@@ -191,7 +192,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         } else {
             columnValue = hitBys + "," + String.valueOf(transitionIndex);
         }
-        updateOneColum(gatewayInstance, sGatewayInstanceBuilder.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
+        updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
 
     private void updateOneColum(final SGatewayInstance gatewayInstance, final String columnName, final Serializable columnValue, final String event)
@@ -203,7 +204,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(event, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(event).setObject(gatewayInstance).done();
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(event).setObject(gatewayInstance).done();
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -231,7 +232,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     @Override
     public void setFinish(final SGatewayInstance gatewayInstance) throws SGatewayModificationException {
         final String columnValue = FINISH + gatewayInstance.getHitBys().split(",").length;
-        updateOneColum(gatewayInstance, sGatewayInstanceBuilder.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
+        updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
 
     @Override

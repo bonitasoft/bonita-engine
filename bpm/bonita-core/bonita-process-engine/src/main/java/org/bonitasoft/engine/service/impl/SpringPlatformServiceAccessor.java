@@ -23,15 +23,10 @@ import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilderAccessor;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -49,8 +44,6 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
  */
 public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
-    private SPlatformBuilder platformBuilder;
-
     private PlatformService platformService;
 
     private PlatformLoginService platformLoginService;
@@ -61,11 +54,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     private TransactionService transactionService;
 
-    private STenantBuilder tenantBuilder;
-
     private IdentityService identityService;
-
-    private IdentityModelBuilder identityModelBuilder;
 
     private TransactionExecutor transactionExecutor;
 
@@ -75,11 +64,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
 
     private DependencyService dependencyService;
 
-    private DependencyBuilderAccessor dependencyBuilderAccessor;
-
     private PlatformCommandService platformCommandService;
-
-    private SPlatformCommandBuilderAccessor platformCommandBuilderAccessor;
 
     private PlatformSessionService platformSessionService;
 
@@ -132,35 +117,11 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public SPlatformBuilder getSPlatformBuilder() {
-        if (platformBuilder == null) {
-            platformBuilder = SpringPlatformFileSystemBeanAccessor.getService(SPlatformBuilder.class);
-        }
-        return platformBuilder;
-    }
-
-    @Override
-    public STenantBuilder getSTenantBuilder() {
-        if (tenantBuilder == null) {
-            tenantBuilder = SpringPlatformFileSystemBeanAccessor.getService(STenantBuilder.class);
-        }
-        return tenantBuilder;
-    }
-
-    @Override
     public IdentityService getIdentityService() {
         if (identityService == null) {
             identityService = SpringPlatformFileSystemBeanAccessor.getService(IdentityService.class);
         }
         return identityService;
-    }
-
-    @Override
-    public IdentityModelBuilder getIdentityModelBuilder() {
-        if (identityModelBuilder == null) {
-            identityModelBuilder = SpringPlatformFileSystemBeanAccessor.getService(IdentityModelBuilder.class);
-        }
-        return identityModelBuilder;
     }
 
     @Override
@@ -201,28 +162,11 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public DependencyBuilderAccessor getDependencyBuilderAccessor() {
-        if (dependencyBuilderAccessor == null) {
-            dependencyBuilderAccessor = SpringPlatformFileSystemBeanAccessor.getService("platformDependencyBuilderAccessor", DependencyBuilderAccessor.class);
-        }
-        return dependencyBuilderAccessor;
-    }
-
-    @Override
     public PlatformCommandService getPlatformCommandService() {
         if (platformCommandService == null) {
             platformCommandService = SpringPlatformFileSystemBeanAccessor.getService("platformCommandService", PlatformCommandService.class);
         }
         return platformCommandService;
-    }
-
-    @Override
-    public SPlatformCommandBuilderAccessor getSPlatformCommandBuilderAccessor() {
-        if (platformCommandBuilderAccessor == null) {
-            platformCommandBuilderAccessor = SpringPlatformFileSystemBeanAccessor.getService("platformCommandBuilderAccessor",
-                    SPlatformCommandBuilderAccessor.class);
-        }
-        return platformCommandBuilderAccessor;
     }
 
     @Override

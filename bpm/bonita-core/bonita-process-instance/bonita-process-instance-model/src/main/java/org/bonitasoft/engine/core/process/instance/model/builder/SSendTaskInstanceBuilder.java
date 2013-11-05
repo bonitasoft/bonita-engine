@@ -19,7 +19,4 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
  */
 public interface SSendTaskInstanceBuilder extends SActivityInstanceBuilder {
 
-    SSendTaskInstanceBuilder createNewSendTaskInstance(final String name, long flowNodeDefinitionId, final long rootContainerId, long parentContainerId,
-            long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
-
 }

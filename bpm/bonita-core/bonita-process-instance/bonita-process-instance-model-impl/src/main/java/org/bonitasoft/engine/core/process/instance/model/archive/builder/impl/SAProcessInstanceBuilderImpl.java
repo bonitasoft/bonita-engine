@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
@@ -26,101 +25,16 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessI
  */
 public class SAProcessInstanceBuilderImpl implements SAProcessInstanceBuilder {
 
-    private static final String ARCHIVE_DATE_KEY = "archiveDate";
+    private final SAProcessInstanceImpl entity;
 
-    private static final String ID_KEY = "id";
-
-    private static final String NAME_KEY = "name";
-
-    private static final String PROCESSDEF_ID_KEY = "processDefinitionId";
-
-    private static final String STATE_ID_KEY = "stateId";
-
-    private static final String SOURCE_OBJECT_ID_KEY = "sourceObjectId";
-
-    private static final String CALLER_ID = "callerId";
-
-    private final String END_DATE_KEY = "endDate";
-
-    private final String STARTED_BY_KEY = "startedBy";
-
-    private final String STARTED_BY_DELEGATE_KEY = "startedByDelegate";
-
-    private final String START_DATE_KEY = "startDate";
-
-    private final String LAST_UPDATE_KEY = "lastUpdate";
-
-    private SAProcessInstanceImpl entity;
-
-    @Override
-    public SAProcessInstanceBuilder createNewInstance(final SProcessInstance processInstance) {
-        entity = new SAProcessInstanceImpl(processInstance);
-        return this;
+    public SAProcessInstanceBuilderImpl(final SAProcessInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
     public SAProcessInstance done() {
         return entity;
-    }
-
-    @Override
-    public String getArchiveDateKey() {
-        return ARCHIVE_DATE_KEY;
-    }
-
-    @Override
-    public String getProcessDefinitionIdKey() {
-        return PROCESSDEF_ID_KEY;
-    }
-
-    @Override
-    public String getIdKey() {
-        return ID_KEY;
-    }
-
-    @Override
-    public String getSourceObjectIdKey() {
-        return SOURCE_OBJECT_ID_KEY;
-    }
-
-    @Override
-    public String getEndDateKey() {
-        return END_DATE_KEY;
-    }
-
-    @Override
-    public String getStartDateKey() {
-        return START_DATE_KEY;
-    }
-
-    @Override
-    public String getLastUpdateKey() {
-        return LAST_UPDATE_KEY;
-    }
-
-    @Override
-    public String getStartedByKey() {
-        return STARTED_BY_KEY;
-    }
-
-    @Override
-    public String getStartedByDelegateKey() {
-        return STARTED_BY_DELEGATE_KEY;
-    }
-
-    @Override
-    public String getStateIdKey() {
-        return STATE_ID_KEY;
-    }
-
-    @Override
-    public String getNameKey() {
-        return NAME_KEY;
-    }
-
-    @Override
-    public String getCallerIdKey() {
-        return CALLER_ID;
     }
 
 }

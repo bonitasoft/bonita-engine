@@ -20,8 +20,6 @@ import org.bonitasoft.engine.platform.model.STenant;
  */
 public interface STenantBuilder {
 
-    STenantBuilder createNewInstance(String name, String createdBy, long created, String status, boolean defaultTenant);
-
     STenantBuilder setDescription(String description);
 
     STenantBuilder setIconName(String iconName);
@@ -31,23 +29,4 @@ public interface STenantBuilder {
     STenantBuilder setDefaultTenant(boolean defaultTenant);
 
     STenant done();
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getDescriptionKey();
-
-    String getCreatedKey();
-
-    String getCreatedByKey();
-
-    String getIconNameKey();
-
-    String getIconPathKey();
-
-    String getStatusKey();
-
-    String getDefaultTenantKey();
-
 }

@@ -18,7 +18,6 @@ import org.bonitasoft.engine.core.process.definition.model.SStandardLoopCharacte
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Matthieu Chaffotte
@@ -47,13 +46,13 @@ public class SStandardLoopCharacteristicsImpl implements SStandardLoopCharacteri
         this.loopMax = loopMax;
     }
 
-    public SStandardLoopCharacteristicsImpl(final StandardLoopCharacteristics loopCharacteristics, final SExpressionBuilders sExpressionBuilders) {
+    public SStandardLoopCharacteristicsImpl(final StandardLoopCharacteristics loopCharacteristics) {
         super();
         testBefore = loopCharacteristics.isTestBefore();
         final Expression loopMaxExpression = loopCharacteristics.getLoopMax();
-        loopMax = ServerModelConvertor.convertExpression(sExpressionBuilders, loopMaxExpression);
+        loopMax = ServerModelConvertor.convertExpression(loopMaxExpression);
         final Expression condition = loopCharacteristics.getLoopCondition();
-        loopCondition = ServerModelConvertor.convertExpression(sExpressionBuilders, condition);
+        loopCondition = ServerModelConvertor.convertExpression(condition);
 
     }
 

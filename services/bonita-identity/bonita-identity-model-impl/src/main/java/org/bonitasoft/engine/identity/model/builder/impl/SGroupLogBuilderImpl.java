@@ -27,19 +27,10 @@ public class SGroupLogBuilderImpl extends CRUDELogBuilder implements SGroupLogBu
 
     private static final String PREFIX = "IDENTITY_GROUP";
 
-    public static final int GROUP_INDEX = 2;
-
-    public static final String GROUP_INDEX_NAME = "numericIndex3";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(GROUP_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SGroupLogBuilderFactoryImpl.GROUP_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return GROUP_INDEX_NAME;
     }
 
     @Override
@@ -49,7 +40,7 @@ public class SGroupLogBuilderImpl extends CRUDELogBuilder implements SGroupLogBu
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(GROUP_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SGroupLogBuilderFactoryImpl.GROUP_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Identity Group Id");
         }
     }

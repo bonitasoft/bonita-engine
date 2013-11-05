@@ -34,22 +34,12 @@ public class SDocumentMappingLogBuilderImpl extends CRUDELogBuilder implements S
     }
 
     @Override
-    public String getObjectIdKey() {
-        return SDocumentMappingLogIndexesMapper.DOCUMENTMAPPING_INDEX_NAME;
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return PREFIX;
     }
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-    }
-
-    @Override
-    public String getProcessInstanceIdKey() {
-        return SDocumentMappingLogIndexesMapper.DOCUMENTMAPPING_INDEX_PROC_INSTANCE_ID_NAME;
     }
 
     @Override

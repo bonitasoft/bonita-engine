@@ -25,17 +25,10 @@ public class SDataInstanceLogBuilderImpl extends CRUDELogBuilder implements SDat
 
     private static int DATA_INSTANCE_INDEX = 0;
 
-    private static String DATA_INSTANCE_INDEX_NAME = "numericIndex1";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
         queriableLogBuilder.numericIndex(DATA_INSTANCE_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return DATA_INSTANCE_INDEX_NAME;
     }
 
     @Override

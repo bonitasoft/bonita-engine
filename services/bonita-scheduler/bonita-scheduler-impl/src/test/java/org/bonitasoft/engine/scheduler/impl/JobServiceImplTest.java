@@ -28,7 +28,6 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.Recorder;
-import org.bonitasoft.engine.scheduler.builder.SSchedulerBuilderAccessor;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogNotFoundException;
@@ -52,9 +51,6 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class JobServiceImplTest {
-
-    @Mock
-    private SSchedulerBuilderAccessor builderAccessor;
 
     @Mock
     private EventService eventService;

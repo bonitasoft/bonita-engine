@@ -17,14 +17,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -34,7 +33,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -61,15 +59,6 @@ public class ConnectorInstanceServiceImplTest {
     private Recorder recorder;
 
     @Mock
-    private BPMInstanceBuilders instanceBuilders;
-    
-    @Mock
-    private SConnectorInstanceWithFailureInfoBuilder connectorWithFailureKeyProvider;
-
-    @Mock(answer = Answers.RETURNS_MOCKS)
-    private SConnectorInstanceLogBuilder connectorInstanceLogBuilder;
-
-    @Mock
     private EventService eventService;
 
     @Mock
@@ -83,9 +72,9 @@ public class ConnectorInstanceServiceImplTest {
     
     @Before
     public void setUp() {
-        when(instanceBuilders.getSConnectorInstanceWithFailureInfoBuilder()).thenReturn(connectorWithFailureKeyProvider);
-        when(connectorWithFailureKeyProvider.getExceptionMessageKey()).thenReturn(EXCEPTION_MESSAGE);
-        when(connectorWithFailureKeyProvider.getStackTraceKey()).thenReturn(STACK_TRACE);
+        SConnectorInstanceWithFailureInfoBuilderFactory fact = mock(SConnectorInstanceWithFailureInfoBuilderFactory.class);
+        when(fact.getExceptionMessageKey()).thenReturn(EXCEPTION_MESSAGE);
+        when(fact.getStackTraceKey()).thenReturn(STACK_TRACE);
     }
 
     @Test

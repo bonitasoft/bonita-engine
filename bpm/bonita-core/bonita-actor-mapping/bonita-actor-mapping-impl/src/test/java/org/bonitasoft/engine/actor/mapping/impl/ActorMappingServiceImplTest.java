@@ -44,8 +44,9 @@ import org.bonitasoft.engine.actor.mapping.SActorUpdateException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilder;
-import org.bonitasoft.engine.actor.mapping.model.impl.SActorUpdateBuilderImpl;
+import org.bonitasoft.engine.actor.mapping.model.SActorUpdateBuilderFactory;
 import org.bonitasoft.engine.actor.mapping.persistence.SelectDescriptorBuilder;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -480,7 +481,7 @@ public class ActorMappingServiceImplTest {
         final SActor sActor = mock(SActor.class);
         doReturn(3L).when(sActor).getId();
 
-        final SActorUpdateBuilder sActorUpdateBuilder = new SActorUpdateBuilderImpl();
+        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();
         sActorUpdateBuilder.updateDescription("newDescription");
         sActorUpdateBuilder.updateDisplayName("newDisplayName");
 
@@ -495,7 +496,7 @@ public class ActorMappingServiceImplTest {
 
     @Test(expected = SActorNotFoundException.class)
     public final void updateActorNotExists() throws SActorUpdateException, SActorNotFoundException, SBonitaReadException {
-        final SActorUpdateBuilder sActorUpdateBuilder = new SActorUpdateBuilderImpl();
+        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();;
         doReturn(null).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<SActor>> any());
 
         actorMappingServiceImpl.updateActor(4, sActorUpdateBuilder.done());
@@ -506,7 +507,7 @@ public class ActorMappingServiceImplTest {
         final SActor sActor = mock(SActor.class);
         doReturn(3L).when(sActor).getId();
 
-        final SActorUpdateBuilder sActorUpdateBuilder = new SActorUpdateBuilderImpl();
+        final SActorUpdateBuilder sActorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();
         sActorUpdateBuilder.updateDescription("newDescription");
         sActorUpdateBuilder.updateDisplayName("newDisplayName");
 

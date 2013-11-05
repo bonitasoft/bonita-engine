@@ -14,27 +14,12 @@
 package org.bonitasoft.engine.core.process.instance.model.builder.event.handling;
 
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public interface SMessageInstanceBuilder extends SCorrelationContainerBuilder {
 
-    SMessageInstanceBuilder createNewInstance(final SThrowMessageEventTriggerInstance throwMessage, long processDefinitionId, String flowNodeName);
-
-    SMessageInstanceBuilder createNewInstance(final SMessageInstance message);
-
     SMessageInstance done();
-
-    String getTargetProcessKey();
-
-    String getTargetFlowNodeKey();
-
-    String getMessageNameKey();
-
-    String getLockedKey();
-
-    String getHandledKey();
 
 }

@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.jobs.BPMEventHandlingJob;
@@ -29,6 +30,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -88,7 +90,7 @@ public final class ActivateTenant implements TransactionContent {
         final String jobClassName = BPMEventHandlingJob.class.getName();
         if (schedulerService.isStarted()) {
             if (plaformConfiguration.shouldStartEventHandlingJob()) {
-                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, BPM_EVENT_HANDLING, true)
+                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(jobClassName, BPM_EVENT_HANDLING, true)
                         .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final String cron = plaformConfiguration.getEventHandlingJobCron(); //
@@ -110,7 +112,7 @@ public final class ActivateTenant implements TransactionContent {
         if (schedulerService.isStarted()) {
             final String cron = plaformConfiguration.getCleanInvalidSessionsJobCron();
             if (!cron.equalsIgnoreCase("none")) {
-                final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder().createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
+                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
                         .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);

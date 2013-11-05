@@ -18,11 +18,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -39,21 +40,18 @@ public class GetNumberOfArchivedProcessInstance implements TransactionContentWit
 
     private final SearchEntitiesDescriptor searchEntitiesDescriptor;
 
-    private final SAProcessInstanceBuilder saProcessInstanceBuilder;
-
     private long number;
 
-    public GetNumberOfArchivedProcessInstance(final ProcessInstanceService processInstanceService, final SearchEntitiesDescriptor searchEntitiesDescriptor,
-            final SAProcessInstanceBuilder saProcessInstanceBuilder) {
+    public GetNumberOfArchivedProcessInstance(final ProcessInstanceService processInstanceService, final SearchEntitiesDescriptor searchEntitiesDescriptor) {
         this.processInstanceService = processInstanceService;
         this.searchEntitiesDescriptor = searchEntitiesDescriptor;
-        this.saProcessInstanceBuilder = saProcessInstanceBuilder;
     }
 
     @Override
     public void execute() throws SBonitaException {
         final SearchArchivedProcessInstances searchProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
                 searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), null);
+        final SAProcessInstanceBuilderFactory saProcessInstanceBuilder = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
         final List<FilterOption> filterOptions = new ArrayList<FilterOption>(2);
         filterOptions.add(new FilterOption(SAProcessInstance.class, saProcessInstanceBuilder.getStateIdKey(), ProcessInstanceState.COMPLETED.getId()));
         filterOptions.add(new FilterOption(SAProcessInstance.class, saProcessInstanceBuilder.getCallerIdKey(), -1));

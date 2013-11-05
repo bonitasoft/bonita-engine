@@ -25,13 +25,13 @@ import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
  */
 public class SExpressionBuilderImpl implements SExpressionBuilder {
 
-    private SExpressionImpl expression;
+    private final SExpressionImpl expression;
 
-    @Override
-    public SExpressionBuilder createNewInstance() {
-        expression = new SExpressionImpl();
-        return this;
+    public SExpressionBuilderImpl(final SExpressionImpl expression) {
+        super();
+        this.expression = expression;
     }
+
 
     @Override
     public SExpression done() throws SInvalidExpressionException {

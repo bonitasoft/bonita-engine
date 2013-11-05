@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.data.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping;
+import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceVisibilityMappingBuilder;
 import org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl;
-import org.bonitasoft.engine.data.instance.model.builder.SADataInstanceVisibilityMappingBuilder;
 
 /**
  * @author Baptiste Mesta
@@ -24,22 +24,9 @@ public class SADataInstanceVisibilityMappingBuilderImpl implements SADataInstanc
 
     private final SADataInstanceVisibilityMappingImpl entity;
 
-    
-    private SADataInstanceVisibilityMappingBuilderImpl(final SADataInstanceVisibilityMappingImpl entity) {
+    public SADataInstanceVisibilityMappingBuilderImpl(final SADataInstanceVisibilityMappingImpl entity) {
         super();
         this.entity = entity;
-    }
-
-    public SADataInstanceVisibilityMappingBuilderImpl() {
-        this.entity = null;
-    }
-
-    @Override
-    public SADataInstanceVisibilityMappingBuilder createNewInstance(final long containerId, final String containerType, final String dataName,
-            final long dataInstanceId, final long sourceObjectId) {
-        final SADataInstanceVisibilityMappingImpl entity = new SADataInstanceVisibilityMappingImpl(containerId, containerType, dataName, dataInstanceId, sourceObjectId);
-        final SADataInstanceVisibilityMappingBuilder builder = new SADataInstanceVisibilityMappingBuilderImpl(entity);
-        return builder;
     }
 
     @Override

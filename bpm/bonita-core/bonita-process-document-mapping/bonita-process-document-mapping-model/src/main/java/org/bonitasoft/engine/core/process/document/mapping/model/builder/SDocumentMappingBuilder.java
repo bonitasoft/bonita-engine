@@ -21,30 +21,6 @@ import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMappin
  */
 public interface SDocumentMappingBuilder {
 
-    String getIdKey();
-
-    String getProcessInstanceIdKey();
-
-    String getDocumentNameKey();
-
-    String getDocumentAuthorKey();
-
-    String getDocumentCreationDateKey();
-
-    String getDocumentHasContent();
-
-    String getDocumentContentFileNameKey();
-
-    String getDocumentContentMimeTypeKey();
-
-    String geContentStorageIdKey();
-
-    String getDocumentURLKey();
-
-    SDocumentMappingBuilder createNewInstance();
-
-    SDocumentMappingBuilder createNewInstance(SDocumentMapping documentMapping);
-
     SDocumentMappingBuilder setProcessInstanceId(final long processInstanceId);
 
     SDocumentMappingBuilder setDocumentName(String documentName);

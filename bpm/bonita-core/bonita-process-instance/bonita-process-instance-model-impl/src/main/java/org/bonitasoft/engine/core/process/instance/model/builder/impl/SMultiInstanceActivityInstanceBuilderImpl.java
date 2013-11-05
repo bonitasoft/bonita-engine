@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl;
 
 /**
@@ -24,70 +23,37 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActi
  */
 public class SMultiInstanceActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SMultiInstanceActivityInstanceBuilder {
 
-    private SMultiInstanceActivityInstanceImpl entity;
-
-    @Override
-    public SMultiInstanceActivityInstanceBuilder createNewOuterTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId,
-            final boolean isSequential) {
-        entity = new SMultiInstanceActivityInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
-                rootProcessInstanceId, isSequential);
-        entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SMultiInstanceActivityInstanceBuilderImpl(final SMultiInstanceActivityInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SMultiInstanceActivityInstance done() {
-        return entity;
+        return (SMultiInstanceActivityInstance) entity;
     }
 
     @Override
     public SMultiInstanceActivityInstanceBuilder setLoopDataInputRef(final String loopDataInputRef) {
-        entity.setLoopDataInputRef(loopDataInputRef);
+        ((SMultiInstanceActivityInstanceImpl) entity).setLoopDataInputRef(loopDataInputRef);
         return this;
     }
 
     @Override
     public SMultiInstanceActivityInstanceBuilder setLoopDataOutputRef(final String loopDataOutputRef) {
-        entity.setLoopDataOutputRef(loopDataOutputRef);
+        ((SMultiInstanceActivityInstanceImpl) entity).setLoopDataOutputRef(loopDataOutputRef);
         return this;
     }
 
     @Override
     public SMultiInstanceActivityInstanceBuilder setDataInputItemRef(final String dataInputItemRef) {
-        entity.setDataInputItemRef(dataInputItemRef);
+        ((SMultiInstanceActivityInstanceImpl) entity).setDataInputItemRef(dataInputItemRef);
         return this;
     }
 
     @Override
     public SMultiInstanceActivityInstanceBuilder setDataOutputItemRef(final String dataOutputItemRef) {
-        entity.setDataOutputItemRef(dataOutputItemRef);
+        ((SMultiInstanceActivityInstanceImpl) entity).setDataOutputItemRef(dataOutputItemRef);
         return this;
-    }
-
-    @Override
-    public String getLoopCardinalityKey() {
-        return "loopCardinality";
-    }
-
-    @Override
-    public String getNumberOfActiveInstancesKey() {
-        return "numberOfActiveInstances";
-    }
-
-    @Override
-    public String getNumberOfCompletedInstancesKey() {
-        return "numberOfCompletedInstances";
-    }
-
-    @Override
-    public String getNumberOfTerminatedInstancesKey() {
-        return "numberOfTerminatedInstances";
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return entity;
     }
 
 }

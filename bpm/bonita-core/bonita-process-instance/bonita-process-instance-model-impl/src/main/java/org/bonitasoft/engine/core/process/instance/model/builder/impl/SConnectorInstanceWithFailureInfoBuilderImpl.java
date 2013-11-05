@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceWithFailureInfoBuilder;
+import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
 
 
 /**
@@ -22,14 +23,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInsta
  */
 public class SConnectorInstanceWithFailureInfoBuilderImpl extends SConnectorInstanceBuilderImpl implements SConnectorInstanceWithFailureInfoBuilder {
 
-    @Override
-    public String getExceptionMessageKey() {
-        return "exceptionMessage";
+    public SConnectorInstanceWithFailureInfoBuilderImpl(final SConnectorInstanceImpl entity) {
+        super(entity);
     }
-
-    @Override
-    public String getStackTraceKey() {
-        return "stackTrace";
-    }
-
+    
 }

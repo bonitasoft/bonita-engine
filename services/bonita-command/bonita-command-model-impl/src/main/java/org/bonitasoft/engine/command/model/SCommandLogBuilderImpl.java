@@ -30,11 +30,6 @@ public class SCommandLogBuilderImpl extends CRUDELogBuilder implements SCommandL
     }
 
     @Override
-    public String getObjectIdKey() {
-        return SCommandLogIndexesMapper.COMMAND_INDEX_NAME;
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return "COMMAND";
     }

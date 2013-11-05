@@ -42,6 +42,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.io.IOUtils;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.document.CmisUserProvider;
 import org.bonitasoft.engine.document.DocumentService;
 import org.bonitasoft.engine.document.SDocumentDeletionException;
@@ -50,7 +51,7 @@ import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.document.SDocumentStorageException;
 import org.bonitasoft.engine.document.model.SDocument;
 import org.bonitasoft.engine.document.model.SDocumentBuilder;
-import org.bonitasoft.engine.document.model.SDocumentBuilders;
+import org.bonitasoft.engine.document.model.SDocumentBuilderFactory;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -79,8 +80,6 @@ public class CMISDocumentServiceImpl implements DocumentService {
      */
     private final Map<String, Session> sessionsMap = new HashMap<String, Session>();
 
-    private final SDocumentBuilders documentBuilders;
-
     private static final String ROOT_PATH = "/";
 
     private static String rootFolderId = null;
@@ -96,7 +95,7 @@ public class CMISDocumentServiceImpl implements DocumentService {
      * @throws SessionNotFoundException
      */
     public CMISDocumentServiceImpl(final SessionAccessor sessionAccessor, final SessionService sessionService, final String cmisServerUrl,
-            final String repositoryId, final CmisUserProvider cmisUserProvider, final SDocumentBuilders documentBuilders) {
+            final String repositoryId, final CmisUserProvider cmisUserProvider) {
         super();
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
@@ -104,7 +103,6 @@ public class CMISDocumentServiceImpl implements DocumentService {
         this.repositoryId = repositoryId;
         this.cmisUserProvider = cmisUserProvider;
         // FIXME cmisUserProvider no more usefull (was here only to have bonita authors on xcmis)
-        this.documentBuilders = documentBuilders;
 
         final AuthAwareCookieManager cm = new AuthAwareCookieManager(null, java.net.CookiePolicy.ACCEPT_ALL);
         java.net.CookieHandler.setDefault(cm);
@@ -298,7 +296,7 @@ public class CMISDocumentServiceImpl implements DocumentService {
     }
 
     private SDocument toSDocument(final Document document) {
-        final SDocumentBuilder docBuilder = documentBuilders.getSDocumentBuilder().createNewInstance();
+        final SDocumentBuilder docBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
         docBuilder.setAuthor(Long.valueOf(document.getCreatedBy()));
         docBuilder.setCreationDate(convertDate(document.getCreationDate()));
         docBuilder.setContentMimeType(document.getContentStreamMimeType());

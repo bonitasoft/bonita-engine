@@ -29,10 +29,4 @@ public interface SUserMembershipLogBuilder extends HasCRUDEAction, SPersistenceL
 
     SUserMembershipLogBuilder identityUserId(final long userId);
 
-    String getRoleNameKey();
-
-    String getGroupPathKey();
-
-    String getIdentityUserNameKey();
-
 }

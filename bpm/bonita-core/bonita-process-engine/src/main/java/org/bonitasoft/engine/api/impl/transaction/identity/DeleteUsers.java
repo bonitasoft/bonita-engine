@@ -19,6 +19,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorMemberDeletionException;
 import org.bonitasoft.engine.actor.mapping.SActorMemberNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -27,7 +28,7 @@ import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
+import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 
 /**
@@ -44,18 +45,15 @@ public class DeleteUsers extends DeleteWithActorMembers implements TransactionCo
 
     private final ProfileService profileService;
 
-    private final SProfileBuilderAccessor profileBuilderAccessor;
-
     private final List<Long> userIds;
 
     public DeleteUsers(final IdentityService identityService, final ActorMappingService actorMappingService, final ProfileService profileService,
-            final SProfileBuilderAccessor profileBuilderAccessor, final List<Long> userIds) {
+            final List<Long> userIds) {
         super();
         this.identityService = identityService;
         this.actorMappingService = actorMappingService;
         this.userIds = userIds;
         this.profileService = profileService;
-        this.profileBuilderAccessor = profileBuilderAccessor;
     }
 
     @Override
@@ -76,7 +74,7 @@ public class DeleteUsers extends DeleteWithActorMembers implements TransactionCo
     }
 
     private void deleteProfileMembers(final Long userId) throws SBonitaException {
-        final String field = profileBuilderAccessor.getSProfileMemberBuilder().getIdKey();
+        final String field = BuilderFactory.get(SProfileMemberBuilderFactory.class).getIdKey();
         final int numberOfElements = 1000;
         List<SProfileMember> profileMembers;
         do {

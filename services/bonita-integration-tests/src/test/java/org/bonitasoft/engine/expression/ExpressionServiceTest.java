@@ -14,21 +14,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -41,10 +43,6 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
 
     protected static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.emptyMap();
 
-    private static SDataDefinitionBuilders dataDefinitionBuilders;
-
-    private static SDataInstanceBuilders dataInstanceBuilders;
-
     private static DataInstanceService dataInstanceService;
 
     private static ExpressionService expressionService;
@@ -54,24 +52,12 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
     static {
         expressionService = getServicesBuilder().buildExpressionService();
         dataInstanceService = getServicesBuilder().buildDataInstanceService();
-        dataInstanceBuilders = getServicesBuilder().builderSDataInstanceBuilder();
-        dataDefinitionBuilders = getServicesBuilder().builderSDataDefinitionBuilders();
         cacheService = getServicesBuilder().buildCacheService();
     }
 
     @Override
     protected synchronized ExpressionService getExpressionService() {
         return expressionService;
-    }
-
-    @Override
-    protected SDataDefinitionBuilders getSDataDefinitionBuilders() {
-        return dataDefinitionBuilders;
-    }
-
-    @Override
-    protected SDataInstanceBuilders getSDataInstanceBuilders() {
-        return dataInstanceBuilders;
     }
 
     @Override
@@ -325,7 +311,7 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         SExpression expression = null;
         if (content != null) {
             // create expression
-            final SExpressionBuilder expreBuilder = sExpressionBuilders.getExpressionBuilder().createNewInstance();
+            final SExpressionBuilder expreBuilder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
             // this discrimination'll be changed.
             expreBuilder.setContent(content).setExpressionType(SExpression.TYPE_READ_ONLY_SCRIPT).setInterpreter(SExpression.GROOVY)
                     .setReturnType(defaultValueReturnType);
@@ -344,12 +330,11 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
     private SDataInstance buildDataInstance(final String instanceName, final String className, final String description, final String content,
             final long containerId, final String containerType, final boolean isTransient) throws SBonitaException {
         // create definition
-        final SDataDefinitionBuilder dataDefinitionBuilder = dataDefinitionBuilders.getDataDefinitionBuilder();
-        dataDefinitionBuilder.createNewInstance(instanceName, className);
+        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, className);
         initializeBuilder(dataDefinitionBuilder, description, content, isTransient, className);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
         // create datainstance
-        final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition);
+        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
     }

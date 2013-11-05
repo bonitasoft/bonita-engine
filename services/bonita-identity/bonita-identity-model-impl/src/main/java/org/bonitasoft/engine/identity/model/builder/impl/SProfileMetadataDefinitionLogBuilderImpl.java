@@ -27,19 +27,10 @@ public class SProfileMetadataDefinitionLogBuilderImpl extends CRUDELogBuilder im
 
     private static final String PREFIX = "IDENTITY_SPROFILE_METADATA_DEFINITION";
 
-    public static final int SPROFILE_METADATA_DEFINITION_INDEX = 1;
-
-    public static final String SPROFILE_METADATA_DEFINITION_INDEX_NAME = "numericIndex2";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(SPROFILE_METADATA_DEFINITION_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SProfileMetadataDefinitionLogBuilderFactoryImpl.SPROFILE_METADATA_DEFINITION_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return SPROFILE_METADATA_DEFINITION_INDEX_NAME;
     }
 
     @Override
@@ -49,7 +40,7 @@ public class SProfileMetadataDefinitionLogBuilderImpl extends CRUDELogBuilder im
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SPROFILE_METADATA_DEFINITION_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SProfileMetadataDefinitionLogBuilderFactoryImpl.SPROFILE_METADATA_DEFINITION_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Identity SProfileMetadataDefinition Id");
         }
     }

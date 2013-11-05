@@ -283,8 +283,7 @@ public class ProfileAPIImpl implements ProfileAPI {
         }
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SProfileMember sProfileMember = ModelConvertor.constructSProfileMember(creator, tenantAccessor.getSProfileBuilderAccessor()
-                .getSProfileMemberBuilder());
+        final SProfileMember sProfileMember = ModelConvertor.constructSProfileMember(creator);
         return createProfileMember(sProfileMember.getProfileId(), sProfileMember.getUserId(), sProfileMember.getGroupId(), sProfileMember.getRoleId());
     }
 

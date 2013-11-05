@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubProcessActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProcessActivityInstanceImpl;
@@ -23,22 +22,13 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SASubProce
  */
 public class SASubProcessActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SASubProcessActivityInstanceBuilder {
 
-    private SASubProcessActivityInstanceImpl entity;
-
-    @Override
-    public SASubProcessActivityInstanceBuilder createNewArchivedSubProcessActivityInstance(final SSubProcessActivityInstance subProcActInst) {
-        entity = new SASubProcessActivityInstanceImpl(subProcActInst);
-        return this;
+    public SASubProcessActivityInstanceBuilderImpl(final SASubProcessActivityInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SASubProcessActivityInstance done() {
-        return entity;
-    }
-
-    @Override
-    public String getTriggeredByEventKey() {
-        return "triggeredByEvent";
+        return (SASubProcessActivityInstance) entity;
     }
 
 }

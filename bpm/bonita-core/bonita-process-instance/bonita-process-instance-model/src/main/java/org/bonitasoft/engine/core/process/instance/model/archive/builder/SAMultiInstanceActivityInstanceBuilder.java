@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstanceActivityInstance;
 
 /**
@@ -22,9 +21,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAMultiInstance
  */
 public interface SAMultiInstanceActivityInstanceBuilder extends SAActivityInstanceBuilder {
 
-    SAMultiInstanceActivityInstanceBuilder createNewMultiInstanceActivityInstance(SMultiInstanceActivityInstance sMultiActivityInstance);
-
-    @Override
     SAMultiInstanceActivityInstance done();
 
 }

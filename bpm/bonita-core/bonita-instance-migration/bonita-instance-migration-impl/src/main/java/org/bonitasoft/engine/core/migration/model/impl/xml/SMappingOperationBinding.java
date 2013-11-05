@@ -15,12 +15,13 @@ package org.bonitasoft.engine.core.migration.model.impl.xml;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.migration.model.impl.SOperationWithEnablementImpl;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilder;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.xml.ElementBinding;
 
@@ -28,8 +29,6 @@ import org.bonitasoft.engine.xml.ElementBinding;
  * @author Elias Ricken de Medeiros
  */
 public class SMappingOperationBinding extends ElementBinding {
-
-    private final SOperationBuilders sOperationBuilders;
 
     private SExpression rightOperand;
 
@@ -40,10 +39,6 @@ public class SMappingOperationBinding extends ElementBinding {
     private SOperatorType operatorType;
 
     private SExpression expression;
-
-    public SMappingOperationBinding(final SOperationBuilders sOperationBuilders) {
-        this.sOperationBuilders = sOperationBuilders;
-    }
 
     @Override
     public void setChildObject(final String name, final Object value) {
@@ -60,7 +55,7 @@ public class SMappingOperationBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        final SOperationBuilder sOperationBuilder = sOperationBuilders.getSOperationBuilder().createNewInstance();
+        final SOperationBuilder sOperationBuilder = BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance();
         sOperationBuilder.setOperator(operator);
         sOperationBuilder.setRightOperand(rightOperand);
         sOperationBuilder.setType(operatorType);

@@ -15,7 +15,8 @@ package org.bonitasoft.engine.core.process.definition.model.builder.impl;
 
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
-import org.bonitasoft.engine.core.process.definition.model.builder.ProcessDefinitionDeployInfoBuilder;
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -27,15 +28,10 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class SProcessDefinitionDeployInfoUpdateBuilderImpl implements SProcessDefinitionDeployInfoUpdateBuilder {
 
-    private final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-
-    private final ProcessDefinitionDeployInfoBuilder processDefinitionDeployInfoBuilder;
-
-    /**
-     * @param processDefinitionDeployInfoBuilder
-     */
-    public SProcessDefinitionDeployInfoUpdateBuilderImpl(final ProcessDefinitionDeployInfoBuilder processDefinitionDeployInfoBuilder) {
-        this.processDefinitionDeployInfoBuilder = processDefinitionDeployInfoBuilder;
+    private final EntityUpdateDescriptor descriptor;
+    
+    public SProcessDefinitionDeployInfoUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
+        this.descriptor = descriptor;
     }
 
     @Override
@@ -45,31 +41,31 @@ public class SProcessDefinitionDeployInfoUpdateBuilderImpl implements SProcessDe
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateDisplayName(final String displayName) {
-        descriptor.addField(processDefinitionDeployInfoBuilder.getDisplayNameKey(), displayName);
+        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getDisplayNameKey(), displayName);
         return this;
     }
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateDisplayDescription(final String description) {
-        descriptor.addField(processDefinitionDeployInfoBuilder.getDisplayDescriptionKey(), description);
+        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getDisplayDescriptionKey(), description);
         return this;
     }
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateActivationState(final ActivationState activationState) {
-        descriptor.addField(processDefinitionDeployInfoBuilder.getActivationStateKey(), activationState.name());
+        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getActivationStateKey(), activationState.name());
         return this;
     }
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateConfigurationState(final ConfigurationState configurationState) {
-        descriptor.addField(processDefinitionDeployInfoBuilder.getConfigurationStateKey(), configurationState.name());
+        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getConfigurationStateKey(), configurationState.name());
         return this;
     }
 
     @Override
     public SProcessDefinitionDeployInfoUpdateBuilder updateIconPath(final String iconPath) {
-        descriptor.addField(processDefinitionDeployInfoBuilder.getIconPathKey(), iconPath);
+        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getIconPathKey(), iconPath);
         return this;
     }
 }

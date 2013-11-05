@@ -13,16 +13,11 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class SDataOutputOperationBinding extends SOperationBinding {
-
-    public SDataOutputOperationBinding(final SOperationBuilders sOperationBuilders) {
-        super(sOperationBuilders);
-    }
 
     @Override
     public String getElementTag() {

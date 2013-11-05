@@ -27,10 +27,6 @@ public class SRoleLogBuilderImpl extends CRUDELogBuilder implements SRoleLogBuil
 
     private static final String PREFIX = "IDENTITY_ROLE";
 
-    public static final int ROLE_INDEX = 0;
-
-    public static final String ROLE_INDEX_NAME = "numericIndex1";
-
     @Override
     protected String getActionTypePrefix() {
         return PREFIX;
@@ -38,20 +34,15 @@ public class SRoleLogBuilderImpl extends CRUDELogBuilder implements SRoleLogBuil
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(ROLE_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SRoleLogBuilderFactoryImpl.ROLE_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatoryFildes are missing: " + "Identity Role Id");
         }
     }
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(ROLE_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SRoleLogBuilderFactoryImpl.ROLE_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return ROLE_INDEX_NAME;
     }
 
 }

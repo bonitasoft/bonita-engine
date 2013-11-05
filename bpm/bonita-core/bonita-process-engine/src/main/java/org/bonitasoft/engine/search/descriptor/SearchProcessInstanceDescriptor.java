@@ -19,15 +19,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 /**
  * @author Yanyan Liu
@@ -43,10 +42,10 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
 
     protected final Set<String> processFields;
 
-    public SearchProcessInstanceDescriptor(final BPMInstanceBuilders instanceBuilders, final SProcessSupervisorBuilders sSupervisorBuilders) {
-        final SProcessInstanceBuilder instanceBuilder = instanceBuilders.getSProcessInstanceBuilder();
-        final SUserTaskInstanceBuilder sUserTaskInstanceBuilder = instanceBuilders.getSUserTaskInstanceBuilder();
-        final SProcessSupervisorBuilder sSupervisorBuilder = sSupervisorBuilders.getSSupervisorBuilder();
+    public SearchProcessInstanceDescriptor() {
+        final SProcessInstanceBuilderFactory instanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
+        final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
+
         searchEntityKeys = new HashMap<String, FieldDescriptor>(11);
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.NAME, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getNameKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
@@ -58,9 +57,9 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.STARTED_BY, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStartedByKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.CALLER_ID,
                 new FieldDescriptor(SProcessInstance.class, instanceBuilder.getCallerIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.USER_ID, new FieldDescriptor(SProcessSupervisor.class, sSupervisorBuilder.getUserIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.GROUP_ID, new FieldDescriptor(SProcessSupervisor.class, sSupervisorBuilder.getGroupIdKey()));
-        searchEntityKeys.put(ProcessInstanceSearchDescriptor.ROLE_ID, new FieldDescriptor(SProcessSupervisor.class, sSupervisorBuilder.getRoleIdKey()));
+        searchEntityKeys.put(ProcessInstanceSearchDescriptor.USER_ID, new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
+        searchEntityKeys.put(ProcessInstanceSearchDescriptor.GROUP_ID, new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
+        searchEntityKeys.put(ProcessInstanceSearchDescriptor.ROLE_ID, new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.ASSIGNEE_ID,
                 new FieldDescriptor(SUserTaskInstance.class, sUserTaskInstanceBuilder.getAssigneeIdKey()));
 

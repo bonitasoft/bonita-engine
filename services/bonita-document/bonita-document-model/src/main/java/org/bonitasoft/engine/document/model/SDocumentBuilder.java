@@ -19,8 +19,6 @@ package org.bonitasoft.engine.document.model;
  */
 public interface SDocumentBuilder {
 
-    SDocumentBuilder createNewInstance();
-
     SDocumentBuilder setAuthor(long author);
 
     SDocumentBuilder setCreationDate(long creationDate);

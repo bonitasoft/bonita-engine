@@ -28,7 +28,6 @@ import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -47,8 +46,6 @@ import org.junit.Test;
  */
 public class DependencyServiceImplTest {
 
-    private DependencyBuilderAccessor builderAccessor;
-
     private ReadPersistenceService persistenceService;
 
     private Recorder recorder;
@@ -65,14 +62,13 @@ public class DependencyServiceImplTest {
 
     @Before
     public void setUp() {
-        builderAccessor = mock(DependencyBuilderAccessor.class);
         persistenceService = mock(ReadPersistenceService.class);
         recorder = mock(Recorder.class);
         eventService = mock(EventService.class);
         queriableLoggerService = mock(QueriableLoggerService.class);
         logger = mock(TechnicalLoggerService.class);
         classLoaderService = mock(ClassLoaderService.class);
-        dependencyServiceImpl = new DependencyServiceImpl(builderAccessor, persistenceService, recorder, eventService, logger, queriableLoggerService,
+        dependencyServiceImpl = new DependencyServiceImpl(persistenceService, recorder, eventService, logger, queriableLoggerService,
                 classLoaderService);
     }
 

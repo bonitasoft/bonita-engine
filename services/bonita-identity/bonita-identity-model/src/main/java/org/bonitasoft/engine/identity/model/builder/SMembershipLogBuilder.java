@@ -27,8 +27,4 @@ public interface SMembershipLogBuilder extends HasCRUDEAction, SPersistenceLogBu
 
     SMembershipLogBuilder groupPath(final String groupPath);
 
-    String getRoleNameKey();
-
-    String getGroupPathKey();
-
 }

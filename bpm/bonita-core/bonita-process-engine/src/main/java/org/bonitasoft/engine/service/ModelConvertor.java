@@ -137,6 +137,7 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDeploymentInfoImpl;
 import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorBuilder;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandDescriptorImpl;
 import org.bonitasoft.engine.command.model.SCommand;
@@ -145,7 +146,8 @@ import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescr
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -204,11 +206,12 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.ExportedUserBuilder;
+import org.bonitasoft.engine.identity.ExportedUserBuilderFactory;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
@@ -229,11 +232,14 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.GroupBuilder;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
-import org.bonitasoft.engine.identity.model.builder.RoleBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilder;
+import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SGroupBuilder;
+import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SRoleBuilder;
+import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.job.impl.FailedJobImpl;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -251,6 +257,7 @@ import org.bonitasoft.engine.profile.ProfileMember;
 import org.bonitasoft.engine.profile.ProfileMemberCreator;
 import org.bonitasoft.engine.profile.ProfileMemberCreator.ProfileMemberField;
 import org.bonitasoft.engine.profile.builder.SProfileMemberBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
 import org.bonitasoft.engine.profile.impl.ProfileEntryImpl;
 import org.bonitasoft.engine.profile.impl.ProfileImpl;
 import org.bonitasoft.engine.profile.impl.ProfileMemberImpl;
@@ -535,7 +542,7 @@ public class ModelConvertor {
     }
 
     public static ProcessInstance toProcessInstance(final SProcessDefinition definition, final SProcessInstance sInstance) {
-        final ProcessInstanceBuilder clientProcessInstanceBuilder = new ProcessInstanceBuilder().createNewInstance(sInstance.getName());
+        final ProcessInstanceBuilder clientProcessInstanceBuilder = ProcessInstanceBuilder.getInstance().createNewInstance(sInstance.getName());
         clientProcessInstanceBuilder.setId(sInstance.getId());
 
         clientProcessInstanceBuilder.setState(ProcessInstanceState.getFromId(sInstance.getStateId()).name().toLowerCase());
@@ -1253,9 +1260,9 @@ public class ModelConvertor {
         return actorInstance;
     }
 
-    public static SUser constructSUser(final UserCreator creator, final IdentityModelBuilder identityModelBuilder) {
+    public static SUser constructSUser(final UserCreator creator) {
         final long now = System.currentTimeMillis();
-        final SUserBuilder userBuilder = identityModelBuilder.getUserBuilder().createNewInstance();
+        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance();
         final Map<UserField, Serializable> fields = creator.getFields();
         userBuilder.setUserName((String) fields.get(UserField.NAME));
         userBuilder.setPassword((String) fields.get(UserField.PASSWORD));
@@ -1302,8 +1309,7 @@ public class ModelConvertor {
         return userBuilder.done();
     }
 
-    public static SContactInfo constructSUserContactInfo(final UserCreator creator, final long userId, final boolean personal,
-            final IdentityModelBuilder identityModelBuilder) {
+    public static SContactInfo constructSUserContactInfo(final UserCreator creator, final long userId, final boolean personal) {
         Map<ContactDataField, Serializable> fields;
         if (personal) {
             fields = creator.getPersoFields();
@@ -1311,7 +1317,7 @@ public class ModelConvertor {
             fields = creator.getProFields();
         }
         if (fields != null && !fields.isEmpty()) {
-            final SContactInfoBuilder contactInfoBuilder = identityModelBuilder.getUserContactInfoBuilder().createNewInstance(userId, personal);
+            final SContactInfoBuilder contactInfoBuilder = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, personal);
             final String address = (String) fields.get(ContactDataField.ADDRESS);
             if (address != null) {
                 contactInfoBuilder.setAddress(address);
@@ -1366,8 +1372,8 @@ public class ModelConvertor {
         }
     }
 
-    public static SUser constructSUser(final ExportedUser newUser, final IdentityModelBuilder identityModelBuilder) {
-        final SUserBuilder userBuilder = identityModelBuilder.getUserBuilder().createNewInstance();
+    public static SUser constructSUser(final ExportedUser newUser) {
+        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance();
         final long now = System.currentTimeMillis();
         userBuilder.setCreationDate(now);
         userBuilder.setLastUpdate(now);
@@ -1387,9 +1393,9 @@ public class ModelConvertor {
         return userBuilder.done();
     }
 
-    public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal, final IdentityModelBuilder identityModelBuilder,
+    public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal,
             final long userId) {
-        final SContactInfoBuilder contactInfoBuilder = identityModelBuilder.getUserContactInfoBuilder().createNewInstance(userId, isPersonal);
+        final SContactInfoBuilder contactInfoBuilder = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, isPersonal);
         if (isPersonal) {
             contactInfoBuilder.setAddress(user.getPersonalAddress());
             contactInfoBuilder.setBuilding(user.getPersonalBuilding());
@@ -1421,7 +1427,7 @@ public class ModelConvertor {
     }
 
     public static ExportedUser toExportedUser(final SUser sUser, final SContactInfo persoInfo, final SContactInfo proInfo, final String managerUserName) {
-        final ExportedUserBuilder clientUserbuilder = new ExportedUserBuilder().createNewInstance(sUser.getUserName(), sUser.getPassword());
+        final ExportedUserBuilder clientUserbuilder = ExportedUserBuilderFactory.createNewInstance(sUser.getUserName(), sUser.getPassword());
         // Do not export dates and id
         clientUserbuilder.setPasswordEncrypted(true);
         clientUserbuilder.setFirstName(sUser.getFirstName());
@@ -1445,10 +1451,9 @@ public class ModelConvertor {
         return clientUserbuilder.done();
     }
 
-    public static SRole constructSRole(final RoleCreator creator, final IdentityModelBuilder identityModelBuilder) {
+    public static SRole constructSRole(final RoleCreator creator) {
         final long now = System.currentTimeMillis();
-        final RoleBuilder roleBuilder = identityModelBuilder.getRoleBuilder();
-        roleBuilder.createNewInstance();
+        final SRoleBuilder roleBuilder = BuilderFactory.get(SRoleBuilderFactory.class).createNewInstance();
         roleBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
         roleBuilder.setCreationDate(now).setLastUpdate(now);
         final Map<RoleField, Serializable> fields = creator.getFields();
@@ -1472,10 +1477,9 @@ public class ModelConvertor {
         return roleBuilder.done();
     }
 
-    public static SGroup constructSGroup(final GroupCreator creator, final IdentityModelBuilder identityModelBuilder) {
+    public static SGroup constructSGroup(final GroupCreator creator) {
         final long now = System.currentTimeMillis();
-        final GroupBuilder groupBuilder = identityModelBuilder.getGroupBuilder();
-        groupBuilder.createNewInstance();
+        final SGroupBuilder groupBuilder = BuilderFactory.get(SGroupBuilderFactory.class).createNewInstance();
         groupBuilder.setCreatedBy(SessionInfos.getUserIdFromSession());
         groupBuilder.setCreationDate(now).setLastUpdate(now);
         final Map<GroupField, Serializable> fields = creator.getFields();
@@ -1636,21 +1640,21 @@ public class ModelConvertor {
         return comments;
     }
 
-    public static Map<String, SExpression> constructExpressions(final SExpressionBuilders sExpressionBuilders, final Map<String, Expression> inputs) {
+    public static Map<String, SExpression> constructExpressions(final Map<String, Expression> inputs) {
 
         final Map<String, SExpression> result = new HashMap<String, SExpression>(inputs.size());
         for (final Entry<String, Expression> expression : inputs.entrySet()) {
-            result.put(expression.getKey(), constructSExpression(expression.getValue(), sExpressionBuilders.getExpressionBuilder()));
+            result.put(expression.getKey(), constructSExpression(expression.getValue()));
         }
         return result;
     }
 
-    public static SExpression constructSExpression(final Expression model, final SExpressionBuilder expressionBuilder) {
+    public static SExpression constructSExpression(final Expression model) {
         final ArrayList<SExpression> dependencies = new ArrayList<SExpression>();
         for (final Expression dep : model.getDependencies()) {
-            dependencies.add(constructSExpression(dep, expressionBuilder));
+            dependencies.add(constructSExpression(dep));
         }
-        expressionBuilder.createNewInstance();
+        final SExpressionBuilder expressionBuilder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
         expressionBuilder.setName(model.getName());
         expressionBuilder.setContent(model.getContent());
         expressionBuilder.setExpressionType(model.getExpressionType());
@@ -1665,27 +1669,23 @@ public class ModelConvertor {
     }
 
     public static SOperation constructSOperation(final Operation operation, final TenantServiceAccessor serviceAccessor) {
-        final SOperationBuilders sOperationBuilders = serviceAccessor.getSOperationBuilders();
-        final SExpressionBuilder sExpressionBuilder = serviceAccessor.getSExpressionBuilders().getExpressionBuilder();
-        final SExpression rightOperand = constructSExpression(operation.getRightOperand(), sExpressionBuilder);
+        final SExpression rightOperand = constructSExpression(operation.getRightOperand());
         final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = constructSLeftOperand(operation.getLeftOperand(), sOperationBuilders);
-        return sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
+        final SLeftOperand sLeftOperand = constructSLeftOperand(operation.getLeftOperand());
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
                 .setType(operatorType).setLeftOperand(sLeftOperand).done();
     }
 
-    public static SOperation constructSOperation(final Operation operation, final SOperationBuilders operationBuilders,
-            final SExpressionBuilders expressionBuilders) {
-        final SExpressionBuilder sExpressionBuilder = expressionBuilders.getExpressionBuilder();
-        final SExpression rightOperand = constructSExpression(operation.getRightOperand(), sExpressionBuilder);
+    public static SOperation constructSOperation(final Operation operation) {
+        final SExpression rightOperand = constructSExpression(operation.getRightOperand());
         final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = constructSLeftOperand(operation.getLeftOperand(), operationBuilders);
-        return operationBuilders.getSOperationBuilder().createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
+        final SLeftOperand sLeftOperand = constructSLeftOperand(operation.getLeftOperand());
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
                 .setType(operatorType).setLeftOperand(sLeftOperand).done();
     }
 
-    private static SLeftOperand constructSLeftOperand(final LeftOperand variableToSet, final SOperationBuilders sOperationBuilders) {
-        return sOperationBuilders.getSLeftOperandBuilder().createNewInstance().setName(variableToSet.getName()).setExternal(variableToSet.isExternal()).done();
+    private static SLeftOperand constructSLeftOperand(final LeftOperand variableToSet) {
+        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).setExternal(variableToSet.isExternal()).done();
     }
 
     public static List<ConnectorImplementationDescriptor> toConnectorImplementationDescriptors(
@@ -1947,9 +1947,9 @@ public class ModelConvertor {
         return profileMemberImpl;
     }
 
-    public static SProfileMember constructSProfileMember(final ProfileMemberCreator creator, final SProfileMemberBuilder sProfileMemberBuilder) {
+    public static SProfileMember constructSProfileMember(final ProfileMemberCreator creator) {
         final Map<ProfileMemberField, Serializable> fields = creator.getFields();
-        final SProfileMemberBuilder newSProfileMemberBuilder = sProfileMemberBuilder.createNewInstance((Long) fields.get(ProfileMemberField.PROFILE_ID));
+        final SProfileMemberBuilder newSProfileMemberBuilder = BuilderFactory.get(SProfileMemberBuilderFactory.class).createNewInstance((Long) fields.get(ProfileMemberField.PROFILE_ID));
         final Long groupeId = (Long) fields.get(ProfileMemberField.GROUP_ID);
         if (groupeId != null) {
             newSProfileMemberBuilder.setGroupId(groupeId);

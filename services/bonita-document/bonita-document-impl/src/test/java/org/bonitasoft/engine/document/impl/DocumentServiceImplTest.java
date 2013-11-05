@@ -19,9 +19,7 @@ import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.document.SDocumentContentNotFoundException;
 import org.bonitasoft.engine.document.SDocumentException;
-import org.bonitasoft.engine.document.model.SDocumentBuilders;
 import org.bonitasoft.engine.document.model.SDocumentContent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -39,19 +37,13 @@ public class DocumentServiceImplTest {
 
     private ReadPersistenceService persistence;
 
-    private SEventBuilders eventBuilders;
-
-    private SDocumentBuilders documentBuilders;
-
     private DocumentServiceImpl documentServiceImpl;
 
     @Before
     public void setUp() {
         recorder = mock(Recorder.class);
         persistence = mock(ReadPersistenceService.class);
-        eventBuilders = mock(SEventBuilders.class);
-        documentBuilders = mock(SDocumentBuilders.class);
-        documentServiceImpl = new DocumentServiceImpl(recorder, eventBuilders, persistence, documentBuilders);
+        documentServiceImpl = new DocumentServiceImpl(recorder, persistence);
     }
 
     /**

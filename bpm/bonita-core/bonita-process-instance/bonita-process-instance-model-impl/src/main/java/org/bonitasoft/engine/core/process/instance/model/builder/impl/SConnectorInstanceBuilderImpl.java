@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
-import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
@@ -24,31 +22,11 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstance
  */
 public class SConnectorInstanceBuilderImpl implements SConnectorInstanceBuilder {
 
-    private static final String ID_KEY = "id";
+    private final SConnectorInstanceImpl entity;
 
-    private static final String NAME_KEY = "name";
-
-    private static final String CONTAINER_ID_KEY = "containerId";
-
-    private static final String CONTAINER_TYPE_KEY = "containerType";
-
-    private static final String CONNECTOR_ID_KEY = "connectorId";
-
-    private static final String VERSION_KEY = "version";
-
-    private static final String ACTIVATION_EVENT_KEY = "activationEvent";
-
-    private static final String STATE_KEY = "state";
-
-    private SConnectorInstanceImpl entity;
-
-    @Override
-    public SConnectorInstanceBuilder createNewInstance(final String name, final long containerId, final String containerType, final String connectorId,
-            final String version, final ConnectorEvent activationEvent, final int executionOrder) {
-        entity = new SConnectorInstanceImpl(name, containerId, containerType, connectorId, version, activationEvent);
-        entity.setState(ConnectorState.TO_BE_EXECUTED.name());
-        entity.setExecutionOrder(executionOrder);
-        return this;
+    public SConnectorInstanceBuilderImpl(final SConnectorInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
@@ -60,51 +38,6 @@ public class SConnectorInstanceBuilderImpl implements SConnectorInstanceBuilder 
     @Override
     public SConnectorInstance done() {
         return entity;
-    }
-
-    @Override
-    public String getIdKey() {
-        return ID_KEY;
-    }
-
-    @Override
-    public String getNameKey() {
-        return NAME_KEY;
-    }
-
-    @Override
-    public String getContainerIdKey() {
-        return CONTAINER_ID_KEY;
-    }
-
-    @Override
-    public String getContainerTypeKey() {
-        return CONTAINER_TYPE_KEY;
-    }
-
-    @Override
-    public String getConnectorIdKey() {
-        return CONNECTOR_ID_KEY;
-    }
-
-    @Override
-    public String getVersionKey() {
-        return VERSION_KEY;
-    }
-
-    @Override
-    public String getActivationEventKey() {
-        return ACTIVATION_EVENT_KEY;
-    }
-
-    @Override
-    public String getStateKey() {
-        return STATE_KEY;
-    }
-
-    @Override
-    public String getExecutionOrderKey() {
-        return "executionOrder";
     }
 
 }

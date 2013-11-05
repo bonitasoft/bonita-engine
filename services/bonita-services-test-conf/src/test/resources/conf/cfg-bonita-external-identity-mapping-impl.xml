@@ -5,11 +5,8 @@
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="sExternalIdentityMappingBuilders" ref="sExternalIdentityMappingBuilders" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
-
-	<bean name="sExternalIdentityMappingBuilders" class="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingBuildersImpl" />
 
 </beans>

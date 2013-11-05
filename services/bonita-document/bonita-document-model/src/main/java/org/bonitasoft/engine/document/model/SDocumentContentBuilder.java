@@ -19,17 +19,10 @@ package org.bonitasoft.engine.document.model;
  */
 public interface SDocumentContentBuilder {
 
-    SDocumentContentBuilder createNewInstance();
-
     SDocumentContentBuilder setContent(byte[] content);
 
     SDocumentContentBuilder setStorageId(String documentId);
 
     SDocumentContent done();
 
-    String getIdKey();
-
-    String getDocumentIdKey();
-
-    String getContentKey();
 }

@@ -19,9 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowNodeInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowNodeInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -34,33 +35,33 @@ public class SearchArchivedFlowNodeInstanceDescriptor extends SearchEntityDescri
 
     private final Map<Class<? extends PersistentObject>, Set<String>> flowNodeInstanceDescriptorAllFields;
 
-    public SearchArchivedFlowNodeInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders) {
-        final SAFlowNodeInstanceBuilder flowNodeKeyProvider = bpmInstanceBuilders.getSAUserTaskInstanceBuilder();
+    public SearchArchivedFlowNodeInstanceDescriptor() {
+        final SAFlowNodeInstanceBuilderFactory keyProvider = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class);
         archFlowNodeDescriptorKeys = new HashMap<String, FieldDescriptor>(9);
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.NAME,
-                new FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getNameKey()));
+                new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getNameKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME,
-                new FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getStateNameKey()));
+                new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getStateNameKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                flowNodeKeyProvider.getProcessDefinitionKey()));
+                keyProvider.getProcessDefinitionKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                flowNodeKeyProvider.getParentProcessInstanceKey()));
+                keyProvider.getParentProcessInstanceKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                flowNodeKeyProvider.getParentActivityInstanceKey()));
+                keyProvider.getParentActivityInstanceKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                flowNodeKeyProvider.getRootProcessInstanceKey()));
+                keyProvider.getRootProcessInstanceKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.DISPLAY_NAME,
-                new FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getDisplayNameKey()));
+                new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getDisplayNameKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.FLOW_NODE_TYPE, new FieldDescriptor(SAFlowNodeInstance.class,
-                flowNodeKeyProvider.getKindKey()));
+                keyProvider.getKindKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, new FieldDescriptor(SAFlowNodeInstance.class,
-                flowNodeKeyProvider.getSourceObjectIdKey()));
+                keyProvider.getSourceObjectIdKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL,
-                new FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getTerminalKey()));
+                new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getTerminalKey()));
 
         final Set<String> tasksInstanceFields = new HashSet<String>(2);
-        tasksInstanceFields.add(flowNodeKeyProvider.getNameKey());
-        tasksInstanceFields.add(flowNodeKeyProvider.getDisplayNameKey());
+        tasksInstanceFields.add(keyProvider.getNameKey());
+        tasksInstanceFields.add(keyProvider.getDisplayNameKey());
         flowNodeInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         flowNodeInstanceDescriptorAllFields.put(SAFlowNodeInstance.class, tasksInstanceFields);
     }

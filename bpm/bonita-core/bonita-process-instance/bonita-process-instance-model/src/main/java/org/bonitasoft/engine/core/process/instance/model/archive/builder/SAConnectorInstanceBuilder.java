@@ -13,27 +13,12 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SAConnectorInstanceBuilder extends SANamedElementBuilder {
-
-    SAConnectorInstanceBuilder createNewArchivedConnectorInstance(SConnectorInstance connectorInstance);
+public interface SAConnectorInstanceBuilder {
 
     SAConnectorInstance done();
-
-    String getContainerIdKey();
-
-    String getConnectorIdKey();
-
-    String getContainerTypeKey();
-
-    String getVersionKey();
-
-    String getActivationEventKey();
-
-    String getStateKey();
 }

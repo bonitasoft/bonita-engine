@@ -13,12 +13,13 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.data;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceState;
-import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
+import org.bonitasoft.engine.data.model.builder.SDataSourceBuilderFactory;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 
@@ -29,17 +30,14 @@ public class CreateDefaultDataSource implements TransactionContent {
 
     private final DataService dataService;
 
-    private final SDataSourceModelBuilder sDataSourceModelBuilder;
-
     private final SessionService sessionService;
 
     private final long tenantId;
 
     private final String username;
 
-    public CreateDefaultDataSource(final SDataSourceModelBuilder sDataSourceModelBuilder, final DataService dataService, final SessionService sessionService,
+    public CreateDefaultDataSource(final DataService dataService, final SessionService sessionService,
             final long tenantId, final String username) {
-        this.sDataSourceModelBuilder = sDataSourceModelBuilder;
         this.dataService = dataService;
         this.sessionService = sessionService;
         this.username = username;
@@ -51,13 +49,12 @@ public class CreateDefaultDataSource implements TransactionContent {
     public void execute() throws SBonitaException {
         // pass -1 because the user is the technical user, which is inexistant in DB:
         final SSession session = sessionService.createSession(tenantId, username);
-        final SDataSource bonitaDataSource = sDataSourceModelBuilder.getDataSourceBuilder()
+        final SDataSource bonitaDataSource = BuilderFactory.get(SDataSourceBuilderFactory.class)
                 .createNewInstance("bonita_data_source", "6.0", SDataSourceState.ACTIVE, "org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl")
                 .done();
         dataService.createDataSource(bonitaDataSource);
 
-        final SDataSource transientDataSource = sDataSourceModelBuilder
-                .getDataSourceBuilder()
+        final SDataSource transientDataSource = BuilderFactory.get(SDataSourceBuilderFactory.class)
                 .createNewInstance("bonita_transient_data_source", "6.0", SDataSourceState.ACTIVE,
                         "org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource").done();
         dataService.createDataSource(transientDataSource);

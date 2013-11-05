@@ -13,15 +13,6 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
-import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
-import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 
 /**
  * @author Matthieu Chaffotte
@@ -82,37 +73,34 @@ public class SearchEntitiesDescriptor {
 
     private final SearchProfileMemberRoleAndGroupDescriptor profileMemberRoleAndGroupDescriptor;
 
-    public SearchEntitiesDescriptor(final IdentityModelBuilder identityModelBuilder, final BPMInstanceBuilders bpmInstanceBuilders,
-            final SProcessSupervisorBuilders sSupervisorBuilders, final BPMDefinitionBuilders definitionBuilders, final SCommentBuilders commentBuilders,
-            final SCategoryBuilderAccessor categoryBuilderAccessor, final SDocumentMappingBuilderAccessor sDocumentMappingBuilderAccessor,
-            final SExternalIdentityMappingBuilders sExternalIdentityMappingBuilders, final SCommandBuilderAccessor commandBuilderAccessor) {
-        userDescriptor = new SearchUserDescriptor(identityModelBuilder);
-        roleDescriptor = new SearchRoleDescriptor(identityModelBuilder);
-        groupDescriptor = new SearchGroupDescriptor(identityModelBuilder);
-        processInstanceDescriptor = new SearchProcessInstanceDescriptor(bpmInstanceBuilders, sSupervisorBuilders);
-        archivedProcessInstanceDescriptor = new SearchArchivedProcessInstancesDescriptor(bpmInstanceBuilders, sSupervisorBuilders);
-        humanTaskInstanceDescriptor = new SearchHumanTaskInstanceDescriptor(bpmInstanceBuilders, sSupervisorBuilders);
-        archivedHumanTaskInstanceDescriptor = new SearchArchivedHumanTaskInstanceDescriptor(bpmInstanceBuilders);
-        searchProcessDefinitionsDescriptor = new SearchProcessDefinitionsDescriptor(definitionBuilders, categoryBuilderAccessor);
-        commentDescriptor = new SearchCommentDescriptor(commentBuilders, identityModelBuilder.getUserBuilder());
-        connectorInstanceDescriptor = new SearchConnectorInstanceDescriptor(bpmInstanceBuilders.getSConnectorInstanceBuilder());
-        documentDescriptor = new SearchDocumentDescriptor(sDocumentMappingBuilderAccessor);
-        entityMemberUserDescriptor = new SearchEntityMemberUserDescriptor(sExternalIdentityMappingBuilders, identityModelBuilder);
-        archivedDocumentDescriptor = new SearchArchivedDocumentDescriptor(sDocumentMappingBuilderAccessor);
-        activityInstanceDescriptor = new SearchActivityInstanceDescriptor(bpmInstanceBuilders, sSupervisorBuilders);
-        archivedActivityInstanceDescriptor = new SearchArchivedActivityInstanceDescriptor(bpmInstanceBuilders);
-        searchArchivedCommentsDescriptor = new SearchArchivedCommentsDescriptor(commentBuilders, identityModelBuilder.getUserBuilder());
-        searchArchivedConnectorInstanceDescriptor = new SearchArchivedConnectorInstanceDescriptor(bpmInstanceBuilders);
-        flowNodeInstanceDescriptor = new SearchFlowNodeInstanceDescriptor(bpmInstanceBuilders);
-        searchCommandDescriptor = new SearchCommandDescriptor(commandBuilderAccessor.getSCommandBuilder());
-        archivedFlowNodeInstanceDescriptor = new SearchArchivedFlowNodeInstanceDescriptor(bpmInstanceBuilders);
+    public SearchEntitiesDescriptor() {
+        userDescriptor = new SearchUserDescriptor();
+        roleDescriptor = new SearchRoleDescriptor();
+        groupDescriptor = new SearchGroupDescriptor();
+        processInstanceDescriptor = new SearchProcessInstanceDescriptor();
+        archivedProcessInstanceDescriptor = new SearchArchivedProcessInstancesDescriptor();
+        humanTaskInstanceDescriptor = new SearchHumanTaskInstanceDescriptor();
+        archivedHumanTaskInstanceDescriptor = new SearchArchivedHumanTaskInstanceDescriptor();
+        searchProcessDefinitionsDescriptor = new SearchProcessDefinitionsDescriptor();
+        commentDescriptor = new SearchCommentDescriptor();
+        connectorInstanceDescriptor = new SearchConnectorInstanceDescriptor();
+        documentDescriptor = new SearchDocumentDescriptor();
+        entityMemberUserDescriptor = new SearchEntityMemberUserDescriptor();
+        archivedDocumentDescriptor = new SearchArchivedDocumentDescriptor();
+        activityInstanceDescriptor = new SearchActivityInstanceDescriptor();
+        archivedActivityInstanceDescriptor = new SearchArchivedActivityInstanceDescriptor();
+        searchArchivedCommentsDescriptor = new SearchArchivedCommentsDescriptor();
+        searchArchivedConnectorInstanceDescriptor = new SearchArchivedConnectorInstanceDescriptor();
+        flowNodeInstanceDescriptor = new SearchFlowNodeInstanceDescriptor();
+        searchCommandDescriptor = new SearchCommandDescriptor();
+        archivedFlowNodeInstanceDescriptor = new SearchArchivedFlowNodeInstanceDescriptor();
 
         searchProfileDescriptor = new SearchProfileDescriptor();
         searchProfileEntryDescriptor = new SearchProfileEntryDescriptor();
-        profileMemberUserDescriptor = new SearchProfileMemberUserDescriptor(identityModelBuilder.getUserBuilder());
-        profileMemberGroupDescriptor = new SearchProfileMemberGroupDescriptor(identityModelBuilder);
-        profileMemberRoleDescriptor = new SearchProfileMemberRoleDescriptor(identityModelBuilder.getRoleBuilder());
-        profileMemberRoleAndGroupDescriptor = new SearchProfileMemberRoleAndGroupDescriptor(identityModelBuilder);
+        profileMemberUserDescriptor = new SearchProfileMemberUserDescriptor();
+        profileMemberGroupDescriptor = new SearchProfileMemberGroupDescriptor();
+        profileMemberRoleDescriptor = new SearchProfileMemberRoleDescriptor();
+        profileMemberRoleAndGroupDescriptor = new SearchProfileMemberRoleAndGroupDescriptor();
     }
 
     public SearchUserDescriptor getUserDescriptor() {

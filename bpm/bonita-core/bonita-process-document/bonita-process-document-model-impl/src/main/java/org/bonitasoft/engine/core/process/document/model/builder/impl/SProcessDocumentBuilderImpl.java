@@ -24,12 +24,11 @@ import org.bonitasoft.engine.core.process.document.model.impl.SProcessDocumentIm
  */
 public class SProcessDocumentBuilderImpl implements SProcessDocumentBuilder {
 
-    private SProcessDocumentImpl processDocument;
+    private final SProcessDocumentImpl processDocument;
 
-    @Override
-    public SProcessDocumentBuilder createNewInstance() {
-        this.processDocument = new SProcessDocumentImpl();
-        return this;
+    public SProcessDocumentBuilderImpl(final SProcessDocumentImpl processDocument) {
+        super();
+        this.processDocument = processDocument;
     }
 
     @Override

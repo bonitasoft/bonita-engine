@@ -32,6 +32,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.bonitasoft.engine.api.impl.ServerAPIImpl;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.StackTraceTransformer;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -105,7 +106,13 @@ public class HttpAPIServletCall extends ServletCall {
 
             final ServerAPIImpl serverAPI = new ServerAPIImpl();
 
-            final Object invokeMethod = serverAPI.invokeMethod(myOptions, apiInterfaceName, methodName, myClassNameParameters, myParametersValues);
+            final Object invokeMethod;
+            try {
+                invokeMethod = serverAPI.invokeMethod(myOptions, apiInterfaceName, methodName, myClassNameParameters, myParametersValues);
+            } catch (ServerWrappedException e) {
+                // merge stack trace of the server exception
+                throw StackTraceTransformer.mergeStackTraces(e);
+            }
 
             String invokeMethodSerialized = null;
             if (invokeMethod != null) {
@@ -160,7 +167,7 @@ public class HttpAPIServletCall extends ServletCall {
         }
         // ignore fields suppressedExceptions and stackTrance causing exceptions in some cases
         xstream.omitField(Throwable.class, "suppressedExceptions");
-        xstream.omitField(Throwable.class, "stackTrace");
+        // xstream.omitField(Throwable.class, "stackTrace");
         return toXML(result, xstream);
     }
 

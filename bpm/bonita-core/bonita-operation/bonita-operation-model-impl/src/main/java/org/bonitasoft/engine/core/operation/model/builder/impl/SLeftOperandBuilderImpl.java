@@ -23,12 +23,11 @@ import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
  */
 public class SLeftOperandBuilderImpl implements SLeftOperandBuilder {
 
-    private SLeftOperandImpl leftOperand;
-
-    @Override
-    public SLeftOperandBuilder createNewInstance() {
-        leftOperand = new SLeftOperandImpl();
-        return this;
+    private final SLeftOperandImpl leftOperand;
+    
+    public SLeftOperandBuilderImpl(final SLeftOperandImpl leftOperand) {
+        super();
+        this.leftOperand = leftOperand;
     }
 
     @Override

@@ -21,11 +21,6 @@ import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInst
  */
 public interface SSubProcessActivityInstanceBuilder extends SActivityInstanceBuilder {
 
-    SSubProcessActivityInstanceBuilder createNewSubProcessActivityInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId, boolean isTriggeredByEvent);
-
-    String getTriggeredByEventKey();
-
     @Override
     SSubProcessActivityInstance done();
 

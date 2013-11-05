@@ -11,7 +11,6 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -23,9 +22,6 @@ public class AssignmentOperationExecutorStrategyTest {
 
     @Mock
     private DataInstanceService dataInstanceService;
-
-    @Mock
-    private SDataInstanceBuilders sDataInstanceBuilders;
 
     @InjectMocks
     private AssignmentOperationExecutorStrategy assignmentOperationExecutorStrategy;

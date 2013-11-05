@@ -27,18 +27,13 @@ import org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterIm
  */
 public class SQueriableLogParameterBuilderImpl implements SQueriableLogParameterBuilder {
 
-    private SQueriableLogParameterImpl entity;
+    private final SQueriableLogParameterImpl entity;
 
-    private List<String> problems;
-
-    @Override
-    public SQueriableLogParameterBuilder createNewInstance(final String name, final String valueType) {
-        entity = new SQueriableLogParameterImpl();
-        entity.setName(name);
-        entity.setValueType(valueType);
-        return this;
+    public SQueriableLogParameterBuilderImpl(final SQueriableLogParameterImpl entity) {
+        super();
+        this.entity = entity;
     }
-
+    
     @Override
     public SQueriableLogParameterBuilder stringValue(final String stringValue) {
         entity.setStringValue(stringValue);
@@ -55,21 +50,22 @@ public class SQueriableLogParameterBuilderImpl implements SQueriableLogParameter
 
     @Override
     public SQueriableLogParameter done() {
-        problems = new ArrayList<String>();
-        checkMandatoryFields();
+        final List<String> problems = checkMandatoryFields();
         if (problems.size() > 0) {
             throw new MissingMandatoryFieldsException("Some mandatory fields were not set: " + problems);
         }
         return entity;
     }
 
-    private void checkMandatoryFields() {
+    private List<String> checkMandatoryFields() {
+        final List<String> problems = new ArrayList<String>();
         if (entity.getName() == null) {
             problems.add("name");
         }
         if (entity.getValueType() == null) {
             problems.add("valueType");
         }
+        return problems;
     }
 
 }

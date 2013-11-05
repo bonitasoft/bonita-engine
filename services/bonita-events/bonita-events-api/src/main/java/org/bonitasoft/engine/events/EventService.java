@@ -20,7 +20,6 @@ import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 
 /**
  * This is the manager of all the events triggered by other services. Handlers are registered into the Event service. When a
@@ -80,12 +79,5 @@ public interface EventService {
      * Retrieve the list of all registered Handlers or the given EventType
      */
     Set<SHandler<SEvent>> getHandlers(String eventType);
-
-    /**
-     * Get the event model builder
-     *
-     * @return the event model builder
-     */
-    SEventBuilder getEventBuilder();
 
 }

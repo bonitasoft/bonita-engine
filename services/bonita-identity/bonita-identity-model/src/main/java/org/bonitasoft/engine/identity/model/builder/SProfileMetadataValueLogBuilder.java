@@ -27,8 +27,4 @@ public interface SProfileMetadataValueLogBuilder extends HasCRUDEAction, SPersis
 
     SProfileMetadataValueLogBuilder metadataName(final String metadataName);
 
-    String getIdentityUserNameKey();
-
-    String getProfileMetadataDefinitionNameKey();
-
 }

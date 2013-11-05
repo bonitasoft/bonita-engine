@@ -15,14 +15,15 @@ import java.util.Properties;
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.MockQueriableLogSessionProviderImpl;
 import org.bonitasoft.engine.commons.io.PropertiesManager;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilderFactory;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -56,9 +57,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
     private final QueriableLoggerService loggerService;
 
-    private final SQueriableLogModelBuilder logModelBuilder;
-
-    private final SIndexedLogBuilder logbuilder;
+    private final SQueriableLogBuilderFactory qLogBuilderFactory;
 
     private final PersistenceService persistenceService;
 
@@ -66,8 +65,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
     public QueriableLoggerServiceTest() {
         loggerService = getServicesBuilder().buildQueriableLogger("syncQueriableLoggerService");
-        logModelBuilder = getServicesBuilder().getInstanceOf(SQueriableLogModelBuilder.class);
-        logbuilder = logModelBuilder.getQueriableLogBuilder();
+        qLogBuilderFactory = BuilderFactory.get(SQueriableLogBuilderFactory.class);
         persistenceService = getServicesBuilder().buildTenantPersistenceService();
         qlSessionProvider = getServicesBuilder().getInstanceOf(MockQueriableLogSessionProviderImpl.class);
     }
@@ -81,19 +79,18 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         getTransactionService().complete();
     }
 
-    private SIndexedLogBuilder buildQueriableLog(final String actionType, final String actionScope, final SQueriableLogSeverity severity,
+    private SQueriableLogBuilder buildQueriableLog(final String actionType, final String actionScope, final SQueriableLogSeverity severity,
             final int actionStatus, final String message) {
-        final SIndexedLogBuilder logBuilder = logModelBuilder.getQueriableLogBuilder();
-        logBuilder.createNewInstance();
+        final SQueriableLogBuilder logBuilder = qLogBuilderFactory.createNewInstance();
         logBuilder.actionType(actionType).actionScope(actionScope).severity(severity);
         logBuilder.actionStatus(actionStatus).rawMessage(message).done();
 
         return logBuilder;
     }
 
-    private SIndexedLogBuilder buildQueriableLog(final String actionType, final String actionScope, final SQueriableLogSeverity severity,
+    private SQueriableLogBuilder buildQueriableLog(final String actionType, final String actionScope, final SQueriableLogSeverity severity,
             final int actionStatus, final String message, final Map<Integer, Long> numericIndexes) {
-        final SIndexedLogBuilder logBuilder = buildQueriableLog(actionType, actionScope, severity, actionStatus, message);
+        final SQueriableLogBuilder logBuilder = buildQueriableLog(actionType, actionScope, severity, actionStatus, message);
         for (final Integer numericIndex : numericIndexes.keySet()) {
             logBuilder.numericIndex(numericIndex, numericIndexes.get(numericIndex));
         }
@@ -107,7 +104,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
     @Test
     public void testLogNominal() throws Exception {
         getTransactionService().begin();
-        final SIndexedLogBuilder log1 = buildQueriableLog("execute_connector", "setVariableConnector", SQueriableLogSeverity.BUSINESS, SQueriableLog.STATUS_OK,
+        final SQueriableLogBuilder log1 = buildQueriableLog("execute_connector", "setVariableConnector", SQueriableLogSeverity.BUSINESS, SQueriableLog.STATUS_OK,
                 "sucessFull", Collections.singletonMap(NUMERIC_INDEX1, 123L));
         loggerService.log(this.getClass().getName(), "testLogNominal", log1.done());
         getTransactionService().complete();
@@ -120,7 +117,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         getTransactionService().begin();
 
         final Map<String, Object> inputs = new HashMap<String, Object>();
-        inputs.put(logbuilder.getNumericIndexKey(1), 123L);
+        inputs.put(qLogBuilderFactory.getNumericIndexKey(1), 123L);
         final String queryName = "getLogsFromNumericIndex1";
         final List<SQueriableLog> retrievedLogs = persistenceService.selectList(new SelectListDescriptor<SQueriableLog>(queryName, inputs, SQueriableLog.class,
                 new QueryOptions(0, 10)));
@@ -150,7 +147,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         getTransactionService().begin();
 
         final Map<String, Object> inputs = new HashMap<String, Object>();
-        inputs.put(logbuilder.getNumericIndexKey(1), 123L);
+        inputs.put(qLogBuilderFactory.getNumericIndexKey(1), 123L);
         final String queryName = "getLogsFromNumericIndex1";
         final List<SQueriableLog> retrievedLogs = persistenceService.selectList(new SelectListDescriptor<SQueriableLog>(queryName, inputs, SQueriableLog.class,
                 new QueryOptions(0, 10)));
@@ -179,11 +176,11 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         getTransactionService().begin();
 
         final Map<String, Object> inputs = new HashMap<String, Object>();
-        inputs.put(logbuilder.getNumericIndexKey(1), 123L);
+        inputs.put(qLogBuilderFactory.getNumericIndexKey(1), 123L);
         final String queryName = "getLogsFromNumericIndex1";
 
         final List<SQueriableLog> retrievedLogs = persistenceService.selectList(new SelectListDescriptor<SQueriableLog>(queryName, inputs, SQueriableLog.class,
-                new QueryOptions(0, 10, SQueriableLog.class, logbuilder.getTimeStampKey(), OrderByType.DESC)));
+                new QueryOptions(0, 10, SQueriableLog.class, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC)));
         assertEquals(2, retrievedLogs.size());
         final SQueriableLog firstRetrievedLog = retrievedLogs.get(0);
         final SQueriableLog secondRetrievedLog = retrievedLogs.get(1);
@@ -297,7 +294,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -306,7 +303,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector2", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -315,7 +312,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector5", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -341,7 +338,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -350,7 +347,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -359,7 +356,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -385,7 +382,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -394,7 +391,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -403,7 +400,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -429,7 +426,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -438,7 +435,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector2", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -447,7 +444,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector5", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -473,7 +470,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -482,7 +479,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -491,7 +488,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -517,7 +514,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -526,7 +523,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -535,7 +532,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -561,7 +558,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -570,7 +567,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector2", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -579,7 +576,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector5", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -605,7 +602,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -614,7 +611,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -623,7 +620,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -649,7 +646,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -658,7 +655,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -667,7 +664,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -693,7 +690,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -702,7 +699,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector2", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -711,7 +708,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector5", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -737,7 +734,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -746,7 +743,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -755,7 +752,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -781,7 +778,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -790,7 +787,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -799,7 +796,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -825,7 +822,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -834,7 +831,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector2", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -843,7 +840,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector5", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -869,7 +866,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -878,7 +875,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -887,7 +884,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -913,7 +910,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector6", retrievedLogs.get(0).getActionScope());
@@ -922,7 +919,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector4", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector3", retrievedLogs.get(0).getActionScope());
@@ -931,7 +928,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals("setVariableConnector1", retrievedLogs.get(2).getActionScope());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, logbuilder.getTimeStampKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, qLogBuilderFactory.getTimeStampKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals("setVariableConnector0", retrievedLogs.get(0).getActionScope());
@@ -957,7 +954,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -966,7 +963,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -975,7 +972,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1001,7 +998,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1010,7 +1007,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1019,7 +1016,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX1, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1045,7 +1042,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1054,7 +1051,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1063,7 +1060,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1089,7 +1086,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1098,7 +1095,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1107,7 +1104,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX2, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1133,7 +1130,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1142,7 +1139,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1151,7 +1148,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1177,7 +1174,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1186,7 +1183,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1195,7 +1192,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX3, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1221,7 +1218,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1230,7 +1227,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1239,7 +1236,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1265,7 +1262,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1274,7 +1271,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1283,7 +1280,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX4, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1309,7 +1306,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1318,7 +1315,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1327,7 +1324,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.ASC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.ASC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1353,7 +1350,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
 
         getTransactionService().begin();
 
-        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        List<SQueriableLog> retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 0, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(1, retrievedLogs.get(0).getActionStatus());
@@ -1362,7 +1359,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(1, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 3, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(3, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1371,7 +1368,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         assertEquals("execute_connector", retrievedLogs.get(2).getActionType());
         assertEquals(0, retrievedLogs.get(2).getActionStatus());
 
-        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, logbuilder.getActionStatusKey(), OrderByType.DESC);
+        retrievedLogs = loggerService.getLogsFromLongIndex(NUMERIC_INDEX5, 123L, 6, 3, qLogBuilderFactory.getActionStatusKey(), OrderByType.DESC);
         assertEquals(1, retrievedLogs.size());
         assertEquals("execute_connector", retrievedLogs.get(0).getActionType());
         assertEquals(0, retrievedLogs.get(0).getActionStatus());
@@ -1383,7 +1380,7 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         for (SQueriableLog sQueriableLog : logs) {
 
             // add attributes injected by the log service implementation
-            sQueriableLog = logModelBuilder.getQueriableLogBuilder().fromInstance(sQueriableLog).userId(qlSessionProvider.getUserId())
+            sQueriableLog = qLogBuilderFactory.fromInstance(sQueriableLog).userId(qlSessionProvider.getUserId())
                     .clusterNode(qlSessionProvider.getClusterNode()).productVersion("BOS-6.0").done();
 
             persistenceService.insert(sQueriableLog);
@@ -1432,13 +1429,13 @@ public class QueriableLoggerServiceTest extends CommonServiceTest {
         persisteLogWithPersistenceService(logs);
 
         List<SQueriableLog> queriablelogs = new ArrayList<SQueriableLog>();
-        queriablelogs = loggerService.getLogs(0, 3, logModelBuilder.getQueriableLogBuilder().getActionScopeKey(), OrderByType.ASC);
+        queriablelogs = loggerService.getLogs(0, 3, qLogBuilderFactory.getActionScopeKey(), OrderByType.ASC);
         assertEquals(3, queriablelogs.size());
         assertEquals("testGetLogsNumber0", queriablelogs.get(0).getActionScope());
         assertEquals("testGetLogsNumber1", queriablelogs.get(1).getActionScope());
         assertEquals("testGetLogsNumber2", queriablelogs.get(2).getActionScope());
 
-        queriablelogs = loggerService.getLogs(0, 3, logModelBuilder.getQueriableLogBuilder().getActionScopeKey(), OrderByType.DESC);
+        queriablelogs = loggerService.getLogs(0, 3, qLogBuilderFactory.getActionScopeKey(), OrderByType.DESC);
         assertEquals(3, queriablelogs.size());
         assertEquals("testGetLogsNumber4", queriablelogs.get(0).getActionScope());
         assertEquals("testGetLogsNumber3", queriablelogs.get(1).getActionScope());

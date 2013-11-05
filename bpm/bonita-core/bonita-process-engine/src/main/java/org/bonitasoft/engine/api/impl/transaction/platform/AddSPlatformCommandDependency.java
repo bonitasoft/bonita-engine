@@ -13,14 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilder;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
-import org.bonitasoft.engine.dependency.model.builder.DependencyMappingBuilder;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
 
 /**
  * @author Zhang Bole
@@ -28,8 +29,6 @@ import org.bonitasoft.engine.dependency.model.builder.DependencyMappingBuilder;
 public class AddSPlatformCommandDependency implements TransactionContent {
 
     private final DependencyService dependencyService;
-
-    private final DependencyBuilderAccessor dependencyBuilderAccessor;
 
     private final String name;
 
@@ -39,10 +38,9 @@ public class AddSPlatformCommandDependency implements TransactionContent {
 
     private final String artifactType;
 
-    public AddSPlatformCommandDependency(final DependencyService dependencyService, final DependencyBuilderAccessor dependencyBuilderAccessor,
+    public AddSPlatformCommandDependency(final DependencyService dependencyService,
             final String name, final byte[] jar, final long artifactId, final String artifactType) {
         this.dependencyService = dependencyService;
-        this.dependencyBuilderAccessor = dependencyBuilderAccessor;
         this.name = name;
         this.jar = jar;
         this.artifactId = artifactId;
@@ -51,11 +49,9 @@ public class AddSPlatformCommandDependency implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        final DependencyBuilder dependencyBuilder = dependencyBuilderAccessor.getDependencyBuilder();
-        final SDependency sDependency = dependencyBuilder.createNewInstance(name, "1.0", name + ".jar", jar).done();
+        final SDependency sDependency = BuilderFactory.get(SPlatformDependencyBuilderFactory.class).createNewInstance(name, "1.0", name + ".jar", jar).done();
         this.dependencyService.createDependency(sDependency);
-        final DependencyMappingBuilder dependencyMappingBuilder = dependencyBuilderAccessor.getDependencyMappingBuilder();
-        final SDependencyMapping sDependencyMapping = dependencyMappingBuilder.createNewInstance(sDependency.getId(), artifactId, artifactType).done();
+        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SPlatformDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), artifactId, artifactType).done();
         this.dependencyService.createDependencyMapping(sDependencyMapping);
     }
 

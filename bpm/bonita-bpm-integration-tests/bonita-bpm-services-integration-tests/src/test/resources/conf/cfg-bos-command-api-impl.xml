@@ -5,12 +5,10 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
-		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
 
-	<bean name="commandBuilderAccessor" class="org.bonitasoft.engine.command.model.SCommandBuilderAccessorImpl" />
 
 	<bean id="db-bos-command-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-createTables.sql" />

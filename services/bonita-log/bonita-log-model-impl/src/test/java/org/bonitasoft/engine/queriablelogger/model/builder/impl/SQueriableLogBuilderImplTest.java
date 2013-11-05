@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,7 +21,7 @@ public class SQueriableLogBuilderImplTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SQueriableLogBuilderImplTest.class);
 
-    private final SIndexedLogBuilderImpl builder;
+    private final SQueriableLogBuilderFactoryImpl fact;
 
     @Rule
     public TestName name = new TestName();
@@ -36,12 +37,13 @@ public class SQueriableLogBuilderImplTest {
     }
 
     public SQueriableLogBuilderImplTest() {
-        builder = new SIndexedLogBuilderImpl();
+        fact = new SQueriableLogBuilderFactoryImpl();
     }
 
     @Test
     public void testSetUsername() {
-        builder.createNewInstance().userId("john").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.userId("john").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").rawMessage("successFull").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
         assertEquals("john", queriableLog.getUserId());
@@ -49,7 +51,8 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetClusterNode() {
-        builder.createNewInstance().clusterNode("node1").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.clusterNode("node1").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").rawMessage("successFull").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
         assertEquals("node1", queriableLog.getClusterNode());
@@ -57,7 +60,8 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetProductVersion() {
-        builder.createNewInstance().productVersion("SP-5.4.1").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.productVersion("SP-5.4.1").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").rawMessage("successFull").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
         assertEquals("SP-5.4.1", queriableLog.getProductVersion());
@@ -65,7 +69,8 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetSeverity() {
-        builder.createNewInstance().severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").rawMessage("successFull").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
         assertEquals(SQueriableLogSeverity.BUSINESS, queriableLog.getSeverity());
@@ -73,7 +78,7 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetActionType() {
-        builder.createNewInstance();
+        final SQueriableLogBuilder builder = fact.createNewInstance();
         builder.actionType("excecute_connector").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionScope("myVar").rawMessage("successFull").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
@@ -82,7 +87,8 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetActionScope() {
-        builder.createNewInstance().actionScope("setVariable").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.actionScope("setVariable").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").rawMessage("successFull").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
         assertEquals("setVariable", queriableLog.getActionScope());
@@ -90,7 +96,8 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetActionStatus() {
-        builder.createNewInstance().actionStatus(1).severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.actionStatus(1).severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").rawMessage("successFull");
         final SQueriableLog queriableLog = builder.done();
         assertEquals(1, queriableLog.getActionStatus());
@@ -98,7 +105,8 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetRawMessage() {
-        builder.createNewInstance().rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
         assertEquals("successfully executed", queriableLog.getRawMessage());
@@ -106,7 +114,7 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetNumericIndexes() {
-        builder.createNewInstance();
+        final SQueriableLogBuilder builder = fact.createNewInstance();
         builder.numericIndex(0, 10).rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
@@ -115,12 +123,13 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testFromInstance() {
-        builder.createNewInstance().userId("john").rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
+        SQueriableLogBuilder builder = fact.createNewInstance();builder.userId("john").rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").actionStatus(1);
         final SQueriableLog queriableLog1 = builder.done();
         assertEquals("john", queriableLog1.getUserId());
 
-        builder.fromInstance(queriableLog1).clusterNode("suomi");
+        builder = fact.fromInstance(queriableLog1);
+        builder.clusterNode("suomi");
         final SQueriableLog queriableLog2 = builder.done();
 
         // verify if it's the same reference
@@ -131,7 +140,8 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetCallerClassName() {
-        builder.createNewInstance().callerClassName("RecorderImpl.class").rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.callerClassName("RecorderImpl.class").rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
         assertEquals("RecorderImpl.class", queriableLog.getCallerClassName());
@@ -139,7 +149,8 @@ public class SQueriableLogBuilderImplTest {
 
     @Test
     public void testSetCallerMethodName() {
-        builder.createNewInstance().callerMethodName("insertRecord").rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.callerMethodName("insertRecord").rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").actionStatus(1);
         final SQueriableLog queriableLog = builder.done();
         assertEquals("insertRecord", queriableLog.getCallerMethodName());
@@ -147,21 +158,24 @@ public class SQueriableLogBuilderImplTest {
 
     @Test(expected = MissingMandatoryFieldsException.class)
     public void testFailIfSeverityIsNull() {
-        builder.createNewInstance().rawMessage("successfully executed");
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.rawMessage("successfully executed");
         builder.actionType("variable_update").actionScope("myVar").actionStatus(1);
         builder.done();
     }
 
     @Test(expected = MissingMandatoryFieldsException.class)
     public void testFailIfRawIsNull() {
-        builder.createNewInstance().severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").actionStatus(1);
         builder.done();
     }
 
     @Test(expected = MissingMandatoryFieldsException.class)
     public void testFailIfActionTypeIsNull() {
-        builder.createNewInstance().rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
 
         builder.actionScope("myVar").actionStatus(1);
         builder.done();
@@ -169,21 +183,24 @@ public class SQueriableLogBuilderImplTest {
 
     @Test(expected = MissingMandatoryFieldsException.class)
     public void testFailIfActionScopeIsNull() {
-        builder.createNewInstance().rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionStatus(1);
         builder.done();
     }
 
     @Test(expected = MissingMandatoryFieldsException.class)
     public void testFailIfActionStatusIsNull() {
-        builder.createNewInstance().rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar");
         builder.done();
     }
 
     @Test(expected = MissingMandatoryFieldsException.class)
     public void testFailIfActionStatusIsMoreThanOne() {
-        builder.createNewInstance().rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
+        final SQueriableLogBuilder builder = fact.createNewInstance();
+        builder.rawMessage("successfully executed").severity(SQueriableLogSeverity.BUSINESS);
         builder.actionType("variable_update").actionScope("myVar").actionStatus(2);
         builder.done();
     }

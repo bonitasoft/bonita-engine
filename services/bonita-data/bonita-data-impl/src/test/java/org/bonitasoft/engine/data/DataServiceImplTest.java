@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.data.model.SDataSource;
-import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -41,8 +40,6 @@ import org.junit.Test;
  * @author Celine Souchet
  */
 public class DataServiceImplTest {
-
-    private SDataSourceModelBuilder logModelBuilder;
 
     private ClassLoaderService classLoaderService;
 
@@ -62,7 +59,6 @@ public class DataServiceImplTest {
 
     @Before
     public void setUp() {
-        logModelBuilder = mock(SDataSourceModelBuilder.class);
         classLoaderService = mock(ClassLoaderService.class);
         dataSourceConfigurations = new ArrayList<DataSourceConfiguration>();
         recorder = mock(Recorder.class);
@@ -70,7 +66,7 @@ public class DataServiceImplTest {
         eventService = mock(EventService.class);
         logger = mock(TechnicalLoggerService.class);
         queriableLoggerService = mock(QueriableLoggerService.class);
-        dataServiceImpl = new DataServiceImpl(logModelBuilder, recorder, persistence, classLoaderService, eventService, dataSourceConfigurations, logger,
+        dataServiceImpl = new DataServiceImpl(recorder, persistence, classLoaderService, eventService, dataSourceConfigurations, logger,
                 queriableLoggerService);
     }
 

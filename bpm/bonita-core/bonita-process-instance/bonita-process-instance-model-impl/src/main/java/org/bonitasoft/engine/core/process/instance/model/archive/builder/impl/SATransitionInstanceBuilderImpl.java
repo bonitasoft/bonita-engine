@@ -13,10 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
-import org.bonitasoft.engine.core.process.definition.model.TransitionState;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SATransitionInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl;
@@ -24,17 +20,13 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransiti
 /**
  * @author Hongwen Zang
  */
-public class SATransitionInstanceBuilderImpl extends SAFlowElementInstanceBuilderImpl implements SATransitionInstanceBuilder {
+public class SATransitionInstanceBuilderImpl implements SATransitionInstanceBuilder {
 
-    private SATransitionInstanceImpl entity;
+    private final SATransitionInstanceImpl entity;
 
-    @Override
-    public SATransitionInstanceBuilder createNewTransitionInstance(final STransitionDefinition sTransitionDefinition,
-            final SFlowNodeInstance sFlowNodeInstance, final TransitionState state) {
-        entity = new SATransitionInstanceImpl(sTransitionDefinition, sFlowNodeInstance);
-        entity.setState(state);
-        entity.setStateCategory(SStateCategory.ABORTING);
-        return this;
+    public SATransitionInstanceBuilderImpl(final SATransitionInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override

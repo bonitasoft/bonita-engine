@@ -22,8 +22,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
  */
 public interface SDocumentMappingLogBuilder extends SPersistenceLogBuilder, HasCRUDEAction {
 
-    String getProcessInstanceIdKey();
-
     void setProcessInstanceId(long procInstanceId);
 
 }

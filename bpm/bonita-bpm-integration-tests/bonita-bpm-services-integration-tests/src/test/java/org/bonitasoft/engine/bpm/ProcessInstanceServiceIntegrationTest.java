@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
@@ -14,13 +15,15 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
@@ -93,7 +96,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void getNumberOfProcessInstances() throws STransactionCreationException, STransactionCommitException, SProcessInstanceCreationException,
             STransactionRollbackException, SBonitaSearchException {
         transactionService.begin();
-        final SProcessInstanceBuilder sProcessInstanceBuilder = bpmServicesBuilder.getBPMInstanceBuilders().getSProcessInstanceBuilder();
+        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
         SProcessInstance sProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
         processInstanceService.createProcessInstance(sProcessInstance);
@@ -122,7 +125,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void getCorrectProcessInstancesOrder() throws Exception {
         // Creation of the process instances we want to retrieve:
         transactionService.begin();
-        final SProcessInstanceBuilder sProcessInstanceBuilder = bpmServicesBuilder.getBPMInstanceBuilders().getSProcessInstanceBuilder();
+        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
         final SProcessInstance sProcessInstance0 = sProcessInstanceBuilder.createNewInstance("instance name 0", processDefinitionId).done();
         final SProcessInstance sProcessInstance1 = sProcessInstanceBuilder.createNewInstance("instance name 1", processDefinitionId).done();
@@ -164,7 +167,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void testDeleteProcessInstance() throws SBonitaException {
         // Creation of a process instance:
         transactionService.begin();
-        final SProcessInstanceBuilder sProcessInstanceBuilder = bpmServicesBuilder.getBPMInstanceBuilders().getSProcessInstanceBuilder();
+        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
         final SProcessInstance sProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
         processInstanceService.createProcessInstance(sProcessInstance);
@@ -186,7 +189,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void testGetChildInstanceIdsOfProcessInstance() throws Exception {
         // first create parent process instance
         transactionService.begin();
-        final SProcessInstanceBuilder sProcessInstanceBuilder = bpmServicesBuilder.getBPMInstanceBuilders().getSProcessInstanceBuilder();
+        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
         final SProcessInstance parentProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
         processInstanceService.createProcessInstance(parentProcessInstance);
@@ -204,7 +207,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         }
         transactionService.complete();
         // test get child by paging, order by name ASC
-        final String nameField = bpmServicesBuilder.getBPMInstanceBuilders().getSProcessInstanceBuilder().getNameKey();
+        final String nameField = BuilderFactory.get(SProcessInstanceBuilderFactory.class).getNameKey();
         transactionService.begin();
         final List<Long> childInstanceIdList1 = processInstanceService.getChildInstanceIdsOfProcessInstance(parentProcessInstance.getId(), 0, 4, nameField,
                 OrderByType.ASC);
@@ -247,7 +250,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     public void testGetNumberOfChildInstancesOfProcessInstance() throws Exception {
         // first create parent process instance and test
         transactionService.begin();
-        final SProcessInstanceBuilder sProcessInstanceBuilder = bpmServicesBuilder.getBPMInstanceBuilders().getSProcessInstanceBuilder();
+        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;
         final SProcessInstance parentProcessInstance = sProcessInstanceBuilder.createNewInstance("an instance name", processDefinitionId).done();
         processInstanceService.createProcessInstance(parentProcessInstance);
@@ -286,7 +289,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
                 DataInstanceContainer.PROCESS_INSTANCE);
 
         // create a automatic task
-        final SActivityInstance taskInstance = createSAutomaticTaskInstance(bpmServicesBuilder.getBPMInstanceBuilders().getSAutomaticTaskInstanceBuilder(),
+        final SActivityInstance taskInstance = createSAutomaticTaskInstance(
                 "auto", 1234L, processInstance.getId(), processDefinitionId, processInstance.getId());
         final SDataInstance localDataInstance = createDataInTransaction("myLocalData", String.class.getName(), taskInstance.getId(),
                 DataInstanceContainer.ACTIVITY_INSTANCE);
@@ -322,7 +325,7 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     private SProcessInstance createProcessInstanceInTransaction(final long process_definition_id, final String processName)
             throws STransactionCreationException, SProcessInstanceCreationException, STransactionCommitException, STransactionRollbackException {
         getTransactionService().begin();
-        final SProcessInstanceBuilder sProcessInstanceBuilder = bpmServicesBuilder.getBPMInstanceBuilders().getSProcessInstanceBuilder();
+        final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
 
         // Creation of a process instance:
         final SProcessInstance processInstance = sProcessInstanceBuilder.createNewInstance(processName, process_definition_id).done();
@@ -334,11 +337,10 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
     private SDataInstance createDataInTransaction(final String dataName, final String dataType, final long containerId,
             final DataInstanceContainer containerType) throws SBonitaException {
         getTransactionService().begin();
-        final SDataInstanceBuilder dataInstanceBuilder = bpmServicesBuilder.getSDataInstanceBuilders().getDataInstanceBuilder();
-        final SDataDefinitionBuilder dataDefBuilder = bpmServicesBuilder.getSDataDefinitionBuilders().getDataDefinitionBuilder();
-        dataDefBuilder.createNewInstance(dataName, dataType);
+        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
+        final SDataDefinitionBuilder dataDefBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(dataName, dataType);
 
-        dataInstanceBuilder.createNewInstance(dataDefBuilder.done());
+        final SDataInstanceBuilder dataInstanceBuilder = fact.createNewInstance(dataDefBuilder.done());
         dataInstanceBuilder.setContainerId(containerId);
         dataInstanceBuilder.setContainerType(containerType.name());
 

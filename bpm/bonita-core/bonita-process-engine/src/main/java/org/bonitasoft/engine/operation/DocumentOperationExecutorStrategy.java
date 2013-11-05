@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.operation;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
@@ -23,7 +24,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -49,18 +50,15 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final SProcessDocumentBuilders processDocumentBuilders;
-
     private final SessionAccessor sessionAccessor;
 
     private final SessionService sessionService;
 
     public DocumentOperationExecutorStrategy(final ProcessDocumentService processDocumentService, final ActivityInstanceService activityInstanceService,
-            final SProcessDocumentBuilders processDocumentBuilders, final SessionAccessor sessionAccessor, final SessionService sessionService) {
+            final SessionAccessor sessionAccessor, final SessionService sessionService) {
         super();
         this.processDocumentService = processDocumentService;
         this.activityInstanceService = activityInstanceService;
-        this.processDocumentBuilders = processDocumentBuilders;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
     }
@@ -142,8 +140,7 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
 
     private SProcessDocument createDocument(final String documentName, final long processInstanceId, final long authorId, final DocumentValue documentValue,
             final boolean hasContent, final String documentUrl) {
-        final SProcessDocumentBuilder processDocumentBuilder = processDocumentBuilders.getSProcessDocumentBuilder();
-        processDocumentBuilder.createNewInstance();
+        final SProcessDocumentBuilder processDocumentBuilder = BuilderFactory.get(SProcessDocumentBuilderFactory.class).createNewInstance();
         processDocumentBuilder.setName(documentName);
         processDocumentBuilder.setFileName(documentValue.getFileName());
         processDocumentBuilder.setContentMimeType(documentValue.getMimeType());

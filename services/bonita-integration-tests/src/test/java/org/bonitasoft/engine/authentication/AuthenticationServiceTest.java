@@ -3,10 +3,11 @@ package org.bonitasoft.engine.authentication;
 import static org.junit.Assert.assertFalse;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.junit.Test;
 
 /**
@@ -18,11 +19,8 @@ public class AuthenticationServiceTest extends CommonServiceTest {
 
     private static IdentityService identityService;
 
-    private static IdentityModelBuilder identityBuilder;
-
     static {
         identityService = getServicesBuilder().buildIdentityService();
-        identityBuilder = getServicesBuilder().buildIdentityModelBuilder();
         authService = getServicesBuilder().buildAuthenticationService();
     }
 
@@ -41,7 +39,7 @@ public class AuthenticationServiceTest extends CommonServiceTest {
 
     private SUser createUser(final String username, final String password) throws Exception {
         getTransactionService().begin();
-        final SUserBuilder userBuilder = identityBuilder.getUserBuilder().createNewInstance().setUserName(username).setPassword(password);
+        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(username).setPassword(password);
         final SUser user = identityService.createUser(userBuilder.done());
         getTransactionService().complete();
 

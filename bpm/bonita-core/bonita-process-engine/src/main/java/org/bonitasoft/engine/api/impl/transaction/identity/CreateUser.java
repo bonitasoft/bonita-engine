@@ -13,12 +13,13 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.identity;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilder;
+import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 
 /**
  * @author Lu Kai
@@ -35,27 +36,23 @@ public class CreateUser implements TransactionContentWithResult<SUser> {
 
     private final SContactInfo sProfessionalData;
 
-    private final SContactInfoBuilder sContactInfoBuilder;
-
     private SUser user;
 
-    public CreateUser(final SUser sUser, final SContactInfo sPersonalData, final SContactInfo sProfessionalData, final IdentityService identityService,
-            final SContactInfoBuilder sContactInfoBuilder) {
+    public CreateUser(final SUser sUser, final SContactInfo sPersonalData, final SContactInfo sProfessionalData, final IdentityService identityService) {
         this.sUser = sUser;
         this.sPersonalData = sPersonalData;
         this.sProfessionalData = sProfessionalData;
         this.identityService = identityService;
-        this.sContactInfoBuilder = sContactInfoBuilder;
     }
 
     @Override
     public void execute() throws SBonitaException {
         user = identityService.createUser(sUser);
         if (sPersonalData != null) {
-            identityService.createUserContactInfo(sContactInfoBuilder.createNewInstance(sPersonalData).setUserId(user.getId()).done());
+            identityService.createUserContactInfo(BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(sPersonalData).setUserId(user.getId()).done());
         }
         if (sProfessionalData != null) {
-            identityService.createUserContactInfo(sContactInfoBuilder.createNewInstance(sProfessionalData).setUserId(user.getId()).done());
+            identityService.createUserContactInfo(BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(sProfessionalData).setUserId(user.getId()).done());
         }
     }
 

@@ -18,9 +18,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErr
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface SThrowErrorEventTriggerInstanceBuilder extends SEventTriggerInstanceBuilder {
-
-    SThrowErrorEventTriggerInstanceBuilder createNewInstance(final long eventInstanceId, final String errorCode);
+public interface SThrowErrorEventTriggerInstanceBuilder {
 
     SThrowErrorEventTriggerInstance done();
 

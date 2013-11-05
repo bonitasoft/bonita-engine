@@ -25,6 +25,7 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -32,7 +33,8 @@ import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -45,7 +47,7 @@ import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -104,35 +106,34 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         }
     }
 
-    protected SOperation toSOperation(final Operation operation, final SOperationBuilders sOperationBuilders, final SExpressionBuilders sExpressionBuilders)
+    protected SOperation toSOperation(final Operation operation)
             throws SInvalidExpressionException {
-        final SExpression rightOperand = toSExpression(operation.getRightOperand(), sExpressionBuilders);
+        final SExpression rightOperand = toSExpression(operation.getRightOperand());
         final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand(), sOperationBuilders);
-        final SOperation sOperation = sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator(operation.getOperator())
+        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
+        final SOperation sOperation = BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
                 .setRightOperand(rightOperand).setType(operatorType).setLeftOperand(sLeftOperand).done();
         return sOperation;
     }
 
-    protected SLeftOperand toSLeftOperand(final LeftOperand variableToSet, final SOperationBuilders sOperationBuilders) {
-        return sOperationBuilders.getSLeftOperandBuilder().createNewInstance().setName(variableToSet.getName()).done();
+    protected SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
+        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
     }
 
-    protected SExpression toSExpression(final Expression exp, final SExpressionBuilders sExpressionBuilders) throws SInvalidExpressionException {
+    protected SExpression toSExpression(final Expression exp) throws SInvalidExpressionException {
         final List<SExpression> dependencies = new ArrayList<SExpression>(exp.getDependencies().size());
         if (!exp.getDependencies().isEmpty()) {
             for (final Expression dependency : exp.getDependencies()) {
-                dependencies.add(toSExpression(dependency, sExpressionBuilders));
+                dependencies.add(toSExpression(dependency));
             }
         }
-        final SExpression sExpression = sExpressionBuilders.getExpressionBuilder().createNewInstance().setName(exp.getName()).setContent(exp.getContent())
+        final SExpression sExpression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(exp.getName()).setContent(exp.getContent())
                 .setExpressionType(exp.getExpressionType()).setInterpreter(exp.getInterpreter()).setReturnType(exp.getReturnType())
                 .setDependencies(dependencies).done();
         return sExpression;
     }
 
-    protected List<SOperation> toSOperation(final List<Operation> operations, final SOperationBuilders sOperationBuilders,
-            final SExpressionBuilders sExpressionBuilders) throws SInvalidExpressionException {
+    protected List<SOperation> toSOperation(final List<Operation> operations) throws SInvalidExpressionException {
         if (operations == null) {
             return null;
         }
@@ -141,7 +142,7 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         }
         final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
         for (final Operation operation : operations) {
-            final SOperation sOperation = toSOperation(operation, sOperationBuilders, sExpressionBuilders);
+            final SOperation sOperation = toSOperation(operation);
             sOperations.add(sOperation);
         }
         return sOperations;

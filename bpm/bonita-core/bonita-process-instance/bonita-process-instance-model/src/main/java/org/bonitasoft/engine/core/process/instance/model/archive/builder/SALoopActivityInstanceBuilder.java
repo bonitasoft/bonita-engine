@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance;
 
 /**
@@ -22,9 +21,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityI
  */
 public interface SALoopActivityInstanceBuilder extends SAActivityInstanceBuilder {
 
-    SALoopActivityInstanceBuilder createNewLoopActivityInstance(SLoopActivityInstance sLoopActivityInstance);
-
-    @Override
     SALoopActivityInstance done();
 
 }

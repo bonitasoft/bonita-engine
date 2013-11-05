@@ -24,12 +24,11 @@ import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
  */
 public class SJobLogBuilderImpl implements SJobLogBuilder {
 
-    private SJobLogImpl entity;
-
-    @Override
-    public SJobLogBuilder createNewInstance(final long jobDescriptorId) {
-        entity = new SJobLogImpl(jobDescriptorId);
-        return this;
+    private final SJobLogImpl entity;
+    
+    public SJobLogBuilderImpl(final SJobLogImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override

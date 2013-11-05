@@ -21,9 +21,6 @@ import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
  */
 public interface SLoopActivityInstanceBuilder extends SActivityInstanceBuilder {
 
-    SLoopActivityInstanceBuilder createNewOuterTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
-
     @Override
     SLoopActivityInstance done();
 

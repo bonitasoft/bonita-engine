@@ -22,31 +22,16 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanc
  */
 public class SHiddenTaskInstanceBuilderImpl implements SHiddenTaskInstanceBuilder {
 
-    private static final String USER_ID_KEY = "userId";
-
-    private static final String ACTIVITY_INSTANCE_ID_KEY = "activityInstanceId";
-
-    private SHiddenTaskInstanceImpl entity;
-
-    @Override
-    public SHiddenTaskInstanceBuilderImpl createNewInstance(final long activityId, final long userId) {
-        entity = new SHiddenTaskInstanceImpl(activityId, userId);
-        return this;
+    private final SHiddenTaskInstanceImpl entity;
+    
+    public SHiddenTaskInstanceBuilderImpl(final SHiddenTaskInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
     public SHiddenTaskInstance done() {
         return entity;
-    }
-
-    @Override
-    public String getUserIdKey() {
-        return USER_ID_KEY;
-    }
-
-    @Override
-    public String getActivityInstanceIdKey() {
-        return ACTIVITY_INSTANCE_ID_KEY;
     }
 
 }

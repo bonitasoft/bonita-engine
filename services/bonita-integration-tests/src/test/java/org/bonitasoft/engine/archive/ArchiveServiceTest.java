@@ -10,14 +10,15 @@ import org.bonitasoft.engine.archive.model.EmployeeProjectMapping;
 import org.bonitasoft.engine.archive.model.Laptop;
 import org.bonitasoft.engine.archive.model.Project;
 import org.bonitasoft.engine.archive.model.TestLogBuilder;
+import org.bonitasoft.engine.archive.model.TestLogBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -40,18 +41,15 @@ public class ArchiveServiceTest extends CommonServiceTest {
 
     private static ArchiveService archiveService;
 
-    private static TestLogBuilder logModelBuilder;
-
     private long sessionId;
 
     static {
         archiveService = getServicesBuilder().buildArchiveService();
-        logModelBuilder = getServicesBuilder().getInstanceOf(TestLogBuilder.class);
     }
 
     @Before
     public void createTenant() throws Exception {
-        final long tenantId = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), getTenantBuilder(), "aTenant", "me", "test");
+        final long tenantId = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), "aTenant", "me", "test");
         createSession(tenantId);
     }
 
@@ -76,7 +74,7 @@ public class ArchiveServiceTest extends CommonServiceTest {
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -84,6 +82,7 @@ public class ArchiveServiceTest extends CommonServiceTest {
     }
 
     private TestLogBuilder getLogBuilder(final ActionType actionType, final String message) {
+        final TestLogBuilder logModelBuilder = new TestLogBuilderFactory().createNewInstance();
         initializeLogBuilder(logModelBuilder, message);
         updateLog(actionType, logModelBuilder);
         return logModelBuilder;

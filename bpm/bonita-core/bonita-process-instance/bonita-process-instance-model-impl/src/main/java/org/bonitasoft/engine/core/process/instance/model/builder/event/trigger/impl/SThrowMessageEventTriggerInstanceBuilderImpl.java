@@ -20,15 +20,13 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThr
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SThrowMessageEventTriggerInstanceBuilderImpl extends SEventTriggerInstanceBuilderImpl implements SThrowMessageEventTriggerInstanceBuilder {
+public class SThrowMessageEventTriggerInstanceBuilderImpl implements SThrowMessageEventTriggerInstanceBuilder {
 
-    private SThrowMessageEventTriggerInstanceImpl entity;
+    private final SThrowMessageEventTriggerInstanceImpl entity;
 
-    @Override
-    public SThrowMessageEventTriggerInstanceBuilder createNewInstance(final long eventInstanceId, final String messageName, final String targetProcess,
-            final String targetFlowNode) {
-        entity = new SThrowMessageEventTriggerInstanceImpl(eventInstanceId, messageName, targetProcess, targetFlowNode);
-        return this;
+    public SThrowMessageEventTriggerInstanceBuilderImpl(final SThrowMessageEventTriggerInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override

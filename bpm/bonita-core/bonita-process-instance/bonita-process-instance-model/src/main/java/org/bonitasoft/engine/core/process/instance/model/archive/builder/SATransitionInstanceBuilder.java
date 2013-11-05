@@ -13,18 +13,12 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
-import org.bonitasoft.engine.core.process.definition.model.TransitionState;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
 
 /**
  * @author Hongwen Zang
  */
 public interface SATransitionInstanceBuilder extends SAFlowElementInstanceBuilder {
-
-    SATransitionInstanceBuilder createNewTransitionInstance(STransitionDefinition sTransitionDefinition, SFlowNodeInstance sFlowNodeInstance,
-            TransitionState state);
 
     SATransitionInstance done();
 

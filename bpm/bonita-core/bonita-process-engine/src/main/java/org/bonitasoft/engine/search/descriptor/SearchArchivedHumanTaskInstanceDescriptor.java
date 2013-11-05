@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -34,30 +34,30 @@ public class SearchArchivedHumanTaskInstanceDescriptor extends SearchEntityDescr
 
     private final Map<Class<? extends PersistentObject>, Set<String>> humanTaskInstanceAllFields;
 
-    public SearchArchivedHumanTaskInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders) {
-        final SAUserTaskInstanceBuilder instanceBuilder = bpmInstanceBuilders.getSAUserTaskInstanceBuilder();
+    public SearchArchivedHumanTaskInstanceDescriptor() {
+        final SAUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class);
         entityKeys = new HashMap<String, FieldDescriptor>(10);
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.NAME, new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getNameKey()));
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PRIORITY, new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getPriorityKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.NAME, new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getNameKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PRIORITY, new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getPriorityKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
-                new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getProcessDefinitionKey()));
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getProcessDefinitionKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
-                new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getRootProcessInstanceKey()));
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getRootProcessInstanceKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID,
-                new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getParentActivityInstanceKey()));
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getStateNameKey()));
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getParentActivityInstanceKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getStateNameKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.ASSIGNEE_ID,
-                new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getAssigneeIdKey()));
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getAssigneeIdKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.DISPLAY_NAME,
-                new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getDisplayNameKey()));
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getDisplayNameKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE,
-                new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getReachedStateDateKey()));
-        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.TERMINAL, new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getTerminalKey()));
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getReachedStateDateKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.TERMINAL, new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getTerminalKey()));
 
         humanTaskInstanceAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> humanFields = new HashSet<String>(2);
-        humanFields.add(instanceBuilder.getNameKey());
-        humanFields.add(instanceBuilder.getDisplayNameKey());
+        humanFields.add(keyProvider.getNameKey());
+        humanFields.add(keyProvider.getDisplayNameKey());
         humanTaskInstanceAllFields.put(SAHumanTaskInstance.class, humanFields);
     }
 

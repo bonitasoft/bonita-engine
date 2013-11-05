@@ -13,10 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
-import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 
 /**
@@ -26,26 +24,13 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceI
  */
 public class SUserTaskInstanceBuilderImpl extends SHumanTaskInstanceBuilderImpl implements SUserTaskInstanceBuilder {
 
-    private SUserTaskInstanceImpl activityInst;
-
-    @Override
-    public SUserTaskInstanceBuilder createNewUserTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long actorId, final long processDefinitionId, final long rootProcessInstanceId,
-            final long parentProcessInstanceId) {
-        activityInst = new SUserTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, actorId, STaskPriority.NORMAL,
-                processDefinitionId, rootProcessInstanceId);
-        activityInst.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SUserTaskInstanceBuilderImpl(final SUserTaskInstanceImpl activityInst) {
+        super(activityInst);
     }
 
     @Override
     public SUserTaskInstance done() {
-        return activityInst;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return activityInst;
+        return (SUserTaskInstance) this.entity;
     }
 
 }

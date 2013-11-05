@@ -23,25 +23,11 @@ import org.bonitasoft.engine.profile.model.impl.SProfileImpl;
  */
 public class SProfileBuilderImpl implements SProfileBuilder {
 
-    private SProfileImpl profile;
+    private final SProfileImpl profile;
 
-    @Override
-    public SProfileBuilder createNewInstance(final SProfile profile) {
-        this.profile = new SProfileImpl(profile);
-        return this;
-    }
-
-    @Override
-    public SProfileBuilder createNewInstance(final String name, final boolean isDefault, final long creationDate, final long createdBy,
-            final long lastUpdateDate, final long lastUpdatedBy) {
-        profile = new SProfileImpl();
-        profile.setName(name);
-        profile.setDefault(isDefault);
-        profile.setCreationDate(creationDate);
-        profile.setCreatedBy(createdBy);
-        profile.setLastUpdateDate(lastUpdateDate);
-        profile.setLastUpdatedBy(lastUpdatedBy);
-        return this;
+    public SProfileBuilderImpl(final SProfileImpl profile) {
+        super();
+        this.profile = profile;
     }
 
     @Override

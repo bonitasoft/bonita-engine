@@ -33,11 +33,6 @@ public class SExternalIdentityMappingLogBuilderImpl extends CRUDELogBuilder impl
     }
 
     @Override
-    public String getObjectIdKey() {
-        return SExternalIdentityMappingLogIndexesMapper.EXTERNAL_IDENTITY_MAPPING_INDEX_NAME;
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return PREFIX;
     }

@@ -22,9 +22,6 @@ import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
  */
 public interface SUserTaskInstanceBuilder extends SHumanTaskInstanceBuilder {
 
-    SUserTaskInstanceBuilder createNewUserTaskInstance(String name, long flowNodeDefinitionId, long rootContainerId, long parentContainerId,
-            long actorId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
-
     @Override
     SUserTaskInstance done();
 

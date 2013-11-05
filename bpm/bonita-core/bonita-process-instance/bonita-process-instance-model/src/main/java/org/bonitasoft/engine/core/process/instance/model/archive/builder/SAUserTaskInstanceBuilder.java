@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInstance;
 
 /**
@@ -22,9 +21,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAUserTaskInsta
  */
 public interface SAUserTaskInstanceBuilder extends SAActivityInstanceBuilder {
 
-    SAUserTaskInstanceBuilder createNewUserTaskInstance(SUserTaskInstance sUserTaskInstance);
-
-    @Override
     SAUserTaskInstance done();
 
 }

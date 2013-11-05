@@ -15,7 +15,6 @@ package org.bonitasoft.engine.data.definition.model.builder.impl;
 
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.STextDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.impl.SDataDefinitionImpl;
 import org.bonitasoft.engine.data.definition.model.impl.STextDefinitionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -27,25 +26,11 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class SDataDefinitionBuilderImpl implements SDataDefinitionBuilder {
 
-    private SDataDefinitionImpl dataDefinitionImpl;
-
-    private void initializeNameAndClassName(final String name, final String className) {
-        dataDefinitionImpl.setName(name);
-        dataDefinitionImpl.setClassName(className);
-    }
-
-    @Override
-    public STextDataDefinitionBuilder createNewTextData(final String name) {
-        dataDefinitionImpl = new STextDefinitionImpl();
-        initializeNameAndClassName(name, String.class.getName());
-        return new STextDataDefinitionBuilderImpl(this);
-    }
-
-    @Override
-    public SDataDefinitionBuilder createNewInstance(final String name, final String className) {
-        dataDefinitionImpl = new SDataDefinitionImpl();
-        initializeNameAndClassName(name, className);
-        return this;
+    private final SDataDefinitionImpl dataDefinitionImpl;
+    
+    public SDataDefinitionBuilderImpl(final SDataDefinitionImpl dataDefinitionImpl) {
+        super();
+        this.dataDefinitionImpl = dataDefinitionImpl;
     }
 
     @Override
@@ -53,6 +38,12 @@ public class SDataDefinitionBuilderImpl implements SDataDefinitionBuilder {
         return dataDefinitionImpl;
     }
 
+    public SDataDefinitionBuilder setAsLongText(final boolean value) {
+        if (dataDefinitionImpl instanceof STextDefinitionImpl && dataDefinitionImpl.getClassName().equals(String.class.getName())) {
+            ((STextDefinitionImpl) dataDefinitionImpl).setIsLongText(value);
+        }
+        return this;
+    }
     @Override
     public SDataDefinitionBuilder setName(final String name) {
         dataDefinitionImpl.setName(name);
@@ -75,6 +66,10 @@ public class SDataDefinitionBuilderImpl implements SDataDefinitionBuilder {
     public SDataDefinitionBuilder setDefaultValue(final SExpression expression) {
         dataDefinitionImpl.setDefaultValueExpression(expression);
         return this;
+    }
+
+    public static SDataDefinitionBuilder getInstance() {
+        return new SDataDefinitionBuilderImpl(null);
     }
 
 }

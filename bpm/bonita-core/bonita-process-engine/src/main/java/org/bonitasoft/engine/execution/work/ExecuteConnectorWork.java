@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
@@ -143,10 +142,6 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             final ProcessDefinitionService processDefinitionService, final Throwable e) throws Exception {
         final HandleConnectorOnFailEventTxContent handleError = new HandleConnectorOnFailEventTxContent(e, processDefinitionService, context);
         return transactionService.executeInTransaction(handleError);
-    }
-
-    protected BPMDefinitionBuilders getBPMDefinitionBuilders(final Map<String, Object> context) {
-        return getTenantAccessor(context).getBPMDefinitionBuilders();
     }
 
     private final class EvaluateParameterAndGetConnectorInstance implements Callable<Void> {

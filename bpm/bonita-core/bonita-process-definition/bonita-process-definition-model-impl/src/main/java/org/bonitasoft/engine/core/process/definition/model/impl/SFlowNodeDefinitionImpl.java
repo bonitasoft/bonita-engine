@@ -24,14 +24,12 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Feng Hui
@@ -65,8 +63,8 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
 
     private final Map<ConnectorEvent, List<SConnectorDefinition>> connectorsMap;
 
-    public SFlowNodeDefinitionImpl(final FlowNodeDefinition flowNodeDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> sTransitionsMap, final SOperationBuilders sOperationBuilders) {
+    public SFlowNodeDefinitionImpl(final FlowNodeDefinition flowNodeDefinition,
+            final Map<String, STransitionDefinition> sTransitionsMap) {
         super(flowNodeDefinition.getName());
         incomings = buildIncomingTransitions(flowNodeDefinition, sTransitionsMap);
         outgoings = buildOutGoingTransitions(flowNodeDefinition, sTransitionsMap);
@@ -79,7 +77,7 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         connectorsMap.put(ConnectorEvent.ON_ENTER, new ArrayList<SConnectorDefinition>());
         connectorsMap.put(ConnectorEvent.ON_FINISH, new ArrayList<SConnectorDefinition>());
         for (final ConnectorDefinition connector : connectors2) {
-            final SConnectorDefinitionImpl e = new SConnectorDefinitionImpl(connector, sExpressionBuilders, sOperationBuilders);
+            final SConnectorDefinitionImpl e = new SConnectorDefinitionImpl(connector);
             mConnectors.add(e);
             connectorsMap.get(e.getActivationEvent()).add(e);
         }
@@ -87,10 +85,9 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         allConnectorsMap = new HashMap<String, SConnectorDefinition>(2);
 
         description = flowNodeDefinition.getDescription();
-        displayDescription = ServerModelConvertor.convertExpression(sExpressionBuilders, flowNodeDefinition.getDisplayDescription());
-        displayDescriptionAfterCompletion = ServerModelConvertor.convertExpression(sExpressionBuilders,
-                flowNodeDefinition.getDisplayDescriptionAfterCompletion());
-        displayName = ServerModelConvertor.convertExpression(sExpressionBuilders, flowNodeDefinition.getDisplayName());
+        displayDescription = ServerModelConvertor.convertExpression(flowNodeDefinition.getDisplayDescription());
+        displayDescriptionAfterCompletion = ServerModelConvertor.convertExpression(flowNodeDefinition.getDisplayDescriptionAfterCompletion());
+        displayName = ServerModelConvertor.convertExpression(flowNodeDefinition.getDisplayName());
         setId(flowNodeDefinition.getId());
     }
 

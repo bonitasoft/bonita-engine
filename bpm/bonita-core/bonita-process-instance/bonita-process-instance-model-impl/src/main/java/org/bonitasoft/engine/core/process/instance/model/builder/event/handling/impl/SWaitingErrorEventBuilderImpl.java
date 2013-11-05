@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.process.instance.model.builder.event.handling.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingErrorEventBuilder;
-import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingErrorEventImpl;
 
@@ -22,41 +21,18 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWa
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class SWaitingErrorEventBuilderImpl extends SWaitingEventKeyProviderImpl implements SWaitingErrorEventBuilder {
+public class SWaitingErrorEventBuilderImpl implements SWaitingErrorEventBuilder {
 
-    private SWaitingErrorEventImpl entity;
+    private final SWaitingErrorEventImpl entity;
 
-    @Override
-    public SWaitingErrorEventBuilder createNewWaitingErrorBoundaryEventInstance(final long processdefinitionId, final long rootProcessInstanceId,
-            final long parentProcessInstanceId, final long flowNodeInstanceId, final String errorCode, final String processName,
-            final long flowNodeDefinitionId, final String flowNodeName, final long relatedActivityInstanceId) {
-        entity = new SWaitingErrorEventImpl(SBPMEventType.BOUNDARY_EVENT, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, errorCode);
-        entity.setFlowNodeInstanceId(flowNodeInstanceId);
-        entity.setRootProcessInstanceId(rootProcessInstanceId);
-        entity.setParentProcessInstanceId(parentProcessInstanceId);
-        entity.setRelatedActivityInstanceId(relatedActivityInstanceId);
-        return this;
-    }
-
-    @Override
-    public SWaitingErrorEventBuilder createNewWaitingErrorEventSubProcInstance(final long processdefinitionId, final long parentProcessInstanceId,
-            final long rootProcessInstanceId, final String errorCode, final String processName, final long flowNodeDefinitionId, final String flowNodeName,
-            final long subProcessId) {
-        entity = new SWaitingErrorEventImpl(SBPMEventType.EVENT_SUB_PROCESS, processdefinitionId, processName, flowNodeDefinitionId, flowNodeName, errorCode);
-        entity.setRootProcessInstanceId(rootProcessInstanceId);
-        entity.setParentProcessInstanceId(parentProcessInstanceId);
-        entity.setSubProcessId(subProcessId);
-        return this;
+    public SWaitingErrorEventBuilderImpl(final SWaitingErrorEventImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
     public SWaitingErrorEvent done() {
         return entity;
-    }
-
-    @Override
-    public String getErrorCodeKey() {
-        return "errorCode";
     }
 
 }

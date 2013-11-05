@@ -16,12 +16,9 @@ package org.bonitasoft.engine.core.process.definition.model.event.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ThrowEventDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateThrowEventDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -31,10 +28,9 @@ public class SIntermediateThrowEventDefinitionImpl extends SThrowEventDefinition
 
     private static final long serialVersionUID = 5010523330087778508L;
 
-    public SIntermediateThrowEventDefinitionImpl(final ThrowEventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(eventDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SIntermediateThrowEventDefinitionImpl(final ThrowEventDefinition eventDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(eventDefinition, transitionsMap);
     }
 
     public SIntermediateThrowEventDefinitionImpl(final long id, final String name) {

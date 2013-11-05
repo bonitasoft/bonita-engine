@@ -20,17 +20,22 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class SCommandUpdateBuilderImpl implements SCommandUpdateBuilder {
 
-    private final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-
+    private final EntityUpdateDescriptor descriptor;
+    
+    public SCommandUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
+        super();
+        this.descriptor = descriptor;
+    }
+    
     @Override
     public SCommandUpdateBuilder updateName(final String name) {
-        this.descriptor.addField(SCommandBuilderImpl.NAME, name);
+        this.descriptor.addField(SCommandBuilderFactoryImpl.NAME, name);
         return this;
     }
 
     @Override
     public SCommandUpdateBuilder updateDescription(final String description) {
-        this.descriptor.addField(SCommandBuilderImpl.DESCRIPTION, description);
+        this.descriptor.addField(SCommandBuilderFactoryImpl.DESCRIPTION, description);
         return this;
     }
 

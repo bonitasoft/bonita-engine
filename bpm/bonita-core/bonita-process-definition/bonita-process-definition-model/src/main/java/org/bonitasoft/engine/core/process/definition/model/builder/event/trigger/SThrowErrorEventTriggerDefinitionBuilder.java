@@ -20,8 +20,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowE
  */
 public interface SThrowErrorEventTriggerDefinitionBuilder {
 
-    SThrowErrorEventTriggerDefinitionBuilder createNewInstance(final String errorCode);
-
     SThrowErrorEventTriggerDefinition done();
 
 }

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -24,7 +25,7 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 /**
  * @author Yanyan Liu
@@ -49,12 +50,11 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<SProcessSupervisor>("getSupervisor", parameters, SProcessSupervisor.class);
     }
 
-    public static SelectListDescriptor<Long> getProcessDefIdsOfUser(final long userId, final int fromIndex, final int maxResult, final OrderByType orderByType,
-            final SProcessSupervisorBuilders supervisorBuilders) {
+    public static SelectListDescriptor<Long> getProcessDefIdsOfUser(final long userId, final int fromIndex, final int maxResult, final OrderByType orderByType) {
         final Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("userId", userId);
 
-        final OrderByOption orderByOption = new OrderByOption(SProcessSupervisor.class, supervisorBuilders.getSSupervisorBuilder().getProcessDefIdKey(),
+        final OrderByOption orderByOption = new OrderByOption(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getProcessDefIdKey(),
                 orderByType);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResult, Collections.singletonList(orderByOption));
 

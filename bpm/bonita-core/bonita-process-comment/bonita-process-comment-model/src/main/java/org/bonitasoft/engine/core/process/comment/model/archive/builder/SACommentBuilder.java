@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 
 /**
@@ -22,24 +21,6 @@ import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
  */
 public interface SACommentBuilder {
 
-    @Deprecated
-    SACommentBuilder createNewInstance(SComment sComment);
-
     SAComment done();
 
-    String getIdKey();
-
-    String getTenantIdKey();
-
-    String getUserIdKey();
-
-    String getProcessInstanceIdKey();
-
-    String getPostDateKey();
-
-    String getContentKey();
-
-    String getArchiveDate();
-
-    String getSourceObjectId();
 }

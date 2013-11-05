@@ -13,19 +13,14 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.event;
 
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowNodeInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.event.SAEndEventInstance;
-import org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
-public interface SAEndEventInstanceBuilder extends SAFlowNodeInstanceBuilder {
+public interface SAEndEventInstanceBuilder {
 
-    SAEndEventInstanceBuilder createNewArchivedEndEventInstance(final SEndEventInstance endEvent);
-
-    @Override
     SAEndEventInstance done();
 
 }

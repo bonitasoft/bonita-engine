@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -25,24 +24,12 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
  */
 public class SStartEventInstanceBuilderImpl extends SEventInstanceBuilderImpl implements SStartEventInstanceBuilder {
 
-    private SStartEventInstanceImpl entity = null;
-
-    @Override
-    public SStartEventInstanceBuilder createNewStartEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        entity = new SStartEventInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId);
-        entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SStartEventInstanceBuilderImpl(final SStartEventInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SStartEventInstance done() {
-        return entity;
+        return (SStartEventInstance) entity;
     }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return entity;
-    }
-
 }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -27,9 +28,8 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
@@ -64,15 +64,12 @@ public class ImportProfiles implements TransactionContentWithResult<List<String>
 
     @Override
     public void execute() throws SBonitaException {
-        final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
-        final SProfileBuilder profileBuilder = builders.getSProfileBuilder();
-        final SProfileEntryBuilder proEntryBuilder = builders.getSProfileEntryBuilder();
 
         for (final ExportedProfile exportedProfile : exportedProfiles) {
             // insert profile
             if (exportedProfile.getName() != null && !"".equals(exportedProfile.getName())) {
                 final long creationDate = System.currentTimeMillis();
-                final SProfile sprofile = profileBuilder
+                final SProfile sprofile = BuilderFactory.get(SProfileBuilderFactory.class)
                         .createNewInstance(exportedProfile.getName(), exportedProfile.isDefault(), creationDate, importer, creationDate, importer)
                         .setDescription(exportedProfile.getDescription())
                         .setIconPath(exportedProfile.getIconPath()).done();
@@ -80,7 +77,7 @@ public class ImportProfiles implements TransactionContentWithResult<List<String>
                 // insert profileEntries
                 final List<ExportedParentProfileEntry> parentProfileEntries = exportedProfile.getParentProfileEntries();
                 for (final ExportedParentProfileEntry parentprofileEntry : parentProfileEntries) {
-                    final SProfileEntry sproEntry = proEntryBuilder.createNewInstance(parentprofileEntry.getName(), newProfile.getId())
+                    final SProfileEntry sproEntry = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(parentprofileEntry.getName(), newProfile.getId())
                             .setDescription(parentprofileEntry.getDescription()).setIndex(parentprofileEntry.getIndex()).setPage(parentprofileEntry.getPage())
                             .setParentId(0).setType(parentprofileEntry.getType()).done();
                     final SProfileEntry parentEntry = profileService.createProfileEntry(sproEntry);
@@ -88,7 +85,7 @@ public class ImportProfiles implements TransactionContentWithResult<List<String>
                     final List<ExportedProfileEntry> childrenProEn = parentprofileEntry.getChildProfileEntries();
                     if (childrenProEn != null && childrenProEn.size() > 0) {
                         for (final ExportedProfileEntry childProfileEntry : childrenProEn) {
-                            final SProfileEntry sproEntrytp = proEntryBuilder.createNewInstance(childProfileEntry.getName(), newProfile.getId())
+                            final SProfileEntry sproEntrytp = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(childProfileEntry.getName(), newProfile.getId())
                                     .setDescription(childProfileEntry.getDescription()).setIndex(childProfileEntry.getIndex())
                                     .setPage(childProfileEntry.getPage()).setParentId(parentEntry.getId()).setType(childProfileEntry.getType()).done();
                             profileService.createProfileEntry(sproEntrytp);

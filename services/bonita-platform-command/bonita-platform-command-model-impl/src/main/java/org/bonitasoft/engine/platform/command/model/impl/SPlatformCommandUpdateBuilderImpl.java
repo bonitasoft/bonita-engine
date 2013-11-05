@@ -21,17 +21,22 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class SPlatformCommandUpdateBuilderImpl implements SPlatformCommandUpdateBuilder {
 
-    private final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+    private final EntityUpdateDescriptor descriptor;
+    
+    public SPlatformCommandUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
+        super();
+        this.descriptor = descriptor;
+    }
 
     @Override
     public SPlatformCommandUpdateBuilder updateName(final String name) {
-        this.descriptor.addField(SPlatformCommandBuilderImpl.NAME, name);
+        this.descriptor.addField(SPlatformCommandBuilderFactoryImpl.NAME, name);
         return this;
     }
 
     @Override
     public SPlatformCommandUpdateBuilder updateDescription(final String description) {
-        this.descriptor.addField(SPlatformCommandBuilderImpl.DESCRIPTION, description);
+        this.descriptor.addField(SPlatformCommandBuilderFactoryImpl.DESCRIPTION, description);
         return this;
     }
 

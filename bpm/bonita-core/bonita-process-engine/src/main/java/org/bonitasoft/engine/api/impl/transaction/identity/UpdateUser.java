@@ -13,12 +13,13 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.identity;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilder;
+import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -40,27 +41,21 @@ public class UpdateUser implements TransactionContentWithResult<SUser> {
 
     private final EntityUpdateDescriptor professionalDataUpdateDescriptor;
 
-    private final SContactInfoBuilder sContactInfoBuilder;
-
     public UpdateUser(final IdentityService identityService, final long userId, final EntityUpdateDescriptor changeDescriptor,
-            final EntityUpdateDescriptor personalDataUpDescriptor, final EntityUpdateDescriptor professionalDataUpDescriptor,
-            final SContactInfoBuilder sContactInfoBuilder) {
+            final EntityUpdateDescriptor personalDataUpDescriptor, final EntityUpdateDescriptor professionalDataUpDescriptor) {
         this.userId = userId;
         personalDataUpdateDescriptor = personalDataUpDescriptor;
         professionalDataUpdateDescriptor = professionalDataUpDescriptor;
-        this.sContactInfoBuilder = sContactInfoBuilder;
         sUser = null;
         this.identityService = identityService;
         this.changeDescriptor = changeDescriptor;
     }
 
     public UpdateUser(final IdentityService identityService, final SUser sUser, final EntityUpdateDescriptor changeDescriptor,
-            final EntityUpdateDescriptor personalDataUpDescriptor, final EntityUpdateDescriptor professionalDataUpDescriptor,
-            final SContactInfoBuilder sContactInfoBuilder) {
+            final EntityUpdateDescriptor personalDataUpDescriptor, final EntityUpdateDescriptor professionalDataUpDescriptor) {
         userId = -1;
         personalDataUpdateDescriptor = personalDataUpDescriptor;
         professionalDataUpdateDescriptor = professionalDataUpDescriptor;
-        this.sContactInfoBuilder = sContactInfoBuilder;
         this.sUser = sUser;
         this.identityService = identityService;
         this.changeDescriptor = changeDescriptor;
@@ -80,7 +75,7 @@ public class UpdateUser implements TransactionContentWithResult<SUser> {
         if (personalDataUpdateDescriptor != null && !personalDataUpdateDescriptor.getFields().isEmpty()) {
             SContactInfo persoContactInfo = identityService.getUserContactInfo(userId, true);
             if (persoContactInfo == null) {
-                persoContactInfo = sContactInfoBuilder.createNewInstance(userId, true).done();
+                persoContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, true).done();
                 identityService.createUserContactInfo(persoContactInfo);
             }
             identityService.updateUserContactInfo(persoContactInfo, personalDataUpdateDescriptor);
@@ -90,7 +85,7 @@ public class UpdateUser implements TransactionContentWithResult<SUser> {
         if (professionalDataUpdateDescriptor != null && !professionalDataUpdateDescriptor.getFields().isEmpty()) {
             SContactInfo professContactInfo = identityService.getUserContactInfo(userId, false);
             if (professContactInfo == null) {
-                professContactInfo = sContactInfoBuilder.createNewInstance(userId, false).done();
+                professContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, false).done();
                 identityService.createUserContactInfo(professContactInfo);
             }
             identityService.updateUserContactInfo(professContactInfo, professionalDataUpdateDescriptor);

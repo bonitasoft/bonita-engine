@@ -14,24 +14,26 @@
 package org.bonitasoft.engine.expression;
 
 import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.connector.EngineExecutionContext;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 
 /**
  * @author Matthieu Chaffotte
  */
 public final class EngineConstantExpressionBuilder {
 
-	public static SExpression getConnectorAPIAccessorExpression(final SExpressionBuilder expressionbuilder) throws SInvalidExpressionException {
-        final SExpressionBuilder builder = expressionbuilder.createNewInstance();
+	public static SExpression getConnectorAPIAccessorExpression() throws SInvalidExpressionException {
+        final SExpressionBuilder builder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
         builder.setContent("connectorApiAccessor").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name()).setReturnType(APIAccessor.class.getName());
         return builder.done();
     }
 	
-    public static SExpression getEngineExecutionContext(final SExpressionBuilder expressionbuilder) throws SInvalidExpressionException {
-        final SExpressionBuilder builder = expressionbuilder.createNewInstance();
+    public static SExpression getEngineExecutionContext() throws SInvalidExpressionException {
+        final SExpressionBuilder builder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
         builder.setContent("engineExecutionContext").setExpressionType(ExpressionType.TYPE_ENGINE_CONSTANT.name())
                 .setReturnType(EngineExecutionContext.class.getName()).done();
         return builder.done();

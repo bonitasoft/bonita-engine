@@ -23,12 +23,10 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -52,8 +50,7 @@ public class SConnectorDefinitionImpl extends SNamedElementImpl implements SConn
 
     private String errorCode;
 
-    public SConnectorDefinitionImpl(final ConnectorDefinition connector, final SExpressionBuilders sExpressionBuilders,
-            final SOperationBuilders sOperationBuilders) {
+    public SConnectorDefinitionImpl(final ConnectorDefinition connector) {
         super(connector.getName());
         activationEvent = connector.getActivationEvent();
         connectorId = connector.getConnectorId();
@@ -64,13 +61,13 @@ public class SConnectorDefinitionImpl extends SNamedElementImpl implements SConn
         for (final Entry<String, Expression> input : connector.getInputs().entrySet()) {
             final Expression value = input.getValue();
             if (value != null) {
-                final SExpression sExpression = ServerModelConvertor.convertExpression(sExpressionBuilders, value);
+                final SExpression sExpression = ServerModelConvertor.convertExpression(value);
                 inputs.put(input.getKey(), sExpression);// creates SExpression
             }
         }
         outputs = new ArrayList<SOperation>(connector.getOutputs().size());
         for (final Operation operation : connector.getOutputs()) {
-            final SOperation sOperation = ServerModelConvertor.convertOperation(sOperationBuilders, sExpressionBuilders, operation);
+            final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
             outputs.add(sOperation);
         }
         // setId(connector.getId()); TODO : Implement generation of id

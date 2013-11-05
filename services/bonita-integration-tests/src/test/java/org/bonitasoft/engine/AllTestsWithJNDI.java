@@ -1,7 +1,6 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.AfterClass;
@@ -22,20 +21,17 @@ public class AllTestsWithJNDI {
 
     private static PlatformService platformService;
 
-    private static SPlatformBuilder platformBuilder;
-
     static {
         CommonServiceTest.setupSpringContextIfNeeded();
         servicesBuilder = new ServicesBuilder();
         transactionService = servicesBuilder.buildTransactionService();
         platformService = servicesBuilder.buildPlatformService();
-        platformBuilder = servicesBuilder.buildPlatformBuilder();
     }
 
     @BeforeClass
     public static void setUpPlatform() throws Exception {
         System.err.println("=================== AllTestsWithJNDI.beforeClass()");
-        TestUtil.createPlatform(transactionService, platformService, platformBuilder);
+        TestUtil.createPlatform(transactionService, platformService);
     }
 
     @AfterClass

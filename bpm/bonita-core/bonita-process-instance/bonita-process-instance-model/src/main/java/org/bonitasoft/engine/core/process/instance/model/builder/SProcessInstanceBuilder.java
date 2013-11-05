@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 
 /**
@@ -25,12 +24,6 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
  * @author Celine Souchet
  */
 public interface SProcessInstanceBuilder {
-
-    SProcessInstanceBuilder createNewInstance(String name, long processDefinitionId);
-
-    SProcessInstanceBuilder createNewInstance(String name, long processDefinitionId, String description);
-
-    SProcessInstanceBuilder createNewInstance(SProcessDefinition definition);
 
     SProcessInstanceBuilder setName(String name);
 
@@ -48,33 +41,5 @@ public interface SProcessInstanceBuilder {
     SProcessInstanceBuilder setRootProcessInstanceId(long rootProcessInstanceId);
 
     SProcessInstance done();
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getProcessDefinitionIdKey();
-
-    String getStateIdKey();
-
-    String getStateCategoryKey();
-
-    String getStartDateKey();
-
-    String getStartedByKey();
-
-    String getStartedByDelegateKey();
-
-    String getEndDateKey();
-
-    String getLastUpdateKey();
-
-    String getContainerIdKey();
-
-    String getInterruptingEventIdKey();
-
-    String getMigrationPlanIdKey();
-
-    String getCallerIdKey();
 
 }

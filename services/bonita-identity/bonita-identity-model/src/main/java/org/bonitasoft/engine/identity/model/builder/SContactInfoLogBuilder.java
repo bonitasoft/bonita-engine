@@ -22,8 +22,6 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
  */
 public interface SContactInfoLogBuilder extends SPersistenceLogBuilder, HasCRUDEAction {
 
-    String getContactInfoUserIdKey();
-
     SPersistenceLogBuilder setContactInfoUserId(long userId);
 
 }

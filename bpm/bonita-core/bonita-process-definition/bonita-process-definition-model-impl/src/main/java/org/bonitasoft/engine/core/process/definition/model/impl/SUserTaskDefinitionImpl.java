@@ -16,12 +16,9 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
@@ -32,10 +29,9 @@ public class SUserTaskDefinitionImpl extends SHumanTaskDefinitionImpl implements
 
     private static final long serialVersionUID = 9039679250456947450L;
 
-    public SUserTaskDefinitionImpl(final UserTaskDefinition userTaskDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(userTaskDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SUserTaskDefinitionImpl(final UserTaskDefinition userTaskDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(userTaskDefinition, transitionsMap);
     }
 
     public SUserTaskDefinitionImpl(final long id, final String name, final String actorName) {

@@ -20,7 +20,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -32,7 +31,6 @@ import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.StateBehaviors;
@@ -56,13 +54,9 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
 
     private final TechnicalLoggerService logger;
 
-    private final BPMInstanceBuilders bpmInstanceBuilders;
-
     private final ArchiveService archiveService;
 
     private final SCommentService commentService;
-
-    private final SCommentBuilders commentBuilders;
 
     private final ProcessDefinitionService processDeifnitionService;
 
@@ -70,8 +64,8 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
 
     public CompletingCallActivityStateImpl(final StateBehaviors stateBehaviors, final OperationService operationService,
             final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final BPMInstanceBuilders bpmInstanceBuilders,
-            final ArchiveService archiveService, final SCommentService commentService, final SCommentBuilders commentBuilders,
+            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger,
+            final ArchiveService archiveService, final SCommentService commentService,
             final ProcessDefinitionService processDeifnitionService, final ConnectorInstanceService connectorInstanceService) {
         super(stateBehaviors);
         this.operationService = operationService;
@@ -79,10 +73,8 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
         this.dataInstanceService = dataInstanceService;
         this.documentMappingService = documentMappingService;
         this.logger = logger;
-        this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.archiveService = archiveService;
         this.commentService = commentService;
-        this.commentBuilders = commentBuilders;
         this.processDeifnitionService = processDeifnitionService;
         this.connectorInstanceService = connectorInstanceService;
     }
@@ -108,7 +100,7 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
             }
             // archive child process instance
             ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentMappingService, logger,
-                    bpmInstanceBuilders, commentService, commentBuilders, processDeifnitionService, connectorInstanceService);
+                    commentService, processDeifnitionService, connectorInstanceService);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }

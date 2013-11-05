@@ -18,7 +18,4 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
  */
 public interface SReceiveTaskInstanceBuilder extends SActivityInstanceBuilder {
 
-    SReceiveTaskInstanceBuilder createNewReceiveTaskInstance(final String name, long flowNodeDefinitionId, final long rootContainerId,
-            long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
-
 }

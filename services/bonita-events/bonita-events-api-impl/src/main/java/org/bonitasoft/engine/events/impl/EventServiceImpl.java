@@ -24,7 +24,6 @@ import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -39,8 +38,8 @@ public class EventServiceImpl extends AbstractEventServiceImpl {
      */
     protected Map<String, List<SHandler<SEvent>>> registeredHandlers;
 
-    public EventServiceImpl(final SEventBuilders eventBuilders, final TechnicalLoggerService logger) {
-        super(eventBuilders, logger);
+    public EventServiceImpl(final TechnicalLoggerService logger) {
+        super(logger);
         registeredHandlers = new HashMap<String, List<SHandler<SEvent>>>();
     }
 

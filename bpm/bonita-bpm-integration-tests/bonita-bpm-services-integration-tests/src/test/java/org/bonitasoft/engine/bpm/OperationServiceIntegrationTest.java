@@ -8,26 +8,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -47,22 +49,10 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
 
     private static DataInstanceService dataInstanceService;
 
-    private static SDataDefinitionBuilders dataDefinitionBuilders;
-
-    private static SDataInstanceBuilders dataInstanceBuilders;
-
-    private static SExpressionBuilders sExpressionBuilders;
-
-    private static SOperationBuilders sOperationBuilders;
-
     public OperationServiceIntegrationTest() {
         servicesBuilder = getServicesBuilder();
         transactionService = servicesBuilder.getTransactionService();
         dataInstanceService = servicesBuilder.getDataInstanceService();
-        dataInstanceBuilders = servicesBuilder.getSDataInstanceBuilders();
-        dataDefinitionBuilders = servicesBuilder.getSDataDefinitionBuilders();
-        sExpressionBuilders = servicesBuilder.getInstanceOf(SExpressionBuilders.class);
-        sOperationBuilders = servicesBuilder.getSOperationBuilders();
         operationService = servicesBuilder.getOperationService();
     }
 
@@ -137,18 +127,18 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     private SOperation buildJavaMethodOperation(final String dataInstanceName, final String newConstantValue) throws SInvalidExpressionException {
-        final SLeftOperand leftOperand = sOperationBuilders.getSLeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
-        final SExpression expression = sExpressionBuilders.getExpressionBuilder().createNewInstance().setContent(newConstantValue)
+        final SLeftOperand leftOperand = BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(dataInstanceName).done();
+        final SExpression expression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setContent(newConstantValue)
                 .setExpressionType(ExpressionType.TYPE_CONSTANT.name()).setReturnType(String.class.getName()).done();
-        return sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator("add:" + Object.class.getName()).setLeftOperand(leftOperand)
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator("add:" + Object.class.getName()).setLeftOperand(leftOperand)
                 .setType(SOperatorType.JAVA_METHOD).setRightOperand(expression).done();
     }
 
     private SOperation buildAssignmentOperation(final String dataInstanceName, final String newConstantValue) throws SInvalidExpressionException {
-        final SLeftOperand leftOperand = sOperationBuilders.getSLeftOperandBuilder().createNewInstance().setName(dataInstanceName).done();
-        final SExpression expression = sExpressionBuilders.getExpressionBuilder().createNewInstance().setContent(newConstantValue)
+        final SLeftOperand leftOperand = BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(dataInstanceName).done();
+        final SExpression expression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setContent(newConstantValue)
                 .setReturnType(String.class.getName()).setExpressionType(ExpressionType.TYPE_CONSTANT.name()).setReturnType(String.class.getName()).done();
-        return sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(SOperatorType.ASSIGNMENT)
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(SOperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
     }
 
@@ -181,12 +171,11 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
             final String defaultValueExpressionContent, final long containerId, final String containerType, final boolean isTransient,
             final String expressionType, final String expressionInterpreter, final Serializable currentDataInstanceValue) throws SBonitaException {
         // create definition
-        final SDataDefinitionBuilder dataDefinitionBuilder = dataDefinitionBuilders.getDataDefinitionBuilder();
-        dataDefinitionBuilder.createNewInstance(instanceName, className);
+        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, className);
         initializeBuilder(dataDefinitionBuilder, description, defaultValueExpressionContent, className, isTransient, expressionType, expressionInterpreter);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
         // create data instance
-        final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition);
+        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition);
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).setValue(currentDataInstanceValue).done();
     }
 
@@ -203,7 +192,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         SExpression expression = null;
         if (defaultValueExpressionContent != null) {
             // create expression
-            final SExpressionBuilder expreBuilder = sExpressionBuilders.getExpressionBuilder().createNewInstance();
+            final SExpressionBuilder expreBuilder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
             // this discrimination'll be changed.
             expreBuilder.setContent(defaultValueExpressionContent).setExpressionType(expressionType).setReturnType(defaultValueExprReturnType);
             if (interpreter != null) {

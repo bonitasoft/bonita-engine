@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SALoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SALoopActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActivityInstanceImpl;
@@ -23,17 +22,13 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SALoopActi
  */
 public class SALoopActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SALoopActivityInstanceBuilder {
 
-    private SALoopActivityInstanceImpl entity;
-
-    @Override
-    public SALoopActivityInstanceBuilder createNewLoopActivityInstance(final SLoopActivityInstance sLoopActivityInstance) {
-        entity = new SALoopActivityInstanceImpl(sLoopActivityInstance);
-        return this;
+    public SALoopActivityInstanceBuilderImpl(final SALoopActivityInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SALoopActivityInstance done() {
-        return entity;
+        return (SALoopActivityInstance) entity;
     }
 
 }

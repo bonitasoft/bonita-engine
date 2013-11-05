@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 
 /**
  * @author Zhang Bole
@@ -57,8 +56,8 @@ public class JavaMethodOperationExecutorStrategy extends UpdateOperationExecutor
         autoboxableTypes.put(Boolean.class.getName(), boolean.class);
     }
 
-    public JavaMethodOperationExecutorStrategy(final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders) {
-        super(dataInstanceService, sDataInstanceBuilders);
+    public JavaMethodOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
+        super(dataInstanceService);
     }
 
     private Method getMethod(final SOperation operation, final Class<?> dataType) throws NoSuchMethodException, ClassNotFoundException {

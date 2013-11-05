@@ -15,6 +15,7 @@ package org.bonitasoft.engine.session.impl;
 
 import java.util.Date;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -24,7 +25,7 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.session.model.builder.SSessionBuilders;
+import org.bonitasoft.engine.session.model.builder.SSessionBuilderFactory;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -36,17 +37,15 @@ public class SessionServiceImpl implements SessionService {
 
     private long sessionDuration = DEFAULT_SESSION_DURATION;
 
-    private final SSessionBuilders sessionModelBuilders;
-
     private final SessionProvider sessionProvider;
 
     private final String applicationName;
 
     private final TechnicalLoggerService logger;
 
-    public SessionServiceImpl(final SessionProvider sessionProvider, final SSessionBuilders sessionModelBuilder, final String applicationName,
+    public SessionServiceImpl(final SessionProvider sessionProvider,
+            final String applicationName,
             final TechnicalLoggerService logger) {
-        this.sessionModelBuilders = sessionModelBuilder;
         this.sessionProvider = sessionProvider;
         this.applicationName = applicationName;
         this.logger = logger;
@@ -62,7 +61,7 @@ public class SessionServiceImpl implements SessionService {
         final long id = SessionIdGenerator.getNextId();
         final long duration = getSessionDuration();
 
-        final SSession session = sessionModelBuilders.getSessionBuilder()
+        final SSession session = BuilderFactory.get(SSessionBuilderFactory.class)
                 .createNewInstance(id, tenantId, duration, userName, applicationName, userId).technicalUser(isTechnicalUser).done();
         sessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -110,7 +109,7 @@ public class SessionServiceImpl implements SessionService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getSession"));
         }
-        return sessionModelBuilders.getSessionBuilder().copy(session);
+        return BuilderFactory.get(SSessionBuilderFactory.class).copy(session);
     }
 
     @Override

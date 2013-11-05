@@ -25,15 +25,24 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
  */
 public class ProcessInstanceBuilder {
 
-    protected ProcessInstanceImpl processInstance;
+    protected final ProcessInstanceImpl processInstance;
+
+    private ProcessInstanceBuilder() {
+        this.processInstance = null;
+    }
+    
+    private ProcessInstanceBuilder(final ProcessInstanceImpl processInstance) {
+        super();
+        this.processInstance = processInstance;
+    }
 
     public ProcessInstance done() {
         return processInstance;
     }
 
     public ProcessInstanceBuilder createNewInstance(final String name) {
-        processInstance = new ProcessInstanceImpl(name);
-        return this;
+        final ProcessInstanceImpl processInstance = new ProcessInstanceImpl(name);
+        return new ProcessInstanceBuilder(processInstance);
     }
 
     public ProcessInstanceBuilder setState(final String state) {
@@ -118,6 +127,10 @@ public class ProcessInstanceBuilder {
 
     public void setStringIndexLabel(final int index, final String stringIndexLabel) {
         processInstance.setStringIndexLabel(index, stringIndexLabel);
+    }
+
+    public static ProcessInstanceBuilder getInstance() {
+        return new ProcessInstanceBuilder(null);
     }
 
 }

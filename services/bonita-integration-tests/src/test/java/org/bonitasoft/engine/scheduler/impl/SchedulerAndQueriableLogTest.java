@@ -7,10 +7,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
@@ -59,7 +61,7 @@ public class SchedulerAndQueriableLogTest extends CommonServiceTest {
         getTransactionService().begin();
 
         final Date now = new Date();
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance("org.bonitasoft.engine.scheduler.job.ThrowsExceptionJob.ThrowsExceptionJob()", "ThrowExceptionJob")
                 .setDescription("a job that throws exception").done();
         final Trigger trigger = new OneExecutionTrigger("eventsLog", now, 10);

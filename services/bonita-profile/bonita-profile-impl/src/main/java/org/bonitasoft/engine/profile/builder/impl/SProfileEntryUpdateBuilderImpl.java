@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.profile.builder.impl;
 
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -35,43 +35,43 @@ public class SProfileEntryUpdateBuilderImpl implements SProfileEntryUpdateBuilde
 
     @Override
     public SProfileEntryUpdateBuilder setName(final String name) {
-        descriptor.addField(SProfileEntryBuilder.NAME, name);
+        descriptor.addField(SProfileEntryBuilderFactory.NAME, name);
         return this;
     }
 
     @Override
     public SProfileEntryUpdateBuilder setDescription(final String description) {
-        descriptor.addField(SProfileEntryBuilder.DESCRIPTION, description);
+        descriptor.addField(SProfileEntryBuilderFactory.DESCRIPTION, description);
         return this;
     }
 
     @Override
     public SProfileEntryUpdateBuilder setParentId(final long parentId) {
-        descriptor.addField(SProfileEntryBuilder.PARENT_ID, parentId);
+        descriptor.addField(SProfileEntryBuilderFactory.PARENT_ID, parentId);
         return this;
     }
 
     @Override
     public SProfileEntryUpdateBuilder setProfileId(final long profileId) {
-        descriptor.addField(SProfileEntryBuilder.PROFILE_ID, profileId);
+        descriptor.addField(SProfileEntryBuilderFactory.PROFILE_ID, profileId);
         return this;
     }
 
     @Override
     public SProfileEntryUpdateBuilder setType(final String type) {
-        descriptor.addField(SProfileEntryBuilder.TYPE, type);
+        descriptor.addField(SProfileEntryBuilderFactory.TYPE, type);
         return this;
     }
 
     @Override
     public SProfileEntryUpdateBuilder setPage(final String page) {
-        descriptor.addField(SProfileEntryBuilder.PAGE, page);
+        descriptor.addField(SProfileEntryBuilderFactory.PAGE, page);
         return this;
     }
 
     @Override
     public SProfileEntryUpdateBuilder setIndex(final long index) {
-        descriptor.addField(SProfileEntryBuilder.INDEX, index);
+        descriptor.addField(SProfileEntryBuilderFactory.INDEX, index);
         return this;
     }
 

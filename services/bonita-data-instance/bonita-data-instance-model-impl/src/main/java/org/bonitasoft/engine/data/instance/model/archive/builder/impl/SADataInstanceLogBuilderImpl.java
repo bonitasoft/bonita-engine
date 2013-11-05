@@ -29,17 +29,10 @@ public class SADataInstanceLogBuilderImpl extends CRUDELogBuilder implements SAD
 
     private static final int SA_DATA_INSTANCE_INDEX = 0;
 
-    private static final String SA_DATA_INSTANCE_INDEX_NAME = "numericIndex1";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
         queriableLogBuilder.numericIndex(SA_DATA_INSTANCE_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return SA_DATA_INSTANCE_INDEX_NAME;
     }
 
     @Override

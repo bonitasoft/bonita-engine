@@ -25,7 +25,6 @@ import java.util.List;
 import org.bonitasoft.engine.core.category.exception.SCategoryException;
 import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
 import org.bonitasoft.engine.core.category.model.SCategory;
-import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -66,9 +65,6 @@ public class CategoryServiceImplTest {
 
     @Mock
     private ReadSessionAccessor sessionAccessor;
-
-    @Mock
-    private SCategoryBuilderAccessor categoryBuilderAccessor;
 
     @InjectMocks
     private CategoryServiceImpl categoryServiceImpl;

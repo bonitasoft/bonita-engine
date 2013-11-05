@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileDeletionException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
@@ -50,8 +49,6 @@ public interface ProfileService {
     String ENTRY_PROFILE = "ENTRY_PROFILE";
 
     String PROFILE_MEMBER = "PROFILE_MEMBER";
-
-    SProfileBuilderAccessor getSProfileBuilderAccessor();
 
     /**
      * Get profile by its id

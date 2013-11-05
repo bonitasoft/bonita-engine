@@ -17,7 +17,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 
 /**
  * AssignmentOperationExecutorStrategy is the default Bonita strategy to execute data assignment operations
@@ -39,11 +38,9 @@ public class AssignmentOperationExecutorStrategy extends UpdateOperationExecutor
      * 
      * @param dataInstanceService
      *            how to access to the data
-     * @param sDataInstanceBuilders
-     *            <code>SDataInstanceBuilders</code> to build the updateDescriptor when updating the data
      */
-    public AssignmentOperationExecutorStrategy(final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders) {
-        super(dataInstanceService, sDataInstanceBuilders);
+    public AssignmentOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
+        super(dataInstanceService);
     }
 
     @Override

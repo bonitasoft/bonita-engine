@@ -24,37 +24,11 @@ import org.bonitasoft.engine.core.category.model.impl.SCategoryImpl;
  */
 public class SCategoryBuilderImpl implements SCategoryBuilder {
 
-    private SCategoryImpl category;
+    private final SCategoryImpl category;
 
-    static final String ID = "id";
-
-    static final String NAME = "name";
-
-    static final String DESCRIPTION = "description";
-
-    static final String CREATOR = "creator";
-
-    static final String CREATION_DATE = "creationDate";
-
-    static final String LAST_UPDATE_DATE = "lastUpdateDate";
-
-    @Override
-    public SCategoryBuilder createNewInstance(final String name, final long creator) {
-        this.category = new SCategoryImpl(name);
-        this.category.setCreator(creator);
-        final long now = System.currentTimeMillis();
-        this.category.setCreationDate(now);
-        this.category.setLastUpdateDate(now);
-        return this;
-    }
-
-    @Override
-    public SCategoryBuilder createNewInstance(final SCategory category) {
-        this.category = new SCategoryImpl(category);
-        final long now = System.currentTimeMillis();
-        this.category.setCreationDate(now);
-        this.category.setLastUpdateDate(now);
-        return this;
+    public SCategoryBuilderImpl(final SCategoryImpl category) {
+        super();
+        this.category = category;
     }
 
     @Override
@@ -72,36 +46,6 @@ public class SCategoryBuilderImpl implements SCategoryBuilder {
     public SCategoryBuilder setLastUpdateDate(final long lastUpdateDate) {
         this.category.setLastUpdateDate(lastUpdateDate);
         return this;
-    }
-
-    @Override
-    public String getIdKey() {
-        return ID;
-    }
-
-    @Override
-    public String getNameKey() {
-        return NAME;
-    }
-
-    @Override
-    public String getDescriptionKey() {
-        return DESCRIPTION;
-    }
-
-    @Override
-    public String getCreatorKey() {
-        return CREATOR;
-    }
-
-    @Override
-    public String getCreationDateKey() {
-        return CREATION_DATE;
-    }
-
-    @Override
-    public String getLastUpdateDateKey() {
-        return LAST_UPDATE_DATE;
     }
 
 }

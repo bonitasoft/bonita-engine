@@ -33,11 +33,6 @@ public class SDataSourceParameterLogBuilderImpl extends CRUDELogBuilder implemen
     }
 
     @Override
-    public String getObjectIdKey() {
-        return SDataSourceLogIndexesMapper.DATA_SOURCE_PARAMETER_INDEX_NAME;
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return DATA_SOURCE_PARAMETER;
     }
@@ -58,11 +53,6 @@ public class SDataSourceParameterLogBuilderImpl extends CRUDELogBuilder implemen
     public SDataSourceParameterLogBuilder dataSourceId(final long datasourceId) {
         this.queriableLogBuilder.numericIndex(SDataSourceLogIndexesMapper.DATA_SOURCE_INDEX, datasourceId);
         return this;
-    }
-
-    @Override
-    public String getDataSourceIdKey() {
-        return SDataSourceLogIndexesMapper.DATA_SOURCE_INDEX_NAME;
     }
 
 }

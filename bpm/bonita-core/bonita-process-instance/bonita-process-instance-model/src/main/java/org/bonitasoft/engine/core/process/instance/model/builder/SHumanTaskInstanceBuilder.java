@@ -32,14 +32,6 @@ public interface SHumanTaskInstanceBuilder extends SActivityInstanceBuilder {
 
     SHumanTaskInstanceBuilder setDisplayName(String displayName);
 
-    String getExpectedEndDateKey();
-
-    String getAssigneeIdKey();
-
-    String getClaimedDateKey();
-
-    String getPriorityKey();
-
     @Override
     SHumanTaskInstance done();
 

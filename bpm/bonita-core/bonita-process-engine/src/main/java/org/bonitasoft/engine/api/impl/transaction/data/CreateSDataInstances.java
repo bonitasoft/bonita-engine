@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api.impl.transaction.data;
 
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -22,8 +23,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SSubProcessActivityInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SSubProcessActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -41,18 +41,15 @@ public class CreateSDataInstances implements TransactionContent {
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final BPMInstanceBuilders instanceBuilders;
-
     private final SProcessDefinition processDefinition;
 
     public CreateSDataInstances(final List<SDataInstance> sDataInstances, final DataInstanceService dataInstanceService,
-            final SProcessInstance processInstance, final ActivityInstanceService activityInstanceService, final BPMInstanceBuilders instanceBuilders,
+            final SProcessInstance processInstance, final ActivityInstanceService activityInstanceService,
             final SProcessDefinition processDefinition) {
         this.sDataInstances = sDataInstances;
         this.dataInstanceService = dataInstanceService;
         this.processInstance = processInstance;
         this.activityInstanceService = activityInstanceService;
-        this.instanceBuilders = instanceBuilders;
         this.processDefinition = processDefinition;
     }
 
@@ -69,7 +66,7 @@ public class CreateSDataInstances implements TransactionContent {
             if (processInstance.getCallerId() > 0) {
                 final SFlowNodeInstance caller = activityInstanceService.getFlowNodeInstance(processInstance.getCallerId());
                 if (SFlowNodeType.SUB_PROCESS.equals(caller.getType())) {
-                    final SSubProcessActivityInstanceBuilder keyProvider = instanceBuilders.getSSubProcessActivityInstanceBuilder();
+                    final SSubProcessActivityInstanceBuilderFactory keyProvider = BuilderFactory.get(SSubProcessActivityInstanceBuilderFactory.class);
                     dataInstanceService.addChildContainer(caller.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()),
                             DataInstanceContainer.PROCESS_INSTANCE.name(), processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
                 } else {

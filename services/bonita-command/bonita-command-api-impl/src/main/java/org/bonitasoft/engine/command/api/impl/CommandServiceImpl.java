@@ -15,6 +15,7 @@ package org.bonitasoft.engine.command.api.impl;
 
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.SCommandAlreadyExistsException;
 import org.bonitasoft.engine.command.SCommandCreationException;
@@ -24,17 +25,17 @@ import org.bonitasoft.engine.command.SCommandNotFoundException;
 import org.bonitasoft.engine.command.SCommandUpdateException;
 import org.bonitasoft.engine.command.api.record.SelectDescriptorBuilder;
 import org.bonitasoft.engine.command.model.SCommand;
-import org.bonitasoft.engine.command.model.SCommandBuilder;
-import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
+import org.bonitasoft.engine.command.model.SCommandBuilderFactory;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.command.model.SCommandLogBuilder;
+import org.bonitasoft.engine.command.model.SCommandLogBuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -47,8 +48,8 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -67,8 +68,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  */
 public class CommandServiceImpl implements CommandService {
 
-    private final SCommandBuilderAccessor commandBuilderAccessor;
-
     private final ReadPersistenceService persistenceService;
 
     private final Recorder recorder;
@@ -79,10 +78,9 @@ public class CommandServiceImpl implements CommandService {
 
     private final QueriableLoggerService queriableLoggerService;
 
-    public CommandServiceImpl(final SCommandBuilderAccessor commandBuilderAccessor, final ReadPersistenceService persistenceService, final Recorder recorder,
+    public CommandServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
         super();
-        this.commandBuilderAccessor = commandBuilderAccessor;
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
@@ -92,14 +90,14 @@ public class CommandServiceImpl implements CommandService {
     }
 
     private SCommandLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SCommandLogBuilder logBuilder = commandBuilderAccessor.getSCommandLogBuilder();
+        final SCommandLogBuilder logBuilder = BuilderFactory.get(SCommandLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -121,8 +119,7 @@ public class CommandServiceImpl implements CommandService {
 
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(COMMAND, EventActionType.CREATED)) {
-                final SEventBuilder eventBuilder = eventService.getEventBuilder();
-                insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(COMMAND).setObject(command).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(COMMAND).setObject(command).done();
             }
             try {
                 recorder.recordInsert(insertRecord, insertEvent);
@@ -151,8 +148,7 @@ public class CommandServiceImpl implements CommandService {
         final DeleteRecord deleteRecord = new DeleteRecord(command);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(COMMAND, EventActionType.DELETED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(COMMAND).setObject(command).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(COMMAND).setObject(command).done();
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
@@ -256,12 +252,13 @@ public class CommandServiceImpl implements CommandService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "update"));
         }
         final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating command with name " + command.getName());
-        final SCommandBuilder commandBuilder = commandBuilderAccessor.getSCommandBuilder();
+
+        final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(command, updateDescriptor);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(COMMAND, EventActionType.UPDATED)) {
-            final SCommand oldCommand = commandBuilder.createNewInstance(command).done();
-            updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(COMMAND).setObject(command).done();
+            final SCommand oldCommand = fact.createNewInstance(command).done();
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(COMMAND).setObject(command).done();
             updateEvent.setOldObject(oldCommand);
         }
         try {
@@ -338,8 +335,7 @@ public class CommandServiceImpl implements CommandService {
         final DeleteRecord deleteRecord = new DeleteRecord(command);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(COMMAND, EventActionType.DELETED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(COMMAND).setObject(command).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(COMMAND).setObject(command).done();
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
