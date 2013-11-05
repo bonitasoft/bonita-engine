@@ -470,7 +470,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             throw new SActivityReadException(e);
         }
         if (selectOne == null) {
-            throw new SActivityInstanceNotFoundException(activityInstanceId);
+            throw new SActivityInstanceNotFoundException(activityInstanceId, stateId);
         }
         return selectOne;
     }

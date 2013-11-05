@@ -2,7 +2,6 @@ package org.bonitasoft.engine.platform;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -90,28 +89,6 @@ public class PlatformTest {
     public void createPlatformException() throws BonitaException {
         assertTrue(platformAPI.isPlatformCreated());
         platformAPI.createAndInitializePlatform();
-    }
-
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Get platform.", jira = "")
-    @Test
-    public void getPlatform() throws BonitaException {
-        final Platform platform = platformAPI.getPlatform();
-
-        final String platformVersionToTest = "6.1.0";
-
-        assertNotNull("can't find the platform", platform);
-        assertEquals("platformAdmin", platform.getCreatedBy());
-        final String version = platform.getVersion();
-        assertTrue(
-                version,
-                version.equals(platformVersionToTest + "-SNAPSHOT") || version.equals(platformVersionToTest + "")
-                        || version.startsWith(platformVersionToTest + "-rc"));
-
-        final String initialVersion = platform.getInitialVersion();
-        assertTrue(
-                version,
-                initialVersion.equals(platformVersionToTest + "-SNAPSHOT") || initialVersion.equals(platformVersionToTest + "")
-                        || initialVersion.startsWith(platformVersionToTest + "-rc"));
     }
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform" }, story = "Delete platform.", jira = "")
