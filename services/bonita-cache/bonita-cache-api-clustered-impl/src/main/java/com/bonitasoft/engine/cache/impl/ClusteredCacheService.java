@@ -3,11 +3,9 @@ package com.bonitasoft.engine.cache.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
@@ -21,13 +19,12 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
 
     private final ReadSessionAccessor sessionAccessor;
 
-    public ClusteredCacheService(final Manager manager, final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
-            final HazelcastInstance hazelcastInstance) {
+    public ClusteredCacheService(Manager manager, TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, HazelcastInstance hazelcastInstance) {
         super(manager, logger, hazelcastInstance);
         this.sessionAccessor = sessionAccessor;
     }
 
-    public ClusteredCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final HazelcastInstance hazelcastInstance) {
+    public ClusteredCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, HazelcastInstance hazelcastInstance) {
         super(logger, hazelcastInstance);
         this.sessionAccessor = sessionAccessor;
     }
@@ -72,13 +69,5 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
      */
     private String getCacheNameFromKey(final String cacheNameKey) {
         return cacheNameKey.substring(cacheNameKey.indexOf('_') + 1);
-    }
-
-    @Override
-    public void start() throws SBonitaException {
-    }
-
-    @Override
-    public void stop() throws SBonitaException, TimeoutException {
     }
 }

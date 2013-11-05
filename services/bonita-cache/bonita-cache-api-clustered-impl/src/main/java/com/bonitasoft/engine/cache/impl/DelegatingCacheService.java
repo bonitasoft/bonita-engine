@@ -14,16 +14,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * Delegate cache request to local or distributed cache services
  * if the cache name is contains in the list localOnlyCaches the call is delegated to local cache, else it is delegated to the distributed cache
- * 
+ *
  * @author Baptiste Mesta
  */
 public class DelegatingCacheService implements CacheService {
@@ -93,15 +91,6 @@ public class DelegatingCacheService implements CacheService {
         cachesNames.addAll(distributedCachesNames);
         Collections.sort(cachesNames);
         return cachesNames;
-    }
-
-    @Override
-    public void start() throws SBonitaException {
-    }
-
-    @Override
-    public void stop() throws SBonitaException, TimeoutException {
-        localCache.stop();
     }
 
 }
