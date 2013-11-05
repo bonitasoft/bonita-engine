@@ -9,9 +9,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.bar.BusinessArchive;
+import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -112,7 +121,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("CS.STATEID AS CS_STATE_ID, ");
         builder.append("CS.STARTDATE AS CS_START_DATE, ");
         builder.append("CS.ID AS CS_ID, ");
-        builder.append("null AS CS_SOURCEOBJECTID, ");
+        builder.append("0 AS CS_SOURCEOBJECTID, ");
         builder.append("APS.PROCESSID AS APS_PROCESS_ID, ");
         builder.append("APS.NAME AS APS_NAME, ");
         builder.append("USR.FIRSTNAME AS USR_FIRSTNAME, ");
@@ -469,6 +478,159 @@ public class ReportingAPIIT extends CommonAPISPTest {
             logoutPlatform(session);
             login();
         }
+    }
+
+    @Test
+    public void getAllArchivedProcessInstances() throws Exception {
+        final StringBuilder builder = new StringBuilder("SELECT ");
+        builder.append("CS.PROCESSDEFINITIONID AS CS_PROCESS_DEFINITION_ID, ");
+        builder.append("CS.NAME AS CS_NAME, ");
+        builder.append("CS.STATEID AS CS_STATE_ID, ");
+        builder.append("CS.STARTDATE AS CS_START_DATE, ");
+        builder.append("CS.ID AS CS_ID, ");
+        builder.append("0 AS CS_SOURCEOBJECTID, ");
+        builder.append("APS.PROCESSID AS APS_PROCESS_ID, ");
+        builder.append("APS.NAME AS APS_NAME, ");
+        builder.append("USR.FIRSTNAME AS USR_FIRSTNAME, ");
+        builder.append("USR.LASTNAME AS USR_LASTNAME ");
+        builder.append("FROM process_instance CS ");
+        builder.append("INNER JOIN process_definition APS ON CS.PROCESSDEFINITIONID = APS.PROCESSID ");
+        builder.append("INNER JOIN user_ USR ON CS.STARTEDBY = USR.ID ");
+        builder.append("WHERE CS.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("AND APS.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("AND USR.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("$P!{__p_state_name} ");
+        builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to} ");
+        builder.append("$P!{_p_apps_id} ");
+        builder.append("UNION ");
+        builder.append("SELECT ");
+        builder.append("CS.PROCESSDEFINITIONID AS CS_PROCESS_DEFINITION_ID, ");
+        builder.append("CS.NAME AS CS_NAME, ");
+        builder.append("CS.STATEID AS CS_STATE_ID, ");
+        builder.append("CS.STARTDATE AS CS_START_DATE, ");
+        builder.append("CS.ID AS CS_ID, ");
+        builder.append("0 AS CS_SOURCEOBJECTID, ");
+        builder.append("APS.PROCESSID AS APS_PROCESS_ID, ");
+        builder.append("APS.NAME AS APS_NAME, ");
+        builder.append("'System' AS USR_FIRSTNAME, ");
+        builder.append("'' AS USR_LASTNAME ");
+        builder.append("FROM process_instance CS ");
+        builder.append("INNER JOIN process_definition APS ON CS.PROCESSDEFINITIONID = APS.PROCESSID ");
+        builder.append("WHERE CS.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("AND APS.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("$P!{__p_state_name} ");
+        builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to} ");
+        builder.append("AND CS.STARTEDBY = 0 ");
+        builder.append("$P!{_p_apps_id} ");
+        builder.append("UNION ");
+        builder.append("SELECT ");
+        builder.append("CS.PROCESSDEFINITIONID AS CS_PROCESS_DEFINITION_ID, ");
+        builder.append("CS.NAME AS CS_NAME, ");
+        builder.append("CS.STATEID AS CS_STATE_ID, ");
+        builder.append("CS.STARTDATE AS CS_START_DATE, ");
+        builder.append("CS.ID AS CS_ID, ");
+        builder.append("CS.SOURCEOBJECTID AS CS_SOURCEOBJECTID, ");
+        builder.append("APS.PROCESSID AS APS_PROCESS_ID, ");
+        builder.append("APS.NAME AS APS_NAME, ");
+        builder.append("USR.FIRSTNAME AS USR_FIRSTNAME, ");
+        builder.append("USR.LASTNAME AS USR_LASTNAME ");
+        builder.append("FROM arch_process_instance  CS ");
+        builder.append("INNER JOIN process_definition APS ON CS.PROCESSDEFINITIONID = APS.PROCESSID ");
+        builder.append("INNER JOIN user_ USR ON CS.STARTEDBY = USR.ID ");
+        builder.append("WHERE CS.ENDDATE > 0 ");
+        builder.append("AND CS.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("AND APS.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("AND USR.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("$P!{__p_state_name} ");
+        builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to} ");
+        builder.append("$P!{_p_apps_id} ");
+        builder.append("UNION ");
+        builder.append("SELECT ");
+        builder.append("CS.PROCESSDEFINITIONID AS CS_PROCESS_DEFINITION_ID, ");
+        builder.append("CS.NAME AS CS_NAME, ");
+        builder.append("CS.STATEID AS CS_STATE_ID, ");
+        builder.append("CS.STARTDATE AS CS_START_DATE, ");
+        builder.append("CS.ID AS CS_ID, ");
+        builder.append("CS.SOURCEOBJECTID AS CS_SOURCEOBJECTID, ");
+        builder.append("APS.PROCESSID AS APS_PROCESS_ID, ");
+        builder.append("APS.NAME AS APS_NAME, ");
+        builder.append("'System' AS USR_FIRSTNAME, ");
+        builder.append("'' AS USR_LASTNAME ");
+        builder.append("FROM arch_process_instance  CS ");
+        builder.append("INNER JOIN process_definition APS ON CS.PROCESSDEFINITIONID = APS.PROCESSID ");
+        builder.append("WHERE CS.ENDDATE > 0 ");
+        builder.append("AND CS.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("AND APS.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("AND CS.STARTEDBY = 0 ");
+        builder.append("$P!{__p_state_name} ");
+        builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to} ");
+
+        String query = builder.toString();
+        query = query.replace("$P{BONITA_TENANT_ID}", "1");
+        query = query.replace("$P{_p_date_from}", "" + (System.currentTimeMillis() - 1000));
+        query = query.replace("$P{_p_date_to}", "" + (System.currentTimeMillis() + 1000000));
+        query = query.replace("$P!{__p_state_name}", "AND CS.STATEID in (1, 6) ");
+        query = query.replace("$P!{_p_apps_id}", " ");
+
+        final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
+
+        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
+        processBuilder.createNewInstance("SayGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start").addUserTask("step1", ACTOR_NAME).addEndEvent("End")
+                .addSignalEventTrigger("GO").addTransition("Start", "step1").addTransition("step1", "End");
+        archiveBuilder.createNewBusinessArchive().setProcessDefinition(processBuilder.done());
+        final BusinessArchive endSignalArchive = archiveBuilder.done();
+
+        processBuilder = new ProcessDefinitionBuilder();
+        processBuilder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal").addSignalEventTrigger("GO")
+                .addUserTask("Task1", ACTOR_NAME).addTransition("StartOnSignal", "Task1");
+        archiveBuilder.createNewBusinessArchive().setProcessDefinition(processBuilder.done());
+        final BusinessArchive startSignalArchive = archiveBuilder.done();
+
+        final User john = createUser("john", "bpm");
+
+        final ProcessDefinition processDefinitionWithStartSignal = deployAndEnableWithActor(startSignalArchive, ACTOR_NAME, john);
+        final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableWithActor(endSignalArchive, ACTOR_NAME, john);
+
+        logout();
+        loginWith("john", "bpm");
+
+        // Check that the process with trigger signal on start is not started, before send signal
+        final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
+        waitForUserTask("step1", processInstanceWithEndSignal);
+        checkNbOfProcessInstances(1);
+
+        List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        assertEquals(1, taskInstances.size());
+        assertEquals("step1", taskInstances.get(0).getName());
+
+        // Send signal
+        assignAndExecuteStep(taskInstances.get(0), john.getId());
+        waitForProcessToFinish(processInstanceWithEndSignal.getId());
+
+        // Check that the process with trigger signal on start is started, after send signal
+        waitForUserTask("Task1");
+
+        String selectList = getReportingAPI().selectList(query);
+        String[] split = selectList.split("\n");
+        assertEquals(3, split.length);
+
+        taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        assertEquals(1, taskInstances.size());
+        assertEquals("Task1", taskInstances.get(0).getName());
+        assignAndExecuteStep(taskInstances.get(0), john.getId());
+        waitForProcessToFinish(taskInstances.get(0).getParentContainerId());
+
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
+        final SearchResult<ArchivedProcessInstance> search = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done());
+        assertEquals(2, search.getCount());
+
+        selectList = getReportingAPI().selectList(query);
+        split = selectList.split("\n");
+        assertEquals(3, split.length);
+
+        disableAndDeleteProcess(processDefinitionWithStartSignal);
+        disableAndDeleteProcess(processDefinitionWithEndSignal);
+        deleteUser(john);
     }
 
 }
