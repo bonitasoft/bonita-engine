@@ -997,6 +997,7 @@
                   <include>org.bonitasoft.engine.platform.command:bonita-platform-command-api</include>
                   <include>org.bonitasoft.engine.platform.command:bonita-platform-command-api-impl</include>
                   <!-- Platform Dependency -->
+                  <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model</include>
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl</include>
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl-hibernate</include>
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-platform-impl</include>
