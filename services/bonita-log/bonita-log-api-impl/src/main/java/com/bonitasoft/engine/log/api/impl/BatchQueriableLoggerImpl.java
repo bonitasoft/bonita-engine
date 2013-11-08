@@ -27,8 +27,6 @@ import org.bonitasoft.engine.transaction.TransactionService;
  */
 public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
 
-    private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<BatchLogSynchronization>();
-
     private final TransactionService transactionService;
 
     private final PersistenceService persistenceService;
@@ -48,15 +46,12 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     }
 
     private synchronized BatchLogSynchronization getBatchLogSynchronization() throws STransactionNotFoundException {
-        BatchLogSynchronization synchro = this.synchronizations.get();
+        final BatchSynchroRepository batchSynchroRepository = BatchSynchroRepository.getInstance();
+        BatchLogSynchronization synchro = batchSynchroRepository.getSynchro();
         if (synchro == null) {
             synchro = new BatchLogSynchronization(this.persistenceService, this.delayable);
-            this.synchronizations.set(synchro);
+            batchSynchroRepository.addSynchro(synchro);
             this.transactionService.registerBonitaSynchronization(synchro);
-        } else {
-            if (!this.transactionService.getBonitaSynchronizations().contains(synchro)) {
-                this.transactionService.registerBonitaSynchronization(synchro);
-            }
         }
         return synchro;
     }

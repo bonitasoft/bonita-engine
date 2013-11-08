@@ -41,6 +41,8 @@ public class BatchLogSynchronization implements BonitaTransactionSynchronization
             final InsertBatchLogsJobRegister register = InsertBatchLogsJobRegister.getInstance();
             register.registerJobIfNotRegistered();
         }
+        final BatchSynchroRepository batchSynchroRepository = BatchSynchroRepository.getInstance();
+        batchSynchroRepository.removeSynchro();
     }
 
     @Override
