@@ -24,8 +24,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +70,7 @@ import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.search.Order;
@@ -1005,6 +1008,43 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertEquals("updated Content", new String(newDocumentContent));
         disableAndDeleteProcess(processDefinition);
 
+    }
+
+    @Test
+    public void startProcessAndSetDocumentValueWithOperations() throws Exception {
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("LivingDay", "1.0");
+        final String actorName = "documentalist";
+        String docRefName = "invoiceReference";
+        designProcessDefinition.addData(docRefName, DocumentValue.class.getName(), null);
+        String docName = "invoiceLetter";
+        designProcessDefinition.addData(docName, DocumentValue.class.getName(), null);
+        designProcessDefinition.addActor(actorName);
+        // ...
+        designProcessDefinition.addUserTask("step1", actorName);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), actorName, user);
+
+        String docUrl = "http://internal.intranet.org/resources/myDoc.pdf";
+        Operation docRefOperation = new OperationBuilder().createSetDocument(docRefName,
+                new ExpressionBuilder().createInputExpression("documentReference", DocumentValue.class.getName()));
+
+        Operation docContentOperation = new OperationBuilder().createSetDocument(docName,
+                new ExpressionBuilder().createInputExpression("documentValue", DocumentValue.class.getName()));
+
+        Map<String, Serializable> expressionContext = new HashMap<String, Serializable>(2);
+        String documentFileName = "updatedContent.txt";
+        expressionContext.put("documentValue", new DocumentValue("Binary content of the document".getBytes(), "plain/text", documentFileName));
+        expressionContext.put("documentReference", new DocumentValue(docUrl));
+        ProcessInstance myCase = getProcessAPI()
+                .startProcess(processDefinition.getId(), Arrays.asList(docContentOperation, docRefOperation), expressionContext);
+        waitForUserTask("step1", myCase);
+        SearchResult<Document> searchDocuments = getProcessAPI().searchDocuments(
+                new SearchOptionsBuilder(0, 5).filter(DocumentsSearchDescriptor.DOCUMENT_NAME, docRefName).done());
+        assertEquals(docUrl, searchDocuments.getResult().get(0).getUrl());
+
+        searchDocuments = getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 5).filter(DocumentsSearchDescriptor.DOCUMENT_NAME, docName).done());
+        assertEquals(documentFileName, searchDocuments.getResult().get(0).getContentFileName());
+
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = DocumentValue.class, concept = BPMNConcept.DOCUMENT, jira = "ENGINE-975", keywords = { "document", "operation", "create", "URL" }, story = "create a document using operation and URL")
