@@ -24,6 +24,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Zhao na
+ * @author Emmanuel Duchastenier
  */
 public class InputExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
@@ -36,7 +37,7 @@ public class InputExpressionExecutorStrategy extends NonEmptyContentExpressionEx
                 return dependencyValues.get(key);
             }
         }
-        throw new SExpressionEvaluationException("Mandatory input value missing : " + expression.getContent());
+        throw new SExpressionEvaluationException("Input Expression is missing mandatory value for: " + expression.getContent());
     }
 
     @Override
