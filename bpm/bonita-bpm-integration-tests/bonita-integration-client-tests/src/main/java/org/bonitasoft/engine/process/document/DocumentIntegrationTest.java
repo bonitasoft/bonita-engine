@@ -48,6 +48,7 @@ import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -1276,6 +1277,8 @@ public class DocumentIntegrationTest extends CommonAPITest {
                 nameAre("textFile" + one, "textFile" + two, "textFile" + three, "textFile" + four, "textFile" + five));
     }
 
+    @Cover(jira = "ENGINE-1898", classes = { Document.class, CallActivityInstance.class }, concept = BPMNConcept.DOCUMENT, keywords = { "document",
+            "call activity", "multi instance" })
     @Test
     public void getMIDocumentOnProcess() throws Exception {
         final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
@@ -1298,17 +1301,14 @@ public class DocumentIntegrationTest extends CommonAPITest {
         builder.addDocumentDefinition("caseDocument").addUrl("toto");
         builder.addShortTextData("url", null);
         builder.addActor(ACTOR);
-        builder.addUserTask("step1", ACTOR)
-                .addOperation(
-                        new LeftOperandBuilder().createNewInstance("caseDocument").done(),
-                        OperatorType.DOCUMENT_CREATE_UPDATE,
-                        "=",
-                        null,
-                        expressionBuilder
-                                .createGroovyScriptExpression(
-                                        "addDocVersion",
-                                        "import org.bonitasoft.engine.bpm.document.Document;import org.bonitasoft.engine.bpm.document.Document;import org.bonitasoft.engine.bpm.document.DocumentValue;return new DocumentValue(url);",
-                                        DocumentValue.class.getName(), expressionBuilder.createDataExpression("url", String.class.getName())));
+        builder.addUserTask("step1", ACTOR).addOperation(
+                new LeftOperandBuilder().createNewInstance("caseDocument").done(),
+                OperatorType.DOCUMENT_CREATE_UPDATE,
+                "=",
+                null,
+                expressionBuilder.createGroovyScriptExpression("addDocVersion",
+                        "import org.bonitasoft.engine.bpm.document.DocumentValue;return new DocumentValue(url);", DocumentValue.class.getName(),
+                        expressionBuilder.createDataExpression("url", String.class.getName())));
         builder.addUserTask("step2", ACTOR).addTransition("step1", "step2");
         final ProcessDefinition docDefinition = deployAndEnableWithActor(builder.done(), ACTOR, user);
         final ProcessDefinition miDefinition = deployAndEnableProcess(miBuilder.done());
@@ -1333,6 +1333,43 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertEquals(Arrays.asList("http://someurl", "http://someurl1", "http://someurl2"), urls);
 
         disableAndDeleteProcess(miDefinition);
+        disableAndDeleteProcess(docDefinition);
+    }
+
+    @Cover(jira = "BS-507", classes = { Document.class, CallActivityInstance.class }, concept = BPMNConcept.DOCUMENT, keywords = { "document reference",
+            "call activity" })
+    @Test
+    public void getDocumentOnACallActivityOfAProcess() throws Exception {
+        final ExpressionBuilder expressionBuilder = new ExpressionBuilder();
+
+        final ProcessDefinitionBuilder spBuilder = new ProcessDefinitionBuilder().createNewInstance("SubProcess", "0.8");
+        spBuilder.addActor(ACTOR);
+        spBuilder.addUserTask("step1", ACTOR);
+        spBuilder.addDocumentDefinition("document1").addMimeType("application/octet-stream").addContentFileName("file").addFile("file");
+        final byte[] pdfContent = new byte[] { 5, 0, 1, 4, 6, 5, 2, 3, 1, 5, 6, 8, 4, 6, 6, 3, 2, 4, 5 };
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(spBuilder.getProcess())
+                .addDocumentResource(new BarResource("file", pdfContent)).done();
+        final ProcessDefinition docDefinition = deployAndEnableWithActor(businessArchive, ACTOR, user);
+
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("CAProcess", "0.4");
+        builder.addActor(ACTOR);
+        builder.addCallActivity("ca", expressionBuilder.createConstantStringExpression("SubProcess"), expressionBuilder.createConstantStringExpression("0.8"));
+        final ProcessDefinition caDefinition = deployAndEnableWithActor(builder.done(), ACTOR, user);
+
+        getProcessAPI().startProcess(caDefinition.getId());
+        final HumanTaskInstance taskInstance = waitForUserTask("step1");
+
+        final Expression expression = expressionBuilder.createDocumentReferenceExpression("document1");
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(5);
+        expressions.put(expression, new HashMap<String, Serializable>());
+
+        final Map<String, Serializable> docsMap = getProcessAPI().evaluateExpressionsOnActivityInstance(taskInstance.getId(), expressions);
+
+        assertNotNull(docsMap);
+        final String fileName = ((Document) docsMap.get(expression.getName())).getContentFileName();
+        assertEquals("file", fileName);
+
+        disableAndDeleteProcess(caDefinition);
         disableAndDeleteProcess(docDefinition);
     }
 
