@@ -1670,6 +1670,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInAllStates(final SearchOptions searchOptions) throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(
+                processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions);
+        try {
+            searchArchivedProcessInstances.execute();
+        } catch (final SBonitaException e) {
+            throw new SearchException(e);
+        }
+        return searchArchivedProcessInstances.getResult();
+    }
+
+    @Override
     public List<ActivityInstance> getOpenActivityInstances(final long processInstanceId, final int startIndex, final int maxResults,
             final ActivityInstanceCriterion criterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
