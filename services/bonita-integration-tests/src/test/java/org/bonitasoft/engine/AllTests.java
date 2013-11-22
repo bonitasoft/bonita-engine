@@ -13,6 +13,7 @@ import org.bonitasoft.engine.exceptions.impl.ExceptionsManagerTests;
 import org.bonitasoft.engine.expression.ExpressionServiceTest;
 import org.bonitasoft.engine.identity.IdentityServiceTest;
 import org.bonitasoft.engine.persistence.PersistenceTests;
+import org.bonitasoft.engine.platform.TenantManagementTest;
 import org.bonitasoft.engine.platform.auth.PlatformAuthenticationServiceTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationTest;
 import org.bonitasoft.engine.profile.ProfileServiceTest;
@@ -59,7 +60,8 @@ import org.junit.runners.Suite.SuiteClasses;
         PlatformCommandServiceIntegrationTest.class,
         ProfileServiceTest.class,
         ParserTest.class,
-        ExceptionsManagerTests.class
+        ExceptionsManagerTests.class,
+        TenantManagementTest.class
 })
 /**
  * Do not run this test suite alone. Use AllTestsWithJNDI instead.

@@ -80,8 +80,7 @@ public class PlatformServiceImpl implements PlatformService {
     private final SPlatformProperties sPlatformProperties;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final List<TenantPersistenceService> tenantPersistenceServices,
-			final TechnicalLoggerService logger, final PlatformCacheService platformCacheService,
-            final SPlatformProperties sPlatformProperties) {
+            final TechnicalLoggerService logger, final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.logger = logger;
@@ -161,16 +160,14 @@ public class PlatformServiceImpl implements PlatformService {
         // check if the tenant already exists. If yes, throws
         // TenantAlreadyExistException
         STenant existingTenant = null;
+        String tenantName = tenant.getName();
         try {
-            existingTenant = getTenantByName(tenant.getName());
+            existingTenant = getTenantByName(tenantName);
         } catch (final STenantNotFoundException e) {
-            if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createTenant", e));
-            }
             // OK
         }
         if (existingTenant != null) {
-            throw new STenantAlreadyExistException("Unable to create the tenant " + tenant.getName() + " : it already exists.");
+            throw new STenantAlreadyExistException("Unable to create the tenant " + tenantName + " : it already exists.");
         }
 
         // create the tenant
@@ -586,6 +583,15 @@ public class PlatformServiceImpl implements PlatformService {
     public void updateTenant(final STenant tenant, final EntityUpdateDescriptor descriptor) throws STenantUpdateException {
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateTenant"));
+        }
+        String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
+        if (tenantName != null) {
+            try {
+                getTenantByName(tenantName);
+                throw new STenantUpdateException("Unable to update the tenant with new name " + tenantName + " : it already exists.");
+            } catch (final STenantNotFoundException e) {
+                // Ok
+            }
         }
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
         desc.addFields(descriptor.getFields());

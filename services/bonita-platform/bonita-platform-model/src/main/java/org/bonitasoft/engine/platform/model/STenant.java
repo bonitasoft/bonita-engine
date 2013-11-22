@@ -34,6 +34,8 @@ public interface STenant extends PersistentObject {
 
     String getStatus();
 
+    boolean isInMaintenance();
+
     boolean isDefaultTenant();
 
 }
