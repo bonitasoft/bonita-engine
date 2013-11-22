@@ -12,6 +12,7 @@ import org.bonitasoft.engine.dependency.DependencyServiceTest;
 import org.bonitasoft.engine.expression.ExpressionServiceTest;
 import org.bonitasoft.engine.identity.IdentityServiceTest;
 import org.bonitasoft.engine.persistence.PersistenceTests;
+import org.bonitasoft.engine.platform.TenantManagementTest;
 import org.bonitasoft.engine.platform.auth.PlatformAuthenticationServiceTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationTest;
 import org.bonitasoft.engine.profile.ProfileServiceTest;
@@ -56,7 +57,8 @@ import org.junit.runners.Suite.SuiteClasses;
         // DocumentServiceTest.class,
         PlatformCommandServiceIntegrationTest.class,
         ProfileServiceTest.class,
-        ParserTest.class
+        ParserTest.class,
+        TenantManagementTest.class
 })
 /**
  * Do not run this test suite alone. Use AllTestsWithJNDI instead.

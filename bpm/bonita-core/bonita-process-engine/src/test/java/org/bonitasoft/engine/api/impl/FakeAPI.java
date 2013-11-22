@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,31 +11,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.platform.model;
+package org.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.api.NoSessionRequired;
+import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 
 /**
- * @author Charles Souillard
+ * @author Emmanuel Duchastenier
  */
-public interface STenant extends PersistentObject {
+public class FakeAPI {
 
-    String getName();
+    @CustomTransactions
+    public void customTxAPIMethod() {
 
-    String getDescription();
+    }
 
-    String getIconName();
+    @NoSessionRequired
+    public void noSessionRequiredMethod() {
 
-    String getIconPath();
+    }
 
-    long getCreated();
+    public void notAnnotatedMethod() {
 
-    String getCreatedBy();
-
-    String getStatus();
-
-    boolean isInMaintenance();
-
-    boolean isDefaultTenant();
+    }
 
 }

@@ -83,7 +83,6 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForVariableValue;
@@ -804,7 +803,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private SearchOptionsBuilder getFirst100ConnectorInstanceSearchOptions(long containerId, String containerType) {
+    private SearchOptionsBuilder getFirst100ConnectorInstanceSearchOptions(final long containerId, final String containerType) {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, containerId);
         searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE, containerType);
@@ -1117,11 +1116,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
-        final PlatformSession loginPlatform = APITestUtil.loginPlatform();
+        final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         platformAPI.stopNode();
         platformAPI.startNode();
-        APITestUtil.logoutPlatform(loginPlatform);
+        logoutPlatform(loginPlatform);
         login();
         assertEquals("value1", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         waitForUserTask("step2", processInstance.getId());
@@ -1155,12 +1154,12 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
-        final PlatformSession loginPlatform = APITestUtil.loginPlatform();
+        final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         platformAPI.stopNode();
         Thread.sleep(300);
         platformAPI.startNode();
-        APITestUtil.logoutPlatform(loginPlatform);
+        logoutPlatform(loginPlatform);
         login();
         waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
@@ -1448,8 +1447,8 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
         connector.addInput(
                 CONNECTOR_INPUT_NAME,
-                new ExpressionBuilder().createGroovyScriptExpression("script", script,
-                        Long.class.getName(), new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
+                new ExpressionBuilder().createGroovyScriptExpression("script", script, Long.class.getName(),
+                        new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
                         new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID)));
         connector.addOutput(new OperationBuilder().createSetDataOperation("numberOfUser",
                 new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, Long.class.getName())));

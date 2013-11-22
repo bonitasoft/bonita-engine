@@ -18,14 +18,24 @@ import org.bonitasoft.engine.exception.ServerAPIException;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
 public class LocalServerAPIFactory {
 
-    private static final String CLASS_NAME = "org.bonitasoft.engine.api.impl.ServerAPIImpl";
+    private static Class<?> forName = null;
+
+    static {
+        try {
+            forName = Class.forName("org.bonitasoft.engine.api.impl.ServerAPIFactory");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace(System.err);
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     public static ServerAPI getServerAPI() throws ServerAPIException {
         try {
-            return (ServerAPI) Class.forName(CLASS_NAME).newInstance();
+            return (ServerAPI) forName.getMethod("getServerAPI").invoke(null);
         } catch (final Exception e) {
             throw new ServerAPIException(e);
         }
