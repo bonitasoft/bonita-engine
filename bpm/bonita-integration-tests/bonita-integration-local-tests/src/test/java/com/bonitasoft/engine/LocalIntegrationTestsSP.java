@@ -10,13 +10,19 @@ package com.bonitasoft.engine;
 
 import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.bdr.BDRIT;
-
 @RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({ BDRIT.class })
+@SuiteClasses({
+        BPMSPTests.class,
+        BPMLocalSuiteTests.class,
+        LocalLogTest.class,
+        APIMethodSPTest.class,
+        ConnectorExecutionTimeOutTest.class,
+        ConnectorImplementationLocalSPTest.class
+})
 @Initializer(TestsInitializerSP.class)
 public class LocalIntegrationTestsSP {
 
