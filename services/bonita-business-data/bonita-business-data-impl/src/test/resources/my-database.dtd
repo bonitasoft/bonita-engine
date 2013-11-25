@@ -1,0 +1,35 @@
+<!ELEMENT dataset (
+    customer*,
+    customer_order*,
+    user*)>
+
+<!ELEMENT customer EMPTY>
+<!ATTLIST customer
+        customer_id  CDATA #REQUIRED
+        tax_id  CDATA #REQUIRED
+        name  CDATA #REQUIRED
+        adresse  CDATA #REQUIRED
+        city  CDATA #REQUIRED
+        state  CDATA #REQUIRED
+        zip  CDATA #REQUIRED
+        phone  CDATA #REQUIRED  
+>
+
+<!ELEMENT customer_order EMPTY>
+<!ATTLIST customer_order
+        order_id CDATA #REQUIRED
+        customer_id CDATA #REQUIRED
+        date_placed CDATA #REQUIRED
+        date_promised CDATA #REQUIRED
+        terms CDATA #REQUIRED
+        status CDATA #REQUIRED
+>
+
+<!ELEMENT user EMPTY>
+<!ATTLIST user
+        user_id CDATA #REQUIRED
+        name CDATA #REQUIRED
+        login CDATA #REQUIRED
+        password CDATA #REQUIRED
+        enabled CDATA #REQUIRED
+>

@@ -1,0 +1,6 @@
+<!-- <!DOCTYPE dataset SYSTEM "my-dataset.dtd"> -->
+<dataset>
+    <EMPLOYEE ID="45" FIRSTNAME="Hannu" LASTNAME="Hakkinen"/>
+    <EMPLOYEE ID="23" FIRSTNAME="Petteri" LASTNAME="Salo"/>
+    <EMPLOYEE ID="75" FIRSTNAME="Matti" LASTNAME="Hakkinen"/>
+</dataset>

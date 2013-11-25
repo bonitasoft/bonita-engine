@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM 
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
+		<!-- Assume test is the database name -->
+		<property name="hibernate.connection.datasource">java:/comp/env/jdbc/PGDS1</property>
+		<property name="hibernate.hbm2ddl.auto">create</property>
+		<!-- List of XML mapping files -->
+		<mapping resource="Employee.hbm.xml" />
+	</session-factory>
+</hibernate-configuration>
