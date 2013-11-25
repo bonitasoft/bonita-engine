@@ -40,6 +40,7 @@ import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
@@ -59,6 +60,8 @@ public class APITestSPUtil extends APITestUtil {
     private PlatformMonitoringAPI platformMonitoringAPI;
 
     private ReportingAPI reportingAPI;
+
+    private TenantManagementAPI tenantManagementAPI;
 
     protected PlatformMonitoringAPI getPlatformMonitoringAPI() {
         return platformMonitoringAPI;
@@ -99,45 +102,37 @@ public class APITestSPUtil extends APITestUtil {
         return reportingAPI;
     }
 
+    public TenantManagementAPI getTenantManagementAPI() {
+        return tenantManagementAPI;
+    }
+
+    public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
+        this.tenantManagementAPI = tenantManagementAPI;
+    }
+
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
         setSession(SPBPMTestUtil.loginTenant(userName, password, tenantId));
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
+        setAPIs();
     }
 
     @Override
     protected void loginWith(final String userName, final String password) throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant(userName, password));
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        logAPI = TenantAPIAccessor.getLogAPI(getSession());
+        setAPIs();
     }
 
     @Override
     protected void login() throws BonitaException {
         setSession(SPBPMTestUtil.loginOnDefaultTenant());
-        setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
-        setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
-        setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
-        setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
-        setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
-        setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
-        setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
-        logAPI = TenantAPIAccessor.getLogAPI(getSession());
+        setAPIs();
     }
 
     protected void login(final long tenantId) throws BonitaException {
         setSession(SPBPMTestUtil.loginTenant(tenantId));
+        setAPIs();
+    }
+
+    private void setAPIs() throws BonitaException {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
@@ -145,6 +140,8 @@ public class APITestSPUtil extends APITestUtil {
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
+        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
+        logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
     @Override
@@ -158,6 +155,8 @@ public class APITestSPUtil extends APITestUtil {
         setPlatformMonitoringAPI(null);
         setReportingAPI(null);
         setCommandAPI(null);
+        setTenantManagementAPI(null);
+        logAPI = null;
     }
 
     public LogAPI getLogAPI() {
@@ -201,7 +200,7 @@ public class APITestSPUtil extends APITestUtil {
             // retry 50 ms after because the might still be some jobs/works that run
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 throw new MonitoringException("interrupted while sleeping");
             }
             numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();

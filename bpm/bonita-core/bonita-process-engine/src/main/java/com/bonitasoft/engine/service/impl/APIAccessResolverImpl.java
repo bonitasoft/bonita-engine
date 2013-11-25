@@ -32,6 +32,7 @@ import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
+import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.impl.CommandAPIExt;
 import com.bonitasoft.engine.api.impl.IdentityAPIExt;
 import com.bonitasoft.engine.api.impl.LogAPIExt;
@@ -43,6 +44,7 @@ import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.ProcessAPIExt;
 import com.bonitasoft.engine.api.impl.ProfileAPIExt;
 import com.bonitasoft.engine.api.impl.ReportingAPIExt;
+import com.bonitasoft.engine.api.impl.TenantManagementAPIExt;
 
 /**
  * @author Matthieu Chaffotte
@@ -73,6 +75,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(com.bonitasoft.engine.api.ReportingAPI.class.getName(), new ReportingAPIExt());
         apis.put(ProfileAPI.class.getName(), new ProfileAPIImpl());
         apis.put(com.bonitasoft.engine.api.ProfileAPI.class.getName(), new ProfileAPIExt());
+        apis.put(TenantManagementAPI.class.getName(), new TenantManagementAPIExt());
     }
 
     @Override
