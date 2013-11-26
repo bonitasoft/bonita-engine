@@ -66,7 +66,7 @@
 		</constructor-arg>
 		<constructor-arg name="cacheConfigurations" ref="cacheConfigurations" />
 		<constructor-arg name="enableStats" value="false" />
-		<constructor-arg name="statsPath" value="${bonita.home}/server/hazelcast-stats.csv" />
+		<constructor-arg name="statsPath" value="${bonita.home}/server/" />
 		<constructor-arg name="statsPrintInterval" value="10000" />
 	</bean>
 

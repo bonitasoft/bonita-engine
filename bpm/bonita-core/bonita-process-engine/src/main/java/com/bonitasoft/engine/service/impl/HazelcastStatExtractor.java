@@ -84,7 +84,12 @@ final class HazelcastStatExtractor implements Runnable {
     public HazelcastStatExtractor(final HazelcastInstance hazelcastInstance, final String statsPath, final long statsPrintInterval) throws IOException {
         this.hazelcastInstance = hazelcastInstance;
         this.statsPrintInterval = statsPrintInterval;
-        File file = new File(statsPath);
+        String statsFilePath = statsPath;
+        if (!statsFilePath.endsWith(File.separator)) {
+            statsFilePath += File.separator;
+        }
+        statsFilePath += "hazelcast-stats-" + hazelcastInstance.getCluster().getLocalMember().getUuid() + ".csv";
+        File file = new File(statsFilePath);
         file.delete();
         file.createNewFile();
         fileWriter = new FileWriter(file);
