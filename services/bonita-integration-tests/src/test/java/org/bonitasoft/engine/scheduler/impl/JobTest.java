@@ -124,7 +124,7 @@ public class JobTest extends CommonServiceTest {
         getTransactionService().complete();
     }
 
-    @Test
+   /* @Test
     public void retriesAFailedJob() throws Exception {
         final Date now = new Date();
         getTransactionService().begin();
@@ -212,7 +212,7 @@ public class JobTest extends CommonServiceTest {
         assertEquals(1, jobLogs.size());
         assertEquals(Long.valueOf(2), jobLogs.get(0).getRetryNumber());
         getTransactionService().complete();
-    }
+    } */
 
     @Test
     public void retriesAFailedCronJob() throws Exception {
