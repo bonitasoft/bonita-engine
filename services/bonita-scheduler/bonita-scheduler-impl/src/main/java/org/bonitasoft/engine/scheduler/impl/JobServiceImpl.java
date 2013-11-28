@@ -35,7 +35,7 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
@@ -78,9 +78,9 @@ public class JobServiceImpl implements JobService {
     @Override
     public SJobDescriptor createJobDescriptor(final SJobDescriptor sJobDescriptor, final long tenantId) throws SJobDescriptorCreationException {
         if (sJobDescriptor == null) {
-            throw new SJobDescriptorCreationException("The job is null");
+            throw new IllegalArgumentException("The job descriptor is null");
         } else if (sJobDescriptor.getJobName() == null) {
-            throw new SJobDescriptorCreationException("The job name is null");
+            throw new IllegalArgumentException("The job name is null");
         }
 
         // Set the tenant manually on the object because it will be serialized
@@ -104,6 +104,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteJobDescriptor(final SJobDescriptor sJobDescriptor) throws SJobDescriptorDeletionException {
+        if (sJobDescriptor == null) {
+            throw new IllegalArgumentException("The job descriptor is null");
+        }
         try {
             delete(sJobDescriptor, JOB_DESCRIPTOR);
         } catch (final SBonitaException e) {
@@ -144,20 +147,23 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void createJobParameters(final List<SJobParameter> sJobParameters, final long tenantId, final long jobDescriptorId)
+    public List<SJobParameter> createJobParameters(final List<SJobParameter> sJobParameters, final long tenantId, final long jobDescriptorId)
             throws SJobParameterCreationException {
+        final List<SJobParameter> createdSJobParameters = new ArrayList<SJobParameter>();
         if (sJobParameters != null) {
             for (final SJobParameter sJobParameter : sJobParameters) {
-                createJobParameter(sJobParameter, tenantId, jobDescriptorId);
+                createdSJobParameters.add(createJobParameter(sJobParameter, tenantId, jobDescriptorId));
             }
         }
+        return createdSJobParameters;
     }
 
     @Override
-    public void setJobParameters(final long tenantId, final long jobDescriptorId, final List<SJobParameter> parameters) throws SJobParameterCreationException {
+    public List<SJobParameter> setJobParameters(final long tenantId, final long jobDescriptorId, final List<SJobParameter> parameters)
+            throws SJobParameterCreationException {
         try {
             final int limit = 100;
-            final List<FilterOption> filters = new ArrayList<FilterOption>(2);
+            final List<FilterOption> filters = new ArrayList<FilterOption>(1);
             filters.add(new FilterOption(SJobParameter.class, "jobDescriptorId", jobDescriptorId));
             final QueryOptions options = new QueryOptions(0, limit, null, filters, null);
             List<SJobParameter> jobParameters = null;
@@ -170,11 +176,16 @@ public class JobServiceImpl implements JobService {
         } catch (final SBonitaException sbe) {
             throw new SJobParameterCreationException(sbe);
         }
-        createJobParameters(parameters, tenantId, jobDescriptorId);
+        return createJobParameters(parameters, tenantId, jobDescriptorId);
     }
 
     @Override
-    public void createJobParameter(final SJobParameter sJobParameter, final long tenantId, final long jobDescriptorId) throws SJobParameterCreationException {
+    public SJobParameter createJobParameter(final SJobParameter sJobParameter, final long tenantId, final long jobDescriptorId)
+            throws SJobParameterCreationException {
+        if (sJobParameter == null) {
+            throw new IllegalArgumentException("The job descriptor is null");
+        }
+
         // Set the tenant manually on the object because it will be serialized
         final SJobParameterImpl sJobParameterToRecord = (SJobParameterImpl) BuilderFactory.get(SJobParameterBuilderFactory.class)
                 .createNewInstance(sJobParameter.getKey(), sJobParameter.getValue()).setJobDescriptorId(jobDescriptorId).done();
@@ -185,6 +196,7 @@ public class JobServiceImpl implements JobService {
         } catch (final SRecorderException sre) {
             throw new SJobParameterCreationException(sre);
         }
+        return sJobParameter;
     }
 
     @Override
@@ -226,12 +238,13 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void createJobLog(final SJobLog sJobLog) throws SJobLogCreationException {
+    public SJobLog createJobLog(final SJobLog sJobLog) throws SJobLogCreationException {
         try {
             create(sJobLog, JOB_LOG);
         } catch (final SRecorderException sre) {
             throw new SJobLogCreationException(sre);
         }
+        return sJobLog;
     }
 
     @Override
@@ -299,12 +312,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<SFailedJob> getFailedJobs(final int startIndex, final int maxResults) throws SSchedulerException {
+    public List<SFailedJob> getFailedJobs(final int startIndex, final int maxResults) throws SFailedJobReadException {
         final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults);
         try {
             return readPersistenceService.selectList(SelectDescriptorBuilder.getFailedJobs(queryOptions));
         } catch (final SBonitaReadException sbre) {
-            throw new SSchedulerException(sbre);
+            throw new SFailedJobReadException(sbre);
         }
     }
 
