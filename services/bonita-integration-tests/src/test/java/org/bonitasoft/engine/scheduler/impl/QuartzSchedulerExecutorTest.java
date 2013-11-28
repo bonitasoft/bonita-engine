@@ -293,7 +293,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         getTransactionService().complete();
     }
 
-    @Test(expected = SSchedulerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCannotUseAJobWithANullName() throws Exception {
         final Date now = new Date();
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
@@ -417,7 +417,8 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
     public void testExecuteSeveralTimesAJob() throws Exception {
         final String jobName = "IncrementVariableJob1";
         final Date now = new Date();
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(IncrementItselfJob.class.getName(), jobName).done();
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                .createNewInstance(IncrementItselfJob.class.getName(), jobName).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
         final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 3, 100);
@@ -534,7 +535,8 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
     public void testExecuteAJobInACron() throws Exception {
         final String jobName = "IncrementItselfJob";
         final Date now = new Date();
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(IncrementItselfJob.class.getName(), jobName).done();
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                .createNewInstance(IncrementItselfJob.class.getName(), jobName).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
         final Trigger trigger = new UnixCronTrigger("events", now, 10, "0/1 * * * * ?");
@@ -612,7 +614,8 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
     public void testDeleteAJob() throws Exception {
         final String jobName = "testDeleteAJob";
         final Date now = new Date();
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(IncrementItselfJob.class.getName(), jobName).done();
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                .createNewInstance(IncrementItselfJob.class.getName(), jobName).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
         final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 1000, 100);
@@ -645,11 +648,13 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
     public void testDeleteAGroupOfJobs() throws Exception {
         final Date now = new Date();
 
-        final SJobDescriptor jobDescriptor1 = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(IncrementItselfJob.class.getName(), "job1").done();
+        final SJobDescriptor jobDescriptor1 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                .createNewInstance(IncrementItselfJob.class.getName(), "job1").done();
         final List<SJobParameter> parameters1 = new ArrayList<SJobParameter>();
         parameters1.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "1").done());
 
-        final SJobDescriptor jobDescriptor2 = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(IncrementItselfJob.class.getName(), "job2").done();
+        final SJobDescriptor jobDescriptor2 = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                .createNewInstance(IncrementItselfJob.class.getName(), "job2").done();
         final List<SJobParameter> parameters2 = new ArrayList<SJobParameter>();
         parameters2.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "2").done());
 

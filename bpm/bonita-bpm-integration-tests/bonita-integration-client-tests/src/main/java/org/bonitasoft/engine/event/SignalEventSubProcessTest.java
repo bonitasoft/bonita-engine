@@ -187,15 +187,16 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, SUB_PROCESS_NAME, false);
         final ActivityInstance subStep = waitForUserTask(SUB_STEP, processInstance);
-        final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
-
-        activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
-        System.out.println("activities = " + activities);
-        assertEquals(2, activities.size());
+        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         // the parent process instance is supposed to be aborted, so no more waiting events are expected
         checkNumberOfWaitingEvents(SUB_PROCESS_START, 0);
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
+        assertEquals(2, activities.size());
+        assertEquals(SUB_PROCESS_NAME, activities.get(0).getName());
+        assertEquals(SUB_STEP, activities.get(1).getName());
+
+        final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         assignAndExecuteStep(subStep, john.getId());
         waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
