@@ -86,6 +86,7 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilder;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -760,10 +761,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final SFlowNodeInstanceBuilder flowNodeKeyProvider = tenantAccessor.getBPMInstanceBuilders().getUserTaskInstanceBuilder();
 
         try {
             final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-            final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getParentContainerId());
+            final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getLogicalGroup(flowNodeKeyProvider
+                    .getParentProcessInstanceIndex()));
             final long processDefinitionId = processInstance.getProcessDefinitionId();
             final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
