@@ -1,28 +1,16 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
 package org.bonitasoft.engine.platform;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,26 +32,18 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.platform.model.impl.SPlatformImpl;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.UpdateDescriptor;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * @author Celine Souchet
- */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(BuilderFactory.class)
+@RunWith(MockitoJUnitRunner.class)
 public class PlatformServiceImplTest {
 
     @Mock
@@ -81,257 +61,236 @@ public class PlatformServiceImplTest {
     @InjectMocks
     private PlatformServiceImpl platformServiceImpl;
 
-    @Before
-    public void setUp() {
-        PowerMockito.mockStatic(BuilderFactory.class);
-        final STenantBuilder sTenantBuilder = mock(STenantBuilder.class);
-        final STenantBuilderFactory sTenantFactory = mock(STenantBuilderFactory.class);
-        Mockito.when(BuilderFactory.get(STenantBuilderFactory.class)).thenReturn(sTenantFactory);
-        when(sTenantFactory.createNewInstance(anyString(), anyString(), any(Long.class), anyString(), any(Boolean.class))).thenReturn(sTenantBuilder);
-        when(sTenantFactory.getNameKey()).thenReturn("name");
-        when(sTenantFactory.getStatusKey()).thenReturn("status");
-    }
-
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getDefaultTenant()}.
-     */
     @Test
-    public final void getDefaultTenant() throws SBonitaReadException, STenantNotFoundException {
-        final STenant sTenant = mock(STenant.class);
-        doReturn(sTenant).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+    public final void getDefaultTenant() throws SBonitaException {
+        final STenant sTenant = buildTenant(1l, "myTenant");
+        when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getDefaultTenant", null, STenant.class))).thenReturn(sTenant);
 
-        Assert.assertEquals(sTenant, platformServiceImpl.getDefaultTenant());
+        assertEquals(sTenant, platformServiceImpl.getDefaultTenant());
     }
 
     @Test(expected = STenantNotFoundException.class)
-    public final void getDefaultTenantNotExists() throws SBonitaReadException, STenantNotFoundException {
-        doReturn(null).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+    public final void getDefaultTenantNotExists() throws SBonitaException {
+        when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getDefaultTenant", null, STenant.class))).thenReturn(null);
 
         platformServiceImpl.getDefaultTenant();
     }
 
     @Test(expected = STenantNotFoundException.class)
-    public final void getDefaultTenantThrowException() throws SBonitaReadException, STenantNotFoundException {
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+    public final void getDefaultTenantThrowException() throws SBonitaException {
+        when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getDefaultTenant", null, STenant.class))).thenThrow(new SBonitaReadException(""));
 
         platformServiceImpl.getDefaultTenant();
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getNumberOfTenants()}.
-     */
     @Test
-    public final void getNumberOfTenants() throws SBonitaReadException, STenantException {
+    public final void getNumberOfTenants() throws SBonitaException {
         final long numberOfTenants = 155L;
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(numberOfTenants);
+        final Map<String, Object> emptyMap = Collections.emptyMap();
+        when(persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenants", emptyMap, STenant.class, Long.class)))
+                .thenReturn(numberOfTenants);
 
-        Assert.assertEquals(numberOfTenants, platformServiceImpl.getNumberOfTenants());
+        assertEquals(numberOfTenants, platformServiceImpl.getNumberOfTenants());
     }
 
     @Test(expected = STenantException.class)
-    public final void getNumberOfTenantsThrowException() throws SBonitaReadException, STenantException {
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+    public final void getNumberOfTenantsThrowException() throws SBonitaException {
+        final Map<String, Object> emptyMap = Collections.emptyMap();
+        when(persistenceService.selectOne(new SelectOneDescriptor<Long>("getNumberOfTenants", emptyMap, STenant.class, Long.class))).thenThrow(
+                new SBonitaReadException(""));
 
         platformServiceImpl.getNumberOfTenants();
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getNumberOfTenants(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
-    public final void getNumberOfTenantsWithOptions() throws SBonitaReadException, SBonitaSearchException {
+    public final void getNumberOfTenantsWithOptions() throws SBonitaException {
         final long numberOfTenants = 155L;
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.getNumberOfEntities(STenant.class, options, null)).thenReturn(numberOfTenants);
 
-        Assert.assertEquals(numberOfTenants, platformServiceImpl.getNumberOfTenants(options));
+        assertEquals(numberOfTenants, platformServiceImpl.getNumberOfTenants(options));
     }
 
     @Test(expected = SBonitaSearchException.class)
-    public final void getNumberOfTenantsWithOptionsThrowException() throws SBonitaReadException, SBonitaSearchException {
+    public final void getNumberOfTenantsWithOptionsThrowException() throws SBonitaException {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.getNumberOfEntities(STenant.class, options, null)).thenThrow(new SBonitaReadException(""));
 
         platformServiceImpl.getNumberOfTenants(options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getPlatform()}.
-     * 
-     * @throws CacheException
-     */
     @Test
-    public final void getPlatform() throws SPlatformNotFoundException, CacheException {
-        final SPlatform sPlatform = mock(SPlatform.class);
+    public final void getPlatform() throws SBonitaException {
+        final SPlatform sPlatform = buildPlatform();
         when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
-        Assert.assertEquals(sPlatform, platformServiceImpl.getPlatform());
+
+        assertEquals(sPlatform, platformServiceImpl.getPlatform());
     }
 
     @Test(expected = SPlatformNotFoundException.class)
-    public final void getPlatformNotExists() throws SPlatformNotFoundException, CacheException {
+    public final void getPlatformNotExists() throws SBonitaException {
         when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
 
         platformServiceImpl.getPlatform();
     }
 
     @Test(expected = SPlatformNotFoundException.class)
-    public final void getPlatformThrowException() throws SPlatformNotFoundException, CacheException {
-        doThrow(new CacheException("")).when(platformCacheService).get(anyString(), anyString());
+    public final void getPlatformThrowException() throws SBonitaException {
+        when(platformCacheService.get(anyString(), anyString())).thenThrow(new CacheException(""));
+
         platformServiceImpl.getPlatform();
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getTenant(long)}.
-     */
     @Test
-    public final void getTenantById() throws SBonitaReadException, STenantNotFoundException {
-        final STenant sTenant = mock(STenant.class);
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(sTenant);
+    public final void getTenantById() throws SBonitaException {
+        final STenant sTenant = buildTenant(15l, "tenant1");
+        when(persistenceService.selectById(new SelectByIdDescriptor<STenant>("getTenantById", STenant.class, 15l))).thenReturn(sTenant);
 
-        Assert.assertEquals(sTenant, platformServiceImpl.getTenant(15L));
+        assertEquals(sTenant, platformServiceImpl.getTenant(15L));
     }
 
     @Test(expected = STenantNotFoundException.class)
-    public final void getTenantByIdNotExists() throws SBonitaReadException, STenantNotFoundException {
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(null);
+    public final void getTenantByIdNotExists() throws SBonitaException {
+        when(persistenceService.selectById(new SelectByIdDescriptor<STenant>("getTenantById", STenant.class, 15l))).thenReturn(null);
 
         platformServiceImpl.getTenant(15L);
     }
 
     @Test(expected = STenantNotFoundException.class)
-    public final void getTenantByIdThrowException() throws SBonitaReadException, STenantNotFoundException {
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
+    public final void getTenantByIdThrowException() throws SBonitaException {
+        when(persistenceService.selectById(new SelectByIdDescriptor<STenant>("getTenantById", STenant.class, 15l))).thenThrow(new SBonitaReadException(""));
 
         platformServiceImpl.getTenant(15L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getTenantByName(java.lang.String)}.
-     */
     @Test
-    public final void getTenantByName() throws SBonitaReadException, STenantNotFoundException {
-        final STenant sTenant = mock(STenant.class);
-        doReturn(sTenant).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+    public final void getTenantByName() throws SBonitaException {
+        final STenant sTenant = buildTenant(486, "name");
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(sTenant);
 
-        Assert.assertEquals(sTenant, platformServiceImpl.getTenantByName("name"));
+        assertEquals(sTenant, platformServiceImpl.getTenantByName("name"));
     }
 
     @Test(expected = STenantNotFoundException.class)
-    public final void getTenantByNameNotExists() throws SBonitaReadException, STenantNotFoundException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+    public final void getTenantByNameNotExists() throws SBonitaException {
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(null);
 
         platformServiceImpl.getTenantByName("name");
     }
 
     @Test(expected = STenantNotFoundException.class)
-    public final void getTenantByNameThrowException() throws SBonitaReadException, STenantNotFoundException {
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+    public final void getTenantByNameThrowException() throws SBonitaException {
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenThrow(
+                new SBonitaReadException(""));
 
         platformServiceImpl.getTenantByName("name");
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getTenants(java.util.Collection, org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
-    public final void getTenantsByIds() throws SBonitaReadException, STenantNotFoundException, STenantException {
+    public final void getTenantsByIds() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
-        sTenants.add(mock(STenant.class));
+        sTenants.add(buildTenant(15, "name"));
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sTenants);
+        final List<Long> ids = Collections.singletonList(15L);
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", ids);
+        when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenantsByIds", parameters, STenant.class, options))).thenReturn(sTenants);
 
-        Assert.assertEquals(sTenants, platformServiceImpl.getTenants(Collections.singletonList(15L), options));
+        assertEquals(sTenants, platformServiceImpl.getTenants(ids, options));
     }
 
     @Test(expected = STenantNotFoundException.class)
-    public final void getTenantsByIdsNotExists() throws SBonitaReadException, STenantNotFoundException, STenantException {
+    public final void getTenantsByIdsNotExists() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
-        sTenants.add(mock(STenant.class));
+        sTenants.add(buildTenant(15, "name"));
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sTenants);
+        final List<Long> ids = Arrays.asList(15l, 32l);
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", ids);
+        when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenantsByIds", parameters, STenant.class, options))).thenReturn(sTenants);
 
-        final List<Long> ids = new ArrayList<Long>();
-        ids.add(15L);
-        ids.add(32L);
         platformServiceImpl.getTenants(ids, options);
     }
 
     @Test(expected = STenantException.class)
-    public final void getTenantsByIdsThrowException() throws SBonitaReadException, STenantNotFoundException, STenantException {
+    public final void getTenantsByIdsThrowException() throws SBonitaException {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        final List<Long> ids = Collections.singletonList(15L);
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", ids);
+        when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenantsByIds", parameters, STenant.class, options))).thenThrow(
+                new SBonitaReadException(""));
 
-        platformServiceImpl.getTenants(Collections.singletonList(15L), options);
+        platformServiceImpl.getTenants(ids, options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getTenants(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
-    public final void getTenantsWithOptions() throws SBonitaReadException, STenantException {
+    public final void getTenantsWithOptions() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
-        sTenants.add(mock(STenant.class));
+        sTenants.add(buildTenant(48, "name"));
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sTenants);
+        when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenants", null, STenant.class, options))).thenReturn(sTenants);
 
-        Assert.assertEquals(sTenants, platformServiceImpl.getTenants(options));
+        assertEquals(sTenants, platformServiceImpl.getTenants(options));
     }
 
     @Test(expected = STenantException.class)
-    public final void getTenantsWithOptionsThrowException() throws SBonitaReadException, STenantException {
+    public final void getTenantsWithOptionsThrowException() throws SBonitaException {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(new SelectListDescriptor<STenant>("getTenants", null, STenant.class, options))).thenThrow(
+                new SBonitaReadException(""));
 
         platformServiceImpl.getTenants(options);
     }
 
     @Test
-    public final void isPlatformCreated() throws CacheException {
-        final SPlatform sPlatform = mock(SPlatform.class);
+    public final void isPlatformCreated() throws SBonitaException {
+        final SPlatform sPlatform = buildPlatform();
         when(platformCacheService.get(anyString(), anyString())).thenReturn(sPlatform);
-        Assert.assertTrue(platformServiceImpl.isPlatformCreated());
+
+        assertTrue(platformServiceImpl.isPlatformCreated());
     }
 
     @Test
-    public final void isPlatformNotCreated() throws CacheException {
+    public final void isPlatformNotCreated() throws SBonitaException {
         when(platformCacheService.get(anyString(), anyString())).thenReturn(null);
 
-        Assert.assertFalse(platformServiceImpl.isPlatformCreated());
+        assertFalse(platformServiceImpl.isPlatformCreated());
     }
 
     @Test
-    public final void isPlatformNotCreatedThrowException() throws CacheException {
-        doThrow(new CacheException("")).when(platformCacheService).get(anyString(), anyString());
-        Assert.assertFalse(platformServiceImpl.isPlatformCreated());
+    public final void isPlatformNotCreatedThrowException() throws SBonitaException {
+        when(platformCacheService.get(anyString(), anyString())).thenThrow(new CacheException(""));
+
+        assertFalse(platformServiceImpl.isPlatformCreated());
     }
 
     @Test
     public final void isTenantActivated() {
         final STenant tenant = buildTenant("ACTIVATED");
 
-        Assert.assertTrue(platformServiceImpl.isTenantActivated(tenant));
+        assertTrue(platformServiceImpl.isTenantActivated(tenant));
     }
 
     @Test
     public final void isNotTenantActivated() {
         final STenant tenant = buildTenant("DEACTIVATED");
 
-        Assert.assertFalse(platformServiceImpl.isTenantActivated(tenant));
+        assertFalse(platformServiceImpl.isTenantActivated(tenant));
     }
 
     @Test
-    public final void searchTenants() throws SBonitaSearchException, SBonitaReadException {
+    public final void searchTenants() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
-        sTenants.add(mock(STenant.class));
+        sTenants.add(buildTenant(87, "tenant"));
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.searchEntity(STenant.class, options, null)).thenReturn(sTenants);
 
-        Assert.assertEquals(sTenants, platformServiceImpl.searchTenants(options));
+        assertEquals(sTenants, platformServiceImpl.searchTenants(options));
     }
 
     @Test(expected = SBonitaSearchException.class)
-    public final void searchTenantsThrowException() throws SBonitaSearchException, SBonitaReadException {
+    public final void searchTenantsThrowException() throws SBonitaException {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.searchEntity(STenant.class, options, null)).thenThrow(new SBonitaReadException(""));
 
@@ -370,15 +329,22 @@ public class PlatformServiceImplTest {
     }
 
     private STenant buildTenant(final long id, final String name) {
-        final STenantImpl tenant = new STenantImpl(name, "me", 15l, "ok", false, false);
+        return buildTenant(id, name, "me", 468786l, "ACTIVATED", true, false);
+    }
+
+    private STenant buildTenant(final String status) {
+        return buildTenant(45, "tenant", "me", 1567l, status, false, false);
+    }
+
+    private STenant buildTenant(final long id, final String name, final String createdBy, final long created, final String status, final boolean defaultTenant,
+            final boolean inMaintenance) {
+        final STenantImpl tenant = new STenantImpl(name, createdBy, created, status, defaultTenant, inMaintenance);
         tenant.setId(id);
         return tenant;
     }
 
-    private STenant buildTenant(final String status) {
-        final STenantImpl tenant = new STenantImpl("tenant", "me", 15l, status, false, false);
-        tenant.setId(45);
-        return tenant;
+    private SPlatform buildPlatform() {
+        return new SPlatformImpl("1.0", "0.9", "0.5", "me", 654687344687645l);
     }
 
 }
