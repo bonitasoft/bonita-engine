@@ -23,7 +23,7 @@ import com.hazelcast.core.IQueue;
 import com.hazelcast.monitor.LocalMapStats;
 import com.hazelcast.monitor.LocalQueueStats;
 
-final class HazelcastStatExtractor implements Runnable {
+public class HazelcastStatExtractor implements Runnable {
 
     private static final String EVENT_SERVICE_HANDLERS_PLATFORM = "EVENT_SERVICE_HANDLERS-PLATFORM";
 
@@ -89,6 +89,7 @@ final class HazelcastStatExtractor implements Runnable {
             statsFilePath += File.separator;
         }
         statsFilePath += "hazelcast-stats-" + hazelcastInstance.getCluster().getLocalMember().getUuid() + ".csv";
+        System.out.println("Saving hazelcast statistics in " + statsFilePath);
         File file = new File(statsFilePath);
         file.delete();
         file.createNewFile();
@@ -126,7 +127,9 @@ final class HazelcastStatExtractor implements Runnable {
 
     @Override
     public void run() {
-        CSVWriter csvWriter = new CSVWriter(fileWriter, statsList.toArray(new String[] {}));
+        ArrayList<String> header = new ArrayList<String>(statsList);
+        header.add(0, "Time");
+        CSVWriter csvWriter = new CSVWriter(fileWriter, header.toArray(new String[] {}));
         while (true) {
             try {
                 Thread.sleep(statsPrintInterval);
@@ -181,6 +184,7 @@ final class HazelcastStatExtractor implements Runnable {
             }
             stats.put(NUMBER_OF_LOCKS, nblock);
             ArrayList<String> counts = new ArrayList<String>();
+            counts.add(String.valueOf(System.currentTimeMillis()));
             for (String name : statsList) {
                 Long count = stats.get(name);
                 counts.add(String.valueOf(count));
