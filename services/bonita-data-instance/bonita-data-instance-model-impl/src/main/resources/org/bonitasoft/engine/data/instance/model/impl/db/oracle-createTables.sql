@@ -3,7 +3,7 @@ CREATE TABLE data_instance (
 	id NUMBER(19, 0) NOT NULL,
 	name VARCHAR2(50),
 	description VARCHAR2(50),
-	transientData NUMBER(1) ,
+	transientData NUMBER(1),
 	className VARCHAR2(100),
 	containerId NUMBER(19, 0),
 	containerType VARCHAR2(60),
@@ -12,9 +12,9 @@ CREATE TABLE data_instance (
 	intValue INT,
 	longValue NUMBER(19, 0),
 	shortTextValue VARCHAR2(255),
-	booleanValue NUMBER(1) ,
+	booleanValue NUMBER(1),
 	doubleValue NUMERIC(19,5),
-	floatValue NUMBER(19,4),
+	floatValue REAL,
 	blobValue BLOB,
 	clobValue CLOB,
 	discriminant VARCHAR2(50) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE data_mapping (
 	containerType VARCHAR2(60),
 	dataName VARCHAR2(50),
 	dataInstanceId NUMBER(19, 0) NOT NULL,
-	UNIQUE (containerId, containerType, dataName),
+	UNIQUE (tenantId, containerId, containerType, dataName),
 	PRIMARY KEY (tenantid, id)
 );
 

@@ -77,19 +77,19 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     public static final String TRANSIENT_DATA_SOURCE_VERSION = "6.0";
 
-    private final DataService dataSourceService;
+    protected final DataService dataSourceService;
 
-    private final SDataInstanceBuilders dataInstanceBuilders;
+    protected final SDataInstanceBuilders dataInstanceBuilders;
 
-    private final Recorder recorder;
+    protected final Recorder recorder;
 
-    private final SEventBuilders eventBuilders;
+    protected final SEventBuilders eventBuilders;
 
-    private final ReadPersistenceService persistenceService;
+    protected final ReadPersistenceService persistenceService;
 
-    private final ArchiveService archiveService;
+    protected final ArchiveService archiveService;
 
-    private final TechnicalLoggerService logger;
+    protected final TechnicalLoggerService logger;
 
     public DataInstanceServiceImpl(final DataService dataSourceService, final SDataInstanceBuilders dataInstanceBuilders, final Recorder recorder,
             final SEventBuilders eventBuilders, final ReadPersistenceService persistenceService, final ArchiveService archiveService,
@@ -427,7 +427,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         try {
             recorder.recordDelete(record, deleteEvent);
         } catch (final SRecorderException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "removeContainer", e);
+            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "deleteDataInstanceVisibilityMapping", e);
             throw new SDataInstanceException(e);
         }
     }
@@ -479,8 +479,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
      */
     protected SDataInstanceVisibilityMapping insertDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
             final long dataInstanceId, final long archiveDate) throws SRecorderException, SDefinitiveArchiveNotFound {
-        final SDataInstanceVisibilityMapping mapping = dataInstanceBuilders.getDataInstanceVisibilityMappingBuilder()
-                .createNewInstance(containerId, containerType, dataName, dataInstanceId).done();
+        final SDataInstanceVisibilityMapping mapping = createDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId);
         final InsertRecord record = new InsertRecord(mapping);
         final SInsertEvent insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(DATA_VISIBILITY_MAPPING).done();
         recorder.recordInsert(record, insertEvent);
@@ -488,6 +487,13 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final SADataInstanceVisibilityMapping archivedMapping = dataInstanceBuilders.getArchivedDataInstanceVisibilityMappingBuilder()
                 .createNewInstance(containerId, containerType, dataName, dataInstanceId, mapping.getId()).done();
         archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping));
+        return mapping;
+    }
+
+    protected SDataInstanceVisibilityMapping createDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
+            final long dataInstanceId) {
+        final SDataInstanceVisibilityMapping mapping = dataInstanceBuilders.getDataInstanceVisibilityMappingBuilder()
+                .createNewInstance(containerId, containerType, dataName, dataInstanceId).done();
         return mapping;
     }
 
