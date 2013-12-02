@@ -587,55 +587,6 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         assertEquals(3, storage.getVariableValue(variableName));
     }
 
-    /*
-     * @Test(expected = SSchedulerException.class)
-     * public void testCannotExecuteACronTriggerDueToExpressionMisconfiguration() throws Throwable {
-     * final Date now = new Date();
-     * final String variableName = "myVar";
-     * final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-     * .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-     * final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-     * final JobParameterBuilder jobParameterBuilder = schedulerService.getJobParameterBuilder();
-     * parameters.add(jobParameterBuilder.createNewInstance("jobName", "job").done());
-     * parameters.add(jobParameterBuilder.createNewInstance("variableName", variableName).done());
-     * parameters.add(jobParameterBuilder.createNewInstance("throwExceptionAfterNIncrements", -1).done());
-     * final Trigger trigger = new UnixCronTrigger("events", now, 10, "1 * * * * * *");
-     * getTransactionService().begin();
-     * schedulerService.schedule(jobDescriptor, parameters, trigger);
-     * getTransactionService().complete();
-     * }
-     * @Test
-     * public void testDoNotThrowAnExceptionWhenDeletingAnUnknownJob() throws Exception {
-     * final boolean deleted = schedulerService.delete("MyJob");
-     * assertFalse(deleted);
-     * }
-     */
-    @Test
-    public void testDeleteAJob() throws Exception {
-        final String jobName = "testDeleteAJob";
-        final Date now = new Date();
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), jobName).done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
-        final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 1000, 100);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-
-        final WaitForIncrementJobToHaveValue wf = new WaitForIncrementJobToHaveValue(1200, IncrementItselfJob.getValue() + 1);
-        assertTrue(wf.waitFor());
-        getTransactionService().begin();
-        schedulerService.delete(jobName);
-        getTransactionService().complete();
-        // may be in execution so the last job is running
-        Thread.sleep(200);
-        IncrementItselfJob.reset();
-        Thread.sleep(500);
-        assertTrue(0 == IncrementItselfJob.getValue());
-    }
-
     @Test
     public void testDoNotThrowAnExceptionWhenDeletingAnUnknownGroupOfJobs() throws Exception {
         getTransactionService().begin();
@@ -744,40 +695,6 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
 
     private long getTenantIdFromSession() throws Exception {
         return getSessionAccessor().getTenantId();
-    }
-
-    @Test
-    public void testCannotDeleteAJobFromAnotherTenant() throws Exception {
-        final Date now = new Date();
-        final String jobName = "IncrementItselfJob";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), "IncrementItselfJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        final Trigger trigger1 = new RepeatXTimesTrigger("events", now, 10, 100, 100);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger1);
-        getTransactionService().complete();
-
-        Thread.sleep(200);
-
-        final WaitForIncrementJobToHaveValue wf = new WaitForIncrementJobToHaveValue(1000, IncrementItselfJob.getValue() + 1);
-        assertTrue(wf.waitFor());
-
-        getTransactionService().begin();
-        // change tenant
-        final long defaultTenant = getTenantIdFromSession();
-        changeToTenant1();
-
-        schedulerService.delete(jobName);
-
-        TestUtil.createSessionOn(getSessionAccessor(), getSessionService(), defaultTenant);
-        getTransactionService().complete();
-
-        // may be in execution so the last job is running
-        Thread.sleep(500);
-        assertFalse(wf.waitFor());
     }
 
     private void changeToTenant1() throws STenantNotFoundException, Exception {
