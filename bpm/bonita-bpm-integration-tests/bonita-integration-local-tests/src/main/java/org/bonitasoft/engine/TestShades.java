@@ -38,7 +38,7 @@ public class TestShades {
             IOUtil.write(file2, thePom);
             System.out.println("building " + file2.getAbsolutePath());
             System.out.println("Run mvn in " + file.getAbsolutePath());
-            Process exec = Runtime.getRuntime().exec(mvn + " dependency:tree", new String[] {}, file);
+            Process exec = Runtime.getRuntime().exec(mvn + " dependency:tree", null, file);
             InputStream inputStream = exec.getInputStream();
             exec.getOutputStream().close();
             exec.getErrorStream().close();
