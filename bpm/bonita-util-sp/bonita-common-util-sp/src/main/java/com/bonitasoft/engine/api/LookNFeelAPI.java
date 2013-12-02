@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -61,5 +63,13 @@ public interface LookNFeelAPI {
      * @since 6.2
      */
     LookNFeel getDefaultLookNFeel() throws LookNFeelNotFoundException;
+
+    /**
+     * 
+     * @return
+     * @throws LookNFeelNotFoundException
+     * @since 6.2
+     */
+    Date getLastUpdatedDate() throws LookNFeelNotFoundException;
 
 }
