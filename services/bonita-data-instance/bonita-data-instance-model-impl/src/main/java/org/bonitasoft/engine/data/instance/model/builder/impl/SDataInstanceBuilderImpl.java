@@ -23,7 +23,6 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl;
-import org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl;
@@ -32,6 +31,7 @@ import org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
@@ -48,9 +48,9 @@ public class SDataInstanceBuilderImpl implements SDataInstanceBuilder {
 
     @Override
     public SDataInstanceBuilder createNewInstance(final SDataDefinition dataDefinition) {
-        final SExpression expression = dataDefinition.getDefaultValueExpression();
         final String className = dataDefinition.getClassName();
         if (dataDefinition instanceof STextDataDefinition) {
+            final SExpression expression = dataDefinition.getDefaultValueExpression();
             dataInstanceImpl = getTextDataInstance((STextDataDefinition) dataDefinition, expression);
         } else if (dataDefinition instanceof SXMLDataDefinition) {
             dataInstanceImpl = new SXMLDataInstanceImpl((SXMLDataDefinition) dataDefinition);

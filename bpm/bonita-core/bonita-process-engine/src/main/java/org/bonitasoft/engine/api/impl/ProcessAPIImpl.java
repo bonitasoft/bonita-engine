@@ -74,7 +74,6 @@ import org.bonitasoft.engine.api.impl.transaction.comment.AddComment;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementation;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetNumberOfConnectorImplementations;
-import org.bonitasoft.engine.api.impl.transaction.data.GetNumberOfDataInstanceForContainer;
 import org.bonitasoft.engine.api.impl.transaction.document.AttachDocumentVersion;
 import org.bonitasoft.engine.api.impl.transaction.document.AttachDocumentVersionAndStoreContent;
 import org.bonitasoft.engine.api.impl.transaction.document.GetArchivedDocument;
@@ -997,11 +996,11 @@ public class ProcessAPIImpl implements ProcessAPI {
             final File processDesignFile = new File(processFolder, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
             final ProcessDefinitionBARContribution processDefinitionBARContribution = new ProcessDefinitionBARContribution();
             return processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
-        } catch (BonitaHomeNotSetException e) {
+        } catch (final BonitaHomeNotSetException e) {
             throw new ProcessDefinitionNotFoundException(e);
-        } catch (InvalidBusinessArchiveFormatException e) {
+        } catch (final InvalidBusinessArchiveFormatException e) {
             throw new ProcessDefinitionNotFoundException(e);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new ProcessDefinitionNotFoundException(processDefinitionId, e);
         }
     }
@@ -3174,7 +3173,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final long starterId;
-        long userIdFromSession = SessionInfos.getUserIdFromSession();
+        final long userIdFromSession = SessionInfos.getUserIdFromSession();
         if (userId == 0) {
             starterId = userIdFromSession;
         } else {
@@ -3268,14 +3267,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private long getNumberOfDataInstancesOfContainer(final long activityInstanceId, final DataInstanceContainer containerType) throws SBonitaException {
+    private long getNumberOfDataInstancesOfContainer(final long instanceId, final DataInstanceContainer containerType) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
-        final GetNumberOfDataInstanceForContainer getNumberOfDataInstance = new GetNumberOfDataInstanceForContainer(activityInstanceId, containerType,
-                dataInstanceService);
-        getNumberOfDataInstance.execute();
-        return getNumberOfDataInstance.getResult();
+        return dataInstanceService.getNumberOfDataInstances(instanceId, containerType);
     }
 
     @Override

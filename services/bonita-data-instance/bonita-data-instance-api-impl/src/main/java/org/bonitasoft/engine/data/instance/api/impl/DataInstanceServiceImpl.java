@@ -143,6 +143,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "updateDataInstance");
         NullCheckingUtil.checkArgsNotNull(dataInstance, descriptor);
+        if (dataInstance.isTransientData()) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "Updating a transient data instance is not a good practice.");
+            }
+        }
         final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(dataInstance.isTransientData());
         dataInstanceDataSource.updateDataInstance(dataInstance, descriptor);
         logAfterMethod(TechnicalLogSeverity.TRACE, "updateDataInstance");
