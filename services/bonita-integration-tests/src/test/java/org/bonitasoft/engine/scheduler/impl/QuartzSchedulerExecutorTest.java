@@ -29,7 +29,6 @@ import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class QuartzSchedulerExecutorTest extends CommonServiceTest {
@@ -175,33 +174,6 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
 
     private void waitForIncrementJobToBeExecutedXTimes(final int x, final int timeout) throws InterruptedException {
         assertTrue("Job was not executed " + x + " time(s)", new WaitForIncrementJobToHaveValue(timeout, x).waitFor());
-    }
-
-    @Ignore("This test is too long, should be deported to less frequently run test suite")
-    @Test
-    public void testExecuteAVeryOldJob() throws Exception {
-        final Date epoch = new Date(0);
-        final String variableName = "testExecuteAVeryOldJob";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testExecuteAVeryOldJob").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new OneExecutionTrigger("events", epoch, 10);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-        final WaitFor waitFor = new WaitFor(300, 100000) {
-
-            @Override
-            boolean check() {
-                final boolean equals = Integer.valueOf(1).equals(storage.getVariableValue(variableName));
-                return equals;
-            }
-        };
-        assertTrue("variable not updated", waitFor.waitFor());
     }
 
     @Test
@@ -552,39 +524,6 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         final int newValue = IncrementItselfJob.getValue();
         final int delta = newValue - value;
         assertTrue("expected 1 or 2, 3 execution in 2 seconds, got: " + delta, delta == 1 || delta == 2 || delta == 3);
-    }
-
-    @Test
-    @Ignore("Rewrite it so that it is more tolerant on Quartz imprecision (see test above)")
-    public void testExecuteAJobInACronAndStopIt() throws Exception {
-        final Date now = new Date();
-        final String variableName = "testExecuteAJobInACronAndStopIt";
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-        final Trigger trigger = new UnixCronTrigger("events", now, 10, "0/1 * * * * ?", new Date(now.getTime() + 2000));
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-
-        Integer value;
-        final int timeout = 5000;
-        final Date time = new Date();
-        do {
-            value = (Integer) storage.getVariableValue(variableName);
-            if (value == null) {
-                value = 0;
-            }
-            Thread.sleep(50);
-        } while (time.getTime() + timeout > System.currentTimeMillis() && value != 3);
-
-        assertEquals(Integer.valueOf(3), value);
-        Thread.sleep(2000);
-        assertEquals(3, storage.getVariableValue(variableName));
     }
 
     @Test
