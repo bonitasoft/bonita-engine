@@ -13,16 +13,16 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.persistence.PersistentObject;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Julien Mege
@@ -43,6 +43,8 @@ public class SearchArchivedHumanTaskInstanceDescriptor extends SearchEntityDescr
                 new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getProcessDefinitionKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
                 new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getRootProcessInstanceKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.ORIGINAL_HUMAN_TASK_ID,
+                new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getSourceObjectIdKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID,
                 new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getParentActivityInstanceKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SAHumanTaskInstance.class, instanceBuilder.getStateNameKey()));
