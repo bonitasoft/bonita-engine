@@ -43,4 +43,12 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
      */
     ReportingAPI getReportingAPI();
 
+    /**
+     * Gives access to LookNFeelAPI
+     * 
+     * @return The LookNFeelAPI, giving access to all look'n'feel methods.
+     * @since 6.2
+     */
+    LookNFeelAPI getLookNFeelAPI();
+
 }

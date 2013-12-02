@@ -15,6 +15,7 @@ import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
+import com.bonitasoft.engine.api.LookNFeelAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
@@ -73,6 +74,11 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
     @Override
     public PlatformMonitoringAPI getPlatformMonitoringAPI() {
         return new PlatformMonitoringAPIImpl();
+    }
+
+    @Override
+    public LookNFeelAPI getLookNFeelAPI() {
+        return new LookNFeelAPIImpl();
     }
 
 }

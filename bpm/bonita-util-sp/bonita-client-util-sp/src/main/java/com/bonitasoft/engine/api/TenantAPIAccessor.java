@@ -34,9 +34,14 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link IdentityAPI}</li>
  * <li>{@link MonitoringAPI}</li>
  * <li>{@link LoginAPI}</li>
+ * <li>{@link ProfileAPI}</li>
+ * <li>{@link ReportingAPI}</li>
+ * <li>{@link LogAPI}</li>
+ * <li>{@link LookNFeelAPI}</li>
  * </ul>
  * 
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class TenantAPIAccessor {
 
@@ -95,6 +100,10 @@ public final class TenantAPIAccessor {
 
     public static LogAPI getLogAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(LogAPI.class, session);
+    }
+
+    public static LookNFeelAPI getLookNFeelAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getAPI(LookNFeelAPI.class, session);
     }
 
     public static CommandAPI getCommandAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
