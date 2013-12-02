@@ -141,7 +141,7 @@ public class PlatformServiceImpl implements PlatformService {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             }
             throw new SPlatformCreationException("Unable to insert the platform row: " + e.getMessage(), e);
-        } catch (CacheException e) {
+        } catch (final CacheException e) {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createPlatform", e));
             }
@@ -160,7 +160,7 @@ public class PlatformServiceImpl implements PlatformService {
         // check if the tenant already exists. If yes, throws
         // TenantAlreadyExistException
         STenant existingTenant = null;
-        String tenantName = tenant.getName();
+        final String tenantName = tenant.getName();
         try {
             existingTenant = getTenantByName(tenantName);
         } catch (final STenantNotFoundException e) {
@@ -282,7 +282,7 @@ public class PlatformServiceImpl implements PlatformService {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             }
             throw new SPlatformDeletionException("Unable to delete the platform row: " + e.getMessage(), e);
-        } catch (CacheException e) {
+        } catch (final CacheException e) {
             throw new SPlatformDeletionException("Unable to delete the platform from cache: " + e.getMessage(), e);
         }
     }
@@ -412,7 +412,7 @@ public class PlatformServiceImpl implements PlatformService {
                 cachePlatform(sPlatform);
             }
             return sPlatform;
-        } catch (CacheException e) {
+        } catch (final CacheException e) {
             throw new SPlatformNotFoundException("platform not present in cache", e);
         }
     }
@@ -584,11 +584,13 @@ public class PlatformServiceImpl implements PlatformService {
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateTenant"));
         }
-        String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
+        final String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
         if (tenantName != null) {
             try {
-                getTenantByName(tenantName);
-                throw new STenantUpdateException("Unable to update the tenant with new name " + tenantName + " : it already exists.");
+                final STenant sTenant = getTenantByName(tenantName);
+                if (tenant.getId() != sTenant.getId()) {
+                    throw new STenantUpdateException("Unable to update the tenant with new name " + tenantName + " : it already exists.");
+                }
             } catch (final STenantNotFoundException e) {
                 // Ok
             }

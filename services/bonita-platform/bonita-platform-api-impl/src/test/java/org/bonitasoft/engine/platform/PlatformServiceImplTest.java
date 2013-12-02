@@ -18,15 +18,20 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
+import org.bonitasoft.engine.commons.CollectionUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -39,7 +44,10 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.platform.model.impl.STenantImpl;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.services.UpdateDescriptor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +55,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -77,14 +84,14 @@ public class PlatformServiceImplTest {
     @Before
     public void setUp() {
         PowerMockito.mockStatic(BuilderFactory.class);
-        STenantBuilder sTenantBuilder = mock(STenantBuilder.class);
-        STenantBuilderFactory sTenantFactory = mock(STenantBuilderFactory.class);
+        final STenantBuilder sTenantBuilder = mock(STenantBuilder.class);
+        final STenantBuilderFactory sTenantFactory = mock(STenantBuilderFactory.class);
         Mockito.when(BuilderFactory.get(STenantBuilderFactory.class)).thenReturn(sTenantFactory);
         when(sTenantFactory.createNewInstance(anyString(), anyString(), any(Long.class), anyString(), any(Boolean.class))).thenReturn(sTenantBuilder);
         when(sTenantFactory.getNameKey()).thenReturn("name");
         when(sTenantFactory.getStatusKey()).thenReturn("status");
     }
-    
+
     /**
      * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getDefaultTenant()}.
      */
@@ -279,11 +286,6 @@ public class PlatformServiceImplTest {
         platformServiceImpl.getTenants(options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#isPlatformCreated()}.
-     * 
-     * @throws CacheException
-     */
     @Test
     public final void isPlatformCreated() throws CacheException {
         final SPlatform sPlatform = mock(SPlatform.class);
@@ -304,28 +306,20 @@ public class PlatformServiceImplTest {
         Assert.assertFalse(platformServiceImpl.isPlatformCreated());
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#isTenantActivated(org.bonitasoft.engine.platform.model.STenant)}.
-     */
     @Test
     public final void isTenantActivated() {
-        final STenant tenant = mock(STenant.class);
-        when(tenant.getStatus()).thenReturn("ACTIVATED");
+        final STenant tenant = buildTenant("ACTIVATED");
 
         Assert.assertTrue(platformServiceImpl.isTenantActivated(tenant));
     }
 
     @Test
     public final void isNotTenantActivated() {
-        final STenant tenant = mock(STenant.class);
-        when(tenant.getStatus()).thenReturn("DESACTIVATED");
+        final STenant tenant = buildTenant("DEACTIVATED");
 
         Assert.assertFalse(platformServiceImpl.isTenantActivated(tenant));
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#searchTenants(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
     public final void searchTenants() throws SBonitaSearchException, SBonitaReadException {
         final List<STenant> sTenants = new ArrayList<STenant>();
@@ -342,6 +336,49 @@ public class PlatformServiceImplTest {
         when(persistenceService.searchEntity(STenant.class, options, null)).thenThrow(new SBonitaReadException(""));
 
         platformServiceImpl.searchTenants(options);
+    }
+
+    @Test
+    public void updateTheTenantUsingTheSameName() throws SBonitaException {
+        final String tenantName = "tenantName";
+        final STenant tenant = buildTenant(15, tenantName);
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(tenant);
+
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField("name", "tenant1");
+        platformServiceImpl.updateTenant(tenant, descriptor);
+
+        verify(persistenceService).update(any(UpdateDescriptor.class));
+    }
+
+    @Test(expected = STenantUpdateException.class)
+    public void updateAnotherTenantUsingAnExistingName() throws SBonitaException {
+        final String tenantName = "tenantName";
+        final STenant tenant = buildTenant(15, tenantName);
+        final STenant actual = buildTenant(45, tenantName);
+        final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
+        when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(actual);
+
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField("name", tenantName);
+        try {
+            platformServiceImpl.updateTenant(tenant, descriptor);
+        } finally {
+            verify(persistenceService, never()).update(any(UpdateDescriptor.class));
+        }
+    }
+
+    private STenant buildTenant(final long id, final String name) {
+        final STenantImpl tenant = new STenantImpl(name, "me", 15l, "ok", false, false);
+        tenant.setId(id);
+        return tenant;
+    }
+
+    private STenant buildTenant(final String status) {
+        final STenantImpl tenant = new STenantImpl("tenant", "me", 15l, status, false, false);
+        tenant.setId(45);
+        return tenant;
     }
 
 }
