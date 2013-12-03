@@ -20,7 +20,7 @@ import org.bonitasoft.engine.session.APISession;
 import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.LookNFeelAPI;
+import com.bonitasoft.engine.api.ThemeAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
@@ -95,8 +95,8 @@ public class ConnectorAPIAccessorExt extends ConnectorAPIAccessorImpl implements
     }
 
     @Override
-    public LookNFeelAPI getLookNFeelAPI() {
-        return getAPI(LookNFeelAPI.class, getAPISession());
+    public ThemeAPI getThemeAPI() {
+        return getAPI(ThemeAPI.class, getAPISession());
     }
 
 }

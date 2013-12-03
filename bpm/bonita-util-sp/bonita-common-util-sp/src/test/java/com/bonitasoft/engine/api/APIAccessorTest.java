@@ -52,9 +52,9 @@ public class APIAccessorTest {
     }
 
     @Test
-    public void checkgetLookNFeelAPI() throws SecurityException {
-        final Method method = getAPIMethod("getLookNFeelAPI");
-        assertEquals("com.bonitasoft.engine.api.LookNFeelAPI", method.getReturnType().getName());
+    public void checkgetThemeAPI() throws SecurityException {
+        final Method method = getAPIMethod("getThemeAPI");
+        assertEquals("com.bonitasoft.engine.api.ThemeAPI", method.getReturnType().getName());
     }
 
     @Test

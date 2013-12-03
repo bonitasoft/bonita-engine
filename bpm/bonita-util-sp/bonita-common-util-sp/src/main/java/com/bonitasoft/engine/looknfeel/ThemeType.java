@@ -13,42 +13,9 @@
  **/
 package com.bonitasoft.engine.looknfeel;
 
-import java.util.Date;
-
-import org.bonitasoft.engine.bpm.BaseElement;
-
 /**
  * @author Celine Souchet
  */
-public interface LookNFeel extends BaseElement {
-
-    /**
-     * @return The zip file associated with this look'n'feel, as a binary content.
-     */
-    byte[] getContent();
-
-    /**
-     * This look'n'feel is default, or not.
-     * 
-     * @return True if this look'n'feel is default, false otherwise.
-     * @since 6.2
-     */
-    boolean isDefault();
-
-    /**
-     * Get the date when this look'n'feel was last modified.
-     * 
-     * @return The date when this look'n'feel was last modified.
-     * @since 6.2
-     */
-    Date getLastUpdatedDate();
-
-    /**
-     * Get the type of this look'n'feel
-     * 
-     * @return The type of this look'n'feel
-     * @since 6.2
-     */
-    LookNFeelType getType();
-
+public enum ThemeType {
+    PORTAL, MOBILE;
 }

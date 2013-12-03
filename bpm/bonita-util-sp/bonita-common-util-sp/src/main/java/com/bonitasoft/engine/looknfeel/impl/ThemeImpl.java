@@ -18,13 +18,13 @@ import java.util.Date;
 
 import org.bonitasoft.engine.bpm.BaseElementImpl;
 
-import com.bonitasoft.engine.looknfeel.LookNFeel;
-import com.bonitasoft.engine.looknfeel.LookNFeelType;
+import com.bonitasoft.engine.looknfeel.Theme;
+import com.bonitasoft.engine.looknfeel.ThemeType;
 
 /**
  * @author Celine Souchet
  */
-public class LookNFeelImpl extends BaseElementImpl implements LookNFeel {
+public class ThemeImpl extends BaseElementImpl implements Theme {
 
     private static final long serialVersionUID = 5445403438892593799L;
 
@@ -34,9 +34,9 @@ public class LookNFeelImpl extends BaseElementImpl implements LookNFeel {
 
     private Date lastUpdatedDate;
 
-    private LookNFeelType type;
+    private ThemeType type;
 
-    public LookNFeelImpl(final byte[] content, final boolean isDefault, final LookNFeelType type, final Date lastUpdatedDate) {
+    public ThemeImpl(final byte[] content, final boolean isDefault, final ThemeType type, final Date lastUpdatedDate) {
         super();
         this.content = content;
         this.isDefault = isDefault;
@@ -72,11 +72,11 @@ public class LookNFeelImpl extends BaseElementImpl implements LookNFeel {
     }
 
     @Override
-    public LookNFeelType getType() {
+    public ThemeType getType() {
         return type;
     }
 
-    public void setType(LookNFeelType type) {
+    public void setType(ThemeType type) {
         this.type = type;
     }
 
@@ -99,7 +99,7 @@ public class LookNFeelImpl extends BaseElementImpl implements LookNFeel {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        LookNFeelImpl other = (LookNFeelImpl) obj;
+        ThemeImpl other = (ThemeImpl) obj;
         if (!super.equals(obj)) {
             return false;
         }

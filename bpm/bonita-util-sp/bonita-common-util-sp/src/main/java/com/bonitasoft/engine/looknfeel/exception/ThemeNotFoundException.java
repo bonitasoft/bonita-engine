@@ -11,11 +11,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package com.bonitasoft.engine.looknfeel;
+package com.bonitasoft.engine.looknfeel.exception;
+
+import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
  * @author Celine Souchet
  */
-public enum LookNFeelType {
-    PORTAL, MOBILE;
+public class ThemeNotFoundException extends NotFoundException {
+
+    private static final long serialVersionUID = 1692118270602416856L;
+
+    public ThemeNotFoundException(final Throwable cause) {
+        super(cause);
+    }
+
 }

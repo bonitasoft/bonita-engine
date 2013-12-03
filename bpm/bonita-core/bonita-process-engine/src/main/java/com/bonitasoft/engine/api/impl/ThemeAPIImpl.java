@@ -16,11 +16,11 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
-import com.bonitasoft.engine.api.LookNFeelAPI;
-import com.bonitasoft.engine.looknfeel.LookNFeel;
-import com.bonitasoft.engine.looknfeel.LookNFeelCreator;
-import com.bonitasoft.engine.looknfeel.LookNFeelUpdater;
-import com.bonitasoft.engine.looknfeel.exception.LookNFeelNotFoundException;
+import com.bonitasoft.engine.api.ThemeAPI;
+import com.bonitasoft.engine.looknfeel.Theme;
+import com.bonitasoft.engine.looknfeel.ThemeCreator;
+import com.bonitasoft.engine.looknfeel.ThemeUpdater;
+import com.bonitasoft.engine.looknfeel.exception.ThemeNotFoundException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
@@ -28,7 +28,7 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 /**
  * @author Celine Souchet
  */
-public class LookNFeelAPIImpl implements LookNFeelAPI {
+public class ThemeAPIImpl implements ThemeAPI {
 
     public TenantServiceAccessor getTenantAccessor() {
         try {
@@ -41,79 +41,79 @@ public class LookNFeelAPIImpl implements LookNFeelAPI {
     }
 
     @Override
-    public LookNFeel createLookNFeel(final LookNFeelCreator creator) throws CreationException, AlreadyExistsException {
+    public Theme createTheme(final ThemeCreator creator) throws CreationException, AlreadyExistsException {
         // TODO Auto-generated method stub
         return null;
         // If field IS_DEFAULT is given, check in database, if exists. If yes, throw exception.
 
-        // Map<LookNFeelField, Serializable> fields = creator.getFields();
-        // final String name = (String) fields.get(LookNFeelField.NAME);
+        // Map<ThemeField, Serializable> fields = creator.getFields();
+        // final String name = (String) fields.get(ThemeField.NAME);
         // if (name == null || name.isEmpty()) {
         // throw new CreationException("Name is mandatory.");
         // }
         // final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        // final LookNFeelService LookNFeelService = tenantAccessor.getLookNFeelService();
+        // final ThemeService ThemeService = tenantAccessor.getThemeService();
         // try {
-        // LookNFeelService.getLookNFeelByName(name);
-        // throw new AlreadyExistsException("A LookNFeel with name \"" + name + "\" already exists");
-        // } catch (final SLookNFeelNotFoundException sLookNFeelNotFoundException) {
+        // ThemeService.getThemeByName(name);
+        // throw new AlreadyExistsException("A Theme with name \"" + name + "\" already exists");
+        // } catch (final SThemeNotFoundException sThemeNotFoundException) {
         // try {
-        // final SLookNFeel LookNFeel = LookNFeelService.createLookNFeel(SPModelConvertor.constructSLookNFeel(creator, false,
+        // final STheme Theme = ThemeService.createTheme(SPModelConvertor.constructSTheme(creator, false,
         // SessionInfos.getUserIdFromSession()));
-        // return SPModelConvertor.toLookNFeel(LookNFeel);
-        // } catch (final SLookNFeelCreationException e) {
+        // return SPModelConvertor.toTheme(Theme);
+        // } catch (final SThemeCreationException e) {
         // throw new CreationException(e);
         // }
         // }
     }
 
     @Override
-    public LookNFeel updateLookNFeel(final long id, final LookNFeelUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
+    public Theme updateTheme(final long id, final ThemeUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
         // TODO Auto-generated method stub
         return null;
         // if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
         // throw new UpdateException("The update descriptor does not contain field updates");
         // }
-        // Serializable updatedName = updateDescriptor.getFields().get(LookNFeelUpdater.LookNFeelField.NAME);
+        // Serializable updatedName = updateDescriptor.getFields().get(ThemeUpdater.ThemeField.NAME);
         // if (updatedName != null) {
-        // SearchResult<LookNFeel> searchLookNFeels;
+        // SearchResult<Theme> searchThemes;
         // try {
-        // searchLookNFeels = searchLookNFeels(new SearchOptionsBuilder(0, 1).differentFrom(LookNFeelSearchDescriptor.ID, id)
-        // .filter(LookNFeelSearchDescriptor.NAME, updatedName).done());
-        // if (searchLookNFeels.getCount() > 0) {
-        // throw new AlreadyExistsException("A LookNFeel with the name '" + updatedName + "' already exists");
+        // searchThemes = searchThemes(new SearchOptionsBuilder(0, 1).differentFrom(ThemeSearchDescriptor.ID, id)
+        // .filter(ThemeSearchDescriptor.NAME, updatedName).done());
+        // if (searchThemes.getCount() > 0) {
+        // throw new AlreadyExistsException("A Theme with the name '" + updatedName + "' already exists");
         // }
         // } catch (SearchException e) {
-        // throw new UpdateException("Cannot check if a LookNFeel with the name '" + updatedName + "' already exists", e);
+        // throw new UpdateException("Cannot check if a Theme with the name '" + updatedName + "' already exists", e);
         // }
         // }
         // final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        // final LookNFeelService LookNFeelService = tenantAccessor.getLookNFeelService();
+        // final ThemeService ThemeService = tenantAccessor.getThemeService();
         //
-        // final UpdateLookNFeel updateLookNFeel = new UpdateLookNFeel(LookNFeelService, id,
+        // final UpdateTheme updateTheme = new UpdateTheme(ThemeService, id,
         // updateDescriptor, SessionInfos.getUserIdFromSession());
         // try {
-        // updateLookNFeel.execute();
-        // return SPModelConvertor.toLookNFeel(updateLookNFeel.getResult());
+        // updateTheme.execute();
+        // return SPModelConvertor.toTheme(updateTheme.getResult());
         // } catch (final SBonitaException e) {
         // throw new UpdateException(e);
         // }
     }
 
     @Override
-    public LookNFeel getCurrentLookNFeel() throws LookNFeelNotFoundException {
+    public Theme getCurrentTheme() throws ThemeNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public LookNFeel getDefaultLookNFeel() throws LookNFeelNotFoundException {
+    public Theme getDefaultTheme() throws ThemeNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Date getLastUpdatedDate() throws LookNFeelNotFoundException {
+    public Date getLastUpdatedDate() throws ThemeNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }

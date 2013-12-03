@@ -14,17 +14,17 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
 
-import com.bonitasoft.engine.looknfeel.LookNFeel;
-import com.bonitasoft.engine.looknfeel.LookNFeelCreator;
-import com.bonitasoft.engine.looknfeel.LookNFeelUpdater;
-import com.bonitasoft.engine.looknfeel.exception.LookNFeelNotFoundException;
+import com.bonitasoft.engine.looknfeel.Theme;
+import com.bonitasoft.engine.looknfeel.ThemeCreator;
+import com.bonitasoft.engine.looknfeel.ThemeUpdater;
+import com.bonitasoft.engine.looknfeel.exception.ThemeNotFoundException;
 
 /**
- * Manage mobile and portal look'n'feel
+ * Manage mobile and portal theme
  * 
  * @author Celine Souchet
  */
-public interface LookNFeelAPI {
+public interface ThemeAPI {
 
     /**
      * 
@@ -35,7 +35,7 @@ public interface LookNFeelAPI {
      * 
      * @since 6.2
      */
-    LookNFeel createLookNFeel(LookNFeelCreator creator) throws AlreadyExistsException, CreationException;
+    Theme createTheme(ThemeCreator creator) throws AlreadyExistsException, CreationException;
 
     /**
      * 
@@ -46,30 +46,30 @@ public interface LookNFeelAPI {
      * @throws AlreadyExistsException
      * @since 6.2
      */
-    LookNFeel updateLookNFeel(long id, LookNFeelUpdater updater) throws UpdateException, AlreadyExistsException;
+    Theme updateTheme(long id, ThemeUpdater updater) throws UpdateException, AlreadyExistsException;
 
     /**
      * 
      * @return
-     * @throws LookNFeelNotFoundException
+     * @throws ThemeNotFoundException
      * @since 6.2
      */
-    LookNFeel getCurrentLookNFeel() throws LookNFeelNotFoundException;
+    Theme getCurrentTheme() throws ThemeNotFoundException;
 
     /**
      * 
      * @return
-     * @throws LookNFeelNotFoundException
+     * @throws ThemeNotFoundException
      * @since 6.2
      */
-    LookNFeel getDefaultLookNFeel() throws LookNFeelNotFoundException;
+    Theme getDefaultTheme() throws ThemeNotFoundException;
 
     /**
      * 
      * @return
-     * @throws LookNFeelNotFoundException
+     * @throws ThemeNotFoundException
      * @since 6.2
      */
-    Date getLastUpdatedDate() throws LookNFeelNotFoundException;
+    Date getLastUpdatedDate() throws ThemeNotFoundException;
 
 }

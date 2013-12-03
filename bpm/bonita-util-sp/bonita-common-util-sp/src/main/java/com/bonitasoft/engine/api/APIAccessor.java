@@ -44,11 +44,11 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
     ReportingAPI getReportingAPI();
 
     /**
-     * Gives access to LookNFeelAPI
+     * Gives access to ThemeAPI
      * 
-     * @return The LookNFeelAPI, giving access to all look'n'feel methods.
+     * @return The ThemeAPI, giving access to all theme methods.
      * @since 6.2
      */
-    LookNFeelAPI getLookNFeelAPI();
+    ThemeAPI getThemeAPI();
 
 }

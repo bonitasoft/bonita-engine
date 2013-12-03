@@ -11,19 +11,44 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package com.bonitasoft.engine.looknfeel.exception;
+package com.bonitasoft.engine.looknfeel;
 
-import org.bonitasoft.engine.exception.NotFoundException;
+import java.util.Date;
+
+import org.bonitasoft.engine.bpm.BaseElement;
 
 /**
  * @author Celine Souchet
  */
-public class LookNFeelNotFoundException extends NotFoundException {
+public interface Theme extends BaseElement {
 
-    private static final long serialVersionUID = 1692118270602416856L;
+    /**
+     * @return The zip file associated with this theme, as a binary content.
+     */
+    byte[] getContent();
 
-    public LookNFeelNotFoundException(final Throwable cause) {
-        super(cause);
-    }
+    /**
+     * This theme is default, or not.
+     * 
+     * @return True if this theme is default, false otherwise.
+     * @since 6.2
+     */
+    boolean isDefault();
+
+    /**
+     * Get the date when this theme was last modified.
+     * 
+     * @return The date when this theme was last modified.
+     * @since 6.2
+     */
+    Date getLastUpdatedDate();
+
+    /**
+     * Get the type of this theme
+     * 
+     * @return The type of this theme
+     * @since 6.2
+     */
+    ThemeType getType();
 
 }

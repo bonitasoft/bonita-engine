@@ -15,36 +15,36 @@ import java.util.Map;
 /**
  * @author Celine Souchet
  */
-public class LookNFeelCreator implements Serializable {
+public class ThemeCreator implements Serializable {
 
     private static final long serialVersionUID = -1414989152963184543L;
 
-    public enum LookNFeelField {
+    public enum ThemeField {
         CONTENT, IS_DEFAULT, TYPE;
     }
 
-    private final Map<LookNFeelField, Serializable> fields;
+    private final Map<ThemeField, Serializable> fields;
 
-    public LookNFeelCreator() {
-        fields = new HashMap<LookNFeelField, Serializable>(3);
+    public ThemeCreator() {
+        fields = new HashMap<ThemeField, Serializable>(3);
     }
 
-    public LookNFeelCreator setContent(final byte[] content) {
-        fields.put(LookNFeelField.CONTENT, content);
+    public ThemeCreator setContent(final byte[] content) {
+        fields.put(ThemeField.CONTENT, content);
         return this;
     }
 
-    public LookNFeelCreator setDefault(final boolean isDefault) {
-        fields.put(LookNFeelField.IS_DEFAULT, isDefault);
+    public ThemeCreator setDefault(final boolean isDefault) {
+        fields.put(ThemeField.IS_DEFAULT, isDefault);
         return this;
     }
 
-    public LookNFeelCreator setType(final LookNFeelType type) {
-        fields.put(LookNFeelField.TYPE, type);
+    public ThemeCreator setType(final ThemeType type) {
+        fields.put(ThemeField.TYPE, type);
         return this;
     }
 
-    public Map<LookNFeelField, Serializable> getFields() {
+    public Map<ThemeField, Serializable> getFields() {
         return fields;
     }
 
