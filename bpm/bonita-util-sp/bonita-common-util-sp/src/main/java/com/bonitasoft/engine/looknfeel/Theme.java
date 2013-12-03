@@ -28,6 +28,11 @@ public interface Theme extends BaseElement {
     byte[] getContent();
 
     /**
+     * @return The CSS file associated with this theme, as a binary content.
+     */
+    byte[] getCssContent();
+
+    /**
      * This theme is default, or not.
      * 
      * @return True if this theme is default, false otherwise.

@@ -30,6 +30,8 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
 
     private byte[] content;
 
+    private byte[] cssContent;
+
     private boolean isDefault;
 
     private Date lastUpdatedDate;
@@ -51,6 +53,15 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
 
     public void setContent(byte[] content) {
         this.content = content;
+    }
+
+    @Override
+    public byte[] getCssContent() {
+        return cssContent;
+    }
+
+    public void setCssContent(byte[] cssContent) {
+        this.cssContent = cssContent;
     }
 
     @Override
@@ -88,6 +99,7 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
         result = prime * result + ((lastUpdatedDate == null) ? 0 : lastUpdatedDate.hashCode());
         result = prime * result + (isDefault ? 1231 : 1237);
         result = prime * result + Arrays.hashCode(content);
+        result = prime * result + Arrays.hashCode(cssContent);
         return result;
     }
 
@@ -114,6 +126,8 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
         } else if (!lastUpdatedDate.equals(other.lastUpdatedDate))
             return false;
         if (!Arrays.equals(content, other.content))
+            return false;
+        if (!Arrays.equals(cssContent, other.cssContent))
             return false;
         return true;
     }
