@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -33,6 +33,7 @@ import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
@@ -72,7 +73,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
             } else {
                 SFlowNodeInstance flowNodeInstance;
                 flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
-                processInstanceId = flowNodeInstance.getRootContainerId();
+                processInstanceId = flowNodeInstance.getParentProcessInstanceId();
             }
             final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
             for (final SExpression expression : expressions) {

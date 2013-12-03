@@ -252,10 +252,10 @@ public abstract class FlowNodeInstanceImpl extends NamedElementImpl implements F
 
     @Override
     public String toString() {
-        return "FlowNodeInstanceImpl [parentContainerId=" + parentContainerId + ", state=" + state + ", stateCategory=" + stateCategory + ", rootContainerId="
-                + rootContainerId + ", processDefinitionId=" + processDefinitionId + ", parentProcessInstanceId=" + parentProcessInstanceId
-                + ", displayDescription=" + displayDescription + ", displayName=" + displayName + ", description=" + description + ", executedBy=" + executedBy
-                + ", flownodeDefinitionId=" + flownodeDefinitionId + "]";
+        return "FlowNodeInstanceImpl [name=" + getName() + ", parentContainerId=" + parentContainerId + ", state=" + state + ", stateCategory=" + stateCategory
+                + ", rootContainerId=" + rootContainerId + ", processDefinitionId=" + processDefinitionId + ", parentProcessInstanceId="
+                + parentProcessInstanceId + ", displayDescription=" + displayDescription + ", displayName=" + displayName + ", description=" + description
+                + ", executedBy=" + executedBy + ", flownodeDefinitionId=" + flownodeDefinitionId + "]";
     }
 
 }

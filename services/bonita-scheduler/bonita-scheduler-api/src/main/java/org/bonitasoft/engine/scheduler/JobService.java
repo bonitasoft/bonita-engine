@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
@@ -123,13 +123,24 @@ public interface JobService {
      * @param tenantId
      *            Identifier of tenant
      * @param jobDescriptorId
-     *            TODO
+     *            Identifier of job descriptor
+     * @return
+     * @throws SJobParameterCreationException
+     * @since 6.2
+     */
+    List<SJobParameter> createJobParameters(List<SJobParameter> parameters, long tenantId, long jobDescriptorId) throws SJobParameterCreationException;
+
+    /**
+     * Delete jobs parameters corresponding to tenant and job descriptor, if exist. After, create new job parameters for a specific tenant
+     * 
+     * @param tenantId
+     * @param jobDescriptorId
+     * @param parameters
+     * @return A list of new SJobParameter objects
      * @throws SJobParameterCreationException
      * @since 6.1
      */
-    void createJobParameters(List<SJobParameter> parameters, long tenantId, long jobDescriptorId) throws SJobParameterCreationException;
-
-    void setJobParameters(final long tenantId, long jobDescriptorId, List<SJobParameter> parameters) throws SJobParameterCreationException;
+    List<SJobParameter> setJobParameters(final long tenantId, long jobDescriptorId, List<SJobParameter> parameters) throws SJobParameterCreationException;
 
     /**
      * Create a new job parameter for a specific tenant
@@ -139,11 +150,12 @@ public interface JobService {
      * @param tenantId
      *            Identifier of tenant
      * @param jobDescriptorId
-     *            TODO
+     *            Identifier of job descriptor
+     * @return
      * @throws SJobParameterCreationException
-     * @since 6.1
+     * @since 6.2
      */
-    void createJobParameter(SJobParameter sJobParameter, long tenantId, long jobDescriptorId) throws SJobParameterCreationException;
+    SJobParameter createJobParameter(SJobParameter sJobParameter, long tenantId, long jobDescriptorId) throws SJobParameterCreationException;
 
     /**
      * Delete the specified job parameter
@@ -195,10 +207,11 @@ public interface JobService {
      * 
      * @param sJobLog
      *            JobLog to create
+     * @return
      * @throws SJobLogCreationException
-     * @since 6.1
+     * @since 6.2
      */
-    void createJobLog(SJobLog sJobLog) throws SJobLogCreationException;
+    SJobLog createJobLog(SJobLog sJobLog) throws SJobLogCreationException;
 
     /**
      * Delete the specified job log
@@ -255,6 +268,15 @@ public interface JobService {
      */
     List<SJobLog> searchJobLogs(QueryOptions queryOptions) throws SBonitaSearchException;
 
-    List<SFailedJob> getFailedJobs(int startIndex, int maxResults) throws SSchedulerException;
+    /**
+     * Get list of failed jobs
+     * 
+     * @param startIndex
+     * @param maxResults
+     * @return A list of SFailedJob objects
+     * @throws SFailedJobReadException
+     * @since 6.2
+     */
+    List<SFailedJob> getFailedJobs(int startIndex, int maxResults) throws SFailedJobReadException;
 
 }
