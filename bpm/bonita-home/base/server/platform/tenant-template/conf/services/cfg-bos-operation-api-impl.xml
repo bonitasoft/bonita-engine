@@ -1,17 +1,14 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="operationService"
-		class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
+	<bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-		<constructor-arg name="operationExecutorStrategyProvider"
-			ref="operationExecutorStrategyProvider" />
+		<constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="operationExecutorStrategyProvider"
-		class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider">
+	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider">
 		<property name="expressionExecutors">
 			<list>
 				<ref bean="assignmentOperationExecutorStrategy" />
@@ -19,25 +16,23 @@
 				<ref bean="xpathUpdateQueryOperationExecutorStrategy" />
 				<ref bean="stringIndexOperationExecutorStrategy" />
 				<ref bean="documentOperationExecutorStrategy" />
+				<ref bean="createBusinessDataOperationExecutorStrategy" />
 			</list>
 		</property>
 	</bean>
 
-	<bean id="assignmentOperationExecutorStrategy"
-		class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy">
-		<constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
-	</bean>
-
-	<bean id="javaMethodOperationExecutorStrategy"
-		class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy">
+	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 	</bean>
 
-	<bean id="xpathUpdateQueryOperationExecutorStrategy"
-		class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy">
+	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 	</bean>
-	
+
+	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy">
+		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+	</bean>
+
 	<bean id="stringIndexOperationExecutorStrategy" class="com.bonitasoft.engine.operation.StringIndexOperationExecutorStrategy">
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
@@ -48,6 +43,10 @@
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
+	</bean>
+
+	<bean id="createBusinessDataOperationExecutorStrategy" class="com.bonitasoft.engine.operation.InsertBusinessDataOperationExecutorStrategy">
+		<constructor-arg name="respository" ref="businessDataRepository" />
 	</bean>
 
 </beans>
