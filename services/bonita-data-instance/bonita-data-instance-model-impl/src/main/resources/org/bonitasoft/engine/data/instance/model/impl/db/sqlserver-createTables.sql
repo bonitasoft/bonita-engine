@@ -32,7 +32,7 @@ CREATE TABLE data_mapping (
 	containerType NVARCHAR(60),
 	dataName NVARCHAR(50),
 	dataInstanceId NUMERIC(19, 0) NOT NULL,
-	UNIQUE (tenantId, containerId, containerType, dataName),
+	UNIQUE (containerId, containerType, dataName),
 	PRIMARY KEY (tenantid, id)
 )
 GO

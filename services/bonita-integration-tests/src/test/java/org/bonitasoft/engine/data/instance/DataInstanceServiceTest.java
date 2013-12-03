@@ -41,7 +41,6 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -53,42 +52,36 @@ import org.junit.Test;
  * @author Emmanuel Duchastenier
  */
 @SuppressWarnings("javadoc")
-public abstract class DataInstanceServiceTest extends CommonServiceTest {
+public class DataInstanceServiceTest extends CommonServiceTest {
 
     private static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.<Integer, Object> emptyMap();
 
-    protected static ExpressionService expressionService;
+    private static ExpressionService expressionService;
 
-    protected DataInstanceService dataInstanceService;
+    private static DataInstanceService dataInstanceService;
 
-    protected static SDataInstanceBuilders dataInstanceBuilders;
+    private static SDataInstanceBuilders dataInstanceBuilders;
 
-    protected static SDataDefinitionBuilders dataDefinitionBuilders;
+    private static SDataDefinitionBuilders dataDefinitionBuilders;
 
-    protected static SExpressionBuilders sExpressionBuilders;
+    private static SExpressionBuilders sExpressionBuilders;
 
-    protected static DataService dataSourceService;
+    private static DataService dataSourceService;
 
-    protected static SDataSourceBuilder dataSourceBuilder;
+    private static SDataSourceBuilder dataSourceBuilder;
 
-    protected static SDataSource dataSource;
+    private static SDataSource dataSource;
 
-    protected static SDataSource transientDataSource;
-
-    protected abstract DataInstanceService getDataInstanceServiceImplementation();
+    private static SDataSource transientDataSource;
 
     static {
         expressionService = getServicesBuilder().buildExpressionService();
         sExpressionBuilders = getServicesBuilder().getInstanceOf(SExpressionBuilders.class);
+        dataInstanceService = getServicesBuilder().buildDataInstanceService();
         dataInstanceBuilders = getServicesBuilder().builderSDataInstanceBuilder();
         dataDefinitionBuilders = getServicesBuilder().builderSDataDefinitionBuilders();
         dataSourceService = getServicesBuilder().buildDataService();
         dataSourceBuilder = getServicesBuilder().buildDataSourceModelBuilder();
-    }
-
-    @Before
-    public void setupDataInstanceService() {
-        dataInstanceService = getDataInstanceServiceImplementation();
     }
 
     @BeforeClass
