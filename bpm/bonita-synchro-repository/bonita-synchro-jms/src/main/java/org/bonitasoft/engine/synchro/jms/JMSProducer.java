@@ -58,7 +58,7 @@ public class JMSProducer {
                     topicConnection.close();
 
                 } catch (JMSException e) {
-                    e.printStackTrace();
+                    System.err.println("Cannot stop the sychro service, probably already stopped?");
                 }
             }
         });
@@ -76,13 +76,13 @@ public class JMSProducer {
         return jmsProducer;
     }
 
-    public void sendMessage(final Map<String, Serializable> properties, final long body) throws JMSException {
+    public void sendMessage(final Map<String, Serializable> properties, final String bodyId) throws JMSException {
         final MapMessage message = session.createMapMessage();
 
         for (final Map.Entry<String, Serializable> property : properties.entrySet()) {
             message.setObjectProperty(property.getKey(), property.getValue());;
         }
-        message.setLong("body-id", body);
+        message.setString("body-id", bodyId);
         message.setJMSExpiration(System.currentTimeMillis() + timeout);
 
         producer.send(message);
