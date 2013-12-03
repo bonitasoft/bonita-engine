@@ -284,6 +284,18 @@ public class ProfileServiceImplForProfileTest {
         profileServiceImpl.createProfile(null);
     }
 
+    @Test(expected = SProfileCreationException.class)
+    public final void createProfileThrowException() throws SRecorderException, SProfileCreationException {
+        final SProfile sProfile = mock(SProfile.class);
+        doReturn(1L).when(sProfile).getId();
+
+        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
+
+        profileServiceImpl.createProfile(sProfile);
+    }
+
     /**
      * Test method for
      * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#updateProfile(org.bonitasoft.engine.profile.model.SProfile, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
