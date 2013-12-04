@@ -28,6 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -35,7 +36,6 @@ import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.junit.AfterClass;
@@ -53,6 +53,16 @@ public class HTTPServerAPIIT {
     private static String baseResourceUrl;
 
     private static Server server;
+
+    private final Map<String, Serializable> options = new HashMap<String, Serializable>();
+
+    private final String apiInterfaceName = "someInterface";
+
+    private final String methodName = "someMethod";
+
+    final List<String> classNameParameters = new ArrayList<String>();
+
+    final Object[] parametersValues = null;
 
     @BeforeClass
     public static void startJetty() throws Exception {
@@ -93,7 +103,7 @@ public class HTTPServerAPIIT {
         server.start();
 
         // retrieve port
-        int actualPort = ((ServerConnector) server.getConnectors()[0]).getLocalPort();
+        int actualPort = server.getConnectors()[0].getLocalPort();
         baseResourceUrl = "http://localhost:" + actualPort;
     }
 
@@ -104,19 +114,25 @@ public class HTTPServerAPIIT {
 
     @Test
     public void invokeMethodWithBasicAuthentication() throws Exception {
-        final Map<String, Serializable> options = new HashMap<String, Serializable>();
-        final String apiInterfaceName = "someInterface";
-        final String methodName = "someMethode";
-        final List<String> classNameParameters = new ArrayList<String>();
-        final Object[] parametersValues = null;
-
         Map<String, String> configuration = new HashMap<String, String>();
-
         configuration.put("server.url", baseResourceUrl);
         configuration.put("application.name", APPLICATION_NAME);
         configuration.put("basicAuthentication.active", "true");
         configuration.put("basicAuthentication.username", "john");
         configuration.put("basicAuthentication.password", "doe");
+
+        final HTTPServerAPI httpServerAPI = new HTTPServerAPI(configuration);
+        httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+    }
+
+    @Test(expected = ServerWrappedException.class)
+    public void invokeBasicAuthenticationWithWrongCredentialsShouldFail() throws Exception {
+        Map<String, String> configuration = new HashMap<String, String>();
+        configuration.put("server.url", baseResourceUrl);
+        configuration.put("application.name", APPLICATION_NAME);
+        configuration.put("basicAuthentication.active", "true");
+        configuration.put("basicAuthentication.username", "john");
+        configuration.put("basicAuthentication.password", "__LENNON__");
 
         final HTTPServerAPI httpServerAPI = new HTTPServerAPI(configuration);
         httpServerAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
