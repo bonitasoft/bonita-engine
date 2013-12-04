@@ -33,12 +33,12 @@ public interface ThemeAPI {
      * Create a new theme
      * 
      * @param creator
-     *            the fields to initialize
+     *            The attributes to initialize
      * @return The new created theme
      * @throws CreationException
-     *             error thrown if can't create the new theme
+     *             If can't create the new theme
      * @throws AlreadyExistsException
-     *             error thrown if the theme already exists
+     *             If the theme already exists
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
@@ -49,14 +49,14 @@ public interface ThemeAPI {
      * Update a theme.
      * 
      * @param id
-     *            the theme identifier to update
+     *            The identifier of the theme to update
      * @param updater
-     *            including new value of all attributes adaptable
+     *            The attributes to update
      * @return The updated theme.
      * @throws UpdateException
-     *             error thrown if can't update theme
+     *             If can't update theme
      * @throws AlreadyExistsException
-     *             error thrown if the theme already exists
+     *             If the theme already exists
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
@@ -67,12 +67,12 @@ public interface ThemeAPI {
      * Get the current theme for the specific type.
      * 
      * @param type
-     *            the type of theme
-     * @return the searched theme
+     *            The type of the theme
+     * @return The theme
      * @throws ThemeNotFoundException
-     *             error thrown if can't find a theme corresponding to criteria
+     *             If can't find a theme corresponding to the type
      * @throws RetrieveException
-     *             If an exception occurs during the theme retrieving
+     *             If an exception occurs while retrieving the theme
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
@@ -83,12 +83,12 @@ public interface ThemeAPI {
      * Get the default theme for the specific type.
      * 
      * @param type
-     *            the type of theme
-     * @return the searched theme
+     *            The type of the theme
+     * @return The theme
      * @throws ThemeNotFoundException
-     *             error thrown if can't find a theme corresponding to criteria
+     *             If can't find a theme corresponding to the type
      * @throws RetrieveException
-     *             If an exception occurs during the theme retrieving
+     *             If an exception occurs while retrieving the theme
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
@@ -99,9 +99,10 @@ public interface ThemeAPI {
      * Get the last updated date of the current theme for the specific type.
      * 
      * @param type
-     *            the type of theme
-     * @return the last updated date of the searched theme
+     *            The type of theme
+     * @return The last updated date of the theme
      * @throws ThemeNotFoundException
+     *             If can't find a theme corresponding to the type
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2

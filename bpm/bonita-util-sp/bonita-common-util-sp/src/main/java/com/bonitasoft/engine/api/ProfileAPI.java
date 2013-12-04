@@ -43,9 +43,9 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *            the profile icon path
      * @return The new created custom profile
      * @throws CreationException
-     *             error thrown if can't create the new profile
+     *             If can't create the new profile
      * @throws AlreadyExistsException
-     *             error thrown if the profile already exists
+     *             If the profile already exists
      * @since 6.0
      */
     Profile createProfile(String name, String description, String iconPath) throws AlreadyExistsException, CreationException;
@@ -54,12 +54,12 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * Create a new custom profile
      * 
      * @param creator
-     *            fields to initialize
+     *            the attributes to initialize
      * @return The new created custom profile
      * @throws CreationException
-     *             error thrown if can't create the new profile
+     *             If can't create the new profile
      * @throws AlreadyExistsException
-     *             error thrown if the profile already exists
+     *             If the profile already exists
      * @since 6.0
      */
     Profile createProfile(ProfileCreator creator) throws AlreadyExistsException, CreationException;
@@ -68,9 +68,9 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * Delete a specific custom profile
      * 
      * @param id
-     *            profile identifier to delete
+     *            the identifier of the profile to delete
      * @throws DeletionException
-     *             errors thrown if can't delete the profile
+     *             If can't delete the profile
      * @since 6.0
      */
     void deleteProfile(long id) throws DeletionException;
@@ -79,9 +79,9 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * Export all profiles from DataBase to XML file
      * 
      * @return
-     *         the content of the xml file containing all profiles
+     *         The content of the xml file containing all profiles
      * @throws ExecutionException
-     *             errors thrown if can't export profiles
+     *             If can't export profiles
      * @since 6.0
      */
     byte[] exportAllProfiles() throws ExecutionException;
@@ -94,7 +94,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @return
      *         the content of the xml file containing profiles to export
      * @throws ExecutionException
-     *             errors thrown if can't export profiles
+     *             If can't export profiles
      * @since 6.0
      */
     byte[] exportProfilesWithIdsSpecified(long[] profileIds) throws ExecutionException;
@@ -109,7 +109,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @return
      *         A List<String> is a warning message list in case of non-existing User, Group or Role to map the profile to.
      * @throws ExecutionException
-     *             errors thrown if can't import profiles
+     *             If can't import profiles
      * @since 6.0
      */
     List<String> importProfilesUsingSpecifiedPolicy(byte[] xmlContent, ImportPolicy policy) throws ExecutionException;
@@ -118,16 +118,16 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * Update a custom profile.
      * 
      * @param id
-     *            the profile identifier to update
+     *            the identifier of the profile to update
      * @param updater
-     *            including new value of all attributes adaptable
+     *            the attributes to update
      * @return The updated custom Profile.
      * @throws UpdateException
-     *             error thrown if can't update profiles
+     *             If can't update profiles
      * @throws ProfileNotFoundException
-     *             if the profile to update cannot be found with the given id
+     *             If the profile to update cannot be found with the given id
      * @throws AlreadyExistsException
-     *             if a profile with the new name already exists
+     *             If a profile with the new name already exists
      * @since 6.1
      */
     Profile updateProfile(long id, ProfileUpdater updater) throws ProfileNotFoundException, UpdateException, AlreadyExistsException;
@@ -136,13 +136,13 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * Create a new profile entry
      * 
      * @param creator
-     *            fields to initialize.
+     *            the attributes to initialize.
      *            The type value must be "folder" or "link". If type = "link", the page is also mandatory.
      *            Index must be an odd long value if the profile is not inserted at last position
      *            To insert at first position, the value of index must be -1
      * @return The created profile entry
      * @throws CreationException
-     *             errors thrown if can't create the new profile entry
+     *             If can't create the new profile entry
      * @since 6.0
      */
     ProfileEntry createProfileEntry(ProfileEntryCreator creator) throws AlreadyExistsException, CreationException;
@@ -160,7 +160,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *            the value must be "folder" or "link". If type = "link", the page parameter.
      * @return The created profile entry
      * @throws CreationException
-     *             errors thrown if can't create the new profile entry
+     *             If can't create the new profile entry
      * @since 6.0
      */
     ProfileEntry createProfileEntry(String name, String description, long profileId, String type) throws AlreadyExistsException, CreationException;
@@ -180,7 +180,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *            token of the linked page
      * @return The created profile entry
      * @throws CreationException
-     *             errors thrown if can't create the new profile entry
+     *             If can't create the new profile entry
      * @since 6.0
      */
     ProfileEntry createProfileEntry(String name, String description, long profileId, String type, String page) throws AlreadyExistsException, CreationException;
@@ -189,9 +189,9 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * Delete a specific profile entry
      * 
      * @param id
-     *            profile entry identifier to delete
+     *            the identifier of the profile entry to delete
      * @throws DeletionException
-     *             errors thrown if can't delete the profile entry
+     *             If can't delete the profile entry
      * @since 6.0
      */
     void deleteProfileEntry(long id) throws DeletionException;
@@ -200,12 +200,12 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * Update a profile entry.
      * 
      * @param id
-     *            the profile entry id to update
+     *            the identifier of the profile entry to update
      * @param updater
-     *            including new value of all attributes adaptable
+     *            the attributes to update
      * @return the updated profile entry
      * @throws UpdateException
-     *             errors thrown if can't update the profile entry
+     *             If can't update the profile entry
      *             Index must be an odd long value if index is updated
      *             To put at first position, the value of index must be -1
      * @since 6.0
