@@ -14,10 +14,9 @@
 	<name>Bonita Client API: HTTP</name>
 
 	<properties>
-		<jetty.version>9.0.6.v20130930</jetty.version>
-	</properties>
-
-
+		<jetty.version>8.1.14.v20131031</jetty.version>
+	</properties>	
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
