@@ -28,6 +28,8 @@ import java.security.SecureRandom;
  * Created by Vincent Elcrin
  * Date: 03/12/13
  * Time: 08:48
+ *
+ * TODO change implementation to use @{java.util.zip.ZipFile}
  */
 public class ZipReader {
 

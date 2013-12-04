@@ -41,14 +41,14 @@ public class DefaultReport {
         return name;
     }
 
-    public void deploy(String reportPath, final ReportDeployer deployer) throws Exception {
+    public void deploy(final String reportPath, final ReportDeployer deployer) throws Exception {
         ZipReader zip = new ZipReader(reportPath, name + "-content.zip");
         zip.read(new Reader() {
             @Override
             public void read(File zip, File unzipped) throws Exception {
                 deployer.deploy(name,
                         getDescriptionQuietly(unzipped),
-                        getScreenShotQuietly(unzipped),
+                        getScreenShotQuietly(reportPath),
                         IOUtil.getAllContentFrom(zip));
             }
         });
@@ -65,9 +65,9 @@ public class DefaultReport {
         return null;
     }
 
-    private byte[] getScreenShotQuietly(File unzipped) {
+    private byte[] getScreenShotQuietly(String reportPath) {
         try {
-            return IOUtil.getAllContentFrom(new File(unzipped, name + "-screenshot").getAbsoluteFile());
+            return IOUtil.getAllContentFrom(new File(reportPath, name + "-screenshot").getAbsoluteFile());
         } catch (IOException e) {
             // stay quiet - a log would be nice
         }

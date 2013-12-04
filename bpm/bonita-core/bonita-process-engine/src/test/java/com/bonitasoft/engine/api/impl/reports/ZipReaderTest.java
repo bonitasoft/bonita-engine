@@ -35,7 +35,7 @@ public class ZipReaderTest {
 
     @Test
     public void should_extract_a_zip_and_expose_content() throws Exception {
-        ZipReader zip = new ZipReader("src/test/resources", "myreport.zip");
+        ZipReader zip = new ZipReader("src/test/resources", "myreport-content.zip");
 
         zip.read(new Reader() {
             @Override
@@ -49,7 +49,7 @@ public class ZipReaderTest {
 
     @Test
     public void should_remove_temporary_files_once_finish() throws Exception {
-        ZipReader zip = new ZipReader("src/test/resources", "myreport.zip");
+        ZipReader zip = new ZipReader("src/test/resources", "myreport-content.zip");
         final File[] files = {null};
 
         zip.read(new Reader() {
