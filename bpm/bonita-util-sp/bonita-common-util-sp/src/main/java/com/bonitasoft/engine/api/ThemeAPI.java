@@ -12,10 +12,13 @@ import java.util.Date;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 import com.bonitasoft.engine.looknfeel.Theme;
 import com.bonitasoft.engine.looknfeel.ThemeCreator;
+import com.bonitasoft.engine.looknfeel.ThemeType;
 import com.bonitasoft.engine.looknfeel.ThemeUpdater;
 import com.bonitasoft.engine.looknfeel.exception.ThemeNotFoundException;
 
@@ -27,49 +30,82 @@ import com.bonitasoft.engine.looknfeel.exception.ThemeNotFoundException;
 public interface ThemeAPI {
 
     /**
+     * Create a new theme
      * 
      * @param creator
-     * @return
-     * @throws AlreadyExistsException
+     *            the fields to initialize
+     * @return The new created theme
      * @throws CreationException
-     * 
+     *             error thrown if can't create the new theme
+     * @throws AlreadyExistsException
+     *             error thrown if the theme already exists
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Theme createTheme(ThemeCreator creator) throws AlreadyExistsException, CreationException;
+    Theme createTheme(ThemeCreator creator) throws CreationException, AlreadyExistsException;
 
     /**
+     * Update a theme.
      * 
      * @param id
+     *            the theme identifier to update
      * @param updater
-     * @return
+     *            including new value of all attributes adaptable
+     * @return The updated theme.
      * @throws UpdateException
+     *             error thrown if can't update theme
      * @throws AlreadyExistsException
+     *             error thrown if the theme already exists
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
     Theme updateTheme(long id, ThemeUpdater updater) throws UpdateException, AlreadyExistsException;
 
     /**
+     * Get the current theme for the specific type.
      * 
-     * @return
+     * @param type
+     *            the type of theme
+     * @return the searched theme
      * @throws ThemeNotFoundException
+     *             error thrown if can't find a theme corresponding to criteria
+     * @throws RetrieveException
+     *             If an exception occurs during the theme retrieving
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Theme getCurrentTheme() throws ThemeNotFoundException;
+    Theme getCurrentTheme(ThemeType type) throws ThemeNotFoundException;
 
     /**
+     * Get the default theme for the specific type.
      * 
-     * @return
+     * @param type
+     *            the type of theme
+     * @return the searched theme
      * @throws ThemeNotFoundException
+     *             error thrown if can't find a theme corresponding to criteria
+     * @throws RetrieveException
+     *             If an exception occurs during the theme retrieving
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Theme getDefaultTheme() throws ThemeNotFoundException;
+    Theme getDefaultTheme(ThemeType type) throws ThemeNotFoundException;
 
     /**
+     * Get the last updated date of the current theme for the specific type.
      * 
-     * @return
+     * @param type
+     *            the type of theme
+     * @return the last updated date of the searched theme
      * @throws ThemeNotFoundException
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Date getLastUpdatedDate() throws ThemeNotFoundException;
+    Date getLastUpdatedDate(ThemeType type) throws ThemeNotFoundException;
 
 }

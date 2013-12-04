@@ -19,6 +19,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import com.bonitasoft.engine.api.ThemeAPI;
 import com.bonitasoft.engine.looknfeel.Theme;
 import com.bonitasoft.engine.looknfeel.ThemeCreator;
+import com.bonitasoft.engine.looknfeel.ThemeType;
 import com.bonitasoft.engine.looknfeel.ThemeUpdater;
 import com.bonitasoft.engine.looknfeel.exception.ThemeNotFoundException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -101,19 +102,19 @@ public class ThemeAPIImpl implements ThemeAPI {
     }
 
     @Override
-    public Theme getCurrentTheme() throws ThemeNotFoundException {
+    public Theme getCurrentTheme(ThemeType type) throws ThemeNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Theme getDefaultTheme() throws ThemeNotFoundException {
+    public Theme getDefaultTheme(ThemeType type) throws ThemeNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Date getLastUpdatedDate() throws ThemeNotFoundException {
+    public Date getLastUpdatedDate(ThemeType type) throws ThemeNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }

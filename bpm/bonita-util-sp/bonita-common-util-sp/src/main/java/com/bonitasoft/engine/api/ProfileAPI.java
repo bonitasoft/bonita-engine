@@ -43,7 +43,9 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *            the profile icon path
      * @return The new created custom profile
      * @throws CreationException
-     *             errors thrown if can't create the new profile
+     *             error thrown if can't create the new profile
+     * @throws AlreadyExistsException
+     *             error thrown if the profile already exists
      * @since 6.0
      */
     Profile createProfile(String name, String description, String iconPath) throws AlreadyExistsException, CreationException;
@@ -55,7 +57,9 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *            fields to initialize
      * @return The new created custom profile
      * @throws CreationException
-     *             errors thrown if can't create the new profile
+     *             error thrown if can't create the new profile
+     * @throws AlreadyExistsException
+     *             error thrown if the profile already exists
      * @since 6.0
      */
     Profile createProfile(ProfileCreator creator) throws AlreadyExistsException, CreationException;
@@ -103,7 +107,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @param policy
      *            import policy to define different way how to import xml content in different case
      * @return
-     *         a List<String> is a warning message list in case of non-existing User, Group or Role to map the profile to.
+     *         A List<String> is a warning message list in case of non-existing User, Group or Role to map the profile to.
      * @throws ExecutionException
      *             errors thrown if can't import profiles
      * @since 6.0
@@ -114,12 +118,12 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * Update a custom profile.
      * 
      * @param id
-     *            the profile id to update
+     *            the profile identifier to update
      * @param updater
      *            including new value of all attributes adaptable
-     * @return the updated custom Profile.
+     * @return The updated custom Profile.
      * @throws UpdateException
-     *             errors thrown if can't update profiles
+     *             error thrown if can't update profiles
      * @throws ProfileNotFoundException
      *             if the profile to update cannot be found with the given id
      * @throws AlreadyExistsException
@@ -151,7 +155,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @param description
      *            the profile entry description
      * @param profileId
-     *            the linked profile id
+     *            the linked profile identifier
      * @param type
      *            the value must be "folder" or "link". If type = "link", the page parameter.
      * @return The created profile entry
