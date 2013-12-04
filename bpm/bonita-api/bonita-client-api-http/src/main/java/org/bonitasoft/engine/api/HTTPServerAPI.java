@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -78,6 +79,12 @@ public class HTTPServerAPI implements ServerAPI {
 
     private static final String SERVER_URL = "server.url";
 
+    private static final String BASIC_AUTHENTICATION_ACTIVE = "basicAuthentication.active";
+
+    private static final String BASIC_AUTHENTICATION_USERNAME = "basicAuthentication.username";
+
+    private static final String BASIC_AUTHENTICATION_PASSWORD = "basicAuthentication.password";
+
     private static final String APPLICATION_NAME = "application.name";
 
     private static final Logger LOGGER = Logger.getLogger(HTTPServerAPI.class.getName());
@@ -86,7 +93,13 @@ public class HTTPServerAPI implements ServerAPI {
 
     private String applicationName = null;
 
-    private static DefaultHttpClient httpclient = null;
+    private boolean basicAuthenticationActive = false;
+
+    private String basicAuthenticationUserName = null;
+
+    private String basicAuthenticationPassword = null;
+
+    private static DefaultHttpClient httpclient;
 
     private static final XStream xstream;
 
@@ -105,6 +118,9 @@ public class HTTPServerAPI implements ServerAPI {
         }
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
+        basicAuthenticationActive  = "true".equalsIgnoreCase(parameters.get(BASIC_AUTHENTICATION_ACTIVE));
+        basicAuthenticationUserName  = parameters.get(BASIC_AUTHENTICATION_USERNAME);
+        basicAuthenticationPassword  = parameters.get(BASIC_AUTHENTICATION_PASSWORD);
     }
 
     @Override
@@ -149,6 +165,16 @@ public class HTTPServerAPI implements ServerAPI {
         sBuilder.append(SLASH).append(applicationName).append(SERVER_API).append(apiInterfaceName).append(SLASH).append(methodName);
         final HttpPost httpost = new HttpPost(sBuilder.toString());
         httpost.setEntity(httpEntity);
+
+        // Basic authentication
+        if (basicAuthenticationActive) {
+            StringBuilder credentials = new StringBuilder();
+            credentials.append(basicAuthenticationUserName).append(":").append(basicAuthenticationPassword);
+            Base64 encoder = new Base64();
+            String encodedCredentials = encoder.encodeAsString(credentials.toString().getBytes());
+            httpost.setHeader("Authorization", "Basic " + encodedCredentials);
+        }
+
         return httpost;
     }
 
