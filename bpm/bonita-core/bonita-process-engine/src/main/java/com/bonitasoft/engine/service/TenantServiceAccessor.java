@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service;
 
+import com.bonitasoft.engine.business.data.BusinessDataRespository;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
@@ -30,5 +31,7 @@ public interface TenantServiceAccessor extends org.bonitasoft.engine.service.Ten
 
     @Override
     SearchEntitiesDescriptor getSearchEntitiesDescriptor();
+
+    BusinessDataRespository getBusinessDataRespository();
 
 }

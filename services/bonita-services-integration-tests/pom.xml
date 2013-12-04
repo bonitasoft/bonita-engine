@@ -458,7 +458,7 @@
 			<artifactId>bonita-sequence-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 
 		<!-- Session Accessor -->
 		<dependency>
@@ -483,13 +483,13 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
+
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- Work -->
 		<dependency>
@@ -600,34 +600,33 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <!-- Local JNDI implementation -->
-        <dependency>
+		<!-- Local JNDI implementation -->
+		<dependency>
 			<groupId>org.bonitasoft.engine.jndi</groupId>
 			<artifactId>bonita-jndi-memory</artifactId>
 			<version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.jolbox</groupId>
 			<artifactId>bonecp</artifactId>
 			<version>0.7.1.RELEASE</version>
 		</dependency>
-		
+
 		<!-- Transaction -->
-    <dependency>
-      <groupId>org.codehaus.btm</groupId>
-      <artifactId>btm</artifactId>
-      <version>2.1.3</version>
-      <scope>test</scope>
-    </dependency>
-    
+		<dependency>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm</artifactId>
+			<version>2.1.3</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-      		<scope>test</scope>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 
 	<build>
 		<plugins>

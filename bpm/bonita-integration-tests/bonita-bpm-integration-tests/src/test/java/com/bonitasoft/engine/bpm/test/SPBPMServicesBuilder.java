@@ -10,6 +10,7 @@ package com.bonitasoft.engine.bpm.test;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 
+import com.bonitasoft.engine.business.data.BusinessDataRespository;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
@@ -29,7 +30,7 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
         super();
     }
 
-    public SPBPMServicesBuilder(Long tenantId) {
+    public SPBPMServicesBuilder(final Long tenantId) {
         super(tenantId);
     }
 
@@ -93,4 +94,10 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
             return getInstanceOf("monitoringService", TenantMonitoringService.class);
         }
     }
+
+    @Override
+    public BusinessDataRespository getBusinessDataRespository() {
+        return getInstanceOf(BusinessDataRespository.class);
+    }
+
 }

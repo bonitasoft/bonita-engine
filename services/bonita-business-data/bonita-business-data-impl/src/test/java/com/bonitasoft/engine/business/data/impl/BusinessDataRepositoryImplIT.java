@@ -1,6 +1,6 @@
 package com.bonitasoft.engine.business.data.impl;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -26,8 +26,9 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
+import com.bonitasoft.engine.business.data.impl.BusinessDataRepositoryImpl.Strategy;
 
-public class BusinessDataRepositoryImplTest {
+public class BusinessDataRepositoryImplIT {
 
     private IDatabaseTester databaseTester;
 
@@ -41,7 +42,7 @@ public class BusinessDataRepositoryImplTest {
         ds1 = new PoolingDataSource();
         ds1.setUniqueName("java:/comp/env/jdbc/PGDS1");
         ds1.setClassName("org.h2.jdbcx.JdbcDataSource");
-        ds1.setMaxPoolSize(3);
+        ds1.setMaxPoolSize(2);
         ds1.setAllowLocalTransactions(true);
         ds1.getDriverProperties().put("URL", "jdbc:h2:mem:database;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;");
         ds1.getDriverProperties().put("user", "sa");
@@ -54,10 +55,9 @@ public class BusinessDataRepositoryImplTest {
         ds1.close();
     }
 
-    // @Before
-    public void setUp() throws Exception {
+    public void setUpDatabase() throws Exception {
         databaseTester = new DataSourceDatabaseTester(ds1);
-        final InputStream stream = BusinessDataRepositoryImplTest.class.getResourceAsStream("/dataset.xml");
+        final InputStream stream = BusinessDataRepositoryImplIT.class.getResourceAsStream("/dataset.xml");
         final FlatXmlDataSet dataSet = new FlatXmlDataSetBuilder().build(stream);
         stream.close();
         databaseTester.setDataSet(dataSet);
@@ -79,13 +79,14 @@ public class BusinessDataRepositoryImplTest {
         try {
             ut.begin();
             businessDataRepositoryImpl.start();
-            setUp();
+            setUpDatabase();
             final Employee employee = businessDataRepositoryImpl.find(Employee.class, 45l);
             assertThat(employee).isNotNull();
             assertThat(employee.getId()).isEqualTo(45l);
             assertThat(employee.getFirstName()).isEqualTo("Hannu");
             assertThat(employee.getLastName()).isEqualTo("Hakkinen");
         } finally {
+            businessDataRepositoryImpl.stop();
             ut.commit();
         }
     }
@@ -99,6 +100,7 @@ public class BusinessDataRepositoryImplTest {
             businessDataRepositoryImpl.start();
             businessDataRepositoryImpl.find(Employee.class, -145l);
         } finally {
+            businessDataRepositoryImpl.stop();
             ut.commit();
         }
     }
@@ -122,6 +124,7 @@ public class BusinessDataRepositoryImplTest {
             ut.begin();
             businessDataRepositoryImpl.find(Employee.class, employee.getId());
         } finally {
+            businessDataRepositoryImpl.stop();
             ut.commit();
         }
     }
@@ -129,7 +132,7 @@ public class BusinessDataRepositoryImplTest {
     @Test
     public void persistANullEmployee() throws Exception {
         final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-        final BusinessDataRepositoryImpl businessDataRepositoryImpl = new BusinessDataRepositoryImpl();
+        final BusinessDataRepositoryImpl businessDataRepositoryImpl = new BusinessDataRepositoryImpl(Strategy.DROP_CREATE);
         try {
             ut.begin();
             businessDataRepositoryImpl.start();
@@ -137,6 +140,7 @@ public class BusinessDataRepositoryImplTest {
             final Long count = businessDataRepositoryImpl.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
             assertThat(count).isEqualTo(0);
         } finally {
+            businessDataRepositoryImpl.stop();
             ut.commit();
         }
     }
@@ -148,11 +152,12 @@ public class BusinessDataRepositoryImplTest {
         try {
             ut.begin();
             businessDataRepositoryImpl.start();
-            setUp();
+            setUpDatabase();
             final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
             final Employee matti = businessDataRepositoryImpl.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
             assertThat(matti.getFirstName()).isEqualTo("Matti");
         } finally {
+            businessDataRepositoryImpl.stop();
             ut.commit();
         }
     }
@@ -164,10 +169,11 @@ public class BusinessDataRepositoryImplTest {
         try {
             ut.begin();
             businessDataRepositoryImpl.start();
-            setUp();
+            setUpDatabase();
             final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Hakkinen");
             businessDataRepositoryImpl.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
         } finally {
+            businessDataRepositoryImpl.stop();
             ut.commit();
         }
     }
@@ -179,7 +185,21 @@ public class BusinessDataRepositoryImplTest {
         try {
             ut.begin();
             businessDataRepositoryImpl.start();
-            setUp();
+            setUpDatabase();
+            final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Makkinen");
+            businessDataRepositoryImpl.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
+        } finally {
+            businessDataRepositoryImpl.stop();
+            ut.commit();
+        }
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwExceptionWhenUsingBDRWihtoutStartingIt() throws Exception {
+        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        final BusinessDataRepositoryImpl businessDataRepositoryImpl = new BusinessDataRepositoryImpl();
+        try {
+            ut.begin();
             final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Makkinen");
             businessDataRepositoryImpl.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
         } finally {

@@ -7,7 +7,12 @@
 		<property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
 		<!-- Assume test is the database name -->
 		<property name="hibernate.connection.datasource">java:/comp/env/jdbc/PGDS1</property>
+
+		<!-- DEV mode -->
 		<property name="hibernate.hbm2ddl.auto">create</property>
+		<property name="hibernate.show_sql">true</property>
+		<property name="hibernate.format_sql">true</property>
+
 		<!-- List of XML mapping files -->
 		<mapping resource="Employee.hbm.xml" />
 	</session-factory>

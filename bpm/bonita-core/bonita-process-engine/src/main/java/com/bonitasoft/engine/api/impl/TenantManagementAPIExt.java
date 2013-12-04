@@ -40,7 +40,8 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
                     .createNewInstance(sDependency.getId(), tenantAccessor.getTenantId(), "tenant").done();
             dependencyService.createDependencyMapping(sDependencyMapping);
-
+            // TODO: should be in activate tenant
+            tenantAccessor.getBusinessDataRespository().start();
         } catch (final SDependencyAlreadyExistsException sdaee) {
             throw new CreationException(sdaee);
         } catch (final SDependencyCreationException sdce) {

@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service.impl;
 
+import com.bonitasoft.engine.business.data.BusinessDataRespository;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
@@ -30,6 +31,8 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     private TenantMonitoringService tenantMonitoringServie;
 
     private SearchEntitiesDescriptor searchEntitiesDescriptor;
+
+    private BusinessDataRespository businessDataRespository;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         super(tenantId);
@@ -77,6 +80,14 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
 
     private <T> T lookupService(final Class<T> clazz) {
         return getBeanAccessor().getService(clazz);
+    }
+
+    @Override
+    public BusinessDataRespository getBusinessDataRespository() {
+        if (businessDataRespository == null) {
+            businessDataRespository = lookupService(BusinessDataRespository.class);
+        }
+        return businessDataRespository;
     }
 
 }
