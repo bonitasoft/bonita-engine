@@ -6,6 +6,8 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.BPMLocalTest;
@@ -16,8 +18,17 @@ public class TestShades {
     @Test
     public void testShades() throws IOException {
         String mvn = System.getProperty("path.to.mvn", "mvn");// to be overwritten in CI
-
         String version = BPMLocalTest.getBonitaVersion();
+
+        // print properties for debugging purpose
+        System.out.println("mvn path used: " + mvn);
+        System.out.println("bonita version detected: " + version);
+
+        Properties properties = System.getProperties();
+        for (Entry<Object, Object> prop : properties.entrySet()) {
+            System.out.println(prop.getKey() + ": " + prop.getValue());
+        }
+
         String thePom = getPom(version);
         File file = new File("shadeTester");
         file.mkdir();
@@ -37,6 +48,7 @@ public class TestShades {
             IOUtil.deleteDir(file);
         }
         assertTrue("build was not successfull", outputOfMaven.contains("BUILD SUCCESS"));
+        outputOfMaven = outputOfMaven.replaceAll("\n?.*Downloading.*\n", "");
         outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-server", "");
         outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-client", "");
         outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-common", "");

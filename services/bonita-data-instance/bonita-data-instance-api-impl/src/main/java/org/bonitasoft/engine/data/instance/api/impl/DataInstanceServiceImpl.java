@@ -83,17 +83,16 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     private final DataService dataSourceService;
 
-    private final Recorder recorder;
+    protected final Recorder recorder;
 
-    private final ReadPersistenceService persistenceService;
+    protected final ReadPersistenceService persistenceService;
 
-    private final ArchiveService archiveService;
+    protected final ArchiveService archiveService;
 
-    private final TechnicalLoggerService logger;
+    protected final TechnicalLoggerService logger;
 
-    public DataInstanceServiceImpl(final DataService dataSourceService, final Recorder recorder,
-            final ReadPersistenceService persistenceService, final ArchiveService archiveService,
-            final TechnicalLoggerService logger) {
+    public DataInstanceServiceImpl(final DataService dataSourceService, final Recorder recorder, final ReadPersistenceService persistenceService,
+            final ArchiveService archiveService, final TechnicalLoggerService logger) {
         this.dataSourceService = dataSourceService;
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -420,7 +419,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         try {
             recorder.recordDelete(record, deleteEvent);
         } catch (final SRecorderException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "removeContainer", e);
+            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "deleteDataInstanceVisibilityMapping", e);
             throw new SDataInstanceException(e);
         }
     }
@@ -472,8 +471,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
      */
     protected SDataInstanceVisibilityMapping insertDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
             final long dataInstanceId, final long archiveDate) throws SRecorderException, SDefinitiveArchiveNotFound {
-        final SDataInstanceVisibilityMapping mapping = BuilderFactory.get(SDataInstanceVisibilityMappingBuilderFactory.class)
-                .createNewInstance(containerId, containerType, dataName, dataInstanceId).done();
+        final SDataInstanceVisibilityMapping mapping = createDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId);
         final InsertRecord record = new InsertRecord(mapping);
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATA_VISIBILITY_MAPPING).done();
         recorder.recordInsert(record, insertEvent);
@@ -482,6 +480,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 .createNewInstance(containerId, containerType, dataName, dataInstanceId, mapping.getId()).done();
         archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping));
         return mapping;
+    }
+
+    protected SDataInstanceVisibilityMapping createDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
+            final long dataInstanceId) {
+        return BuilderFactory.get(SDataInstanceVisibilityMappingBuilderFactory.class).createNewInstance(containerId, containerType, dataName, dataInstanceId)
+                .done();
     }
 
     @Override
@@ -701,7 +705,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public void deleteSADataInstance(final SADataInstance dataInstance) throws SDeleteDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
         final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
-        final SEvent event = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DataInstanceDataSource.DATA_INSTANCE).setObject(dataInstance).done();
+        final SEvent event = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DataInstanceDataSource.DATA_INSTANCE).setObject(dataInstance)
+                .done();
         final SDeleteEvent deleteEvent = (SDeleteEvent) event;
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.omg.CORBA.SystemException;
@@ -109,8 +108,6 @@ public interface TransactionService {
      *                encounters an unexpected error condition.
      */
     void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException;
-
-    List<BonitaTransactionSynchronization> getBonitaSynchronizations();
 
     /**
      * Get the number of active transactions (i.e. transactions that opened but not yet completed or rolledback).
