@@ -1,5 +1,6 @@
 package org.bonitasoft.engine;
 
+import org.bonitasoft.engine.persistence.TenantTest;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -12,7 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
 // FIXME add paltformtest suite
 // FIXME abstract impl test suites
 @RunWith(Suite.class)
-@SuiteClasses({ AllTests.class })
+@SuiteClasses({ TenantTest.class })
 public class AllTestsWithJNDI {
 
     private static ServicesBuilder servicesBuilder;

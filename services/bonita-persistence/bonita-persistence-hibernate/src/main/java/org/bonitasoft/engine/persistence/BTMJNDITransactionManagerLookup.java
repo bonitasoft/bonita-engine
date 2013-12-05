@@ -14,11 +14,16 @@
 package org.bonitasoft.engine.persistence;
 
 import java.lang.reflect.Method;
+import java.util.Properties;
+
+import javax.naming.NamingException;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 
 import org.hibernate.HibernateException;
-import org.hibernate.transaction.JNDITransactionManagerLookup;
+import org.hibernate.transaction.TransactionManagerLookup;
 
-public class BTMJNDITransactionManagerLookup extends JNDITransactionManagerLookup {
+public class BTMJNDITransactionManagerLookup implements TransactionManagerLookup {
 
     public BTMJNDITransactionManagerLookup() {
     }
@@ -28,11 +33,6 @@ public class BTMJNDITransactionManagerLookup extends JNDITransactionManagerLooku
         return getInternalName();
     }
 
-    @Override
-    protected String getName() {
-        return getInternalName();
-    }
-    
     private String getInternalName() {
         try {
             final Class<?> transactionManagerServiceClass = Class.forName("bitronix.tm.TransactionManagerServices");
@@ -45,9 +45,24 @@ public class BTMJNDITransactionManagerLookup extends JNDITransactionManagerLooku
                 return configuredJndiUserTransactionName;
             }
             return "java:comp/UserTransaction";
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new HibernateException("Could not obtain BTM UserTransactionName", e);
         }
+    }
+
+    @Override
+    public TransactionManager getTransactionManager(final Properties props) throws HibernateException {
+        try {
+            return (TransactionManager) NamingHelper.getInitialContext(props).lookup(getInternalName());
+        } catch (final NamingException ne) {
+            throw new HibernateException("Could not locate TransactionManager", ne);
+        }
+    }
+
+    @Override
+    public Object getTransactionIdentifier(final Transaction transaction) {
+        // for sane JEE/JTA containers, the transaction itself functions as its identifier...
+        return transaction;
     }
 
 }

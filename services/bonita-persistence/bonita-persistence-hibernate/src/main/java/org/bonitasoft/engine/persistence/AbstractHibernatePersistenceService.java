@@ -166,8 +166,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected Session getSession(final boolean useTenant) throws SPersistenceException {
         logStats();
         try {
-            final org.hibernate.classic.Session currentSession = sessionFactory.getCurrentSession();
-            return currentSession;
+            final Session session = sessionFactory.getCurrentSession();
+            // session.flush();
+            return session;
         } catch (final HibernateException e) {
             throw new SPersistenceException(e);
         }
@@ -580,7 +581,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             checkClassMapping(entityClass);
 
             final Session session = getSession(true);
-
             Query query = session.getNamedQuery(selectDescriptor.getQueryName());
             String builtQuery = query.getQueryString();
 
