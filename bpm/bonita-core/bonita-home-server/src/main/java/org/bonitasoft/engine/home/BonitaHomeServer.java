@@ -188,12 +188,25 @@ public class BonitaHomeServer extends BonitaHome {
         return platformProperties;
     }
 
-    public String getVersion() throws BonitaHomeNotSetException, IOException {
+    public String getVersion() {
         if (version == null) {
-            File file = new File(new File(getPlatformConfFolder()), VERSION_FILE_NAME);
-            version = IOUtil.read(file);
+            String platformConfFolder = null;
+            try {
+                platformConfFolder = getPlatformConfFolder();
+                File file = new File(new File(platformConfFolder), VERSION_FILE_NAME);
+                version = IOUtil.read(file);
+            } catch (Exception e) {
+                buildUnreadableVersionException(platformConfFolder);
+            }
+            if (version == null) {
+                buildUnreadableVersionException(platformConfFolder);
+            }
         }
         return version;
+    }
+
+    private void buildUnreadableVersionException(final String platformConfFolder) {
+        throw new IllegalStateException(VERSION_FILE_NAME + " file not present or invalid in folder: " + platformConfFolder);
     }
 
     public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {

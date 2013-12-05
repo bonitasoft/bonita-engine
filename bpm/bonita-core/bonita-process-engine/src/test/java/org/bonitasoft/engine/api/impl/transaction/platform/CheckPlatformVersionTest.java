@@ -132,6 +132,15 @@ public class CheckPlatformVersionTest {
         assertTrue(checkPlatformVersion.sameVersion());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void check_bonita_home_without_version_throw_nice_exception() throws Exception {
+        when(platform.getVersion()).thenReturn("6");
+        when(platformProperties.getPlatformVersion()).thenReturn("6");
+        when(bonitaHomeServer.getVersion()).thenThrow(new IllegalStateException("error"));
+
+        checkPlatformVersion.execute();
+    }
+
     private void given_DB_Jar_Home_Versions(final String dbVersion, final String jarVersion, final String homeVersion) throws Exception {
         when(platform.getVersion()).thenReturn(dbVersion);
         when(platformProperties.getPlatformVersion()).thenReturn(jarVersion);

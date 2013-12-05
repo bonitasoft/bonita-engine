@@ -16,7 +16,6 @@ package org.bonitasoft.engine.api.impl.transaction.platform;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
@@ -54,11 +53,7 @@ public class CheckPlatformVersion implements TransactionContent {
         String jarVersion = platformProperties.getPlatformVersion();
         // the version in bonita home
         String bonitaHomeVersion;
-        try {
-            bonitaHomeVersion = bonitaHomeServer.getVersion();
-        } catch (Exception e) {
-            throw new SBonitaReadException("unable to read the bonita home");
-        }
+        bonitaHomeVersion = bonitaHomeServer.getVersion();
         final String platformMinorVersion = format(dbVersion);
         final String propertiesMinorVersion = format(jarVersion);
         same = platformMinorVersion.equals(propertiesMinorVersion);
@@ -66,7 +61,7 @@ public class CheckPlatformVersion implements TransactionContent {
             errorMessage = "The version of the platform in database is not the same as expected: bonita-server version is <" + jarVersion
                     + "> and database version is <" + dbVersion + ">";
         } else {
-            same = bonitaHomeVersion.equals(platformProperties.getPlatformVersion());
+            same = bonitaHomeVersion.equals(jarVersion);
             if (!same) {
                 errorMessage = "The version of the bonita home is not the same as expected: bonita-server version is <" + jarVersion
                         + "> and bonita home version is <" + bonitaHomeVersion + ">";
