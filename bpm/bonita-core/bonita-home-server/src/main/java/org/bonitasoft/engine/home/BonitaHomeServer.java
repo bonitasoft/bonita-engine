@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 
 /**
@@ -26,6 +27,8 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * @author Matthieu Chaffotte
  */
 public class BonitaHomeServer extends BonitaHome {
+
+    private static final String VERSION_FILE_NAME = "VERSION";
 
     private static final String TENANT_CONFIGURATION_FILE = "bonita-server.properties";
 
@@ -52,6 +55,8 @@ public class BonitaHomeServer extends BonitaHome {
     private String serverPath;
 
     private Properties platformProperties;
+
+    private String version;
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();;
 
@@ -184,7 +189,11 @@ public class BonitaHomeServer extends BonitaHome {
     }
 
     public String getVersion() throws BonitaHomeNotSetException, IOException {
-        return getPlatformProperties().getProperty("version");
+        if (version == null) {
+            File file = new File(new File(getPlatformConfFolder()), VERSION_FILE_NAME);
+            version = IOUtil.read(file);
+        }
+        return version;
     }
 
     public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {
