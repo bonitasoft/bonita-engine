@@ -183,6 +183,10 @@ public class BonitaHomeServer extends BonitaHome {
         return platformProperties;
     }
 
+    public String getVersion() throws BonitaHomeNotSetException, IOException {
+        return getPlatformProperties().getProperty("version");
+    }
+
     public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {
         return PropertiesManager.getProperties(new File(getTenantConfFolder(tenantId) + File.separatorChar + TENANT_CONFIGURATION_FILE));
     }
