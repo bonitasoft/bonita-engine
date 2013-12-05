@@ -34,15 +34,16 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
 
     private boolean isDefault;
 
-    private Date lastUpdatedDate;
+    private Date lastUpdateDate;
 
     private ThemeType type;
 
-    public ThemeImpl(final byte[] content, final boolean isDefault, final ThemeType type, final Date lastUpdatedDate) {
+    public ThemeImpl(final byte[] content, final byte[] cssContent, final boolean isDefault, final ThemeType type, final Date lastUpdateDate) {
         super();
         this.content = content;
+        this.cssContent = cssContent;
         this.isDefault = isDefault;
-        this.lastUpdatedDate = lastUpdatedDate;
+        this.lastUpdateDate = lastUpdateDate;
         this.type = type;
     }
 
@@ -75,11 +76,11 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
 
     @Override
     public Date getLastUpdatedDate() {
-        return lastUpdatedDate;
+        return lastUpdateDate;
     }
 
     public void setLastUpdatedDate(Date lastUpdatedDate) {
-        this.lastUpdatedDate = lastUpdatedDate;
+        this.lastUpdateDate = lastUpdatedDate;
     }
 
     @Override
@@ -96,7 +97,7 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((type == null) ? 0 : type.hashCode());
-        result = prime * result + ((lastUpdatedDate == null) ? 0 : lastUpdatedDate.hashCode());
+        result = prime * result + ((lastUpdateDate == null) ? 0 : lastUpdateDate.hashCode());
         result = prime * result + (isDefault ? 1231 : 1237);
         result = prime * result + Arrays.hashCode(content);
         result = prime * result + Arrays.hashCode(cssContent);
@@ -120,10 +121,10 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
                 return false;
         } else if (!type.equals(other.type))
             return false;
-        if (lastUpdatedDate == null) {
-            if (other.lastUpdatedDate != null)
+        if (lastUpdateDate == null) {
+            if (other.lastUpdateDate != null)
                 return false;
-        } else if (!lastUpdatedDate.equals(other.lastUpdatedDate))
+        } else if (!lastUpdateDate.equals(other.lastUpdateDate))
             return false;
         if (!Arrays.equals(content, other.content))
             return false;

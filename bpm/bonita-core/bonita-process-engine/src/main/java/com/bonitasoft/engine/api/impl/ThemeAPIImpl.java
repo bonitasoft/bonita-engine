@@ -69,7 +69,7 @@ public class ThemeAPIImpl implements ThemeAPI {
     }
 
     @Override
-    public Theme updateTheme(final long id, final ThemeUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
+    public Theme updateTheme(final long id, final ThemeUpdater themeUpdater) throws UpdateException, AlreadyExistsException {
         // TODO Auto-generated method stub
         return null;
         // if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
@@ -114,7 +114,7 @@ public class ThemeAPIImpl implements ThemeAPI {
     }
 
     @Override
-    public Date getLastUpdatedDate(ThemeType type) throws ThemeNotFoundException {
+    public Date getLastUpdateDate(ThemeType type) throws ThemeNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }

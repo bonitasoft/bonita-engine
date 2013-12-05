@@ -20,7 +20,7 @@ public class ThemeUpdater implements Serializable {
     private static final long serialVersionUID = 728214104237982027L;
 
     public enum ThemeField {
-        CONTENT, TYPE;
+        CONTENT, CSS_CONTENT, TYPE;
     }
 
     private final Map<ThemeField, Serializable> fields;
@@ -31,6 +31,11 @@ public class ThemeUpdater implements Serializable {
 
     public ThemeUpdater setContent(final byte[] content) {
         fields.put(ThemeField.CONTENT, content);
+        return this;
+    }
+
+    public ThemeUpdater setCSSContent(final byte[] cssContent) {
+        fields.put(ThemeField.CSS_CONTENT, cssContent);
         return this;
     }
 

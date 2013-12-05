@@ -50,9 +50,9 @@ public interface ThemeAPI {
      * 
      * @param id
      *            The identifier of the theme to update
-     * @param updater
+     * @param themeUpdater
      *            The attributes to update
-     * @return The updated theme.
+     * @return
      * @throws UpdateException
      *             If can't update theme
      * @throws AlreadyExistsException
@@ -61,7 +61,7 @@ public interface ThemeAPI {
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Theme updateTheme(long id, ThemeUpdater updater) throws UpdateException, AlreadyExistsException;
+    Theme updateTheme(long id, ThemeUpdater themeUpdater) throws UpdateException, AlreadyExistsException;
 
     /**
      * Get the current theme for the specific type.
@@ -107,6 +107,6 @@ public interface ThemeAPI {
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Date getLastUpdatedDate(ThemeType type) throws ThemeNotFoundException;
+    Date getLastUpdateDate(ThemeType type) throws ThemeNotFoundException;
 
 }
