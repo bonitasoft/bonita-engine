@@ -24,7 +24,6 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -35,7 +34,6 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -94,8 +92,6 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
-        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final SessionInfos session = SessionInfos.getSessionInfos();
         final long starterId;
         if (userId == 0) {
@@ -120,7 +116,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         }
         SProcessInstance startedInstance;
         try {
-            final List<SOperation> sOperations = toSOperation(operations, sOperationBuilders, sExpressionBuilders);
+            final List<SOperation> sOperations = toSOperation(operations);
             startedInstance = processExecutor.start(sDefinition, starterId, session.getUserId(), sOperations, context, connectorsWithInput);
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);

@@ -35,24 +35,22 @@ import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.*;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
-import org.bonitasoft.engine.command.model.SCommandBuilder;
-import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
 import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.platform.*;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -82,6 +80,8 @@ import java.util.concurrent.Callable;
 public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
+
+    private static final String PROFILES_FILE_SP = "profiles-sp.xml";
 
     @Override
     protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
@@ -197,8 +197,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TransactionService transactionService = platformAccessor.getTransactionService();
 
             // add tenant to database
-            final STenantBuilder sTenantBuilder = platformAccessor.getSTenantBuilder();
-            final STenant tenant = SPModelConvertor.constructTenant(creator, sTenantBuilder);
+            final STenant tenant = SPModelConvertor.constructTenant(creator);
 
             final Long tenantId = transactionService.executeInTransaction(new Callable<Long>() {
 
@@ -239,7 +238,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final SDataSourceModelBuilder sDataSourceModelBuilder = tenantServiceAccessor.getSDataSourceModelBuilder();
             final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final CommandService commandService = tenantServiceAccessor.getCommandService();
@@ -262,10 +260,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-                        createDefaultDataSource(sDataSourceModelBuilder, dataService);
+                        createDefaultDataSource(dataService);
                         final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
-                        final SCommandBuilder commandBuilder = tenantServiceAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
-                        createDefaultCommands(commandService, commandBuilder, defaultCommandProvider);
+                        createDefaultCommands(commandService, defaultCommandProvider);
                         deployTenantReports(tenantId, tenantServiceAccessor);
                         createDefaultProfiles(tenantId, profileParser, profileService, identityService, logger);
                         sessionService.deleteSession(session.getId());
@@ -291,13 +288,12 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws SBonitaException {
-                final ReportingService reportingService = tenantAccessor.getReportingService();
-                final SReportBuilder reportBuilder = reportingService.getReportBuilder();
-                reportBuilder.createNewInstance(name, /* system user */-1, true, description, screenShot);
-                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-                // Here we are already in a transaction, so we can call execute() directly:
-                addReport.execute();
-            }
+            final ReportingService reportingService = tenantAccessor.getReportingService();
+		final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true, description, screenShot);
+            final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
+            // Here we are already in a transaction, so we can call execute() directly:
+            addReport.execute();
+        }
         });
     }
 
@@ -446,44 +442,44 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         try {
             final PlatformService platformService = platformAccessor.getPlatformService();
-            final STenantBuilder tenantBuilder = platformAccessor.getSTenantBuilder();
+            final STenantBuilderFactory tenantBuildeFactr = BuilderFactory.get(STenantBuilderFactory.class);
             String field = null;
             OrderByType order = null;
             switch (pagingCriterion) {
                 case NAME_ASC:
-                    field = tenantBuilder.getNameKey();
+                    field = tenantBuildeFactr.getNameKey();
                     order = OrderByType.ASC;
                     break;
                 case DESCRIPTION_ASC:
-                    field = tenantBuilder.getDescriptionKey();
+                    field = tenantBuildeFactr.getDescriptionKey();
                     order = OrderByType.ASC;
                     break;
                 case CREATION_ASC:
-                    field = tenantBuilder.getCreatedKey();
+                    field = tenantBuildeFactr.getCreatedKey();
                     order = OrderByType.ASC;
                     break;
                 case STATE_ASC:
-                    field = tenantBuilder.getStatusKey();
+                    field = tenantBuildeFactr.getStatusKey();
                     order = OrderByType.ASC;
                     break;
                 case NAME_DESC:
-                    field = tenantBuilder.getNameKey();
+                    field = tenantBuildeFactr.getNameKey();
                     order = OrderByType.DESC;
                     break;
                 case DESCRIPTION_DESC:
-                    field = tenantBuilder.getDescriptionKey();
+                    field = tenantBuildeFactr.getDescriptionKey();
                     order = OrderByType.DESC;
                     break;
                 case CREATION_DESC:
-                    field = tenantBuilder.getCreatedKey();
+                    field = tenantBuildeFactr.getCreatedKey();
                     order = OrderByType.DESC;
                     break;
                 case STATE_DESC:
-                    field = tenantBuilder.getStatusKey();
+                    field = tenantBuildeFactr.getStatusKey();
                     order = OrderByType.DESC;
                     break;
                 case DEFAULT:
-                    field = tenantBuilder.getCreatedKey();
+                    field = tenantBuildeFactr.getCreatedKey();
                     order = OrderByType.DESC;
                     break;
             }
@@ -629,27 +625,26 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private EntityUpdateDescriptor getTenantUpdateDescriptor(final TenantUpdater udpateDescriptor) throws BonitaHomeNotSetException,
             BonitaHomeConfigurationException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-        final PlatformServiceAccessor platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        final STenantBuilder tenantBuilder = platformAccessor.getSTenantBuilder();
+        final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         final Map<TenantField, Serializable> fields = udpateDescriptor.getFields();
         for (final Entry<TenantField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
                 case NAME:
-                    descriptor.addField(tenantBuilder.getNameKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getNameKey(), field.getValue());
                     break;
                 case DESCRIPTION:
-                    descriptor.addField(tenantBuilder.getDescriptionKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getDescriptionKey(), field.getValue());
                     break;
                 case ICON_NAME:
-                    descriptor.addField(tenantBuilder.getIconNameKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getIconNameKey(), field.getValue());
                     break;
                 case ICON_PATH:
-                    descriptor.addField(tenantBuilder.getIconPathKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getIconPathKey(), field.getValue());
                     break;
                 case STATUS:
-                    descriptor.addField(tenantBuilder.getStatusKey(), field.getValue());
+                    descriptor.addField(tenantBuilderFact.getStatusKey(), field.getValue());
                     break;
                 default:
                     break;
@@ -706,6 +701,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final IOException ioe) {
             throw new StopNodeException(ioe);
         }
+    }
+
+    @Override
+    protected String getProfileFileName() {
+        return PROFILES_FILE_SP;
     }
 
 }

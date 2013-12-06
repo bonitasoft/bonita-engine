@@ -3,10 +3,10 @@
 
 	<bean id="syncQueriableLoggerService" class="org.bonitasoft.engine.services.impl.SyncQueriableLoggerServiceImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="builder" ref="logModelBuilder" />
 		<constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="platformService" ref="platformService" />
 	</bean>
 
 </beans>

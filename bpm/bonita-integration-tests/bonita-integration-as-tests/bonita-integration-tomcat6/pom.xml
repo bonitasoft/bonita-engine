@@ -4,7 +4,7 @@
     <parent>
         <artifactId>bonita-integration-as-tests</artifactId>
         <groupId>com.bonitasoft.engine</groupId>
-        <version>6.1.0-SNAPSHOT</version>
+        <version>6.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-integration-tomcat6</artifactId>
@@ -217,6 +217,9 @@
 		                        <home>${tomcat.home}</home>
 		                        <properties>
 		                            <cargo.servlet.port>${provider.port}</cargo.servlet.port>
+		                            <cargo.jvmargs>
+									 -XX:+HeapDumpOnOutOfMemoryError
+									</cargo.jvmargs>
 		                        </properties>
 		                    </configuration>
 		                    <wait>false</wait>

@@ -16,8 +16,6 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
@@ -32,7 +30,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsAndTerminateTask;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
@@ -90,8 +87,8 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         return null;
     }
 
-    private void executeConnectors(final long sActivityInstanceID, final long processDefinitionID, final List<ConnectorDefinitionWithInputValues> connectors)
-            throws ActivityInstanceNotFoundException, ProcessInstanceNotFoundException, InvalidEvaluationConnectorConditionException, SBonitaException {
+    private void executeConnectors(final long sActivityInstanceID, final long processDefinitionId, final List<ConnectorDefinitionWithInputValues> connectors)
+            throws InvalidEvaluationConnectorConditionException, SBonitaException {
         if (connectors == null) {
             return;
         }
@@ -103,16 +100,15 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
                 throw new InvalidEvaluationConnectorConditionException(connectorInputParameters.size(), contextMap.size());
             }
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-            final long processDefinitionId = getProcessInstance(tenantAccessor, getActivityInstance(tenantAccessor, sActivityInstanceID).getRootContainerId())
-                    .getProcessDefinitionId();
-            final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
-            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+
+
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final String connectorDefinitionId = connectorDefinition.getConnectorId();
             final ConnectorService connectorService = tenantAccessor.getConnectorService();
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(sActivityInstanceID);
             expcontext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
-            expcontext.setProcessDefinitionId(processDefinitionID);
+            expcontext.setProcessDefinitionId(processDefinitionId);
             final ConnectorResult result = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
                     connectorDefinition.getVersion(), connectorsExps, contextMap, Thread.currentThread().getContextClassLoader(), expcontext);
             final List<Operation> outputs = connectorDefinition.getOutputs();

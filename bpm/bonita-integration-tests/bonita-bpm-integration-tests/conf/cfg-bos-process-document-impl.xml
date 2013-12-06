@@ -2,18 +2,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="processDocumentService" class="org.bonitasoft.engine.core.process.document.api.impl.ProcessDocumentServiceImpl">
-		<constructor-arg name="processDocumentBuilders" ref="processDocumentBuilders" />
-		<constructor-arg name="archivedProcessDocumentBuilders" ref="archivedProcessDocumentBuilders" />
 		<constructor-arg name="documentService" ref="documentService" />
 		<constructor-arg name="documentMappingService" ref="documentMappingService" />
-		<constructor-arg name="documentMappingBuilderAccessor" ref="documentMappingBuilderAccessor" />
-		<constructor-arg name="documentBuilders" ref="documentBuilders" />
 		<constructor-arg name="urlProvider" ref="documentURLProvider" />
 	</bean>
-
-	<bean name="processDocumentBuilders" class="org.bonitasoft.engine.core.process.document.model.builder.impl.SProcessDocumentBuildersImpl" />
-
-	<bean name="archivedProcessDocumentBuilders" class="org.bonitasoft.engine.core.process.document.model.builder.impl.SAProcessDocumentBuildersImpl" />
 
 	<bean name="documentURLProvider" class="org.bonitasoft.engine.core.process.document.api.impl.SDocumentDownloadURLProviderImpl" >
 		<constructor-arg name="servletUrl" value="http://localhost:8080/bos-xp/console/download"></constructor-arg>

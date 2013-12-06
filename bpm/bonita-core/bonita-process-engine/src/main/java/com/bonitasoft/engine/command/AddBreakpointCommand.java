@@ -17,7 +17,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 import com.bonitasoft.engine.api.impl.transaction.AddBreakpoint;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -34,13 +33,12 @@ public class AddBreakpointCommand extends TenantCommand {
         final int idOfTheStateToInterrupt = getIntegerMandadoryParameter(parameters, "idOfTheStateToInterrupt");
         final int idOfTheInterruptingState = getIntegerMandadoryParameter(parameters, "idOfTheInterruptingState");
         final BreakpointService breakpointService = tenantAccessor.getBreakpointService();
-        final BPMInstanceBuilders breakpointBuilder = tenantAccessor.getBPMInstanceBuilders();
         final AddBreakpoint addBreakpoint;
         if (instanceId == null) {
-            addBreakpoint = new AddBreakpoint(breakpointService, breakpointBuilder, definitionId, elementName, idOfTheStateToInterrupt,
+            addBreakpoint = new AddBreakpoint(breakpointService, definitionId, elementName, idOfTheStateToInterrupt,
                     idOfTheInterruptingState);
         } else {
-            addBreakpoint = new AddBreakpoint(breakpointService, breakpointBuilder, definitionId, instanceId, elementName, idOfTheStateToInterrupt,
+            addBreakpoint = new AddBreakpoint(breakpointService, definitionId, instanceId, elementName, idOfTheStateToInterrupt,
                     idOfTheInterruptingState);
         }
         try {

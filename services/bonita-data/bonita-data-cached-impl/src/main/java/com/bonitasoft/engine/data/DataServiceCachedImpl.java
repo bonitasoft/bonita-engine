@@ -15,7 +15,6 @@ import org.bonitasoft.engine.data.SDataSourceInactiveException;
 import org.bonitasoft.engine.data.SDataSourceInitializationException;
 import org.bonitasoft.engine.data.SDataSourceNotFoundException;
 import org.bonitasoft.engine.data.model.SDataSource;
-import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -30,13 +29,12 @@ public class DataServiceCachedImpl extends DataServiceImpl implements DataServic
     private final Map<String, SDataSource> sDataSourcesByNameAndVersion = new HashMap<String, SDataSource>();
     private final Map<String, DataSourceImplementation> sDataSourceImplementations = new HashMap<String, DataSourceImplementation>();
 
-    public DataServiceCachedImpl(final SDataSourceModelBuilder modelBuilder,
-            final Recorder recorder, final ReadPersistenceService persistenceService,
+    public DataServiceCachedImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
             final ClassLoaderService classLoaderService, final EventService eventService,
             final List<DataSourceConfiguration> dataSourceConfigurations,
             final TechnicalLoggerService logger,
             final QueriableLoggerService queriableLoggerService) {
-        super(modelBuilder, recorder, persistenceService, classLoaderService, eventService, dataSourceConfigurations, logger, queriableLoggerService);
+        super(recorder, persistenceService, classLoaderService, eventService, dataSourceConfigurations, logger, queriableLoggerService);
     }
 
     private String getKeyFromDataSourceNameAndVersion(final String name, final String version) {

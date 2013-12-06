@@ -37,7 +37,6 @@
     </bean>
 
 	<bean id="searchPlatformEntitiesDescriptor" class="com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor">
-		<constructor-arg name="tenantBuilder" ref="tenantBuilder" />
 	</bean>
 
 	<bean id="transactionExecutor" class="org.bonitasoft.engine.execution.TransactionExecutorImpl">

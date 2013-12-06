@@ -97,18 +97,21 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
     void updateParameterInstanceValue(long processDefinitionId, String parameterName, String parameterValue) throws ParameterNotFoundException, UpdateException;
 
     /**
-     * Import the parameters by a processDefinition id and an array byte of parametersXML
+     * Imports the parameters of the process definition.
+     * The parameters are stored in a properties file.
      * 
-     * @param pDefinitionId
-     *            Identifier of the processDefinition
-     * @param parametersXML
-     *            The parameter with XML format.
+     * @param processDefinitionId
+     *            the identifier of the process definition
+     * @param parameters
+     *            The content of the properties file as a byte array. If null or empty byte[], nothing is done, and the process does not reset to unresolved but
+     *            stays the same.
      * @throws ImportParameterException
+     *             If an exception occurs while importing the parameters
      * @throws InvalidSessionException
-     *             if API Session is invalid, e.g session has expired.
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
-    void importParameters(long pDefinitionId, byte[] parametersXML) throws ImportParameterException;
+    void importParameters(long processDefinitionId, byte[] parameters) throws ImportParameterException;
 
     /**
      * Retrieve the list of connector instances on an activity instance

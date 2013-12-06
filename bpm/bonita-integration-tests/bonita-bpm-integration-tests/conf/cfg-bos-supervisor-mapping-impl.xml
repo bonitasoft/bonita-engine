@@ -5,11 +5,8 @@
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="sSupervisorBuilders" ref="sSupervisorBuilders" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
-
-	<bean name="sSupervisorBuilders" class="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorBuildersImpl" />
 
 	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/supervisor/mapping/db/${db.vendor}-createTables.sql" />

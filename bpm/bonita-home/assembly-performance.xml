@@ -15,6 +15,9 @@
 		<fileSet>
 			<outputDirectory>home</outputDirectory>
 			<directory>base</directory>
+			<excludes>
+				<exclude>**/.gitignore</exclude>
+			</excludes>
 		</fileSet>
 		<fileSet>
 			<outputDirectory>home</outputDirectory>

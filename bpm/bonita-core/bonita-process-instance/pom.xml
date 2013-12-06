@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-core</artifactId>
 		<groupId>com.bonitasoft.engine.core</groupId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.bonitasoft.engine.core.process.instance</groupId>
@@ -19,6 +19,5 @@
 		<module>bonita-process-instance-model</module>
 		<module>bonita-process-instance-model-impl</module>
 		<module>bonita-process-instance-model-impl-hibernate</module>
-		<module>bonita-process-instance-model-impl-mybatis</module>
 	</modules>
 </project>

@@ -18,12 +18,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 import com.bonitasoft.engine.core.reporting.SReport;
-import com.bonitasoft.engine.core.reporting.SReportBuilder;
+import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
 import com.bonitasoft.engine.reporting.ReportSearchDescriptor;
 
 /**
@@ -35,17 +36,18 @@ public class SearchReportDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> reportAllFields;
 
-    SearchReportDescriptor(final SReportBuilder reportBuilder) {
+    SearchReportDescriptor() {
+        final SReportBuilderFactory keyProvider = BuilderFactory.get(SReportBuilderFactory.class);
         reportKeys = new HashMap<String, FieldDescriptor>(5);
-        reportKeys.put(ReportSearchDescriptor.ID, new FieldDescriptor(SReport.class, reportBuilder.getIdKey()));
-        reportKeys.put(ReportSearchDescriptor.NAME, new FieldDescriptor(SReport.class, reportBuilder.getNameKey()));
-        reportKeys.put(ReportSearchDescriptor.PROVIDED, new FieldDescriptor(SReport.class, reportBuilder.getProvidedKey()));
-        reportKeys.put(ReportSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SReport.class, reportBuilder.getInstallationDateKey()));
-        reportKeys.put(ReportSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SReport.class, reportBuilder.getInstalledByKey()));
+        reportKeys.put(ReportSearchDescriptor.ID, new FieldDescriptor(SReport.class, keyProvider.getIdKey()));
+        reportKeys.put(ReportSearchDescriptor.NAME, new FieldDescriptor(SReport.class, keyProvider.getNameKey()));
+        reportKeys.put(ReportSearchDescriptor.PROVIDED, new FieldDescriptor(SReport.class, keyProvider.getProvidedKey()));
+        reportKeys.put(ReportSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SReport.class, keyProvider.getInstallationDateKey()));
+        reportKeys.put(ReportSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SReport.class, keyProvider.getInstalledByKey()));
 
         reportAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> reportFields = new HashSet<String>(8);
-        reportFields.add(reportBuilder.getNameKey());
+        reportFields.add(keyProvider.getNameKey());
         reportAllFields.put(SReport.class, reportFields);
     }
 

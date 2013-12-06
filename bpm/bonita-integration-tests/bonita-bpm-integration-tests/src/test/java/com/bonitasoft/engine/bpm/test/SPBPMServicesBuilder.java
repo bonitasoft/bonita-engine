@@ -11,7 +11,6 @@ package com.bonitasoft.engine.bpm.test;
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
@@ -57,11 +56,6 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     @Override
     public SearchEntitiesDescriptor getSearchEntitiesDescriptor() {
         return this.getInstanceOf(SearchEntitiesDescriptor.class);
-    }
-
-    @Override
-    public BPMInstanceBuilders getBPMInstanceBuilders() {
-        return this.getInstanceOf(BPMInstanceBuilders.class);
     }
 
     @Override

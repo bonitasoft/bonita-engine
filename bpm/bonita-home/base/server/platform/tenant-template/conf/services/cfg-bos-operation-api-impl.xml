@@ -26,31 +26,26 @@
 	<bean id="assignmentOperationExecutorStrategy"
 		class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
-		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders"/>
 	</bean>
 
 	<bean id="javaMethodOperationExecutorStrategy"
 		class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 	</bean>
 
 	<bean id="xpathUpdateQueryOperationExecutorStrategy"
 		class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 	</bean>
 	
 	<bean id="stringIndexOperationExecutorStrategy" class="com.bonitasoft.engine.operation.StringIndexOperationExecutorStrategy">
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
-		<constructor-arg name="bpmInstanceBuilders" ref="bpmInstanceBuilders" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 	</bean>
 
 	<bean id="documentOperationExecutorStrategy" class="org.bonitasoft.engine.operation.DocumentOperationExecutorStrategy">
 		<constructor-arg name="processDocumentService" ref="processDocumentService" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
-		<constructor-arg name="processDocumentBuilders" ref="processDocumentBuilders" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 	</bean>

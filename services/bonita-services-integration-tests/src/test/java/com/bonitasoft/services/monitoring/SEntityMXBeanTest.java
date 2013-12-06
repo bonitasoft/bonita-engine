@@ -10,8 +10,10 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -91,7 +93,7 @@ public class SEntityMXBeanTest extends CommonServiceSPTest {
     }
 
     public SUser createNewUser(final String user) {
-        return getServicesBuilder().buildIdentityModelBuilder().getUserBuilder().createNewInstance().setUserName(user).setPassword("toto").done();
+        return BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(user).setPassword("toto").done();
     }
 
     @Test

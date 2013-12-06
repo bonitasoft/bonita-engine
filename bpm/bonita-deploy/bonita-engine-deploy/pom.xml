@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-deploy</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-engine-deploy</artifactId>
@@ -28,13 +28,6 @@
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-server-sp</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-home-sp</artifactId>
-			<version>${project.version}</version>
-			<classifier>performance-mybatis</classifier>
-			<type>zip</type>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
@@ -98,7 +91,6 @@
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>assembly-mybatis-performance.xml</descriptor>
 								<descriptor>assembly-hibernate-teamwork.xml</descriptor>
 								<descriptor>assembly-hibernate-efficiency.xml</descriptor>
 								<descriptor>assembly-hibernate-performance.xml</descriptor>

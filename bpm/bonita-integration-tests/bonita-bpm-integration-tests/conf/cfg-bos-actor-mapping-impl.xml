@@ -19,6 +19,4 @@
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="20" />
     </bean>
 
-	<bean name="sActorBuilders" class="org.bonitasoft.engine.actor.mapping.model.impl.SActorBuildersImpl" />
-
 </beans>

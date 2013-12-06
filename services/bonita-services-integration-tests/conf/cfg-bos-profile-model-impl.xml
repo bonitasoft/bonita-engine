@@ -11,6 +11,4 @@
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="11" />
 	</bean>
 	
-	<bean id="sProfileBuilderAccessor" class="org.bonitasoft.engine.profile.builder.impl.SProfileBuilderAccessorImpl"/>
-	
 </beans>

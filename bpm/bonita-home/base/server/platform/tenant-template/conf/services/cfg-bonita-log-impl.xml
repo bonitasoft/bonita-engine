@@ -73,7 +73,12 @@
         		<entry key="PROFILE_CREATED:INTERNAL" value="true" />
         		<entry key="PROFILE_DELETED:INTERNAL" value="true" />
         		<entry key="PROFILE_UPDATED:INTERNAL" value="true" />
+        		<entry key="PROFILE_MEMBER_CREATED:INTERNAL" value="true" />
         		<entry key="PROFILE_MEMBER_DELETED:INTERNAL" value="true" />
+        		<entry key="PROFILE_MEMBER_UPDATED:INTERNAL" value="true" />
+        		<entry key="PROFILE_ENTRY_CREATED:INTERNAL" value="true" />
+        		<entry key="PROFILE_ENTRY_DELETED:INTERNAL" value="true" />
+        		<entry key="PROFILE_ENTRY_UPDATED:INTERNAL" value="true" />
         		<entry key="REPORT_CREATED:INTERNAL" value="true" />
         		<entry key="REPORT_DELETED:INTERNAL" value="true" />
         		<entry key="SCHEDULER_SCHEDULED:INTERNAL" value="false" />
@@ -88,10 +93,10 @@
 	<bean id="syncQueriableLoggerService" class="com.bonitasoft.engine.log.api.impl.BatchQueriableLoggerImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
-		<constructor-arg name="builder" ref="logModelBuilder" />
 		<constructor-arg name="loggerStrategy" ref="queriableLoggerStrategy" />
 		<constructor-arg name="sessionProvider" ref="queriableLogSessionProvider" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="platformService" ref="platformService" />
 		<constructor-arg name="delayable" value="false" />
 	</bean>
 

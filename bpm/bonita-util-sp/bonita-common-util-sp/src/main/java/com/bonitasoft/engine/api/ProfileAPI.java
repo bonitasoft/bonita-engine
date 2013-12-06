@@ -120,9 +120,13 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @return the updated custom Profile.
      * @throws UpdateException
      *             errors thrown if can't update profiles
-     * @since 6.0
+     * @throws ProfileNotFoundException
+     *             if the profile to update cannot be found with the given id
+     * @throws AlreadyExistsException
+     *             if a profile with the new name already exists
+     * @since 6.1
      */
-    Profile updateProfile(long id, ProfileUpdater updater) throws ProfileNotFoundException, UpdateException;
+    Profile updateProfile(long id, ProfileUpdater updater) throws ProfileNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
      * Create a new profile entry

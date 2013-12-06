@@ -12,10 +12,11 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -33,8 +34,6 @@ public abstract class TenantMonitoringServiceTest extends CommonServiceSPTest {
 
     private static IdentityService identityService;
 
-    private static IdentityModelBuilder identityModelBuilder;
-
     private static MBeanServer mbserver = null;
 
     private static ObjectName entityMB;
@@ -49,7 +48,6 @@ public abstract class TenantMonitoringServiceTest extends CommonServiceSPTest {
 
     static {
         identityService = getServicesBuilder().buildIdentityService();
-        identityModelBuilder = getServicesBuilder().buildIdentityModelBuilder();
     }
 
     @Before
@@ -112,7 +110,7 @@ public abstract class TenantMonitoringServiceTest extends CommonServiceSPTest {
     }
 
     public SUser createNewUser(final String username, final String password) throws Exception {
-        final SUserBuilder userBuilder = identityModelBuilder.getUserBuilder().createNewInstance().setUserName(username).setPassword(password);
+        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(username).setPassword(password);
         getTransactionService().begin();
         final SUser user = identityService.createUser(userBuilder.done());
         getTransactionService().complete();

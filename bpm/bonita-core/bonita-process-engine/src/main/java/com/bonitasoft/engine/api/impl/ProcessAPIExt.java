@@ -55,6 +55,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -84,8 +85,8 @@ import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -99,7 +100,6 @@ import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.IOUtil;
@@ -125,8 +125,6 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 import com.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
 import com.bonitasoft.engine.parameter.OrderBy;
 import com.bonitasoft.engine.parameter.ParameterService;
@@ -160,13 +158,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void importParameters(final long pDefinitionId, final byte[] parametersXML) throws ImportParameterException {
+    public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_PARAMETER);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         SProcessDefinition sDefinition = null;
-        if (pDefinitionId > 0) {
+        if (processDefinitionId > 0) {
             final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-            final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(pDefinitionId, processDefinitionService);
+            final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processDefinitionId, processDefinitionService);
             try {
                 getProcessDefinition.execute();
             } catch (final SBonitaException e) {
@@ -176,26 +174,26 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
 
         final ParameterService parameterService = tenantAccessor.getParameterService();
-        final Set<SParameterDefinition> parameters = sDefinition.getParameters();
-        final Map<String, String> defaultParamterValues = new HashMap<String, String>();
+        final Set<SParameterDefinition> params = sDefinition.getParameters();
+        final Map<String, String> defaultParameterValues = new HashMap<String, String>();
 
-        if (parametersXML != null) {
+        if (parameters != null) {
             final Properties property = new Properties();
             try {
-                property.load(new ByteArrayInputStream(parametersXML));
+                property.load(new ByteArrayInputStream(parameters));
             } catch (final IOException e1) {
                 throw new ImportParameterException(e1);
             }
 
             for (final Entry<Object, Object> entry : property.entrySet()) {
-                defaultParamterValues.put(entry.getKey().toString(), entry.getValue().toString());
+                defaultParameterValues.put(entry.getKey().toString(), entry.getValue().toString());
             }
         }
 
         final Map<String, String> storedParameters = new HashMap<String, String>();
-        for (final SParameterDefinition sParameterDefinition : parameters) {
+        for (final SParameterDefinition sParameterDefinition : params) {
             final String name = sParameterDefinition.getName();
-            final String value = defaultParamterValues.get(name);
+            final String value = defaultParameterValues.get(name);
             if (value != null) {
                 storedParameters.put(name, value);
             }
@@ -206,6 +204,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SParameterProcessNotFoundException e) {
             throw new ImportParameterException(e);
         }
+
+        // update process resolution:
+        tenantAccessor.getDependencyResolver().resolveDependencies(processDefinitionId, tenantAccessor);
     }
 
     private void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
@@ -391,65 +392,65 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final ConnectorInstanceCriterion order) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
-        final SConnectorInstanceBuilder connectorInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSConnectorInstanceBuilder();
+        final SConnectorInstanceBuilderFactory keyProvider = BuilderFactory.get(SConnectorInstanceBuilderFactory.class);
         OrderByType orderByType;
         String fieldName;
         switch (order) {
             case ACTIVATION_EVENT_ASC:
                 orderByType = OrderByType.ASC;
-                fieldName = connectorInstanceBuilder.getActivationEventKey();
+                fieldName = keyProvider.getActivationEventKey();
                 break;
             case ACTIVATION_EVENT_DESC:
                 orderByType = OrderByType.DESC;
-                fieldName = connectorInstanceBuilder.getActivationEventKey();
+                fieldName = keyProvider.getActivationEventKey();
                 break;
             case CONNECTOR_ID_ASC:
                 orderByType = OrderByType.ASC;
-                fieldName = connectorInstanceBuilder.getConnectorIdKey();
+                fieldName = keyProvider.getConnectorIdKey();
                 break;
             case CONNECTOR_ID__DESC:
                 orderByType = OrderByType.DESC;
-                fieldName = connectorInstanceBuilder.getConnectorIdKey();
+                fieldName = keyProvider.getConnectorIdKey();
                 break;
             case CONTAINER_ID_ASC:
                 orderByType = OrderByType.ASC;
-                fieldName = connectorInstanceBuilder.getContainerIdKey();
+                fieldName = keyProvider.getContainerIdKey();
                 break;
             case CONTAINER_ID__DESC:
                 orderByType = OrderByType.DESC;
-                fieldName = connectorInstanceBuilder.getContainerIdKey();
+                fieldName = keyProvider.getContainerIdKey();
                 break;
             case DEFAULT:
                 orderByType = OrderByType.ASC;
-                fieldName = connectorInstanceBuilder.getNameKey();
+                fieldName = keyProvider.getNameKey();
                 break;
             case NAME_ASC:
                 orderByType = OrderByType.ASC;
-                fieldName = connectorInstanceBuilder.getNameKey();
+                fieldName = keyProvider.getNameKey();
                 break;
             case NAME_DESC:
                 orderByType = OrderByType.DESC;
-                fieldName = connectorInstanceBuilder.getNameKey();
+                fieldName = keyProvider.getNameKey();
                 break;
             case STATE_ASC:
                 orderByType = OrderByType.ASC;
-                fieldName = connectorInstanceBuilder.getStateKey();
+                fieldName = keyProvider.getStateKey();
                 break;
             case STATE_DESC:
                 orderByType = OrderByType.DESC;
-                fieldName = connectorInstanceBuilder.getStateKey();
+                fieldName = keyProvider.getStateKey();
                 break;
             case VERSION_ASC:
                 orderByType = OrderByType.ASC;
-                fieldName = connectorInstanceBuilder.getVersionKey();
+                fieldName = keyProvider.getVersionKey();
                 break;
             case VERSION_DESC:
                 orderByType = OrderByType.DESC;
-                fieldName = connectorInstanceBuilder.getVersionKey();
+                fieldName = keyProvider.getVersionKey();
                 break;
             default:
                 orderByType = OrderByType.ASC;
-                fieldName = connectorInstanceBuilder.getNameKey();
+                fieldName = keyProvider.getNameKey();
                 break;
         }
         try {
@@ -688,19 +689,17 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        final SAProcessInstanceBuilder saProcessInstanceBuilder = tenantAccessor.getBPMInstanceBuilders().getSAProcessInstanceBuilder();
         try {
             final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                    tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1, saProcessInstanceBuilder.getIdKey(), OrderByType.ASC);
+                    tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1, BuilderFactory.get(SAProcessInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
             getArchivedProcessInstanceList.execute();
             final ArchivedProcessInstance saprocessInstance = getArchivedProcessInstanceList.getResult().get(0);
             final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
             final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
 
-            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);
             expcontext.setContainerType("PROCESS_INSTANCE");
@@ -752,7 +751,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final long activityInstanceId) throws ConnectorExecutionException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -763,7 +761,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getParentContainerId());
             final long processDefinitionId = processInstance.getProcessDefinitionId();
             final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
-            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(activityInstanceId);
             expcontext.setContainerType("ACTIVITY_INSTANCE");
@@ -807,7 +805,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -822,7 +819,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final long processDefinitionId = getLastArchivedProcessInstance.getResult().getProcessDefinitionId();
             final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
 
-            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(activityInstanceId);
             expcontext.setContainerType("ACTIVITY_INSTANCE");
@@ -866,7 +863,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
 
@@ -878,7 +874,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
             final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
 
-            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);
             expcontext.setContainerType("PROCESS_INSTANCE");
@@ -927,7 +923,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final long processInstanceId) throws ConnectorExecutionException {
         checkConnectorParameters(connectorInputParameters, inputValues);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -937,7 +932,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
             final long processDefinitionId = processInstance.getProcessDefinitionId();
             final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
-            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(sExpressionBuilders, connectorInputParameters);
+            final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);
             expcontext.setContainerType("PROCESS_INSTANCE");
@@ -977,11 +972,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throws ProcessInstanceNotFoundException, UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
-        final SProcessInstanceUpdateBuilder updateBuilder = bpmInstanceBuilders.getProcessInstanceUpdateBuilder();
         try {
-            final UpdateProcessInstance updateProcessInstance = new UpdateProcessInstance(processInstanceService, updateBuilder, processInstanceId, index,
-                    value);
+            final UpdateProcessInstance updateProcessInstance = new UpdateProcessInstance(processInstanceService, processInstanceId, index, value);
             updateProcessInstance.execute();
             return getProcessInstance(processInstanceId);
         } catch (final SProcessInstanceNotFoundException spinfe) {
@@ -1001,10 +993,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
-        final SProcessInstanceUpdateBuilder updateBuilder = bpmInstanceBuilders.getProcessInstanceUpdateBuilder();
         try {
-            final UpdateProcessInstance updateProcessInstance = new UpdateProcessInstance(processInstanceService, updater, updateBuilder, processInstanceId);
+            final UpdateProcessInstance updateProcessInstance = new UpdateProcessInstance(processInstanceService, updater, processInstanceId);
             updateProcessInstance.execute();
             return getProcessInstance(processInstanceId);
         } catch (final SProcessInstanceNotFoundException spinfe) {

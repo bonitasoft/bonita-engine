@@ -34,7 +34,6 @@ import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -67,20 +66,20 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
     private final HazelcastInstance hazelcastInstance;
 
-    public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
+    public ClusteredEventServiceImpl(final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
             final HazelcastInstance hazelcastInstance) throws HandlerRegistrationException {
-        this("PLATFORM", eventBuilders, handlers, logger, hazelcastInstance, Manager.getInstance());
+        this("PLATFORM", handlers, logger, hazelcastInstance, Manager.getInstance());
     }
 
-    public ClusteredEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
+    public ClusteredEventServiceImpl(final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
             final HazelcastInstance hazelcastInstance, final long tenantId) throws HandlerRegistrationException {
-        this("TENANT@" + tenantId, eventBuilders, handlers, logger, hazelcastInstance, Manager.getInstance());
+        this("TENANT@" + tenantId, handlers, logger, hazelcastInstance, Manager.getInstance());
     }
 
-    ClusteredEventServiceImpl(final String eventServiceHandlerMapNameSuffix, final SEventBuilders eventBuilders,
+    ClusteredEventServiceImpl(final String eventServiceHandlerMapNameSuffix,
             final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance, final Manager manager)
                     throws HandlerRegistrationException {
-        super(eventBuilders, logger);
+        super(logger);
         if (!manager.isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }

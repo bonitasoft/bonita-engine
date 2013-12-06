@@ -16,6 +16,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -24,12 +25,10 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -55,14 +54,13 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
+import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
 
 /**
  * @author Baptiste Mesta
@@ -74,25 +72,22 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
  */
 public class ProcessExecutorExt extends ProcessExecutorImpl {
 
-    protected final BPMInstanceBuilders instanceBuilders;
-
-    public ProcessExecutorExt(final BPMInstanceBuilders instanceBuilders, final ActivityInstanceService activityInstanceService,
+    public ProcessExecutorExt(final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor,
             final WorkService workService, final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
-            final SExpressionBuilders expressionBuilders, final ExpressionResolverService expressionResolverService, final EventService eventService,
+            final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
-            final SProcessDocumentBuilders processDocumentBuilders, final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
+            final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
             final BPMInstancesCreator bpmInstancesCreator, final TokenService tokenService, final EventsHandler eventsHandler,
-            final SOperationBuilders operationBuilders, final TransactionService transactionService, final FlowNodeStateManager flowNodeStateManager) {
-        super(instanceBuilders, activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService,
+            final TransactionService transactionService, final FlowNodeStateManager flowNodeStateManager) {
+        super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService,
                 gatewayInstanceService, transitionService, eventInstanceService, connectorService,
-                connectorInstanceService, classLoaderService, operationService, expressionBuilders, expressionResolverService, eventService, handlers,
-                processDocumentService, processDocumentBuilders, sessionAccessor, containerRegistry, bpmInstancesCreator, tokenService,
-                eventsHandler, operationBuilders, transactionService, flowNodeStateManager);
+                connectorInstanceService, classLoaderService, operationService, expressionResolverService, eventService, handlers,
+                processDocumentService, sessionAccessor, containerRegistry, bpmInstancesCreator, tokenService,
+                eventsHandler, transactionService, flowNodeStateManager);
 
-        this.instanceBuilders = instanceBuilders;
     }
 
     @Override
@@ -139,7 +134,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
         final SExpressionContext contextDependency = new SExpressionContext(sInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                 sDefinition.getId());
         boolean update = false;
-        final SProcessInstanceUpdateBuilder updateBuilder = instanceBuilders.getProcessInstanceUpdateBuilder();
+        final SProcessInstanceUpdateBuilder updateBuilder = BuilderFactory.get(SProcessInstanceUpdateBuilderFactory.class).createNewInstance();
         for (int i = 1; i <= 5; i++) {
             final SExpression value = sDefinition.getStringIndexValue(i);
             if (value != null) {

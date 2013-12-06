@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.SessionInfos;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -34,6 +35,7 @@ import com.bonitasoft.engine.api.impl.transaction.reporting.SearchReports;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReport;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
+import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
 import com.bonitasoft.engine.core.reporting.SReportNotFoundException;
 import com.bonitasoft.engine.reporting.Report;
 import com.bonitasoft.engine.reporting.ReportCreator;
@@ -69,8 +71,7 @@ public class ReportingAPIExt implements ReportingAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         ReportingService reportingService = tenantAccessor.getReportingService();
         final long userId = SessionInfos.getUserIdFromSession();
-        final SReportBuilder reportBuilder = reportingService.getReportBuilder();
-        reportBuilder.createNewInstance(name, userId, false, description, null);
+        final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, userId, false, description, null);
         SReport report = reportBuilder.done();
         checkReportAlreadyExists(name, tenantAccessor);
         final AddReport addReport = new AddReport(reportingService, report, content);
@@ -87,8 +88,7 @@ public class ReportingAPIExt implements ReportingAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final long userId = SessionInfos.getUserIdFromSession();
         ReportingService reportingService = tenantAccessor.getReportingService();
-        final SReportBuilder reportBuilder = reportingService.getReportBuilder();
-        final SReport sReport = SPModelConvertor.constructSReport(reportCreator, reportBuilder, userId);
+        final SReport sReport = SPModelConvertor.constructSReport(reportCreator, userId);
         final AddReport addReport = new AddReport(reportingService, sReport, content);
         checkReportAlreadyExists((String) reportCreator.getFields().get(ReportCreator.ReportField.NAME), tenantAccessor);
         try {
@@ -176,8 +176,7 @@ public class ReportingAPIExt implements ReportingAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ReportingService reportingService = tenantAccessor.getReportingService();
-        final SearchReports searchReports = new SearchReports(reportingService, searchEntitiesDescriptor.getReportDescriptor(reportingService
-                .getReportBuilder()), options);
+        final SearchReports searchReports = new SearchReports(reportingService, searchEntitiesDescriptor.getReportDescriptor(), options);
         try {
             searchReports.execute();
             return searchReports.getResult();

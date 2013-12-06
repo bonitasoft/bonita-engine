@@ -14,7 +14,6 @@ import org.bonitasoft.engine.events.impl.EventServiceImpl;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
@@ -22,9 +21,9 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class ConfigurableEventServiceImpl extends EventServiceImpl {
 
-    public ConfigurableEventServiceImpl(final SEventBuilders eventBuilders, final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger)
+    public ConfigurableEventServiceImpl(final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger)
             throws HandlerRegistrationException {
-        super(eventBuilders, logger);
+        super(logger);
         // register the handlers with their associated event type
         for (final Map.Entry<String, SHandler<SEvent>> entry : handlers.entrySet()) {
             addHandler(entry.getKey(), entry.getValue());

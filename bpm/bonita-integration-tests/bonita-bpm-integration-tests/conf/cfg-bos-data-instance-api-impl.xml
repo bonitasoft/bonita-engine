@@ -3,9 +3,7 @@
 
 	<bean id="dataInstanceService" class="org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl">
 		<constructor-arg name="dataSourceService" ref="dataService" />
-		<constructor-arg name="dataInstanceBuilders" ref="dataInstanceBuilders" />
 		<constructor-arg name="recorder" ref="recorderSync" />
-		<constructor-arg name="eventBuilders" ref="eventBuilders" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
@@ -14,8 +12,6 @@
 	<bean id="persistentDataInstanceDSConf" class="org.bonitasoft.engine.data.instance.PersistentDataInstanceDataSourceConfiguration">
 		<constructor-arg name="persistenceRead" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
-		<constructor-arg name="dataInstanceBuilders" ref="dataInstanceBuilders" />
-		<constructor-arg name="eventBuilders" ref="eventBuilders" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
     </bean>
 

@@ -21,9 +21,9 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.SProfileEntryDeletionException;
-import org.bonitasoft.engine.profile.SProfileEntryUpdateException;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -95,7 +95,7 @@ public class DeleteProfileEntry implements TransactionContent {
 
     private void updateProfileEntryIndex(final SProfileEntry profileEntry, final Long newIndex) throws SProfileEntryUpdateException {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField(SProfileEntryBuilder.INDEX, newIndex);
+        entityUpdateDescriptor.addField(SProfileEntryBuilderFactory.INDEX, newIndex);
         profileService.updateProfileEntry(profileEntry, entityUpdateDescriptor);
     }
 

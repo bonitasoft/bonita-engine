@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.reporting;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,19 +17,14 @@ import org.junit.Test;
  */
 public class SReportBuilderImplTest {
 
-    @Test
-    public void getNullReport() {
-        final SReportBuilderImpl builder = new SReportBuilderImpl();
-        Assert.assertNull(builder.done());
-    }
 
     @Test
     public void getSimpleReport() {
-        final SReportBuilderImpl builder = new SReportBuilderImpl();
+        final SReportBuilderFactory builderFact = BuilderFactory.get(SReportBuilderFactory.class);
         final String name = "report";
         final long installationDate = System.currentTimeMillis();
         final int installedBy = 10;
-        builder.createNewInstance(name, installationDate, installedBy, false);
+        SReportBuilder builder = builderFact.createNewInstance(name, installationDate, installedBy, false);
         final SReport report = builder.done();
         final SReportImpl expected = new SReportImpl(name, installationDate, installedBy, false);
         expected.setLastModificationDate(installationDate);
@@ -37,12 +33,12 @@ public class SReportBuilderImplTest {
 
     @Test
     public void getComplexReport() {
-        final SReportBuilderImpl builder = new SReportBuilderImpl();
+        final SReportBuilderFactory builderFact = BuilderFactory.get(SReportBuilderFactory.class);
         final String name = "report";
         final long installationDate = System.currentTimeMillis();
         final int installedBy = 10;
         final String description = "description";
-        builder.createNewInstance(name, installationDate, installedBy, true).setDescription(description);
+        SReportBuilder builder = builderFact.createNewInstance(name, installationDate, installedBy, true).setDescription(description);
         final SReport report = builder.done();
         final SReportImpl expected = new SReportImpl(name, installationDate, installedBy, true);
         expected.setDescription(description);

@@ -8,9 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.process.instance.model.builder.impl;
 
-import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SProcessInstanceBuilderImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 
@@ -21,38 +18,10 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
  */
 public class SProcessInstanceBuilderExt extends SProcessInstanceBuilderImpl implements SProcessInstanceBuilder {
 
-    static final String STRING_INDEX_1_KEY = "stringIndex1";
-
-    static final String STRING_INDEX_2_KEY = "stringIndex2";
-
-    static final String STRING_INDEX_3_KEY = "stringIndex3";
-
-    static final String STRING_INDEX_4_KEY = "stringIndex4";
-
-    static final String STRING_INDEX_5_KEY = "stringIndex5";
-
-    @Override
-    public SProcessInstanceBuilder createNewInstance(final String name, final long processDefinitionId) {
-        NullCheckingUtil.checkArgsNotNull(name, processDefinitionId);
-        entity = new SProcessInstanceImpl(name, processDefinitionId);
-        entity.setStateCategory(SStateCategory.NORMAL);
-        return this;
+    public SProcessInstanceBuilderExt(final SProcessInstanceImpl entity) {
+        super(entity);
     }
-
-    @Override
-    public SProcessInstanceBuilder createNewInstance(final String name, final long processDefinitionId, final String description) {
-        NullCheckingUtil.checkArgsNotNull(name, processDefinitionId);
-        entity = new SProcessInstanceImpl(name, processDefinitionId);
-        entity.setStateCategory(SStateCategory.NORMAL);
-        entity.setDescription(description);
-        return this;
-    }
-
-    @Override
-    public SProcessInstanceBuilder createNewInstance(final SProcessDefinition definition) {
-        return createNewInstance(definition.getName(), definition.getId(), definition.getDescription());
-    }
-
+    
     @Override
     public SProcessInstanceBuilder setStringIndex(final int index, final String value) {
         switch (index) {
@@ -75,31 +44,6 @@ public class SProcessInstanceBuilderExt extends SProcessInstanceBuilderImpl impl
                 throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
         }
         return this;
-    }
-
-    @Override
-    public String getStringIndex1Key() {
-        return STRING_INDEX_1_KEY;
-    }
-
-    @Override
-    public String getStringIndex2Key() {
-        return STRING_INDEX_2_KEY;
-    }
-
-    @Override
-    public String getStringIndex3Key() {
-        return STRING_INDEX_3_KEY;
-    }
-
-    @Override
-    public String getStringIndex4Key() {
-        return STRING_INDEX_4_KEY;
-    }
-
-    @Override
-    public String getStringIndex5Key() {
-        return STRING_INDEX_5_KEY;
     }
 
 }

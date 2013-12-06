@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
@@ -20,8 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
+import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
 
 /**
  * @author Baptiste Mesta
@@ -33,14 +34,11 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
 
     private final ProcessInstanceService processInstanceService;
 
-    private final BPMInstanceBuilders bpmInstanceBuilders;
-
     private final ActivityInstanceService activityInstanceService;
 
-    public StringIndexOperationExecutorStrategy(final ProcessInstanceService processInstanceService, final BPMInstanceBuilders bpmInstanceBuilders,
+    public StringIndexOperationExecutorStrategy(final ProcessInstanceService processInstanceService,
             final ActivityInstanceService activityInstanceService) {
         this.processInstanceService = processInstanceService;
-        this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.activityInstanceService = activityInstanceService;
     }
 
@@ -63,7 +61,6 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
     @Override
     public void update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        final SProcessInstanceUpdateBuilder updateBuilder = bpmInstanceBuilders.getProcessInstanceUpdateBuilder();
         final String name = leftOperand.getName();
         Integer index;
         try {
@@ -83,6 +80,7 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
                 processInstance = processInstanceService.getProcessInstance(flowNodeInstance.getRootContainerId());
             }
             final String stringValue = (String) newValue;
+            final SProcessInstanceUpdateBuilder updateBuilder = BuilderFactory.get(SProcessInstanceUpdateBuilderFactory.class).createNewInstance();
             switch (index) {
                 case 1:
                     updateBuilder.updateStringIndex1(stringValue);

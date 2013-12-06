@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-home-sp</artifactId>
@@ -76,7 +76,6 @@
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>assembly-performance-mybatis.xml</descriptor>
 								<descriptor>assembly-teamwork.xml</descriptor>
 								<descriptor>assembly-efficiency.xml</descriptor>
 								<descriptor>assembly-performance.xml</descriptor>

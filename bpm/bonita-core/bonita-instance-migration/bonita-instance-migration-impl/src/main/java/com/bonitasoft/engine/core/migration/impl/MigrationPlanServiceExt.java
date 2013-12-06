@@ -10,6 +10,7 @@ package com.bonitasoft.engine.core.migration.impl;
 
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.core.migration.MigrationPlanService;
 import org.bonitasoft.engine.core.migration.exceptions.SInvalidMigrationPlanException;
@@ -18,14 +19,12 @@ import org.bonitasoft.engine.core.migration.exceptions.SPrepareForMigrationFaile
 import org.bonitasoft.engine.core.migration.impl.MigrationPlanServiceImpl;
 import org.bonitasoft.engine.core.migration.model.SMigrationMapping;
 import org.bonitasoft.engine.core.migration.model.SMigrationPlan;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -35,7 +34,7 @@ import org.bonitasoft.engine.xml.ParserFactory;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SBreakpointCreationException;
-import com.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import com.bonitasoft.engine.core.process.instance.model.builder.SBreakpointBuilderFactory;
 
 /**
  * @author Baptiste Mesta
@@ -45,19 +44,16 @@ public class MigrationPlanServiceExt extends MigrationPlanServiceImpl implements
 
     private final BreakpointService breakpointService;
 
-    private final BPMInstanceBuilders breakpointBuilder;
-
     private final int interruptingStateId;
 
     public MigrationPlanServiceExt(final Recorder recorder, final ReadPersistenceService persistenceService, final EventService eventService,
-            final ParserFactory parserFactory, final SExpressionBuilders sExpressionBuilders, final SOperationBuilders sOperationBuilders,
+            final ParserFactory parserFactory,
             final CacheService cacheService, final ReadSessionAccessor sessionAccessor, final ProcessInstanceService processInstanceService,
-            final BreakpointService breakpointService, final BPMInstanceBuilders breakpointBuilder, final int interruptingStateId,
+            final BreakpointService breakpointService, final int interruptingStateId,
             final QueriableLoggerService queriableLoggerService) {
-        super(recorder, persistenceService, eventService, parserFactory, sExpressionBuilders, sOperationBuilders, cacheService, sessionAccessor,
+        super(recorder, persistenceService, eventService, parserFactory, cacheService, sessionAccessor,
                 processInstanceService, queriableLoggerService);
         this.breakpointService = breakpointService;
-        this.breakpointBuilder = breakpointBuilder;
         this.interruptingStateId = interruptingStateId;
     }
 
@@ -79,8 +75,7 @@ public class MigrationPlanServiceExt extends MigrationPlanServiceImpl implements
                 processInstance = processInstanceService.getProcessInstance(processInstanceId);
                 processInstanceService.setMigrationPlanId(processInstance, migrationPlanId);
                 for (final SMigrationMapping mapping : migrationPlan.getMappings()) {
-                    breakpointService.addBreakpoint(breakpointBuilder
-                            .getSBreakpointBuilder()
+                    breakpointService.addBreakpoint(BuilderFactory.get(SBreakpointBuilderFactory.class)
                             .createNewInstance(processInstance.getProcessDefinitionId(), processInstance.getId(), mapping.getSourceName(),
                                     mapping.getSourceState(), interruptingStateId).done());
                 }

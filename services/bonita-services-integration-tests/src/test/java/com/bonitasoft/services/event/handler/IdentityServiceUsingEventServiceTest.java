@@ -11,12 +11,14 @@ package com.bonitasoft.services.event.handler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.UserUpdateEventHandler;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
@@ -29,13 +31,10 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceSPTest {
 
     private static IdentityService identityService;
 
-    private static IdentityModelBuilder builder;
-
     private static EventService eventService;
 
     static {
         identityService = getServicesBuilder().buildIdentityService();
-        builder = getServicesBuilder().buildIdentityModelBuilder();
         eventService = getServicesBuilder().buildEventService();
     }
 
@@ -43,8 +42,7 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceSPTest {
     public void testUserPasswordUpdate() throws Exception {
         getTransactionService().begin();
         final String userName = "Zhang";
-        final SUserBuilder userBuilder = builder.getUserBuilder();
-        userBuilder.createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang");
+        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang");
         SUser user = identityService.createUser(userBuilder.done());
         getTransactionService().complete();
 
@@ -53,7 +51,7 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceSPTest {
 
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
 
-        final EntityUpdateDescriptor changeDescriptor = builder.getUserUpdateBuilder().updatePassword("newpassword").done();
+        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updatePassword("newpassword").done();
         identityService.updateUser(user, changeDescriptor);
 
         user = identityService.getUser(user.getId());
@@ -68,8 +66,7 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceSPTest {
         getTransactionService().begin();
 
         final String userName = "Zhang";
-        final SUserBuilder userBuilder = builder.getUserBuilder();
-        userBuilder.createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang");
+        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(userName).setPassword("oldpassword").setFirstName("bole").setLastName("zhang");
         SUser user = identityService.createUser(userBuilder.done());
         getTransactionService().complete();
 
@@ -77,7 +74,7 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceSPTest {
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
 
         user = identityService.getUser(user.getId());
-        final EntityUpdateDescriptor changeDescriptor = builder.getUserUpdateBuilder().updatePassword("oldpassword").done();
+        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updatePassword("oldpassword").done();
         identityService.updateUser(user, changeDescriptor);
 
         assertNull(userUpdateEventHandler.getPassword(userName));
@@ -88,8 +85,7 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceSPTest {
     @Test
     public void testUpdateUserWithoutPasswordChange() throws Exception {
         getTransactionService().begin();
-        final SUserBuilder userBuilder = builder.getUserBuilder();
-        userBuilder.createNewInstance().setUserName("testUpdateUser").setPassword("kikoo").setFirstName("Update").setLastName("User");
+        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("testUpdateUser").setPassword("kikoo").setFirstName("Update").setLastName("User");
         SUser user = identityService.createUser(userBuilder.done());
         getTransactionService().complete();
 
@@ -97,7 +93,7 @@ public class IdentityServiceUsingEventServiceTest extends CommonServiceSPTest {
         user = identityService.getUser(user.getId());
         final UserUpdateEventHandler userUpdateEventHandler = resetUserPasswordUpdateEventHandler(eventService);
 
-        final EntityUpdateDescriptor changeDescriptor = builder.getUserUpdateBuilder().updateUserName("testUpdateUser2").updateFirstName("updated")
+        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance().updateUserName("testUpdateUser2").updateFirstName("updated")
                 .updateLastName("user2").done();
         identityService.updateUser(user, changeDescriptor);
 

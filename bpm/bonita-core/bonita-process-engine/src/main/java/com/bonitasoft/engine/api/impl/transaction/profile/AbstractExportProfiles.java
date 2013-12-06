@@ -27,9 +27,9 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileMemberBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -266,24 +266,24 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
 
     protected List<SProfile> searchProfiles(final int fromIndex) throws SBonitaSearchException {
         final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, Collections.singletonList(new OrderByOption(
-                SProfile.class, SProfileBuilder.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
+                SProfile.class, SProfileBuilderFactory.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
         return profileService.searchProfiles(queryOptions);
     }
 
     protected List<SProfileEntry> searchProfileEntries(final int fromIndex, final long profileId, final long parentId) throws SBonitaSearchException {
         final List<OrderByOption> orderByOptions = Collections
-                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilder.INDEX, OrderByType.ASC));
+                .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilder.PROFILE_ID, profileId));
-        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilder.PARENT_ID, parentId));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PROFILE_ID, profileId));
+        filters.add(new FilterOption(SProfileEntry.class, SProfileEntryBuilderFactory.PARENT_ID, parentId));
         final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, orderByOptions, filters, null);
         return profileService.searchProfileEntries(queryOptions);
     }
 
     private List<SProfileMember> searchProfileMembers(final int fromIndex, final long profileId, final String querySuffix) throws SBonitaSearchException {
         final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, Collections.singletonList(new OrderByOption(
-                SProfileMember.class, SProfileMemberBuilder.ID, OrderByType.ASC)), Collections.singletonList(new FilterOption(SProfileMember.class,
-                SProfileMemberBuilder.PROFILE_ID, profileId)), null);
+                SProfileMember.class, SProfileMemberBuilderFactory.ID, OrderByType.ASC)), Collections.singletonList(new FilterOption(SProfileMember.class,
+                        SProfileEntryBuilderFactory.PROFILE_ID, profileId)), null);
         return profileService.searchProfileMembers(querySuffix, queryOptions);
     }
 

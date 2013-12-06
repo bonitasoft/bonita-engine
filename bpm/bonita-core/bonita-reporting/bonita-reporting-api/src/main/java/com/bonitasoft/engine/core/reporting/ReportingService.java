@@ -45,8 +45,6 @@ public interface ReportingService {
 
     void deleteReport(long reportId) throws SReportDeletionException, SReportNotFoundException;
 
-    SReportBuilder getReportBuilder();
-
     byte[] getReportContent(long reportId) throws SBonitaReadException, SReportNotFoundException;
 
 }

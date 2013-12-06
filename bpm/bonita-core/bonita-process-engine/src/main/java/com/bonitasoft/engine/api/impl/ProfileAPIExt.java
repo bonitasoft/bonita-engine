@@ -29,23 +29,24 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileEntryNotFoundException;
+import org.bonitasoft.engine.profile.ProfileSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.SProfileCreationException;
-import org.bonitasoft.engine.profile.SProfileNotFoundException;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfileMapping;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.SValidationException;
@@ -110,8 +111,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             throw new AlreadyExistsException("A profile with name \"" + name + "\" already exists");
         } catch (final SProfileNotFoundException sProfileNotFoundException) {
             try {
-                final SProfile profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, profileService.getSProfileBuilderAccessor()
-                        .getSProfileBuilder(), false, SessionInfos.getUserIdFromSession()));
+                final SProfile profile = profileService.createProfile(SPModelConvertor.constructSProfile(creator, false, SessionInfos.getUserIdFromSession()));
                 return SPModelConvertor.toProfile(profile);
             } catch (final SProfileCreationException e) {
                 throw new CreationException(e);
@@ -220,9 +220,6 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     private List<String> importInCaseReplaceOnDuplicate(final TransactionExecutor transactionExecutor, final ProfileService profileService,
             final IdentityService identityService, final List<ExportedProfile> exportedProfiles) throws ExecutionException {
         final List<String> warnings = new ArrayList<String>();
-        final SProfileBuilderAccessor builders = profileService.getSProfileBuilderAccessor();
-        final SProfileBuilder profileBuilder = builders.getSProfileBuilder();
-        final SProfileEntryBuilder sProfileEntryBuilder = builders.getSProfileEntryBuilder();
         final long importerId = SessionInfos.getUserIdFromSession();
         for (final ExportedProfile exportedProfile : exportedProfiles) {
             if (exportedProfile.getName() != null && !"".equals(exportedProfile.getName())) {
@@ -243,7 +240,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
                     }
                 }
                 // insert profile
-                final CreateProfile createProfile = new CreateProfile(profileService, profileBuilder, getProfileCreator(exportedProfile),
+                final CreateProfile createProfile = new CreateProfile(profileService, getProfileCreator(exportedProfile),
                         exportedProfile.isDefault(), importerId);
                 try {
                     transactionExecutor.execute(createProfile);
@@ -257,7 +254,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
                 final long profileId = newProfile.getId();
                 for (final ExportedParentProfileEntry parentProfileEntry : parentProfileEntries) {
                     final ProfileEntryCreator parentProfileEntryCreator = getProfileEntryCreator(parentProfileEntry, profileId, 0);
-                    final CreateProfileEntry createProfileEntry = new CreateProfileEntry(profileService, sProfileEntryBuilder, parentProfileEntryCreator);
+                    final CreateProfileEntry createProfileEntry = new CreateProfileEntry(profileService, parentProfileEntryCreator);
                     try {
                         transactionExecutor.execute(createProfileEntry);
                     } catch (final SBonitaException e) {
@@ -270,7 +267,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
                     if (childrenProEn != null && childrenProEn.size() > 0) {
                         for (final ExportedProfileEntry childProfileEntry : childrenProEn) {
                             final ProfileEntryCreator childProfileEntryCreator = getProfileEntryCreator(childProfileEntry, profileId, parentProfileEntryId);
-                            final CreateProfileEntry addProfileEntryTransactionc = new CreateProfileEntry(profileService, sProfileEntryBuilder,
+                            final CreateProfileEntry addProfileEntryTransactionc = new CreateProfileEntry(profileService,
                                     childProfileEntryCreator);
                             try {
                                 transactionExecutor.execute(addProfileEntryTransactionc);
@@ -346,17 +343,29 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
     }
 
     @Override
-    public Profile updateProfile(final long id, final ProfileUpdater updateDescriptor) throws UpdateException {
+    public Profile updateProfile(final long id, final ProfileUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
 
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
-
+        Serializable updatedName = updateDescriptor.getFields().get(ProfileUpdater.ProfileField.NAME);
+        if (updatedName != null) {
+            SearchResult<Profile> searchProfiles;
+            try {
+                searchProfiles = searchProfiles(new SearchOptionsBuilder(0, 1).differentFrom(ProfileSearchDescriptor.ID, id)
+                        .filter(ProfileSearchDescriptor.NAME, updatedName).done());
+                if (searchProfiles.getCount() > 0) {
+                    throw new AlreadyExistsException("A profile with the name '" + updatedName + "' already exists");
+                }
+            } catch (SearchException e) {
+                throw new UpdateException("Cannot check if a profile with the name '" + updatedName + "' already exists", e);
+            }
+        }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
 
-        final UpdateProfile updateProfile = new UpdateProfile(profileService, profileService.getSProfileBuilderAccessor().getSProfileUpdateBuilder(), id,
+        final UpdateProfile updateProfile = new UpdateProfile(profileService, id,
                 updateDescriptor, SessionInfos.getUserIdFromSession());
         try {
             updateProfile.execute();
@@ -379,10 +388,9 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
-        final SProfileEntryBuilder sProfileEntryBuilder = profileService.getSProfileBuilderAccessor().getSProfileEntryBuilder();
 
         SProfileEntry sProfileEntry;
-        final CreateProfileEntry createProfileEntry = new CreateProfileEntry(profileService, sProfileEntryBuilder, creator);
+        final CreateProfileEntry createProfileEntry = new CreateProfileEntry(profileService, creator);
         try {
             createProfileEntry.execute();
             sProfileEntry = createProfileEntry.getResult();
@@ -435,8 +443,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
         SProfileEntry sProfileEntry;
 
-        final UpdateProfileEntry updateProfileEntry = new UpdateProfileEntry(profileService, profileService.getSProfileBuilderAccessor()
-                .getSProfileEntryUpdateBuilder(), id, updateDescriptor);
+        final UpdateProfileEntry updateProfileEntry = new UpdateProfileEntry(profileService, id, updateDescriptor);
         try {
             updateProfileEntry.execute();
             sProfileEntry = updateProfileEntry.getResult();
