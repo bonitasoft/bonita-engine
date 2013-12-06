@@ -13,17 +13,17 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Emmanuel Duchastenier
@@ -57,11 +57,13 @@ public class SearchArchivedFlowNodeInstanceDescriptor extends SearchEntityDescri
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, new FieldDescriptor(SAFlowNodeInstance.class,
                 keyProvider.getSourceObjectIdKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL,
-   keyProvidereldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getTerminalKey()));
+                new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getTerminalKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.REACHED_STATE_DATE,
- keyProviderFieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getReachedStateDateKey()));
-        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ARCHIVE_DATE,keyProviderw FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getArchivedDateKey()));
-        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.STATE_IDkeyProvidernew FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getStateIdKey()));
+                new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getReachedStateDateKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ARCHIVE_DATE,
+                new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getArchivedDateKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.STATE_ID,
+                new FieldDescriptor(SAFlowNodeInstance.class, keyProvider.getStateIdKey()));
 
         final Set<String> tasksInstanceFields = new HashSet<String>(2);
         tasksInstanceFields.add(keyProvider.getNameKey());
