@@ -10,7 +10,7 @@
 
 	<artifactId>bonita-profile-impl-hibernate</artifactId>
 
-	<name>Bonita Scheduler: Hibernate Configuration Files</name>
+	<name>Bonita Profile: Hibernate Configuration Files</name>
 
 	<dependencies>
 		<dependency>

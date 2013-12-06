@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<query name="getNumberOfSTheme">
+		SELECT COUNT(theme)
+		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+	</query>
+
+	<query name="searchSTheme">
+		SELECT theme
+		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+	</query>
+	
+	<query name="getCurrentTheme">
+		SELECT theme
+		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		WHERE isDefault = FALSE
+			AND type = :type
+	</query>
+
+	<query name="getDefaultTheme">
+		SELECT theme
+		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		WHERE isDefault = TRUE
+			AND type = :type
+	</query>
+	
+</hibernate-mapping>
