@@ -60,12 +60,22 @@ public class SearchFilter implements Serializable {
     public SearchFilter(final SearchFilterOperation operation) throws IncorrectParameterException {
         this.operation = operation;
         if (!isUndefinedFieldNameAuthorized()) {
-            throw new IncorrectParameterException("search operator can only be AND or OR on the one-parameter SearchFilter constructor");
+            throw new IncorrectParameterException(
+                    "search operator can only be AND, OR, L_PARENTHESIS, R_PARENTHESIS and  on the one-parameter SearchFilter constructor");
         }
     }
 
     public boolean isUndefinedFieldNameAuthorized() {
-        return operation == SearchFilterOperation.AND || operation == SearchFilterOperation.OR;
+        switch (operation) {
+            case AND:
+            case OR:
+            case L_PARENTHESIS:
+            case R_PARENTHESIS:
+                return true;
+
+            default:
+                return false;
+        }
     }
 
     /**

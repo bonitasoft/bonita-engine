@@ -159,6 +159,16 @@ public class SearchOptionsBuilder {
         return this;
     }
 
+    public SearchOptionsBuilder leftParenthesis() {
+        options.addLeftParenthesis();
+        return this;
+    }
+
+    public SearchOptionsBuilder rightParenthesis() {
+        options.addRightParenthesis();
+        return this;
+    }
+
     /**
      * @param value
      * @return this builder itself

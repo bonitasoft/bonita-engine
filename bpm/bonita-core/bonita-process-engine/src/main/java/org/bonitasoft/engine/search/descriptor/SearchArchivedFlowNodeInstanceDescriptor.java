@@ -36,7 +36,7 @@ public class SearchArchivedFlowNodeInstanceDescriptor extends SearchEntityDescri
 
     public SearchArchivedFlowNodeInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders) {
         final SAFlowNodeInstanceBuilder flowNodeKeyProvider = bpmInstanceBuilders.getSAUserTaskInstanceBuilder();
-        archFlowNodeDescriptorKeys = new HashMap<String, FieldDescriptor>(9);
+        archFlowNodeDescriptorKeys = new HashMap<String, FieldDescriptor>(13);
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.NAME,
                 new FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getNameKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME,
@@ -57,6 +57,12 @@ public class SearchArchivedFlowNodeInstanceDescriptor extends SearchEntityDescri
                 flowNodeKeyProvider.getSourceObjectIdKey()));
         archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL,
                 new FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getTerminalKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.REACHED_STATE_DATE,
+                new FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getReachedStateDateKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.ARCHIVE_DATE,
+                new FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getArchivedDateKey()));
+        archFlowNodeDescriptorKeys.put(ArchivedFlowNodeInstanceSearchDescriptor.STATE_ID,
+                new FieldDescriptor(SAFlowNodeInstance.class, flowNodeKeyProvider.getStateIdKey()));
 
         final Set<String> tasksInstanceFields = new HashSet<String>(2);
         tasksInstanceFields.add(flowNodeKeyProvider.getNameKey());
