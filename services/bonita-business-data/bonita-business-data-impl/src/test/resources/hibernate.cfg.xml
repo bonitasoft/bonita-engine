@@ -4,6 +4,9 @@
 
 <hibernate-configuration>
 	<session-factory>
+		<property name="hibernate.current_session_context_class">jta</property>
+        <property name="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</property>
+        <property name="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.BTMTransactionManagerLookup</property>
 		<property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
 		<!-- Assume test is the database name -->
 		<property name="hibernate.connection.datasource">java:/comp/env/jdbc/PGDS1</property>

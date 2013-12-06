@@ -92,13 +92,9 @@ public class BusinessDataRepositoryImpl implements BusinessDataRespository {
 
     private void executeQueries(final String... sqlQuerys) {
         final Session session = getSession();
-        try {
-            for (final String sqlQuery : sqlQuerys) {
-                final SQLQuery query = session.createSQLQuery(sqlQuery);
-                query.executeUpdate();
-            }
-        } finally {
-            session.close();
+        for (final String sqlQuery : sqlQuerys) {
+            final SQLQuery query = session.createSQLQuery(sqlQuery);
+            query.executeUpdate();
         }
     }
 
@@ -113,39 +109,31 @@ public class BusinessDataRepositoryImpl implements BusinessDataRespository {
     @Override
     public <T> T find(final Class<T> entityClass, final Serializable primaryKey) throws BusinessDataNotFoundException {
         final Session session = getSession();
-        try {
-            final T entity = (T) session.get(entityClass, primaryKey, LockOptions.READ);
-            if (entity == null) {
-                throw new BusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
-            }
-            return entity;
-        } finally {
-            session.close();
+        final T entity = (T) session.get(entityClass, primaryKey, LockOptions.READ);
+        if (entity == null) {
+            throw new BusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
         }
+        return entity;
     }
 
     @Override
     public <T> T find(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) throws BusinessDataNotFoundException,
             NonUniqueResultException {
         final Session session = getSession();
+        final Query query = session.createQuery(qlString);
+        if (parameters != null) {
+            for (final Entry<String, Object> parameter : parameters.entrySet()) {
+                query.setParameter(parameter.getKey(), parameter.getValue());
+            }
+        }
         try {
-            final Query query = session.createQuery(qlString);
-            if (parameters != null) {
-                for (final Entry<String, Object> parameter : parameters.entrySet()) {
-                    query.setParameter(parameter.getKey(), parameter.getValue());
-                }
+            final T entity = (T) query.uniqueResult();
+            if (entity == null) {
+                throw new BusinessDataNotFoundException("Impossible to get data using query: " + qlString + " and parameters: " + parameters);
             }
-            try {
-                final T entity = (T) query.uniqueResult();
-                if (entity == null) {
-                    throw new BusinessDataNotFoundException("Impossible to get data using query: " + qlString + " and parameters: " + parameters);
-                }
-                return entity;
-            } catch (final org.hibernate.NonUniqueResultException nure) {
-                throw new NonUniqueResultException(nure);
-            }
-        } finally {
-            session.close();
+            return entity;
+        } catch (final org.hibernate.NonUniqueResultException nure) {
+            throw new NonUniqueResultException(nure);
         }
     }
 
@@ -153,7 +141,7 @@ public class BusinessDataRepositoryImpl implements BusinessDataRespository {
         if (sessionFactory == null) {
             throw new IllegalStateException("The BDR is not started");
         }
-        return sessionFactory.openSession();
+        return sessionFactory.getCurrentSession();
     }
 
     @Override
@@ -162,11 +150,7 @@ public class BusinessDataRepositoryImpl implements BusinessDataRespository {
             return;
         }
         final Session session = getSession();
-        try {
-            session.save(entity);
-        } finally {
-            session.close();
-        }
+        session.save(entity);
     }
 
 }
