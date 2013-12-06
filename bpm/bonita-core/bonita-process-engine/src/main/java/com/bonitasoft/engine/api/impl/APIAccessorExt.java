@@ -78,7 +78,7 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
 
     @Override
     public ThemeAPI getThemeAPI() {
-        return new ThemeAPIImpl();
+        return new ThemeAPIExt();
     }
 
 }

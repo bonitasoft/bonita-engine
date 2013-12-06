@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,20 +8,17 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
-import java.util.Date;
-
+import org.bonitasoft.engine.api.impl.ThemeAPIImpl;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.looknfeel.Theme;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ThemeAPI;
-import com.bonitasoft.engine.looknfeel.Theme;
 import com.bonitasoft.engine.looknfeel.ThemeCreator;
-import com.bonitasoft.engine.looknfeel.ThemeType;
 import com.bonitasoft.engine.looknfeel.ThemeUpdater;
-import com.bonitasoft.engine.looknfeel.exception.ThemeNotFoundException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
@@ -29,8 +26,9 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 /**
  * @author Celine Souchet
  */
-public class ThemeAPIImpl implements ThemeAPI {
+public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
 
+    @Override
     public TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -99,24 +97,6 @@ public class ThemeAPIImpl implements ThemeAPI {
         // } catch (final SBonitaException e) {
         // throw new UpdateException(e);
         // }
-    }
-
-    @Override
-    public Theme getCurrentTheme(ThemeType type) throws ThemeNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Theme getDefaultTheme(ThemeType type) throws ThemeNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Date getLastUpdateDate(ThemeType type) throws ThemeNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

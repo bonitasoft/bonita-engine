@@ -8,26 +8,21 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import java.util.Date;
-
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.looknfeel.Theme;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
-import com.bonitasoft.engine.looknfeel.Theme;
 import com.bonitasoft.engine.looknfeel.ThemeCreator;
-import com.bonitasoft.engine.looknfeel.ThemeType;
 import com.bonitasoft.engine.looknfeel.ThemeUpdater;
-import com.bonitasoft.engine.looknfeel.exception.ThemeNotFoundException;
 
 /**
  * Manage mobile and portal theme
  * 
  * @author Celine Souchet
  */
-public interface ThemeAPI {
+public interface ThemeAPI extends org.bonitasoft.engine.api.ThemeAPI {
 
     /**
      * Create a new theme
@@ -62,51 +57,5 @@ public interface ThemeAPI {
      * @since 6.2
      */
     Theme updateTheme(long id, ThemeUpdater themeUpdater) throws UpdateException, AlreadyExistsException;
-
-    /**
-     * Get the current theme for the specific type.
-     * 
-     * @param type
-     *            The type of the theme
-     * @return The theme
-     * @throws ThemeNotFoundException
-     *             If can't find a theme corresponding to the type
-     * @throws RetrieveException
-     *             If an exception occurs while retrieving the theme
-     * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
-     * @since 6.2
-     */
-    Theme getCurrentTheme(ThemeType type) throws ThemeNotFoundException;
-
-    /**
-     * Get the default theme for the specific type.
-     * 
-     * @param type
-     *            The type of the theme
-     * @return The theme
-     * @throws ThemeNotFoundException
-     *             If can't find a theme corresponding to the type
-     * @throws RetrieveException
-     *             If an exception occurs while retrieving the theme
-     * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
-     * @since 6.2
-     */
-    Theme getDefaultTheme(ThemeType type) throws ThemeNotFoundException;
-
-    /**
-     * Get the last updated date of the current theme for the specific type.
-     * 
-     * @param type
-     *            The type of theme
-     * @return The last updated date of the theme
-     * @throws ThemeNotFoundException
-     *             If can't find a theme corresponding to the type
-     * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
-     * @since 6.2
-     */
-    Date getLastUpdateDate(ThemeType type) throws ThemeNotFoundException;
 
 }
