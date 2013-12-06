@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -816,19 +816,19 @@
 			<scope>test</scope>
 		</dependency>
 
-        <dependency>
-            <groupId>org.bonitasoft.engine</groupId>
-            <artifactId>bonita-builder</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-builder</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<pluginManagement>
 			<plugins>
-                <!--This plugin's configuration is used to store Eclipse 
-                    m2e settings only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -850,21 +850,21 @@
 									</action>
 								</pluginExecution>
 								<pluginExecution>
-								  <pluginExecutionFilter>
-								    <groupId>
-								      org.apache.maven.plugins
-								    </groupId>
-								    <artifactId>
-								      maven-dependency-plugin
-								    </artifactId>
-								    <versionRange>[2.7,)</versionRange>
-								    <goals>
-								      <goal>unpack</goal>
-								    </goals>
-								  </pluginExecutionFilter>
-								  <action>
-								    <ignore></ignore>
-								  </action>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-dependency-plugin
+										</artifactId>
+										<versionRange>[2.7,)</versionRange>
+										<goals>
+											<goal>unpack</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
 								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
@@ -887,6 +887,9 @@
 							<target name="copy-bos-home">
 								<copy todir="${bonita.home}">
 									<fileset dir="${basedir}/home" />
+									<filterset>
+										<filter token="VERSION" value="${project.version}" />
+									</filterset>
 								</copy>
 							</target>
 						</configuration>
@@ -929,10 +932,8 @@
 						</goals>
 						<configuration>
 							<target name="copy-bpm-test-conf">
-                                <copy todir="${project.build.directory}/conf"
-                                    overwrite="true">
-                                    <fileset
-                                        dir="${basedir}/src/test/resources/conf" />
+								<copy todir="${project.build.directory}/conf" overwrite="true">
+									<fileset dir="${basedir}/src/test/resources/conf" />
 								</copy>
 							</target>
 						</configuration>
