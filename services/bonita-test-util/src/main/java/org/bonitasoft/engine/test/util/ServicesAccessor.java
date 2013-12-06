@@ -16,11 +16,7 @@ package org.bonitasoft.engine.test.util;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.Map;
-
-import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.ReflectException;
 
 /**
  * @author Matthieu Chaffotte
@@ -60,7 +56,7 @@ public final class ServicesAccessor {
         }
 
         try {
-            final FileFilter fileFilter = getFileFilter();
+            final FileFilter fileFilter = new ServicesFileFilter();
             final File[] listFiles = serviceFolder.listFiles(fileFilter);
             if (listFiles.length == 0) {
                 throw new RuntimeException("No file found");
@@ -70,24 +66,9 @@ public final class ServicesAccessor {
                 resources[i] = listFiles[i].getCanonicalPath();
             }
             return resources;
-        } catch (final ReflectException re) {
-            throw new RuntimeException(re);
         } catch (final IOException ioe) {
             throw new RuntimeException(ioe);
         }
-    }
-
-    private FileFilter getFileFilter() throws ReflectException {
-        FileFilter fileFilter;
-        final String fileFilterClassName = System.getProperty("bonita.file.filter");
-        if (fileFilterClassName == null) {
-            fileFilter = new ServicesFileFilter();
-        } else {
-            final Class<FileFilter> fileFilterClass = ClassReflector.getClass(FileFilter.class, fileFilterClassName);
-            final Constructor<FileFilter> constructor = ClassReflector.getConstructor(fileFilterClass);
-            fileFilter = ClassReflector.getInstance(constructor);
-        }
-        return fileFilter;
     }
 
     public <T> T getInstanceOf(final Class<T> clazz) {

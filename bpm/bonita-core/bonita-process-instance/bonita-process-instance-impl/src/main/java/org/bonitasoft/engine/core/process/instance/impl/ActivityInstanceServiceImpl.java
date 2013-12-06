@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
@@ -41,21 +42,23 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingLogBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -68,7 +71,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
@@ -107,19 +110,19 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     private static final int BATCH_SIZE = 100;
 
-    private final SUserTaskInstanceBuilder sUserTaskInstanceBuilder;
+    private final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder;
 
-    private final SMultiInstanceActivityInstanceBuilder sMultiInstanceActivityInstanceBuilder;
+    private final SMultiInstanceActivityInstanceBuilderFactory sMultiInstanceActivityInstanceBuilder;
 
     private final ArchiveService archiveService;
 
     public ActivityInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final ArchiveService archiveService,
-            final EventService eventService, final BPMInstanceBuilders instanceBuilders, final QueriableLoggerService queriableLoggerService,
+            final EventService eventService, final QueriableLoggerService queriableLoggerService,
             final TechnicalLoggerService logger) {
-        super(recorder, persistenceRead, eventService, instanceBuilders, queriableLoggerService, logger);
+        super(recorder, persistenceRead, eventService, queriableLoggerService, logger);
         this.archiveService = archiveService;
-        sUserTaskInstanceBuilder = instanceBuilders.getSUserTaskInstanceBuilder();
-        sMultiInstanceActivityInstanceBuilder = instanceBuilders.getSMultiInstanceActivityInstanceBuilder();
+        sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
+        sMultiInstanceActivityInstanceBuilder = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class);
     }
 
     @Override
@@ -128,8 +131,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             final InsertRecord insertRecord = new InsertRecord(activityInstance);
             SInsertEvent insertEvent = null;
             if (getEventService().hasHandlers(ACTIVITYINSTANCE, EventActionType.CREATED)) {
-                final SEventBuilder eventBuilder = getEventService().getEventBuilder();
-                insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(ACTIVITYINSTANCE).setObject(activityInstance).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ACTIVITYINSTANCE).setObject(activityInstance).done();
             }
             getRecorder().recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
@@ -163,11 +165,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             final long userId, final String description, final long dueDate, final STaskPriority priority) throws SActivityCreationException,
             SFlowNodeNotFoundException, SFlowNodeReadException {
         final SHumanTaskInstance parentUserTask = (SHumanTaskInstance) getFlowNodeInstance(userTaskId);
-        final SManualTaskInstanceBuilder manualTaskInstanceBuilder = getInstanceBuilders().getSManualTaskInstanceBuilder();
-        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getProcessDefinitionIndex());
-        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getRootProcessInstanceIndex());
-        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilder.getParentProcessInstanceIndex());
-        final SManualTaskInstanceBuilder createNewManualTaskInstance = manualTaskInstanceBuilder.createNewManualTaskInstance(name, flowNodeDefinitionId,
+        final SManualTaskInstanceBuilderFactory manualTaskInstanceBuilderFact = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class);
+        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getProcessDefinitionIndex());
+        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getRootProcessInstanceIndex());
+        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getParentProcessInstanceIndex());
+        final SManualTaskInstanceBuilder createNewManualTaskInstance = manualTaskInstanceBuilderFact.createNewManualTaskInstance(name, flowNodeDefinitionId,
                 parentUserTask.getRootContainerId(), userTaskId, parentUserTask.getActorId(), processDefinitionId, rootProcessInstanceId,
                 parentProcessInstanceId);
         createNewManualTaskInstance.setParentContainerId(userTaskId);
@@ -184,7 +186,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     protected SPendingActivityMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SPendingActivityMapping mapping) {
-        final SPendingActivityMappingLogBuilder logBuilder = instanceBuilders.getPendingActivityMappingLogBuilder();
+        final SPendingActivityMappingLogBuilder logBuilder = BuilderFactory.get(SPendingActivityMappingLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         logBuilder.activityInstanceId(mapping.getActivityId());
@@ -197,8 +199,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         final EventService eventService = getEventService();
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = getEventService().getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
         }
         try {
             getRecorder().recordInsert(insertRecord, insertEvent);
@@ -209,7 +210,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
     @Override
     public void deletePendingMappings(final long humanTaskInstanceId) throws SActivityModificationException {
-        final SEventBuilder eventBuilder = getEventService().getEventBuilder();
         List<SPendingActivityMapping> mappings = null;
         final boolean createEvents = getEventService().hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.DELETED);
         try {
@@ -217,7 +217,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
                 for (final SPendingActivityMapping mapping : mappings) {
                     SDeleteEvent deleteEvent = null;
                     if (createEvents) {
-                        deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
+                        deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PENDINGACTIVITYMAPPING).setObject(mapping).done();
                     }
                     try {
                         getRecorder().recordDelete(new DeleteRecord(mapping), deleteEvent);
@@ -234,7 +234,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     @Override
     public void deleteAllPendingMappings() throws SActivityModificationException {
         try {
-            final FilterOption filterOption = new FilterOption(SPendingActivityMapping.class, SPendingActivityMappingBuilder.ACTOR_ID, -1);
+            final FilterOption filterOption = new FilterOption(SPendingActivityMapping.class, SPendingActivityMappingBuilderFactory.ACTOR_ID, -1);
             final DeleteAllRecord record = new DeleteAllRecord(SPendingActivityMapping.class, Collections.singletonList(filterOption));
             getRecorder().recordDeleteAll(record);
         } catch (final SRecorderException e) {
@@ -437,7 +437,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
             SUpdateEvent updateEvent = null;
             if (getEventService().hasHandlers(ACTIVITYINSTANCE_ASSIGNEE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_ASSIGNEE).setObject(flowNodeInstance)
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_ASSIGNEE).setObject(flowNodeInstance)
                         .done();
             }
             try {
@@ -470,7 +470,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             throw new SActivityReadException(e);
         }
         if (selectOne == null) {
-            throw new SActivityInstanceNotFoundException(activityInstanceId);
+            throw new SActivityInstanceNotFoundException(activityInstanceId, stateId);
         }
         return selectOne;
     }
@@ -672,7 +672,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(loopInstance, descriptor);
         SUpdateEvent updateEvent = null;
         if (getEventService().hasHandlers(ACTIVITYINSTANCE_STATE, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(loopInstance).done();
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_STATE).setObject(loopInstance).done();
         }
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);
@@ -837,7 +837,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
 
         SUpdateEvent updateEvent = null;
         if (getEventService().hasHandlers(ACTIVITY_INSTANCE_TOKEN_COUNT, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(ACTIVITY_INSTANCE_TOKEN_COUNT).setObject(activityInstance)
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITY_INSTANCE_TOKEN_COUNT).setObject(activityInstance)
                     .done();
         }
         try {
@@ -867,14 +867,12 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             throw new SActivityInstanceNotFoundException(activityInstanceId);
         }
 
-        final SHiddenTaskInstanceBuilder hiddenTaskBuilder = instanceBuilders.getSHiddenTaskInstanceBuilder();
-        final SHiddenTaskInstance hiddenTask = hiddenTaskBuilder.createNewInstance(activityInstanceId, userId).done();
+        final SHiddenTaskInstance hiddenTask = BuilderFactory.get(SHiddenTaskInstanceBuilderFactory.class).createNewInstance(activityInstanceId, userId).done();
         final InsertRecord insertRecord = new InsertRecord(hiddenTask);
         final EventService eventService = getEventService();
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(HIDDEN_TASK, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(HIDDEN_TASK).setObject(hiddenTask).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(HIDDEN_TASK).setObject(hiddenTask).done();
         }
 
         try {
@@ -899,8 +897,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
             final DeleteRecord deleteRecord = new DeleteRecord(hiddenTask);
             SDeleteEvent deleteEvent = null;
             if (getEventService().hasHandlers(HIDDEN_TASK, EventActionType.DELETED)) {
-                final SEventBuilder eventBuilder = getEventService().getEventBuilder();
-                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(HIDDEN_TASK).setObject(hiddenTask).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(HIDDEN_TASK).setObject(hiddenTask).done();
             }
             getRecorder().recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {
@@ -982,7 +979,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     }
 
     protected SHiddenTaskInstanceLogBuilder getHiddenTaskQueriableLog(final ActionType actionType, final String message, final SHiddenTaskInstance hiddenTask) {
-        final SHiddenTaskInstanceLogBuilder logBuilder = instanceBuilders.getHiddenTaskInstanceLogBuilder();
+        final SHiddenTaskInstanceLogBuilder logBuilder = BuilderFactory.get(SHiddenTaskInstanceLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         logBuilder.activityInstanceId(hiddenTask.getActivityId());
@@ -1044,7 +1041,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
     @Override
     public void deleteArchivedPendingMappings(final long flowNodeInstanceId) {
         // TODO archived pending mapping... first we need to have archived pending mapping and so on
-        // final SEventBuilder eventBuilder = getEventService().getEventBuilder();
+        // final SEventBuilder eventBuilder = BuilderFactory.get(SEventBuilderFactory.class);
         // List<SPendingActivityMapping> mappings = null;
         // try {
         // while ((mappings = getPendingMappings(flowNodeInstanceId, new QueryOptions(0, BATCH_SIZE))).size() > 0) {
@@ -1071,7 +1068,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         descriptor.addField(sUserTaskInstanceBuilder.getAbortedByBoundaryEventIdKey(), boundaryEventId);
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(activityInstance, descriptor);
-        final SUpdateEvent updateEvent = (SUpdateEvent) getEventService().getEventBuilder().createUpdateEvent(STATE_CATEGORY).setObject(activityInstance)
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(STATE_CATEGORY).setObject(activityInstance)
                 .done();
         try {
             getRecorder().recordUpdate(updateRecord, updateEvent);

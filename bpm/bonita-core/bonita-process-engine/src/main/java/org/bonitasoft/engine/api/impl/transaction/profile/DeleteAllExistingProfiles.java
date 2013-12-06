@@ -24,7 +24,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfile;
 
 /**
@@ -45,7 +45,7 @@ public class DeleteAllExistingProfiles implements TransactionContent {
     @Override
     public void execute() throws SBonitaException {
         final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(new OrderByOption(SProfile.class,
-                SProfileBuilder.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
+                SProfileBuilderFactory.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
         do {
             profiles = profileService.searchProfiles(queryOptions);
             for (final SProfile sProfile : profiles) {

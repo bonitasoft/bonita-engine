@@ -6,11 +6,10 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilder;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
@@ -21,11 +20,8 @@ public class DependencyServiceTest extends CommonServiceTest {
 
     private static DependencyService dependencyService;
 
-    private static DependencyBuilder dependencyModelBuilder;
-
     static {
         dependencyService = getServicesBuilder().buildDependencyService();
-        dependencyModelBuilder = getServicesBuilder().buildDependencyModelBuilder();
     }
 
     private final String defaultName = "abc";
@@ -37,7 +33,7 @@ public class DependencyServiceTest extends CommonServiceTest {
     private final byte[] defaultValue = new byte[] { 12, 33 };
 
     private SDependency buildDefaultDependency() {
-        return dependencyModelBuilder.createNewInstance(defaultName, defaultVersion, defaultFileName, defaultValue).done();
+        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(defaultName, defaultVersion, defaultFileName, defaultValue).done();
     }
 
     @Test
@@ -50,8 +46,8 @@ public class DependencyServiceTest extends CommonServiceTest {
         assertEquals(dependency, dependencyService.getDependency(dependency.getId()));
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(dependencyModelBuilder.getDescriptionKey(), "updated description");
-        descriptor.addField(dependencyModelBuilder.getFileNameKey(), "updated filename");
+        descriptor.addField(BuilderFactory.get(SDependencyBuilderFactory.class).getDescriptionKey(), "updated description");
+        descriptor.addField(BuilderFactory.get(SDependencyBuilderFactory.class).getFileNameKey(), "updated filename");
 
         dependencyService.updateDependency(dependency, descriptor);
 

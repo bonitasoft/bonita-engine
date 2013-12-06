@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
@@ -39,16 +38,15 @@ public class SUserFilterDefinitionImpl extends SNamedElementImpl implements SUse
 
     /**
      * @param userFilter
-     * @param sExpressionBuilders
      */
-    public SUserFilterDefinitionImpl(final UserFilterDefinition userFilter, final SExpressionBuilders sExpressionBuilders) {
+    public SUserFilterDefinitionImpl(final UserFilterDefinition userFilter) {
         super(userFilter.getName());
         filterId = userFilter.getUserFilterId();
         version = userFilter.getVersion();
         inputs = new HashMap<String, SExpression>(userFilter.getInputs().size());
         for (final Entry<String, Expression> input : userFilter.getInputs().entrySet()) {
             final Expression value = input.getValue();
-            final SExpression sExpression = ServerModelConvertor.convertExpression(sExpressionBuilders, value);
+            final SExpression sExpression = ServerModelConvertor.convertExpression(value);
             inputs.put(input.getKey(), sExpression);
         }
     }

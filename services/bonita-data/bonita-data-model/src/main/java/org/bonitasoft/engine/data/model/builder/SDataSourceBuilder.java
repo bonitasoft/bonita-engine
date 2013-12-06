@@ -21,20 +21,8 @@ import org.bonitasoft.engine.data.model.SDataSourceState;
  */
 public interface SDataSourceBuilder {
 
-    SDataSourceBuilder createNewInstance(final String name, final String version, final SDataSourceState state, final String implementationClassName);
-
     SDataSourceBuilder setState(SDataSourceState state);
 
     SDataSource done();
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getVersionKey();
-
-    String getImplementationClassNameKey();
-
-    String getStateKey();
 
 }

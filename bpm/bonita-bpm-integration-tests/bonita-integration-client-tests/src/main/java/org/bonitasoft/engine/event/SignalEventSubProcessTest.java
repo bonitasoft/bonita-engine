@@ -168,7 +168,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         final Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStep.getId(), expressions);
         assertEquals("childActivityVar", expressionResults.get(dataName));
 
-        disableAndDeleteProcess(process.getId());
+        disableAndDeleteProcess(process);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal" }, jira = "ENGINE-536")
@@ -187,14 +187,16 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, SUB_PROCESS_NAME, false);
         final ActivityInstance subStep = waitForUserTask(SUB_STEP, processInstance);
-        final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
-
-        activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
-        assertEquals(2, activities.size());
+        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
         // the parent process instance is supposed to be aborted, so no more waiting events are expected
         checkNumberOfWaitingEvents(SUB_PROCESS_START, 0);
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
+        assertEquals(2, activities.size());
+        assertEquals(SUB_PROCESS_NAME, activities.get(0).getName());
+        assertEquals(SUB_STEP, activities.get(1).getName());
+
+        final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         assignAndExecuteStep(subStep, john.getId());
         waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
@@ -203,7 +205,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         // check that the transition wasn't taken
         checkWasntExecuted(processInstance, PARENT_END);
 
-        disableAndDeleteProcess(process.getId());
+        disableAndDeleteProcess(process);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal",
@@ -219,7 +221,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         waitForUserTask(SUB_STEP, processInstance);
 
-        disableAndDeleteProcess(process.getId());
+        disableAndDeleteProcess(process);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal" }, jira = "ENGINE-536")
@@ -240,7 +242,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         // the parent process instance has completed, so no more waiting events are expected
         checkNumberOfWaitingEvents(SUB_PROCESS_START, 0);
 
-        disableAndDeleteProcess(process.getId());
+        disableAndDeleteProcess(process);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal" }, jira = "ENGINE-536")
@@ -260,7 +262,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         waitForUserTask(SUB_STEP, processInstance2);
         Thread.sleep(50);
 
-        disableAndDeleteProcess(process.getId());
+        disableAndDeleteProcess(process);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal", "parent process data" }, jira = "ENGINE-536")
@@ -284,7 +286,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(processInstance, TestStates.getAbortedState());
 
-        disableAndDeleteProcess(process.getId());
+        disableAndDeleteProcess(process);
     }
 
     private void checkProcessDataInstance(final String dataName, final long processInstanceId, final Serializable expectedValue) throws DataNotFoundException {

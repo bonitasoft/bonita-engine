@@ -21,8 +21,6 @@ import java.util.List;
  */
 public interface SEnumationDataDefinitionBuilder extends AbstractSDataDefinitionBuilder {
 
-    SDataDefinitionBuilder createNewInstance(String name);
-
     SDataDefinitionBuilder enumarationValues(List<?> enumerationValues);
 
 }

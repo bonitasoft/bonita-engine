@@ -16,6 +16,7 @@ package org.bonitasoft.engine.queriablelogger.model.builder.impl;
 import static org.junit.Assert.assertEquals;
 
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogParameter;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogParameterBuilderFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,10 +32,10 @@ public class SQueriableLogParameterBuilderImplTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SQueriableLogParameterBuilderImplTest.class);
 
-    private final SQueriableLogParameterBuilderImpl builder;
+    private final SQueriableLogParameterBuilderFactory factory;
 
     public SQueriableLogParameterBuilderImplTest() {
-        builder = new SQueriableLogParameterBuilderImpl();
+        factory = new SQueriableLogParameterBuilderFactoryImpl();
     }
 
     @Rule
@@ -52,31 +53,31 @@ public class SQueriableLogParameterBuilderImplTest {
 
     @Test
     public void criateNewInstance() {
-        final SQueriableLogParameter parameter = builder.createNewInstance("returnValue", "String").done();
+        final SQueriableLogParameter parameter = factory.createNewInstance("returnValue", "String").done();
         assertEquals("returnValue", parameter.getName());
         assertEquals("String", parameter.getValueType());
     }
 
     @Test
     public void setStringValue() {
-        final SQueriableLogParameter parameter = builder.createNewInstance("returnValue", "String").stringValue("38").done();
+        final SQueriableLogParameter parameter = factory.createNewInstance("returnValue", "String").stringValue("38").done();
         assertEquals("38", parameter.getStringValue());
     }
 
     @Test
     public void setBlobValue() {
-        final SQueriableLogParameter parameter = builder.createNewInstance("returnValue", "String").blobValue("blobValue").done();
+        final SQueriableLogParameter parameter = factory.createNewInstance("returnValue", "String").blobValue("blobValue").done();
         assertEquals("blobValue", parameter.getBlobValue().getValue());
     }
 
     @Test(expected = MissingMandatoryFieldsException.class)
     public void failsIfNameIsNull() {
-        builder.createNewInstance(null, "Integer").done();
+        factory.createNewInstance(null, "Integer").done();
     }
 
     @Test(expected = MissingMandatoryFieldsException.class)
     public void failsIfValueType() {
-        builder.createNewInstance("name", null).done();
+        factory.createNewInstance("name", null).done();
     }
 
 }

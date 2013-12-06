@@ -240,9 +240,9 @@ public class ProcessActorTest extends CommonAPITest {
         deleteUser(user);
     }
 
-    private ProcessDefinition preparationBeforeTest(final String ACTOR_NAME) throws Exception {
+    private ProcessDefinition preparationBeforeTest(final String actorName) throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        processBuilder.setActorInitiator(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        processBuilder.setActorInitiator(actorName).addDescription(DESCRIPTION).addUserTask("userTask1", actorName);
         final DesignProcessDefinition processDefinition = processBuilder.done();
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
@@ -251,7 +251,7 @@ public class ProcessActorTest extends CommonAPITest {
             file.delete();
             BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive.done(), file);
             final BusinessArchive archive = BusinessArchiveFactory.readBusinessArchive(file);
-            return deployAndEnableWithActor(archive.getProcessDefinition(), ACTOR_NAME, john);
+            return deployAndEnableWithActor(archive.getProcessDefinition(), actorName, john);
         } finally {
             file.delete();
         }

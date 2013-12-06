@@ -19,6 +19,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorMemberDeletionException;
 import org.bonitasoft.engine.actor.mapping.SActorMemberNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -27,7 +28,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
+import org.bonitasoft.engine.profile.builder.SProfileMemberBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 
 /**
@@ -43,18 +44,15 @@ public class DeleteRole extends DeleteWithActorMembers implements TransactionCon
 
     private final ProfileService profileService;
 
-    private final SProfileBuilderAccessor profileBuilderAccessor;
-
     private final long roleId;
 
     public DeleteRole(final IdentityService identityService, final ActorMappingService actorMappingService, final ProfileService profileService,
-            final long roleId, final SProfileBuilderAccessor profileBuilderAccessor) {
+            final long roleId) {
         super();
         this.identityService = identityService;
         this.actorMappingService = actorMappingService;
         this.roleId = roleId;
         this.profileService = profileService;
-        this.profileBuilderAccessor = profileBuilderAccessor;
     }
 
     @Override
@@ -73,7 +71,7 @@ public class DeleteRole extends DeleteWithActorMembers implements TransactionCon
     }
 
     private void deleteProfileMembers() throws SBonitaException {
-        final String field = profileBuilderAccessor.getSProfileMemberBuilder().getIdKey();
+        final String field = BuilderFactory.get(SProfileMemberBuilderFactory.class).getIdKey();
         List<SProfileMember> profileMembers;
         do {
             profileMembers = profileService.getProfileMembersOfRole(roleId, 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS, field, OrderByType.ASC);

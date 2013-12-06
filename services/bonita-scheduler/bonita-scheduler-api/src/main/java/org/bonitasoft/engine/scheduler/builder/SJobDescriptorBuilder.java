@@ -21,20 +21,8 @@ import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
  */
 public interface SJobDescriptorBuilder {
 
-    SJobDescriptorBuilder createNewInstance(String jobClassName, String jobName, boolean disallowConcurrentExecution);
-    
-    SJobDescriptorBuilder createNewInstance(String jobClassName, String jobName);
-
     SJobDescriptorBuilder setDescription(final String description);
 
     SJobDescriptor done();
-
-    String getIdKey();
-
-    String getJobClassNameKey();
-
-    String getJobNameKey();
-
-    String getDescriptionKey();
 
 }

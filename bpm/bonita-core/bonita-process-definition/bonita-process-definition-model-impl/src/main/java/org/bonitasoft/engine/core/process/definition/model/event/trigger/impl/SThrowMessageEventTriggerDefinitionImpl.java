@@ -22,9 +22,7 @@ import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -44,16 +42,15 @@ public class SThrowMessageEventTriggerDefinitionImpl extends SMessageEventTrigge
         sDataDefinitions = new ArrayList<SDataDefinition>();
     }
 
-    public SThrowMessageEventTriggerDefinitionImpl(final ThrowMessageEventTriggerDefinition throwMessageEventTrigger,
-            final SDataDefinitionBuilders sDataDefinitionBuilders, final SExpressionBuilders sExpressionBuilders) {
-        super(throwMessageEventTrigger, sDataDefinitionBuilders, sExpressionBuilders);
+    public SThrowMessageEventTriggerDefinitionImpl(final ThrowMessageEventTriggerDefinition throwMessageEventTrigger) {
+        super(throwMessageEventTrigger);
         final List<DataDefinition> dataDefinitions = throwMessageEventTrigger.getDataDefinitions();
         sDataDefinitions = new ArrayList<SDataDefinition>(dataDefinitions.size());
         for (final DataDefinition dataDefinition : dataDefinitions) {
-            sDataDefinitions.add(buildSDataDefinition(dataDefinition, sDataDefinitionBuilders, sExpressionBuilders));
+            sDataDefinitions.add(buildSDataDefinition(dataDefinition));
         }
-        targetProcess = ServerModelConvertor.convertExpression(sExpressionBuilders, throwMessageEventTrigger.getTargetProcess());
-        targetFlowNode = ServerModelConvertor.convertExpression(sExpressionBuilders, throwMessageEventTrigger.getTargetFlowNode());
+        targetProcess = ServerModelConvertor.convertExpression(throwMessageEventTrigger.getTargetProcess());
+        targetFlowNode = ServerModelConvertor.convertExpression(throwMessageEventTrigger.getTargetFlowNode());
     }
 
     @Override

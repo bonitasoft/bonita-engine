@@ -23,6 +23,4 @@ public interface SDataSourceParameterLogBuilder extends SPersistenceLogBuilder, 
 
     SDataSourceParameterLogBuilder dataSourceId(final long datasourceId);
 
-    String getDataSourceIdKey();
-
 }

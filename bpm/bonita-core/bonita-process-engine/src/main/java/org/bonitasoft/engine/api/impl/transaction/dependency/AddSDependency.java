@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.dependency;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilder;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
-import org.bonitasoft.engine.dependency.model.builder.DependencyMappingBuilder;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,8 +28,6 @@ import org.bonitasoft.engine.dependency.model.builder.DependencyMappingBuilder;
 public class AddSDependency implements TransactionContent {
 
     private final DependencyService dependencyService;
-
-    private final DependencyBuilderAccessor dependencyBuilderAccessor;
 
     private final String name;
 
@@ -39,10 +37,9 @@ public class AddSDependency implements TransactionContent {
 
     private final String artifactType;
 
-    public AddSDependency(final DependencyService dependencyService, final DependencyBuilderAccessor dependencyBuilderAccessor, final String name,
+    public AddSDependency(final DependencyService dependencyService, final String name,
             final byte[] jar, final long artifactId, final String artifactType) {
         this.dependencyService = dependencyService;
-        this.dependencyBuilderAccessor = dependencyBuilderAccessor;
         this.name = name;
         this.jar = jar;
         this.artifactId = artifactId;
@@ -51,11 +48,9 @@ public class AddSDependency implements TransactionContent {
 
     @Override
     public void execute() throws SDependencyException {
-        final DependencyBuilder dependencyBuilder = dependencyBuilderAccessor.getDependencyBuilder();
-        final SDependency sDependency = dependencyBuilder.createNewInstance(name, "1.0", name + ".jar", jar).done();
-        dependencyService.createDependency(sDependency);
-        final DependencyMappingBuilder dependencyMappingBuilder = dependencyBuilderAccessor.getDependencyMappingBuilder();
-        final SDependencyMapping sDependencyMapping = dependencyMappingBuilder.createNewInstance(sDependency.getId(), artifactId, artifactType).done();
+        final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, "1.0", name + ".jar", jar).done();
+        dependencyService.createDependency(sDependency);;
+        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), artifactId, artifactType).done();
         dependencyService.createDependencyMapping(sDependencyMapping);
     }
 

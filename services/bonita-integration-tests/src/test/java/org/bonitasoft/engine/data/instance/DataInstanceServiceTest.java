@@ -15,13 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
+import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
@@ -29,18 +31,20 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
+import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.model.SDataSource;
 import org.bonitasoft.engine.data.model.SDataSourceState;
 import org.bonitasoft.engine.data.model.builder.SDataSourceBuilder;
+import org.bonitasoft.engine.data.model.builder.SDataSourceBuilderFactory;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -52,36 +56,35 @@ import org.junit.Test;
  * @author Emmanuel Duchastenier
  */
 @SuppressWarnings("javadoc")
-public class DataInstanceServiceTest extends CommonServiceTest {
+public abstract class DataInstanceServiceTest extends CommonServiceTest {
 
     private static final Map<Integer, Object> EMPTY_RESOLVED_EXPRESSIONS = Collections.<Integer, Object> emptyMap();
 
-    private static ExpressionService expressionService;
+    protected static ExpressionService expressionService;
 
-    private static DataInstanceService dataInstanceService;
+    protected DataInstanceService dataInstanceService;
 
-    private static SDataInstanceBuilders dataInstanceBuilders;
+    protected static DataService dataSourceService;
 
-    private static SDataDefinitionBuilders dataDefinitionBuilders;
+    protected static SDataSourceBuilderFactory dataSourceBuilderFactory;
 
-    private static SExpressionBuilders sExpressionBuilders;
+    protected static SDataSourceBuilder dataSourceBuilder;
 
-    private static DataService dataSourceService;
+    protected static SDataSource dataSource;
 
-    private static SDataSourceBuilder dataSourceBuilder;
+    protected static SDataSource transientDataSource;
 
-    private static SDataSource dataSource;
-
-    private static SDataSource transientDataSource;
+    protected abstract DataInstanceService getDataInstanceServiceImplementation();
 
     static {
         expressionService = getServicesBuilder().buildExpressionService();
-        sExpressionBuilders = getServicesBuilder().getInstanceOf(SExpressionBuilders.class);
-        dataInstanceService = getServicesBuilder().buildDataInstanceService();
-        dataInstanceBuilders = getServicesBuilder().builderSDataInstanceBuilder();
-        dataDefinitionBuilders = getServicesBuilder().builderSDataDefinitionBuilders();
         dataSourceService = getServicesBuilder().buildDataService();
-        dataSourceBuilder = getServicesBuilder().buildDataSourceModelBuilder();
+        dataSourceBuilderFactory = BuilderFactory.get(SDataSourceBuilderFactory.class);
+    }
+
+    @Before
+    public void setupDataInstanceService() {
+        dataInstanceService = getDataInstanceServiceImplementation();
     }
 
     @BeforeClass
@@ -95,7 +98,8 @@ public class DataInstanceServiceTest extends CommonServiceTest {
     private static SDataSource createDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion,
             final Class<? extends DataInstanceDataSource> clazz) throws Exception {
         getTransactionService().begin();
-        final SDataSource dataSource = dataSourceBuilder.createNewInstance(dataSourceName, dataSourceVersion, SDataSourceState.ACTIVE, clazz.getName()).done();
+        final SDataSource dataSource = dataSourceBuilderFactory.createNewInstance(dataSourceName, dataSourceVersion, SDataSourceState.ACTIVE, clazz.getName())
+                .done();
         dataSourceService.createDataSource(dataSource);
         getTransactionService().complete();
         return dataSource;
@@ -119,13 +123,12 @@ public class DataInstanceServiceTest extends CommonServiceTest {
     private SDataInstance buildDataInstance(final String instanceName, final String className, final String description, final String content,
             final long containerId, final String containerType, final boolean isTransient) throws SBonitaException {
         // create definition
-        final SDataDefinitionBuilder dataDefinitionBuilder = dataDefinitionBuilders.getDataDefinitionBuilder();
-        dataDefinitionBuilder.createNewInstance(instanceName, className);
+        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, className);
         initializeBuilder(dataDefinitionBuilder, description, content, className, isTransient);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
 
         // create data instance
-        final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition);
+        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
     }
@@ -133,12 +136,11 @@ public class DataInstanceServiceTest extends CommonServiceTest {
     private SDataInstance buildDataInstanceConstant(final String instanceName, final String className, final String description, final String content,
             final long containerId, final String containerType, final boolean isTransient) throws SBonitaException {
         // create definition
-        final SDataDefinitionBuilder dataDefinitionBuilder = dataDefinitionBuilders.getDataDefinitionBuilder();
-        dataDefinitionBuilder.createNewInstance(instanceName, className);
+        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, className);
         initializeBuilderConstant(dataDefinitionBuilder, description, content, className, isTransient);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
         // create datainstance
-        final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition);
+        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.setContainerId(containerId).setContainerType(containerType).done();
     }
@@ -153,12 +155,12 @@ public class DataInstanceServiceTest extends CommonServiceTest {
     private SDataInstance buildLongTextDataInstance(final String instanceName, final String description, final String content, final long containerId,
             final String containerType, final Boolean isTransient) throws SBonitaException {
         // create definition
-        final SDataDefinitionBuilder dataDefinitionBuilder = dataDefinitionBuilders.getDataDefinitionBuilder();
-        dataDefinitionBuilder.createNewTextData(instanceName).setAsLongText(true);
+        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewTextData(instanceName)
+                .setAsLongText(true);
 
         initializeBuilder(dataDefinitionBuilder, description, content, String.class.getName(), isTransient);
         final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
-        final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition)
+        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition)
                 .setContainerId(containerId).setContainerType(containerType);
         // create data instance
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
@@ -171,7 +173,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         final SDataDefinition dataDefinition = buildDataDefinition(instanceName, description, namespace, xmlElement, content, String.class.getName());
 
         // create data instance
-        final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder().createNewInstance(dataDefinition)
+        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition)
                 .setContainerId(containerId).setContainerType(containerType);
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.done();
@@ -179,14 +181,14 @@ public class DataInstanceServiceTest extends CommonServiceTest {
 
     private SDataDefinition buildDataDefinition(final String instanceName, final String description, final String namespace, final String xmlElement,
             final String content, final String defaultValueReturnType) throws SInvalidExpressionException {
-        final SXMLDataDefinitionBuilder dataDefinitionBuilder = dataDefinitionBuilders.getXMLDataDefinitionBuilder();
-        dataDefinitionBuilder.createNewXMLData(instanceName).setNamespace(namespace).setElement(xmlElement);
+        final SXMLDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class).createNewXMLData(instanceName)
+                .setNamespace(namespace).setElement(xmlElement);
         dataDefinitionBuilder.setDescription(description);
         dataDefinitionBuilder.setTransient(false);
         SExpression expression = null;
         if (content != null) {
             // create expression
-            final SExpressionBuilder expreBuilder = sExpressionBuilders.getExpressionBuilder().createNewInstance();
+            final SExpressionBuilder expreBuilder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
             // this discrimination'll be changed.
             expreBuilder.setContent(content).setReturnType(defaultValueReturnType).setExpressionType(SExpression.TYPE_READ_ONLY_SCRIPT)
                     .setInterpreter(SExpression.GROOVY);
@@ -201,7 +203,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         SExpression expression = null;
         if (content != null) {
             // create expression
-            final SExpressionBuilder expreBuilder = sExpressionBuilders.getExpressionBuilder().createNewInstance();
+            final SExpressionBuilder expreBuilder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
             // this discrimination'll be changed.
             expreBuilder.setContent(content).setReturnType(defaultValueReturnType).setExpressionType(SExpression.TYPE_READ_ONLY_SCRIPT)
                     .setInterpreter(SExpression.GROOVY);
@@ -218,7 +220,7 @@ public class DataInstanceServiceTest extends CommonServiceTest {
         SExpression expression = null;
         if (content != null) {
             // create expression
-            final SExpressionBuilder expreBuilder = sExpressionBuilders.getExpressionBuilder().createNewInstance();
+            final SExpressionBuilder expreBuilder = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance();
             // this discrimination'll be changed.
             expreBuilder.setContent(content).setReturnType(defaultValueReturnType).setExpressionType(SExpression.TYPE_CONSTANT);
             expression = expreBuilder.done();
@@ -250,9 +252,9 @@ public class DataInstanceServiceTest extends CommonServiceTest {
     private EntityUpdateDescriptor getUpdateDescriptor(final String description, final Serializable newValue) {
         // update data instance
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        final SDataInstanceBuilder dataInstanceBuilder = dataInstanceBuilders.getDataInstanceBuilder();
-        updateDescriptor.addField(dataInstanceBuilder.getValueKey(), newValue);
-        updateDescriptor.addField(dataInstanceBuilder.getDescriptionKey(), description);
+        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
+        updateDescriptor.addField(fact.getValueKey(), newValue);
+        updateDescriptor.addField(fact.getDescriptionKey(), description);
 
         return updateDescriptor;
     }

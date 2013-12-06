@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
@@ -26,9 +27,8 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
-import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SEndEventDefinitionBuilder;
-import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowErrorEventTriggerDefinitionBuilder;
+import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SEndEventDefinitionBuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowErrorEventTriggerDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
@@ -37,8 +37,8 @@ import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -92,7 +92,6 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     protected void setContainerInFail(final Map<String, Object> context) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
-        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -102,7 +101,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
         final SFlowNodeInstance intTxflowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         ProcessArchiver.archiveFlowNodeInstance(intTxflowNodeInstance, false, processDefinitionId, processInstanceService, processDefinitionService,
-                archiveService, bpmInstanceBuilders, dataInstanceService, activityInstanceService, connectorInstanceService);
+                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService);
         activityInstanceService.setState(intTxflowNodeInstance, flowNodeStateManager.getFailedState());
     }
 
@@ -111,12 +110,10 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
             throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
-        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
-        final SEndEventInstanceBuilder endEventInstanceBuilder = bpmInstanceBuilders.getSEndEventInstanceBuilder();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-        final SEndEventInstanceBuilder builder = endEventInstanceBuilder.createNewEndEventInstance(eventDefinition.getName(), eventDefinition.getId(),
+        final SEndEventInstanceBuilder builder = BuilderFactory.get(SEndEventInstanceBuilderFactory.class).createNewEndEventInstance(eventDefinition.getName(), eventDefinition.getId(),
                 sFlowNodeInstance.getRootContainerId(), sFlowNodeInstance.getParentContainerId(), processDefinitionId, sFlowNodeInstance.getRootContainerId(),
                 sFlowNodeInstance.getParentContainerId());
         builder.setParentActivityInstanceId(flowNodeInstanceId);
@@ -134,9 +131,6 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     private void handleErrorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Throwable throwable)
             throws SBonitaException {
-        final BPMDefinitionBuilders bpmDefinitionBuilders = getBPMDefinitionBuilders(context);
-        final SThrowErrorEventTriggerDefinitionBuilder errorEventTriggerDefinitionBuilder = bpmDefinitionBuilders.getThrowErrorEventTriggerDefinitionBuilder();
-        final SEndEventDefinitionBuilder sEndEventDefinitionBuilder = bpmDefinitionBuilders.getSEndEventDefinitionBuilder();
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -146,9 +140,9 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
         // create a fake definition
         final String errorCode = sConnectorDefinition.getErrorCode();
-        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = errorEventTriggerDefinitionBuilder.createNewInstance(errorCode).done();
+        final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory.get(SThrowErrorEventTriggerDefinitionBuilderFactory.class).createNewInstance(errorCode).done();
         // event definition as the error code as name, this way we don't need to find the connector that throw this error
-        final SEndEventDefinition eventDefinition = sEndEventDefinitionBuilder.createNewInstance(errorCode)
+        final SEndEventDefinition eventDefinition = BuilderFactory.get(SEndEventDefinitionBuilderFactory.class).createNewInstance(errorCode)
                 .addErrorEventTriggerDefinition(errorEventTriggerDefinition).done();
         // create an instance using this definition
         final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(context, eventDefinition);

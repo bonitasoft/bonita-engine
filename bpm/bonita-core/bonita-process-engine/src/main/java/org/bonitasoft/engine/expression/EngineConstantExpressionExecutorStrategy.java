@@ -36,6 +36,9 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -158,7 +161,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
             if (ExpressionConstants.PROCESS_DEFINITION_ID.equals(expressionConstant)) {
                 return (Serializable) dependencyValues.get(SExpressionContext.processDefinitionIdKey);
             } else if (DataInstanceContainer.ACTIVITY_INSTANCE.toString().equals(containerType)) {
-                return evaluteUsingActivityInstanceContainer(expressionConstant, dependencyValues, containerId);
+                return evaluateUsingActivityInstanceContainer(expressionConstant, dependencyValues, containerId);
             } else {
                 return evaluateUsingProcessInstanceContainer(expressionConstant, dependencyValues, containerId);
             }
@@ -180,7 +183,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         }
     }
 
-    private Serializable evaluteUsingActivityInstanceContainer(final ExpressionConstants expressionConstant, final Map<String, Object> dependencyValues,
+    private Serializable evaluateUsingActivityInstanceContainer(final ExpressionConstants expressionConstant, final Map<String, Object> dependencyValues,
             final long containerId) throws SExpressionEvaluationException {
         if (ExpressionConstants.ACTIVITY_INSTANCE_ID.equals(expressionConstant)) {
             return containerId;
@@ -209,21 +212,36 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         }
     }
 
-    private void fillDependenciesFromFlowNodeInstance(final Map<String, Object> dependencyValues, final long flowNodeInstanceId)
-            throws SExpressionEvaluationException {
+    void fillDependenciesFromFlowNodeInstance(final Map<String, Object> dependencyValues, final long flowNodeInstanceId) throws SExpressionEvaluationException {
         try {
-            final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-            dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), flowNodeInstance.getLogicalGroup(3));
-            dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), flowNodeInstance.getLogicalGroup(1));
-            if (isHumanTask(flowNodeInstance)) {
-                final SHumanTaskInstance taskInstance = (SHumanTaskInstance) flowNodeInstance;
-                dependencyValues.put(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(), taskInstance.getAssigneeId());
+            if (dependencyValues.get("time") != null) {
+                SAActivityInstance aActivityInstance = activityInstanceService.getMostRecentArchivedActivityInstance(flowNodeInstanceId);
+                dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), aActivityInstance.getLogicalGroup(3));
+                dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), aActivityInstance.getLogicalGroup(1));
+                if (isHumanTask(aActivityInstance)) {
+                    final SAHumanTaskInstance saHumanTask = (SAHumanTaskInstance) aActivityInstance;
+                    dependencyValues.put(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(), saHumanTask.getAssigneeId());
+                }
+            } else {
+                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+                dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), flowNodeInstance.getLogicalGroup(3));
+                dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), flowNodeInstance.getLogicalGroup(1));
+                if (isHumanTask(flowNodeInstance)) {
+                    final SHumanTaskInstance taskInstance = (SHumanTaskInstance) flowNodeInstance;
+                    dependencyValues.put(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(), taskInstance.getAssigneeId());
+                }
             }
         } catch (final SFlowNodeReadException e) {
-            throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineExecutionContext as EngineConstantExpression", e);
+            throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineConstantExpression context", e);
         } catch (final SFlowNodeNotFoundException e) {
-            throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineExecutionContext as EngineConstantExpression", e);
+            throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineConstantExpression context", e);
+        } catch (SActivityInstanceNotFoundException e) {
+            throw new SExpressionEvaluationException("Error retrieving activity instance while building EngineConstantExpression context", e);
         }
+    }
+
+    private boolean isHumanTask(final SAFlowNodeInstance aFlowNodeInstance) {
+        return SFlowNodeType.USER_TASK.equals(aFlowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(aFlowNodeInstance.getType());
     }
 
     private boolean isHumanTask(final SFlowNodeInstance flowNodeInstance) {

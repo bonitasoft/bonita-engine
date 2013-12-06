@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskInstance;
 
 /**
@@ -21,8 +20,5 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAReceiveTaskIn
  */
 public interface SAReceiveTaskInstanceBuilder extends SAActivityInstanceBuilder {
 
-    SAReceiveTaskInstanceBuilder createNewReceiveTaskInstance(SReceiveTaskInstance sReceiveTaskInstance);
-
-    @Override
     SAReceiveTaskInstance done();
 }

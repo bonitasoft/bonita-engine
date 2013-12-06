@@ -22,8 +22,6 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public interface SThrowMessageEventTriggerDefinitionBuilder {
 
-    SThrowMessageEventTriggerDefinitionBuilder createNewInstance(final String name, final SExpression targetProcessName, final SExpression targetFlowNodeName);
-
     SThrowMessageEventTriggerDefinitionBuilder addCorrelation(final SExpression key, final SExpression value);
 
     SThrowMessageEventTriggerDefinitionBuilder addData(SDataDefinition dataDefinition);

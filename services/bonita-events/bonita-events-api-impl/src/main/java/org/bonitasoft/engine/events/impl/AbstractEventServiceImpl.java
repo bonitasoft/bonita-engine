@@ -13,18 +13,14 @@ import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public abstract class AbstractEventServiceImpl implements EventService {
 
-    protected final SEventBuilders eventBuilders;
     protected final TechnicalLoggerService logger;
 
-    protected AbstractEventServiceImpl(final SEventBuilders eventBuilders, final TechnicalLoggerService logger) {
-        this.eventBuilders = eventBuilders;
+    protected AbstractEventServiceImpl(final TechnicalLoggerService logger) {
         this.logger = logger;
     }
 
@@ -168,11 +164,6 @@ public abstract class AbstractEventServiceImpl implements EventService {
         HashSet<SHandler<SEvent>> hashSet = new HashSet<SHandler<SEvent>>(handlers.size());
         hashSet.addAll(handlers);
         return hashSet;
-    }
-
-    @Override
-    public final SEventBuilder getEventBuilder() {
-        return eventBuilders.getEventBuilder();
     }
 
     @Override

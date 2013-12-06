@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-process-instance</artifactId>
 		<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-process-instance-api</artifactId>
@@ -28,5 +28,10 @@
 	  		<artifactId>bonita-expression-resolver-api</artifactId>
 	  		<version>${project.version}</version>
 	  	</dependency>
+	  	<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			 <scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

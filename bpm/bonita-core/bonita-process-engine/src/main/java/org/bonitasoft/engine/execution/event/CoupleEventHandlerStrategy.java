@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
@@ -24,8 +25,7 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProvider;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProviderBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -40,14 +40,11 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
  */
 public abstract class CoupleEventHandlerStrategy extends EventHandlerStrategy {
 
-    private final BPMInstanceBuilders instanceBuilders;
-
     private final EventInstanceService eventInstanceService;
 
     private static final int MAX_NUMBER_OF_RESULTS = 100;
 
-    public CoupleEventHandlerStrategy(final BPMInstanceBuilders instanceBuilders, final EventInstanceService eventInstanceService) {
-        this.instanceBuilders = instanceBuilders;
+    public CoupleEventHandlerStrategy(final EventInstanceService eventInstanceService) {
         this.eventInstanceService = eventInstanceService;
     }
 
@@ -56,28 +53,25 @@ public abstract class CoupleEventHandlerStrategy extends EventHandlerStrategy {
             final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessIsnstance)
             throws SBonitaException {
         if (!eventDefinition.getEventTriggers().isEmpty()) {
-            final SWaitingEventKeyProvider waitingEventKeyProvider = instanceBuilders.getSWaitingMessageEventBuilder();
-            unregisterWaitingEvents(SWaitingEvent.class, waitingEventKeyProvider, subProcessId, parentProcessIsnstance);
+            unregisterWaitingEvents(SWaitingEvent.class, subProcessId, parentProcessIsnstance);
         }
     }
 
-    private QueryOptions getWaitingEventsCountOptions(final SWaitingEventKeyProvider waitingEventKeyProvider,
-            final Class<? extends SWaitingEvent> waitingEventClass, final long subProcessId, final SProcessInstance parentProcessInstance) {
-        final List<FilterOption> filters = getFilterForWaitingEventsToUnregister(waitingEventKeyProvider, waitingEventClass, subProcessId,
+    private QueryOptions getWaitingEventsCountOptions(final Class<? extends SWaitingEvent> waitingEventClass, final long subProcessId, final SProcessInstance parentProcessInstance) {
+        final List<FilterOption> filters = getFilterForWaitingEventsToUnregister(waitingEventClass, subProcessId,
                 parentProcessInstance);
         return new QueryOptions(filters, null);
     }
 
-    private QueryOptions getWaitingEventsQueryOptions(final SWaitingEventKeyProvider waitingEventKeyProvider,
-            final Class<? extends SWaitingEvent> waitingEventClass, final long subProcessId, final SProcessInstance parentProcessInstance) {
-        final OrderByOption orderByOption = new OrderByOption(waitingEventClass, waitingEventKeyProvider.getIdKey(), OrderByType.ASC);
-        final List<FilterOption> filters = getFilterForWaitingEventsToUnregister(waitingEventKeyProvider, waitingEventClass, subProcessId,
+    private QueryOptions getWaitingEventsQueryOptions(final Class<? extends SWaitingEvent> waitingEventClass, final long subProcessId, final SProcessInstance parentProcessInstance) {
+        final OrderByOption orderByOption = new OrderByOption(waitingEventClass, BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class).getIdKey(), OrderByType.ASC);
+        final List<FilterOption> filters = getFilterForWaitingEventsToUnregister(waitingEventClass, subProcessId,
                 parentProcessInstance);
         return new QueryOptions(0, MAX_NUMBER_OF_RESULTS, Collections.singletonList(orderByOption), filters, null);
     }
 
-    private List<FilterOption> getFilterForWaitingEventsToUnregister(final SWaitingEventKeyProvider waitingEventKeyProvider,
-            final Class<? extends SWaitingEvent> waitingEventClass, final long subProcessId, final SProcessInstance parentProcessInstance) {
+    private List<FilterOption> getFilterForWaitingEventsToUnregister(final Class<? extends SWaitingEvent> waitingEventClass, final long subProcessId, final SProcessInstance parentProcessInstance) {
+        final SWaitingEventKeyProviderBuilderFactory waitingEventKeyProvider = BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class);
         final List<FilterOption> filters = new ArrayList<FilterOption>(3);
         filters.add(new FilterOption(waitingEventClass, waitingEventKeyProvider.getSubProcessIdKey(), subProcessId));
         filters.add(new FilterOption(waitingEventClass, waitingEventKeyProvider.getParentProcessInstanceIdKey(), parentProcessInstance.getId()));
@@ -85,10 +79,10 @@ public abstract class CoupleEventHandlerStrategy extends EventHandlerStrategy {
         return filters;
     }
 
-    private <T extends SWaitingEvent> void unregisterWaitingEvents(final Class<T> waitingEventClass, final SWaitingEventKeyProvider waitingEventKeyProvider,
+    private <T extends SWaitingEvent> void unregisterWaitingEvents(final Class<T> waitingEventClass,
             final long subProcessId, final SProcessInstance parentProcessInstance) throws SBonitaSearchException, SWaitingEventModificationException {
-        final QueryOptions queryOptions = getWaitingEventsQueryOptions(waitingEventKeyProvider, waitingEventClass, subProcessId, parentProcessInstance);
-        final QueryOptions countOptions = getWaitingEventsCountOptions(waitingEventKeyProvider, waitingEventClass, subProcessId, parentProcessInstance);
+        final QueryOptions queryOptions = getWaitingEventsQueryOptions(waitingEventClass, subProcessId, parentProcessInstance);
+        final QueryOptions countOptions = getWaitingEventsCountOptions(waitingEventClass, subProcessId, parentProcessInstance);
         long count = 0;
         List<T> waitingEvents;
         do {
@@ -106,10 +100,6 @@ public abstract class CoupleEventHandlerStrategy extends EventHandlerStrategy {
 
     protected EventInstanceService getEventInstanceService() {
         return eventInstanceService;
-    }
-
-    protected BPMInstanceBuilders getInstanceBuilders() {
-        return instanceBuilders;
     }
 
 }

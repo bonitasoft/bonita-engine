@@ -23,12 +23,11 @@ import org.bonitasoft.engine.core.process.document.model.impl.SAProcessDocumentI
  */
 public class SAProcessDocumentBuilderImpl implements SAProcessDocumentBuilder {
 
-    private SAProcessDocumentImpl processDocument;
+    private final SAProcessDocumentImpl processDocument;
 
-    @Override
-    public SAProcessDocumentBuilder createNewInstance() {
-        this.processDocument = new SAProcessDocumentImpl();
-        return this;
+    public SAProcessDocumentBuilderImpl(final SAProcessDocumentImpl processDocument) {
+        super();
+        this.processDocument = processDocument;
     }
 
     @Override

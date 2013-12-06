@@ -19,7 +19,4 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event;
  */
 public interface SIntermediateThrowEventInstanceBuilder extends SEventInstanceBuilder {
 
-    SIntermediateThrowEventInstanceBuilder createNewIntermediateThrowEventInstance(final String name, final long flowNodeDefinitionId,
-            final long rootContainerId, long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
-
 }

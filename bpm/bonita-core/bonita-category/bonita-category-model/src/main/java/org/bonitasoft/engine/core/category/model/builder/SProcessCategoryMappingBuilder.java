@@ -20,14 +20,6 @@ import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
  */
 public interface SProcessCategoryMappingBuilder {
 
-    SProcessCategoryMappingBuilder createNewInstance(long categoryId, long processId);
-
     SProcessCategoryMapping done();
-
-    String getIdKey();
-
-    String getCategoryIdKey();
-
-    String getProcessIdKey();
 
 }

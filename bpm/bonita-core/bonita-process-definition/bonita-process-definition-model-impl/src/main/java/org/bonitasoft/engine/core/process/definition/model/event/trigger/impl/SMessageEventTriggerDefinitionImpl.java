@@ -22,6 +22,7 @@ import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
 import org.bonitasoft.engine.bpm.flownode.CorrelationDefinition;
 import org.bonitasoft.engine.bpm.flownode.MessageEventTriggerDefinition;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCatchMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SCorrelationDefinition;
@@ -29,9 +30,9 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SMessageEventTriggerDefinition;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilderFactory;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -59,13 +60,12 @@ public class SMessageEventTriggerDefinitionImpl extends SEventTriggerDefinitionI
         this.correlations = trigger.getCorrelations();
     }
 
-    public SMessageEventTriggerDefinitionImpl(final MessageEventTriggerDefinition messageEventTrigger, final SDataDefinitionBuilders sDataDefinitionBuilder,
-            final SExpressionBuilders sExpressionBuilders) {
+    public SMessageEventTriggerDefinitionImpl(final MessageEventTriggerDefinition messageEventTrigger) {
         messageName = messageEventTrigger.getMessageName();
         correlations = new ArrayList<SCorrelationDefinition>(messageEventTrigger.getCorrelations().size());
         for (final CorrelationDefinition correlation : messageEventTrigger.getCorrelations()) {
-            correlations.add(new SCorrelationDefinitionImpl(ServerModelConvertor.convertExpression(sExpressionBuilders, correlation.getKey()),
-                    ServerModelConvertor.convertExpression(sExpressionBuilders, correlation.getValue())));
+            correlations.add(new SCorrelationDefinitionImpl(ServerModelConvertor.convertExpression(correlation.getKey()),
+                    ServerModelConvertor.convertExpression(correlation.getValue())));
         }
     }
 
@@ -87,28 +87,28 @@ public class SMessageEventTriggerDefinitionImpl extends SEventTriggerDefinitionI
         correlations.add(correlation);
     }
 
-    protected SDataDefinition buildSDataDefinition(final DataDefinition dataDefinition, final SDataDefinitionBuilders dataDefinitionBuilders,
-            final SExpressionBuilders sExpressionBuilders) {
+    protected SDataDefinition buildSDataDefinition(final DataDefinition dataDefinition) {
         if (isXMLDataDefinition(dataDefinition)) {
             final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
-            final SXMLDataDefinitionBuilder xmlDataDefinitionBuilder = dataDefinitionBuilders.getXMLDataDefinitionBuilder();
-            xmlDataDefinitionBuilder.createNewXMLData(messageName).setElement(xmlDataDef.getElement()).setNamespace(xmlDataDef.getNamespace());
-            xmlDataDefinitionBuilder.setDefaultValue(ServerModelConvertor.convertExpression(sExpressionBuilders, dataDefinition.getDefaultValueExpression()));
-            xmlDataDefinitionBuilder.setDescription(dataDefinition.getDescription());
-            xmlDataDefinitionBuilder.setTransient(dataDefinition.isTransientData());
-            return xmlDataDefinitionBuilder.done();
+            final SXMLDataDefinitionBuilderFactory fact = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class);
+            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(messageName).setElement(xmlDataDef.getElement()).setNamespace(xmlDataDef.getNamespace());
+            builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
+            builder.setDescription(dataDefinition.getDescription());
+            builder.setTransient(dataDefinition.isTransientData());
+            return builder.done();
         } else {
-            final SDataDefinitionBuilder dataDefinitionBuilder = dataDefinitionBuilders.getDataDefinitionBuilder();
+            final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
+            SDataDefinitionBuilder builder = null;
             if (isTextDataDefinition(dataDefinition)) {
                 final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
-                dataDefinitionBuilder.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
+                builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
             } else {
-                dataDefinitionBuilder.createNewInstance(dataDefinition.getName(), dataDefinition.getClassName());
+                builder = fact.createNewInstance(dataDefinition.getName(), dataDefinition.getClassName());
             }
-            dataDefinitionBuilder.setDefaultValue(ServerModelConvertor.convertExpression(sExpressionBuilders, dataDefinition.getDefaultValueExpression()));
-            dataDefinitionBuilder.setDescription(dataDefinition.getDescription());
-            dataDefinitionBuilder.setTransient(dataDefinition.isTransientData());
-            return dataDefinitionBuilder.done();
+            builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
+            builder.setDescription(dataDefinition.getDescription());
+            builder.setTransient(dataDefinition.isTransientData());
+            return builder.done();
         }
     }
 

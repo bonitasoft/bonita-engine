@@ -19,10 +19,12 @@ import java.util.Map.Entry;
 
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater.ProcessDeploymentInfoField;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
+import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -34,17 +36,14 @@ public class UpdateProcessDeploymentInfo implements TransactionContent {
 
     private final ProcessDefinitionService processDefinitionService;
 
-    private final SProcessDefinitionDeployInfoUpdateBuilder processDeploymentInfoUpdateBuilder;
-
     private final long processId;
 
     private final ProcessDeploymentInfoUpdater processDeploymentInfoUpdateDescriptor;
 
     public UpdateProcessDeploymentInfo(final ProcessDefinitionService processDefinitionService,
-            final SProcessDefinitionDeployInfoUpdateBuilder processDeploymentInfoUpdateBuilder, final long processId,
+            final long processId,
             final ProcessDeploymentInfoUpdater processDeploymentInfoUpdateDescriptor) {
         this.processDefinitionService = processDefinitionService;
-        this.processDeploymentInfoUpdateBuilder = processDeploymentInfoUpdateBuilder;
         this.processId = processId;
         this.processDeploymentInfoUpdateDescriptor = processDeploymentInfoUpdateDescriptor;
     }
@@ -55,6 +54,7 @@ public class UpdateProcessDeploymentInfo implements TransactionContent {
     }
 
     private EntityUpdateDescriptor buildDescriptor() {
+        final SProcessDefinitionDeployInfoUpdateBuilder processDeploymentInfoUpdateBuilder = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance();
         final Map<ProcessDeploymentInfoField, Serializable> updatedFieldsMap = processDeploymentInfoUpdateDescriptor.getFields();
         for (final Entry<ProcessDeploymentInfoField, Serializable> field : updatedFieldsMap.entrySet()) {
             switch (field.getKey()) {

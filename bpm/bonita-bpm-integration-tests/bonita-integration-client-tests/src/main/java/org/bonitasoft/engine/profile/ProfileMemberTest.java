@@ -196,4 +196,48 @@ public class ProfileMemberTest extends AbstractProfileTest {
         getProfileAPI().searchProfileMembers("plop", null);
     }
 
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "User", "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-1989")
+    @Test
+    public void searchUserProfileMembersOfUser() throws BonitaException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileMemberSearchDescriptor.USER_ID, user1.getId());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("user", builder.done());
+        assertEquals(1, searchedProfileMember.getResult().size());
+        assertEquals("User1FirstName", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
+        assertEquals("User1LastName", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
+        assertEquals("userName1", searchedProfileMember.getResult().get(0).getDisplayNamePart3());
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Group", "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-2023")
+    @Test
+    public void searchUserProfileMembersOfGroup() throws BonitaException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileMemberSearchDescriptor.GROUP_ID, group1.getId());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("group", builder.done());
+        assertEquals(1, searchedProfileMember.getResult().size());
+        assertEquals("group1", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-2023")
+    @Test
+    public void searchUserProfileMembersOfRole() throws BonitaException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileMemberSearchDescriptor.ROLE_ID, role1.getId());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("role", builder.done());
+        assertEquals(1, searchedProfileMember.getResult().size());
+        assertEquals("role1", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
+    }
+
+    @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile member", "Role", "Group", "Search" }, story = "Search user profile members for profile.", jira = "ENGINE-2023")
+    @Test
+    public void searchUserProfileMembersOfRoleAndGroup() throws BonitaException {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.filter(ProfileMemberSearchDescriptor.ROLE_ID, role3.getId());
+        builder.filter(ProfileMemberSearchDescriptor.GROUP_ID, group3.getId());
+        final SearchResult<ProfileMember> searchedProfileMember = getProfileAPI().searchProfileMembers("roleAndGroup", builder.done());
+        assertEquals(1, searchedProfileMember.getResult().size());
+        assertEquals("role3", searchedProfileMember.getResult().get(0).getDisplayNamePart1());
+        assertEquals("group3", searchedProfileMember.getResult().get(0).getDisplayNamePart2());
+    }
+
 }

@@ -8,13 +8,14 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.category.exception.SCategoryAlreadyExistsException;
 import org.bonitasoft.engine.core.category.exception.SCategoryCreationException;
 import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
 import org.bonitasoft.engine.core.category.model.SCategory;
-import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryUpdateBuilder;
+import org.bonitasoft.engine.core.category.model.builder.SCategoryUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -27,13 +28,10 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
 
     private static CategoryService categoryService;
 
-    private final SCategoryBuilderAccessor categoryModelBuilderAccessor;
-
     private static TransactionService transactionService;
 
     public CategoryServiceIntegrationTest() {
         categoryService = getServicesBuilder().getCategoryService();
-        categoryModelBuilderAccessor = getServicesBuilder().getCategoryModelBuilderAccessor();
         transactionService = getServicesBuilder().getTransactionService();
     }
 
@@ -128,7 +126,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
         final String newName = "updatedName";
         final String newDescription = "updatedDescription";
 
-        final SCategoryUpdateBuilder updateBuilder = categoryModelBuilderAccessor.getCategoryUpdateBuilder();
+        final SCategoryUpdateBuilder updateBuilder = BuilderFactory.get(SCategoryUpdateBuilderFactory.class).createNewInstance();
         updateBuilder.updateName(newName).updateDescription(newDescription);
         categoryService.updateCategory(categoryId, updateBuilder.done());
         transactionService.complete();
@@ -149,7 +147,7 @@ public class CategoryServiceIntegrationTest extends CommonBPMServicesTest {
         final long categoryId = 1;
         final String newName = "updatedName";
         final String newDescription = "updatedDescription";
-        final SCategoryUpdateBuilder updateBuilder = categoryModelBuilderAccessor.getCategoryUpdateBuilder();
+        final SCategoryUpdateBuilder updateBuilder = BuilderFactory.get(SCategoryUpdateBuilderFactory.class).createNewInstance();
         updateBuilder.updateName(newName).updateDescription(newDescription);
 
         transactionService.begin();

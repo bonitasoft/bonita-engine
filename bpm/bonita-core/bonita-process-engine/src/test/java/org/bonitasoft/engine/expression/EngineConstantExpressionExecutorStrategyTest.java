@@ -15,6 +15,7 @@ package org.bonitasoft.engine.expression;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -78,8 +80,8 @@ public class EngineConstantExpressionExecutorStrategyTest {
 
     }
 
-    private void taskAssigneeOnHumanTask(final SFlowNodeType flowNodeType, final SHumanTaskInstance humanTaskInstance)
-            throws SExpressionEvaluationException, SFlowNodeNotFoundException, SFlowNodeReadException {
+    private void taskAssigneeOnHumanTask(final SFlowNodeType flowNodeType, final SHumanTaskInstance humanTaskInstance) throws SExpressionEvaluationException,
+            SFlowNodeNotFoundException, SFlowNodeReadException {
         final SExpression expression = mock(SExpression.class);
 
         when(activityInstanceService.getFlowNodeInstance(containerId)).thenReturn(humanTaskInstance);
@@ -214,4 +216,21 @@ public class EngineConstantExpressionExecutorStrategyTest {
         strategy.validate(expression);
     }
 
+    @Test
+    public void fillDependenciesOnArchivedFlowNodeDoesNotThrowException() throws Exception {
+        final SAActivityInstance saai = mock(SAActivityInstance.class);
+
+        when(activityInstanceService.getMostRecentArchivedActivityInstance(anyLong())).thenReturn(saai);
+        when(saai.getType()).thenReturn(SFlowNodeType.AUTOMATIC_TASK);
+        long arbitraryValue = 123456L;
+        when(saai.getLogicalGroup(anyInt())).thenReturn(arbitraryValue);
+
+        final Map<String, Object> dependencies = new HashMap<String, Object>(defaultDependencyValues);
+        dependencies.put("time", System.currentTimeMillis());
+
+        final EngineConstantExpressionExecutorStrategy strategy = new EngineConstantExpressionExecutorStrategy(activityInstanceService, null, null, null);
+        strategy.fillDependenciesFromFlowNodeInstance(dependencies, 54);
+        assertEquals(arbitraryValue, dependencies.get(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName()));
+        assertEquals(arbitraryValue, dependencies.get(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName()));
+    }
 }

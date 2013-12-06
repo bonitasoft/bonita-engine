@@ -21,7 +21,12 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class SCategoryUpdateBuilderImpl implements SCategoryUpdateBuilder {
 
-    private final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+    private final EntityUpdateDescriptor descriptor;
+
+    public SCategoryUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
+        super();
+        this.descriptor = descriptor;
+    }
 
     @Override
     public EntityUpdateDescriptor done() {
@@ -30,14 +35,18 @@ public class SCategoryUpdateBuilderImpl implements SCategoryUpdateBuilder {
 
     @Override
     public SCategoryUpdateBuilder updateName(final String name) {
-        this.descriptor.addField(SCategoryBuilderImpl.NAME, name);
+        this.descriptor.addField(SCategoryBuilderFactoryImpl.NAME, name);
         return this;
     }
 
     @Override
     public SCategoryUpdateBuilder updateDescription(final String description) {
-        this.descriptor.addField(SCategoryBuilderImpl.DESCRIPTION, description);
+        this.descriptor.addField(SCategoryBuilderFactoryImpl.DESCRIPTION, description);
         return this;
+    }
+
+    public static SCategoryUpdateBuilder getInstance() {
+        return new SCategoryUpdateBuilderImpl(null);
     }
 
 }

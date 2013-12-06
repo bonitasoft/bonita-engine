@@ -13,18 +13,14 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance;
 
 /**
  * @author Hongwen Zang
  * @author Matthieu Chaffotte
  */
-public interface SAGatewayInstanceBuilder extends SAActivityInstanceBuilder {
+public interface SAGatewayInstanceBuilder extends SAFlowNodeInstanceBuilder {
 
-    SAGatewayInstanceBuilder createNewGatewayInstance(SGatewayInstance sGatewayInstance);
-
-    @Override
     SAGatewayInstance done();
 
 }

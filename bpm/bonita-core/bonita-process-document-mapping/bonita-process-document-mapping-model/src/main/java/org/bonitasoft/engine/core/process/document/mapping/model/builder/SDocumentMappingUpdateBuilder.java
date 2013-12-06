@@ -20,8 +20,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public interface SDocumentMappingUpdateBuilder {
 
-    SDocumentMappingUpdateBuilder createNewInstance();
-
     SDocumentMappingUpdateBuilder setDocumentName(String documentName);
 
     SDocumentMappingUpdateBuilder setDocumentAuthor(long author);

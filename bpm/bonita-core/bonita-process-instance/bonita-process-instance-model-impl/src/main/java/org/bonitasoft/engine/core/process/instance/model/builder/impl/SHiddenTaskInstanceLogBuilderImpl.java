@@ -33,30 +33,15 @@ public class SHiddenTaskInstanceLogBuilderImpl extends CRUDELogBuilder implement
     }
 
     @Override
-    public String getObjectIdKey() {
-        return "numericIndex3";
-    }
-
-    @Override
     public SHiddenTaskInstanceLogBuilder activityInstanceId(final long activityInstanceId) {
         queriableLogBuilder.numericIndex(0, activityInstanceId);
         return this;
     }
 
     @Override
-    public String getActivityInstanceIdKey() {
-        return "numericIndex1";
-    }
-
-    @Override
     public SHiddenTaskInstanceLogBuilder userId(final long userId) {
         queriableLogBuilder.numericIndex(1, userId);
         return this;
-    }
-
-    @Override
-    public String getUserIdKey() {
-        return "numericIndex2";
     }
 
     @Override

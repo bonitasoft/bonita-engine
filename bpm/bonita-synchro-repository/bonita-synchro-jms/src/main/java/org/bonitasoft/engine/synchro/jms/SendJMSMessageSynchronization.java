@@ -47,7 +47,7 @@ public class SendJMSMessageSynchronization implements BonitaTransactionSynchroni
     public void afterCompletion(final TransactionState status) {
         if (status == TransactionState.COMMITTED) {
         	try {
-	            jmsProducer.sendMessage(event, id);
+	            jmsProducer.sendMessage(event, Long.toString(id));
             } catch (JMSException e) {
 	            e.printStackTrace();
 	            throw new RuntimeException(e);

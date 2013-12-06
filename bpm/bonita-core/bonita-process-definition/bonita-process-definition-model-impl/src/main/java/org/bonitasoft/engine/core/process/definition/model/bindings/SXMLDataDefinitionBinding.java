@@ -15,9 +15,10 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
+import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilderFactory;
 
 /**
  * @author Matthieu Chaffotte
@@ -27,10 +28,6 @@ public class SXMLDataDefinitionBinding extends SDataDefinitionBinding {
     private String namespace;
 
     private String element;
-
-    public SXMLDataDefinitionBinding(final SDataDefinitionBuilders builder) {
-        super(builder);
-    }
 
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
@@ -45,8 +42,7 @@ public class SXMLDataDefinitionBinding extends SDataDefinitionBinding {
 
     @Override
     public SDataDefinition getObject() {
-        final SXMLDataDefinitionBuilder xmlDataDefinitionBuilder = builder.getXMLDataDefinitionBuilder();
-        final SXMLDataDefinitionBuilder dataDefinitionImpl = xmlDataDefinitionBuilder.createNewXMLData(name);
+        final SXMLDataDefinitionBuilder dataDefinitionImpl = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class).createNewXMLData(name);
         if (description != null) {
             dataDefinitionImpl.setDescription(description);
         }

@@ -20,11 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilder;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -44,14 +45,11 @@ public class DocumentMappingServiceTest extends CommonBPMServicesTest {
 
     private static DocumentMappingService documentMappingService;
 
-    private static SDocumentMappingBuilderAccessor documentMappingBuilderAccessor;
-
     private static TransactionService transactionService;
 
     static {
         bpmServicesBuilder = new BPMServicesBuilder();
         documentMappingService = bpmServicesBuilder.getDocumentMappingService();
-        documentMappingBuilderAccessor = bpmServicesBuilder.getDocumentMappingBuilderAccessor();
         transactionService = bpmServicesBuilder.getTransactionService();
     }
 
@@ -171,7 +169,7 @@ public class DocumentMappingServiceTest extends CommonBPMServicesTest {
     }
 
     private SDocumentMapping buildDocumentMapping(final int i) {
-        final SDocumentMappingBuilder builder = documentMappingBuilderAccessor.getSDocumentMappingBuilder().createNewInstance();
+        final SDocumentMappingBuilder builder = BuilderFactory.get(SDocumentMappingBuilderFactory.class).createNewInstance();
         builder.setDocumentAuthor(i);
         builder.setDocumentContentFileName("getContentTest.txt");
         builder.setDocumentContentMimeType("text/plain");

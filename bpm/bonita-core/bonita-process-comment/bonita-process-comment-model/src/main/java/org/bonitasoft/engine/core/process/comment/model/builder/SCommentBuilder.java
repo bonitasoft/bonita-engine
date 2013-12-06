@@ -21,23 +21,9 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
  */
 public interface SCommentBuilder {
 
-    SCommentBuilder createNewInstance(final long processInstanceId, final String comment, final Long userId);
-
     SCommentBuilder setUserId(final long userId);
 
     SCommentBuilder setPostDate(final long postDate);
-
-    String getIdKey();
-
-    String getUserIdKey();
-
-    String getProcessInstanceIdKey();
-
-    String getPostDateKey();
-
-    String getContentKey();
-
-    String getKindKey();
 
     SComment done();
 

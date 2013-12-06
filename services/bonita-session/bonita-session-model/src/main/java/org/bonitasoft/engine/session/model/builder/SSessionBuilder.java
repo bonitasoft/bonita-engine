@@ -23,10 +23,6 @@ import org.bonitasoft.engine.session.model.SSession;
  */
 public interface SSessionBuilder {
 
-    SSession copy(SSession session);
-
-    SSessionBuilder createNewInstance(long id, long tenantId, long duration, String userName, String productVersion, String applicationName, long userId);
-
     SSessionBuilder lastRenewDate(Date lastRenewDate);
 
     SSessionBuilder technicalUser(boolean technicalUser);

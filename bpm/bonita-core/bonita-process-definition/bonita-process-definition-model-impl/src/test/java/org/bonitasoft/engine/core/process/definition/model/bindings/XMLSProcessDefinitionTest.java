@@ -2,7 +2,8 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.core.process.definition.model.builder.impl.SProcessDefinitionBuilderImpl;
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilderFactory;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -18,6 +19,6 @@ public class XMLSProcessDefinitionTest {
         processDefinitionBuilder.addAutomaticTask("task").addOperation(new LeftOperandBuilder().createNewInstance("myData").done(), OperatorType.ASSIGNMENT,
                 "=", null, null);
 
-        new SProcessDefinitionBuilderImpl().createNewInstance(processDefinitionBuilder.done(), null, null, null).done();
+        BuilderFactory.get(SProcessDefinitionBuilderFactory.class).createNewInstance(processDefinitionBuilder.done()).done();
     }
 }

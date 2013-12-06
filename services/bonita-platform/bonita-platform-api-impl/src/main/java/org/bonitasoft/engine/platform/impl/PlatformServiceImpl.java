@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.commons.CollectionUtil;
@@ -47,8 +48,9 @@ import org.bonitasoft.engine.platform.STenantException;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.SPlatform;
+import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
@@ -67,8 +69,6 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final List<TenantPersistenceService> tenantPersistenceServices;
 
-    private final STenantBuilder tenantBuilder;
-
     private final TechnicalLoggerService logger;
 
     private final boolean trace;
@@ -77,13 +77,16 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final PlatformCacheService platformCacheService;
 
+    private final SPlatformProperties sPlatformProperties;
+
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final List<TenantPersistenceService> tenantPersistenceServices,
-            final STenantBuilder tenantBuilder, final TechnicalLoggerService logger, final PlatformCacheService platformCacheService) {
+			final TechnicalLoggerService logger, final PlatformCacheService platformCacheService,
+            final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
-        this.tenantBuilder = tenantBuilder;
         this.logger = logger;
         this.platformCacheService = platformCacheService;
+        this.sPlatformProperties = sPlatformProperties;
         trace = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
         error = logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR);
     }
@@ -498,7 +501,7 @@ public class PlatformServiceImpl implements PlatformService {
         }
         STenant tenant;
         try {
-            final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(tenantBuilder.getNameKey(), name);
+            final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), name);
             tenant = platformPersistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class));
             if (tenant == null) {
                 throw new STenantNotFoundException("No tenant found with name: " + name);
@@ -612,7 +615,7 @@ public class PlatformServiceImpl implements PlatformService {
             return false;
         } else {
             final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-            desc.addField(tenantBuilder.getStatusKey(), ACTIVATED);
+            desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), ACTIVATED);
             try {
                 platformPersistenceService.update(desc);
                 if (trace) {
@@ -641,7 +644,7 @@ public class PlatformServiceImpl implements PlatformService {
         }
         final STenant tenant = getTenant(tenantId);
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        desc.addField(tenantBuilder.getStatusKey(), DEACTIVATED);
+        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), DEACTIVATED);
         try {
             platformPersistenceService.update(desc);
             if (trace) {
@@ -757,6 +760,11 @@ public class PlatformServiceImpl implements PlatformService {
             }
             throw new STenantUpdateException("Unable to clean tenant tables: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public SPlatformProperties getSPlatformProperties() {
+        return sPlatformProperties;
     }
 
 }

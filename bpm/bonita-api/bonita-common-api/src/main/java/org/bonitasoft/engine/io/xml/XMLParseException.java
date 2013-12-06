@@ -22,6 +22,10 @@ public class XMLParseException extends BonitaException {
 
     private static final long serialVersionUID = -4922640446759977100L;
 
+    public XMLParseException(final String message) {
+        super(message);
+    }
+
     public XMLParseException(final Throwable cause) {
         super(cause);
     }

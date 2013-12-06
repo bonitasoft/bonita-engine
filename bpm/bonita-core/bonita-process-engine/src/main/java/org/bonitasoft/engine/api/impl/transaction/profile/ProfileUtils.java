@@ -20,26 +20,26 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bonitasoft.engine.profile.Profile;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfile;
 
 public class ProfileUtils {
 
     public static HashMap<String, Serializable> profileToMap(final Profile profile) {
         final HashMap<String, Serializable> profielMap = new HashMap<String, Serializable>(4);
-        profielMap.put(SProfileBuilder.ID, profile.getId());
-        profielMap.put(SProfileBuilder.NAME, profile.getName());
-        profielMap.put(SProfileBuilder.DESCRIPTION, profile.getDescription());
-        profielMap.put(SProfileBuilder.ICON_PATH, profile.getIconPath());
+        profielMap.put(SProfileBuilderFactory.ID, profile.getId());
+        profielMap.put(SProfileBuilderFactory.NAME, profile.getName());
+        profielMap.put(SProfileBuilderFactory.DESCRIPTION, profile.getDescription());
+        profielMap.put(SProfileBuilderFactory.ICON_PATH, profile.getIconPath());
         return profielMap;
     }
 
     public static HashMap<String, Serializable> sProfileToMap(final SProfile profile) {
         final HashMap<String, Serializable> profielMap = new HashMap<String, Serializable>(4);
-        profielMap.put(SProfileBuilder.ID, profile.getId());
-        profielMap.put(SProfileBuilder.NAME, profile.getName());
-        profielMap.put(SProfileBuilder.DESCRIPTION, profile.getDescription());
-        profielMap.put(SProfileBuilder.ICON_PATH, profile.getIconPath());
+        profielMap.put(SProfileBuilderFactory.ID, profile.getId());
+        profielMap.put(SProfileBuilderFactory.NAME, profile.getName());
+        profielMap.put(SProfileBuilderFactory.DESCRIPTION, profile.getDescription());
+        profielMap.put(SProfileBuilderFactory.ICON_PATH, profile.getIconPath());
         return profielMap;
     }
 

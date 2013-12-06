@@ -33,16 +33,6 @@ public class SConnectorInstanceLogBuilderImpl extends CRUDELogBuilder implements
     }
 
     @Override
-    public String getObjectIdKey() {
-        return "numericIndex2";
-    }
-
-    @Override
-    public String getContainerIdKey() {
-        return "containerId";
-    }
-
-    @Override
     public SConnectorInstanceLogBuilder containerId(final long containerId) {
         queriableLogBuilder.numericIndex(0, containerId);
         return this;

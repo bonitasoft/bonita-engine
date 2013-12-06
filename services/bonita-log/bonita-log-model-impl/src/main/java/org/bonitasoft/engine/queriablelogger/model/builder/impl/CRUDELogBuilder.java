@@ -15,8 +15,9 @@ package org.bonitasoft.engine.queriablelogger.model.builder.impl;
 
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.SIndexedLogBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 
 /**
@@ -26,31 +27,19 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
  */
 public abstract class CRUDELogBuilder implements HasCRUDEAction, SLogBuilder {
 
-    protected SIndexedLogBuilder queriableLogBuilder;
+    protected SQueriableLogBuilder queriableLogBuilder;
 
-    private static final String SEPARATOR = "_";
-
-    public CRUDELogBuilder() {
-        queriableLogBuilder = new SIndexedLogBuilderImpl();
+    protected CRUDELogBuilder() {
+        queriableLogBuilder = new SQueriableLogBuilderImpl();
     }
+    
+    private static final String SEPARATOR = "_";
 
     protected abstract String getActionTypePrefix();
 
     @Override
-    public SLogBuilder setActionType(final HasCRUDEAction.ActionType actionType) {
+    public SLogBuilder setActionType(final ActionType actionType) {
         queriableLogBuilder.actionType(getActionTypePrefix() + SEPARATOR + actionType.name());
-        return this;
-    }
-
-    @Override
-    public SLogBuilder createNewInstance() {
-        queriableLogBuilder.createNewInstance();
-        return this;
-    }
-
-    @Override
-    public SLogBuilder fromInstance(final SQueriableLog log) {
-        queriableLogBuilder.fromInstance(log);
         return this;
     }
 
@@ -109,95 +98,10 @@ public abstract class CRUDELogBuilder implements HasCRUDEAction, SLogBuilder {
     }
 
     @Override
-    public String getTimeStampKey() {
-        return queriableLogBuilder.getTimeStampKey();
-    }
-
-    @Override
-    public String getYearKey() {
-        return queriableLogBuilder.getYearKey();
-    }
-
-    @Override
-    public String getMonthKey() {
-        return queriableLogBuilder.getMonthKey();
-    }
-
-    @Override
-    public String getDayOfYearKey() {
-        return queriableLogBuilder.getDayOfYearKey();
-    }
-
-    @Override
-    public String getWeekOfYearKey() {
-        return queriableLogBuilder.getWeekOfYearKey();
-    }
-
-    @Override
-    public String getUserIdKey() {
-        return queriableLogBuilder.getUserIdKey();
-    }
-
-    @Override
-    public String getThreadNumberKey() {
-        return queriableLogBuilder.getThreadNumberKey();
-    }
-
-    @Override
-    public String getClusterNodeKey() {
-        return queriableLogBuilder.getClusterNodeKey();
-    }
-
-    @Override
-    public String getProductVersionKey() {
-        return queriableLogBuilder.getProductVersionKey();
-    }
-
-    @Override
-    public String getSeverityKey() {
-        return queriableLogBuilder.getSeverityKey();
-    }
-
-    @Override
-    public String getActionScopeKey() {
-        return queriableLogBuilder.getActionScopeKey();
-    }
-
-    @Override
-    public String getActionStatusKey() {
-        return queriableLogBuilder.getActionStatusKey();
-    }
-
-    @Override
-    public String getRawMessageKey() {
-        return queriableLogBuilder.getRawMessageKey();
-    }
-
-    @Override
-    public String getCallerClassNameKey() {
-        return queriableLogBuilder.getCallerClassNameKey();
-    }
-
-    @Override
-    public String getCallerMethodNameKey() {
-        return queriableLogBuilder.getCallerMethodNameKey();
-    }
-
-    @Override
     public SQueriableLog done() {
         final SQueriableLog log = queriableLogBuilder.done();
         checkExtraRules(log);
         return log;
-    }
-
-    @Override
-    public String getActionTypeKey() {
-        return queriableLogBuilder.getActionTypeKey();
-    }
-
-    @Override
-    public Class<? extends SQueriableLog> getModelClass() {
-        return queriableLogBuilder.getModelClass();
     }
 
     protected abstract void checkExtraRules(final SQueriableLog log);

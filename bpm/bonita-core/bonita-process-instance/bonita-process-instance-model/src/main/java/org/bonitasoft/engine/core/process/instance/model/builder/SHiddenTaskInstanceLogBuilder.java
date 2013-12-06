@@ -25,6 +25,4 @@ public interface SHiddenTaskInstanceLogBuilder extends SPersistenceLogBuilder, H
 
     SHiddenTaskInstanceLogBuilder userId(long userId);
 
-    String getActivityInstanceIdKey();
-
 }

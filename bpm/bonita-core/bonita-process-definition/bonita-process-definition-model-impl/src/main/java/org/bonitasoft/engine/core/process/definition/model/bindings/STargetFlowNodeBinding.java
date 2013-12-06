@@ -13,16 +13,11 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Yanyan Liu
  */
 public class STargetFlowNodeBinding extends SExpressionBinding {
-
-    public STargetFlowNodeBinding(final SExpressionBuilders sExpressionBuilders) {
-        super(sExpressionBuilders);
-    }
 
     @Override
     public String getElementTag() {

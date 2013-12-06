@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 
 public class ProfileEntryUtils {
@@ -33,14 +33,14 @@ public class ProfileEntryUtils {
 
     public static HashMap<String, Serializable> profileEntryToMap(final SProfileEntry profileEntry) {
         final HashMap<String, Serializable> profileEntryMap = new HashMap<String, Serializable>();
-        profileEntryMap.put(SProfileEntryBuilder.ID, profileEntry.getId());
-        profileEntryMap.put(SProfileEntryBuilder.PARENT_ID, profileEntry.getParentId());
-        profileEntryMap.put(SProfileEntryBuilder.PROFILE_ID, profileEntry.getProfileId());
-        profileEntryMap.put(SProfileEntryBuilder.INDEX, profileEntry.getIndex());
-        profileEntryMap.put(SProfileEntryBuilder.NAME, profileEntry.getName());
-        profileEntryMap.put(SProfileEntryBuilder.DESCRIPTION, profileEntry.getDescription());
-        profileEntryMap.put(SProfileEntryBuilder.TYPE, profileEntry.getType());
-        profileEntryMap.put(SProfileEntryBuilder.PAGE, profileEntry.getPage());
+        profileEntryMap.put(SProfileEntryBuilderFactory.ID, profileEntry.getId());
+        profileEntryMap.put(SProfileEntryBuilderFactory.PARENT_ID, profileEntry.getParentId());
+        profileEntryMap.put(SProfileEntryBuilderFactory.PROFILE_ID, profileEntry.getProfileId());
+        profileEntryMap.put(SProfileEntryBuilderFactory.INDEX, profileEntry.getIndex());
+        profileEntryMap.put(SProfileEntryBuilderFactory.NAME, profileEntry.getName());
+        profileEntryMap.put(SProfileEntryBuilderFactory.DESCRIPTION, profileEntry.getDescription());
+        profileEntryMap.put(SProfileEntryBuilderFactory.TYPE, profileEntry.getType());
+        profileEntryMap.put(SProfileEntryBuilderFactory.PAGE, profileEntry.getPage());
         return profileEntryMap;
     }
 

@@ -19,13 +19,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
 
 /**
  * @author Yanyan Liu
@@ -37,37 +36,36 @@ public class SearchActivityInstanceDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> activityInstanceDescriptorAllFields;
 
-    public SearchActivityInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders, final SProcessSupervisorBuilders sSupervisorBuilders) {
-        final SUserTaskInstanceBuilder sUserTaskInstanceBuilder = bpmInstanceBuilders.getSUserTaskInstanceBuilder();
+    public SearchActivityInstanceDescriptor() {
+        final SUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         activityInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(11);
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.NAME,
-                new FieldDescriptor(SActivityInstance.class, sUserTaskInstanceBuilder.getNameKey()));
+                new FieldDescriptor(SActivityInstance.class, keyProvider.getNameKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.STATE_NAME,
-                new FieldDescriptor(SActivityInstance.class, sUserTaskInstanceBuilder.getStateNameKey()));
+                new FieldDescriptor(SActivityInstance.class, keyProvider.getStateNameKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, new FieldDescriptor(SActivityInstance.class,
-                sUserTaskInstanceBuilder.getProcessDefinitionKey()));
+                keyProvider.getProcessDefinitionKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, new FieldDescriptor(SActivityInstance.class,
-                sUserTaskInstanceBuilder.getRootProcessInstanceKey()));
+                keyProvider.getRootProcessInstanceKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, new FieldDescriptor(SActivityInstance.class,
-                sUserTaskInstanceBuilder.getParentActivityInstanceKey()));
+                keyProvider.getParentActivityInstanceKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.PARENT_CONTAINER_ID, new FieldDescriptor(SActivityInstance.class,
-                sUserTaskInstanceBuilder.getParentContainerIdKey()));
+                keyProvider.getParentContainerIdKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.LAST_MODIFICATION_DATE, new FieldDescriptor(SActivityInstance.class,
-                sUserTaskInstanceBuilder.getLastUpdateDateKey()));
+                keyProvider.getLastUpdateDateKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.DISPLAY_NAME,
-                new FieldDescriptor(SActivityInstance.class, sUserTaskInstanceBuilder.getDisplayNameKey()));
-        final SProcessSupervisorBuilder sSupervisorBuilder = sSupervisorBuilders.getSSupervisorBuilder();
+                new FieldDescriptor(SActivityInstance.class, keyProvider.getDisplayNameKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.USER_ID,
-                new FieldDescriptor(SProcessSupervisor.class, sSupervisorBuilder.getUserIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getUserIdKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.GROUP_ID,
-                new FieldDescriptor(SProcessSupervisor.class, sSupervisorBuilder.getGroupIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getGroupIdKey()));
         activityInstanceDescriptorKeys.put(ActivityInstanceSearchDescriptor.ROLE_ID,
-                new FieldDescriptor(SProcessSupervisor.class, sSupervisorBuilder.getRoleIdKey()));
+                new FieldDescriptor(SProcessSupervisor.class, BuilderFactory.get(SProcessSupervisorBuilderFactory.class).getRoleIdKey()));
 
         activityInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> tasksInstanceFields = new HashSet<String>(2);
-        tasksInstanceFields.add(sUserTaskInstanceBuilder.getNameKey());
-        tasksInstanceFields.add(sUserTaskInstanceBuilder.getDisplayNameKey());
+        tasksInstanceFields.add(keyProvider.getNameKey());
+        tasksInstanceFields.add(keyProvider.getDisplayNameKey());
         activityInstanceDescriptorAllFields.put(SActivityInstance.class, tasksInstanceFields);
     }
 

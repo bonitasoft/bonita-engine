@@ -24,13 +24,11 @@ import org.bonitasoft.engine.platform.session.model.impl.SPlatformSessionImpl;
  */
 public class SPlatformSessionBuilderImpl implements SPlatformSessionBuilder {
 
-    private SPlatformSessionImpl entity;
-
-    @Override
-    public SPlatformSessionBuilder createNewInstance(final long id, final long duration, final String username) {
-        this.entity = new SPlatformSessionImpl(id, username);
-        this.entity.setDuration(duration);
-        return this;
+    private final SPlatformSessionImpl entity;
+    
+    public SPlatformSessionBuilderImpl(final SPlatformSessionImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
@@ -45,11 +43,6 @@ public class SPlatformSessionBuilderImpl implements SPlatformSessionBuilder {
         this.entity.setCreationDate(now);
         this.entity.setLastRenewDate(now);
         return this.entity;
-    }
-
-    @Override
-    public SPlatformSession copy(final SPlatformSession session) {
-        return new SPlatformSessionImpl(session);
     }
 
 }

@@ -1,17 +1,22 @@
 package org.bonitasoft.engine.bpm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilder;
+import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -24,10 +29,6 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Celine Souchet
@@ -83,9 +84,7 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
 
         getTransactionService().begin();
         // update processDefinitionDeployInfo
-        final SProcessDefinitionDeployInfoUpdateBuilder processDefinitionDeployInfoUpdateBuilder = getServicesBuilder().getBPMDefinitionBuilders()
-                .getProcessDefinitionDeployInfoUpdateBuilder();
-        final EntityUpdateDescriptor updateDescriptor = processDefinitionDeployInfoUpdateBuilder.updateDisplayName(updatedDisplayName)
+        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance().updateDisplayName(updatedDisplayName)
                 .updateActivationState(ActivationState.ENABLED).done();
         processDefinitionService.updateProcessDefinitionDeployInfo(processId, updateDescriptor);
 
@@ -111,9 +110,8 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
 
         getTransactionService().begin();
         // update processDefinitionDeployInfo with wrong processId
-        final SProcessDefinitionDeployInfoUpdateBuilder processDefinitionDeployInfoUpdateBuilder = getServicesBuilder().getBPMDefinitionBuilders()
-                .getProcessDefinitionDeployInfoUpdateBuilder();
-        final EntityUpdateDescriptor updateDescriptor = processDefinitionDeployInfoUpdateBuilder.updateDisplayName(updatedDisplayName).done();
+
+        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SProcessDefinitionDeployInfoUpdateBuilderFactory.class).createNewInstance().updateDisplayName(updatedDisplayName).done();
         try {
             processDefinitionService.updateProcessDefinitionDeployInfo(sProcessDefinition.getId() + 1, updateDescriptor);
         } finally {

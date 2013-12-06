@@ -19,10 +19,11 @@ import org.bonitasoft.engine.bpm.document.DocumentCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.EventCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.OrderByType;
 
@@ -85,49 +86,50 @@ public class OrderAndFields {
         return new OrderAndField(orderBy, filed);
     }
 
-    static OrderAndField getOrderAndFieldForProcessInstance(final ProcessInstanceCriterion criterion, final SAProcessInstanceBuilder modelBuilder) {
+    static OrderAndField getOrderAndFieldForProcessInstance(final ProcessInstanceCriterion criterion) {
+        final SAProcessInstanceBuilderFactory keyProvider = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
         String field = null;
         OrderByType order = null;
         switch (criterion) {
             case STATE_ASC:
-                field = modelBuilder.getStateIdKey();
+                field = keyProvider.getStateIdKey();
                 order = OrderByType.ASC;
                 break;
             case STATE_DESC:
-                field = modelBuilder.getStateIdKey();
+                field = keyProvider.getStateIdKey();
                 order = OrderByType.DESC;
                 break;
             case ARCHIVE_DATE_ASC:
-                field = modelBuilder.getArchiveDateKey();
+                field = keyProvider.getArchiveDateKey();
                 order = OrderByType.ASC;
                 break;
             case ARCHIVE_DATE_DESC:
-                field = modelBuilder.getArchiveDateKey();
+                field = keyProvider.getArchiveDateKey();
                 order = OrderByType.DESC;
                 break;
             case LAST_UPDATE_DESC:
-                field = modelBuilder.getLastUpdateKey();
+                field = keyProvider.getLastUpdateKey();
                 order = OrderByType.DESC;
                 break;
             case LAST_UPDATE_ASC:
-                field = modelBuilder.getLastUpdateKey();
+                field = keyProvider.getLastUpdateKey();
                 order = OrderByType.ASC;
                 break;
             case CREATION_DATE_ASC:
-                field = modelBuilder.getStartDateKey();
+                field = keyProvider.getStartDateKey();
                 order = OrderByType.ASC;
                 break;
             case CREATION_DATE_DESC:
             case DEFAULT:
-                field = modelBuilder.getStartDateKey();
+                field = keyProvider.getStartDateKey();
                 order = OrderByType.DESC;
                 break;
             case NAME_ASC:
-                field = modelBuilder.getNameKey();
+                field = keyProvider.getNameKey();
                 order = OrderByType.ASC;
                 break;
             case NAME_DESC:
-                field = modelBuilder.getNameKey();
+                field = keyProvider.getNameKey();
                 order = OrderByType.DESC;
                 break;
             default:
@@ -136,23 +138,25 @@ public class OrderAndFields {
         return new OrderAndField(order, field);
     }
 
-    static OrderAndField getOrderAndFieldForEvent(final EventCriterion sortingType, final SEndEventInstanceBuilder eventInstanceBuilder) {
+    static OrderAndField getOrderAndFieldForEvent(final EventCriterion sortingType) {
+        final SEndEventInstanceBuilderFactory keyProvider = BuilderFactory.get(SEndEventInstanceBuilderFactory.class);
         OrderByType orderByType = null;
         String fieldName = null;
         switch (sortingType) {
             case NAME_DESC:
                 orderByType = OrderByType.DESC;
-                fieldName = eventInstanceBuilder.getNameKey();
+                fieldName = keyProvider.getNameKey();
                 break;
             default:
                 orderByType = OrderByType.ASC;
-                fieldName = eventInstanceBuilder.getNameKey();
+                fieldName = keyProvider.getNameKey();
                 break;
         }
         return new OrderAndField(orderByType, fieldName);
     }
 
-    static OrderAndField getOrderAndFieldForActivityInstance(ActivityInstanceCriterion pagingCriterion, final SUserTaskInstanceBuilder modelBuilder) {
+    static OrderAndField getOrderAndFieldForActivityInstance(ActivityInstanceCriterion pagingCriterion) {
+        final SUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         String field = null;
         OrderByType order = null;
         if (pagingCriterion == null) {
@@ -160,47 +164,47 @@ public class OrderAndFields {
         }
         switch (pagingCriterion) {
             case DEFAULT:
-                field = modelBuilder.getPriorityKey();
+                field = keyProvider.getPriorityKey();
                 order = OrderByType.DESC;
                 break;
             case NAME_DESC:
-                field = modelBuilder.getNameKey();
+                field = keyProvider.getNameKey();
                 order = OrderByType.DESC;
                 break;
             case NAME_ASC:
-                field = modelBuilder.getNameKey();
+                field = keyProvider.getNameKey();
                 order = OrderByType.ASC;
                 break;
             case LAST_UPDATE_ASC:
-                field = modelBuilder.getLastUpdateDateKey();
+                field = keyProvider.getLastUpdateDateKey();
                 order = OrderByType.ASC;
                 break;
             case LAST_UPDATE_DESC:
-                field = modelBuilder.getLastUpdateDateKey();
+                field = keyProvider.getLastUpdateDateKey();
                 order = OrderByType.DESC;
                 break;
             case PRIORITY_ASC:
-                field = modelBuilder.getPriorityKey();
+                field = keyProvider.getPriorityKey();
                 order = OrderByType.ASC;
                 break;
             case PRIORITY_DESC:
-                field = modelBuilder.getPriorityKey();
+                field = keyProvider.getPriorityKey();
                 order = OrderByType.DESC;
                 break;
             case REACHED_STATE_DATE_ASC:
-                field = modelBuilder.getReachStateDateKey();
+                field = keyProvider.getReachStateDateKey();
                 order = OrderByType.ASC;
                 break;
             case REACHED_STATE_DATE_DESC:
-                field = modelBuilder.getReachStateDateKey();
+                field = keyProvider.getReachStateDateKey();
                 order = OrderByType.DESC;
                 break;
             case EXPECTED_END_DATE_ASC:
-                field = modelBuilder.getExpectedEndDateKey();
+                field = keyProvider.getExpectedEndDateKey();
                 order = OrderByType.ASC;
                 break;
             case EXPECTED_END_DATE_DESC:
-                field = modelBuilder.getExpectedEndDateKey();
+                field = keyProvider.getExpectedEndDateKey();
                 order = OrderByType.DESC;
                 break;
             default:
@@ -214,7 +218,8 @@ public class OrderAndFields {
      * @param builder
      * @return
      */
-    public static OrderAndField getOrderAndFieldForDocument(DocumentCriterion pagingCriterion, final SDocumentMappingBuilder builder) {
+    public static OrderAndField getOrderAndFieldForDocument(DocumentCriterion pagingCriterion) {
+        final SDocumentMappingBuilderFactory fact = BuilderFactory.get(SDocumentMappingBuilderFactory.class);
         String field = null;
         OrderByType order = null;
         if (pagingCriterion == null) {
@@ -222,55 +227,55 @@ public class OrderAndFields {
         }
         switch (pagingCriterion) {
             case DEFAULT:
-                field = builder.getDocumentCreationDateKey();
+                field = fact.getDocumentCreationDateKey();
                 order = OrderByType.DESC;
                 break;
             case AUTHOR_ASC:
-                field = builder.getDocumentAuthorKey();
+                field = fact.getDocumentAuthorKey();
                 order = OrderByType.ASC;
                 break;
             case AUTHOR_DESC:
-                field = builder.getDocumentAuthorKey();
+                field = fact.getDocumentAuthorKey();
                 order = OrderByType.DESC;
                 break;
             case FILENAME_ASC:
-                field = builder.getDocumentContentFileNameKey();
+                field = fact.getDocumentContentFileNameKey();
                 order = OrderByType.ASC;
                 break;
             case FILENAME_DESC:
-                field = builder.getDocumentContentFileNameKey();
+                field = fact.getDocumentContentFileNameKey();
                 order = OrderByType.DESC;
                 break;
             case MIMETYPE_ASC:
-                field = builder.getDocumentContentMimeTypeKey();
+                field = fact.getDocumentContentMimeTypeKey();
                 order = OrderByType.ASC;
                 break;
             case MIMETYPE_DESC:
-                field = builder.getDocumentContentMimeTypeKey();
+                field = fact.getDocumentContentMimeTypeKey();
                 order = OrderByType.DESC;
                 break;
             case CREATION_DATE_ASC:
-                field = builder.getDocumentCreationDateKey();
+                field = fact.getDocumentCreationDateKey();
                 order = OrderByType.ASC;
                 break;
             case CREATION_DATE_DESC:
-                field = builder.getDocumentCreationDateKey();
+                field = fact.getDocumentCreationDateKey();
                 order = OrderByType.DESC;
                 break;
             case NAME_ASC:
-                field = builder.getDocumentNameKey();
+                field = fact.getDocumentNameKey();
                 order = OrderByType.ASC;
                 break;
             case NAME_DESC:
-                field = builder.getDocumentNameKey();
+                field = fact.getDocumentNameKey();
                 order = OrderByType.DESC;
                 break;
             case URL_ASC:
-                field = builder.getDocumentURLKey();
+                field = fact.getDocumentURLKey();
                 order = OrderByType.ASC;
                 break;
             case URL_DESC:
-                field = builder.getDocumentURLKey();
+                field = fact.getDocumentURLKey();
                 order = OrderByType.DESC;
                 break;
         }

@@ -23,6 +23,4 @@ public interface SConnectorInstanceLogBuilder extends SPersistenceLogBuilder, Ha
 
     SConnectorInstanceLogBuilder containerId(final long containerId);
 
-    String getContainerIdKey();
-
 }

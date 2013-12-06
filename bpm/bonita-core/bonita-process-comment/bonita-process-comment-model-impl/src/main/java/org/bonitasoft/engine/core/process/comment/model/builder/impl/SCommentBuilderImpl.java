@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.comment.model.builder.impl;
 
+import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilder;
 import org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl;
 
@@ -22,19 +23,12 @@ import org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl;
  */
 public abstract class SCommentBuilderImpl implements SCommentBuilder {
 
-    private static final String ID_KEY = "id";
-
-    private static final String USERID_KEY = "userId";
-
-    private static final String PROCESSINSTANCEID_KEY = "processInstanceId";
-
-    private static final String POSTDATE_KEY = "postDate";
-
-    private static final String CONTENT_KEY = "content";
-
-    private static final String KIND_KEY = "kind";
-
-    private SCommentImpl commentImpl;
+    protected final SCommentImpl commentImpl;
+    
+    public SCommentBuilderImpl(final SCommentImpl commentImpl) {
+        super();
+        this.commentImpl = commentImpl;
+    }
 
     @Override
     public SCommentBuilder setUserId(final long userId) {
@@ -47,35 +41,9 @@ public abstract class SCommentBuilderImpl implements SCommentBuilder {
         commentImpl.setPostDate(postDate);
         return this;
     }
-
-    @Override
-    public String getIdKey() {
-        return ID_KEY;
-    }
-
-    @Override
-    public String getUserIdKey() {
-        return USERID_KEY;
-    }
-
-    @Override
-    public String getProcessInstanceIdKey() {
-        return PROCESSINSTANCEID_KEY;
-    }
-
-    @Override
-    public String getPostDateKey() {
-        return POSTDATE_KEY;
-    }
-
-    @Override
-    public String getContentKey() {
-        return CONTENT_KEY;
-    }
-
-    @Override
-    public String getKindKey() {
-        return KIND_KEY;
+    
+    public SComment done() {
+        return this.commentImpl;
     }
 
 }

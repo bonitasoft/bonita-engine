@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -38,7 +39,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerT
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
@@ -178,13 +179,13 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         long count = 0;
         List<SActivityInstance> children;
         boolean hasChildren = false;
-        final SUserTaskInstanceBuilder userTaskInstanceBuilder = bpmInstancesCreator.getBPMInstanceBuilders().getUserTaskInstanceBuilder();
+        final SUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         do {
-            final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, userTaskInstanceBuilder.getNameKey(), OrderByType.ASC);
+            final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, keyProvider.getNameKey(), OrderByType.ASC);
             final List<FilterOption> filters = new ArrayList<FilterOption>(2);
-            filters.add(new FilterOption(SActivityInstance.class, userTaskInstanceBuilder.getParentActivityInstanceKey(), flowNodeInstance.getId()));
-            filters.add(new FilterOption(SActivityInstance.class, userTaskInstanceBuilder.getTerminalKey(), false));
-            filters.add(new FilterOption(SActivityInstance.class, userTaskInstanceBuilder.getStateCategoryKey(), SStateCategory.NORMAL.name()));
+            filters.add(new FilterOption(SActivityInstance.class, keyProvider.getParentActivityInstanceKey(), flowNodeInstance.getId()));
+            filters.add(new FilterOption(SActivityInstance.class, keyProvider.getTerminalKey(), false));
+            filters.add(new FilterOption(SActivityInstance.class, keyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
             final QueryOptions queryOptions = new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
             final QueryOptions countOptions = new QueryOptions(0, numberOfResults, null, filters, null);
             children = activityInstanceService.searchActivityInstances(SActivityInstance.class, queryOptions);

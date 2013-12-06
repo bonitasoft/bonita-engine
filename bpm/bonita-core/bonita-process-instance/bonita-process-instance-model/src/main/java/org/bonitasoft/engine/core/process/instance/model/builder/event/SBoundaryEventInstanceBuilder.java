@@ -19,7 +19,4 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event;
  */
 public interface SBoundaryEventInstanceBuilder extends SEventInstanceBuilder {
 
-    SBoundaryEventInstanceBuilder createNewBoundaryEventInstance(final String name, boolean isInterrupting, final long flowNodeDefinitionId,
-            final long rootContainerId, long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId, long activityInstanceId);
-
 }

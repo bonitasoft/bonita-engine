@@ -15,8 +15,6 @@ package org.bonitasoft.engine.test.util;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
@@ -79,29 +77,29 @@ public class TestUtil {
     }
 
     public static long createPlatformAndDefaultTenant(final TransactionService txService, final PlatformService platformService,
-            final SessionAccessor sessionAccessor, final SPlatformBuilder platformBuilder, final STenantBuilder tenantBuilder,
+            final SessionAccessor sessionAccessor,
             final SessionService sessionService) throws Exception {
-        PlatformUtil.createPlatform(txService, platformService, platformBuilder);
-        final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService, tenantBuilder);
+        PlatformUtil.createPlatform(txService, platformService);
+        final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService);
         final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME);
         sessionAccessor.setSessionInfo(session.getId(), defaultTenantId);
         return defaultTenantId;
     }
 
-    public static void createPlatform(final TransactionService txService, final PlatformService platformService, final SPlatformBuilder platformBuilder)
+    public static void createPlatform(final TransactionService txService, final PlatformService platformService)
             throws Exception {
         if (PlatformUtil.isPlatformCreated(txService, platformService)) {
             PlatformUtil.deletePlatform(txService, platformService);
         }
-        PlatformUtil.createPlatform(txService, platformService, platformBuilder);
+        PlatformUtil.createPlatform(txService, platformService);
     }
 
     public static long createDefaultTenant(final TransactionService txService, final PlatformService platformService, final SessionAccessor sessionAccessor,
-            final STenantBuilder tenantBuilder, final SessionService sessionService, final SPlatformBuilder platformBuilder) throws Exception {
+            final SessionService sessionService) throws Exception {
         if (!PlatformUtil.isPlatformCreated(txService, platformService)) {
-            PlatformUtil.createPlatform(txService, platformService, platformBuilder);
+            PlatformUtil.createPlatform(txService, platformService);
         }
-        final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService, tenantBuilder);
+        final long defaultTenantId = PlatformUtil.createDefaultTenant(txService, platformService);
         final SSession session = createSession(txService, sessionService, defaultTenantId, DEFAULT_USER_NAME);
         sessionAccessor.deleteSessionId();
         sessionAccessor.setSessionInfo(session.getId(), defaultTenantId);

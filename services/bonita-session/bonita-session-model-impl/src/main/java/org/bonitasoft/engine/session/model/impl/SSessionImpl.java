@@ -44,19 +44,16 @@ public class SSessionImpl implements SSession {
 
     private String clusterNode;
 
-    private String productVersion;
-
     private String applicationName;
 
     private String clientApplicationName;
 
     private boolean technicalUser;
 
-    public SSessionImpl(final long id, final long tenantId, final String userName, final String productVersion, final String applicationName, final long userId) {
+    public SSessionImpl(final long id, final long tenantId, final String userName, final String applicationName, final long userId) {
         this.id = id;
         this.tenantId = tenantId;
         this.userName = userName;
-        this.productVersion = productVersion;
         this.applicationName = applicationName;
         this.userId = userId;
     }
@@ -72,7 +69,6 @@ public class SSessionImpl implements SSession {
         technicalUser = session.isTechnicalUser();
         clientIP = session.getClientIP();
         clusterNode = session.getClusterNode();
-        productVersion = session.getProductVersion();
         applicationName = session.getApplicationName();
         clientApplicationName = session.getClientApplicationName();
     }
@@ -151,15 +147,6 @@ public class SSessionImpl implements SSession {
     }
 
     @Override
-    public String getProductVersion() {
-        return productVersion;
-    }
-
-    public void setProductVersion(final String productVersion) {
-        this.productVersion = productVersion;
-    }
-
-    @Override
     public String getApplicationName() {
         return applicationName;
     }
@@ -212,7 +199,6 @@ public class SSessionImpl implements SSession {
         result = prime * result + (int) (duration ^ duration >>> 32);
         result = prime * result + (int) (id ^ id >>> 32);
         result = prime * result + (lastRenewDate == null ? 0 : lastRenewDate.hashCode());
-        result = prime * result + (productVersion == null ? 0 : productVersion.hashCode());
         result = prime * result + (technicalUser ? 1231 : 1237);
         result = prime * result + (int) (tenantId ^ tenantId >>> 32);
         result = prime * result + (int) (userId ^ userId >>> 32);
@@ -278,13 +264,6 @@ public class SSessionImpl implements SSession {
                 return false;
             }
         } else if (!lastRenewDate.equals(other.lastRenewDate)) {
-            return false;
-        }
-        if (productVersion == null) {
-            if (other.productVersion != null) {
-                return false;
-            }
-        } else if (!productVersion.equals(other.productVersion)) {
             return false;
         }
         if (technicalUser != other.technicalUser) {

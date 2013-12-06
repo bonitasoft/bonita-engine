@@ -33,11 +33,6 @@ public class SDependencyLogBuilderImpl extends CRUDELogBuilder implements SDepen
     }
 
     @Override
-    public String getObjectIdKey() {
-        return SDependencyLogIndexesMapper.DEPENDENCY_INDEX_NAME;
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return PREFIX;
     }

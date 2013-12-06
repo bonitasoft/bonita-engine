@@ -20,12 +20,11 @@ import org.bonitasoft.engine.data.model.impl.SDataSourceImpl;
 
 public class SDataSourceBuilderImpl implements SDataSourceBuilder {
 
-    private SDataSourceImpl object;
+    private final SDataSourceImpl object;
 
-    @Override
-    public SDataSourceBuilder createNewInstance(final String name, final String version, final SDataSourceState state, final String implementationClassName) {
-        this.object = new SDataSourceImpl(name, version, state, implementationClassName);
-        return this;
+    public SDataSourceBuilderImpl(final SDataSourceImpl object) {
+        super();
+        this.object = object;
     }
 
     @Override
@@ -37,31 +36,6 @@ public class SDataSourceBuilderImpl implements SDataSourceBuilder {
     @Override
     public SDataSource done() {
         return object;
-    }
-
-    @Override
-    public String getIdKey() {
-        return "id";
-    }
-
-    @Override
-    public String getImplementationClassNameKey() {
-        return "implementationClassName";
-    }
-
-    @Override
-    public String getNameKey() {
-        return "name";
-    }
-
-    @Override
-    public String getVersionKey() {
-        return "version";
-    }
-
-    @Override
-    public String getStateKey() {
-        return "state";
     }
 
 }

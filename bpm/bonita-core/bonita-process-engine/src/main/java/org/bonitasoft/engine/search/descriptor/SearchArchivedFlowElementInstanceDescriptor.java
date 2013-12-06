@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.flownode.FlowElementInstanceSearchDescriptor;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowElementInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowElementInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -33,19 +33,19 @@ public class SearchArchivedFlowElementInstanceDescriptor extends SearchEntityDes
 
     private final Map<Class<? extends PersistentObject>, Set<String>> flowElementInstanceDescriptorAllFields;
 
-    public SearchArchivedFlowElementInstanceDescriptor(final BPMInstanceBuilders bpmInstanceBuilders) {
-        final SAFlowElementInstanceBuilder flowElementKeyProvider = bpmInstanceBuilders.getSATransitionInstanceBuilder();
+    public SearchArchivedFlowElementInstanceDescriptor() {
+        final SAFlowElementInstanceBuilderFactory keyProvider = BuilderFactory.get(SAFlowElementInstanceBuilderFactory.class);
         flowElementInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(7);
         flowElementInstanceDescriptorKeys.put(FlowElementInstanceSearchDescriptor.NAME,
-                new FieldDescriptor(SAFlowElementInstance.class, flowElementKeyProvider.getNameKey()));
+                new FieldDescriptor(SAFlowElementInstance.class, keyProvider.getNameKey()));
         flowElementInstanceDescriptorKeys.put(FlowElementInstanceSearchDescriptor.DESCRIPTION, new FieldDescriptor(SAFlowElementInstance.class,
-                flowElementKeyProvider.getDescriptionKey()));
+                keyProvider.getDescriptionKey()));
         // flowElementInstanceDescriptorKeys.put(FlowElementInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SAFlowElementInstance.class,
         // flowElementKeyProvider.getStateNameKey()));
 
         final Set<String> tasksInstanceFields = new HashSet<String>(2);
-        tasksInstanceFields.add(flowElementKeyProvider.getNameKey());
-        tasksInstanceFields.add(flowElementKeyProvider.getDescriptionKey());
+        tasksInstanceFields.add(keyProvider.getNameKey());
+        tasksInstanceFields.add(keyProvider.getDescriptionKey());
         flowElementInstanceDescriptorAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         flowElementInstanceDescriptorAllFields.put(SAFlowElementInstance.class, tasksInstanceFields);
     }

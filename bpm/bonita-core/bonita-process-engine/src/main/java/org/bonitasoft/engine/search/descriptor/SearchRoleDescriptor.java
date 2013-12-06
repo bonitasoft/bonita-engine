@@ -18,10 +18,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.RoleSearchDescriptor;
 import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
-import org.bonitasoft.engine.identity.model.builder.RoleBuilder;
+import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -33,20 +33,19 @@ public class SearchRoleDescriptor extends SearchEntityDescriptor {
 
     private final Map<Class<? extends PersistentObject>, Set<String>> roleAllFields;
 
-    SearchRoleDescriptor(final IdentityModelBuilder identityModelBuilder) {
-        final RoleBuilder roleBuilder = identityModelBuilder.getRoleBuilder();
+    SearchRoleDescriptor() {
         roleKeys = new HashMap<String, FieldDescriptor>(5);
-        roleKeys.put(RoleSearchDescriptor.ID, new FieldDescriptor(SRole.class, roleBuilder.getIdKey()));
-        roleKeys.put(RoleSearchDescriptor.NAME, new FieldDescriptor(SRole.class, roleBuilder.getNameKey()));
-        roleKeys.put(RoleSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SRole.class, roleBuilder.getDisplayNameKey()));
+        roleKeys.put(RoleSearchDescriptor.ID, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getIdKey()));
+        roleKeys.put(RoleSearchDescriptor.NAME, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getNameKey()));
+        roleKeys.put(RoleSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getDisplayNameKey()));
 
         roleAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> roleFields = new HashSet<String>(8);
-        roleFields.add(roleBuilder.getNameKey());
-        roleFields.add(roleBuilder.getDisplayNameKey());
-        roleFields.add(roleBuilder.getDescriptionKey());
-        roleFields.add(roleBuilder.getIconNameKey());
-        roleFields.add(roleBuilder.getIconPathKey());
+        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getNameKey());
+        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getDisplayNameKey());
+        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getDescriptionKey());
+        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getIconNameKey());
+        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getIconPathKey());
         roleAllFields.put(SRole.class, roleFields);
     }
 

@@ -20,11 +20,13 @@ import static org.junit.Assert.assertNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
+import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilderFactory;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -46,17 +48,13 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
 
     private static TransactionService transactionService;
 
-    private static SProcessDocumentBuilders sProcessDocumentBuilders;
-
     private static String documentNameKey;
 
     static {
         bpmServicesBuilder = new BPMServicesBuilder();
         processDocumentService = bpmServicesBuilder.getProcessDocumentService();
         transactionService = bpmServicesBuilder.getTransactionService();
-        sProcessDocumentBuilders = bpmServicesBuilder.getProcessDocumentBuilders();
-        documentNameKey = bpmServicesBuilder.getDocumentMappingBuilderAccessor().getSDocumentMappingBuilder()
-                .getDocumentNameKey();
+        documentNameKey = BuilderFactory.get(SDocumentMappingBuilderFactory.class).getDocumentNameKey();
     }
 
     @Cover(classes = { ProcessDocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Attach", "ProcessInstance", "Document", "Content" }, jira = "")
@@ -223,7 +221,7 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
     }
 
     private SProcessDocument buildProcessDocumentWithContent(final int i) {
-        final SProcessDocumentBuilder builder = sProcessDocumentBuilders.getSProcessDocumentBuilder().createNewInstance();
+        final SProcessDocumentBuilder builder = BuilderFactory.get(SProcessDocumentBuilderFactory.class).createNewInstance();
         builder.setAuthor(i);
         builder.setCreationDate(System.currentTimeMillis());
         builder.setFileName("getContentTest.txt");
@@ -234,7 +232,7 @@ public class ProcessDocumentServiceTest extends CommonBPMServicesTest {
     }
 
     private SProcessDocument buildProcessDocument(final int i) {
-        final SProcessDocumentBuilder builder = sProcessDocumentBuilders.getSProcessDocumentBuilder().createNewInstance();
+        final SProcessDocumentBuilder builder = BuilderFactory.get(SProcessDocumentBuilderFactory.class).createNewInstance();
         builder.setAuthor(i);
         builder.setCreationDate(System.currentTimeMillis());
         builder.setFileName("getContentTest.txt");

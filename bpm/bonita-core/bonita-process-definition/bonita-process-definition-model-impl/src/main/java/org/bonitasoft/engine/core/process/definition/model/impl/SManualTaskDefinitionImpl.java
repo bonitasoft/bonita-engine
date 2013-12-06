@@ -16,12 +16,9 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ManualTaskDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SManualTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
@@ -34,15 +31,11 @@ public class SManualTaskDefinitionImpl extends SHumanTaskDefinitionImpl implemen
 
     /**
      * @param manualTaskDefinition
-     * @param sExpressionBuilders
      * @param transitionsMap
-     * @param sDataDefinitionBuilders
-     * @param sOperationBuilders
      */
-    public SManualTaskDefinitionImpl(final ManualTaskDefinition manualTaskDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(manualTaskDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SManualTaskDefinitionImpl(final ManualTaskDefinition manualTaskDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(manualTaskDefinition, transitionsMap);
     }
 
     /**

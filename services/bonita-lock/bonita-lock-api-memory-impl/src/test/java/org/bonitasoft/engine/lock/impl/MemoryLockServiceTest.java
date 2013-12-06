@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.Before;
 /**
  * Copyright (C) 2013 BonitaSoft S.A.
@@ -37,6 +36,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class MemoryLockServiceTest {
 
+    private final Long tenantId = 1l;
+
     private final class LockThread extends Thread {
 
         private BonitaLock lock;
@@ -53,7 +54,7 @@ public class MemoryLockServiceTest {
         @Override
         public void run() {
             try {
-                lock = memoryLockService.lock(id, type);
+                lock = memoryLockService.lock(id, type, tenantId);
             } catch (SLockException e) {
                 // NOTHING
             }
@@ -89,11 +90,11 @@ public class MemoryLockServiceTest {
                 System.out.println(name2 + " wait to acquire the lock");
                 semaphore.acquire();
                 System.out.println(name2 + " will lock");
-                lock = memoryLockService.tryLock(id, type, 20, TimeUnit.SECONDS);
+                lock = memoryLockService.tryLock(id, type, 20, TimeUnit.SECONDS, tenantId);
                 System.out.println(name2 + " lock obtained, wait to unlock");
                 semaphore.acquire();
                 System.out.println(name2 + " will unlock");
-                memoryLockService.unlock(lock);
+                memoryLockService.unlock(lock, tenantId);
                 lock = null;
                 System.out.println(name2 + " unlocked");
             } catch (SLockException e) {
@@ -110,36 +111,34 @@ public class MemoryLockServiceTest {
 
     private final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
 
-    private final ReadSessionAccessor sessionAccessor = mock(ReadSessionAccessor.class);
-
     private MemoryLockService memoryLockService;
 
     @Before
     public void before() {
-        memoryLockService = new MemoryLockService(logger, sessionAccessor, 1, 12);
+        memoryLockService = new MemoryLockService(logger, 1, 12);
     }
 
     @Test
     public void testUnlock() throws Exception {
 
-        BonitaLock lock = memoryLockService.lock(5, "a");
+        BonitaLock lock = memoryLockService.lock(5, "a", tenantId);
         LockThread lockThread = new LockThread(5, "a");
         lockThread.start();
         Thread.sleep(100);
-        memoryLockService.unlock(lock);
+        memoryLockService.unlock(lock, tenantId);
         lockThread.join(1200);
         assertTrue("should not be able to lock", lockThread.isLockObtained());
     }
 
     @Test(expected = SLockException.class)
     public void testLockOnSameThread() throws Exception {
-        memoryLockService.lock(123, "abc");
-        memoryLockService.lock(123, "abc");
+        memoryLockService.lock(123, "abc", tenantId);
+        memoryLockService.lock(123, "abc", tenantId);
     }
 
     @Test
     public void testLock() throws Exception {
-        memoryLockService.lock(3, "a");
+        memoryLockService.lock(3, "a", tenantId);
         LockThread lockThread = new LockThread(4, "a");
         lockThread.start();
         lockThread.join(100);
@@ -148,7 +147,7 @@ public class MemoryLockServiceTest {
 
     @Test
     public void testLockTimeout() throws Exception {
-        memoryLockService.lock(2, "a");
+        memoryLockService.lock(2, "a", tenantId);
         LockThread lockThread = new LockThread(2, "a");
         lockThread.start();
         lockThread.join(1200);

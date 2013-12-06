@@ -24,6 +24,9 @@ import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.lock.BonitaLock;
+import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.lock.SLockException;
 
 /**
  * @author Charles Souillard
@@ -32,11 +35,13 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
  */
 public class SequenceManagerImpl implements SequenceManager {
 
-    private static final String NEXTID = "nextid";
+    static final String SEQUENCE = "SEQUENCE";
 
-    private static final String SELECT_BY_ID = "SELECT * FROM sequence WHERE tenantid = ? AND id = ?";
+    static final String NEXTID = "nextid";
 
-    private static final String UPDATE_SEQUENCE = "UPDATE sequence SET nextId = ? WHERE tenantid = ? AND id = ?";
+    static final String SELECT_BY_ID = "SELECT * FROM sequence WHERE tenantid = ? AND id = ?";
+
+    static final String UPDATE_SEQUENCE = "UPDATE sequence SET nextId = ? WHERE tenantid = ? AND id = ?";
 
     private final Map<Long, Integer> rangeSizes;
 
@@ -52,8 +57,6 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private final Map<String, Long> sequencesMappings;
 
-    private static final Object newRangeMutex = new Object();
-
     private final int retries;
 
     private final int delay;
@@ -62,8 +65,12 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private final DataSource datasource;
 
-    public SequenceManagerImpl(final Map<Long, Integer> rangeSizes, final int defaultRangeSize, final Map<String, Long> sequencesMappings,
+    private final LockService lockService;
+
+    public SequenceManagerImpl(final LockService lockService, final Map<Long, Integer> rangeSizes, final int defaultRangeSize,
+            final Map<String, Long> sequencesMappings,
             final DataSource datasource, final int retries, final int delay, final int delayFactor) {
+        this.lockService = lockService;
         this.defaultRangeSize = defaultRangeSize;
         this.rangeSizes = rangeSizes;
         this.sequencesMappings = sequencesMappings;
@@ -166,54 +173,65 @@ public class SequenceManagerImpl implements SequenceManager {
     }
 
     private void setNewRange(final long sequenceId, final long tenantId) throws SObjectNotFoundException {
-        synchronized (newRangeMutex) {
-            int attempt = 1;
-            long sleepTime = delay;
-            while (attempt <= retries) {
-                if (attempt > 1) {
-                    System.err.println("retrying... #" + attempt);
-                }
-                Connection connection = null;
-                try {
-                    connection = datasource.getConnection();
-                    connection.setAutoCommit(false);
+        BonitaLock lock;
+        try {
+            lock = lockService.lock(sequenceId, SEQUENCE, tenantId);
 
-                    // we have reach the maximum in this range
-                    final long nextAvailableId = selectById(connection,
-                            sequenceId, tenantId);
-                    setNextAvailableId(sequenceId, nextAvailableId, tenantId);
+            try {
 
-                    final long nextSequenceId = nextAvailableId
-                            + getRangeSize(sequenceId);
-                    updateSequence(connection, nextSequenceId, tenantId,
-                            sequenceId);
-                    setLastIdInRange(sequenceId, nextSequenceId - 1, tenantId);
-
-                    connection.commit();
-                    return;
-                } catch (final Throwable t) {
-                    attempt++;
-                    try {
-                        connection.rollback();
-                    } catch (final SQLException e) {
-                        e.printStackTrace();
-                        // do nothing
+                int attempt = 1;
+                long sleepTime = delay;
+                while (attempt <= retries) {
+                    if (attempt > 1) {
+                        System.err.println("retrying... #" + attempt);
                     }
-                    manageException(sleepTime, t);
-                    sleepTime *= delayFactor;
-                } finally {
-                    if (connection != null) {
+                    Connection connection = null;
+                    try {
+                        connection = datasource.getConnection();
+                        connection.setAutoCommit(false);
+
+                        // we have reach the maximum in this range
+                        final long nextAvailableId = selectById(connection,
+                                sequenceId, tenantId);
+                        setNextAvailableId(sequenceId, nextAvailableId, tenantId);
+
+                        final long nextSequenceId = nextAvailableId
+                                + getRangeSize(sequenceId);
+                        updateSequence(connection, nextSequenceId, tenantId,
+                                sequenceId);
+                        setLastIdInRange(sequenceId, nextSequenceId - 1, tenantId);
+
+                        connection.commit();
+                        return;
+                    } catch (final Throwable t) {
+                        attempt++;
                         try {
-                            connection.close();
-                        } catch (SQLException e) {
-                            // Can't do anything...
+                            connection.rollback();
+                        } catch (final SQLException e) {
+                            e.printStackTrace();
+                            // do nothing
+                        }
+                        manageException(sleepTime, t);
+                        sleepTime *= delayFactor;
+                    } finally {
+                        if (connection != null) {
+                            try {
+                                connection.close();
+                            } catch (SQLException e) {
+                                // Can't do anything...
+                            }
                         }
                     }
                 }
+            } finally {
+                lockService.unlock(lock, tenantId);
             }
+        } catch (SLockException e1) {
             throw new SObjectNotFoundException(
-                    "Unable to get a sequence id for " + sequenceId);
+                    "Unable to get a sequence id for " + sequenceId, e1);
         }
+        throw new SObjectNotFoundException(
+                "Unable to get a sequence id for " + sequenceId);
     }
 
     int getRangeSize(final long sequenceId) {
@@ -221,7 +239,7 @@ public class SequenceManagerImpl implements SequenceManager {
         return rangeSize != null ? rangeSize : defaultRangeSize;
     }
 
-    protected void updateSequence(Connection connection, final long nextSequenceId, final long tenantId, final long id)
+    protected void updateSequence(final Connection connection, final long nextSequenceId, final long tenantId, final long id)
             throws SQLException {
         PreparedStatement updateSequencePreparedStatement = connection.prepareStatement(UPDATE_SEQUENCE);
         try {
@@ -236,7 +254,7 @@ public class SequenceManagerImpl implements SequenceManager {
         }
     }
 
-    protected long selectById(Connection connection, final long id, final long tenantId) throws SQLException, SObjectNotFoundException {
+    protected long selectById(final Connection connection, final long id, final long tenantId) throws SQLException, SObjectNotFoundException {
         PreparedStatement selectByIdPreparedStatement = null;
         try {
             selectByIdPreparedStatement = connection.prepareStatement(SELECT_BY_ID);

@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder;
 
+import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
+
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 public interface SAutomaticTaskInstanceBuilder extends SActivityInstanceBuilder {
 
-    SAutomaticTaskInstanceBuilder createNewAutomaticTaskInstance(final String name, long flowNodeDefinitionId, final long rootContainerId,
-            long parentContainerId, long processDefinitionId, long rootProcessInstanceId, long parentProcessInstanceId);
-
+    SAutomaticTaskInstance done();
+    
 }

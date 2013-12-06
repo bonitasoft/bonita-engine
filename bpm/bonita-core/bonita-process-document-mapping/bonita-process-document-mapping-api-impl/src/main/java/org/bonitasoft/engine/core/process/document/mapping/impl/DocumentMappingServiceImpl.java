@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingCreationException;
 import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingDeletionException;
@@ -26,15 +27,16 @@ import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMa
 import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingNotFoundException;
 import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping;
-import org.bonitasoft.engine.core.process.document.mapping.model.archive.builder.SADocumentMappingBuilder;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
+import org.bonitasoft.engine.core.process.document.mapping.model.archive.builder.SADocumentMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingUpdateBuilder;
+import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.document.mapping.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -68,18 +70,15 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
 
     private final EventService eventService;
 
-    private final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor;
-
     private final ArchiveService archiveService;
 
     public DocumentMappingServiceImpl(final TechnicalLoggerService technicalLogger, final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final SDocumentMappingBuilderAccessor documentMappingBuilderAccessor, final ArchiveService archiveService) {
+            final EventService eventService, final ArchiveService archiveService) {
         super();
         this.technicalLogger = technicalLogger;
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
-        this.documentMappingBuilderAccessor = documentMappingBuilderAccessor;
         this.archiveService = archiveService;
     }
 
@@ -89,7 +88,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             final InsertRecord insertRecord = new InsertRecord(documentMapping);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) eventService.getEventBuilder().createInsertEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
             return documentMapping;
@@ -104,7 +103,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             final DeleteRecord deleteRecord = new DeleteRecord(documentMapping);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) eventService.getEventBuilder().createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {
@@ -234,12 +233,11 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     private SADocumentMapping buildMappingToArchive(final SDocumentMapping docMapping) {
-        final SADocumentMappingBuilder archiveBuilder = documentMappingBuilderAccessor.getSADocumentMappingBuilder();
-        return archiveBuilder.createNewInstance(docMapping).done();
+        return BuilderFactory.get(SADocumentMappingBuilderFactory.class).createNewInstance(docMapping).done();
     }
 
     private EntityUpdateDescriptor buildUpdateDescriptor(final SDocumentMapping docMapping) {
-        final SDocumentMappingUpdateBuilder updateBuilder = documentMappingBuilderAccessor.getSDocumentMappingUpdateBuilder().createNewInstance();
+        final SDocumentMappingUpdateBuilder updateBuilder = BuilderFactory.get(SDocumentMappingUpdateBuilderFactory.class).createNewInstance();
         updateBuilder.setDocumentAuthor(docMapping.getDocumentAuthor());
         updateBuilder.setDocumentContentFileName(docMapping.getDocumentContentFileName());
         updateBuilder.setDocumentContentMimeType(docMapping.getDocumentContentMimeType());
@@ -255,7 +253,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
         try {
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(DOCUMENTMAPPING).setObject(docMapping).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DOCUMENTMAPPING).setObject(docMapping).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             return docMapping;
@@ -378,7 +376,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             final DeleteRecord deleteRecord = new DeleteRecord(documentMapping);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) eventService.getEventBuilder().createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {

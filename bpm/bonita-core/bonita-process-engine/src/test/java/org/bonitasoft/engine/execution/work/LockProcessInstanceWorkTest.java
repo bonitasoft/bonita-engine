@@ -37,12 +37,15 @@ public class LockProcessInstanceWorkTest {
     private LockService lockService;
 
     private WorkService workService;
-    
+
     private TechnicalLoggerService loggerService;
+
+    private static final long TENANT_ID = 1;
 
     @Before
     public void before() {
         lockProcessInstanceWork = new LockProcessInstanceWork(wrappedWork, processInstanceId);
+        when(wrappedWork.getTenantId()).thenReturn(TENANT_ID);
         tenantAccessor = mock(TenantServiceAccessor.class);
         lockService = mock(LockService.class);
         workService = mock(WorkService.class);
@@ -55,21 +58,21 @@ public class LockProcessInstanceWorkTest {
     @Test
     public void testWork() throws Exception {
         BonitaLock bonitaLock = new BonitaLock(new ReentrantLock(), PROCESS, processInstanceId);
-        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS))).thenReturn(
+        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID))).thenReturn(
                 bonitaLock);
         Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         lockProcessInstanceWork.work(singletonMap);
-        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS));
-        verify(lockService, times(1)).unlock(bonitaLock);
+        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID));
+        verify(lockService, times(1)).unlock(bonitaLock, TENANT_ID);
         verify(wrappedWork, times(1)).work(singletonMap);
     }
 
     @Test
     public void workDidNotLock() throws Exception {
-        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS))).thenReturn(null);
+        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID))).thenReturn(null);
         Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         lockProcessInstanceWork.work(singletonMap);
-        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS));
+        verify(lockService, times(1)).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID));
         verify(wrappedWork, times(0)).work(singletonMap);
     }
 
@@ -120,14 +123,14 @@ public class LockProcessInstanceWorkTest {
     public void testRescheduleWorkOnLockTimeout() throws Exception {
         // On first try to lock : exception to reschedule the work
         // On the second try : return a correct lock
-        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS))).thenReturn(null);
+        when(lockService.tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID))).thenReturn(null);
         Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
 
         LockProcessInstanceWork spiedWork = Mockito.spy(lockProcessInstanceWork);
         spiedWork.work(context);
 
-        //in fact we should ensure the rootWork of the lockProcessInstanceWork has been re-executed. We should check the method getRootWork has been called
-        verify(lockService).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS));
+        // in fact we should ensure the rootWork of the lockProcessInstanceWork has been re-executed. We should check the method getRootWork has been called
+        verify(lockService).tryLock(eq(processInstanceId), eq(PROCESS), eq(20L), eq(TimeUnit.MILLISECONDS), eq(TENANT_ID));
         verify(workService).executeWork(spiedWork);
         verify(spiedWork).getRootWork();
     }

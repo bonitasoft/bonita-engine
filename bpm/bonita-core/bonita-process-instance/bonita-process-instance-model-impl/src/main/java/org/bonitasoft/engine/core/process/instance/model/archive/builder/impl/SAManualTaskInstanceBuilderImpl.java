@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManualTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl;
@@ -23,17 +22,13 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTa
  */
 public class SAManualTaskInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SAManualTaskInstanceBuilder {
 
-    private SAManualTaskInstanceImpl entity;
-
-    @Override
-    public SAManualTaskInstanceBuilder createNewManualTaskInstance(final SManualTaskInstance sManualTaskInstance) {
-        entity = new SAManualTaskInstanceImpl(sManualTaskInstance);
-        return this;
+    public SAManualTaskInstanceBuilderImpl(final SAManualTaskInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SAManualTaskInstance done() {
-        return entity;
+        return (SAManualTaskInstance) entity;
     }
 
 }

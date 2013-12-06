@@ -22,8 +22,8 @@ P-metadata_val -> 25
 user_contactinfo -> 26
 
 LOG
-business_log -> 30
-business_log_parameter -> 31 
+queriable_log -> 30
+queriable_log_parameter -> 31 
 
 DATA
 dataSource -> 50

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.bonitasoft.engine.persistence</groupId>
 		<artifactId>bonita-persistence</artifactId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>bonita-sequence-impl</artifactId>
 
@@ -13,6 +13,21 @@
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-sequence-api</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.lock</groupId>
+			<artifactId>bonita-lock-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			 <scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			 <scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

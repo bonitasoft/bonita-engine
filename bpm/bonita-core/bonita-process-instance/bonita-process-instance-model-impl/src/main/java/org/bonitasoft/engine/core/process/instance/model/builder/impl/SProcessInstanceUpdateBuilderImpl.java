@@ -24,19 +24,19 @@ public class SProcessInstanceUpdateBuilderImpl implements SProcessInstanceUpdate
 
     protected final EntityUpdateDescriptor descriptor;
 
-    public SProcessInstanceUpdateBuilderImpl() {
-        descriptor = new EntityUpdateDescriptor();
+    public SProcessInstanceUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
+        this.descriptor = descriptor;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateLastUpdate(final long lastUpdate) {
-        descriptor.addField(SProcessInstanceBuilderImpl.LAST_UPDATE_KEY, lastUpdate);
+        descriptor.addField(SProcessInstanceBuilderFactoryImpl.LAST_UPDATE_KEY, lastUpdate);
         return this;
     }
 
     @Override
     public SProcessInstanceUpdateBuilder updateInterruptingEventId(final long interruptingEventId) {
-        descriptor.addField(SProcessInstanceBuilderImpl.INTERRUPTING_EVENT_ID_KEY, interruptingEventId);
+        descriptor.addField(SProcessInstanceBuilderFactoryImpl.INTERRUPTING_EVENT_ID_KEY, interruptingEventId);
         return this;
     }
 

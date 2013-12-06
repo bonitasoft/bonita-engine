@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.log.recorder.QueriableLogSelectDescriptorBuilder;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -27,9 +28,10 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilderFactory;
 import org.bonitasoft.engine.services.IllegalIndexPositionException;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
@@ -42,24 +44,25 @@ import org.bonitasoft.engine.services.SQueriableLogNotFoundException;
  * @author Elias Ricken de Medeiros
  * @author Bole Zhang
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerService {
 
     private final PersistenceService persistenceService;
 
-    private final SQueriableLogModelBuilder builder;
-
     private final QueriableLoggerStrategy loggerConfiguration;
 
     private final QueriableLogSessionProvider sessionProvider;
 
-    public AbstractQueriableLoggerImpl(final PersistenceService persistenceService, final SQueriableLogModelBuilder builder,
-            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider) {
-        NullCheckingUtil.checkArgsNotNull(persistenceService, builder, loggerStrategy, sessionProvider);
+    private final PlatformService platformService;
+
+    public AbstractQueriableLoggerImpl(final PersistenceService persistenceService,
+            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final PlatformService platformService) {
+        NullCheckingUtil.checkArgsNotNull(persistenceService, loggerStrategy, sessionProvider);
         this.persistenceService = persistenceService;
-        this.builder = builder;
         loggerConfiguration = loggerStrategy;
         this.sessionProvider = sessionProvider;
+        this.platformService = platformService;
     }
 
     @Override
@@ -110,8 +113,10 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
         final List<SQueriableLog> loggableLogs = new ArrayList<SQueriableLog>();
         for (SQueriableLog log : queriableLogs) {
             if (isLoggable(log.getActionType(), log.getSeverity())) {
-                log = getBuilder().getQueriableLogBuilder().fromInstance(log).callerClassName(callerClassName).callerMethodName(callerMethodName)
-                        .userId(sessionProvider.getUserId()).clusterNode(sessionProvider.getClusterNode()).productVersion(sessionProvider.getProductVersion())
+                final SQueriableLogBuilderFactory fact = BuilderFactory.get(SQueriableLogBuilderFactory.class);
+                log = fact.fromInstance(log).callerClassName(callerClassName).callerMethodName(callerMethodName)
+                        .userId(sessionProvider.getUserId()).clusterNode(sessionProvider.getClusterNode())
+                        .productVersion(platformService.getSPlatformProperties().getPlatformVersion())
                         .done();
 
                 loggableLogs.add(log);
@@ -186,10 +191,6 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
 
     protected PersistenceService getPersitenceService() {
         return persistenceService;
-    }
-
-    protected SQueriableLogModelBuilder getBuilder() {
-        return builder;
     }
 
     protected QueriableLoggerStrategy getQueriableLogConfiguration() {

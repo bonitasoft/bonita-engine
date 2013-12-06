@@ -29,47 +29,54 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Elias Ricken de Medeiros
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(BuilderFactory.class)
 public class BPMInstancesCreatorTest {
 
     @Mock
     private TransactionExecutor transactionExecutor;
 
     @Mock
-    private BPMInstanceBuilders instanceBuilders;
-
-    @Mock
     private ConnectorInstanceService connectorInstanceService;
 
     @Mock
-    private SConnectorInstanceBuilder connectorBuilder;
+    private SConnectorInstanceBuilderFactory connectorBuilderFact;
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        PowerMockito.mockStatic(BuilderFactory.class);
+        
+        connectorBuilderFact = mock(SConnectorInstanceBuilderFactory.class);
+        Mockito.when(BuilderFactory.get(SConnectorInstanceBuilderFactory.class)).thenReturn(connectorBuilderFact);
     }
 
     @Test
     public void testExecutionOrder() throws Exception {
-        final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, instanceBuilders, null, null, null, connectorInstanceService, null, null,
+        final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, null, null, null, connectorInstanceService, null,
                 null, null);
         final SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
-        when(instanceBuilders.getSConnectorInstanceBuilder()).thenReturn(connectorBuilder);
-        when(connectorBuilder.createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), anyInt()))
+        final SConnectorInstanceBuilder connectorBuilder = mock(SConnectorInstanceBuilder.class);
+        when(connectorBuilderFact.createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), anyInt()))
                 .thenReturn(connectorBuilder);
         when(connectorBuilder.done()).thenReturn(connectorInstance);
 
@@ -77,8 +84,8 @@ public class BPMInstancesCreatorTest {
         final List<SConnectorDefinition> connectors = getConnectorList();
 
         bpmInstancesCreator.createConnectorInstances(container, connectors, SConnectorInstance.FLOWNODE_TYPE);
-        verify(connectorBuilder, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), eq(0));
-        verify(connectorBuilder, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), eq(1));
+        verify(connectorBuilderFact, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), eq(0));
+        verify(connectorBuilderFact, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), eq(1));
         ignoreStubs(transactionExecutor);
         ignoreStubs(connectorInstanceService);
     }

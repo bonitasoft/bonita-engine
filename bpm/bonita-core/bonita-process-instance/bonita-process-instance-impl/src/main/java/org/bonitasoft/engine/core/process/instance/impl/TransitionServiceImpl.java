@@ -19,6 +19,7 @@ import java.util.List;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
@@ -26,10 +27,9 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionCre
 import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionDeletionException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SATransitionInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SATransitionInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceLogBuilder;
-import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceLogBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -39,10 +39,9 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -54,27 +53,18 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  */
 public class TransitionServiceImpl implements TransitionService {
 
-    private final Recorder recorder;
-
-    private final EventService eventService;
-
     private final ReadPersistenceService persistenceRead;
-
-    private final BPMInstanceBuilders instanceBuilders;
 
     private final ArchiveService archiveService;
 
-    public TransitionServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
-            final BPMInstanceBuilders instanceBuilders, final ArchiveService archiveService, final QueriableLoggerService queriableLoggerService) {
-        this.recorder = recorder;
-        this.eventService = eventService;
+    public TransitionServiceImpl(final ReadPersistenceService persistenceRead,
+            final ArchiveService archiveService, final QueriableLoggerService queriableLoggerService) {
         this.persistenceRead = persistenceRead;
-        this.instanceBuilders = instanceBuilders;
         this.archiveService = archiveService;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -102,7 +92,7 @@ public class TransitionServiceImpl implements TransitionService {
     @Override
     public void archive(final STransitionDefinition sTransitionDefinition, final SFlowNodeInstance sFlowNodeInstance, final TransitionState transitionState)
             throws STransitionCreationException {
-        final SATransitionInstance saTransitionInstance = this.instanceBuilders.getSATransitionInstanceBuilder()
+        final SATransitionInstance saTransitionInstance = BuilderFactory.get(SATransitionInstanceBuilderFactory.class)
                 .createNewTransitionInstance(sTransitionDefinition, sFlowNodeInstance, transitionState).done();
         final long archiveDate = System.currentTimeMillis();
         try {
@@ -122,7 +112,7 @@ public class TransitionServiceImpl implements TransitionService {
     }
 
     protected STransitionInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final STransitionInstanceLogBuilder logBuilder = this.instanceBuilders.getSTransitionInstanceLogBuilder();
+        final STransitionInstanceLogBuilder logBuilder = BuilderFactory.get(STransitionInstanceLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
@@ -140,7 +130,7 @@ public class TransitionServiceImpl implements TransitionService {
 
     @Override
     public void deleteArchivedTransitionsOfProcessInstance(final long processInstanceId) throws STransitionDeletionException, SBonitaSearchException {
-        final SATransitionInstanceBuilder saTransitionInstanceBuilder = instanceBuilders.getSATransitionInstanceBuilder();
+        final SATransitionInstanceBuilderFactory saTransitionInstanceBuilder = BuilderFactory.get(SATransitionInstanceBuilderFactory.class);
         final String rootContainerIdKey = saTransitionInstanceBuilder.getRootContainerIdKey();
         final String idKey = saTransitionInstanceBuilder.getIdKey();
 

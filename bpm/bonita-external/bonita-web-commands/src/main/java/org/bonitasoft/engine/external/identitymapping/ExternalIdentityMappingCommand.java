@@ -16,6 +16,7 @@ package org.bonitasoft.engine.external.identitymapping;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -25,6 +26,7 @@ import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingC
 import org.bonitasoft.engine.external.identity.mapping.SExternalIdentityMappingDeletionException;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilder;
+import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilderFactory;
 import org.bonitasoft.engine.identity.MemberType;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
@@ -66,8 +68,8 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
 
     protected SExternalIdentityMapping addExternalIdentityMapping(final String externalId, final long userId, final long roleId, final long groupId,
             final String kind, final MemberType memberType) throws SBonitaException {
-        final SExternalIdentityMappingBuilder builder = serviceAccessor.getExternalIdentityMappingBuilders().getSExternalIdentityMappingBuilder()
-                .createNewInstance(externalId).setGroupId(groupId).setKind(kind).setRoleId(roleId).setUserId(userId);
+        final SExternalIdentityMappingBuilder builder = BuilderFactory.get(SExternalIdentityMappingBuilderFactory.class).createNewInstance(externalId).setGroupId(groupId);
+        builder.setKind(kind).setRoleId(roleId).setUserId(userId);
         final CreateExternalIdentityMapping transactionContent = new CreateExternalIdentityMapping(builder, memberType, userId, groupId, roleId);
         try {
             transactionContent.execute();

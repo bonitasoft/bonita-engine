@@ -238,24 +238,24 @@ public class IdentityServiceImplForUserTest {
         final List<SUser> users = Arrays.asList(sUser1, sUser2);
         final List<String> names = Arrays.asList("matti", "marja", "taina");
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(users);
-        Assert.assertEquals(users, identityServiceImpl.getUsersByName(names));
+        Assert.assertEquals(users, identityServiceImpl.getUsersByUsername(names));
     }
 
     @Test
     public void getUsersByNullNames() throws Exception {
-        assertTrue(identityServiceImpl.getUsersByName(null).isEmpty());
+        assertTrue(identityServiceImpl.getUsersByUsername(null).isEmpty());
     }
 
     @Test
     public void getUsersByEmptyNames() throws Exception {
-        assertTrue(identityServiceImpl.getUsersByName(Collections.<String> emptyList()).isEmpty());
+        assertTrue(identityServiceImpl.getUsersByUsername(Collections.<String> emptyList()).isEmpty());
     }
 
     @SuppressWarnings("unchecked")
     @Test(expected = SIdentityException.class)
     public void getUsersByNamesThrowException() throws Exception {
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(SBonitaReadException.class);
-        identityServiceImpl.getUsersByName(Arrays.asList("hannu"));
+        identityServiceImpl.getUsersByUsername(Arrays.asList("hannu"));
     }
 
     /**

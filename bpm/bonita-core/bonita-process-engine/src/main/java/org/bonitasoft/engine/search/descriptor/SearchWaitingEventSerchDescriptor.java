@@ -19,7 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProvider;
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProviderBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
@@ -30,20 +31,21 @@ public class SearchWaitingEventSerchDescriptor extends SearchEntityDescriptor {
 
     private final Map<String, FieldDescriptor> activityInstanceDescriptorKeys;
 
-    public SearchWaitingEventSerchDescriptor(final SWaitingEventKeyProvider waitingEventKeyProvider) {
+    public SearchWaitingEventSerchDescriptor() {
+        final SWaitingEventKeyProviderBuilderFactory keyProvider = BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class);
         activityInstanceDescriptorKeys = new HashMap<String, FieldDescriptor>(6);
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.BPM_EVENT_TYPE,
-                new FieldDescriptor(SWaitingEvent.class, waitingEventKeyProvider.getEventTypeKey()));
+                new FieldDescriptor(SWaitingEvent.class, keyProvider.getEventTypeKey()));
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.FLOW_NODE_NAME,
-                new FieldDescriptor(SWaitingEvent.class, waitingEventKeyProvider.getFlowNodeNameKey()));
+                new FieldDescriptor(SWaitingEvent.class, keyProvider.getFlowNodeNameKey()));
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, new FieldDescriptor(SWaitingEvent.class,
-                waitingEventKeyProvider.getParentProcessInstanceIdKey()));
+                keyProvider.getParentProcessInstanceIdKey()));
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.PROCESS_DEFINITION_ID,
-                new FieldDescriptor(SWaitingEvent.class, waitingEventKeyProvider.getProcessDefinitionIdKey()));
+                new FieldDescriptor(SWaitingEvent.class, keyProvider.getProcessDefinitionIdKey()));
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.PROCESS_NAME,
-                new FieldDescriptor(SWaitingEvent.class, waitingEventKeyProvider.getProcessNameKey()));
+                new FieldDescriptor(SWaitingEvent.class, keyProvider.getProcessNameKey()));
         activityInstanceDescriptorKeys.put(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, new FieldDescriptor(SWaitingEvent.class,
-                waitingEventKeyProvider.getRootProcessInstanceIdKey()));
+                keyProvider.getRootProcessInstanceIdKey()));
     }
 
     @Override

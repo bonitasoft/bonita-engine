@@ -28,24 +28,14 @@ public class SFlowNodeInstanceLogBuilderImpl extends CRUDELogBuilder implements 
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        this.queriableLogBuilder.numericIndex(ProcessInstanceLogIndexesMapper.ACTIVITY_INSTANCE_INDEX, objectId);
+        this.queriableLogBuilder.numericIndex(SProcessInstanceLogIndexesMapper.ACTIVITY_INSTANCE_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return ProcessInstanceLogIndexesMapper.ACTIVITY_INSTANCE_NAME;
     }
 
     @Override
     public SFlowNodeInstanceLogBuilder processInstanceId(final long processInstanceId) {
-        this.queriableLogBuilder.numericIndex(ProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_INDEX, processInstanceId);
+        this.queriableLogBuilder.numericIndex(SProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_INDEX, processInstanceId);
         return this;
-    }
-
-    @Override
-    public String getProcessInstanceIdKey() {
-        return ProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_NAME;
     }
 
     @Override
@@ -56,11 +46,11 @@ public class SFlowNodeInstanceLogBuilderImpl extends CRUDELogBuilder implements 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
-            if (log.getNumericIndex(ProcessInstanceLogIndexesMapper.ACTIVITY_INSTANCE_INDEX) == 0L) {
+            if (log.getNumericIndex(SProcessInstanceLogIndexesMapper.ACTIVITY_INSTANCE_INDEX) == 0L) {
                 throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Flow Node Instance Id");
             }
         }
-        if (log.getNumericIndex(ProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_INDEX) == 0L) {
+        if (log.getNumericIndex(SProcessInstanceLogIndexesMapper.PROCESS_INSTANCE_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "ProcessInstance Id");
         }
     }

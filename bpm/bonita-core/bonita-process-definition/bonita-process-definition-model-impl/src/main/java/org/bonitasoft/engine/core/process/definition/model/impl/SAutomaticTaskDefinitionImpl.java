@@ -16,12 +16,9 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SAutomaticTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
@@ -31,10 +28,9 @@ public class SAutomaticTaskDefinitionImpl extends SActivityDefinitionImpl implem
 
     private static final long serialVersionUID = 96851790923787649L;
 
-    public SAutomaticTaskDefinitionImpl(final ActivityDefinition activityDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(activityDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SAutomaticTaskDefinitionImpl(final ActivityDefinition activityDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(activityDefinition, transitionsMap);
     }
 
     public SAutomaticTaskDefinitionImpl(final long id, final String name) {

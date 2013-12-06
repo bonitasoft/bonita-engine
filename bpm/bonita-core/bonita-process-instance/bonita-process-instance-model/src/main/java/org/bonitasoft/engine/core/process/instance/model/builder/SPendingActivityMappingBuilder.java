@@ -21,11 +21,5 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
  */
 public interface SPendingActivityMappingBuilder {
 
-    static final String ACTOR_ID = "actorId";
-
-    SPendingActivityMappingBuilder createNewInstanceForUser(final long activityId, final long userId);
-
-    SPendingActivityMappingBuilder createNewInstanceForActor(final long activityId, final long actorId);
-
     SPendingActivityMapping done();
 }

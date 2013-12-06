@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,52 +14,19 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAFlowNodeInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl;
 
 /**
- * @author Elias Ricken de Medeiros
+ * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
-public abstract class SAFlowNodeInstanceBuilderImpl extends SAFlowElementInstanceBuilderImpl implements SAFlowNodeInstanceBuilder {
+public abstract class SAFlowNodeInstanceBuilderImpl implements SAFlowNodeInstanceBuilder {
 
-    private static final String STATE_ID_KEY = "stateId";
+    protected final SAFlowNodeInstanceImpl entity;
 
-    private static final String STATE_NAME_KEY = "stateName";
-
-    private static final String REACHED_STATE_DATE_KEY = "reachedStateDate";
-
-    private static final String LAST_UPDATE_KEY = "lastUpdateDate";
-
-    private static final String DISPLAY_NAME_KEY = "displayName";
-
-    private static final String TERMINAL_KEY = "terminal";
-
-    @Override
-    public String getStateIdKey() {
-        return STATE_ID_KEY;
-    }
-
-    @Override
-    public String getStateNameKey() {
-        return STATE_NAME_KEY;
-    }
-
-    @Override
-    public String getReachedStateDateKey() {
-        return REACHED_STATE_DATE_KEY;
-    }
-
-    @Override
-    public String getLastUpdateKey() {
-        return LAST_UPDATE_KEY;
-    }
-
-    @Override
-    public String getDisplayNameKey() {
-        return DISPLAY_NAME_KEY;
-    }
-
-    @Override
-    public String getTerminalKey() {
-        return TERMINAL_KEY;
+    protected SAFlowNodeInstanceBuilderImpl(final SAFlowNodeInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
 }

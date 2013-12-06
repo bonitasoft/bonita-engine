@@ -16,6 +16,7 @@ package org.bonitasoft.engine.identity.xml;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
@@ -28,11 +29,15 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.GroupUpdateBuilder;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
-import org.bonitasoft.engine.identity.model.builder.RoleUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
-import org.bonitasoft.engine.identity.model.builder.UserUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -43,11 +48,8 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
 
     private final IdentityService identityService;
 
-    private final IdentityModelBuilder identityModelBuilder;
-
-    public ImportOrganizationMergeDuplicatesStrategy(final IdentityService identityService, final IdentityModelBuilder identityModelBuilder) {
+    public ImportOrganizationMergeDuplicatesStrategy(final IdentityService identityService) {
         this.identityService = identityService;
-        this.identityModelBuilder = identityModelBuilder;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
 
         SContactInfo persoContactInfo = identityService.getUserContactInfo(userId, true);
         if (persoContactInfo == null) {
-            persoContactInfo = identityModelBuilder.getUserContactInfoBuilder().createNewInstance(userId, true).done();
+            persoContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, true).done();
             identityService.createUserContactInfo(persoContactInfo);
         }
         final EntityUpdateDescriptor personalDataDesc = getUserContactInfoDescriptor(user, true);
@@ -74,7 +76,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
 
         SContactInfo professContactInfo = identityService.getUserContactInfo(userId, false);
         if (professContactInfo == null) {
-            professContactInfo = identityModelBuilder.getUserContactInfoBuilder().createNewInstance(userId, false).done();
+            professContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, false).done();
             identityService.createUserContactInfo(professContactInfo);
         }
         final EntityUpdateDescriptor professionalDataDesc = getUserContactInfoDescriptor(user, false);
@@ -95,7 +97,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     protected EntityUpdateDescriptor getRoleDescriptor(final SRole existingRole, final RoleCreator roleCreator) {
-        final RoleUpdateBuilder roleUpdateBuilder = identityModelBuilder.getRoleUpdateBuilder();
+        final SRoleUpdateBuilder roleUpdateBuilder = BuilderFactory.get(SRoleUpdateBuilderFactory.class).createNewInstance();
         final Map<RoleField, Serializable> fields = roleCreator.getFields();
         final String name = (String) fields.get(RoleField.NAME);
         if (name != null && !name.equals(existingRole.getName())) {
@@ -121,7 +123,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     protected EntityUpdateDescriptor getGroupDescriptor(final SGroup existingGroup, final GroupCreator groupCreator) {
-        final GroupUpdateBuilder groupUpdateBuilder = identityModelBuilder.getGroupUpdateBuilder();
+        final SGroupUpdateBuilder groupUpdateBuilder = BuilderFactory.get(SGroupUpdateBuilderFactory.class).createNewInstance();
         final Map<GroupField, Serializable> fields = groupCreator.getFields();
         final String name = (String) fields.get(GroupField.NAME);
         if (name != null && !name.equals(existingGroup.getName())) {
@@ -151,7 +153,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     protected EntityUpdateDescriptor getUserContactInfoDescriptor(final ExportedUser user, final boolean isPersonal) {
-        final SContactInfoUpdateBuilder updateBuilder = identityModelBuilder.getUserContactInfoUpdateBuilder();
+        final SContactInfoUpdateBuilder updateBuilder = BuilderFactory.get(SContactInfoUpdateBuilderFactory.class).createNewInstance();
         if (isPersonal) {
             updateBuilder.updateAddress(user.getPersonalAddress());
             updateBuilder.updateBuilding(user.getPersonalBuilding());
@@ -183,7 +185,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     protected EntityUpdateDescriptor getUserDescriptor(final ExportedUser user) {
-        final UserUpdateBuilder userUpdateBuilder = identityModelBuilder.getUserUpdateBuilder();
+        final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
         userUpdateBuilder.updateFirstName(user.getFirstName());
         userUpdateBuilder.updateIconName(user.getIconName());
         userUpdateBuilder.updateIconPath(user.getIconPath());

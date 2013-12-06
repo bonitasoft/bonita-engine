@@ -23,62 +23,16 @@ import org.bonitasoft.engine.platform.model.impl.STenantImpl;
  */
 public class STenantBuilderImpl implements STenantBuilder {
 
-    private STenantImpl object;
-
-    @Override
-    public STenantBuilder createNewInstance(final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {
-        this.object = new STenantImpl(name, createdBy, created, status, defaultTenant);
-        return this;
+    private final STenantImpl object;
+    
+    public STenantBuilderImpl(final STenantImpl object) {
+        super();
+        this.object = object;
     }
 
     @Override
     public STenant done() {
         return this.object;
-    }
-
-    @Override
-    public String getCreatedByKey() {
-        return "createdBy";
-    }
-
-    @Override
-    public String getCreatedKey() {
-        return "created";
-    }
-
-    @Override
-    public String getDescriptionKey() {
-        return "description";
-    }
-
-    @Override
-    public String getIdKey() {
-        return "id";
-    }
-
-    @Override
-    public String getNameKey() {
-        return "name";
-    }
-
-    @Override
-    public String getStatusKey() {
-        return "status";
-    }
-
-    @Override
-    public String getIconNameKey() {
-        return "iconName";
-    }
-
-    @Override
-    public String getIconPathKey() {
-        return "iconPath";
-    }
-
-    @Override
-    public String getDefaultTenantKey() {
-        return "defaultTenant";
     }
 
     @Override

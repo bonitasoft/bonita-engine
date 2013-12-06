@@ -23,7 +23,5 @@ public interface SEndEventDefinitionBuilder {
 
     SEndEventDefinition done();
 
-    SEndEventDefinitionBuilder createNewInstance(String name);
-
     SEndEventDefinitionBuilder addErrorEventTriggerDefinition(SThrowErrorEventTriggerDefinition errorEventTrigger);
 }

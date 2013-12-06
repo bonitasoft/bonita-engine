@@ -27,19 +27,10 @@ public class SWaitingEventLogBuilderImpl extends CRUDELogBuilder implements SWai
 
     private static final String EVENT_INSTANCE_TRIGGER = "EVENT_INSTANCE_TRIGGER";
 
-    public static final int EVENT_TRIGGER_INSTANCE_ID_INDEX = 2;
-
-    public static final String EVENT_TRIGGER_INSTANCE_ID_KEY = "numericIndex3";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(EVENT_TRIGGER_INSTANCE_ID_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SWaitingEventLogBuilderFactoryImpl.EVENT_TRIGGER_INSTANCE_ID_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return EVENT_TRIGGER_INSTANCE_ID_KEY;
     }
 
     @Override
@@ -50,7 +41,7 @@ public class SWaitingEventLogBuilderImpl extends CRUDELogBuilder implements SWai
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
-            if (log.getNumericIndex(EVENT_TRIGGER_INSTANCE_ID_INDEX) == 0L) {
+            if (log.getNumericIndex(SWaitingEventLogBuilderFactoryImpl.EVENT_TRIGGER_INSTANCE_ID_INDEX) == 0L) {
                 throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Event Trigger Instance Id");
             }
         }

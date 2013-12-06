@@ -24,8 +24,6 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public interface SOperationBuilder {
 
-    SOperationBuilder createNewInstance();
-
     SOperationBuilder setLeftOperand(final SLeftOperand leftOperand);
 
     SOperationBuilder setType(final SOperatorType operatorType);

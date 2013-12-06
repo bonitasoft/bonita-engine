@@ -31,7 +31,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
 import org.bonitasoft.engine.xml.DocumentManager;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -50,8 +49,8 @@ public class XpathUpdateQueryOperationExecutorStrategy extends UpdateOperationEx
 
     public static final String TYPE_XPATH_UPDATE_QUERY = "XPATH_UPDATE_QUERY";
 
-    public XpathUpdateQueryOperationExecutorStrategy(final DataInstanceService dataInstanceService, final SDataInstanceBuilders sDataInstanceBuilders) {
-        super(dataInstanceService, sDataInstanceBuilders);
+    public XpathUpdateQueryOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
+        super(dataInstanceService);
     }
 
     @Override

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.impl;
 
-import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SACallActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActivityInstanceImpl;
@@ -23,17 +22,12 @@ import org.bonitasoft.engine.core.process.instance.model.archive.impl.SACallActi
  */
 public class SACallActivityInstanceBuilderImpl extends SAActivityInstanceBuilderImpl implements SACallActivityInstanceBuilder {
 
-    private SACallActivityInstanceImpl entity;
-
-    @Override
-    public SACallActivityInstanceBuilder createNewArchivedCallActivityInstance(final SCallActivityInstance callActivityInstance) {
-        entity = new SACallActivityInstanceImpl(callActivityInstance);
-        return this;
+    public SACallActivityInstanceBuilderImpl(final SACallActivityInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SACallActivityInstance done() {
-        return entity;
+        return (SACallActivityInstance) this.entity;
     }
-
 }

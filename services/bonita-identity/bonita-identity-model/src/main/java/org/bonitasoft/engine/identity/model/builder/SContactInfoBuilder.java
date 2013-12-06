@@ -21,10 +21,6 @@ import org.bonitasoft.engine.identity.model.SContactInfo;
  */
 public interface SContactInfoBuilder {
 
-    SContactInfoBuilder createNewInstance(final long userId, final boolean isPersonal);
-
-    SContactInfoBuilder createNewInstance(final SContactInfo contactInfo);
-
     SContactInfoBuilder setPersonal(final boolean personal);
 
     SContactInfoBuilder setId(final long id);
@@ -56,33 +52,5 @@ public interface SContactInfoBuilder {
     SContactInfoBuilder setWebsite(final String website);
 
     SContactInfo done();
-
-    String getIdKey();
-
-    String getEmailKey();
-
-    String getPhoneNumberKey();
-
-    String getMobileNumberKey();
-
-    String getFaxNumberKey();
-
-    String getBuildingKey();
-
-    String getRoomKey();
-
-    String getAddressKey();
-
-    String getZipCodeKey();
-
-    String getCityKey();
-
-    String getStateKey();
-
-    String getCountryKey();
-
-    String getWebsiteKey();
-
-    String getIsPersonalKey();
 
 }

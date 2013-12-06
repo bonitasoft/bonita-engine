@@ -16,12 +16,9 @@ package org.bonitasoft.engine.core.process.definition.model.event.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.StartEventDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -31,10 +28,9 @@ public class SStartEventDefinitionImpl extends SCatchEventDefinitionImpl impleme
 
     private static final long serialVersionUID = -8788360140531631436L;
 
-    public SStartEventDefinitionImpl(final StartEventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(eventDefinition, sExpressionBuilders, transitionsMap, sDataDefinitionBuilders, sOperationBuilders);
+    public SStartEventDefinitionImpl(final StartEventDefinition eventDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(eventDefinition, transitionsMap);
     }
 
     public SStartEventDefinitionImpl(final long id, final String name) {

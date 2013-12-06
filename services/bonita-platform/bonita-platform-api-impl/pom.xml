@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-platform</artifactId>
 		<groupId>org.bonitasoft.engine.platform</groupId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-platform-api-impl</artifactId>
@@ -18,6 +18,11 @@
 			<artifactId>bonita-platform-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-api</artifactId>
@@ -43,5 +48,15 @@
 			<artifactId>mockito-all</artifactId>
 			 <scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 </project>

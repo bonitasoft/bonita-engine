@@ -30,10 +30,11 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.commons.IOUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
@@ -54,7 +55,8 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -106,13 +108,11 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     private final DependencyService dependencyService;
 
-    private final DependencyBuilderAccessor dependencyBuilderAccessor;
-
     private final TechnicalLoggerService logger;
 
     public ConnectorServiceImpl(final CacheService cacheService, final ConnectorExecutor connectorExecutor, final ParserFactory parserFactory,
             final ReadSessionAccessor sessionAccessor, final ExpressionResolverService expressionResolverService, final OperationService operationService,
-            final DependencyBuilderAccessor dependencyBuilderAccessor, final DependencyService dependencyService, final TechnicalLoggerService logger) {
+            final DependencyService dependencyService, final TechnicalLoggerService logger) {
         this.cacheService = cacheService;
         this.connectorExecutor = connectorExecutor;
         this.sessionAccessor = sessionAccessor;
@@ -123,7 +123,6 @@ public class ConnectorServiceImpl implements ConnectorService {
         parser = parserFactory.createParser(bindings);
         this.operationService = operationService;
         this.dependencyService = dependencyService;
-        this.dependencyBuilderAccessor = dependencyBuilderAccessor;
         this.logger = logger;
     }
 
@@ -411,10 +410,10 @@ public class ConnectorServiceImpl implements ConnectorService {
             for (final File jarFile : listFiles) {
                 final String name = jarFile.getName();
                 final byte[] jarContent = IOUtil.getAllContentFrom(jarFile);
-                final SDependency sDependency = dependencyBuilderAccessor.getDependencyBuilder().createNewInstance(name, "1.0", name + ".jar", jarContent)
+                final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, "1.0", name + ".jar", jarContent)
                         .done();
                 dependencyService.createDependency(sDependency);
-                final SDependencyMapping sDependencyMapping = dependencyBuilderAccessor.getDependencyMappingBuilder()
+                final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
                         .createNewInstance(sDependency.getId(), processDefinitionId, "process").done();
                 dependencyService.createDependencyMapping(sDependencyMapping);
             }

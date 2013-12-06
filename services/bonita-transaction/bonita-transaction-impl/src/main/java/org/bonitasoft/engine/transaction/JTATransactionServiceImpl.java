@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -35,8 +33,6 @@ public class JTATransactionServiceImpl implements TransactionService {
     protected final TechnicalLoggerService logger;
 
     private final TransactionManager txManager;
-
-    private List<BonitaTransactionSynchronization> synchronizations;
 
     private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
 
@@ -67,12 +63,6 @@ public class JTATransactionServiceImpl implements TransactionService {
                         logger.log(getClass(), TechnicalLogSeverity.TRACE,
                                 "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
                     }
-
-                    // Reset the synchronizations each time we begin a new transaction
-                    if (synchronizations != null) {
-                        synchronizations.clear();
-                    }
-                    synchronizations = new ArrayList<BonitaTransactionSynchronization>();
                 } catch (final NotSupportedException e) {
                     // Should never happen as we do not want to support nested transaction
                     throw new STransactionCreationException(e);
@@ -201,7 +191,6 @@ public class JTATransactionServiceImpl implements TransactionService {
                 throw new STransactionNotFoundException("No active transaction");
             }
             transaction.registerSynchronization(new JTATransactionWrapper(txSync));
-            synchronizations.add(txSync);
         } catch (final IllegalStateException e) {
             throw new STransactionNotFoundException(e.getMessage());
         } catch (final RollbackException e) {
@@ -209,11 +198,6 @@ public class JTATransactionServiceImpl implements TransactionService {
         } catch (final SystemException e) {
             throw new STransactionNotFoundException(e.getMessage());
         }
-    }
-
-    @Override
-    public List<BonitaTransactionSynchronization> getBonitaSynchronizations() {
-        return synchronizations;
     }
 
     @Override

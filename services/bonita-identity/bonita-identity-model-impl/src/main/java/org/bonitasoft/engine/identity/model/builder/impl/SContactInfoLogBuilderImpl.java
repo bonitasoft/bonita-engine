@@ -27,34 +27,16 @@ public class SContactInfoLogBuilderImpl extends CRUDELogBuilder implements SCont
 
     private static final String PREFIX = "IDENTITY_USER_CONTACT_INFO";
 
-    public static final int USER_CONTACT_INFO_INDEX = 1;
-
-    public static final int USER_CONTACT_INFO_USERID_INDEX = 2;
-
-    public static final String USER_CONTACT_INFO_INDEX_NAME = "numericIndex2";
-
-    public static final String USER_CONTACT_INFO_USERID_INDEX_NAME = "numericIndex3";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(USER_CONTACT_INFO_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SContactInfoLogBuilderFactoryImpl.USER_CONTACT_INFO_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return USER_CONTACT_INFO_INDEX_NAME;
     }
 
     @Override
     public SPersistenceLogBuilder setContactInfoUserId(final long userId) {
-        queriableLogBuilder.numericIndex(USER_CONTACT_INFO_USERID_INDEX, userId);
+        queriableLogBuilder.numericIndex(SContactInfoLogBuilderFactoryImpl.USER_CONTACT_INFO_USERID_INDEX, userId);
         return this;
-    }
-
-    @Override
-    public String getContactInfoUserIdKey() {
-        return USER_CONTACT_INFO_USERID_INDEX_NAME;
     }
 
     @Override
@@ -64,9 +46,13 @@ public class SContactInfoLogBuilderImpl extends CRUDELogBuilder implements SCont
 
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
-        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(USER_CONTACT_INFO_USERID_INDEX) == 0L) {
+        if (log.getActionStatus() != SQueriableLog.STATUS_FAIL && log.getNumericIndex(SContactInfoLogBuilderFactoryImpl.USER_CONTACT_INFO_USERID_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatory fields are missing: Identity Contact info User Id");
         }
+    }
+
+    public static SContactInfoLogBuilder getInstance() {
+        return new SContactInfoLogBuilderImpl();
     }
 
 }

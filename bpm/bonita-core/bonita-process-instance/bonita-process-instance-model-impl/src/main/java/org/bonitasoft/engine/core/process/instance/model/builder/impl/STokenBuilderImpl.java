@@ -14,7 +14,6 @@
  */
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
-import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
 import org.bonitasoft.engine.core.process.instance.model.builder.STokenBuilder;
 import org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl;
@@ -24,13 +23,11 @@ import org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl;
  */
 public class STokenBuilderImpl implements STokenBuilder {
 
-    private STokenImpl entity;
+    private final STokenImpl entity;
 
-    @Override
-    public STokenBuilder createNewInstance(final long processInstanceId, final Long refId, final Long parentRefId) {
-        NullCheckingUtil.checkArgsNotNull(processInstanceId);
-        entity = new STokenImpl(processInstanceId, refId, parentRefId);
-        return this;
+    protected STokenBuilderImpl(final STokenImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override

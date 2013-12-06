@@ -49,7 +49,7 @@ import org.bonitasoft.engine.profile.ProfileMemberCreator;
 import org.bonitasoft.engine.profile.ProfileMemberSearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileNotFoundException;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.SProfileNotFoundException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -283,8 +283,7 @@ public class ProfileAPIImpl implements ProfileAPI {
         }
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final SProfileMember sProfileMember = ModelConvertor.constructSProfileMember(creator, tenantAccessor.getSProfileBuilderAccessor()
-                .getSProfileMemberBuilder());
+        final SProfileMember sProfileMember = ModelConvertor.constructSProfileMember(creator);
         return createProfileMember(sProfileMember.getProfileId(), sProfileMember.getUserId(), sProfileMember.getGroupId(), sProfileMember.getRoleId());
     }
 

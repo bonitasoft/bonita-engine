@@ -18,13 +18,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.entitymember.EntityMemberSearchDescriptor;
-import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
-import org.bonitasoft.engine.identity.model.builder.GroupBuilder;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
-import org.bonitasoft.engine.identity.model.builder.RoleBuilder;
+import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -35,21 +34,19 @@ public class SearchEntityMemberRoleAndGroupDescriptor extends SearchEntityMember
 
     private final Map<Class<? extends PersistentObject>, Set<String>> entityMemberAllFields;
 
-    public SearchEntityMemberRoleAndGroupDescriptor(final SExternalIdentityMappingBuilders builders, final IdentityModelBuilder identityModelBuilder) {
-        super(builders, identityModelBuilder);
-        final GroupBuilder groupBuilder = identityModelBuilder.getGroupBuilder();
-        final RoleBuilder roleBuilder = identityModelBuilder.getRoleBuilder();
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SRole.class, roleBuilder.getNameKey()));
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SGroup.class, groupBuilder.getNameKey()));
-        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, new FieldDescriptor(SGroup.class, groupBuilder.getParentPathKey()));
+    public SearchEntityMemberRoleAndGroupDescriptor() {
+        super();
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART1, new FieldDescriptor(SRole.class, BuilderFactory.get(SRoleBuilderFactory.class).getNameKey()));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART2, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey()));
+        putField(EntityMemberSearchDescriptor.DISPLAY_NAME_PART3, new FieldDescriptor(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getParentPathKey()));
 
         entityMemberAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(2);
         final Set<String> roleFields = new HashSet<String>(1);
-        roleFields.add(roleBuilder.getNameKey());
+        roleFields.add(BuilderFactory.get(SRoleBuilderFactory.class).getNameKey());
         entityMemberAllFields.put(SRole.class, roleFields);
         final Set<String> groupFields = new HashSet<String>(2);
-        groupFields.add(groupBuilder.getNameKey());
-        groupFields.add(groupBuilder.getParentPathKey());
+        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getNameKey());
+        groupFields.add(BuilderFactory.get(SGroupBuilderFactory.class).getParentPathKey());
         entityMemberAllFields.put(SGroup.class, groupFields);
     }
 

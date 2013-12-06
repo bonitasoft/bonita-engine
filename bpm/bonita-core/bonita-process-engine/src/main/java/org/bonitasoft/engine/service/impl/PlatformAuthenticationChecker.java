@@ -13,14 +13,14 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
+import java.io.IOException;
+import java.util.Properties;
+
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.authentication.SInvalidPasswordException;
 import org.bonitasoft.engine.platform.authentication.SInvalidUserException;
-
-import java.io.IOException;
-import java.util.Properties;
 
 /**
  * @author Lu Kai

@@ -19,18 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public interface SWaitingErrorEventBuilder extends SWaitingEventKeyProvider {
-
-    SWaitingErrorEventBuilder createNewWaitingErrorBoundaryEventInstance(long processdefinitionId, final long rootProcessInstanceId,
-            final long parentProcessInstanceId, final long flowNodeInstanceId, final String errorCode, final String processName,
-            final long flowNodeDefinitionId, final String flowNodeName, long relatedActivityInstanceId);
-
-    SWaitingErrorEventBuilder createNewWaitingErrorEventSubProcInstance(final long processdefinitionId, final long parentProcessInstanceId,
-            final long rootProcessInstanceId, final String errorCode, final String processName, final long flowNodeDefinitionId, final String flowNodeName,
-            final long subProcessId);
+public interface SWaitingErrorEventBuilder {
 
     SWaitingErrorEvent done();
-
-    String getErrorCodeKey();
 
 }

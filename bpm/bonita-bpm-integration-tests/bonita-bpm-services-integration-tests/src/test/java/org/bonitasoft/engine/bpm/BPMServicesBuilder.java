@@ -14,11 +14,16 @@
  */
 package org.bonitasoft.engine.bpm;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
-import org.bonitasoft.engine.actor.mapping.model.SActorBuilders;
+import org.bonitasoft.engine.actor.xml.GroupPathsBinding;
+import org.bonitasoft.engine.actor.xml.RoleNamesBinding;
+import org.bonitasoft.engine.actor.xml.UserNamesBinding;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -29,28 +34,21 @@ import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
-import org.bonitasoft.engine.command.model.SCommandBuilderAccessor;
 import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
-import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.model.builder.BPMDefinitionBuilders;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderAccessor;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilders;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
@@ -58,19 +56,11 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.data.DataService;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilders;
-import org.bonitasoft.engine.data.model.builder.SDataSourceBuilder;
-import org.bonitasoft.engine.data.model.builder.SDataSourceModelBuilder;
-import org.bonitasoft.engine.data.model.builder.SDataSourceParameterBuilder;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilder;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
-import org.bonitasoft.engine.dependency.model.builder.DependencyMappingBuilder;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exceptions.ExceptionsManager;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
@@ -79,24 +69,25 @@ import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ExpressionService;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingService;
-import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMappingBuilders;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.authentication.PlatformAuthenticationService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilderAccessor;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.profile.ProfileService;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogModelBuilder;
+import org.bonitasoft.engine.profile.xml.ChildrenEntriesBinding;
+import org.bonitasoft.engine.profile.xml.MembershipBinding;
+import org.bonitasoft.engine.profile.xml.MembershipsBinding;
+import org.bonitasoft.engine.profile.xml.ParentProfileEntryBinding;
+import org.bonitasoft.engine.profile.xml.ProfileBinding;
+import org.bonitasoft.engine.profile.xml.ProfileEntriesBinding;
+import org.bonitasoft.engine.profile.xml.ProfileEntryBinding;
+import org.bonitasoft.engine.profile.xml.ProfileMappingBinding;
+import org.bonitasoft.engine.profile.xml.ProfilesBinding;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -110,13 +101,14 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.test.util.ServicesAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
+import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
+import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.XMLWriter;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
@@ -151,33 +143,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(ExpressionService.class);
     }
 
-    @Override
-    public IdentityModelBuilder getIdentityModelBuilder() {
-        return getInstanceOf(IdentityModelBuilder.class);
-    }
-
-    public SExpressionBuilders getExpressionBuilders() {
-        return getInstanceOf(SExpressionBuilders.class);
-    }
-
-    @Override
-    public SDataInstanceBuilders getSDataInstanceBuilders() {
-        return getInstanceOf(SDataInstanceBuilders.class);
-    }
-
-    @Override
-    public SDataDefinitionBuilders getSDataDefinitionBuilders() {
-        return getInstanceOf(SDataDefinitionBuilders.class);
-    }
-
-    public DependencyBuilder getDependencyModelBuilder() {
-        return getInstanceOf(DependencyBuilder.class);
-    }
-
-    public DependencyMappingBuilder getDependencyMappingModelBuilder() {
-        return getInstanceOf(DependencyMappingBuilder.class);
-    }
-
     public PersistenceService getPersistence() {
         return getInstanceOf(PersistenceService.class);
     }
@@ -199,22 +164,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public DataService getDataService() {
         return getInstanceOf(DataService.class);
-    }
-
-    public SDataSourceParameterBuilder getDataSourceParameterModelBuilder() {
-        return getInstanceOf(SDataSourceParameterBuilder.class);
-    }
-
-    public SDataSourceBuilder getDataSourceModelBuilder() {
-        return getInstanceOf(SDataSourceBuilder.class);
-    }
-
-    public SPlatformBuilder getPlatformBuilder() {
-        return getInstanceOf(SPlatformBuilder.class);
-    }
-
-    public STenantBuilder getTenantBuilder() {
-        return getInstanceOf(STenantBuilder.class);
     }
 
     @Override
@@ -240,10 +189,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public DependencyService getDependencyService() {
         return getInstanceOf("platformDependencyService", DependencyService.class);
-    }
-
-    public SQueriableLogModelBuilder getQueriableLogModelBuilder() {
-        return getInstanceOf(SQueriableLogModelBuilder.class);
     }
 
     @Override
@@ -312,16 +257,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SPlatformBuilder getSPlatformBuilder() {
-        return getInstanceOf(SPlatformBuilder.class);
-    }
-
-    @Override
-    public STenantBuilder getSTenantBuilder() {
-        return getInstanceOf(STenantBuilder.class);
-    }
-
-    @Override
     public TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
         return this;
     }
@@ -337,11 +272,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SQueriableLogModelBuilder getSQueriableLogModelBuilder() {
-        return getInstanceOf(SQueriableLogModelBuilder.class);
-    }
-
-    @Override
     public ProcessInstanceService getProcessInstanceService() {
         return getInstanceOf(ProcessInstanceService.class);
     }
@@ -354,16 +284,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public ActivityInstanceService getActivityInstanceService() {
         return getInstanceOf(ActivityInstanceService.class);
-    }
-
-    @Override
-    public BPMDefinitionBuilders getBPMDefinitionBuilders() {
-        return getInstanceOf(BPMDefinitionBuilders.class);
-    }
-
-    @Override
-    public BPMInstanceBuilders getBPMInstanceBuilders() {
-        return getInstanceOf(BPMInstanceBuilders.class);
     }
 
     @Override
@@ -397,23 +317,8 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SActorBuilders getSActorBuilders() {
-        return getInstanceOf(SActorBuilders.class);
-    }
-
-    @Override
-    public SCategoryBuilderAccessor getCategoryModelBuilderAccessor() {
-        return getInstanceOf(SCategoryBuilderAccessor.class);
-    }
-
-    @Override
     public CategoryService getCategoryService() {
         return getInstanceOf(CategoryService.class);
-    }
-
-    @Override
-    public SExpressionBuilders getSExpressionBuilders() {
-        return getInstanceOf(SExpressionBuilders.class);
     }
 
     public GatewayInstanceService getGatewayInstanceService() {
@@ -436,33 +341,13 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SDocumentMappingBuilderAccessor getDocumentMappingBuilderAccessor() {
-        return getInstanceOf(SDocumentMappingBuilderAccessor.class);
-    }
-
-    @Override
     public ProcessDocumentService getProcessDocumentService() {
         return getInstanceOf(ProcessDocumentService.class);
     }
 
     @Override
-    public SProcessDocumentBuilders getProcessDocumentBuilders() {
-        return getInstanceOf(SProcessDocumentBuilders.class);
-    }
-
-    @Override
-    public SCommandBuilderAccessor getSCommandBuilderAccessor() {
-        return getInstanceOf(SCommandBuilderAccessor.class);
-    }
-
-    @Override
     public EventInstanceService getEventInstanceService() {
         return getInstanceOf(EventInstanceService.class);
-    }
-
-    @Override
-    public DependencyBuilderAccessor getDependencyBuilderAccessor() {
-        return getInstanceOf("platformDependencyBuilderAccessor", DependencyBuilderAccessor.class);
     }
 
     @Override
@@ -486,23 +371,8 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SProfileBuilderAccessor getSProfileBuilderAccessor() {
-        return getInstanceOf(SProfileBuilderAccessor.class);
-    }
-
-    @Override
     public PlatformCommandService getPlatformCommandService() {
         return getInstanceOf(PlatformCommandService.class);
-    }
-
-    @Override
-    public SPlatformCommandBuilderAccessor getSPlatformCommandBuilderAccessor() {
-        return getInstanceOf(SPlatformCommandBuilderAccessor.class);
-    }
-
-    @Override
-    public SDataSourceModelBuilder getSDataSourceModelBuilder() {
-        return getInstanceOf(SDataSourceModelBuilder.class);
     }
 
     @Override
@@ -531,18 +401,8 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SProcessSupervisorBuilders getSSupervisorBuilders() {
-        return getInstanceOf(SProcessSupervisorBuilders.class);
-    }
-
-    @Override
     public OperationService getOperationService() {
         return getInstanceOf(OperationService.class);
-    }
-
-    @Override
-    public SOperationBuilders getSOperationBuilders() {
-        return getInstanceOf(SOperationBuilders.class);
     }
 
     @Override
@@ -561,11 +421,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SCommentBuilders getSCommentBuilders() {
-        return getInstanceOf(SCommentBuilders.class);
-    }
-
-    @Override
     public ContainerRegistry getContainerRegistry() {
         return getInstanceOf(ContainerRegistry.class);
     }
@@ -576,18 +431,41 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public SExternalIdentityMappingBuilders getExternalIdentityMappingBuilders() {
-        return getInstanceOf(SExternalIdentityMappingBuilders.class);
-    }
-
-    @Override
     public LockService getLockService() {
         return getInstanceOf(LockService.class);
     }
 
     @Override
     public Parser getProfileParser() {
-        return getInstanceOf(Parser.class);
+        // TODO is duplicated in SpringTenantServiceAccessor, must not, but profile service does not have dep on Parser..
+        final List<Class<? extends ElementBinding>> bindings = new ArrayList<Class<? extends ElementBinding>>();
+        bindings.add(ProfileBinding.class);
+        bindings.add(ProfilesBinding.class);
+        bindings.add(ProfileEntryBinding.class);
+        bindings.add(ParentProfileEntryBinding.class);
+        bindings.add(ChildrenEntriesBinding.class);
+        bindings.add(ProfileEntriesBinding.class);
+        bindings.add(ProfileMappingBinding.class);
+        bindings.add(MembershipsBinding.class);
+        bindings.add(MembershipBinding.class);
+        bindings.add(UserNamesBinding.class);
+        bindings.add(RoleNamesBinding.class);
+        bindings.add(RoleNamesBinding.class);
+        bindings.add(GroupPathsBinding.class);
+        final Parser parser = getParserFactgory().createParser(bindings);
+        final InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("profiles.xsd");
+        try {
+            parser.setSchema(resource);
+            return parser;
+        } catch (final SInvalidSchemaException ise) {
+            throw new BonitaRuntimeException(ise);
+        } finally {
+            try {
+                resource.close();
+            } catch (final IOException ioe) {
+                throw new BonitaRuntimeException(ioe);
+            }
+        }
     }
 
     @Override

@@ -15,11 +15,12 @@ package org.bonitasoft.engine.supervisor.mapping.impl;
 
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -28,8 +29,8 @@ import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -43,8 +44,8 @@ import org.bonitasoft.engine.supervisor.mapping.SSupervisorDeletionException;
 import org.bonitasoft.engine.supervisor.mapping.SSupervisorNotFoundException;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
-import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilders;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorLogBuilder;
+import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorLogBuilderFactory;
 
 /**
  * @author Yanyan Liu
@@ -59,16 +60,13 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
 
     private final EventService eventService;
 
-    private final SProcessSupervisorBuilders sSupervisorBuilders;
-
     private final QueriableLoggerService queriableLoggerService;
 
     public SupervisorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final SProcessSupervisorBuilders sSupervisorBuilders, final QueriableLoggerService queriableLoggerService) {
+            final QueriableLoggerService queriableLoggerService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
-        this.sSupervisorBuilders = sSupervisorBuilders;
         this.queriableLoggerService = queriableLoggerService;
     }
 
@@ -78,8 +76,7 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
         final InsertRecord insertRecord = new InsertRecord(supervisor);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(SUPERVISOR, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(SUPERVISOR).setObject(supervisor).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(SUPERVISOR).setObject(supervisor).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -115,8 +112,7 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     public void deleteSupervisor(final SProcessSupervisor supervisor) throws SSupervisorDeletionException {
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(SUPERVISOR, EventActionType.DELETED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(SUPERVISOR).setObject(supervisor).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(SUPERVISOR).setObject(supervisor).done();
         }
         final DeleteRecord record = new DeleteRecord(supervisor);
         final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting supervisor");
@@ -140,14 +136,14 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     private SProcessSupervisorLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SProcessSupervisorLogBuilder logBuilder = sSupervisorBuilders.getSSupervisorLogBuilder();
+        final SProcessSupervisorLogBuilder logBuilder = BuilderFactory.get(SProcessSupervisorLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {

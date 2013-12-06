@@ -15,41 +15,21 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SSubProcessActivityInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl;
 
 /**
- * @author Elias Ricken de Medeiros
  * @author Celine Souchet
+ * @author Elias Ricken de Medeiros
  */
 public class SSubProcessActivityInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SSubProcessActivityInstanceBuilder {
 
-    private SSubProcessActivityInstanceImpl entity;
-
-    @Override
-    public SSubProcessActivityInstanceBuilder createNewSubProcessActivityInstance(final String name, final long flowNodeDefinitionId,
-            final long rootContainerId, final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
-            final long parentProcessInstanceId, final boolean isTriggeredByEvent) {
-        entity = new SSubProcessActivityInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
-                rootProcessInstanceId, isTriggeredByEvent);
-        entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        entity.setTokenCount(1);
-        return this;
-    }
-
-    @Override
-    public String getTriggeredByEventKey() {
-        return "triggeredByEvent";
+    public SSubProcessActivityInstanceBuilderImpl(final SSubProcessActivityInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SSubProcessActivityInstance done() {
-        return entity;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return entity;
+        return (SSubProcessActivityInstance) entity;
     }
 
 }

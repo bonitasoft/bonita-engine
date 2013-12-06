@@ -23,6 +23,4 @@ public interface SEventTriggerInstanceLogBuilder extends SPersistenceLogBuilder,
 
     SEventTriggerInstanceLogBuilder eventInstanceId(final long eventId);
 
-    String getEventInstanceIdKey();
-
 }

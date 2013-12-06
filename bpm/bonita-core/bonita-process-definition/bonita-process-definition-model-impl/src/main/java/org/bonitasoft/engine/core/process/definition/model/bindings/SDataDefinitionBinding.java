@@ -15,9 +15,10 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
@@ -33,12 +34,6 @@ public class SDataDefinitionBinding extends SNamedElementBinding {
     protected String className;
 
     protected String isTransient;
-
-    protected final SDataDefinitionBuilders builder;
-
-    public SDataDefinitionBinding(final SDataDefinitionBuilders builder) {
-        this.builder = builder;
-    }
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
@@ -63,7 +58,7 @@ public class SDataDefinitionBinding extends SNamedElementBinding {
 
     @Override
     public SDataDefinition getObject() {
-        final SDataDefinitionBuilder dataDefinitionImpl = builder.getDataDefinitionBuilder().createNewInstance(name, className);
+        final SDataDefinitionBuilder dataDefinitionImpl = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(name, className);
         if (description != null) {
             dataDefinitionImpl.setDescription(description);
         }

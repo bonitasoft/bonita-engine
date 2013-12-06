@@ -19,12 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.EventDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SFlowNodeDefinitionImpl;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -36,9 +34,9 @@ public abstract class SEventDefinitionImpl extends SFlowNodeDefinitionImpl imple
 
     private final List<SEventTriggerDefinition> eventTriggers;
 
-    public SEventDefinitionImpl(final EventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SOperationBuilders sOperationBuilders) {
-        super(eventDefinition, sExpressionBuilders, transitionsMap, sOperationBuilders);
+    public SEventDefinitionImpl(final EventDefinition eventDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(eventDefinition, transitionsMap);
         // initialize the list have an initial capacity of 1: most of time there will be zero or one event trigger
         eventTriggers = new ArrayList<SEventTriggerDefinition>(1);
     }

@@ -22,26 +22,10 @@ import org.bonitasoft.engine.core.category.model.SCategory;
  */
 public interface SCategoryBuilder {
 
-    SCategoryBuilder createNewInstance(final String name, final long creator);
-
-    SCategoryBuilder createNewInstance(final SCategory category);
-
     SCategoryBuilder setDescription(final String description);
 
     SCategoryBuilder setLastUpdateDate(final long lastUpdateDate);
 
     SCategory done();
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getDescriptionKey();
-
-    String getCreatorKey();
-
-    String getCreationDateKey();
-
-    String getLastUpdateDateKey();
 
 }

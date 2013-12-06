@@ -22,20 +22,11 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMa
  */
 public class SPendingActivityMappingBuilderImpl implements SPendingActivityMappingBuilder {
 
-    private SPendingActivityMappingImpl entity;
+    private final SPendingActivityMappingImpl entity;
 
-    @Override
-    public SPendingActivityMappingBuilder createNewInstanceForUser(final long activityId, final long userId) {
-        entity = new SPendingActivityMappingImpl(activityId);
-        entity.setUserId(userId);
-        return this;
-    }
-
-    @Override
-    public SPendingActivityMappingBuilder createNewInstanceForActor(final long activityId, final long actorId) {
-        entity = new SPendingActivityMappingImpl(activityId);
-        entity.setActorId(actorId);
-        return this;
+    public SPendingActivityMappingBuilderImpl(final SPendingActivityMappingImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override

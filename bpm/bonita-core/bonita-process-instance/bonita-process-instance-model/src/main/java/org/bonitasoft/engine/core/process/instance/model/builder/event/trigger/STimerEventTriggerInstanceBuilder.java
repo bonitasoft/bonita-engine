@@ -13,20 +13,13 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger;
 
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public interface STimerEventTriggerInstanceBuilder extends SEventTriggerInstanceBuilder {
-
-    STimerEventTriggerInstanceBuilder createNewTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue);
+public interface STimerEventTriggerInstanceBuilder {
 
     STimerEventTriggerInstance done();
-
-    String getTimerTypeKey();
-
-    String getTimerValueKey();
 
 }

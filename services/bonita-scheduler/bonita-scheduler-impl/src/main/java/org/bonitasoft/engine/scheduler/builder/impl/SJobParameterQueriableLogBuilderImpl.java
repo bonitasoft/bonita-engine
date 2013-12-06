@@ -27,21 +27,12 @@ public class SJobParameterQueriableLogBuilderImpl extends CRUDELogBuilder implem
 
     private static final int JOB_PARAMETER_INDEX = 1;
 
-    private static final String JOB_PARAMETER_INDEX_NAME = "numericIndex2";
-
     private static final int JOB_INDEX = 0;
-
-    private static final String JOB_INDEX_NAME = "numericIndex1";
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
         this.queriableLogBuilder.numericIndex(JOB_PARAMETER_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return JOB_PARAMETER_INDEX_NAME;
     }
 
     @Override
@@ -66,11 +57,6 @@ public class SJobParameterQueriableLogBuilderImpl extends CRUDELogBuilder implem
     public SJobParameterQueriableLogBuilder jogDescriptorId(final long jobDescriptorId) {
         this.queriableLogBuilder.numericIndex(JOB_INDEX, jobDescriptorId);
         return this;
-    }
-
-    @Override
-    public String getJobDescriptorIdKey() {
-        return JOB_INDEX_NAME;
     }
 
 }

@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.document.DocumentService;
@@ -25,12 +26,12 @@ import org.bonitasoft.engine.document.SDocumentContentNotFoundException;
 import org.bonitasoft.engine.document.SDocumentDeletionException;
 import org.bonitasoft.engine.document.SDocumentStorageException;
 import org.bonitasoft.engine.document.model.SDocument;
-import org.bonitasoft.engine.document.model.SDocumentBuilders;
 import org.bonitasoft.engine.document.model.SDocumentContent;
 import org.bonitasoft.engine.document.model.SDocumentContentBuilder;
+import org.bonitasoft.engine.document.model.SDocumentContentBuilderFactory;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -47,18 +48,11 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final Recorder recorder;
 
-    private final SEventBuilders eventBuilders;
-
     private final ReadPersistenceService persistenceService;
 
-    private final SDocumentBuilders documentBuilders;
-
-    public DocumentServiceImpl(final Recorder recorder, final SEventBuilders eventBuilders, final ReadPersistenceService persistenceService,
-            final SDocumentBuilders documentBuilders) {
+    public DocumentServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService) {
         this.recorder = recorder;
-        this.eventBuilders = eventBuilders;
         this.persistenceService = persistenceService;
-        this.documentBuilders = documentBuilders;
     }
 
     @Override
@@ -71,7 +65,7 @@ public class DocumentServiceImpl implements DocumentService {
         final String documentId = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
         final SDocumentContent sdocumentContent = createDocumentContent(documentId, documentContent);
         final InsertRecord insertRecord = new InsertRecord(sdocumentContent);
-        final SInsertEvent insertEvent = (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent("SDocumentContent").setObject(sdocumentContent)
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent("SDocumentContent").setObject(sdocumentContent)
                 .done();
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -93,7 +87,7 @@ public class DocumentServiceImpl implements DocumentService {
             // sdocumentContent = getDocumentContent(sDocument.getStorageId());
             sdocumentContent = getDocumentContent(documentId);
             final DeleteRecord deleteRecord = new DeleteRecord(sdocumentContent);
-            final SDeleteEvent deleteEvent = (SDeleteEvent) eventBuilders.getEventBuilder().createDeleteEvent("SDocumentContent").setObject(sdocumentContent)
+            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SDocumentContent").setObject(sdocumentContent)
                     .done();
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {
@@ -102,8 +96,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     private SDocumentContent createDocumentContent(final String storageId, final byte[] content) {
-        final SDocumentContentBuilder dcontentBuilder = documentBuilders.getSDocumentContentBuilder();
-        dcontentBuilder.createNewInstance();
+        final SDocumentContentBuilder dcontentBuilder = BuilderFactory.get(SDocumentContentBuilderFactory.class).createNewInstance();
         dcontentBuilder.setStorageId(storageId).setContent(content);
         return dcontentBuilder.done();
     }

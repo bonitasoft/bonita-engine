@@ -16,6 +16,7 @@ package org.bonitasoft.engine.identity.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.identity.ExportedUserBuilder;
+import org.bonitasoft.engine.identity.ExportedUserBuilderFactory;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
@@ -25,18 +26,14 @@ import org.bonitasoft.engine.xml.ElementBinding;
  */
 public class UserBinding extends ElementBinding {
 
-    private final ExportedUserBuilder userBuilder;
+    private ExportedUserBuilder userBuilder;
 
     private boolean containsEnabled = false;
-
-    public UserBinding() {
-        userBuilder = new ExportedUserBuilder();
-    }
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         final String userName = attributes.get(OrganizationMappingConstants.USER_NAME);
-        userBuilder.createNewInstance(userName, null);
+        userBuilder = ExportedUserBuilderFactory.createNewInstance(userName, null);
     }
 
     @Override

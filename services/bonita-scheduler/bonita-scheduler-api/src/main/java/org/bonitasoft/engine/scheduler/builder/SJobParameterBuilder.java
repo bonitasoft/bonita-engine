@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.scheduler.builder;
 
-import java.io.Serializable;
-
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 
 /**
@@ -22,16 +20,8 @@ import org.bonitasoft.engine.scheduler.model.SJobParameter;
  */
 public interface SJobParameterBuilder {
 
-    SJobParameterBuilder createNewInstance(String key, Serializable value);
-
     SJobParameterBuilder setJobDescriptorId(long jobDescriptorId);
 
     SJobParameter done();
-
-    String getJobDescriptorIdKey();
-
-    String getKeyKey();
-
-    String getValueKey();
 
 }

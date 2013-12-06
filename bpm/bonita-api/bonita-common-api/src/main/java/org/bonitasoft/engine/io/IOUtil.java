@@ -45,7 +45,7 @@ public class IOUtil {
 
     private static final int BUFF_SIZE = 100000;
 
-    private static final String fEncoding = "UTF-8";
+    public static final String fEncoding = "UTF-8";
 
     public static void write(final File file, final byte[] fileContent) throws IOException {
         if (!file.exists()) {

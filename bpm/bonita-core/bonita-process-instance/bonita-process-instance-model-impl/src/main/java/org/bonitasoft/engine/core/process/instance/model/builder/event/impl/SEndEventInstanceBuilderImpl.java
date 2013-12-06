@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SEndEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -24,24 +23,13 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
  */
 public class SEndEventInstanceBuilderImpl extends SEventInstanceBuilderImpl implements SEndEventInstanceBuilder {
 
-    private SEndEventInstanceImpl entity = null;
-
-    @Override
-    public SEndEventInstanceBuilder createNewEndEventInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        entity = new SEndEventInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId);
-        entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SEndEventInstanceBuilderImpl(final SEndEventInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SEventInstance done() {
-        return entity;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return entity;
+        return (SEventInstance) entity;
     }
 
 }

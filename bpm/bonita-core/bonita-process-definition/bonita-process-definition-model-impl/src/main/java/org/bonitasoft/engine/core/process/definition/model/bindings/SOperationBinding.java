@@ -15,10 +15,11 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilder;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.xml.ElementBinding;
 
@@ -27,8 +28,6 @@ import org.bonitasoft.engine.xml.ElementBinding;
  */
 public class SOperationBinding extends ElementBinding {
 
-    private final SOperationBuilders sOperationBuilders;
-
     private SExpression rightOperand;
 
     private SLeftOperand leftOperand;
@@ -36,10 +35,6 @@ public class SOperationBinding extends ElementBinding {
     private String operator;
 
     private SOperatorType operatorType;
-
-    public SOperationBinding(final SOperationBuilders sOperationBuilders) {
-        this.sOperationBuilders = sOperationBuilders;
-    }
 
     @Override
     public void setChildObject(final String name, final Object value) {
@@ -53,7 +48,7 @@ public class SOperationBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        final SOperationBuilder sOperationBuilder = sOperationBuilders.getSOperationBuilder().createNewInstance();
+        final SOperationBuilder sOperationBuilder = BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance();
         sOperationBuilder.setOperator(operator);
         sOperationBuilder.setRightOperand(rightOperand);
         sOperationBuilder.setType(operatorType);

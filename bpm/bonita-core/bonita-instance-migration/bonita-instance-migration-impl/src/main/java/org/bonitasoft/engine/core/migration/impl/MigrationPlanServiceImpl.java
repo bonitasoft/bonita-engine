@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.core.migration.MigrationPlanService;
@@ -31,8 +32,7 @@ import org.bonitasoft.engine.core.migration.exceptions.SPrepareForMigrationFaile
 import org.bonitasoft.engine.core.migration.model.SMigrationPlan;
 import org.bonitasoft.engine.core.migration.model.SMigrationPlanDescriptor;
 import org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorImpl;
-import org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorLogBuilder;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.migration.model.impl.SMigrationPlanDescriptorLogBuilderImpl;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -41,8 +41,8 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -52,8 +52,8 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -92,7 +92,7 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
     protected final QueriableLoggerService queriableLoggerService;
 
     public MigrationPlanServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final EventService eventService,
-            final ParserFactory parserFactory, final SExpressionBuilders sExpressionBuilders, final SOperationBuilders sOperationBuilders,
+            final ParserFactory parserFactory,
             final CacheService cacheService, final ReadSessionAccessor sessionAccessor, final ProcessInstanceService processInstanceService,
             final QueriableLoggerService queriableLoggerService) {
         this.recorder = recorder;
@@ -101,7 +101,7 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
         this.cacheService = cacheService;
         this.processInstanceService = processInstanceService;
         this.queriableLoggerService = queriableLoggerService;
-        final ElementBindingsFactory bindingsFactory = new SMigrationPlanElementBindings(sExpressionBuilders, sOperationBuilders);
+        final ElementBindingsFactory bindingsFactory = new SMigrationPlanElementBindings();
         parser = parserFactory.createParser(bindingsFactory);
         // the schema is in common-api
         final InputStream schemaStream = this.getClass().getResourceAsStream("/org/bonitasoft/engine/bpm/migration/MigrationPlan.xsd");
@@ -131,9 +131,9 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
             throw new SInvalidMigrationPlanException(e);
         }
         final InsertRecord insertRecord = new InsertRecord(descriptor);
-        final SMigrationPlanDescriptorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, ADDED_A_NEW_MIGRATION_PLAN);
+        final SMigrationPlanDescriptorLogBuilderImpl logBuilder = getQueriableLog(ActionType.CREATED, ADDED_A_NEW_MIGRATION_PLAN);
         try {
-            final SInsertEvent insertEvent = (SInsertEvent) eventService.getEventBuilder().createInsertEvent(MIGRATION_PLAN_DESCRIPTOR).setObject(descriptor)
+            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(MIGRATION_PLAN_DESCRIPTOR).setObject(descriptor)
                     .done();
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(insertRecord.getEntity().getId(), SQueriableLog.STATUS_OK, logBuilder, "importMigrationPlan");
@@ -147,15 +147,15 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
         }
     }
 
-    private SMigrationPlanDescriptorLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SMigrationPlanDescriptorLogBuilder logBuilder = new SMigrationPlanDescriptorLogBuilder();
+    private SMigrationPlanDescriptorLogBuilderImpl getQueriableLog(final ActionType actionType, final String message) {
+        final SMigrationPlanDescriptorLogBuilderImpl logBuilder = new SMigrationPlanDescriptorLogBuilderImpl();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -224,8 +224,8 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
     public void deleteMigrationPlan(final long id) throws SBonitaReadException, SMigrationPlanNotFoundException, SMigrationPlanDeletionException {
         final SMigrationPlanDescriptor descriptor = getMigrationPlanDescriptor(id);
         final DeleteRecord deleteRecord = new DeleteRecord(descriptor);
-        final SMigrationPlanDescriptorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, DELETED_MIGRATION_PLAN);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) eventService.getEventBuilder().createDeleteEvent(MIGRATION_PLAN_DESCRIPTOR).setObject(descriptor)
+        final SMigrationPlanDescriptorLogBuilderImpl logBuilder = getQueriableLog(ActionType.DELETED, DELETED_MIGRATION_PLAN);
+        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(MIGRATION_PLAN_DESCRIPTOR).setObject(descriptor)
                 .done();
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);

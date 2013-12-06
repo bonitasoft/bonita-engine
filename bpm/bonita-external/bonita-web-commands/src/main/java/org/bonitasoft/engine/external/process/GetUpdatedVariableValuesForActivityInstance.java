@@ -18,12 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -99,6 +101,6 @@ public class GetUpdatedVariableValuesForActivityInstance extends UpdateVariableV
     @Override
     public long getProcessDefinitionId(final long containerInstanceId) throws SBonitaException {
         return serviceAccessor.getActivityInstanceService().getActivityInstance(containerInstanceId)
-                .getLogicalGroup(serviceAccessor.getBPMInstanceBuilders().getSAutomaticTaskInstanceBuilder().getProcessDefinitionIndex());
+                .getLogicalGroup(BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex());
     }
 }

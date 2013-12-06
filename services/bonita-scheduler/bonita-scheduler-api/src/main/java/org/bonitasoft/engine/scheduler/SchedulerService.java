@@ -16,8 +16,6 @@ package org.bonitasoft.engine.scheduler;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.ServiceWithLifecycle;
-import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilder;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -135,19 +133,6 @@ public interface SchedulerService extends ServiceWithLifecycle {
      */
     List<String> getJobs() throws SSchedulerException;
 
-    /**
-     * Get the builder of job description
-     * 
-     * @return job descriptor builder
-     */
-    SJobDescriptorBuilder getJobDescriptorBuilder();
-
-    /**
-     * Get the builder of job parameter
-     * 
-     * @return job parameter builder
-     */
-    SJobParameterBuilder getJobParameterBuilder();
 
     /**
      * Get all jobs on all tenants

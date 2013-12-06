@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-dependency</artifactId>
 		<groupId>org.bonitasoft.engine.dependency</groupId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-dependency-impl</artifactId>
@@ -18,6 +18,11 @@
 			<artifactId>bonita-dependency-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 		  <groupId>org.bonitasoft.engine.classloader</groupId>
       <artifactId>bonita-classloader-api</artifactId>

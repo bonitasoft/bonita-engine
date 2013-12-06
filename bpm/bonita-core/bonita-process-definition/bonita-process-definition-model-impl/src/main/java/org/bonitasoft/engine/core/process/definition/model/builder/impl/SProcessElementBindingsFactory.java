@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.definition.model.builder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SActorDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SActorInitiatorDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SAutomaticTaskDefinitionBinding;
@@ -79,8 +78,6 @@ import org.bonitasoft.engine.core.process.definition.model.bindings.STransitionD
 import org.bonitasoft.engine.core.process.definition.model.bindings.SUserFilterDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SUserTaskDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SXMLDataDefinitionBinding;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 
@@ -90,19 +87,9 @@ import org.bonitasoft.engine.xml.ElementBindingsFactory;
  */
 public class SProcessElementBindingsFactory implements ElementBindingsFactory {
 
-    private final SExpressionBuilders sExpressionBuilders;
-
-    private final SDataDefinitionBuilders sDataDefinitionBuilders;
-
-    private final SOperationBuilders sOperationBuilders;
-
     private final List<ElementBinding> bindings;
 
-    public SProcessElementBindingsFactory(final SExpressionBuilders sExpressionBuilders, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        this.sExpressionBuilders = sExpressionBuilders;
-        this.sDataDefinitionBuilders = sDataDefinitionBuilders;
-        this.sOperationBuilders = sOperationBuilders;
+    public SProcessElementBindingsFactory() {
         bindings = new ArrayList<ElementBinding>();
         bindings.add(new SProcessDefinitionBinding());
         bindings.add(new SGatewayDefinitionBinding());
@@ -120,27 +107,27 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         bindings.add(new SSendTaskDefinitionBinding());
         bindings.add(new SUserTaskDefinitionBinding());
         bindings.add(new SManualTaskDefinitionBinding());
-        bindings.add(new SExpressionBinding(sExpressionBuilders));
-        bindings.add(new SConditionalExpressionBinding(sExpressionBuilders));
+        bindings.add(new SExpressionBinding());
+        bindings.add(new SConditionalExpressionBinding());
         bindings.add(new SConnectorDefinitionBinding());
         bindings.add(new SConnectorDefinitionInputBinding());
         bindings.add(new SUserFilterDefinitionBinding());
-        bindings.add(new SDataDefinitionBinding(sDataDefinitionBuilders));
-        bindings.add(new STextDataDefinitionBinding(sDataDefinitionBuilders));
-        bindings.add(new SXMLDataDefinitionBinding(sDataDefinitionBuilders));
+        bindings.add(new SDataDefinitionBinding());
+        bindings.add(new STextDataDefinitionBinding());
+        bindings.add(new SXMLDataDefinitionBinding());
         bindings.add(new SDocumentDefinitionBinding());
-        bindings.add(new SDefaultValueBinding(sExpressionBuilders));
-        bindings.add(new SDisplayDescriptionAfterCompletionExpressionBinding(sExpressionBuilders));
-        bindings.add(new SDisplayDescriptionExpressionBinding(sExpressionBuilders));
-        bindings.add(new SDisplayNameExpressionBinding(sExpressionBuilders));
+        bindings.add(new SDefaultValueBinding());
+        bindings.add(new SDisplayDescriptionAfterCompletionExpressionBinding());
+        bindings.add(new SDisplayDescriptionExpressionBinding());
+        bindings.add(new SDisplayNameExpressionBinding());
         bindings.add(new STimerEventTriggerDefinitionBinding());
         bindings.add(new SIntermediateCatchEventDefinitionBinding());
         bindings.add(new SIncomingTransitionRefBinding());
         bindings.add(new SOutgoingTransitionRefBinding());
         bindings.add(new SCatchMessageEventTriggerDefinitionBinding());
-        bindings.add(new SOperationBinding(sOperationBuilders));
-        bindings.add(new SRightOperandBinding(sExpressionBuilders));
-        bindings.add(new SLeftOperandBinding(sOperationBuilders));
+        bindings.add(new SOperationBinding());
+        bindings.add(new SRightOperandBinding());
+        bindings.add(new SLeftOperandBinding());
         bindings.add(new SIntermediateThrowEventDefinitionBinding());
         bindings.add(new SThrowMessageEventTriggerDefinitionBinding());
         bindings.add(new SCatchSignalEventTriggerDefinitionBinding());
@@ -149,21 +136,21 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         bindings.add(new SThrowErrorEventTriggerDefinitionBinding());
         bindings.add(new STerminateEventTriggerDefinitionBinding());
         bindings.add(new SCorrelationBinding());
-        bindings.add(new SCorrelationKeyBinding(sExpressionBuilders));
-        bindings.add(new SCorrelationValueBinding(sExpressionBuilders));
+        bindings.add(new SCorrelationKeyBinding());
+        bindings.add(new SCorrelationValueBinding());
         bindings.add(new SStandardLoopCharacteristicsBinding());
-        bindings.add(new SLoopMaxBinding(sExpressionBuilders));
-        bindings.add(new SLoopConditionBinding(sExpressionBuilders));
-        bindings.add(new SMultiInstanceCompletionConditionBinding(sExpressionBuilders));
-        bindings.add(new SMultiInstanceLoopCardinalityBinding(sExpressionBuilders));
+        bindings.add(new SLoopMaxBinding());
+        bindings.add(new SLoopConditionBinding());
+        bindings.add(new SMultiInstanceCompletionConditionBinding());
+        bindings.add(new SMultiInstanceLoopCardinalityBinding());
         bindings.add(new SMultiInstanceLoopCharacteristicsBinding());
         bindings.add(new SCallActivityDefinitionBinding());
-        bindings.add(new SCallableElementBinding(sExpressionBuilders));
-        bindings.add(new SCallableElementVersionBinding(sExpressionBuilders));
-        bindings.add(new SDataInputOperationBinding(sOperationBuilders));
-        bindings.add(new SDataOutputOperationBinding(sOperationBuilders));
-        bindings.add(new STargetProcessBinding(sExpressionBuilders));
-        bindings.add(new STargetFlowNodeBinding(sExpressionBuilders));
+        bindings.add(new SCallableElementBinding());
+        bindings.add(new SCallableElementVersionBinding());
+        bindings.add(new SDataInputOperationBinding());
+        bindings.add(new SDataOutputOperationBinding());
+        bindings.add(new STargetProcessBinding());
+        bindings.add(new STargetFlowNodeBinding());
         bindings.add(new SFlowElementBinding());
         bindings.add(new SSubProcessDefinitionBinding());
         bindings.add(new SStringIndexBinding());
@@ -204,25 +191,25 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
             return new SOutgoingTransitionRefBinding();
         }
         if (SDefaultValueBinding.class.equals(binderClass)) {
-            return new SDefaultValueBinding(sExpressionBuilders);
+            return new SDefaultValueBinding();
         }
         if (SDisplayDescriptionAfterCompletionExpressionBinding.class.equals(binderClass)) {
-            return new SDisplayDescriptionAfterCompletionExpressionBinding(sExpressionBuilders);
+            return new SDisplayDescriptionAfterCompletionExpressionBinding();
         }
         if (SDisplayDescriptionExpressionBinding.class.equals(binderClass)) {
-            return new SDisplayDescriptionExpressionBinding(sExpressionBuilders);
+            return new SDisplayDescriptionExpressionBinding();
         }
         if (SDisplayNameExpressionBinding.class.equals(binderClass)) {
-            return new SDisplayDescriptionExpressionBinding(sExpressionBuilders);
+            return new SDisplayDescriptionExpressionBinding();
         }
         if (SDataDefinitionBinding.class.equals(binderClass)) {
-            return new SDataDefinitionBinding(sDataDefinitionBuilders);
+            return new SDataDefinitionBinding();
         }
         if (STextDataDefinitionBinding.class.equals(binderClass)) {
-            return new STextDataDefinitionBinding(sDataDefinitionBuilders);
+            return new STextDataDefinitionBinding();
         }
         if (SXMLDataDefinitionBinding.class.equals(binderClass)) {
-            return new SXMLDataDefinitionBinding(sDataDefinitionBuilders);
+            return new SXMLDataDefinitionBinding();
         }
         if (SDocumentDefinitionBinding.class.equals(binderClass)) {
             return new SDocumentDefinitionBinding();
@@ -261,10 +248,10 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
             return new SManualTaskDefinitionBinding();
         }
         if (SExpressionBinding.class.equals(binderClass)) {
-            return new SExpressionBinding(sExpressionBuilders);
+            return new SExpressionBinding();
         }
         if (SConditionalExpressionBinding.class.equals(binderClass)) {
-            return new SConditionalExpressionBinding(sExpressionBuilders);
+            return new SConditionalExpressionBinding();
         }
         if (SConnectorDefinitionBinding.class.equals(binderClass)) {
             return new SConnectorDefinitionBinding();
@@ -285,13 +272,13 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
             return new SCatchErrorEventTriggerDefinitionBinding();
         }
         if (SOperationBinding.class.equals(binderClass)) {
-            return new SOperationBinding(sOperationBuilders);
+            return new SOperationBinding();
         }
         if (SRightOperandBinding.class.equals(binderClass)) {
-            return new SRightOperandBinding(sExpressionBuilders);
+            return new SRightOperandBinding();
         }
         if (SLeftOperandBinding.class.equals(binderClass)) {
-            return new SLeftOperandBinding(sOperationBuilders);
+            return new SLeftOperandBinding();
         }
         if (SIntermediateThrowEventDefinitionBinding.class.equals(binderClass)) {
             return new SIntermediateThrowEventDefinitionBinding();
@@ -312,25 +299,25 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
             return new SCorrelationBinding();
         }
         if (SCorrelationKeyBinding.class.equals(binderClass)) {
-            return new SCorrelationKeyBinding(sExpressionBuilders);
+            return new SCorrelationKeyBinding();
         }
         if (SCorrelationValueBinding.class.equals(binderClass)) {
-            return new SCorrelationValueBinding(sExpressionBuilders);
+            return new SCorrelationValueBinding();
         }
         if (SStandardLoopCharacteristicsBinding.class.equals(binderClass)) {
             return new SStandardLoopCharacteristicsBinding();
         }
         if (SLoopConditionBinding.class.equals(binderClass)) {
-            return new SLoopConditionBinding(sExpressionBuilders);
+            return new SLoopConditionBinding();
         }
         if (SLoopMaxBinding.class.equals(binderClass)) {
-            return new SLoopMaxBinding(sExpressionBuilders);
+            return new SLoopMaxBinding();
         }
         if (SMultiInstanceCompletionConditionBinding.class.equals(binderClass)) {
-            return new SMultiInstanceCompletionConditionBinding(sExpressionBuilders);
+            return new SMultiInstanceCompletionConditionBinding();
         }
         if (SMultiInstanceLoopCardinalityBinding.class.equals(binderClass)) {
-            return new SMultiInstanceLoopCardinalityBinding(sExpressionBuilders);
+            return new SMultiInstanceLoopCardinalityBinding();
         }
         if (SMultiInstanceLoopCharacteristicsBinding.class.equals(binderClass)) {
             return new SMultiInstanceLoopCharacteristicsBinding();
@@ -339,22 +326,22 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
             return new SCallActivityDefinitionBinding();
         }
         if (SCallableElementBinding.class.equals(binderClass)) {
-            return new SCallableElementBinding(sExpressionBuilders);
+            return new SCallableElementBinding();
         }
         if (SCallableElementVersionBinding.class.equals(binderClass)) {
-            return new SCallableElementVersionBinding(sExpressionBuilders);
+            return new SCallableElementVersionBinding();
         }
         if (SDataInputOperationBinding.class.equals(binderClass)) {
-            return new SDataInputOperationBinding(sOperationBuilders);
+            return new SDataInputOperationBinding();
         }
         if (SDataOutputOperationBinding.class.equals(binderClass)) {
-            return new SDataOutputOperationBinding(sOperationBuilders);
+            return new SDataOutputOperationBinding();
         }
         if (STargetProcessBinding.class.equals(binderClass)) {
-            return new STargetProcessBinding(sExpressionBuilders);
+            return new STargetProcessBinding();
         }
         if (STargetFlowNodeBinding.class.equals(binderClass)) {
-            return new STargetFlowNodeBinding(sExpressionBuilders);
+            return new STargetFlowNodeBinding();
         }
         if (SStringIndexBinding.class.equals(binderClass)) {
             return new SStringIndexBinding();

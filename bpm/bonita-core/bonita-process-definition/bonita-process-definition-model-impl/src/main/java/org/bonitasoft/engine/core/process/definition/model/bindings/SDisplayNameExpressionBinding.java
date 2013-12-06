@@ -13,16 +13,11 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
  */
 public class SDisplayNameExpressionBinding extends SExpressionBinding {
-
-    public SDisplayNameExpressionBinding(final SExpressionBuilders expressionBuilders) {
-        super(expressionBuilders);
-    }
 
     @Override
     public String getElementTag() {

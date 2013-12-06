@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.impl.SAutomaticTaskInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 
 /**
  * @author Baptiste Mesta
@@ -25,25 +24,13 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
  */
 public class SAutomaticTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SAutomaticTaskInstanceBuilder {
 
-    private SAutomaticTaskInstanceImpl activityInstanceImpl;
-
-    @Override
-    public SAutomaticTaskInstanceBuilder createNewAutomaticTaskInstance(final String name, final long flowNodeDefinitionId, final long rootContainerId,
-            final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId, final long parentProcessInstanceId) {
-        activityInstanceImpl = new SAutomaticTaskInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
-                rootProcessInstanceId);
-        activityInstanceImpl.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SAutomaticTaskInstanceBuilderImpl(final SAutomaticTaskInstanceImpl activityInstanceImpl) {
+        super(activityInstanceImpl);
     }
 
     @Override
     public SAutomaticTaskInstance done() {
-        return activityInstanceImpl;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return activityInstanceImpl;
+        return (SAutomaticTaskInstance) this.entity;
     }
 
 }

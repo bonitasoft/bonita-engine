@@ -22,6 +22,4 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 public interface SDependencyMappingLogBuilder extends SPersistenceLogBuilder, HasCRUDEAction {
 
     SDependencyMappingLogBuilder dependencyId(final long dependencyId);
-
-    String getDependencyIdKey();
 }

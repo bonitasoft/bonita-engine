@@ -16,27 +16,17 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.handling
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
 
 /**
  * @author Elias Ricken de Medeiros
  */
 public class SMessageInstanceBuilderImpl implements SMessageInstanceBuilder {
 
-    private SMessageInstanceImpl entity;
-
-    @Override
-    public SMessageInstanceBuilder createNewInstance(final SThrowMessageEventTriggerInstance throwMessage, final long processDefinitionId,
-            final String flowNodeName) {
-        entity = new SMessageInstanceImpl(throwMessage, processDefinitionId, flowNodeName);
-        return this;
-    }
-
-    @Override
-    public SMessageInstanceBuilder createNewInstance(final SMessageInstance message) {
-        entity = new SMessageInstanceImpl(message.getMessageName(), message.getTargetProcess(), message.getTargetFlowNode(), message.getProcessDefinitionId(),
-                message.getFlowNodeName());
-        return this;
+    private final SMessageInstanceImpl entity;
+    
+    public SMessageInstanceBuilderImpl(final SMessageInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
@@ -66,31 +56,6 @@ public class SMessageInstanceBuilderImpl implements SMessageInstanceBuilder {
     @Override
     public SMessageInstance done() {
         return entity;
-    }
-
-    @Override
-    public String getTargetProcessKey() {
-        return "targetProcess";
-    }
-
-    @Override
-    public String getTargetFlowNodeKey() {
-        return "targetFlowNode";
-    }
-
-    @Override
-    public String getMessageNameKey() {
-        return "messageName";
-    }
-
-    @Override
-    public String getLockedKey() {
-        return "locked";
-    }
-
-    @Override
-    public String getHandledKey() {
-        return "handled";
     }
 
 }

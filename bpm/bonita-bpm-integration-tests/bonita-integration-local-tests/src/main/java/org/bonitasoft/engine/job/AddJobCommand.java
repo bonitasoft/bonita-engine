@@ -6,11 +6,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
+import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
+import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -25,16 +27,15 @@ public class AddJobCommand extends TenantCommand {
             throws SCommandParameterizationException, SCommandExecutionException {
         final SchedulerService schedulerService = serviceAccessor.getSchedulerService();
         final Trigger trigger = new OneShotTrigger("OneShot", new Date());
-        final SJobDescriptor jobDescriptor = schedulerService.getJobDescriptorBuilder()
+        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(ThrowsExceptionJob.class.getName(), "ThowExceptionJob").setDescription("Throw an exception when 'throwException'=true")
                 .done();
-        final SJobParameterBuilder parameterBuilder = schedulerService.getJobParameterBuilder();
         Boolean throwException = Boolean.TRUE;
         final Serializable exception = parameters.get("throwException");
         if (exception != null) {
             throwException = (Boolean) exception;
         }
-        final SJobParameter parameter = parameterBuilder.createNewInstance("throwException", throwException).done();
+        final SJobParameter parameter = BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwException", throwException).done();
         final List<SJobParameter> params = new ArrayList<SJobParameter>(2);
         params.add(parameter);
         try {

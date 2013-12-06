@@ -25,16 +25,11 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class SThrowMessageEventTriggerDefinitionBuilderImpl implements SThrowMessageEventTriggerDefinitionBuilder {
 
-    private SThrowMessageEventTriggerDefinitionImpl entity = null;
+    private final SThrowMessageEventTriggerDefinitionImpl entity;
 
-    @Override
-    public SThrowMessageEventTriggerDefinitionBuilder createNewInstance(final String name, final SExpression targetProcessName,
-            final SExpression targetFlowNodeName) {
-        entity = new SThrowMessageEventTriggerDefinitionImpl();
-        entity.setMessageName(name);
-        entity.setTargetProcess(targetProcessName);
-        entity.setTargetFlowNode(targetFlowNodeName);
-        return this;
+    public SThrowMessageEventTriggerDefinitionBuilderImpl(final SThrowMessageEventTriggerDefinitionImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override

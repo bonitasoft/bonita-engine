@@ -13,26 +13,17 @@
  **/
 package org.bonitasoft.engine.scheduler.builder.impl;
 
-import java.io.Serializable;
-
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl;
 
 public class SJobParameterBuilderImpl implements SJobParameterBuilder {
 
-    private static final String JOB_DESCRIPTOR_ID = "jobDescriptorId";
-
-    private static final String KEY = "key";
-
-    private static final String VALUE = "value";
-
-    private SJobParameterImpl entity;
-
-    @Override
-    public SJobParameterBuilder createNewInstance(final String key, final Serializable value) {
-        entity = new SJobParameterImpl(key, value);
-        return this;
+    private final SJobParameterImpl entity;
+    
+    public SJobParameterBuilderImpl(final SJobParameterImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
@@ -44,21 +35,6 @@ public class SJobParameterBuilderImpl implements SJobParameterBuilder {
     @Override
     public SJobParameter done() {
         return entity;
-    }
-
-    @Override
-    public String getJobDescriptorIdKey() {
-        return JOB_DESCRIPTOR_ID;
-    }
-
-    @Override
-    public String getKeyKey() {
-        return KEY;
-    }
-
-    @Override
-    public String getValueKey() {
-        return VALUE;
     }
 
 }

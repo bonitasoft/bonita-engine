@@ -15,7 +15,6 @@ package org.bonitasoft.engine.data.instance.model.builder;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 
@@ -23,8 +22,6 @@ import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWell
  * @author Zhao Na
  */
 public interface SDataInstanceBuilder {
-
-    SDataInstanceBuilder createNewInstance(SDataDefinition dataDefinition);
 
     SDataInstance done() throws SDataInstanceNotWellFormedException;
 
@@ -34,23 +31,4 @@ public interface SDataInstanceBuilder {
 
     SDataInstanceBuilder setValue(Serializable value);
 
-    String getIdKey();
-
-    String getNameKey();
-
-    String getLabelKey();
-
-    String getDescriptionKey();
-
-    String getTransientDataKey();
-
-    String getclassNameKey();
-
-    String getValueKey();
-
-    String getContainerIdKey();
-
-    String getContainerTypeKey();
-
-    String getArchiveDateKey();
 }

@@ -26,11 +26,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
  */
 public class SCommentLogBuilderImpl extends CRUDELogBuilder implements SCommmentLogBuilder {
 
-    private static final String COMMENT = "COMMENT";
-
     private static final int COMMENT_INDEX = 0;
-
-    private static final String COMMENT_INDEX_NAME = "numericIndex1";
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
@@ -39,13 +35,8 @@ public class SCommentLogBuilderImpl extends CRUDELogBuilder implements SCommment
     }
 
     @Override
-    public String getObjectIdKey() {
-        return COMMENT_INDEX_NAME;
-    }
-
-    @Override
     protected String getActionTypePrefix() {
-        return COMMENT;
+        return SCommentLogBuilderFactoryImpl.COMMENT;
     }
 
     @Override

@@ -13,15 +13,12 @@
  **/
 package org.bonitasoft.engine.data.instance.model.archive.builder;
 
-import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 
 /**
  * @author Feng Hui
  */
 public interface SADataInstanceBuilder {
-
-    SADataInstanceBuilder createNewInstance(SDataInstance sDataInstance);
 
     SADataInstance done();
 

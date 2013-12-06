@@ -21,8 +21,6 @@ import org.bonitasoft.engine.core.process.instance.model.SToken;
  */
 public interface STokenBuilder {
 
-    STokenBuilder createNewInstance(long processInstanceId, Long refId, Long parentRefId);
-
     SToken done();
 
 }

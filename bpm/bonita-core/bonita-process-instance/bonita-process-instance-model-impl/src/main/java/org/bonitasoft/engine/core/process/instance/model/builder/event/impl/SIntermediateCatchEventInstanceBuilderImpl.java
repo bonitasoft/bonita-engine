@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.impl;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SIntermediateCatchEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -24,26 +23,13 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
  */
 public class SIntermediateCatchEventInstanceBuilderImpl extends SEventInstanceBuilderImpl implements SIntermediateCatchEventInstanceBuilder {
 
-    private SIntermediateCatchEventInstanceImpl entity = null;
-
-    @Override
-    public SIntermediateCatchEventInstanceBuilder createNewIntermediateCatchEventInstance(final String name, final long flowNodeDefinitionId,
-            final long rootContainerId, final long parentContainerId, final long processDefinitionId, final long rootProcessInstanceId,
-            final long parentProcessInstanceId) {
-        entity = new SIntermediateCatchEventInstanceImpl(name, flowNodeDefinitionId, rootContainerId, parentContainerId, processDefinitionId,
-                rootProcessInstanceId);
-        entity.setLogicalGroup(PARENT_PROCESS_INSTANCE_INDEX, parentProcessInstanceId);
-        return this;
+    public SIntermediateCatchEventInstanceBuilderImpl(final SIntermediateCatchEventInstanceImpl entity) {
+        super(entity);
     }
 
     @Override
     public SEventInstance done() {
-        return entity;
-    }
-
-    @Override
-    protected SFlowNodeInstanceImpl getEntity() {
-        return entity;
+        return (SEventInstance) entity;
     }
 
 }

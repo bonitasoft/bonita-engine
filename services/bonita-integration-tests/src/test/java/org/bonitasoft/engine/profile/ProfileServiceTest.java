@@ -5,21 +5,21 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserCreationException;
 import org.bonitasoft.engine.identity.model.SUser;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.profile.builder.SProfileBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
-import org.bonitasoft.engine.profile.builder.SProfileEntryBuilder;
+import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
+import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
-import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,12 +34,9 @@ public class ProfileServiceTest extends CommonServiceTest {
 
     private static IdentityService identityService;
 
-    private static IdentityModelBuilder identityModelBuilder;
-
     static {
         profileService = getServicesBuilder().buildProfileService();
         identityService = getServicesBuilder().buildIdentityService();
-        identityModelBuilder = getServicesBuilder().buildIdentityModelBuilder();
     }
 
     @Test(expected = SProfileNotFoundException.class)
@@ -56,9 +53,7 @@ public class ProfileServiceTest extends CommonServiceTest {
     @Test
     public void getProfile() throws SBonitaException {
         getTransactionService().begin();
-        final SProfileBuilderAccessor sProfileBuilderAccessor = profileService.getSProfileBuilderAccessor();
-        final SProfileBuilder sProfileBuilder = sProfileBuilderAccessor.getSProfileBuilder();
-        final SProfile profile = sProfileBuilder.createNewInstance("profile1", true, 0, 0, 0, 0).done();
+        final SProfile profile = BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance("profile1", true, 0, 0, 0, 0).done();
         final SProfile createdProfile = profileService.createProfile(profile);
         final SProfile gotProfile = profileService.getProfile(createdProfile.getId());
         Assert.assertEquals(createdProfile, gotProfile);
@@ -72,30 +67,9 @@ public class ProfileServiceTest extends CommonServiceTest {
     }
 
     @Test
-    public void getEntries() throws SBonitaException {
-        getTransactionService().begin();
-        final SProfileBuilderAccessor sProfileBuilderAccessor = profileService.getSProfileBuilderAccessor();
-        final SProfileBuilder sProfileBuilder = sProfileBuilderAccessor.getSProfileBuilder();
-        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1", false, 0, 0, 0, 0).done());
-        final SProfileEntryBuilder sProfileEntryBuilder = sProfileBuilderAccessor.getSProfileEntryBuilder();
-        final SProfileEntry profileEntry = profileService.createProfileEntry(sProfileEntryBuilder.createNewInstance("entry1", profile.getId()).done());
-        List<SProfileEntry> entries = profileService.getEntriesOfProfile(profile.getId(), 0, 10);
-        Assert.assertEquals(1, entries.size());
-        final SProfileEntry sProfileEntry = entries.get(0);
-        Assert.assertEquals(profileEntry, sProfileEntry);
-        profileService.deleteProfileEntry(profileEntry.getId());
-        entries = profileService.getEntriesOfProfile(profile.getId(), 0, 10);
-        Assert.assertEquals(0, entries.size());
-        profileService.deleteProfile(profile);
-        getTransactionService().complete();
-    }
-
-    @Test
     public void getUserProfile() throws SBonitaException {
         getTransactionService().begin();
-        final SProfileBuilderAccessor sProfileBuilderAccessor = profileService.getSProfileBuilderAccessor();
-        final SProfileBuilder sProfileBuilder = sProfileBuilderAccessor.getSProfileBuilder();
-        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1", true, 0, 0, 0, 0).done());
+        final SProfile profile = profileService.createProfile(BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance("profile1", true, 0, 0, 0, 0).done());
 
         final List<OrderByOption> orderByOptions = getOrderByOptions();
         final QueryOptions queryOptions = new QueryOptions(0, 10, orderByOptions, Collections.singletonList(new FilterOption(SProfileMember.class, "profileId",
@@ -104,11 +78,10 @@ public class ProfileServiceTest extends CommonServiceTest {
         List<SProfileMember> profileMembers = profileService.searchProfileMembers("ForUser", queryOptions);
         Assert.assertEquals(0, profileMembers.size());
 
-        final SUserBuilder userBuilder = identityModelBuilder.getUserBuilder();
-        userBuilder.createNewInstance().setUserName("john").setPassword("bpm").setFirstName("John").setLastName("Doe");
+        SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("john").setPassword("bpm").setFirstName("John").setLastName("Doe");
         final SUser john = identityService.createUser(userBuilder.done());
 
-        userBuilder.createNewInstance().setUserName("jane").setPassword("bpm").setFirstName("Jane").setLastName("Doe");
+        userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName("jane").setPassword("bpm").setFirstName("Jane").setLastName("Doe");
         final SUser jane = identityService.createUser(userBuilder.done());
 
         final SProfileMember johnProfileMember = profileService.addUserToProfile(profile.getId(), john.getId(), "John", "Doe", "john");
@@ -128,24 +101,20 @@ public class ProfileServiceTest extends CommonServiceTest {
     }
 
     private List<OrderByOption> getOrderByOptions() {
-        final SUserBuilder userBuilder = identityModelBuilder.getUserBuilder();
         final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>(1);
-        orderByOptions.add(new OrderByOption(SUser.class, userBuilder.getFirstNameKey(), OrderByType.ASC));
+        orderByOptions.add(new OrderByOption(SUser.class, BuilderFactory.get(SUserBuilderFactory.class).getFirstNameKey(), OrderByType.ASC));
         return orderByOptions;
     }
 
     private SUser createUser(final String username, final String password) throws SUserCreationException {
-        final SUserBuilder userBuilder = identityModelBuilder.getUserBuilder();
-        userBuilder.createNewInstance().setUserName(username).setPassword(password);
+        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(username).setPassword(password);
         return identityService.createUser(userBuilder.done());
     }
 
     @Test
     public void getProfileOfUserFrom() throws SBonitaException {
         getTransactionService().begin();
-        final SProfileBuilderAccessor sProfileBuilderAccessor = profileService.getSProfileBuilderAccessor();
-        final SProfileBuilder sProfileBuilder = sProfileBuilderAccessor.getSProfileBuilder();
-        final SProfile profile = profileService.createProfile(sProfileBuilder.createNewInstance("profile1", false, 0, 0, 0, 0).done());
+        final SProfile profile = profileService.createProfile(BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance("profile1", false, 0, 0, 0, 0).done());
 
         final SUser john = createUser("john", "bpm");
         final SUser jane = createUser("jane", "bpm");

@@ -25,6 +25,7 @@ import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -32,8 +33,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletionException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
+import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -62,10 +62,8 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.ProcessInstanceLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -76,7 +74,7 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -88,11 +86,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -130,9 +123,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private final ActivityInstanceService activityService;
 
-    private final SProcessInstanceBuilder processInstanceKeyProvider;
-
-    private final BPMInstanceBuilders bpmInstanceBuilders;
+    private final SProcessInstanceBuilderFactory processInstanceKeyProvider;
 
     private final EventInstanceService bpmEventInstanceService;
 
@@ -154,42 +145,31 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private final SCommentService commentService;
 
-    private final SCommentBuilders commentBuilders;
-
     private final TokenService tokenService;
 
     public ProcessInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final ActivityInstanceService activityService, final TechnicalLoggerService logger, final BPMInstanceBuilders bpmInstanceBuilders,
+            final ActivityInstanceService activityService, final TechnicalLoggerService logger,
             final EventInstanceService bpmEventInstanceService, final DataInstanceService dataInstanceService, final ArchiveService archiveService,
             final QueriableLoggerService queriableLoggerService, final TransitionService transitionService,
             final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
             final ClassLoaderService classLoaderService, final ProcessDocumentService processDocumentService, final SCommentService commentService,
-            final SCommentBuilders commentBuilders, final TokenService tokenService) {
+            final TokenService tokenService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.eventService = eventService;
         this.activityService = activityService;
-        this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.transitionService = transitionService;
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
         this.classLoaderService = classLoaderService;
         this.processDocumentService = processDocumentService;
         this.commentService = commentService;
-        this.commentBuilders = commentBuilders;
         this.tokenService = tokenService;
-        processInstanceKeyProvider = bpmInstanceBuilders.getSProcessInstanceBuilder();
+        processInstanceKeyProvider = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         this.bpmEventInstanceService = bpmEventInstanceService;
         this.dataInstanceService = dataInstanceService;
         this.archiveService = archiveService;
         this.logger = logger;
-    }
-
-    private ProcessInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final ProcessInstanceLogBuilder logBuilder = bpmInstanceBuilders.getProcessInstanceLogBuilder();
-        initializeLogBuilder(logBuilder, message);
-        updateLog(actionType, logBuilder);
-        return logBuilder;
     }
 
     @Override
@@ -197,8 +177,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final InsertRecord insertRecord = new InsertRecord(processInstance);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(PROCESSINSTANCE).setObject(processInstance).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROCESSINSTANCE).setObject(processInstance).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -288,8 +267,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final DeleteRecord deleteRecord = new DeleteRecord(archivedProcessInstance);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.DELETED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PROCESSINSTANCE).setObject(archivedProcessInstance).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESSINSTANCE).setObject(archivedProcessInstance).done();
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
@@ -370,8 +348,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public List<Long> getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(final long processDefinitionId, final int fromIndex, final int maxResults,
             final OrderByType sortingOrder) throws SProcessInstanceReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        final SACommentBuilder archCommentKeyProvider = commentBuilders.getSACommentBuilder();
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SAProcessInstance.class, archCommentKeyProvider.getSourceObjectId(),
+        final String saCommentSourceObjectId = BuilderFactory.get(SACommentBuilderFactory.class).getSourceObjectId();
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SAProcessInstance.class, saCommentSourceObjectId,
                 sortingOrder);
         try {
             return persistenceService.selectList(SelectDescriptorBuilder.getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId,
@@ -392,8 +370,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final DeleteRecord deleteRecord = new DeleteRecord(sProcessInstance);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.DELETED)) {
-                final SEventBuilder eventBuilder = eventService.getEventBuilder();
-                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PROCESSINSTANCE).setObject(sProcessInstance).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESSINSTANCE).setObject(sProcessInstance).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SBonitaException e) {
@@ -486,13 +463,13 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void deleteArchivedProcessInstancesOfProcessInstance(final long processInstanceId) throws SBonitaException {
         final int fromIndex = 0;
         final int maxResults = 100;
-        final SAProcessInstanceBuilder archProcInstKeyProvider = bpmInstanceBuilders.getSAProcessInstanceBuilder();
+        final SAProcessInstanceBuilderFactory archProcInstKeyProvider = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
 
         List<SAProcessInstance> archProcInstances = null;
         do {
             // fromIndex variable is not updated because the elements will be deleted, so we always need to start from zero;
-            final SAProcessInstanceBuilder processInstanceBuilder = bpmInstanceBuilders.getSAProcessInstanceBuilder();
-            final FilterOption filterOption = new FilterOption(SAProcessInstance.class, processInstanceBuilder.getSourceObjectIdKey(), processInstanceId);
+            final SAProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
+            final FilterOption filterOption = new FilterOption(SAProcessInstance.class, processInstanceBuilderFact.getSourceObjectIdKey(), processInstanceId);
             final OrderByOption orderBy = new OrderByOption(SAProcessInstance.class, archProcInstKeyProvider.getIdKey(), OrderByType.ASC);
             final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, Collections.singletonList(orderBy),
                     Collections.singletonList(filterOption), null);
@@ -613,8 +590,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(processInstance, descriptor);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(eventType, EventActionType.UPDATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            updateEvent = (SUpdateEvent) eventBuilder.createUpdateEvent(eventType).setObject(processInstance).done();
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(eventType).setObject(processInstance).done();
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -624,7 +600,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void archiveProcessInstance(final SProcessInstance processInstance) throws SProcessInstanceModificationException {
-        final SAProcessInstance saProcessInstance = bpmInstanceBuilders.getSAProcessInstanceBuilder().createNewInstance(processInstance).done();
+        final SAProcessInstance saProcessInstance = BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
         final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saProcessInstance);
         try {
             archiveService.recordInsert(System.currentTimeMillis(), insertRecord);
@@ -644,14 +620,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         updateProcessInstance(processInstance, "update process instance state category", descriptor, PROCESS_INSTANCE_CATEGORY_STATE);
     }
 
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
-    }
-
     @Override
     public List<Long> getChildInstanceIdsOfProcessInstance(final long processInstanceId, final int fromIndex, final int maxResults, final String sortingField,
             final OrderByType sortingOrder) throws SProcessInstanceReadException {
@@ -668,8 +636,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public SProcessInstance getChildOfActivity(final long activityInstId) throws SProcessInstanceNotFoundException, SBonitaSearchException {
         try {
-            final SProcessInstanceBuilder processInstanceBuilder = bpmInstanceBuilders.getSProcessInstanceBuilder();
-            final FilterOption filterOption = new FilterOption(SProcessInstance.class, processInstanceBuilder.getCallerIdKey(), activityInstId);
+            final SProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
+            final FilterOption filterOption = new FilterOption(SProcessInstance.class, processInstanceBuilderFact.getCallerIdKey(), activityInstId);
             final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, Collections.singletonList(filterOption), null);
             return searchProcessInstances(queryOptions).get(0);
         } catch (final IndexOutOfBoundsException e) {
@@ -862,7 +830,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(processInstance, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(PROCESSINSTANCE).setObject(processInstance).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSINSTANCE).setObject(processInstance).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
         } catch (final SRecorderException e) {

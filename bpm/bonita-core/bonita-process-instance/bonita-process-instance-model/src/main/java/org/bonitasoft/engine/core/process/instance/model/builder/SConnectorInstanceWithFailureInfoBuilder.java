@@ -20,8 +20,4 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
  */
 public interface SConnectorInstanceWithFailureInfoBuilder extends SConnectorInstanceBuilder {
 
-    String getExceptionMessageKey();
-    
-    String getStackTraceKey();
-    
 }

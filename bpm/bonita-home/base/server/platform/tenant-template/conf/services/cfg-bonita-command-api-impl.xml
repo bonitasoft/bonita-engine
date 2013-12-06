@@ -5,7 +5,6 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
-		<constructor-arg name="commandBuilderAccessor" ref="commandBuilderAccessor" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
@@ -41,8 +40,6 @@
 			</list>
 		</property>
 	</bean>
-
-	<bean name="commandBuilderAccessor" class="org.bonitasoft.engine.command.model.SCommandBuilderAccessorImpl" />
 
 	<bean id="getActorIdsForUserIdIncludingTeam" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
 		<constructor-arg name="name">

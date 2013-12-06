@@ -6,10 +6,12 @@ import static org.junit.Assert.assertNull;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
+import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.junit.After;
 import org.junit.Before;
@@ -46,7 +48,7 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
 
     private SConnectorInstance createConnectorInTransaction(final String name, final long containerId, final String containerType, final String connectorId,
             final String version, final ConnectorEvent activationEvent, final int executionOrder) throws SBonitaException {
-        final SConnectorInstance connectorInstance = getServicesBuilder().getBPMInstanceBuilders().getSConnectorInstanceBuilder()
+        final SConnectorInstance connectorInstance = BuilderFactory.get(SConnectorInstanceBuilderFactory.class)
                 .createNewInstance(name, containerId, containerType, connectorId, version, activationEvent, executionOrder).done();
         getTransactionService().begin();
         this.connectorInstanceService.createConnectorInstance(connectorInstance);

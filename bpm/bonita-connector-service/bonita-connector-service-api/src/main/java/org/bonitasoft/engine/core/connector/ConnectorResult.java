@@ -60,6 +60,9 @@ public class ConnectorResult {
      * @return the result
      */
     public Map<String, Object> getResult() {
+        if (result == null) {
+            return Collections.emptyMap();
+        }
         return Collections.unmodifiableMap(result);
     }
 

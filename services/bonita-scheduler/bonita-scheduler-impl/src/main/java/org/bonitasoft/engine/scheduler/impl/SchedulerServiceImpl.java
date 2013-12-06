@@ -20,11 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.events.model.SEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -32,20 +34,16 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilder;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilder;
-import org.bonitasoft.engine.scheduler.builder.SSchedulerBuilderAccessor;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilder;
-import org.bonitasoft.engine.scheduler.builder.impl.SJobDescriptorBuilderImpl;
-import org.bonitasoft.engine.scheduler.builder.impl.SJobParameterBuilderImpl;
+import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -66,8 +64,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     private final TechnicalLoggerService logger;
 
     // this recorder must not use async logging else we have an infinite loop.
-    private final SSchedulerBuilderAccessor builderAccessor;
-
     private final SchedulerExecutor schedulerExecutor;
 
     private final JobService jobService;
@@ -88,16 +84,15 @@ public class SchedulerServiceImpl implements SchedulerService {
      * Create a new instance of scheduler service. Synchronous
      * QueriableLoggerService must be used to avoid an infinite loop.
      */
-    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final SSchedulerBuilderAccessor builderAccessor, final JobService jobService,
+    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService,
             final TechnicalLoggerService logger, final EventService eventService,
             final TransactionService transactionService, final SessionAccessor sessionAccessor) {
-        this.builderAccessor = builderAccessor;
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.logger = logger;
-        schedulStarted = eventService.getEventBuilder().createNewInstance(SCHEDULER_STARTED).done();
-        schedulStopped = eventService.getEventBuilder().createNewInstance(SCHEDULER_STOPPED).done();
-        jobFailed = eventService.getEventBuilder().createNewInstance(JOB_FAILED).done();
+        schedulStarted = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(SCHEDULER_STARTED).done();
+        schedulStopped = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(SCHEDULER_STOPPED).done();
+        jobFailed = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(JOB_FAILED).done();
         this.eventService = eventService;
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
@@ -123,7 +118,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -131,7 +126,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     private SSchedulerQueriableLogBuilder getLogBuilder(final ActionType actionType, final String message, final String scope) {
-        final SSchedulerQueriableLogBuilder logBuilder = builderAccessor.getSSchedulerQueriableLogBuilder();
+        final SSchedulerQueriableLogBuilder logBuilder = BuilderFactory.get(SSchedulerQueriableLogBuilderFactory.class).createNewInstance();
         initializeLogBuilder(logBuilder, message);
         updateLog(actionType, logBuilder);
         logBuilder.actionScope(scope);
@@ -310,11 +305,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         return list;
     }
 
-    @Override
-    public SJobDescriptorBuilder getJobDescriptorBuilder() {
-        return new SJobDescriptorBuilderImpl();
-    }
-
     /**
      * get the persisted job from the database
      * It opens a transaction!
@@ -366,11 +356,6 @@ public class SchedulerServiceImpl implements SchedulerService {
                 return jobWrapper;
             }
         };
-    }
-
-    @Override
-    public SJobParameterBuilder getJobParameterBuilder() {
-        return new SJobParameterBuilderImpl();
     }
 
     @Override

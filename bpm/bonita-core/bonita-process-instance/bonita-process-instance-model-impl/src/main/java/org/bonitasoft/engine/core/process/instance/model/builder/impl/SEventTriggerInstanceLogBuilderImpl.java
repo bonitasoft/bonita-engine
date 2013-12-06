@@ -27,34 +27,16 @@ public class SEventTriggerInstanceLogBuilderImpl extends CRUDELogBuilder impleme
 
     private static final String EVENT_INSTANCE_TRIGGER = "EVENT_INSTANCE_TRIGGER";
 
-    public static final int EVENT_INSTANCE_INDEX = 0;
-
-    public static final int EVENT_TRIGGER_INSTANCE_INDEX = 1;
-
-    public static final String EVENT_INSTANCE_NAME = "numericIndex1";
-
-    public static final String EVENT_TRIGGER_INSTANCE_NAME = "numericIndex2";
-
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
-        queriableLogBuilder.numericIndex(EVENT_TRIGGER_INSTANCE_INDEX, objectId);
+        queriableLogBuilder.numericIndex(SEventTriggerInstanceLogBuilderFactoryImpl.EVENT_TRIGGER_INSTANCE_INDEX, objectId);
         return this;
-    }
-
-    @Override
-    public String getObjectIdKey() {
-        return EVENT_TRIGGER_INSTANCE_NAME;
     }
 
     @Override
     public SEventTriggerInstanceLogBuilder eventInstanceId(final long eventId) {
-        queriableLogBuilder.numericIndex(EVENT_INSTANCE_INDEX, eventId);
+        queriableLogBuilder.numericIndex(SEventTriggerInstanceLogBuilderFactoryImpl.EVENT_INSTANCE_INDEX, eventId);
         return this;
-    }
-
-    @Override
-    public String getEventInstanceIdKey() {
-        return EVENT_INSTANCE_NAME;
     }
 
     @Override
@@ -65,11 +47,11 @@ public class SEventTriggerInstanceLogBuilderImpl extends CRUDELogBuilder impleme
     @Override
     protected void checkExtraRules(final SQueriableLog log) {
         if (log.getActionStatus() != SQueriableLog.STATUS_FAIL) {
-            if (log.getNumericIndex(EVENT_TRIGGER_INSTANCE_INDEX) == 0L) {
+            if (log.getNumericIndex(SEventTriggerInstanceLogBuilderFactoryImpl.EVENT_TRIGGER_INSTANCE_INDEX) == 0L) {
                 throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Event Trigger Instance Id");
             }
         }
-        if (log.getNumericIndex(EVENT_INSTANCE_INDEX) == 0L) {
+        if (log.getNumericIndex(SEventTriggerInstanceLogBuilderFactoryImpl.EVENT_INSTANCE_INDEX) == 0L) {
             throw new MissingMandatoryFieldsException("Some mandatory fields are missing: " + "Event Instance Id");
         }
     }

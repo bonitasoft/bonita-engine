@@ -16,6 +16,8 @@ package org.bonitasoft.engine.commons;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.bonitasoft.engine.commons.io.IOUtil;
+
 /**
  * @author Elias Ricken de Medeiros
  */

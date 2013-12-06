@@ -17,12 +17,10 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Feng Hui
@@ -36,9 +34,9 @@ public class SGatewayDefinitionImpl extends SFlowNodeDefinitionImpl implements S
 
     private final SGatewayType gatewayType;
 
-    public SGatewayDefinitionImpl(final GatewayDefinition gatewayDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SOperationBuilders sOperationBuilders) {
-        super(gatewayDefinition, sExpressionBuilders, transitionsMap, sOperationBuilders);
+    public SGatewayDefinitionImpl(final GatewayDefinition gatewayDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(gatewayDefinition, transitionsMap);
         final GatewayType type = gatewayDefinition.getGatewayType();
         gatewayType = SGatewayType.valueOf(type.toString());
     }

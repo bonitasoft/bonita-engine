@@ -37,8 +37,6 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="testLogBuilder" class="org.bonitasoft.engine.archive.model.TestLogBuilder" />
-
 	<bean id="sessionAccessor" class="org.bonitasoft.engine.sessionaccessor.ThreadLocalSessionAccessor" />
 
 </beans>

@@ -15,11 +15,12 @@ package org.bonitasoft.engine.api.impl.transaction.identity;
 
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.IdentityModelBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
 
 /**
  * @author Lu Kai
@@ -29,8 +30,6 @@ public class AddUserMemberships implements TransactionContent {
 
     private final List<Long> userIds;
 
-    private final IdentityModelBuilder modelBuilder;
-
     private final IdentityService identityService;
 
     private final long groupId;
@@ -39,12 +38,11 @@ public class AddUserMemberships implements TransactionContent {
 
     private final long currentUserId;
 
-    public AddUserMemberships(final long groupId, final long roleId, final List<Long> userIds, final IdentityModelBuilder modelBuilder,
+    public AddUserMemberships(final long groupId, final long roleId, final List<Long> userIds,
             final IdentityService identityService, final long currentUserId) {
         this.groupId = groupId;
         this.roleId = roleId;
         this.userIds = userIds;
-        this.modelBuilder = modelBuilder;
         this.identityService = identityService;
         this.currentUserId = currentUserId;
     }
@@ -53,7 +51,7 @@ public class AddUserMemberships implements TransactionContent {
     public void execute() throws SBonitaException {
 
         for (final long userId : userIds) {
-            final SUserMembership userMembership = modelBuilder.getUserMembershipBuilder().createNewInstance(userId, groupId, roleId)
+            final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(userId, groupId, roleId)
                     .setAssignedBy(currentUserId).done();
             identityService.createUserMembership(userMembership);
         }

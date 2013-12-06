@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
@@ -23,9 +22,6 @@ public class ActivityInstanceServiceImplTest {
 
     @Mock
     private ReadPersistenceService persistenceService;
-
-    @Mock
-    private BPMInstanceBuilders instanceBuilders;
 
     @InjectMocks
     private ActivityInstanceServiceImpl activityInstanceService;

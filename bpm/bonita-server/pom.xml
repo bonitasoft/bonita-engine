@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-server</artifactId>
@@ -20,6 +20,13 @@
 			<artifactId>bonita-process-engine</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        
+        <!-- Builder Factory -->
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<!-- Actor Mapping -->
 		<dependency>
@@ -652,6 +659,8 @@
 						<configuration>
 							<artifactSet>
 								<includes>
+                                    <!-- Builder Factory -->
+                                    <include>org.bonitasoft.engine:bonita-builder</include>
 									<!-- Actor Mapping -->
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-api</include>
 									<include>org.bonitasoft.engine.core.actor.mapping:bonita-actor-mapping-impl</include>
@@ -794,6 +803,7 @@
 									<include>org.bonitasoft.engine.platform.command:bonita-platform-command-api-impl</include>
 									<!-- Platform Dependency -->
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-platform-impl</include>
+									<include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl</include>
 									<include>org.bonitasoft.engine.dependency:bonita-dependency-platform-model-impl-hibernate</include>
 									<!-- Platform Login -->

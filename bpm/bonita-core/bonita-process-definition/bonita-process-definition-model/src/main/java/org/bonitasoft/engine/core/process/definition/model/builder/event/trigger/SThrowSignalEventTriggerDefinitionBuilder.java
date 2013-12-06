@@ -20,8 +20,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowS
  */
 public interface SThrowSignalEventTriggerDefinitionBuilder {
 
-    SThrowSignalEventTriggerDefinitionBuilder createNewInstance(String signalName);
-
     SThrowSignalEventTriggerDefinition done();
 
 }

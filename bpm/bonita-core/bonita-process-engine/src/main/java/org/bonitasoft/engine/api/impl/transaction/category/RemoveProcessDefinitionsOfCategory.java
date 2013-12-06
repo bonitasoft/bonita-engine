@@ -16,11 +16,12 @@ package org.bonitasoft.engine.api.impl.transaction.category;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
-import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilder;
+import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -34,24 +35,18 @@ public class RemoveProcessDefinitionsOfCategory implements TransactionContent {
 
     private final CategoryService categoryService;
 
-    private final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder;
-
     private final long categoryId;
 
     private final long processDefinitionId;
 
-    public RemoveProcessDefinitionsOfCategory(final CategoryService categoryService, final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder,
-            final long categoryId) {
+    public RemoveProcessDefinitionsOfCategory(final CategoryService categoryService, final long categoryId) {
         this.categoryService = categoryService;
-        this.sProcessCategoryMappingBuilder = sProcessCategoryMappingBuilder;
         this.categoryId = categoryId;
         processDefinitionId = -1;
     }
 
-    public RemoveProcessDefinitionsOfCategory(final long processDefinitionId, final SProcessCategoryMappingBuilder sProcessCategoryMappingBuilder,
-            final CategoryService categoryService) {
+    public RemoveProcessDefinitionsOfCategory(final long processDefinitionId, final CategoryService categoryService) {
         this.processDefinitionId = processDefinitionId;
-        this.sProcessCategoryMappingBuilder = sProcessCategoryMappingBuilder;
         this.categoryService = categoryService;
         categoryId = -1;
     }
@@ -60,11 +55,11 @@ public class RemoveProcessDefinitionsOfCategory implements TransactionContent {
     public void execute() throws SBonitaException {
         final FilterOption filterOption;
         if (categoryId != -1) {
-            filterOption = new FilterOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getCategoryIdKey(), categoryId);
+            filterOption = new FilterOption(SProcessCategoryMapping.class, BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).getCategoryIdKey(), categoryId);
         } else {
-            filterOption = new FilterOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getProcessIdKey(), processDefinitionId);
+            filterOption = new FilterOption(SProcessCategoryMapping.class, BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).getProcessIdKey(), processDefinitionId);
         }
-        final OrderByOption order = new OrderByOption(SProcessCategoryMapping.class, sProcessCategoryMappingBuilder.getIdKey(), OrderByType.ASC);
+        final OrderByOption order = new OrderByOption(SProcessCategoryMapping.class, BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).getIdKey(), OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(order),
                 Collections.singletonList(filterOption), null);
 

@@ -13,15 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.builder;
 
-import java.io.InputStream;
-
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
-import org.bonitasoft.engine.xml.ElementBindingsFactory;
-import org.bonitasoft.engine.xml.XMLNode;
 
 /**
  * @author Baptiste Mesta
@@ -29,16 +21,6 @@ import org.bonitasoft.engine.xml.XMLNode;
  */
 public interface SProcessDefinitionBuilder {
 
-    SProcessDefinitionBuilder createNewInstance(DesignProcessDefinition processDefinition, SExpressionBuilders sExpressionBuilders,
-            SDataDefinitionBuilders sDataDefinitionBuilders, SOperationBuilders sOperationBuilders);
-
     SProcessDefinition done();
-
-    ElementBindingsFactory getElementsBindings(SExpressionBuilders sExpressionBuilders, SDataDefinitionBuilders sDataDefinitionBuilders,
-            SOperationBuilders sOperationBuilders);
-
-    InputStream getModelSchema();
-
-    XMLNode getXMLProcessDefinition(SProcessDefinition definition);
 
 }

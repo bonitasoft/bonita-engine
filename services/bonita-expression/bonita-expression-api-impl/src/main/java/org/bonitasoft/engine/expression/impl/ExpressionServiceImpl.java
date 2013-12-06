@@ -153,7 +153,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             try {
                 final Class<?> declaredReturnedType = Thread.currentThread().getContextClassLoader().loadClass(expression.getReturnType());
                 final Class<?> evaluatedReturnedType = result.getClass();
-                if (!declaredReturnedType.isAssignableFrom(evaluatedReturnedType)) {
+                if (!(declaredReturnedType.isAssignableFrom(evaluatedReturnedType) || declaredReturnedType.getName().equals(evaluatedReturnedType.getName()))) {
                     throw new SInvalidExpressionException("Declared return type " + declaredReturnedType + " is not compatible with evaluated type "
                             + evaluatedReturnedType + " for expression " + expression.getName());
                 }

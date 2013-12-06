@@ -28,6 +28,7 @@ import org.bonitasoft.engine.api.impl.transaction.command.GetTenantCommand;
 import org.bonitasoft.engine.api.impl.transaction.command.UpdateSCommand;
 import org.bonitasoft.engine.api.impl.transaction.dependency.AddSDependency;
 import org.bonitasoft.engine.api.impl.transaction.dependency.DeleteSDependency;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.CommandCriterion;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandExecutionException;
@@ -41,13 +42,13 @@ import org.bonitasoft.engine.command.SCommandNotFoundException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.command.model.SCommand;
-import org.bonitasoft.engine.command.model.SCommandBuilder;
+import org.bonitasoft.engine.command.model.SCommandBuilderFactory;
 import org.bonitasoft.engine.command.model.SCommandUpdateBuilder;
+import org.bonitasoft.engine.command.model.SCommandUpdateBuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyAlreadyExistsException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -86,9 +87,8 @@ public class CommandAPIImpl implements CommandAPI {
     public void addDependency(final String name, final byte[] jar) throws AlreadyExistsException, CreationException {
         // FIXME method in dependency service which get a dependency using its name
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final DependencyBuilderAccessor dependencyBuilderAccessor = tenantAccessor.getDependencyBuilderAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final AddSDependency addSDependency = new AddSDependency(dependencyService, dependencyBuilderAccessor, name, jar, tenantAccessor.getTenantId(),
+        final AddSDependency addSDependency = new AddSDependency(dependencyService, name, jar, tenantAccessor.getTenantId(),
                 "tenant");
         try {
             addSDependency.execute();
@@ -128,8 +128,8 @@ public class CommandAPIImpl implements CommandAPI {
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CommandService commandService = tenantAccessor.getCommandService();
-        final SCommandBuilder commandBuilder = tenantAccessor.getSCommandBuilderAccessor().getSCommandBuilder();
-        final SCommand sCommand = commandBuilder.createNewInstance(name, description, implementation).setSystem(false).done();
+        final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
+        final SCommand sCommand = fact.createNewInstance(name, description, implementation).setSystem(false).done();
         try {
             final CreateSCommand createCommand = new CreateSCommand(commandService, sCommand);
             createCommand.execute();
@@ -230,7 +230,8 @@ public class CommandAPIImpl implements CommandAPI {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
         final CommandService commandService = getTenantAccessor().getCommandService();
-        final SCommandUpdateBuilder commandUpdateBuilder = getTenantAccessor().getSCommandBuilderAccessor().getSCommandUpdateBuilder();
+        final SCommandUpdateBuilderFactory fact = BuilderFactory.get(SCommandUpdateBuilderFactory.class);
+        final SCommandUpdateBuilder commandUpdateBuilder = fact.createNewInstance();
         try {
             final UpdateSCommand updateCommand = new UpdateSCommand(commandService, commandUpdateBuilder, commandName, updateDescriptor);
             updateCommand.execute();
@@ -284,7 +285,8 @@ public class CommandAPIImpl implements CommandAPI {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
         final CommandService commandService = getTenantAccessor().getCommandService();
-        final SCommandUpdateBuilder commandUpdateBuilder = getTenantAccessor().getSCommandBuilderAccessor().getSCommandUpdateBuilder();
+        final SCommandUpdateBuilderFactory fact = BuilderFactory.get(SCommandUpdateBuilderFactory.class);
+        final SCommandUpdateBuilder commandUpdateBuilder = fact.createNewInstance();
         try {
             final UpdateSCommand updateCommand = new UpdateSCommand(commandService, commandUpdateBuilder, commandId, updater);
             updateCommand.execute();

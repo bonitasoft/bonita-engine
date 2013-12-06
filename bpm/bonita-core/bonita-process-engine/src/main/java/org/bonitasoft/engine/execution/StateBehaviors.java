@@ -25,6 +25,7 @@ import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -37,6 +38,9 @@ import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
+import org.bonitasoft.engine.core.process.comment.api.SCommentService;
+import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -76,10 +80,11 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProvider;
+import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProviderBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance;
@@ -98,6 +103,9 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SUserNotFoundException;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -142,8 +150,6 @@ public class StateBehaviors {
 
     private final ClassLoaderService classLoaderService;
 
-    private final BPMInstanceBuilders instanceBuilders;
-
     private final ActorMappingService actorMappingService;
 
     private final ExpressionResolverService expressionResolverService;
@@ -168,20 +174,24 @@ public class StateBehaviors {
 
     private ProcessExecutor processExecutor;
 
+    private final SCommentService commentService;
+
+    private final IdentityService identityService;
+
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
-            final BPMInstanceBuilders instanceBuilders, final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
+            final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice,
-            final SchedulerService schedulerService, final TechnicalLoggerService logger) {
+            final SchedulerService schedulerService, final SCommentService commentService, final IdentityService identityService,
+            final TechnicalLoggerService logger) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
         this.activityInstanceService = activityInstanceService;
         this.userFilterService = userFilterService;
         this.classLoaderService = classLoaderService;
-        this.instanceBuilders = instanceBuilders;
         this.actorMappingService = actorMappingService;
         this.connectorInstanceService = connectorInstanceService;
         this.expressionResolverService = expressionResolverService;
@@ -192,6 +202,8 @@ public class StateBehaviors {
         this.containerRegistry = containerRegistry;
         eventInstanceService = eventInstanceSevice;
         this.schedulerService = schedulerService;
+        this.commentService = commentService;
+        this.identityService = identityService;
         this.logger = logger;
     }
 
@@ -275,14 +287,15 @@ public class StateBehaviors {
     private void mapUsingActors(final SFlowNodeInstance flowNodeInstance, final String actorName, final long processDefinitionId)
             throws SActorNotFoundException, SActivityCreationException {
         final SActor actor = actorMappingService.getActor(actorName, processDefinitionId);
-        final SPendingActivityMapping mapping = instanceBuilders.getSPendingActivityMappingBuilder()
+        final SPendingActivityMapping mapping = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class)
                 .createNewInstanceForActor(flowNodeInstance.getId(), actor.getId()).done();
         activityInstanceService.addPendingActivityMappings(mapping);
     }
 
     private void mapUsingUserFilters(final SFlowNodeInstance flowNodeInstance, final SHumanTaskDefinition humanTaskDefinition, final String actorName,
             final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition) throws ClassLoaderException, SUserFilterExecutionException,
-            SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException {
+            SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException,
+            SCommentAddException, SUserNotFoundException {
         final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
         final SExpressionContext expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 flowNodeInstance.getLogicalGroup(0));
@@ -294,12 +307,19 @@ public class StateBehaviors {
                     + humanTaskDefinition.getName());
         }
         for (final Long userId : userIds) {
-            final SPendingActivityMapping mapping = instanceBuilders.getSPendingActivityMappingBuilder()
+            final SPendingActivityMapping mapping = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class)
                     .createNewInstanceForUser(flowNodeInstance.getId(), userId).done();
             activityInstanceService.addPendingActivityMappings(mapping);
         }
         if (userIds.size() == 1 && result.shouldAutoAssignTaskIfSingleResult()) {
-            activityInstanceService.assignHumanTask(flowNodeInstance.getId(), userIds.get(0));
+            final Long userId = userIds.get(0);
+            activityInstanceService.assignHumanTask(flowNodeInstance.getId(), userId);
+
+            final SUser user = identityService.getUser(userId);
+            if (commentService.isCommentEnabled(SystemCommentType.STATE_CHANGE)) {
+                commentService.addSystemComment(flowNodeInstance.getRootContainerId(), "The task \"" + flowNodeInstance.getName()
+                        + "\" is now assigned to " + user.getUserName());
+            }
         }
     }
 
@@ -631,7 +651,7 @@ public class StateBehaviors {
                 childrenOfAnActivity = activityInstanceService.getChildrenOfAnActivity(flowNodeInstance.getId(), i, BATCH_SIZE);
                 for (final SActivityInstance sActivityInstance : childrenOfAnActivity) {
                     containerRegistry.executeFlowNode(sActivityInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
-                            sActivityInstance.getLogicalGroup(instanceBuilders.getSAAutomaticTaskInstanceBuilder().getParentProcessInstanceIndex()));
+                            sActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
                 }
                 i += BATCH_SIZE;
             } while (childrenOfAnActivity.size() == BATCH_SIZE);
@@ -643,7 +663,7 @@ public class StateBehaviors {
     public void interruptSubActivities(final long parentActivityInstanceId, final SStateCategory stateCategory) throws SBonitaException {
         final int numberOfResults = 100;
         List<SActivityInstance> childrenToEnd;
-        final SUserTaskInstanceBuilder flowNodeKeyProvider = instanceBuilders.getUserTaskInstanceBuilder();
+        final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         final List<FilterOption> filters = new ArrayList<FilterOption>(3);
         filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getParentActivityInstanceKey(), parentActivityInstanceId));
         filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getTerminalKey(), false));
@@ -656,7 +676,7 @@ public class StateBehaviors {
                 activityInstanceService.setStateCategory(child, stateCategory);
                 if (child.isStable()) {
                     containerRegistry.executeFlowNode(child.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
-                            child.getLogicalGroup(instanceBuilders.getSAAutomaticTaskInstanceBuilder().getParentProcessInstanceIndex()));
+                            child.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
                 }
             }
             queryOptions = QueryOptions.getNextPage(queryOptions);
@@ -696,8 +716,7 @@ public class StateBehaviors {
                 if (!boundaryEventDefinitions.isEmpty()) {
                     try {
 
-                        final SBoundaryEventInstanceBuilder boundaryEventInstanceBuilder = bpmInstancesCreator.getBPMInstanceBuilders()
-                                .getSBoundaryEventInstanceBuilder();
+                        final SBoundaryEventInstanceBuilderFactory boundaryEventInstanceBuilder = BuilderFactory.get(SBoundaryEventInstanceBuilderFactory.class);
                         final long rootProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getRootProcessInstanceIndex());
                         final long parentProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getParentProcessInstanceIndex());
 
@@ -726,7 +745,7 @@ public class StateBehaviors {
 
     public void interruptAttachedBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance,
             final SStateCategory categoryState) throws SActivityStateExecutionException {
-        final SBoundaryEventInstanceBuilder keyProvider = instanceBuilders.getSBoundaryEventInstanceBuilder();
+        final SBoundaryEventInstanceBuilderFactory keyProvider = BuilderFactory.get(SBoundaryEventInstanceBuilderFactory.class);
         try {
             final List<SBoundaryEventInstance> boundaryEventInstances = eventInstanceService.getActivityBoundaryEventInstances(activityInstance.getId());
             for (final SBoundaryEventInstance boundaryEventInstance : boundaryEventInstances) {
@@ -762,41 +781,36 @@ public class StateBehaviors {
     private void interruptWaitingEvents(final long instanceId, final SCatchEventDefinition catchEventDef) throws SBonitaSearchException,
             SWaitingEventModificationException {
         if (!catchEventDef.getEventTriggers().isEmpty()) {
-            final SWaitingEventKeyProvider waitingEventKeyProvider = instanceBuilders.getSWaitingMessageEventBuilder();
-            interruptWaitingEvents(instanceId, SWaitingEvent.class, waitingEventKeyProvider);
+            interruptWaitingEvents(instanceId, SWaitingEvent.class);
         }
     }
 
     public void interrupWaitinEvents(final SReceiveTaskInstance receiveTaskInstance) throws SBonitaException {
-        final SWaitingEventKeyProvider waitingEventKeyProvider = instanceBuilders.getSWaitingMessageEventBuilder();
-        interruptWaitingEvents(receiveTaskInstance.getId(), SWaitingEvent.class, waitingEventKeyProvider);
+        interruptWaitingEvents(receiveTaskInstance.getId(), SWaitingEvent.class);
     }
 
-    private QueryOptions getWaitingEventsCountOptions(final long instanceId, final SWaitingEventKeyProvider waitingEventKeyProvider,
-            final Class<? extends SWaitingEvent> waitingEventClass) {
-        final List<FilterOption> filters = getFilterForWaitingEventsToInterrupt(instanceId, waitingEventKeyProvider, waitingEventClass);
+    private QueryOptions getWaitingEventsCountOptions(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
+        final List<FilterOption> filters = getFilterForWaitingEventsToInterrupt(instanceId, waitingEventClass);
         return new QueryOptions(filters, null);
     }
 
-    private QueryOptions getWaitingEventsQueryOptions(final long instanceId, final SWaitingEventKeyProvider waitingEventKeyProvider,
-            final Class<? extends SWaitingEvent> waitingEventClass) {
-        final OrderByOption orderByOption = new OrderByOption(waitingEventClass, waitingEventKeyProvider.getIdKey(), OrderByType.ASC);
-        final List<FilterOption> filters = getFilterForWaitingEventsToInterrupt(instanceId, waitingEventKeyProvider, waitingEventClass);
+    private QueryOptions getWaitingEventsQueryOptions(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
+        final OrderByOption orderByOption = new OrderByOption(waitingEventClass, BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class).getIdKey(), OrderByType.ASC);
+        final List<FilterOption> filters = getFilterForWaitingEventsToInterrupt(instanceId, waitingEventClass);
         return new QueryOptions(0, MAX_NUMBER_OF_RESULTS, Collections.singletonList(orderByOption), filters, null);
     }
 
-    private List<FilterOption> getFilterForWaitingEventsToInterrupt(final long instanceId, final SWaitingEventKeyProvider waitingEventKeyProvider,
-            final Class<? extends SWaitingEvent> waitingEventClass) {
+    private List<FilterOption> getFilterForWaitingEventsToInterrupt(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
+        final SWaitingEventKeyProviderBuilderFactory waitingEventKeyProvider = BuilderFactory.get(SWaitingEventKeyProviderBuilderFactory.class);
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(new FilterOption(waitingEventClass, waitingEventKeyProvider.getFlowNodeInstanceIdKey(), instanceId));
         filters.add(new FilterOption(waitingEventClass, waitingEventKeyProvider.getActiveKey(), true));
         return filters;
     }
 
-    private <T extends SWaitingEvent> void interruptWaitingEvents(final long instanceId, final Class<T> waitingEventClass,
-            final SWaitingEventKeyProvider waitingEventKeyProvider) throws SBonitaSearchException, SWaitingEventModificationException {
-        final QueryOptions queryOptions = getWaitingEventsQueryOptions(instanceId, waitingEventKeyProvider, waitingEventClass);
-        final QueryOptions countOptions = getWaitingEventsCountOptions(instanceId, waitingEventKeyProvider, waitingEventClass);
+    private <T extends SWaitingEvent> void interruptWaitingEvents(final long instanceId, final Class<T> waitingEventClass) throws SBonitaSearchException, SWaitingEventModificationException {
+        final QueryOptions queryOptions = getWaitingEventsQueryOptions(instanceId, waitingEventClass);
+        final QueryOptions countOptions = getWaitingEventsCountOptions(instanceId, waitingEventClass);
         long count = 0;
         List<T> waitingEvents;
         do {

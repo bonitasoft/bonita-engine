@@ -16,7 +16,7 @@ package org.bonitasoft.engine.identity.model.builder;
 /**
  * @author Emmanuel Duchastenier
  */
-public interface SContactInfoUpdateBuilder extends UpdateBuilder {
+public interface SContactInfoUpdateBuilder extends SIdentityUpdateBuilder {
 
     SContactInfoUpdateBuilder updateEmail(final String email);
 

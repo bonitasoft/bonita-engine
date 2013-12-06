@@ -105,7 +105,7 @@ public final class MemoryLockConditionService implements LockService {
 
 
     @Override
-    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit) {
+    public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId) {
         try {
             return innerTryLock(objectToLockId, objectType, timeout, timeUnit);
         } catch (final SLockException e) {
@@ -114,7 +114,7 @@ public final class MemoryLockConditionService implements LockService {
     }
 
     @Override
-    public BonitaLock lock(final long objectToLockId, final String objectType) throws SLockException {
+    public BonitaLock lock(final long objectToLockId, final String objectType, long tenantId) throws SLockException {
         return innerTryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS);
     }
 
@@ -182,7 +182,7 @@ public final class MemoryLockConditionService implements LockService {
     }
 
     @Override
-    public void unlock(final BonitaLock bonitaLock) throws SLockException {
+    public void unlock(final BonitaLock bonitaLock, long tenantId) throws SLockException {
         final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType());
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + bonitaLock.getLock().hashCode() + " id=" + key);

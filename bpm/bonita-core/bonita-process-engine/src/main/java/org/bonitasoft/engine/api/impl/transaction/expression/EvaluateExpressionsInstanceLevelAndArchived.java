@@ -25,7 +25,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Zhao Na
@@ -45,17 +44,13 @@ public class EvaluateExpressionsInstanceLevelAndArchived extends AbstractEvaluat
 
     private final ExpressionResolverService expressionResolver;
 
-    private final SExpressionBuilders expBuilders;
-
     private final Map<String, Serializable> results = new HashMap<String, Serializable>(0);
 
     public EvaluateExpressionsInstanceLevelAndArchived(final Map<Expression, Map<String, Serializable>> expressions, final long containerId,
-            final String containerType, final long processDefinitionId, final long time, final ExpressionResolverService expressionService,
-            final SExpressionBuilders expBuilder) {
+            final String containerType, final long processDefinitionId, final long time, final ExpressionResolverService expressionService) {
         this.expressions = expressions;
         this.containerId = containerId;
         expressionResolver = expressionService;
-        this.expBuilders = expBuilder;
         this.processDefinitionId = processDefinitionId;
         this.containerType = containerType;
         this.time = time;
@@ -76,7 +71,7 @@ public class EvaluateExpressionsInstanceLevelAndArchived extends AbstractEvaluat
             for (Expression exp : exps) {
                 final Map<String, Serializable> partialContext = expressions.get(exp);
                 context.setSerializableInputValues(partialContext);
-                final SExpression sexp = ServerModelConvertor.convertExpression(expBuilders, exp);
+                final SExpression sexp = ServerModelConvertor.convertExpression(exp);
                 final Serializable res = (Serializable) expressionResolver.evaluate(sexp, context);
                 results.put(buildName(exp), res);// MAYBE instead of exp.getNAME
             }

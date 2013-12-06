@@ -20,6 +20,4 @@ public interface SPersistenceLogBuilder extends SLogBuilder {
 
     SPersistenceLogBuilder objectId(final long objectId);
 
-    String getObjectIdKey();
-
 }

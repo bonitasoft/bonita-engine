@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.archive.builder;
 
-import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessActivityInstance;
 
 /**
@@ -22,11 +21,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SASubProcessAct
  */
 public interface SASubProcessActivityInstanceBuilder extends SAActivityInstanceBuilder {
 
-    SASubProcessActivityInstanceBuilder createNewArchivedSubProcessActivityInstance(SSubProcessActivityInstance subProcActInst);
-
-    @Override
     SASubProcessActivityInstance done();
-
-    String getTriggeredByEventKey();
 
 }

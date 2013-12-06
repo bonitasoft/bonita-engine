@@ -18,9 +18,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSig
 /**
  * @author Matthieu Chaffotte
  */
-public interface SThrowSignalEventTriggerInstanceBuilder extends SEventTriggerInstanceBuilder {
-
-    SThrowSignalEventTriggerInstanceBuilder createNewInstance(final long eventInstanceId, final String signalName);
+public interface SThrowSignalEventTriggerInstanceBuilder {
 
     SThrowSignalEventTriggerInstance done();
 

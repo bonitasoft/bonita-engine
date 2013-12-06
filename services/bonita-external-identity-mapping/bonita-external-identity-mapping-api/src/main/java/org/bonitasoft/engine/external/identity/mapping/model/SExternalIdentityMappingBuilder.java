@@ -18,8 +18,6 @@ package org.bonitasoft.engine.external.identity.mapping.model;
  */
 public interface SExternalIdentityMappingBuilder {
 
-    SExternalIdentityMappingBuilder createNewInstance(String externalId);
-
     SExternalIdentityMappingBuilder setKind(String kind);
 
     SExternalIdentityMappingBuilder setUserId(long userId);
@@ -35,23 +33,5 @@ public interface SExternalIdentityMappingBuilder {
     SExternalIdentityMappingBuilder setDisplayNamePart3(String displayNamePart3);
 
     SExternalIdentityMapping done();
-
-    String getIdKey();
-
-    String getKindKey();
-
-    String getUserIdKey();
-
-    String getGroupIdKey();
-
-    String getRoleIdKey();
-
-    String getExternalIdKey();
-
-    String getDisplayNamePart1Key();
-
-    String getDisplayNamePart2Key();
-
-    String getDisplayNamePart3Key();
 
 }

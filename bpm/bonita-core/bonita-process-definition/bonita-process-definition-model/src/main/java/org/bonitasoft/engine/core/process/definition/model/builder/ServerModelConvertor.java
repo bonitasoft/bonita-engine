@@ -19,18 +19,20 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
+import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
+import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
+import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
+import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
+import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
@@ -38,17 +40,16 @@ import org.bonitasoft.engine.operation.Operation;
  */
 public class ServerModelConvertor {
 
-    public static SExpression convertExpression(final SExpressionBuilders sExpressionBuilders, final Expression value) {
+    public static SExpression convertExpression(final Expression value) {
         if (value == null) {
             return null;
         } else {
             final ArrayList<SExpression> dependencies = new ArrayList<SExpression>();
             for (final Expression expression : value.getDependencies()) {
-                dependencies.add(convertExpression(sExpressionBuilders, expression));
+                dependencies.add(convertExpression(expression));
             }
-            final SExpressionBuilder expressionBuilder = sExpressionBuilders.getExpressionBuilder();
             try {
-                return expressionBuilder.createNewInstance().setName(value.getName()).setContent(value.getContent())
+                return BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(value.getName()).setContent(value.getContent())
                         .setExpressionType(value.getExpressionType()).setInterpreter(value.getInterpreter()).setReturnType(value.getReturnType())
                         .setDependencies(dependencies).done();
             } catch (final SInvalidExpressionException e) {
@@ -57,51 +58,47 @@ public class ServerModelConvertor {
         }
     }
 
-    public static SOperation convertOperation(final SOperationBuilders sOperationBuilders, final SExpressionBuilders sExpressionBuilders,
-            final Operation operation) {
-        return sOperationBuilders.getSOperationBuilder().createNewInstance().setOperator(operation.getOperator())
+    public static SOperation convertOperation(final Operation operation) {
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
                 .setType(SOperatorType.valueOf(operation.getType().name()))
-                .setRightOperand(ServerModelConvertor.convertExpression(sExpressionBuilders, operation.getRightOperand()))
-                .setLeftOperand(sOperationBuilders.getSLeftOperandBuilder().createNewInstance().setName(operation.getLeftOperand().getName()).done()).done();
+                .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
+                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName()).done()).done();
     }
 
-    public static List<SOperation> convertOperations(final SOperationBuilders sOperationBuilders, final SExpressionBuilders sExpressionBuilders,
-            final List<Operation> operations) {
+    public static List<SOperation> convertOperations(final List<Operation> operations) {
         final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
         for (final Operation operation : operations) {
-            sOperations.add(convertOperation(sOperationBuilders, sExpressionBuilders, operation));
+            sOperations.add(convertOperation(operation));
         }
         return sOperations;
     }
 
     /**
      * @param dataDefinition
-     * @param sDataDefinitionBuilders
-     * @param sExpressionBuilders
      * @return
      */
-    public static SDataDefinition convertDataDefinition(final DataDefinition dataDefinition, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SExpressionBuilders sExpressionBuilders) {
+    public static SDataDefinition convertDataDefinition(final DataDefinition dataDefinition) {
         if (dataDefinition instanceof XMLDataDefinition) {
             final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
-            final SXMLDataDefinitionBuilder xmlDataDefinitionBuilder = sDataDefinitionBuilders.getXMLDataDefinitionBuilder();
-            xmlDataDefinitionBuilder.createNewXMLData(dataDefinition.getName()).setElement(xmlDataDef.getElement()).setNamespace(xmlDataDef.getNamespace());
-            xmlDataDefinitionBuilder.setDefaultValue(ServerModelConvertor.convertExpression(sExpressionBuilders, dataDefinition.getDefaultValueExpression()));
-            xmlDataDefinitionBuilder.setDescription(dataDefinition.getDescription());
-            xmlDataDefinitionBuilder.setTransient(dataDefinition.isTransientData());
-            return xmlDataDefinitionBuilder.done();
+            final SXMLDataDefinitionBuilderFactory fact = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class);
+            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(dataDefinition.getName()).setElement(xmlDataDef.getElement()).setNamespace(xmlDataDef.getNamespace());
+            builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
+            builder.setDescription(dataDefinition.getDescription());
+            builder.setTransient(dataDefinition.isTransientData());
+            return builder.done();
         } else {
-            final SDataDefinitionBuilder dataDefinitionBuilder = sDataDefinitionBuilders.getDataDefinitionBuilder();
+            final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
+            SDataDefinitionBuilder builder = null; 
             if (dataDefinition instanceof TextDataDefinition) {
                 final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
-                dataDefinitionBuilder.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
+                builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
             } else {
-                dataDefinitionBuilder.createNewInstance(dataDefinition.getName(), dataDefinition.getClassName());
+                builder = fact.createNewInstance(dataDefinition.getName(), dataDefinition.getClassName());
             }
-            dataDefinitionBuilder.setDefaultValue(ServerModelConvertor.convertExpression(sExpressionBuilders, dataDefinition.getDefaultValueExpression()));
-            dataDefinitionBuilder.setDescription(dataDefinition.getDescription());
-            dataDefinitionBuilder.setTransient(dataDefinition.isTransientData());
-            return dataDefinitionBuilder.done();
+            builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
+            builder.setDescription(dataDefinition.getDescription());
+            builder.setTransient(dataDefinition.isTransientData());
+            return builder.done();
         }
     }
 }

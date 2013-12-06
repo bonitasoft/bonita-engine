@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
@@ -27,14 +28,14 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilder;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilder;
-import org.bonitasoft.engine.core.process.comment.model.builder.SCommentBuilders;
+import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
+import org.bonitasoft.engine.core.process.comment.model.builder.SHumanCommentBuilderFactory;
+import org.bonitasoft.engine.core.process.comment.model.builder.SSystemCommentBuilderFactory;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilders;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -68,11 +69,7 @@ public class SCommentServiceImpl implements SCommentService {
 
     private static final String MANAGED_BY = "ManagedBy";
 
-    private final SCommentBuilders commentBuilders;
-
     private final Recorder recorder;
-
-    private final SEventBuilders eventBuilders;
 
     private final ReadPersistenceService persistenceService;
 
@@ -86,14 +83,12 @@ public class SCommentServiceImpl implements SCommentService {
 
     private final ArchiveService archiveService;
 
-    public SCommentServiceImpl(final SCommentBuilders commentBuilders, final Recorder recorder, final SEventBuilders eventBuilders,
+    public SCommentServiceImpl(final Recorder recorder,
             final ReadPersistenceService persistenceService, final ArchiveService archiveService, final SessionService sessionService,
             final ReadSessionAccessor sessionAccessor, final Map<SystemCommentType, Boolean> systemCommentType,
             final EventService eventService) {
         super();
-        this.commentBuilders = commentBuilders;
         this.recorder = recorder;
-        this.eventBuilders = eventBuilders;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
@@ -103,11 +98,11 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     private SInsertEvent getInsertEvent(final Object obj) {
-        return (SInsertEvent) eventBuilders.getEventBuilder().createInsertEvent(COMMENT).setObject(obj).done();
+        return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(COMMENT).setObject(obj).done();
     }
 
     private SDeleteEvent getDeleteEvent(final Object obj) {
-        return (SDeleteEvent) eventBuilders.getEventBuilder().createDeleteEvent(COMMENT).setObject(obj).done();
+        return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(COMMENT).setObject(obj).done();
     }
 
     @Override
@@ -147,9 +142,8 @@ public class SCommentServiceImpl implements SCommentService {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
         NullCheckingUtil.checkArgsNotNull(comment);
         try {
-            final SCommentBuilder sCommentBuilder = commentBuilders.getSHumanCommentBuilder();
             final long userId = getUserId();
-            final SComment sComment = sCommentBuilder.createNewInstance(processInstanceId, comment, userId).done();
+            final SComment sComment = BuilderFactory.get(SHumanCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, userId).done();
             final InsertRecord insertRecord = new InsertRecord(sComment);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(COMMENT, EventActionType.CREATED)) {
@@ -289,8 +283,7 @@ public class SCommentServiceImpl implements SCommentService {
         NullCheckingUtil.checkArgsNotNull(processInstanceId);
         NullCheckingUtil.checkArgsNotNull(comment);
         try {
-            final SCommentBuilder sCommentBuilder = commentBuilders.getSSystemCommentBuilder();
-            final SComment sComment = sCommentBuilder.createNewInstance(processInstanceId, comment, null).done();
+            final SComment sComment = BuilderFactory.get(SSystemCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, null).done();
             final InsertRecord insertRecord = new InsertRecord(sComment);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(COMMENT, EventActionType.CREATED)) {
@@ -324,10 +317,9 @@ public class SCommentServiceImpl implements SCommentService {
 
     @Override
     public void deleteArchivedComments(final long processInstanceId) throws SBonitaException {
-        final SACommentBuilder archCommentKeyProvider = commentBuilders.getSACommentBuilder();
-        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, archCommentKeyProvider.getProcessInstanceIdKey(),
+        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class).getProcessInstanceIdKey(),
                 processInstanceId));
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, archCommentKeyProvider.getIdKey(),
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class).getIdKey(),
                 OrderByType.ASC));
         List<SAComment> searchArchivedComments = null;
         // fromIndex always will be zero because the elements will be deleted

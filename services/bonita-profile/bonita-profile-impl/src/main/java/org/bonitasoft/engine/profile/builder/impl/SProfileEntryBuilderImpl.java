@@ -23,18 +23,11 @@ import org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl;
  */
 public class SProfileEntryBuilderImpl implements SProfileEntryBuilder {
 
-    private SProfileEntryImpl profileEntry;
+    private final SProfileEntryImpl profileEntry;
 
-    @Override
-    public SProfileEntryBuilder createNewInstance(final String name, final long profileId) {
-        profileEntry = new SProfileEntryImpl(name, profileId);
-        return this;
-    }
-
-    @Override
-    public SProfileEntryBuilder createNewInstance(final SProfileEntry profileEntry) {
-        this.profileEntry = new SProfileEntryImpl(profileEntry);
-        return this;
+    public SProfileEntryBuilderImpl(final SProfileEntryImpl profileEntry) {
+        super();
+        this.profileEntry = profileEntry;
     }
 
     @Override

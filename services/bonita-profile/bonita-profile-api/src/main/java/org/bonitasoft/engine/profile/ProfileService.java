@@ -18,7 +18,20 @@ import java.util.List;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.profile.builder.SProfileBuilderAccessor;
+import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileDeletionException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileReadException;
+import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryReadException;
+import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberCreationException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberNotFoundException;
+import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberReadException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -36,8 +49,6 @@ public interface ProfileService {
     String ENTRY_PROFILE = "ENTRY_PROFILE";
 
     String PROFILE_MEMBER = "PROFILE_MEMBER";
-
-    SProfileBuilderAccessor getSProfileBuilderAccessor();
 
     /**
      * Get profile by its id
@@ -78,11 +89,12 @@ public interface ProfileService {
      * 
      * @param profile
      * @param descriptor
+     * @return The updated profile
      * @throws SProfileUpdateException
      *             occurs when an exception is thrown during sProfile update
      * @since 6.0
      */
-    void updateProfile(SProfile profile, EntityUpdateDescriptor descriptor) throws SProfileUpdateException;
+    SProfile updateProfile(SProfile profile, EntityUpdateDescriptor descriptor) throws SProfileUpdateException;
 
     /**
      * Delete profile by given sProfile
@@ -113,11 +125,10 @@ public interface ProfileService {
      * 
      * @param userId
      * @return a list of sProfile
-     * @throws SProfileMemberNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfile
+     * @throws SProfileReadException
      * @since 6.0
      */
-    List<SProfile> getProfilesOfUser(long userId) throws SProfileMemberNotFoundException;
+    List<SProfile> getProfilesOfUser(long userId) throws SProfileReadException;
 
     /**
      * Get profile entry by its id
@@ -131,21 +142,6 @@ public interface ProfileService {
     SProfileEntry getProfileEntry(long profileEntryId) throws SProfileEntryNotFoundException;
 
     /**
-     * Get all profile entries having the given value for the given int index
-     * 
-     * @param fromIndex
-     *            first result to be considered(>=0)
-     * @param numberOfProfileEntry
-     *            the max number of profileEntry to be returned (>=0)
-     * @param numberOfProfileEntry
-     * @return all profile entries having the given value for the given int index
-     * @throws SProfileNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfileEntry
-     * @since 6.0
-     */
-    List<SProfileEntry> getEntriesOfProfile(long profileId, int fromIndex, int numberOfProfileEntry) throws SProfileNotFoundException;
-
-    /**
      * Get all profile entries having the given value for the given int index by profileId
      * 
      * @param profileId
@@ -156,12 +152,11 @@ public interface ProfileService {
      * @param field
      * @param order
      * @return all profile entries having the given value for the given int index by profileId
-     * @throws SProfileNotFoundException
-     *             occurs when the identifier does not refer to an existing sProfileEntry
+     * @throws SProfileEntryReadException
      * @since 6.0
      */
     List<SProfileEntry> getEntriesOfProfile(long profileId, int fromIndex, int numberOfProfileEntry, String field, OrderByType order)
-            throws SProfileNotFoundException;
+            throws SProfileEntryReadException;
 
     /**
      * Add new profile entry
@@ -179,11 +174,12 @@ public interface ProfileService {
      * 
      * @param profileEntry
      * @param descriptor
+     * @return The updated profile entry
      * @throws SProfileEntryUpdateException
      *             occurs when an exception is thrown during sProfileEntry update
      * @since 6.0
      */
-    void updateProfileEntry(SProfileEntry profileEntry, EntityUpdateDescriptor descriptor) throws SProfileEntryUpdateException;
+    SProfileEntry updateProfileEntry(SProfileEntry profileEntry, EntityUpdateDescriptor descriptor) throws SProfileEntryUpdateException;
 
     /**
      * Delete a profileEntry by given profileEntry
@@ -218,7 +214,8 @@ public interface ProfileService {
      * @param lastName
      * @param userName
      * @return sProfileMember
-     * @throws SProfileMemberCreationException TODO
+     * @throws SProfileMemberCreationException
+     *             TODO
      * @since 6.0
      */
     SProfileMember addUserToProfile(long profileId, long userId, String firstName, String lastName, String userName) throws SProfileMemberCreationException;
@@ -233,7 +230,8 @@ public interface ProfileService {
      * @param groupName
      * @param parentPath
      * @return sProfileMember
-     * @throws SProfileMemberCreationException TODO
+     * @throws SProfileMemberCreationException
+     *             TODO
      * @since 6.0
      */
     SProfileMember addGroupToProfile(long profileId, long groupId, String groupName, String parentPath) throws SProfileMemberCreationException;
@@ -247,7 +245,8 @@ public interface ProfileService {
      *            the identifier of role
      * @param roleName
      * @return sProfileMember
-     * @throws SProfileMemberCreationException TODO
+     * @throws SProfileMemberCreationException
+     *             TODO
      * @since 6.0
      */
     SProfileMember addRoleToProfile(long profileId, long roleId, String roleName) throws SProfileMemberCreationException;
@@ -265,7 +264,8 @@ public interface ProfileService {
      * @param groupName
      * @param groupParentPath
      * @return sProfileMember
-     * @throws SProfileMemberCreationException TODO
+     * @throws SProfileMemberCreationException
+     *             TODO
      * @since 6.0
      */
     SProfileMember addRoleAndGroupToProfile(long profileId, long roleId, long groupId, String roleName, String groupName, String groupParentPath)
@@ -402,9 +402,9 @@ public interface ProfileService {
      * 
      * @param profileId
      * @return a list of profileMembers
-     * @throws SProfileNotFoundException
+     * @throws SProfileMemberNotFoundException
      */
-    List<SProfileMember> getSProfileMembers(long profileId) throws SProfileNotFoundException;
+    List<SProfileMember> getSProfileMembers(long profileId) throws SProfileMemberNotFoundException;
 
     /**
      * Get a list of profileEntries by the given profileId and parentId
@@ -416,10 +416,10 @@ public interface ProfileService {
      * @param field
      * @param order
      * @return a list of profileEntries
-     * @throws SProfileNotFoundException
+     * @throws SProfileEntryReadException
      */
     List<SProfileEntry> getEntriesOfProfileByParentId(long profileId, long parentId, int fromIndex, int numberOfProfileEntries, String field, OrderByType order)
-            throws SProfileNotFoundException;
+            throws SProfileEntryReadException;
 
     /**
      * Delete all profile members for the connected tenant

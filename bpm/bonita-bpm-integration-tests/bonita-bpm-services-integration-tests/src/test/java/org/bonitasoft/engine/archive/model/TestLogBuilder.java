@@ -16,11 +16,6 @@ public class TestLogBuilder extends CRUDELogBuilder implements SPersistenceLogBu
     }
 
     @Override
-    public String getObjectIdKey() {
-        return "numericIndex1";
-    }
-
-    @Override
     protected String getActionTypePrefix() {
         return "TEST";
     }

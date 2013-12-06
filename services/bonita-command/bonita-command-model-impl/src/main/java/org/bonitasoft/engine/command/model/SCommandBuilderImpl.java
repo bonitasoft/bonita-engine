@@ -18,28 +18,11 @@ package org.bonitasoft.engine.command.model;
  */
 public class SCommandBuilderImpl implements SCommandBuilder {
 
-    private static final String ID = "id";
+    private final SCommandImpl command;
 
-    static final String NAME = "name";
-
-    static final String DESCRIPTION = "description";
-
-    static final String IMPLEMENTATION = "implementation";
-    
-    static final String SYSTEM = "system";
-
-    private SCommandImpl command;
-
-    @Override
-    public SCommandBuilder createNewInstance(final SCommand command) {
-        this.command = new SCommandImpl(command);
-        return this;
-    }
-
-    @Override
-    public SCommandBuilder createNewInstance(final String name, final String description, final String implementationClass) {
-        this.command = new SCommandImpl(name, description, implementationClass);
-        return this;
+    public SCommandBuilderImpl(final SCommandImpl command) {
+        super();
+        this.command = command;
     }
 
     @Override
@@ -48,34 +31,9 @@ public class SCommandBuilderImpl implements SCommandBuilder {
     }
 
     @Override
-    public String getIdKey() {
-        return ID;
-    }
-
-    @Override
-    public String getNameKey() {
-        return NAME;
-    }
-
-    @Override
-    public String getDescriptionKey() {
-        return DESCRIPTION;
-    }
-
-    @Override
-    public String getImplementationClassKey() {
-        return IMPLEMENTATION;
-    }
-
-    @Override
     public SCommandBuilder setSystem(boolean system) {
         this.command.setSystem(system);
         return this;
-    }
-
-    @Override
-    public String getSystemKey() {
-        return SYSTEM;
     }
 
 }

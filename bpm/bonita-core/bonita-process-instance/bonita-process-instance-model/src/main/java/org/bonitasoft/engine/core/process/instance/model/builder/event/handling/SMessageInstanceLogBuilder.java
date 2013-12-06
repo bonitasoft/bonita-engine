@@ -29,10 +29,4 @@ public interface SMessageInstanceLogBuilder extends SPersistenceLogBuilder, HasC
 
     SMessageInstanceLogBuilder setTargetFlowNode(final String flowNode);
 
-    String getProcessNameKey();
-
-    String getStartEventNameKey();
-
-    String getMessageNameKey();
-
 }

@@ -20,16 +20,6 @@ import org.bonitasoft.engine.data.model.SDataSourceParameter;
  */
 public interface SDataSourceParameterBuilder {
 
-    SDataSourceParameterBuilder createNewInstance(final long dataSourceId, final String name, final String value);
-
     SDataSourceParameter done();
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getValueKey();
-
-    String getDataSourceIdKey();
 
 }

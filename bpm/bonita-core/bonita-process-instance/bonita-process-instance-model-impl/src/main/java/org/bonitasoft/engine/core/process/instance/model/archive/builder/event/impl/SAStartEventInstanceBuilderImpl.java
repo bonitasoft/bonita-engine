@@ -14,22 +14,19 @@
 package org.bonitasoft.engine.core.process.instance.model.archive.builder.event.impl;
 
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.event.SAStartEventInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.archive.builder.impl.SAFlowNodeInstanceBuilderImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.event.SAStartEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.event.impl.SAStartEventInstanceImpl;
-import org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SAStartEventInstanceBuilderImpl extends SAFlowNodeInstanceBuilderImpl implements SAStartEventInstanceBuilder {
+public class SAStartEventInstanceBuilderImpl implements SAStartEventInstanceBuilder {
 
-    private SAStartEventInstanceImpl entity;
+    private final SAStartEventInstanceImpl entity;
 
-    @Override
-    public SAStartEventInstanceBuilder createNewArchivedStartEventInstance(final SStartEventInstance startEventInstance) {
-        this.entity = new SAStartEventInstanceImpl(startEventInstance);
-        return this;
+    public SAStartEventInstanceBuilderImpl(final SAStartEventInstanceImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override

@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-engine</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>services</artifactId>
@@ -52,6 +52,7 @@
 		<module>bonita-work</module>
 		<module>bonita-services-test-conf</module>
 		<module>bonita-incident</module>
+		<module>bonita-builder</module>
 	</modules>
 	
 	<profiles>

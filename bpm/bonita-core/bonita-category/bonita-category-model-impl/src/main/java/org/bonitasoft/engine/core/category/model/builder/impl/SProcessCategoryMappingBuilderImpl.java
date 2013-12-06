@@ -22,32 +22,16 @@ import org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImp
  */
 public class SProcessCategoryMappingBuilderImpl implements SProcessCategoryMappingBuilder {
 
-    private SProcessCategoryMappingImpl entity;
-
-    @Override
-    public SProcessCategoryMappingBuilder createNewInstance(final long categoryId, final long processId) {
-        entity = new SProcessCategoryMappingImpl(categoryId, processId);
-        return this;
+    private final SProcessCategoryMappingImpl entity;
+    
+    public SProcessCategoryMappingBuilderImpl(final SProcessCategoryMappingImpl entity) {
+        super();
+        this.entity = entity;
     }
 
     @Override
     public SProcessCategoryMapping done() {
         return entity;
-    }
-
-    @Override
-    public String getIdKey() {
-        return "id";
-    }
-
-    @Override
-    public String getCategoryIdKey() {
-        return "categoryId";
-    }
-
-    @Override
-    public String getProcessIdKey() {
-        return "processId";
     }
 
 }

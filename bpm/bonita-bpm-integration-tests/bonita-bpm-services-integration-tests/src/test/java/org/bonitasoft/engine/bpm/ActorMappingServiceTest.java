@@ -12,9 +12,10 @@ import java.util.Set;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.actor.mapping.model.SActorBuilder;
+import org.bonitasoft.engine.actor.mapping.model.SActorBuilderFactory;
 import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -36,7 +37,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
 
     private final ActorMappingService actorMappingService;
 
-    private final SActorBuilder sActorBuilder;
+    private final SActorBuilderFactory sActorBuilderFactory;
 
     private Group mainGroup;
 
@@ -67,7 +68,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         servicesBuilder = getServicesBuilder();
         transactionService = servicesBuilder.getTransactionService();
         actorMappingService = servicesBuilder.getActorMappingService();
-        sActorBuilder = servicesBuilder.getSActorBuilders().getSActorBuilder();
+        sActorBuilderFactory = BuilderFactory.getInstance().get(SActorBuilderFactory.class);
     }
 
     @Test(expected = SActorNotFoundException.class)
@@ -85,7 +86,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final Set<SActor> actors = new HashSet<SActor>();
         final String manager = "Manager";
         final long scopeId = 12;
-        final SActor actor = sActorBuilder.create(manager, scopeId, false).getActor();
+        final SActor actor = sActorBuilderFactory.create(manager, scopeId, false).getActor();
         actors.add(actor);
         transactionService.begin();
         try {
@@ -111,12 +112,12 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
 
         final String manager = "Manager";
         final long scopeId = 12;
-        final SActor actor = sActorBuilder.create(manager, scopeId, false).getActor();
+        final SActor actor = sActorBuilderFactory.create(manager, scopeId, false).getActor();
         actors.add(actor);
 
         final String manager2 = "Leader";
         final long scopeId2 = 12;
-        final SActor actor2 = sActorBuilder.create(manager2, scopeId2, false).getActor();
+        final SActor actor2 = sActorBuilderFactory.create(manager2, scopeId2, false).getActor();
         actors.add(actor2);
 
         transactionService.begin();
@@ -171,7 +172,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @Test
     public void addAndRemoveAUserOfAnActor() throws Exception {
         Set<SActor> actors = new HashSet<SActor>();
-        final SActor actor = sActorBuilder.create("Manager", 12, false).getActor();
+        final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
         transactionService.begin();
@@ -208,7 +209,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @Test
     public void addAndRemoveARoleOfAnActor() throws Exception {
         Set<SActor> actors = new HashSet<SActor>();
-        final SActor actor = sActorBuilder.create("Manager", 12, false).getActor();
+        final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
         transactionService.begin();
@@ -239,7 +240,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @Test
     public void addAndRemoveAGroupOfAnActor() throws Exception {
         Set<SActor> actors = new HashSet<SActor>();
-        final SActor actor = sActorBuilder.create("Manager", 12, false).getActor();
+        final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
         transactionService.begin();
@@ -270,7 +271,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @Test
     public void addAndRemoveAGroupWithSubGroupsOfAnActor() throws Exception {
         Set<SActor> actors = new HashSet<SActor>();
-        final SActor actor = sActorBuilder.create("Manager", 12, false).getActor();
+        final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
         transactionService.begin();
@@ -303,7 +304,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @Test
     public void addAndRemoveAMembershipOfAnActor() throws Exception {
         Set<SActor> actors = new HashSet<SActor>();
-        final SActor actor = sActorBuilder.create("Manager", 12, false).getActor();
+        final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
         transactionService.begin();
@@ -334,7 +335,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @Test
     public void addAndRemoveAMembershipOfAnActorWithSubGroups() throws Exception {
         Set<SActor> actors = new HashSet<SActor>();
-        final SActor actor = sActorBuilder.create("Manager", 12, false).getActor();
+        final SActor actor = sActorBuilderFactory.create("Manager", 12, false).getActor();
         actors.add(actor);
 
         transactionService.begin();
@@ -367,7 +368,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @Test
     public void countActorMembers() throws Exception {
         final long scopId = 12;
-        SActor actor = sActorBuilder.create("Manager", scopId, false).getActor();
+        SActor actor = sActorBuilderFactory.create("Manager", scopId, false).getActor();
 
         transactionService.begin();
         actor = actorMappingService.addActor(actor);
@@ -397,7 +398,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
         final Role role2 = identityAPI.createRole("role2test");
         transactionService.complete();
 
-        SActor actor = sActorBuilder.create("ActorRoleTest", scopId, false).getActor();
+        SActor actor = sActorBuilderFactory.create("ActorRoleTest", scopId, false).getActor();
         transactionService.begin();
         actor = actorMappingService.addActor(actor);
 
@@ -423,7 +424,7 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     @Test
     public void getNumberOfGroupsOfActorShouldNotCountMemberships() throws Exception {
         final long scopId = 12;
-        SActor actor = sActorBuilder.create("ActorGroupTest", scopId, false).getActor();
+        SActor actor = sActorBuilderFactory.create("ActorGroupTest", scopId, false).getActor();
 
         transactionService.begin();
         actor = actorMappingService.addActor(actor);

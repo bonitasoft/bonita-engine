@@ -22,15 +22,12 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.flownode.ThrowEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.ThrowSignalEventTriggerDefinition;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilders;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowSignalEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SThrowMessageEventTriggerDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.impl.SThrowSignalEventTriggerDefinitionImpl;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilders;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -45,16 +42,14 @@ public abstract class SThrowEventDefinitionImpl extends SEventDefinitionImpl imp
 
     private final List<SThrowSignalEventTriggerDefinition> sSignalEventTriggerDefinitions;
 
-    public SThrowEventDefinitionImpl(final ThrowEventDefinition eventDefinition, final SExpressionBuilders sExpressionBuilders,
-            final Map<String, STransitionDefinition> transitionsMap, final SDataDefinitionBuilders sDataDefinitionBuilders,
-            final SOperationBuilders sOperationBuilders) {
-        super(eventDefinition, sExpressionBuilders, transitionsMap, sOperationBuilders);
+    public SThrowEventDefinitionImpl(final ThrowEventDefinition eventDefinition,
+            final Map<String, STransitionDefinition> transitionsMap) {
+        super(eventDefinition, transitionsMap);
 
         final List<ThrowMessageEventTriggerDefinition> messageEventTriggerDefinitions = eventDefinition.getMessageEventTriggerDefinitions();
         sMessageEventTriggerDefinitions = new ArrayList<SThrowMessageEventTriggerDefinition>(messageEventTriggerDefinitions.size());
         for (final ThrowMessageEventTriggerDefinition throwMessageEventTriggerDefinition : messageEventTriggerDefinitions) {
-            addMessageEventTriggerDefinition(new SThrowMessageEventTriggerDefinitionImpl(throwMessageEventTriggerDefinition, sDataDefinitionBuilders,
-                    sExpressionBuilders));
+            addMessageEventTriggerDefinition(new SThrowMessageEventTriggerDefinitionImpl(throwMessageEventTriggerDefinition));
         }
 
         final List<ThrowSignalEventTriggerDefinition> signalEventTriggerDefinitions = eventDefinition.getSignalEventTriggerDefinitions();

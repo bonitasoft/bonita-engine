@@ -17,7 +17,6 @@ import org.bonitasoft.engine.bpm.flownode.impl.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SMultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Baptiste Mesta
@@ -43,15 +42,14 @@ public class SMultiInstanceLoopCharacteristicsImpl implements SMultiInstanceLoop
     public SMultiInstanceLoopCharacteristicsImpl() {
     }
 
-    public SMultiInstanceLoopCharacteristicsImpl(final MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics,
-            final SExpressionBuilders sExpressionBuilders) {
+    public SMultiInstanceLoopCharacteristicsImpl(final MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics) {
         isSequential = multiInstanceLoopCharacteristics.isSequential();
         loopDataInputRef = multiInstanceLoopCharacteristics.getLoopDataInputRef();
         loopDataOutputRef = multiInstanceLoopCharacteristics.getLoopDataOutputRef();
         dataInputItemRef = multiInstanceLoopCharacteristics.getDataInputItemRef();
         dataOutputItemRef = multiInstanceLoopCharacteristics.getDataOutputItemRef();
-        loopCardinality = ServerModelConvertor.convertExpression(sExpressionBuilders, multiInstanceLoopCharacteristics.getLoopCardinality());
-        completionCondition = ServerModelConvertor.convertExpression(sExpressionBuilders, multiInstanceLoopCharacteristics.getCompletionCondition());
+        loopCardinality = ServerModelConvertor.convertExpression(multiInstanceLoopCharacteristics.getLoopCardinality());
+        completionCondition = ServerModelConvertor.convertExpression(multiInstanceLoopCharacteristics.getCompletionCondition());
     }
 
     @Override

@@ -20,7 +20,6 @@ import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * @author Matthieu Chaffotte
@@ -39,11 +38,11 @@ public class STransitionDefinitionImpl extends SNamedElementImpl implements STra
 
     private List<SExpression> dependencies;
 
-    public STransitionDefinitionImpl(final TransitionDefinition transition, final SExpressionBuilders sExpressionBuilders) {
+    public STransitionDefinitionImpl(final TransitionDefinition transition) {
         this(transition.getName(), transition.getSource(), transition.getTarget());
         final Expression exp = transition.getCondition();
         if (transition.getCondition() != null) {
-            final SExpression sExpression = ServerModelConvertor.convertExpression(sExpressionBuilders, exp);
+            final SExpression sExpression = ServerModelConvertor.convertExpression(exp);
             condition = sExpression;
         }
     }

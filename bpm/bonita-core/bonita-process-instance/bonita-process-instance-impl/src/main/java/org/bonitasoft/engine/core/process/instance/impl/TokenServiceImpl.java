@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.impl;
 
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -23,14 +24,13 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
-import org.bonitasoft.engine.core.process.instance.model.builder.BPMInstanceBuilders;
-import org.bonitasoft.engine.core.process.instance.model.builder.STokenBuilder;
+import org.bonitasoft.engine.core.process.instance.model.builder.STokenBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -51,17 +51,14 @@ public class TokenServiceImpl implements TokenService {
 
     private final ReadPersistenceService persistenceRead;
 
-    private final BPMInstanceBuilders bpmInstanceBuilders;
-
     private final EventService eventService;
 
     private final TechnicalLoggerService logger;
 
-    public TokenServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final BPMInstanceBuilders bpmInstanceBuilders,
+    public TokenServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead,
             final EventService eventService, final TechnicalLoggerService logger) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
-        this.bpmInstanceBuilders = bpmInstanceBuilders;
         this.eventService = eventService;
         this.logger = logger;
 
@@ -69,13 +66,11 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public SToken createToken(final Long processInstanceId, final Long refId, final Long parentRefId) throws SObjectCreationException {
-        final STokenBuilder tokenBuilder = bpmInstanceBuilders.getSTokenBuilder();
-        final SToken token = tokenBuilder.createNewInstance(processInstanceId, refId, parentRefId).done();
+        final SToken token = BuilderFactory.get(STokenBuilderFactory.class).createNewInstance(processInstanceId, refId, parentRefId).done();
         final InsertRecord insertRecord = new InsertRecord(token);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(PROCESS_INSTANCE_TOKEN_COUNT, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -116,8 +111,7 @@ public class TokenServiceImpl implements TokenService {
             final DeleteRecord deleteRecord = new DeleteRecord(token);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESS_INSTANCE_TOKEN_COUNT, EventActionType.DELETED)) {
-                final SEventBuilder eventBuilder = eventService.getEventBuilder();
-                deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token).done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {

@@ -23,6 +23,4 @@ public interface SJobLogQueriableLogBuilder extends SPersistenceLogBuilder, HasC
 
     SJobLogQueriableLogBuilder jogDescriptorId(final long jobDescriptorId);
 
-    String getJobDescriptorIdKey();
-
 }

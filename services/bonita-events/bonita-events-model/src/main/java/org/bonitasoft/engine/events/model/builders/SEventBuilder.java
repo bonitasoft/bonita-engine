@@ -20,14 +20,6 @@ import org.bonitasoft.engine.events.model.SEvent;
  */
 public interface SEventBuilder {
 
-    SEventBuilder createNewInstance(String type);
-
-    SEventBuilder createInsertEvent(String type);
-
-    SEventBuilder createDeleteEvent(String type);
-
-    SEventBuilder createUpdateEvent(String type);
-
     SEventBuilder setObject(Object ob);
 
     SEvent done();

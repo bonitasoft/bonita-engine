@@ -21,8 +21,6 @@ import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
  */
 public interface SAProcessDocumentBuilder {
 
-    SAProcessDocumentBuilder createNewInstance();
-
     SAProcessDocumentBuilder setId(long id);
 
     SAProcessDocumentBuilder setProcessInstanceId(final long processInstanceId);

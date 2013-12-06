@@ -12,17 +12,14 @@
 
 	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 	</bean>
 
 	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 	</bean>
 
 	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-		<constructor-arg name="sDataInstanceBuilders" ref="dataInstanceBuilders" />
 	</bean>
 
 </beans>

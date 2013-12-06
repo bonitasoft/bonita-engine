@@ -7,10 +7,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.command.model.SPlatformCommand;
-import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilderAccessor;
+import org.bonitasoft.engine.platform.command.model.SPlatformCommandBuilderFactory;
+import org.bonitasoft.engine.platform.command.model.SPlatformCommandUpdateBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
@@ -21,11 +23,8 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
 
     private static PlatformCommandService platformCommandService;
 
-    private static SPlatformCommandBuilderAccessor platformCommandBuilderAccessor;
-
     static {
         platformCommandService = getServicesBuilder().buildPlatformCommandService();
-        platformCommandBuilderAccessor = getServicesBuilder().buildSPlatformCommandBuilderAccessor();
     }
 
     public PlatformCommandServiceIntegrationTest() {
@@ -35,7 +34,7 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
     @Test(expected = SPlatformCommandAlreadyExistsException.class)
     public void testSPlatformCommandAlreadyExistsException() throws Exception {
         getTransactionService().begin();
-        final SPlatformCommand sPlatformCommand = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand sPlatformCommand = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("createCommand", "this is a command", "command implementation").done();
         platformCommandService.create(sPlatformCommand);
         try {
@@ -59,7 +58,7 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
     @Test
     public void testCreatePlatformCommand() throws Exception {
         getTransactionService().begin();
-        final SPlatformCommand command1 = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand command1 = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("createCommand", "this is a command", "command implementation").done();
         platformCommandService.create(command1);
         final SPlatformCommand command2 = platformCommandService.getPlatformCommand("createCommand");
@@ -73,7 +72,7 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
     @Test(expected = SPlatformCommandNotFoundException.class)
     public void testDeletePlatformCommand() throws Exception {
         getTransactionService().begin();
-        final SPlatformCommand sPlatformCommand = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand sPlatformCommand = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("testCommandDelete", "this is a command", "command implementation").done();
         platformCommandService.create(sPlatformCommand);
         platformCommandService.delete("testCommandDelete");
@@ -87,11 +86,11 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
     @Test
     public void testDeleteAll() throws Exception {
         getTransactionService().begin();
-        final SPlatformCommand command1 = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand command1 = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("createCommand1", "this is a command", "command implementation").done();
-        final SPlatformCommand command2 = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand command2 = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("createCommand2", "this is a command", "command implementation").done();
-        final SPlatformCommand command3 = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand command3 = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("createCommand3", "this is a command", "command implementation").done();
         platformCommandService.create(command1);
         platformCommandService.create(command2);
@@ -109,14 +108,14 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
     @Test
     public void testUpdatePlatformCommand() throws Exception {
         getTransactionService().begin();
-        final SPlatformCommand oldCommand = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand oldCommand = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("old", "this is an old command", "command implementation").done();
         platformCommandService.create(oldCommand);
         assertEquals("old", oldCommand.getName());
         assertEquals("this is an old command", oldCommand.getDescription());
 
         final String commandName = "new";
-        final EntityUpdateDescriptor updateDescriptor = platformCommandBuilderAccessor.getSPlatformCommandUpdateBuilder().updateName(commandName)
+        final EntityUpdateDescriptor updateDescriptor = BuilderFactory.get(SPlatformCommandUpdateBuilderFactory.class).createNewInstance().updateName(commandName)
                 .updateDescription("this is a new command").done();
         platformCommandService.update(oldCommand, updateDescriptor);
         final SPlatformCommand newCommand = platformCommandService.getPlatformCommand(commandName);
@@ -129,7 +128,7 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
     @Test
     public void testGetPlatformCommandByName() throws Exception {
         getTransactionService().begin();
-        final SPlatformCommand sPlatformCommand = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand sPlatformCommand = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("commandOne", "this is a command", "command implementation").done();
         platformCommandService.create(sPlatformCommand);
         final SPlatformCommand command = platformCommandService.getPlatformCommand("commandOne");
@@ -142,11 +141,11 @@ public class PlatformCommandServiceIntegrationTest extends CommonServiceTest {
     @Test
     public void testGetPlatformCommandsWithCriterion() throws Exception {
         getTransactionService().begin();
-        final SPlatformCommand sPlatformCommand1 = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand sPlatformCommand1 = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("commandB", "this is command1", "command implementation").done();
-        final SPlatformCommand sPlatformCommand2 = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand sPlatformCommand2 = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("commandC", "this is command2", "command implementation").done();
-        final SPlatformCommand sPlatformCommand3 = platformCommandBuilderAccessor.getSPlatformCommandBuilder()
+        final SPlatformCommand sPlatformCommand3 = BuilderFactory.get(SPlatformCommandBuilderFactory.class)
                 .createNewInstance("commandA", "this is command3", "command implementation").done();
         platformCommandService.create(sPlatformCommand1);
         platformCommandService.create(sPlatformCommand2);

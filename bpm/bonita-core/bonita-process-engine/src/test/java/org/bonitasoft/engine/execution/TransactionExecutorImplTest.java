@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -114,12 +113,6 @@ public class TransactionExecutorImplTest {
         public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
             // TODO Auto-generated method stub
 
-        }
-
-        @Override
-        public List<BonitaTransactionSynchronization> getBonitaSynchronizations() {
-            // TODO Auto-generated method stub
-            return null;
         }
 
         @Override

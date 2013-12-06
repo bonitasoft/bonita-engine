@@ -23,63 +23,39 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstance
  */
 public abstract class SHumanTaskInstanceBuilderImpl extends SActivityInstanceBuilderImpl implements SHumanTaskInstanceBuilder {
 
-    private static final String ASSIGNEE_ID_KEY = "assigneeId";
-
-    private static final String CLAIMED_DATE = "claimedDate";
-
-    private static final String EXPECTED_END_DATE_KEY = "expectedEndDate";
-
-    private static final String PRIORITY_KEY = "priority";
+    protected SHumanTaskInstanceBuilderImpl(final SHumanTaskInstanceImpl entity) {
+        super(entity);
+    }
 
     @Override
     public SHumanTaskInstanceBuilder setAssigneeId(final long assigneeId) {
-        ((SHumanTaskInstanceImpl) getEntity()).setAssigneeId(assigneeId);
-        ((SHumanTaskInstanceImpl) getEntity()).setClaimedDate(System.currentTimeMillis());
+        ((SHumanTaskInstanceImpl) this.entity).setAssigneeId(assigneeId);
+        ((SHumanTaskInstanceImpl) this.entity).setClaimedDate(System.currentTimeMillis());
         return this;
     }
 
     @Override
     public SHumanTaskInstanceBuilder setPriority(final STaskPriority priority) {
-        ((SHumanTaskInstanceImpl) getEntity()).setPriority(priority);
+        ((SHumanTaskInstanceImpl) this.entity).setPriority(priority);
         return this;
     }
 
     @Override
     public SHumanTaskInstanceBuilder setExpectedEndDate(final long expectedEndDate) {
-        ((SHumanTaskInstanceImpl) getEntity()).setExpectedEndDate(expectedEndDate);
+        ((SHumanTaskInstanceImpl) this.entity).setExpectedEndDate(expectedEndDate);
         return this;
     }
 
     @Override
     public SHumanTaskInstanceBuilder setDisplayDescription(final String displayDescription) {
-        getEntity().setDisplayDescription(displayDescription);
+        this.entity.setDisplayDescription(displayDescription);
         return this;
     }
 
     @Override
     public SHumanTaskInstanceBuilder setDisplayName(final String displayName) {
-        getEntity().setDisplayName(displayName);
+        this.entity.setDisplayName(displayName);
         return this;
-    }
-
-    @Override
-    public String getAssigneeIdKey() {
-        return ASSIGNEE_ID_KEY;
-    }
-
-    @Override
-    public String getClaimedDateKey() {
-        return CLAIMED_DATE;
-    }
-
-    @Override
-    public String getPriorityKey() {
-        return PRIORITY_KEY;
-    }
-
-    @Override
-    public String getExpectedEndDateKey() {
-        return EXPECTED_END_DATE_KEY;
     }
 
 }

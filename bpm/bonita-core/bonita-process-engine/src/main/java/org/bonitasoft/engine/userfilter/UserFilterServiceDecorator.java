@@ -27,7 +27,6 @@ import org.bonitasoft.engine.expression.EngineConstantExpressionBuilder;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilders;
 
 /**
  * This {@link UserFilterService} implementation injects, in method {@link #executeFilter(long, SUserFilterDefinition, Map, ClassLoader)} a new expression to
@@ -41,18 +40,15 @@ public class UserFilterServiceDecorator implements UserFilterService {
 
     private final UserFilterService userFilterService;
 
-    private final SExpressionBuilders expressionbuilders;
-
     /**
      * @param userFilterService
      *            the UserFilterService class that this class is decorating.
      * @param expressionbuilder
      *            the {@link SExpressionBuilder} used to decorate.
      */
-    public UserFilterServiceDecorator(final UserFilterService userFilterService, final SExpressionBuilders expressionBuilders) {
+    public UserFilterServiceDecorator(final UserFilterService userFilterService) {
         super();
         this.userFilterService = userFilterService;
-        this.expressionbuilders = expressionBuilders;
     }
 
     /**
@@ -67,8 +63,8 @@ public class UserFilterServiceDecorator implements UserFilterService {
         SExpression apiAccessorExpression;
         SExpression engineExecutionContext;
         try {
-            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression(expressionbuilders.getExpressionBuilder());
-            engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext(expressionbuilders.getExpressionBuilder());
+            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
+            engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext();
         } catch (final SInvalidExpressionException e) {
             throw new SUserFilterExecutionException(e);
         }

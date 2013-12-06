@@ -20,26 +20,6 @@ import org.bonitasoft.engine.profile.model.SProfileEntry;
  */
 public interface SProfileEntryBuilder {
 
-    String ID = "id";
-
-    String NAME = "name";
-
-    String DESCRIPTION = "description";
-
-    String PROFILE_ID = "profileId";
-
-    String PARENT_ID = "parentId";
-
-    String PAGE = "page";
-
-    String INDEX = "index";
-
-    String TYPE = "type";
-
-    SProfileEntryBuilder createNewInstance(String name, long profileId);
-
-    SProfileEntryBuilder createNewInstance(SProfileEntry profileEntry);
-
     SProfileEntryBuilder setId(long id);
 
     SProfileEntryBuilder setDescription(String description);

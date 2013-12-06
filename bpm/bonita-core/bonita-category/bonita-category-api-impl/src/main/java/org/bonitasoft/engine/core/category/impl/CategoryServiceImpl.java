@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.category.impl;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.category.exception.SCategoryAlreadyExistsException;
@@ -26,17 +27,17 @@ import org.bonitasoft.engine.core.category.exception.SCategoryInProcessAlreadyEx
 import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
 import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
-import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilder;
-import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderAccessor;
+import org.bonitasoft.engine.core.category.model.builder.SCategoryBuilderFactory;
 import org.bonitasoft.engine.core.category.model.builder.SCategoryLogBuilder;
-import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilder;
+import org.bonitasoft.engine.core.category.model.builder.SCategoryLogBuilderFactory;
+import org.bonitasoft.engine.core.category.model.builder.SProcessCategoryMappingBuilderFactory;
 import org.bonitasoft.engine.core.category.persistence.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -47,8 +48,8 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -81,12 +82,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final ReadSessionAccessor sessionAccessor;
 
-    private final SCategoryBuilderAccessor categoryBuilderAccessor;
-
     private final QueriableLoggerService queriableLoggerService;
 
     public CategoryServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final SessionService sessionService, final ReadSessionAccessor sessionAccessor, final SCategoryBuilderAccessor categoryBuilderAccessor,
+            final SessionService sessionService, final ReadSessionAccessor sessionAccessor,
             final QueriableLoggerService queriableLoggerService) {
         super();
         this.persistenceService = persistenceService;
@@ -94,7 +93,6 @@ public class CategoryServiceImpl implements CategoryService {
         this.eventService = eventService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
-        this.categoryBuilderAccessor = categoryBuilderAccessor;
         this.queriableLoggerService = queriableLoggerService;
     }
 
@@ -112,20 +110,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private SCategory addCategory(final String name, final String description) throws SCategoryCreationException {
-        final SCategoryBuilder categoryBuilder = categoryBuilderAccessor.getCategoryBuilder();
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new category with name " + name);
-        final SEventBuilder eventBuilder = eventService.getEventBuilder();
         final long creator;
         try {
             creator = getCreator();
         } catch (final SSessionNotFoundException e) {
             throw new SCategoryCreationException(e);
         }
-        final SCategory sCategory = categoryBuilder.createNewInstance(name, creator).setDescription(description).done();
+        final SCategory sCategory = BuilderFactory.get(SCategoryBuilderFactory.class).createNewInstance(name, creator).setDescription(description).done();
         final InsertRecord insertRecord = new InsertRecord(sCategory);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(CATEGORY, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(CATEGORY).setObject(sCategory).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(CATEGORY).setObject(sCategory).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -184,7 +180,7 @@ public class CategoryServiceImpl implements CategoryService {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(persistedCategory, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(CATEGORY, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) eventService.getEventBuilder().createUpdateEvent(CATEGORY).setObject(persistedCategory).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CATEGORY).setObject(persistedCategory).done();
                 updateEvent.setOldObject(persistedCategory);
             }
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -204,8 +200,7 @@ public class CategoryServiceImpl implements CategoryService {
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a category");
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(CATEGORY, EventActionType.DELETED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(CATEGORY).setObject(sCategory).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(CATEGORY).setObject(sCategory).done();
         }
         try {
             recorder.recordDelete(record, deleteEvent);
@@ -242,15 +237,13 @@ public class CategoryServiceImpl implements CategoryService {
         if (isCategoryExistsInProcess(categoryId, processDefinitionId)) {
             throw new SCategoryInProcessAlreadyExistsException("The category '" + categoryId + "' is already in process '" + processDefinitionId + "'");
         }
-        final SProcessCategoryMappingBuilder mappingBuilder = categoryBuilderAccessor.getSProcessCategoryMappingBuilder();
-        final SProcessCategoryMapping mapping = mappingBuilder.createNewInstance(categoryId, processDefinitionId).done();
+        final SProcessCategoryMapping mapping = BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).createNewInstance(categoryId, processDefinitionId).done();
         final InsertRecord insertRecord = new InsertRecord(mapping);
         final String logMessage = "Creating a new category mapping {categoryId:" + categoryId + " --> processDefinitionId:" + processDefinitionId + "}";
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, logMessage);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(CATEGORY, EventActionType.CREATED)) {
-            final SEventBuilder eventBuilder = eventService.getEventBuilder();
-            insertEvent = (SInsertEvent) eventBuilder.createInsertEvent(CATEGORY).setObject(mapping).done();
+            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(CATEGORY).setObject(mapping).done();
         }
         try {
             recorder.recordInsert(insertRecord, insertEvent);
@@ -373,13 +366,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     private void deleteProcessCategoryMapping(final SProcessCategoryMapping mapping) throws SCategoryException {
         final DeleteRecord deleteRecord = new DeleteRecord(mapping);
-        final SEventBuilder eventBuilder = eventService.getEventBuilder();
         final String logMessage = "Deleting a category mapping {processDefinitionId:" + mapping.getProcessId() + " --> categoryId" + mapping.getCategoryId()
                 + "}";
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, logMessage);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(CATEGORY, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) eventBuilder.createDeleteEvent(CATEGORY).setObject(mapping).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(CATEGORY).setObject(mapping).done();
         }
         try {
             // /FIXME change log
@@ -392,14 +384,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private SCategoryLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final SCategoryLogBuilder logBuilder = categoryBuilderAccessor.getSCategoryLogBuilder();
+        final SCategoryLogBuilder logBuilder = BuilderFactory.get(SCategoryLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
         return logBuilder;
     }
 
     private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.createNewInstance().actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
+        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {

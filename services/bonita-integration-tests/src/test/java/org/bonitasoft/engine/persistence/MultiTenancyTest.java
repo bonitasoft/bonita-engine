@@ -65,7 +65,7 @@ public class MultiTenancyTest extends CommonServiceTest {
     public void testIfOneFailAllFail() throws Exception {
         // Initialize
         TestUtil.deleteDefaultTenantAndPlatForm(getTransactionService(), getPlatformService(), getSessionAccessor(), getSessionService());
-        TestUtil.createPlatformAndDefaultTenant(getTransactionService(), getPlatformService(), getSessionAccessor(), getPlatformBuilder(), getTenantBuilder(),
+        TestUtil.createPlatformAndDefaultTenant(getTransactionService(), getPlatformService(), getSessionAccessor(),
                 getSessionService());
 
         getTransactionService().begin();
@@ -98,7 +98,7 @@ public class MultiTenancyTest extends CommonServiceTest {
 
     @Test
     public void testMultiTenant() throws Exception {
-        final long tenant1Id = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), getTenantBuilder(), "tenant1",
+        final long tenant1Id = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), "tenant1",
                 PlatformUtil.DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
         try {
             final String firstName = "firstName";
@@ -146,9 +146,9 @@ public class MultiTenancyTest extends CommonServiceTest {
 
     @Test
     public void testSearchWith3Tenants() throws Exception {
-        final long tenant1Id = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), getTenantBuilder(), "tenant2",
+        final long tenant1Id = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), "tenant2",
                 PlatformUtil.DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
-        final long tenant2Id = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), getTenantBuilder(), "tenant1",
+        final long tenant2Id = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), "tenant1",
                 PlatformUtil.DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
         try {
             // getTransactionService().begin();
@@ -183,10 +183,10 @@ public class MultiTenancyTest extends CommonServiceTest {
 
         // Initialize
         TestUtil.deleteDefaultTenantAndPlatForm(getTransactionService(), getPlatformService(), getSessionAccessor(), getSessionService());
-        TestUtil.createPlatformAndDefaultTenant(getTransactionService(), getPlatformService(), getSessionAccessor(), getPlatformBuilder(), getTenantBuilder(),
+        TestUtil.createPlatformAndDefaultTenant(getTransactionService(), getPlatformService(), getSessionAccessor(),
                 getSessionService());
 
-        final long tenant1Id = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), getTenantBuilder(), "tenant1",
+        final long tenant1Id = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), "tenant1",
                 PlatformUtil.DEFAULT_CREATED_BY, DEFAULT_TENANT_STATUS);
         try {
             final String firstName = "firstName";

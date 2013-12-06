@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-data-instance</artifactId>
 		<groupId>org.bonitasoft.engine.data.instance</groupId>
-		<version>6.1.0-SNAPSHOT</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-data-instance-api-impl</artifactId>
@@ -17,6 +17,11 @@
 			<artifactId>bonita-data-instance-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
 			<artifactId>bonita-expression-api</artifactId>

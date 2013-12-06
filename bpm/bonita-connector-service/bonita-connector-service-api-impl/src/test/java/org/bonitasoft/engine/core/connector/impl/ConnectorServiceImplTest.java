@@ -19,8 +19,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,11 +40,6 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilder;
-import org.bonitasoft.engine.dependency.model.builder.DependencyBuilderAccessor;
-import org.bonitasoft.engine.dependency.model.builder.DependencyMappingBuilder;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -81,22 +74,14 @@ public class ConnectorServiceImplTest {
     @Before
     public void setup() {
         parser = mock(Parser.class);
+        
         final ParserFactory parserFactory = mock(ParserFactory.class);
         when(parserFactory.createParser(anyList())).thenReturn(parser);
 
-        final DependencyBuilder dependencyBuilder = mock(DependencyBuilder.class);
-        when(dependencyBuilder.createNewInstance(anyString(), anyString(), anyString(), any(byte[].class))).thenReturn(dependencyBuilder);
-        when(dependencyBuilder.done()).thenReturn(mock(SDependency.class));
-        final DependencyMappingBuilder dependencyMappingBuilder = mock(DependencyMappingBuilder.class);
-        when(dependencyMappingBuilder.createNewInstance(anyLong(), anyLong(), anyString())).thenReturn(dependencyMappingBuilder);
-        when(dependencyMappingBuilder.done()).thenReturn(mock(SDependencyMapping.class));
-        final DependencyBuilderAccessor dependencyBuilderAccessor = mock(DependencyBuilderAccessor.class);
-        when(dependencyBuilderAccessor.getDependencyBuilder()).thenReturn(dependencyBuilder);
-        when(dependencyBuilderAccessor.getDependencyMappingBuilder()).thenReturn(dependencyMappingBuilder);
         final DependencyService dependencyService = mock(DependencyService.class);
 
         connectorService = new ConnectorServiceImpl(mock(CacheService.class), mock(ConnectorExecutor.class), parserFactory, mock(ReadSessionAccessor.class),
-                mock(ExpressionResolverService.class), mock(OperationService.class), dependencyBuilderAccessor, dependencyService, null);
+                mock(ExpressionResolverService.class), mock(OperationService.class), dependencyService, null);
     }
 
     @Test(expected = SInvalidConnectorImplementationException.class)
@@ -217,7 +202,7 @@ public class ConnectorServiceImplTest {
             File[] jarFiles = classPathFolder.listFiles(jarFilenameFilter);
             assertEquals(1, jarFiles.length);
             assertTrue("Deployed connector jar is not the expected size + content",
-                    Arrays.equals(org.bonitasoft.engine.commons.IOUtil.getAllContentFrom(jarFiles[0]), originalConnectorJarContent));
+                    Arrays.equals(org.bonitasoft.engine.commons.io.IOUtil.getAllContentFrom(jarFiles[0]), originalConnectorJarContent));
 
             // now let's prepare the new connector implementation to replace:
             zipFileMap = new HashMap<String, byte[]>(1);
@@ -230,7 +215,7 @@ public class ConnectorServiceImplTest {
             jarFiles = classPathFolder.listFiles(jarFilenameFilter);
             assertEquals(1, jarFiles.length);
             assertTrue("Replaced connector jar is not the expected size + content",
-                    Arrays.equals(org.bonitasoft.engine.commons.IOUtil.getAllContentFrom(jarFiles[0]), newConnectorJarContent));
+                    Arrays.equals(org.bonitasoft.engine.commons.io.IOUtil.getAllContentFrom(jarFiles[0]), newConnectorJarContent));
         } finally {
             final boolean folderCleaned = IOUtil.deleteDir(processDefFolder);
             if (!folderCleaned) {

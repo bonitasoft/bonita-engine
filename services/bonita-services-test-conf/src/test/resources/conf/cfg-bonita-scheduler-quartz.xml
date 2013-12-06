@@ -42,8 +42,6 @@
 		<constructor-arg name="useOptimization" value="true" />
 	</bean>
 
-	<bean id="schedulerBuilderAccessor" class="org.bonitasoft.engine.scheduler.builder.impl.SSchedulerBuilderAccessorImpl" />
-
 	<bean id="jobService" class="org.bonitasoft.engine.scheduler.impl.JobServiceImpl">
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
@@ -52,7 +50,6 @@
 
 	<bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerServiceImpl">
 		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
-		<constructor-arg name="builderAccessor" ref="schedulerBuilderAccessor" />
 		<constructor-arg name="jobService" ref="jobService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
