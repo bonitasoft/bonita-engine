@@ -36,7 +36,7 @@ public class DefaultReportList {
             new DefaultReport("case_avg_time"),
             new DefaultReport("case_list"),
             new DefaultReport("task_list"),
-            new ProtectedReport("case_history", Features.BPM_MONITORING, LicenseChecker.getInstance())
+            new ProtectedReport("case_history", Features.TRACEABILITY, LicenseChecker.getInstance())
     );
 
     private TechnicalLoggerService logger;
