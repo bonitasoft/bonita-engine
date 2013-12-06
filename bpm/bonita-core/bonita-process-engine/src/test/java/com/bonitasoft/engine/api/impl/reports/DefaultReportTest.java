@@ -33,7 +33,7 @@ import static junit.framework.Assert.*;
  */
 public class DefaultReportTest {
 
-    public static final String RESOURCES_PATH = "src/test/resources";
+    public static final String RESOURCES_PATH = "src/test/resources/reports";
 
     private ReportDeployer emptyDeployer = new ReportDeployer() {
 
@@ -111,6 +111,21 @@ public class DefaultReportTest {
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
                 assertNull(screenShot);
+            }
+        });
+    }
+
+    @Test
+    public void DefaultReport_should_provide_screenshot_if_existing() throws Exception {
+        DefaultReport report = new DefaultReport("myreport");
+        final File file = new File(RESOURCES_PATH, "myreport-screenshot.png");
+        assert file.exists();
+
+        report.deploy(RESOURCES_PATH, new ReportDeployer() {
+
+            @Override
+            public void deploy(String name, String description, byte[] screenShot, byte[] content) throws IOException {
+                assertTrue(areEquals(IOUtil.getAllContentFrom(file), screenShot));
             }
         });
     }

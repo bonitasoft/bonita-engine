@@ -67,7 +67,7 @@ public class DefaultReport {
 
     private byte[] getScreenShotQuietly(String reportPath) {
         try {
-            return IOUtil.getAllContentFrom(new File(reportPath, name + "-screenshot").getAbsoluteFile());
+            return IOUtil.getAllContentFrom(new File(reportPath, name + "-screenshot.png").getAbsoluteFile());
         } catch (IOException e) {
             // stay quiet - a log would be nice
         }
