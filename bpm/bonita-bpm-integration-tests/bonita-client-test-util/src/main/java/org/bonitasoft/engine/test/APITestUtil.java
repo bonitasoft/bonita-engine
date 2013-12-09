@@ -25,6 +25,7 @@ import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
@@ -153,6 +154,8 @@ public class APITestUtil {
 
     private ProfileAPI profileAPI;
 
+    private ThemeAPI themeAPI;
+
     public static final String DEFAULT_TENANT = "default";
 
     public static final String ACTOR_NAME = "Employee actor";
@@ -188,6 +191,7 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
     }
 
     protected void login() throws BonitaException {
@@ -196,6 +200,7 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
     }
 
     protected void logout() throws BonitaException {
@@ -205,6 +210,7 @@ public class APITestUtil {
         setProcessAPI(null);
         setCommandAPI(null);
         setProfileAPI(null);
+        setThemeAPI(null);
     }
 
     public void logoutThenlogin() throws BonitaException {
@@ -1654,6 +1660,14 @@ public class APITestUtil {
 
     protected void setProfileAPI(final ProfileAPI profileAPI) {
         this.profileAPI = profileAPI;
+    }
+
+    protected ThemeAPI getThemeAPI() {
+        return themeAPI;
+    }
+
+    protected void setThemeAPI(ThemeAPI themeAPI) {
+        this.themeAPI = themeAPI;
     }
 
     protected void setSession(final APISession session) {

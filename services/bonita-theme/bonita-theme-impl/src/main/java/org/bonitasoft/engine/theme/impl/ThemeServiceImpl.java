@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.theme.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -43,6 +45,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
@@ -51,17 +54,18 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
 import org.bonitasoft.engine.theme.builder.impl.SThemeLogBuilderImpl;
+import org.bonitasoft.engine.theme.exception.SRestoreThemeException;
 import org.bonitasoft.engine.theme.exception.SThemeCreationException;
 import org.bonitasoft.engine.theme.exception.SThemeDeletionException;
 import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
+import org.bonitasoft.engine.theme.exception.SThemeReadException;
 import org.bonitasoft.engine.theme.exception.SThemeUpdateException;
 import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
 import org.bonitasoft.engine.theme.persistence.SelectDescriptorBuilder;
 
 /**
- * @author Matthieu Chaffotte
- * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class ThemeServiceImpl implements ThemeService {
 
@@ -109,7 +113,12 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public void deleteTheme(final long id) throws SThemeNotFoundException, SThemeDeletionException {
         logBeforeMethod("deleteTheme");
-        final STheme theme = getTheme(id);
+        STheme theme;
+        try {
+            theme = getTheme(id);
+        } catch (final SThemeReadException e) {
+            throw new SThemeDeletionException(e);
+        }
         deleteTheme(theme);
         logAfterMethod("deleteTheme");
     }
@@ -135,31 +144,41 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public STheme getCurrentTheme(final SThemeType type) throws SThemeNotFoundException {
-        final SelectOneDescriptor<STheme> selectDescriptor = SelectDescriptorBuilder.getCurrentTheme(type);
-        return getThemeByType(type, selectDescriptor);
-    }
-
-    @Override
-    public STheme getDefaultTheme(final SThemeType type) throws SThemeNotFoundException {
-        final SelectOneDescriptor<STheme> selectDescriptor = SelectDescriptorBuilder.getDefaultTheme(type);
-        return getThemeByType(type, selectDescriptor);
-    }
-
-    private STheme getThemeByType(final SThemeType type, final SelectOneDescriptor<STheme> selectDescriptor) throws SThemeNotFoundException {
+    public STheme restoreDefaultTheme(final SThemeType type) throws SRestoreThemeException {
         try {
-            final STheme theme = persistenceService.selectOne(selectDescriptor);
-            if (theme == null) {
-                throw new SThemeNotFoundException("No theme exists with type : " + type);
-            }
-            return theme;
-        } catch (final SBonitaReadException e) {
-            throw new SThemeNotFoundException(e);
+            final FilterOption defaultFilter = new FilterOption(STheme.class, SThemeBuilderFactory.IS_DEFAULT, false);
+            final FilterOption typeFilter = new FilterOption(STheme.class, SThemeBuilderFactory.TYPE, type.name());
+            final List<FilterOption> filterOptions = new ArrayList<FilterOption>();
+            filterOptions.add(defaultFilter);
+            filterOptions.add(typeFilter);
+            final DeleteAllRecord record = new DeleteAllRecord(STheme.class, filterOptions);
+            recorder.recordDeleteAll(record);
+        } catch (final SRecorderException e) {
+            throw new SRestoreThemeException("Can't delete custom themes for type = " + type, e);
+        }
+        try {
+            return getTheme(type, true);
+        } catch (final SBonitaException e) {
+            throw new SRestoreThemeException(e);
         }
     }
 
     @Override
-    public STheme getTheme(final long id) throws SThemeNotFoundException {
+    public STheme getTheme(final SThemeType type, final boolean isDefault) throws SThemeNotFoundException, SThemeReadException {
+        final SelectOneDescriptor<STheme> selectDescriptor = SelectDescriptorBuilder.getTheme(type, isDefault);
+        try {
+            final STheme theme = persistenceService.selectOne(selectDescriptor);
+            if (theme == null) {
+                throw new SThemeNotFoundException("No theme exists with type = " + type + ", and isDefault = " + isDefault);
+            }
+            return theme;
+        } catch (final SBonitaReadException e) {
+            throw new SThemeReadException(e);
+        }
+    }
+
+    @Override
+    public STheme getTheme(final long id) throws SThemeNotFoundException, SThemeReadException {
         logBeforeMethod("getTheme");
         try {
             final SelectByIdDescriptor<STheme> descriptor = SelectDescriptorBuilder.getElementById(STheme.class, "Theme", id);
@@ -171,7 +190,21 @@ public class ThemeServiceImpl implements ThemeService {
             return theme;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod("getTheme", e);
-            throw new SThemeNotFoundException(e);
+            throw new SThemeReadException(e);
+        }
+    }
+
+    @Override
+    public STheme getLastModifiedTheme(final SThemeType type) throws SThemeNotFoundException, SThemeReadException {
+        final SelectOneDescriptor<STheme> selectDescriptor = SelectDescriptorBuilder.getLastModifiedTheme(type);
+        try {
+            final STheme theme = persistenceService.selectOne(selectDescriptor);
+            if (theme == null) {
+                throw new SThemeNotFoundException("No theme exists with type = " + type);
+            }
+            return theme;
+        } catch (final SBonitaReadException e) {
+            throw new SThemeReadException(e);
         }
     }
 

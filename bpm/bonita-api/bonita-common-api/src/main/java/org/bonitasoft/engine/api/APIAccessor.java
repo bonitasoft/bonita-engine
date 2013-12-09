@@ -29,4 +29,6 @@ public interface APIAccessor extends Serializable {
 
     ProfileAPI getProfileAPI();
 
+    ThemeAPI getThemeAPI();
+
 }

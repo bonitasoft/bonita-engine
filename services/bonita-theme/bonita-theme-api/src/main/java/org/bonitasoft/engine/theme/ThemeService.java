@@ -18,9 +18,11 @@ import java.util.List;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.theme.exception.SRestoreThemeException;
 import org.bonitasoft.engine.theme.exception.SThemeCreationException;
 import org.bonitasoft.engine.theme.exception.SThemeDeletionException;
 import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
+import org.bonitasoft.engine.theme.exception.SThemeReadException;
 import org.bonitasoft.engine.theme.exception.SThemeUpdateException;
 import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
@@ -85,6 +87,17 @@ public interface ThemeService {
     void deleteTheme(long id) throws SThemeNotFoundException, SThemeDeletionException;
 
     /**
+     * Restore default theme by the given type
+     * 
+     * @param type
+     *            The type of the theme to restore
+     * @throws SRestoreThemeException
+     *             If an exception is thrown when the default theme is restored
+     * @since 6.2
+     */
+    STheme restoreDefaultTheme(SThemeType type) throws SRestoreThemeException;
+
+    /**
      * Get theme by its id
      * 
      * @param id
@@ -92,33 +105,38 @@ public interface ThemeService {
      * @return The theme
      * @throws SThemeNotFoundException
      *             If the identifier does not refer to an existing sTheme
+     * @throws SThemeReadException
      * @since 6.2
      */
-    STheme getTheme(long id) throws SThemeNotFoundException;
+    STheme getTheme(long id) throws SThemeNotFoundException, SThemeReadException;
 
     /**
-     * Get the current theme for the specific type.
+     * Get the default or current theme for the specific type.
+     * 
+     * @param type
+     *            The type of the theme
+     * @param isDefault
+     *            Theme is default or not
+     * @return The theme
+     * @throws SThemeNotFoundException
+     *             If the type does not refer to an existing sTheme
+     * @throws SThemeReadException
+     * @since 6.2
+     */
+    STheme getTheme(SThemeType type, boolean isDefault) throws SThemeNotFoundException, SThemeReadException;
+
+    /**
+     * Get the last modified theme for the specific type.
      * 
      * @param type
      *            The type of the theme
      * @return The theme
      * @throws SThemeNotFoundException
      *             If the type does not refer to an existing sTheme
+     * @throws SThemeReadException
      * @since 6.2
      */
-    STheme getCurrentTheme(SThemeType type) throws SThemeNotFoundException;
-
-    /**
-     * Get the default theme for the specific type.
-     * 
-     * @param type
-     *            The type of the theme
-     * @return The theme
-     * @throws SThemeNotFoundException
-     *             If the type does not refer to an existing sTheme
-     * @since 6.2
-     */
-    STheme getDefaultTheme(SThemeType type) throws SThemeNotFoundException;
+    STheme getLastModifiedTheme(SThemeType type) throws SThemeNotFoundException, SThemeReadException;
 
     /**
      * Get the number of the themes corresponding to criteria

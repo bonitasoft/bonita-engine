@@ -11,10 +11,9 @@ package org.bonitasoft.engine.api;
 import java.util.Date;
 
 import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.looknfeel.Theme;
-import org.bonitasoft.engine.looknfeel.ThemeType;
-import org.bonitasoft.engine.looknfeel.exception.ThemeNotFoundException;
 import org.bonitasoft.engine.session.InvalidSessionException;
+import org.bonitasoft.engine.theme.Theme;
+import org.bonitasoft.engine.theme.ThemeType;
 
 /**
  * Manage mobile and portal theme
@@ -29,15 +28,13 @@ public interface ThemeAPI {
      * @param type
      *            The type of the theme
      * @return The theme
-     * @throws ThemeNotFoundException
-     *             If can't find a theme corresponding to the type
      * @throws RetrieveException
      *             If an exception occurs while retrieving the theme
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Theme getCurrentTheme(ThemeType type) throws ThemeNotFoundException;
+    Theme getCurrentTheme(ThemeType type);
 
     /**
      * Get the default theme for the specific type.
@@ -45,15 +42,13 @@ public interface ThemeAPI {
      * @param type
      *            The type of the theme
      * @return The theme
-     * @throws ThemeNotFoundException
-     *             If can't find a theme corresponding to the type
      * @throws RetrieveException
      *             If an exception occurs while retrieving the theme
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Theme getDefaultTheme(ThemeType type) throws ThemeNotFoundException;
+    Theme getDefaultTheme(ThemeType type);
 
     /**
      * Get the last updated date of the current theme for the specific type.
@@ -61,12 +56,10 @@ public interface ThemeAPI {
      * @param type
      *            The type of theme
      * @return The last updated date of the theme
-     * @throws ThemeNotFoundException
-     *             If can't find a theme corresponding to the type
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Date getLastUpdateDate(ThemeType type) throws ThemeNotFoundException;
+    Date getLastUpdateDate(ThemeType type);
 
 }

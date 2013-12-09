@@ -11,30 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.theme.builder;
+package org.bonitasoft.engine.theme.exception;
 
-import org.bonitasoft.engine.theme.model.STheme;
-import org.bonitasoft.engine.theme.model.SThemeType;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Celine Souchet
  */
-public interface SThemeBuilderFactory {
+public class SRestoreThemeException extends SBonitaException {
 
-    static String ID = "id";
+    private static final long serialVersionUID = 3465858452506324242L;
 
-    static String CONTENT = "content";
+    public SRestoreThemeException(final String message) {
+        super(message);
+    }
 
-    static String CSS_CONTENT = "cssContent";
+    public SRestoreThemeException(final Throwable cause) {
+        super(cause);
+    }
 
-    static String LAST_UPDATE_DATE = "lastUpdateDate";
-
-    static String TYPE = "type";
-
-    static String IS_DEFAULT = "isDefault";
-
-    SThemeBuilder createNewInstance(STheme theme);
-
-    SThemeBuilder createNewInstance(byte[] content, byte[] cssContent, boolean isDefault, SThemeType type, long lastUpdateDate);
+    public SRestoreThemeException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
 }

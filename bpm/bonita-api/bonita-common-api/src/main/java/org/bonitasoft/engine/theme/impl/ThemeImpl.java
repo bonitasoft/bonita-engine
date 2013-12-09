@@ -11,14 +11,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.looknfeel.impl;
+package org.bonitasoft.engine.theme.impl;
 
 import java.util.Arrays;
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.BaseElementImpl;
-import org.bonitasoft.engine.looknfeel.Theme;
-import org.bonitasoft.engine.looknfeel.ThemeType;
+import org.bonitasoft.engine.theme.Theme;
+import org.bonitasoft.engine.theme.ThemeType;
 
 /**
  * @author Celine Souchet

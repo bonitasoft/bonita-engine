@@ -58,17 +58,16 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<T>("get" + elementName + "s", parameters, clazz, queryOptions);
     }
 
-    public static SelectOneDescriptor<STheme> getDefaultTheme(final SThemeType type) {
-        return getThemeByType("getDefaultTheme", type);
-    }
-
-    public static SelectOneDescriptor<STheme> getCurrentTheme(final SThemeType type) {
-        return getThemeByType("getCurrentTheme", type);
-    }
-
-    private static SelectOneDescriptor<STheme> getThemeByType(final String requestName, final SThemeType type) {
+    public static SelectOneDescriptor<STheme> getTheme(SThemeType type, boolean isDefault) {
         final Map<String, Object> inputParameters = new HashMap<String, Object>(1);
         inputParameters.put("type", type);
-        return new SelectOneDescriptor<STheme>(requestName, inputParameters, STheme.class);
+        inputParameters.put("isDefault", isDefault);
+        return new SelectOneDescriptor<STheme>("getTheme", inputParameters, STheme.class);
+    }
+
+    public static SelectOneDescriptor<STheme> getLastModifiedTheme(SThemeType type) {
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(1);
+        inputParameters.put("type", type);
+        return new SelectOneDescriptor<STheme>("getLastModifiedTheme", inputParameters, STheme.class);
     }
 }

@@ -42,15 +42,18 @@ import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
+import org.bonitasoft.engine.recorder.model.DeleteAllRecord;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilder;
 import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilderFactory;
+import org.bonitasoft.engine.theme.exception.SRestoreThemeException;
 import org.bonitasoft.engine.theme.exception.SThemeCreationException;
 import org.bonitasoft.engine.theme.exception.SThemeDeletionException;
 import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
+import org.bonitasoft.engine.theme.exception.SThemeReadException;
 import org.bonitasoft.engine.theme.exception.SThemeUpdateException;
 import org.bonitasoft.engine.theme.model.STheme;
 import org.bonitasoft.engine.theme.model.SThemeType;
@@ -198,19 +201,62 @@ public class ThemeServiceImplTest {
     }
 
     /**
+     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#restoreDefaultTheme(SThemeType)}.
+     * 
+     * @throws SRestoreThemeException
+     * @throws SRecorderException
+     * @throws SBonitaReadException
+     * 
+     */
+    @Test
+    public final void restoreDefaultTheme() throws SRestoreThemeException, SRecorderException, SBonitaReadException {
+        final STheme sTheme = mock(STheme.class);
+
+        doNothing().when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
+        doReturn(sTheme).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<STheme>> any());
+
+        final STheme defaultTheme = themeServiceImpl.restoreDefaultTheme(SThemeType.MOBILE);
+        assertEquals(sTheme, defaultTheme);
+    }
+
+    @Test(expected = SRestoreThemeException.class)
+    public void restoreNoDefaultTheme() throws Exception {
+        doNothing().when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenReturn(null);
+
+        themeServiceImpl.restoreDefaultTheme(SThemeType.MOBILE);
+    }
+
+    @Test(expected = SRestoreThemeException.class)
+    public void restoreDefaultThemeThrowExceptionWhenGetDefault() throws Exception {
+        doNothing().when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
+
+        themeServiceImpl.restoreDefaultTheme(SThemeType.MOBILE);
+    }
+
+    @Test(expected = SRestoreThemeException.class)
+    public void restoreDefaultThemeThrowExceptionWhenDelete() throws Exception {
+        doThrow(new SRecorderException("")).when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
+
+        themeServiceImpl.restoreDefaultTheme(SThemeType.PORTAL);
+    }
+
+    /**
      * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getCurrentTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
      * 
      * @throws SThemeNotFoundException
      * @throws SBonitaReadException
+     * @throws SThemeReadException
      */
     @Test
-    public final void getCurrentTheme() throws SThemeNotFoundException, SBonitaReadException {
+    public final void getCurrentTheme() throws SThemeNotFoundException, SBonitaReadException, SThemeReadException {
         final STheme sTheme = mock(STheme.class);
         final SThemeType type = SThemeType.MOBILE;
 
         doReturn(sTheme).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<STheme>> any());
 
-        assertEquals(sTheme, themeServiceImpl.getCurrentTheme(type));
+        assertEquals(sTheme, themeServiceImpl.getTheme(type, false));
     }
 
     @Test(expected = SThemeNotFoundException.class)
@@ -219,16 +265,16 @@ public class ThemeServiceImplTest {
 
         when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenReturn(null);
 
-        themeServiceImpl.getCurrentTheme(type);
+        themeServiceImpl.getTheme(type, false);
     }
 
-    @Test(expected = SThemeNotFoundException.class)
+    @Test(expected = SThemeReadException.class)
     public void getCurrentThemeThrowException() throws Exception {
         final SThemeType type = SThemeType.MOBILE;
 
         when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
 
-        themeServiceImpl.getCurrentTheme(type);
+        themeServiceImpl.getTheme(type, false);
     }
 
     /**
@@ -236,15 +282,16 @@ public class ThemeServiceImplTest {
      * 
      * @throws SBonitaReadException
      * @throws SThemeNotFoundException
+     * @throws SThemeReadException
      */
     @Test
-    public final void getDefaultTheme() throws SBonitaReadException, SThemeNotFoundException {
+    public final void getDefaultTheme() throws SBonitaReadException, SThemeNotFoundException, SThemeReadException {
         final STheme sTheme = mock(STheme.class);
         final SThemeType type = SThemeType.MOBILE;
 
         doReturn(sTheme).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<STheme>> any());
 
-        assertEquals(sTheme, themeServiceImpl.getDefaultTheme(type));
+        assertEquals(sTheme, themeServiceImpl.getTheme(type, true));
     }
 
     @Test(expected = SThemeNotFoundException.class)
@@ -253,16 +300,16 @@ public class ThemeServiceImplTest {
 
         when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenReturn(null);
 
-        themeServiceImpl.getDefaultTheme(type);
+        themeServiceImpl.getTheme(type, true);
     }
 
-    @Test(expected = SThemeNotFoundException.class)
+    @Test(expected = SThemeReadException.class)
     public void getDefaultThemeThrowException() throws Exception {
         final SThemeType type = SThemeType.MOBILE;
 
         when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
 
-        themeServiceImpl.getDefaultTheme(type);
+        themeServiceImpl.getTheme(type, true);
     }
 
     /**
@@ -284,11 +331,46 @@ public class ThemeServiceImplTest {
         themeServiceImpl.getTheme(1);
     }
 
-    @Test(expected = SThemeNotFoundException.class)
+    @Test(expected = SThemeReadException.class)
     public void getThemeByIdThrowException() throws Exception {
         when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
 
         themeServiceImpl.getTheme(1);
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getLastModifiedTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
+     * 
+     * @throws SBonitaReadException
+     * @throws SThemeNotFoundException
+     * @throws SThemeReadException
+     */
+    @Test
+    public final void getLastModifiedTheme() throws SBonitaReadException, SThemeNotFoundException, SThemeReadException {
+        final STheme sTheme = mock(STheme.class);
+        final SThemeType type = SThemeType.MOBILE;
+
+        doReturn(sTheme).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<STheme>> any());
+
+        assertEquals(sTheme, themeServiceImpl.getLastModifiedTheme(type));
+    }
+
+    @Test(expected = SThemeNotFoundException.class)
+    public void getNoLastModifiedTheme() throws Exception {
+        final SThemeType type = SThemeType.MOBILE;
+
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenReturn(null);
+
+        themeServiceImpl.getLastModifiedTheme(type);
+    }
+
+    @Test(expected = SThemeReadException.class)
+    public void getLastModifiedThemeThrowException() throws Exception {
+        final SThemeType type = SThemeType.MOBILE;
+
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
+
+        themeServiceImpl.getLastModifiedTheme(type);
     }
 
     /**

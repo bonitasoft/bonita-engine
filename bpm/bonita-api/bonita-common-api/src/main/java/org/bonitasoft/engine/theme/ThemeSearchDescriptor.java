@@ -11,30 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.theme.builder;
-
-import org.bonitasoft.engine.theme.model.STheme;
-import org.bonitasoft.engine.theme.model.SThemeType;
+package org.bonitasoft.engine.theme;
 
 /**
  * @author Celine Souchet
  */
-public interface SThemeBuilderFactory {
+public final class ThemeSearchDescriptor {
 
-    static String ID = "id";
+    public static final String ID = "id";
 
-    static String CONTENT = "content";
+    public static final String IS_DEFAULT = "isDefault";
 
-    static String CSS_CONTENT = "cssContent";
-
-    static String LAST_UPDATE_DATE = "lastUpdateDate";
-
-    static String TYPE = "type";
-
-    static String IS_DEFAULT = "isDefault";
-
-    SThemeBuilder createNewInstance(STheme theme);
-
-    SThemeBuilder createNewInstance(byte[] content, byte[] cssContent, boolean isDefault, SThemeType type, long lastUpdateDate);
+    public static final String TYPE = "type";
 
 }

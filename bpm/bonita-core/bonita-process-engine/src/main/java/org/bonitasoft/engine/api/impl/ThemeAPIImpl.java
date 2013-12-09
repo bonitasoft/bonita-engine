@@ -11,14 +11,19 @@ package org.bonitasoft.engine.api.impl;
 import java.util.Date;
 
 import org.bonitasoft.engine.api.ThemeAPI;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.looknfeel.Theme;
-import org.bonitasoft.engine.looknfeel.ThemeType;
-import org.bonitasoft.engine.looknfeel.exception.ThemeNotFoundException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.theme.Theme;
+import org.bonitasoft.engine.theme.ThemeService;
+import org.bonitasoft.engine.theme.ThemeType;
+import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
+import org.bonitasoft.engine.theme.model.SThemeType;
 
 /**
  * @author Celine Souchet
@@ -36,21 +41,38 @@ public class ThemeAPIImpl implements ThemeAPI {
     }
 
     @Override
-    public Theme getCurrentTheme(ThemeType type) throws ThemeNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
+    public Theme getCurrentTheme(final ThemeType type) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ThemeService themeService = tenantAccessor.getThemeService();
+        try {
+            return ModelConvertor.toTheme(themeService.getLastModifiedTheme(SThemeType.valueOf(type.name())));
+        } catch (SThemeNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        }
     }
 
     @Override
-    public Theme getDefaultTheme(ThemeType type) throws ThemeNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
+    public Theme getDefaultTheme(final ThemeType type) {
+        return getThemeByType(type, true);
+    }
+
+    private Theme getThemeByType(final ThemeType type, final boolean isDefault) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ThemeService themeService = tenantAccessor.getThemeService();
+        try {
+            return ModelConvertor.toTheme(themeService.getTheme(SThemeType.valueOf(type.name()), isDefault));
+        } catch (SThemeNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        }
     }
 
     @Override
-    public Date getLastUpdateDate(ThemeType type) throws ThemeNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
+    public Date getLastUpdateDate(final ThemeType type) {
+        return getCurrentTheme(type).getLastUpdatedDate();
     }
 
 }
