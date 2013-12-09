@@ -31,13 +31,10 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.command.DefaultCommandProvider;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -48,7 +45,6 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -62,7 +58,6 @@ import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
-import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -72,7 +67,6 @@ import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
-import org.bonitasoft.engine.xml.Parser;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
@@ -264,13 +258,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final CommandService commandService = tenantServiceAccessor.getCommandService();
-            final Parser profileParser = tenantServiceAccessor.getProfileParser();
-            final ProfileService profileService = tenantServiceAccessor.getProfileService();
-            final IdentityService identityService = tenantServiceAccessor.getIdentityService();
-            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             final Callable<Long> initializeTenant = new Callable<Long>() {
 
                 @Override
@@ -278,19 +266,25 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                     SessionAccessor sessionAccessor = null;
                     long platformSessionId = -1;
                     try {
+                        // Create session
                         sessionAccessor = serviceAccessorFactory.createSessionAccessor();
                         final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
-
                         platformSessionId = sessionAccessor.getSessionId();
                         sessionAccessor.deleteSessionId();
-
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-                        createDefaultDataSource(dataService);
-                        final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
-                        createDefaultCommands(commandService, defaultCommandProvider);
-                        deployTenantReports(tenantId, tenantServiceAccessor);
-                        createDefaultProfiles(tenantId, profileParser, profileService, identityService, logger);
+                        // Create default data source
+                        createDefaultDataSource(tenantServiceAccessor);
+
+                        // Create default commands
+                        createDefaultCommands(tenantServiceAccessor);
+
+                        // Create default profiles
+                        createDefaultProfiles(tenantServiceAccessor);
+
+                        // Create default theme
+                        createDefaultTheme(tenantServiceAccessor);
+
                         sessionService.deleteSession(session.getId());
                         return tenantId;
                     } finally {
@@ -320,7 +314,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final byte[] screenshot = getReportScreenshot(reportFolder, reportName);
 
             final ReportingService reportingService = tenantAccessor.getReportingService();
-            final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(reportName, /* system user */-1, true, reportDescription, screenshot);
+            final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(reportName, /* system user */-1, true,
+                    reportDescription, screenshot);
             final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
             // Here we are already in a transaction, so we can call execute() directly:
             addReport.execute();
@@ -688,14 +683,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new UpdateException(e);
         } catch (final BonitaHomeNotSetException e) {
             throw new UpdateException(e);
-        } catch (final BonitaHomeConfigurationException e) {
-            throw new UpdateException(e);
-        } catch (final InstantiationException e) {
-            throw new UpdateException(e);
-        } catch (final IllegalAccessException e) {
-            throw new UpdateException(e);
-        } catch (final ClassNotFoundException e) {
-            throw new UpdateException(e);
         } catch (final IOException e) {
             throw new UpdateException(e);
         } catch (final SBonitaException e) {
@@ -705,8 +692,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private EntityUpdateDescriptor getTenantUpdateDescriptor(final TenantUpdater udpateDescriptor) throws BonitaHomeNotSetException,
-            BonitaHomeConfigurationException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
+    private EntityUpdateDescriptor getTenantUpdateDescriptor(final TenantUpdater udpateDescriptor) {
         final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();

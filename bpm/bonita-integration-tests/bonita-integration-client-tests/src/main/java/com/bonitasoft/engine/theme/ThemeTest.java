@@ -2,7 +2,9 @@ package com.bonitasoft.engine.theme;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Date;
 
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -35,47 +37,75 @@ public class ThemeTest extends CommonAPISPTest {
         login();
     }
 
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Set custom" }, jira = "BS-2396, BS-2397")
     @Test
     public void setCustomTheme() throws Exception {
+        final ThemeType type = ThemeType.MOBILE;
+        final Theme defaultTheme = getThemeAPI().getDefaultTheme(type);
+
         final byte[] content = "plop".getBytes();
         final byte[] cssContent = "cssContent".getBytes();
-        final ThemeType type = ThemeType.MOBILE;
         final Theme createdTheme = getThemeAPI().setCustomTheme(content, cssContent, type);
 
         final Theme themeResult = getThemeAPI().getCurrentTheme(type);
         assertEquals(createdTheme, themeResult);
+        assertEquals(content, createdTheme.getContent());
+        assertEquals(cssContent, createdTheme.getCssContent());
+        assertEquals(type, createdTheme.getType());
         assertFalse(createdTheme.isDefault());
+
+        final Date lastUpdateDate = getThemeAPI().getLastUpdateDate(type);
+        assertEquals(createdTheme.getLastUpdatedDate(), lastUpdateDate);
+        assertTrue(defaultTheme.getLastUpdatedDate().before(lastUpdateDate));
     }
 
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Set custom", "Update custom" }, jira = "BS-2396, BS-2397")
     @Test
     public void overrideCustomTheme() throws Exception {
+        final Theme createdTheme = getThemeAPI().setCustomTheme("plop".getBytes(), "cssContent".getBytes(), ThemeType.MOBILE);
+
         final byte[] content = "plop".getBytes();
         final byte[] cssContent = "cssContent".getBytes();
         final ThemeType type = ThemeType.MOBILE;
-        final Theme createdTheme = getThemeAPI().setCustomTheme(content, cssContent, type);
+        final Theme updatedTheme = getThemeAPI().setCustomTheme(content, cssContent, type);
+        assertEquals(content, updatedTheme.getContent());
+        assertEquals(cssContent, updatedTheme.getCssContent());
+        assertEquals(type, updatedTheme.getType());
+        assertEquals(createdTheme.getId(), updatedTheme.getId());
+        assertTrue(createdTheme.getLastUpdatedDate().before(updatedTheme.getLastUpdatedDate()));
 
-        final Theme createdTheme2 = getThemeAPI().setCustomTheme(content, cssContent, ThemeType.PORTAL);
-        assertEquals(createdTheme.getContent(), createdTheme2.getContent());
-        assertEquals(createdTheme.getCssContent(), createdTheme2.getCssContent());
-        assertEquals(createdTheme.getId(), createdTheme2.getId());
-        assertNotEquals(createdTheme.getType(), createdTheme2.getType());
-        assertNotEquals(createdTheme.getLastUpdatedDate(), createdTheme2.getLastUpdatedDate());
+        assertEquals(updatedTheme, getThemeAPI().getCurrentTheme(type));
     }
 
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Set custom", "Wrong parameter" }, jira = "BS-2396, BS-2397")
     @Test(expected = SetThemeException.class)
     public void cantSetCustomThemeWithoutContent() throws Exception {
-        final byte[] cssContent = "cssContent".getBytes();
         final ThemeType type = ThemeType.MOBILE;
-        getThemeAPI().setCustomTheme(null, cssContent, type);
+        final Theme defaultTheme = getThemeAPI().getDefaultTheme(type);
+
+        final byte[] cssContent = "cssContent".getBytes();
+        try {
+            getThemeAPI().setCustomTheme(null, cssContent, type);
+        } finally {
+            assertEquals(defaultTheme, getThemeAPI().getDefaultTheme(type));
+        }
     }
 
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Set custom", "Wrong parameter" }, jira = "BS-2396, BS-2397")
     @Test(expected = SetThemeException.class)
     public void cantSetCustomThemeWithoutCssContent() throws Exception {
-        final byte[] content = "plop".getBytes();
         final ThemeType type = ThemeType.MOBILE;
-        getThemeAPI().setCustomTheme(content, null, type);
+        final Theme defaultTheme = getThemeAPI().getDefaultTheme(type);
+
+        final byte[] content = "plop".getBytes();
+        try {
+            getThemeAPI().setCustomTheme(content, null, type);
+        } finally {
+            assertEquals(defaultTheme, getThemeAPI().getDefaultTheme(type));
+        }
     }
 
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Set custom", "Wrong parameter" }, jira = "BS-2396, BS-2397")
     @Test(expected = SetThemeException.class)
     public void cantSetCustomThemeWithoutType() throws Exception {
         final byte[] content = "plop".getBytes();
@@ -83,23 +113,35 @@ public class ThemeTest extends CommonAPISPTest {
         getThemeAPI().setCustomTheme(content, cssContent, null);
     }
 
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Restore default", "Custom theme" }, jira = "BS-2396, BS-2397")
     @Test
     public void restoreDefaultTheme() throws Exception {
+        final ThemeType type = ThemeType.MOBILE;
+        final Theme defaultTheme = getThemeAPI().getDefaultTheme(type);
+
         final byte[] content = "plop".getBytes();
         final byte[] cssContent = "cssContent".getBytes();
-        final ThemeType type = ThemeType.MOBILE;
         getThemeAPI().setCustomTheme(content, cssContent, type);
 
-        getThemeAPI().restoreDefaultTheme(ThemeType.MOBILE);
+        final Theme restoreDefaultTheme = getThemeAPI().restoreDefaultTheme(type);
+        assertEquals(defaultTheme, restoreDefaultTheme);
+        assertEquals(defaultTheme, getThemeAPI().getDefaultTheme(type));
+        assertEquals(defaultTheme, getThemeAPI().getCurrentTheme(type));
     }
 
-    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme" }, jira = "BS-2396")
-    @Test(expected = RestoreThemeException.class)
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Restore default", "No custom theme" }, jira = "BS-2396, BS-2397")
+    @Test
     public void restoreDefaultThemeIfNoExistingCustomTheme() throws Exception {
-        getThemeAPI().restoreDefaultTheme(ThemeType.MOBILE);
+        final ThemeType type = ThemeType.MOBILE;
+        final Theme defaultTheme = getThemeAPI().getDefaultTheme(type);
+
+        final Theme restoreDefaultTheme = getThemeAPI().restoreDefaultTheme(type);
+        assertEquals(defaultTheme, restoreDefaultTheme);
+        assertEquals(defaultTheme, getThemeAPI().getDefaultTheme(type));
+        assertEquals(defaultTheme, getThemeAPI().getCurrentTheme(type));
     }
 
-    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Wrong parameter" }, jira = "BS-2396")
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Restore default", "Wrong parameter" }, jira = "BS-2396, BS-2397")
     @Test(expected = RestoreThemeException.class)
     public void cantRestoreDefaultThemeWithoutType() throws Exception {
         getThemeAPI().restoreDefaultTheme(null);

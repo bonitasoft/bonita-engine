@@ -78,6 +78,10 @@ public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
 
     @Override
     public Theme restoreDefaultTheme(final ThemeType type) throws RestoreThemeException {
+        if (type == null) {
+            throw new RestoreThemeException("Type are required.");
+        }
+
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ThemeService themeService = tenantAccessor.getThemeService();
 
