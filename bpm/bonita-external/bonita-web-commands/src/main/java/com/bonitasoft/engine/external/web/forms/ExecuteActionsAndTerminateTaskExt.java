@@ -101,7 +101,6 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             }
             final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
-
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final String connectorDefinitionId = connectorDefinition.getConnectorId();
             final ConnectorService connectorService = tenantAccessor.getConnectorService();
@@ -114,7 +113,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
             final List<Operation> outputs = connectorDefinition.getOutputs();
             final ArrayList<SOperation> operations = new ArrayList<SOperation>(outputs.size());
             for (final Operation operation : outputs) {
-                operations.add(ModelConvertor.constructSOperation(operation, tenantAccessor));
+                operations.add(ModelConvertor.constructSOperation(operation));
             }
             expcontext.setInputValues(result.getResult());
             connectorService.executeOutputOperation(operations, expcontext, result);
