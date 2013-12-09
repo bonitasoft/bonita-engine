@@ -117,7 +117,14 @@
             <page>profilelisting</page>
           </profileEntry>
         </childrenEntries>
-      </parentProfileEntry>       
+      </parentProfileEntry>  
+	  <parentProfileEntry name="Look & Feel">
+        <parentName>NULL</parentName>
+        <index>8</index>
+        <description>LooknFeel</description>
+        <type>link</type>
+        <page>thememoredetailsadminext</page>
+      </parentProfileEntry>	
     </profileEntries>
   </profile>
 </profiles:proFiles>
