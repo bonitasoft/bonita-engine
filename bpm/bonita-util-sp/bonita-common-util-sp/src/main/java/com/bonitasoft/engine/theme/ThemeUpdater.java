@@ -6,47 +6,42 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.looknfeel;
+package com.bonitasoft.engine.theme;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.looknfeel.ThemeType;
+import org.bonitasoft.engine.theme.ThemeType;
 
 /**
  * @author Celine Souchet
  */
-public class ThemeCreator implements Serializable {
+public class ThemeUpdater implements Serializable {
 
-    private static final long serialVersionUID = -1414989152963184543L;
+    private static final long serialVersionUID = 728214104237982027L;
 
     public enum ThemeField {
-        CONTENT, CSS_CONTENT, IS_DEFAULT, TYPE;
+        CONTENT, CSS_CONTENT, TYPE;
     }
 
     private final Map<ThemeField, Serializable> fields;
 
-    public ThemeCreator() {
+    public ThemeUpdater() {
         fields = new HashMap<ThemeField, Serializable>(3);
     }
 
-    public ThemeCreator setContent(final byte[] content) {
+    public ThemeUpdater setContent(final byte[] content) {
         fields.put(ThemeField.CONTENT, content);
         return this;
     }
 
-    public ThemeCreator setCSSContent(final byte[] cssContent) {
+    public ThemeUpdater setCSSContent(final byte[] cssContent) {
         fields.put(ThemeField.CSS_CONTENT, cssContent);
         return this;
     }
 
-    public ThemeCreator setDefault(final boolean isDefault) {
-        fields.put(ThemeField.IS_DEFAULT, isDefault);
-        return this;
-    }
-
-    public ThemeCreator setType(final ThemeType type) {
+    public ThemeUpdater setType(final ThemeType type) {
         fields.put(ThemeField.TYPE, type);
         return this;
     }

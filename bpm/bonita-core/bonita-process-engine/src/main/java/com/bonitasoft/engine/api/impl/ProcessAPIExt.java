@@ -693,7 +693,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         try {
             final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                    tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1, BuilderFactory.get(SAProcessInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
+                    tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1,
+                    BuilderFactory.get(SAProcessInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
             getArchivedProcessInstanceList.execute();
             final ArchivedProcessInstance saprocessInstance = getArchivedProcessInstanceList.getResult().get(0);
             final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
@@ -1013,7 +1014,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
         try {
             final SearchProcessInstances searchProcessInstances = new SearchProcessInstances(processInstanceService,
-                    searchEntitiesDescriptor.getProcessInstanceDescriptor(), searchOptions, processDefinitionService);
+                    searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), searchOptions, processDefinitionService);
             searchProcessInstances.execute();
             return searchProcessInstances.getResult();
         } catch (final SBonitaException sbe) {

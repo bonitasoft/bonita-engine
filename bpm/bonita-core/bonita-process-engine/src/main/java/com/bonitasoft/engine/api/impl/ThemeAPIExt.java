@@ -9,19 +9,33 @@
 package com.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.impl.ThemeAPIImpl;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.looknfeel.Theme;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.theme.Theme;
+import org.bonitasoft.engine.theme.ThemeService;
+import org.bonitasoft.engine.theme.ThemeType;
+import org.bonitasoft.engine.theme.builder.SThemeBuilder;
+import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
+import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilder;
+import org.bonitasoft.engine.theme.builder.SThemeUpdateBuilderFactory;
+import org.bonitasoft.engine.theme.exception.SThemeCreationException;
+import org.bonitasoft.engine.theme.exception.SThemeNotFoundException;
+import org.bonitasoft.engine.theme.exception.SThemeUpdateException;
+import org.bonitasoft.engine.theme.model.STheme;
+import org.bonitasoft.engine.theme.model.SThemeType;
 
 import com.bonitasoft.engine.api.ThemeAPI;
-import com.bonitasoft.engine.looknfeel.ThemeCreator;
-import com.bonitasoft.engine.looknfeel.ThemeUpdater;
+import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
+import com.bonitasoft.engine.theme.exception.RestoreThemeException;
+import com.bonitasoft.engine.theme.exception.SetThemeException;
 
 /**
  * @author Celine Souchet
@@ -40,63 +54,74 @@ public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
     }
 
     @Override
-    public Theme createTheme(final ThemeCreator creator) throws CreationException, AlreadyExistsException {
-        // TODO Auto-generated method stub
-        return null;
-        // If field IS_DEFAULT is given, check in database, if exists. If yes, throw exception.
+    public Theme setCustomTheme(final byte[] content, final byte[] cssContent, final ThemeType type) throws SetThemeException {
+        if (content == null || content.length == 0 || cssContent == null || cssContent.length == 0 || type == null) {
+            throw new SetThemeException("Content, cssContent and type are required.");
+        }
 
-        // Map<ThemeField, Serializable> fields = creator.getFields();
-        // final String name = (String) fields.get(ThemeField.NAME);
-        // if (name == null || name.isEmpty()) {
-        // throw new CreationException("Name is mandatory.");
-        // }
-        // final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        // final ThemeService ThemeService = tenantAccessor.getThemeService();
-        // try {
-        // ThemeService.getThemeByName(name);
-        // throw new AlreadyExistsException("A Theme with name \"" + name + "\" already exists");
-        // } catch (final SThemeNotFoundException sThemeNotFoundException) {
-        // try {
-        // final STheme Theme = ThemeService.createTheme(SPModelConvertor.constructSTheme(creator, false,
-        // SessionInfos.getUserIdFromSession()));
-        // return SPModelConvertor.toTheme(Theme);
-        // } catch (final SThemeCreationException e) {
-        // throw new CreationException(e);
-        // }
-        // }
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ThemeService themeService = tenantAccessor.getThemeService();
+        final SThemeType sType = SThemeType.valueOf(type.name());
+        try {
+            try {
+                final STheme sTheme = themeService.getTheme(SThemeType.valueOf(type.name()), false);
+                return updateTheme(sTheme, content, cssContent, sType);
+            } catch (final SThemeNotFoundException sThemeNotFoundException) {
+                return createTheme(content, cssContent, sType);
+            }
+        } catch (final BonitaException e) {
+            throw new SetThemeException(e);
+        } catch (final SBonitaException e) {
+            throw new SetThemeException(e);
+        }
     }
 
     @Override
-    public Theme updateTheme(final long id, final ThemeUpdater themeUpdater) throws UpdateException, AlreadyExistsException {
-        // TODO Auto-generated method stub
-        return null;
-        // if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
-        // throw new UpdateException("The update descriptor does not contain field updates");
-        // }
-        // Serializable updatedName = updateDescriptor.getFields().get(ThemeUpdater.ThemeField.NAME);
-        // if (updatedName != null) {
-        // SearchResult<Theme> searchThemes;
-        // try {
-        // searchThemes = searchThemes(new SearchOptionsBuilder(0, 1).differentFrom(ThemeSearchDescriptor.ID, id)
-        // .filter(ThemeSearchDescriptor.NAME, updatedName).done());
-        // if (searchThemes.getCount() > 0) {
-        // throw new AlreadyExistsException("A Theme with the name '" + updatedName + "' already exists");
-        // }
-        // } catch (SearchException e) {
-        // throw new UpdateException("Cannot check if a Theme with the name '" + updatedName + "' already exists", e);
-        // }
-        // }
-        // final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        // final ThemeService ThemeService = tenantAccessor.getThemeService();
-        //
-        // final UpdateTheme updateTheme = new UpdateTheme(ThemeService, id,
-        // updateDescriptor, SessionInfos.getUserIdFromSession());
-        // try {
-        // updateTheme.execute();
-        // return SPModelConvertor.toTheme(updateTheme.getResult());
-        // } catch (final SBonitaException e) {
-        // throw new UpdateException(e);
-        // }
+    public Theme restoreDefaultTheme(final ThemeType type) throws RestoreThemeException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ThemeService themeService = tenantAccessor.getThemeService();
+
+        try {
+            return SPModelConvertor.toTheme(themeService.restoreDefaultTheme(SThemeType.valueOf(type.name())));
+        } catch (final SBonitaException e) {
+            throw new RestoreThemeException(e);
+        }
+    }
+
+    private Theme createTheme(final byte[] content, final byte[] cssContent, final SThemeType type) throws CreationException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ThemeService themeService = tenantAccessor.getThemeService();
+        try {
+            final long creationDate = System.currentTimeMillis();
+
+            final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(content, cssContent, false, type,
+                    creationDate);
+            final STheme theme = themeService.createTheme(sThemeBuilder.done());
+            return SPModelConvertor.toTheme(theme);
+        } catch (final SThemeCreationException e) {
+            throw new CreationException(e);
+        }
+    }
+
+    private Theme updateTheme(final STheme sTheme, final byte[] content, final byte[] cssContent, final SThemeType type) throws UpdateException {
+        if (sTheme.isDefault()) {
+            throw new UpdateException("Can't update a default theme. Theme id = <" + sTheme.getId() + ">, type = <" + sTheme.getType() + ">");
+        }
+
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ThemeService themeService = tenantAccessor.getThemeService();
+
+        final SThemeUpdateBuilder updateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
+        updateBuilder.setContent(content);
+        updateBuilder.setCSSContent(cssContent);
+        updateBuilder.setType(SThemeType.valueOf(type.name()));
+        updateBuilder.setLastUpdateDate(System.currentTimeMillis());
+        try {
+            return SPModelConvertor.toTheme(themeService.updateTheme(sTheme, updateBuilder.done()));
+        } catch (final SThemeUpdateException e) {
+            throw new UpdateException(e);
+        }
+
     }
 
 }

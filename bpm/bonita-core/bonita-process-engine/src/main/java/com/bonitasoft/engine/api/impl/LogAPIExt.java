@@ -140,7 +140,7 @@ public class LogAPIExt implements LogAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final QueriableLoggerService loggerService = tenantAccessor.getQueriableLoggerService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchLogs searchLogs = new SearchLogs(loggerService, searchEntitiesDescriptor.getLogDescriptor(), searchOptions);
+        final SearchLogs searchLogs = new SearchLogs(loggerService, searchEntitiesDescriptor.getSearchLogDescriptor(), searchOptions);
         try {
             searchLogs.execute();
             return searchLogs.getResult();

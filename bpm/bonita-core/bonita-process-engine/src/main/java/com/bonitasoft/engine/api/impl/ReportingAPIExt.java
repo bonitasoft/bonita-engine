@@ -176,7 +176,7 @@ public class ReportingAPIExt implements ReportingAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ReportingService reportingService = tenantAccessor.getReportingService();
-        final SearchReports searchReports = new SearchReports(reportingService, searchEntitiesDescriptor.getReportDescriptor(), options);
+        final SearchReports searchReports = new SearchReports(reportingService, searchEntitiesDescriptor.getSearchReportDescriptor(), options);
         try {
             searchReports.execute();
             return searchReports.getResult();

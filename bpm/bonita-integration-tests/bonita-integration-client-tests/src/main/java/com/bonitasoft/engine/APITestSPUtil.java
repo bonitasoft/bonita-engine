@@ -40,6 +40,7 @@ import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.api.ThemeAPI;
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
@@ -59,6 +60,8 @@ public class APITestSPUtil extends APITestUtil {
     private PlatformMonitoringAPI platformMonitoringAPI;
 
     private ReportingAPI reportingAPI;
+
+    private ThemeAPI themeAPI;
 
     protected PlatformMonitoringAPI getPlatformMonitoringAPI() {
         return platformMonitoringAPI;
@@ -81,6 +84,15 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
+    protected ThemeAPI getThemeAPI() {
+        return themeAPI;
+    }
+
+    protected void setThemeAPI(final ThemeAPI themeAPI) {
+        this.themeAPI = themeAPI;
+    }
+
+    @Override
     public ProcessAPI getProcessAPI() {
         return (ProcessAPI) super.getProcessAPI();
     }
@@ -99,11 +111,16 @@ public class APITestSPUtil extends APITestUtil {
         return reportingAPI;
     }
 
+    public LogAPI getLogAPI() {
+        return logAPI;
+    }
+
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
         setSession(SPBPMTestUtil.loginTenant(userName, password, tenantId));
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
@@ -116,6 +133,7 @@ public class APITestSPUtil extends APITestUtil {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
@@ -129,6 +147,7 @@ public class APITestSPUtil extends APITestUtil {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
@@ -141,6 +160,7 @@ public class APITestSPUtil extends APITestUtil {
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
@@ -154,14 +174,11 @@ public class APITestSPUtil extends APITestUtil {
         setIdentityAPI(null);
         setProcessAPI(null);
         setProfileAPI(null);
+        setThemeAPI(null);
         setMonitoringAPI(null);
         setPlatformMonitoringAPI(null);
         setReportingAPI(null);
         setCommandAPI(null);
-    }
-
-    public LogAPI getLogAPI() {
-        return logAPI;
     }
 
     protected boolean containsLogWithActionType(final List<Log> logs, final String actionType, final int minimalFrequency) {

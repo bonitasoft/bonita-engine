@@ -8,14 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.looknfeel.Theme;
 import org.bonitasoft.engine.session.InvalidSessionException;
+import org.bonitasoft.engine.theme.Theme;
+import org.bonitasoft.engine.theme.ThemeType;
 
-import com.bonitasoft.engine.looknfeel.ThemeCreator;
-import com.bonitasoft.engine.looknfeel.ThemeUpdater;
+import com.bonitasoft.engine.theme.exception.RestoreThemeException;
+import com.bonitasoft.engine.theme.exception.SetThemeException;
 
 /**
  * Manage mobile and portal theme
@@ -25,37 +23,33 @@ import com.bonitasoft.engine.looknfeel.ThemeUpdater;
 public interface ThemeAPI extends org.bonitasoft.engine.api.ThemeAPI {
 
     /**
-     * Create a new theme
+     * Update a custom theme, if it exists; otherwise create it.
      * 
-     * @param creator
-     *            The attributes to initialize
-     * @return The new created theme
-     * @throws CreationException
-     *             If can't create the new theme
-     * @throws AlreadyExistsException
-     *             If the theme already exists
+     * @param content
+     *            The zip file associated with this theme, as a binary content.
+     * @param cssContent
+     *            The CSS file associated with this theme, as a binary content.
+     * @param type
+     *            The type of the theme
+     * @return The current theme
+     * @throws SetThemeException
+     *             If can't set theme
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
      * @since 6.2
      */
-    Theme createTheme(ThemeCreator creator) throws CreationException, AlreadyExistsException;
+    Theme setCustomTheme(byte[] content, byte[] cssContent, ThemeType type) throws SetThemeException;
 
     /**
-     * Update a theme.
+     * Restore the default theme. Delete the custom theme.
      * 
-     * @param id
-     *            The identifier of the theme to update
-     * @param themeUpdater
-     *            The attributes to update
-     * @return
-     * @throws UpdateException
-     *             If can't update theme
-     * @throws AlreadyExistsException
-     *             If the theme already exists
-     * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     * @param type
+     *            The type of the theme to restore
+     * @return The default theme
+     * @throws RestoreThemeException
+     *             If can't restore default theme
      * @since 6.2
      */
-    Theme updateTheme(long id, ThemeUpdater themeUpdater) throws UpdateException, AlreadyExistsException;
+    Theme restoreDefaultTheme(ThemeType type) throws RestoreThemeException;
 
 }
