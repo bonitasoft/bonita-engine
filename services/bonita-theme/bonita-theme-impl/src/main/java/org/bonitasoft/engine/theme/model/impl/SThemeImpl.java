@@ -36,6 +36,10 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
 
     private SThemeType type;
 
+    public SThemeImpl() {
+        super();
+    }
+
     public SThemeImpl(final byte[] content, final byte[] cssContent, final boolean isDefault, final SThemeType type, final long lastUpdatedDate) {
         super();
         this.content = content;
@@ -135,5 +139,11 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
     @Override
     public String getDiscriminator() {
         return STheme.class.getName();
+    }
+
+    @Override
+    public String toString() {
+        return "SThemeImpl [id=" + getId() + ", content=" + Arrays.toString(content) + ", cssContent=" + Arrays.toString(cssContent) + ", isDefault="
+                + isDefault + ", lastUpdateDate=" + lastUpdateDate + ", type=" + type + "]";
     }
 }

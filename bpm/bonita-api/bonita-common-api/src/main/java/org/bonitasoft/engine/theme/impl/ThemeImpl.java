@@ -115,21 +115,25 @@ public class ThemeImpl extends BaseElementImpl implements Theme {
         if (!super.equals(obj)) {
             return false;
         }
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
+        if (type == null && other.type != null)
             return false;
-        if (lastUpdateDate == null) {
-            if (other.lastUpdateDate != null)
-                return false;
-        } else if (!lastUpdateDate.equals(other.lastUpdateDate))
+        else if (!type.equals(other.type))
+            return false;
+        if (lastUpdateDate == null && other.lastUpdateDate != null)
+            return false;
+        else if (!lastUpdateDate.equals(other.lastUpdateDate))
             return false;
         if (!Arrays.equals(content, other.content))
             return false;
         if (!Arrays.equals(cssContent, other.cssContent))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "ThemeImpl [id=" + getId() + ", content=" + Arrays.toString(content) + ", cssContent=" + Arrays.toString(cssContent) + ", isDefault="
+                + isDefault + ", lastUpdateDate=" + lastUpdateDate + ", type=" + type + "]";
     }
 
 }
