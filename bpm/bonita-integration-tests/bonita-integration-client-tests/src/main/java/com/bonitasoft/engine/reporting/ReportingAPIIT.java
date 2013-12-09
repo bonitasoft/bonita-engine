@@ -1,9 +1,14 @@
 package com.bonitasoft.engine.reporting;
 
-import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.platform.TenantCreator;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
@@ -25,11 +30,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.*;
+import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.platform.TenantCreator;
 
 @SuppressWarnings("javadoc")
 public class ReportingAPIIT extends CommonAPISPTest {
@@ -72,7 +76,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         SearchResult<Report> reports = getReportingAPI().searchReports(options);
         assertEquals(4, reports.getCount());
         final List<Report> r = reports.getResult();
-        getReportingAPI().deleteReports(Arrays.asList(r.get(0).getId(), r.get(1).getId(), r.get(2).getId()));
+        getReportingAPI().deleteReports(Arrays.asList(r.get(0).getId(), r.get(1).getId(), r.get(2).getId(), r.get(3).getId()));
         reports = getReportingAPI().searchReports(options);
         assertEquals(0, reports.getCount());
     }
