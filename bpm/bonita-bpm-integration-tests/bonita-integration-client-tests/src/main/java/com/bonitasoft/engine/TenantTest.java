@@ -15,6 +15,7 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -36,6 +37,8 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.WaitUntil;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,6 +49,9 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.api.TenantMode;
+import com.bonitasoft.engine.api.TenantModeException;
 import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.TenantActivationException;
@@ -132,6 +138,38 @@ public class TenantTest {
             platformAPI.activateTenant(tenantId);
         }
 
+    }
+
+    @Test(expected = TenantModeException.class)
+    @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantModeException, tenant maintenance" }, concept = BPMNConcept.NONE)
+    public void cannotAccessTenantAPIsOnMaintenanceTenant() throws Exception {
+        APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+        apiTestSPUtil.loginWith(userName, password, tenantId);
+        TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        tenantManagementAPI.setTenantMaintenanceMode(tenantId, TenantMode.MAINTENANCE);
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+        apiSession = loginAPI.login(tenantId, userName, password);
+        try {
+            apiTestSPUtil.getIdentityAPI().getNumberOfGroups();
+        } finally {
+            tenantManagementAPI.setTenantMaintenanceMode(tenantId, TenantMode.AVAILABLE);
+            loginAPI.logout(apiSession);
+        }
+    }
+
+    @Test
+    @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "tenant maintenance" }, concept = BPMNConcept.NONE)
+    public void maintenanceAnnotatedAPIMethodShouldBePossibleOnMaintenanceTenant() throws Exception {
+        APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+        apiTestSPUtil.loginWith(userName, password, tenantId);
+        TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        tenantManagementAPI.setTenantMaintenanceMode(tenantId, TenantMode.MAINTENANCE);
+        try {
+            tenantManagementAPI.isTenantInMaintenance(tenantId);
+        } finally {
+            tenantManagementAPI.setTenantMaintenanceMode(tenantId, TenantMode.AVAILABLE);
+            apiTestSPUtil.logoutTenant(apiTestSPUtil.getSession());
+        }
     }
 
     @Test

@@ -6,18 +6,29 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.external;
+package com.bonitasoft.engine.api.impl;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 
-import com.bonitasoft.engine.command.web.ActivityCommandExtTest;
+/**
+ * @author Emmanuel Duchastenier
+ */
+public class FakeTenantLevelAPI {
 
-@RunWith(Suite.class)
-@SuiteClasses({
-        ActivityCommandExtTest.class
-})
-public class ExternalCommandsTestSP {
+    @AvailableOnMaintenanceTenant
+    @AvailableOnStoppedNode
+    public void canAlsoBeCalledOnMaintenanceTenant() {
+
+    }
+
+    @AvailableOnStoppedNode
+    public void mustBeCalledOnRunningTenant() {
+
+    }
+
+    @AvailableOnStoppedNode
+    public void platformAPIMethod() {
+
+    }
 
 }

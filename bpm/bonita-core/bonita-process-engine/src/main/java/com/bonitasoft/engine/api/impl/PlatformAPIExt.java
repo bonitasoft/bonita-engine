@@ -320,14 +320,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         reports.deploy(new ReportDeployer() {
 
             @Override
-            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
-                final ReportingService reportingService = tenantAccessor.getReportingService();
-                final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
-                        description, screenShot);
-                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-                // Here we are already in a transaction, so we can call execute() directly:
-                addReport.execute();
-            }
+            public void deploy(String name, String description, byte[] screenShot, byte[] content) throws SBonitaException {
+            final ReportingService reportingService = tenantAccessor.getReportingService();
+		final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true, description, screenShot);
+            final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
+            // Here we are already in a transaction, so we can call execute() directly:
+            addReport.execute();
+        }
         });
     }
 
@@ -614,13 +613,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         if (udpater == null || udpater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
+        final PlatformService platformService = getPlatformService();
         // check existence for tenant
         Tenant tenant;
         try {
@@ -672,6 +665,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 case STATUS:
                     descriptor.addField(tenantBuilderFact.getStatusKey(), field.getValue());
                     break;
+                case IN_MAINTENANCE:
+                    descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), field.getValue());
+                    break;
                 default:
                     break;
             }
@@ -681,14 +677,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public SearchResult<Tenant> searchTenants(final SearchOptions searchOptions) throws SearchException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final SearchPlatformEntitiesDescriptor searchPlatformEntitiesDescriptor = platformAccessor.getSearchPlatformEntitiesDescriptor();
+        final PlatformService platformService = getPlatformService();
+        final SearchPlatformEntitiesDescriptor searchPlatformEntitiesDescriptor = getPlatformAccessorNoException().getSearchPlatformEntitiesDescriptor();
         final SearchTenants searchTenants = new SearchTenants(platformService, searchPlatformEntitiesDescriptor.getSearchTenantDescriptor(), searchOptions);
         try {
             searchTenants.execute();
@@ -732,6 +722,22 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     @Override
     protected String getProfileFileName() {
         return PROFILES_FILE_SP;
+    }
+
+    protected PlatformService getPlatformService() {
+        PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
+        final PlatformService platformService = platformAccessor.getPlatformService();
+        return platformService;
+    }
+
+    protected PlatformServiceAccessor getPlatformAccessorNoException() {
+        PlatformServiceAccessor platformAccessor;
+        try {
+            platformAccessor = getPlatformAccessor();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+        return platformAccessor;
     }
 
 }
