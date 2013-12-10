@@ -37,7 +37,10 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -55,7 +58,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
@@ -77,6 +79,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecu
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionCreationException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -89,7 +92,6 @@ import org.bonitasoft.engine.core.process.instance.model.SToken;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -780,155 +782,17 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      */
     private int executeValidOutgoingTransitionsAndUpdateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child,
             final SProcessInstance sProcessInstance) throws SBonitaException {
-        final long parentProcessInstanceId = sProcessInstance.getId();
-        final long childId = child.getId();
         // token we merged
         final int numberOfTokenToMerge = getNumberOfTokenToMerge(child);
         final SFlowNodeDefinition flowNode = sProcessDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
-        final int inputTransitionsSize;
-        final List<STransitionDefinition> allOutgoingTransitionDefinitions;
-        // Retrieve all outgoing transitions
-        if (flowNode == null) {
-            // not in definition
-            inputTransitionsSize = 0;
-            allOutgoingTransitionDefinitions = Collections.emptyList();
-        } else {
-            inputTransitionsSize = flowNode.getIncomingTransitions().size();
-            allOutgoingTransitionDefinitions = new ArrayList<STransitionDefinition>(flowNode.getOutgoingTransitions());
-        }
-        // Evaluate all outgoing transitions, and retrieve valid outgoing transitions
-        final List<STransitionDefinition> validOutgoingTransitionDefinitions = evaluateOutgoingTransitions(allOutgoingTransitionDefinitions,
-                sProcessDefinition, child);
+        FlowNodeTransitionsDescriptor transitionsDescriptor = getTransitionsDescriptor(flowNode, sProcessDefinition, child);
+        GatewayMergeDescriptor mergeDescriptor = new GatewayMergeDescriptor(child, sProcessInstance, flowNode, transitionsDescriptor, tokenService);;
+        
+        archiveInvalidTransitions(child, transitionsDescriptor);
 
-        final long rootProcessInstanceId = child.getRootProcessInstanceId();
-
-        final List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<STransitionDefinition>(validOutgoingTransitionDefinitions.size());
-        final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<SFlowNodeDefinition>(validOutgoingTransitionDefinitions.size());
-        boolean consumeInputToken = false;
-        Long outputTokenRefId = null;
-        Long outputParentTokenRefId = null;
-        boolean createToken = false;
-        boolean isParalleleOrInclusive = false;
-        boolean isExclusive = false;
-        boolean implicitEnd = false;
-        if (flowNode instanceof SGatewayDefinition) {
-            final SGatewayType gatewayType = ((SGatewayDefinition) flowNode).getGatewayType();
-            switch (gatewayType) {
-                case EXCLUSIVE:
-                    isExclusive = true;
-                    break;
-                case INCLUSIVE:
-                    isParalleleOrInclusive = true;
-                    break;
-                case PARALLEL:
-                    isParalleleOrInclusive = true;
-                    break;
-            }
-        }
-        if (flowNode == null) {
-            // not in the definition: no merge no split no implicit end
-            consumeInputToken = false;
-            createToken = false;
-            implicitEnd = false;
-        } else if (SFlowNodeType.BOUNDARY_EVENT.equals(child.getType())) {
-            // the creation of tokens for the boundaries are done inside the ExecutingBoundaryEventStateImpl
-            // we don't change tokens
-            consumeInputToken = false;
-            createToken = false;
-            implicitEnd = false;
-            // still need to get the refId to put on the next element
-            final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) child;
-            if (boundaryEventInstance.isInterrupting()) {
-                // we create the same token that activated the activity
-                // the activity is canceled so a token will be consumed by the aborted activity
-                final SToken token = tokenService.getToken(boundaryEventInstance.getParentProcessInstanceId(), boundaryEventInstance.getTokenRefId());
-                outputTokenRefId = token.getRefId();
-                outputParentTokenRefId = token.getParentRefId();
-            } else {
-                // a token with no parent is produced -> not the same "execution" than activity
-                outputTokenRefId = boundaryEventInstance.getId();
-                outputParentTokenRefId = null;
-            }
-
-        } else {
-
-            if (validOutgoingTransitionDefinitions.size() > 0) {
-                // depending on the split type and number of input/output transition we determine if token are created, with with type and if we consume
-                // incoming
-                // tokens
-                if (isExclusive) {
-                    // always transmit token
-                    consumeInputToken = false;
-                    outputTokenRefId = child.getTokenRefId();
-                    createToken = false;
-                } else {
-                    if (inputTransitionsSize <= 1) {
-                        if (allOutgoingTransitionDefinitions.size() <= 1) {
-                            // 1 input , 1 output
-                            // input token is transmit
-                            consumeInputToken = false;
-                            outputTokenRefId = child.getTokenRefId();
-                            createToken = false;
-                        } else {
-                            // 1 input , >1 output
-                            // create children input token
-                            consumeInputToken = false;
-                            outputTokenRefId = child.getId();
-                            outputParentTokenRefId = child.getTokenRefId();
-                            createToken = true;
-                        }
-                    } else {
-                        if (allOutgoingTransitionDefinitions.size() <= 1) {
-                            // >1 input , 1 output
-                            // consume input and transmit parent token for parallele and inclusive
-                            if (isParalleleOrInclusive) {
-                                // consume input token + transmit parent token
-                                consumeInputToken = true;
-                                final SToken token = tokenService.getToken(sProcessInstance.getId(), child.getTokenRefId());
-                                outputTokenRefId = token.getParentRefId();
-                                createToken = false;
-                            } else {
-                                // implicit gateway: input token is transmit
-                                consumeInputToken = false;
-                                outputTokenRefId = child.getTokenRefId();
-                                createToken = false;
-                            }
-                        } else {
-                            // >1 input , >1 output
-                            if (isParalleleOrInclusive) {
-                                // consume input tokens and create children token having the same parent
-                                consumeInputToken = true;
-                                outputTokenRefId = child.getId();
-                                // TODO get ParentTokenRefId
-                                final SToken token = tokenService.getToken(sProcessInstance.getId(), child.getTokenRefId());
-                                outputParentTokenRefId = token.getParentRefId();
-                                createToken = true;
-                            } else {
-                                // implicit gateway: create children token of input
-                                consumeInputToken = false;
-                                outputTokenRefId = child.getId();
-                                outputParentTokenRefId = child.getTokenRefId();
-                                createToken = true;
-                            }
-                        }
-                    }
-                }
-            } else {
-                // implicit end
-                implicitEnd = true;
-                consumeInputToken = false;
-                createToken = false;
-            }
-        }
-
-        for (final STransitionDefinition sTransitionDefinition : allOutgoingTransitionDefinitions) {
-            if (!validOutgoingTransitionDefinitions.contains(sTransitionDefinition)) {
-                // Archive invalid transitions
-                transitionService.archive(sTransitionDefinition, child, TransitionState.ABORTED);
-            }
-        }
-
-        for (final STransitionDefinition sTransitionDefinition : validOutgoingTransitionDefinitions) {
+        final List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<STransitionDefinition>(transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
+        final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<SFlowNodeDefinition>(transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
+        for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getValidOutgoingTransitionDefinitions()) {
             final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(sProcessDefinition, sTransitionDefinition.getName());
             // we archive a transition to keep a track of where the flow was
             transitionService.archive(sTransitionDefinition, child, TransitionState.TAKEN);
@@ -940,25 +804,37 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             }
         }
 
-        if (childId != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
+        archiveFlowNodeInstance(sProcessDefinition, child, sProcessInstance);
+
+        // execute transition/activities
+        createAndExecuteActivities(sProcessDefinition.getId(), child, sProcessInstance.getId(), chosenFlowNode, child.getRootProcessInstanceId(), mergeDescriptor.getOutputTokenRefId());
+        for (STransitionDefinition sTransitionDefinition : chosenGatewaysTransitions) {
+            executeGateway(sProcessDefinition, sTransitionDefinition, child, mergeDescriptor.getOutputTokenRefId());
+        }
+
+        return updateTokens(sProcessDefinition, child, sProcessInstance, numberOfTokenToMerge, transitionsDescriptor, mergeDescriptor);
+    }
+
+    private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
+            throws SActivityExecutionException {
+        if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
         }
+    }
 
-        // execute transition/activities
-        createAndExecuteActivities(sProcessDefinition.getId(), child, parentProcessInstanceId, chosenFlowNode, rootProcessInstanceId, outputTokenRefId);
-        for (STransitionDefinition sTransitionDefinition : chosenGatewaysTransitions) {
-            executeGateway(sProcessDefinition, sTransitionDefinition, child, outputTokenRefId);
-        }
-
+    private int updateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
+            final int numberOfTokenToMerge, FlowNodeTransitionsDescriptor transitionsDescriptor, GatewayMergeDescriptor mergeDescriptor)
+            throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
+            WorkRegisterException, SBonitaException {
         // handle token creation/deletion
-        if (consumeInputToken) {
+        if (mergeDescriptor.mustConsumeInputToken()) {
             tokenService.deleteTokens(sProcessInstance.getId(), child.getTokenRefId(), numberOfTokenToMerge);
         }
-        if (createToken) {
-            tokenService.createTokens(sProcessInstance.getId(), outputTokenRefId, outputParentTokenRefId, validOutgoingTransitionDefinitions.size());
+        if (mergeDescriptor.mustCreateToken()) {
+            tokenService.createTokens(sProcessInstance.getId(), mergeDescriptor.getOutputTokenRefId(), mergeDescriptor.getOutputParentTokenRefId(), transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
         }
-        if (implicitEnd) {
+        if (mergeDescriptor.isImplicitEnd()) {
             final Long tokenRefId = child.getTokenRefId();
             if (tokenRefId == null) {
                 throw new SObjectNotFoundException("no token ref id set for " + child);
@@ -966,6 +842,34 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             implicitEnd(sProcessDefinition, sProcessInstance.getId(), numberOfTokenToMerge, tokenRefId);
         }
         return tokenService.getNumberOfToken(sProcessInstance.getId());
+    }
+
+    private void archiveInvalidTransitions(final SFlowNodeInstance child, FlowNodeTransitionsDescriptor transitionsDescriptor)
+            throws STransitionCreationException {
+        for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getAllOutgoingTransitionDefinitions()) {
+            if (!transitionsDescriptor.getValidOutgoingTransitionDefinitions().contains(sTransitionDefinition)) {
+                // Archive invalid transitions
+                transitionService.archive(sTransitionDefinition, child, TransitionState.ABORTED);
+            }
+        }
+    }
+
+    private FlowNodeTransitionsDescriptor getTransitionsDescriptor(final SFlowNodeDefinition flowNode, SProcessDefinition sProcessDefinition, SFlowNodeInstance child) throws SBonitaException {
+        FlowNodeTransitionsDescriptor transitionsDescriptor = new FlowNodeTransitionsDescriptor();
+        // Retrieve all outgoing transitions
+        if (flowNode == null) {
+            // not in definition
+            transitionsDescriptor.setInputTransitionsSize(0);
+            transitionsDescriptor.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition>emptyList());
+        } else {
+            transitionsDescriptor.setInputTransitionsSize(flowNode.getIncomingTransitions().size());
+            transitionsDescriptor.setAllOutgoingTransitionDefinitions(new ArrayList<STransitionDefinition>(flowNode.getOutgoingTransitions()));
+        }
+        
+        // Evaluate all outgoing transitions, and retrieve valid outgoing transitions
+        transitionsDescriptor.setValidOutgoingTransitionDefinitions(evaluateOutgoingTransitions(transitionsDescriptor.getAllOutgoingTransitionDefinitions(),
+                sProcessDefinition, child));
+        return transitionsDescriptor;
     }
 
     /**
