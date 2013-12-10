@@ -53,6 +53,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StaleStateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.LockAcquisitionException;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.stat.Statistics;
 
 /**
@@ -121,7 +122,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         sessionFactory = configuration.buildSessionFactory();
         statistics = sessionFactory.getStatistics();
 
-        final Iterator<org.hibernate.mapping.PersistentClass> classMappingsIterator = configuration.getClassMappings();
+        final Iterator<PersistentClass> classMappingsIterator = configuration.getClassMappings();
         classMapping = new ArrayList<Class<? extends PersistentObject>>();
         while (classMappingsIterator.hasNext()) {
             classMapping.add(classMappingsIterator.next().getMappedClass());
@@ -168,6 +169,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         try {
             final Session session = sessionFactory.getCurrentSession();
             // session.flush();
+            if (session.getTransaction() == null) {
+                session.beginTransaction();
+            }
             return session;
         } catch (final HibernateException e) {
             throw new SPersistenceException(e);

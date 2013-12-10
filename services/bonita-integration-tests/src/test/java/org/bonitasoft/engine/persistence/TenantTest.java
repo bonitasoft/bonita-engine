@@ -76,8 +76,7 @@ public class TenantTest extends CommonServiceTest {
 
         // Sequence id must be reinitialized.
         TestUtil.deleteDefaultTenantAndPlatForm(getTransactionService(), getPlatformService(), getSessionAccessor(), getSessionService());
-        TestUtil.createPlatformAndDefaultTenant(getTransactionService(), getPlatformService(), getSessionAccessor(),
-                getSessionService());
+        TestUtil.createPlatformAndDefaultTenant(getTransactionService(), getPlatformService(), getSessionAccessor(), getSessionService());
 
         getTransactionService().begin();
 
