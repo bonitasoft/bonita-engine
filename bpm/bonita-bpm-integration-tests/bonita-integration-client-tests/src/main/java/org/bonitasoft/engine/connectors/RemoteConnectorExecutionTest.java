@@ -83,7 +83,6 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForVariableValue;
@@ -97,7 +96,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     private static final String CONNECTOR_INPUT_NAME = "input1";
 
     private static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
-    
+
     private static final String FLOWNODE = "flowNode";
 
     private static final String PROCESS = "process";
@@ -528,7 +527,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
         assertEquals(ConnectorState.FAILED, instance.getState());
-        
+
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -795,11 +794,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
         assertEquals(ConnectorState.FAILED, instance.getState());
-        
+
         disableAndDeleteProcess(processDefinition);
     }
 
-    private SearchOptionsBuilder getFirst100ConnectorInstanceSearchOptions(long containerId, String containerType) {
+    private SearchOptionsBuilder getFirst100ConnectorInstanceSearchOptions(final long containerId, final String containerType) {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, containerId);
         searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE, containerType);
@@ -1116,11 +1115,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
-        final PlatformSession loginPlatform = APITestUtil.loginPlatform();
+        final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         platformAPI.stopNode();
         platformAPI.startNode();
-        APITestUtil.logoutPlatform(loginPlatform);
+        logoutPlatform(loginPlatform);
         login();
         assertEquals("value1", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         waitForUserTask("step2", processInstance.getId());
@@ -1154,7 +1153,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
-        final PlatformSession loginPlatform = APITestUtil.loginPlatform();
+        final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         System.out.println("stopping node");
         platformAPI.stopNode();
@@ -1163,7 +1162,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         System.out.println("starting node");
         platformAPI.startNode();
         System.out.println("node started");
-        APITestUtil.logoutPlatform(loginPlatform);
+        logoutPlatform(loginPlatform);
         login();
         assertEquals("value1", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
@@ -1262,11 +1261,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
         final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor("actor")
-                // .addData(
-                // "data",
-                // "org.bonitasoft.dfgdfg.Restaurant",
-                // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
-                // "org.bonitasoft.dfgdfg.Restaurant"))
+        // .addData(
+        // "data",
+        // "org.bonitasoft.dfgdfg.Restaurant",
+        // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
+        // "org.bonitasoft.dfgdfg.Restaurant"))
                 .addUserTask("step1", "actor");
         addUserTask.addData("dataActivity", java.lang.Object.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));
@@ -1465,8 +1464,8 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
         connector.addInput(
                 "input1",
-                new ExpressionBuilder().createGroovyScriptExpression("script", script,
-                        Long.class.getName(), new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
+                new ExpressionBuilder().createGroovyScriptExpression("script", script, Long.class.getName(),
+                        new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
                         new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID)));
         connector.addOutput(new OperationBuilder().createSetDataOperation("numberOfUser",
                 new ExpressionBuilder().createInputExpression("output1", Long.class.getName())));

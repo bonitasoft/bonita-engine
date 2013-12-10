@@ -45,6 +45,8 @@ public class BonitaHomeServer extends BonitaHome {
 
     private static final String BONITA_HOME_TENANT_TEMPLATE = "tenant-template";
 
+    private static final String SERVER_API_IMPLEMENTATION = "serverApi";
+
     private String tenantsPath;
 
     private String platformPath;
@@ -53,7 +55,7 @@ public class BonitaHomeServer extends BonitaHome {
 
     private Properties platformProperties;
 
-    public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();;
+    public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
 
     private BonitaHomeServer() {
         platformProperties = null;
@@ -61,6 +63,20 @@ public class BonitaHomeServer extends BonitaHome {
 
     public static BonitaHomeServer getInstance() {
         return INSTANCE;
+    }
+
+    public String getBonitaHomeProperty(final String propertyName) throws IllegalStateException {
+        try {
+            return getPlatformProperties().getProperty(propertyName);
+        } catch (BonitaHomeNotSetException e) {
+            throw new IllegalStateException(e);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public String getServerAPIImplementation() throws IllegalStateException {
+        return getBonitaHomeProperty(SERVER_API_IMPLEMENTATION);
     }
 
     public String getBonitaHomeServerFolder() throws BonitaHomeNotSetException {

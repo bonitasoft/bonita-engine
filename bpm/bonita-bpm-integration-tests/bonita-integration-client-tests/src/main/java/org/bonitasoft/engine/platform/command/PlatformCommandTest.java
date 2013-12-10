@@ -10,7 +10,6 @@ import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,13 +22,13 @@ public class PlatformCommandTest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        session = APITestUtil.loginPlatform();
+        session = loginPlatform();
         platformCommandAPI = PlatformAPIAccessor.getPlatformCommandAPI(session);
     }
 
     @After
     public void after() throws BonitaException {
-        APITestUtil.logoutPlatform(session);
+        logoutPlatform(session);
     }
 
     //

@@ -37,15 +37,17 @@ public class PlatformTest {
 
     private static PlatformSession session;
 
+    private static APITestUtil apiTestUtil = new APITestUtil();
+
     @BeforeClass
     public static void beforeClass() throws BonitaException {
-        session = APITestUtil.loginPlatform();
+        session = apiTestUtil.loginPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
-        APITestUtil.logoutPlatform(session);
+        apiTestUtil.logoutPlatform(session);
     }
 
     @Before

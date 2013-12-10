@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,52 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.bean;
+package org.bonitasoft.engine.api.impl;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
-import javax.ejb.EJBException;
-import javax.ejb.SessionBean;
-import javax.ejb.SessionContext;
-
-import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
-public class ServerAPIBean implements SessionBean, ServerAPI {
+public class TestImplemOfServerAPI implements ServerAPI {
 
-    private static final long serialVersionUID = 7410412298676783045L;
-
-    protected SessionContext ctx;
+    private static final long serialVersionUID = 1L;
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
-        final ServerAPI apiImpl = ServerAPIFactory.getServerAPI();
-        return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-    }
-
-    @Override
-    public void ejbActivate() throws EJBException {
-    }
-
-    @Override
-    public void ejbPassivate() throws EJBException {
-    }
-
-    @Override
-    public void ejbRemove() throws EJBException {
-    }
-
-    @Override
-    public void setSessionContext(final SessionContext ctx) throws EJBException {
-        this.ctx = ctx;
+        return null;
     }
 
 }

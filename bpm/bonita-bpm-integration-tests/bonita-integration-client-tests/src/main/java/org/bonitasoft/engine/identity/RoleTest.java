@@ -20,7 +20,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -35,13 +34,13 @@ public class RoleTest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        session = APITestUtil.loginDefaultTenant();
+        session = loginDefaultTenant();
         identityAPI = TenantAPIAccessor.getIdentityAPI(session);
     }
 
     @After
     public void after() throws BonitaException {
-        APITestUtil.logoutTenant(session);
+        logoutTenant(session);
         identityAPI = null;
     }
 
@@ -122,7 +121,7 @@ public class RoleTest extends CommonAPITest {
 
     @Test
     public void getRolesByIDs() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
 
         final String manager = "manager";
@@ -142,11 +141,11 @@ public class RoleTest extends CommonAPITest {
 
         identityAPI.deleteRole(roles.get(roleCreated1.getId()).getId());
         identityAPI.deleteRole(roles.get(roleCreated2.getId()).getId());
-        APITestUtil.logoutTenant(session);
+        logoutTenant(session);
     }
 
     public void getRolesByIDsWithoutRoleNotFoundException() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
 
         final String manager = "manager";
@@ -165,7 +164,7 @@ public class RoleTest extends CommonAPITest {
 
         identityAPI.deleteRole(roleCreated1.getId());
         identityAPI.deleteRole(roleCreated2.getId());
-        APITestUtil.logoutTenant(session);
+        logoutTenant(session);
     }
 
     @Test(expected = RoleNotFoundException.class)
@@ -408,7 +407,7 @@ public class RoleTest extends CommonAPITest {
     @Test(expected = AlreadyExistsException.class)
     public void cannotCreateTwoRoleWithTheSameName() throws BonitaException {
         final String role = "role";
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         final Role role1 = identityAPI.createRole(role);
         try {
@@ -416,12 +415,12 @@ public class RoleTest extends CommonAPITest {
         } finally {
             identityAPI.deleteRole(role1.getId());
         }
-        APITestUtil.logoutTenant(session);
+        logoutTenant(session);
     }
 
     @Test
     public void searchRoleUsingFilter() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
 
         final RoleCreator roleCreator1 = new RoleCreator("manager");
@@ -442,13 +441,13 @@ public class RoleTest extends CommonAPITest {
         identityAPI.deleteRole(mananger.getId());
         identityAPI.deleteRole(dev.getId());
 
-        APITestUtil.logoutTenant(session);
+        logoutTenant(session);
     }
 
     @Cover(classes = { SearchOptionsBuilder.class, IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "SearchRole", "Apostrophe" }, jira = "ENGINE-366")
     @Test
     public void searchRoleWithApostrophe() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
 
         final RoleCreator roleCreator1 = new RoleCreator("mana'ger");
@@ -471,12 +470,12 @@ public class RoleTest extends CommonAPITest {
         identityAPI.deleteRole(mananger.getId());
         identityAPI.deleteRole(dev.getId());
 
-        APITestUtil.logoutTenant(session);
+        logoutTenant(session);
     }
 
     @Test
     public void testGetRolesFromIds() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
 
         final RoleCreator roleCreator1 = new RoleCreator("managerA");
@@ -513,7 +512,7 @@ public class RoleTest extends CommonAPITest {
 
         identityAPI.deleteRoles(roleIds);
 
-        APITestUtil.logoutTenant(session);
+        logoutTenant(session);
     }
 
     @Test
