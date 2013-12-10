@@ -21,15 +21,17 @@ import org.junit.runners.Suite.SuiteClasses;
 @Initializer(BPMSPTestsForServers.class)
 public class BPMSPTestsForServers {
 
+    static APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+
     public static void beforeAll() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.beforeClass()");
-        APITestSPUtil.createPlatformStructure();
+        apiTestSPUtil.createPlatformStructure();
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
     }
 
     public static void afterAll() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.afterClass()");
-        APITestSPUtil.deletePlatformStructure();
+        apiTestSPUtil.deletePlatformStructure();
     }
 
 }

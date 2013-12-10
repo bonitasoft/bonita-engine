@@ -63,7 +63,7 @@ import com.bonitasoft.engine.reporting.impl.ReportImpl;
  */
 public final class SPModelConvertor extends ModelConvertor {
 
-    private static final String PLATFORM_STATUS_DEACTIVATED = "DEACTIVATED";
+    private static final String TENANT_STATUS_DEACTIVATED = "DEACTIVATED";
 
     public static List<Log> toLogs(final Collection<SQueriableLog> sQueriableLogs) {
         final List<Log> logs = new ArrayList<Log>();
@@ -96,14 +96,15 @@ public final class SPModelConvertor extends ModelConvertor {
         tenant.setDescription(sTenant.getDescription());
         tenant.setDefaultTenant(sTenant.isDefaultTenant());
         tenant.setCreationDate(new Date(sTenant.getCreated()));
+        tenant.setInMaintenance(sTenant.isInMaintenance());
         // no createdBy in tenantImpl
         return tenant;
     }
 
     public static STenant constructTenant(final TenantCreator tCreator) {
         final Map<TenantField, Serializable> fields = tCreator.getFields();
-        final STenantBuilder sTenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance((String) fields.get(TenantField.NAME), "defaultUser", System.currentTimeMillis(), PLATFORM_STATUS_DEACTIVATED,
-                (Boolean) fields.get(TenantField.DEFAULT_TENANT));
+        final STenantBuilder sTenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance((String) fields.get(TenantField.NAME),
+                "defaultUser", System.currentTimeMillis(), TENANT_STATUS_DEACTIVATED, (Boolean) fields.get(TenantField.DEFAULT_TENANT), false);
         sTenantBuilder.setDescription((String) fields.get(TenantField.DESCRIPTION));
         sTenantBuilder.setIconName((String) fields.get(TenantField.ICON_NAME));
         sTenantBuilder.setIconPath((String) fields.get(TenantField.ICON_PATH));
@@ -141,8 +142,8 @@ public final class SPModelConvertor extends ModelConvertor {
     public static SProfile constructSProfile(final ProfileCreator creator, final boolean isDefault, final long createdBy) {
         final long creationDate = System.currentTimeMillis();
         final Map<ProfileField, Serializable> fields = creator.getFields();
-        final SProfileBuilder newSProfileBuilder = BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance((String) fields.get(ProfileField.NAME), isDefault, creationDate,
-                createdBy, creationDate, createdBy);
+        final SProfileBuilder newSProfileBuilder = BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance((String) fields.get(ProfileField.NAME),
+                isDefault, creationDate, createdBy, creationDate, createdBy);
         final String description = (String) fields.get(ProfileField.DESCRIPTION);
         if (description != null) {
             newSProfileBuilder.setDescription(description);
@@ -156,8 +157,8 @@ public final class SPModelConvertor extends ModelConvertor {
 
     public static SProfileEntry constructSProfileEntry(final ProfileEntryCreator creator) {
         final Map<ProfileEntryField, Serializable> fields = creator.getFields();
-        final SProfileEntryBuilder newSProfileEntryBuilder = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance((String) fields.get(ProfileEntryField.NAME),
-                (Long) fields.get(ProfileEntryField.PROFILE_ID));
+        final SProfileEntryBuilder newSProfileEntryBuilder = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(
+                (String) fields.get(ProfileEntryField.NAME), (Long) fields.get(ProfileEntryField.PROFILE_ID));
         final String description = (String) fields.get(ProfileEntryField.DESCRIPTION);
         if (description != null) {
             newSProfileEntryBuilder.setDescription(description);
@@ -243,7 +244,8 @@ public final class SPModelConvertor extends ModelConvertor {
         // if (isProvided == null) {
         // isProvided = false;
         // }
-        final SReportBuilder newSReportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, System.currentTimeMillis(), creatorUserId, false);
+        final SReportBuilder newSReportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, System.currentTimeMillis(),
+                creatorUserId, false);
         final String description = (String) fields.get(ReportField.DESCRIPTION);
         if (description != null) {
             newSReportBuilder.setDescription(description);

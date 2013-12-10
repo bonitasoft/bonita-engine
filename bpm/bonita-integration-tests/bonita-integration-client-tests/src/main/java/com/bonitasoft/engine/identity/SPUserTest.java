@@ -8,6 +8,11 @@
  *******************************************************************************/
 package com.bonitasoft.engine.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Date;
 
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -22,11 +27,6 @@ import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Matthieu Chaffotte

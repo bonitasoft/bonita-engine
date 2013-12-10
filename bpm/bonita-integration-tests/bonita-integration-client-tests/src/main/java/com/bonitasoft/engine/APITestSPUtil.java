@@ -17,6 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
@@ -24,10 +27,14 @@ import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
@@ -62,6 +70,21 @@ public class APITestSPUtil extends APITestUtil {
     private ReportingAPI reportingAPI;
 
     private TenantManagementAPI tenantManagementAPI;
+
+    @Override
+    public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
+        return PlatformAPIAccessor.getPlatformLoginAPI();
+    }
+
+    @Override
+    protected PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return PlatformAPIAccessor.getPlatformAPI(session);
+    }
+
+    @Override
+    protected LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getLoginAPI();
+    }
 
     protected PlatformMonitoringAPI getPlatformMonitoringAPI() {
         return platformMonitoringAPI;

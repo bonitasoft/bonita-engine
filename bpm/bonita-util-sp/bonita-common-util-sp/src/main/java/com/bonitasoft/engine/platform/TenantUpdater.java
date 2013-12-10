@@ -21,13 +21,13 @@ public class TenantUpdater implements Serializable {
     private static final long serialVersionUID = -3608167879596202047L;
 
     public enum TenantField {
-        NAME, DESCRIPTION, ICON_NAME, ICON_PATH, STATUS, USERNAME, PASSWOWRD;
+        NAME, DESCRIPTION, ICON_NAME, ICON_PATH, STATUS, USERNAME, PASSWOWRD, IN_MAINTENANCE;
     }
 
     private final Map<TenantField, Serializable> fields;
 
     public TenantUpdater() {
-        fields = new HashMap<TenantField, Serializable>();
+        fields = new HashMap<TenantField, Serializable>(TenantField.values().length);
     }
 
     public void setName(final String name) {
@@ -56,6 +56,10 @@ public class TenantUpdater implements Serializable {
 
     public void setPassword(final String password) {
         fields.put(TenantField.PASSWOWRD, password);
+    }
+
+    public void setInMaintenance(final boolean inMaintenance) {
+        fields.put(TenantField.IN_MAINTENANCE, inMaintenance);
     }
 
     public Map<TenantField, Serializable> getFields() {

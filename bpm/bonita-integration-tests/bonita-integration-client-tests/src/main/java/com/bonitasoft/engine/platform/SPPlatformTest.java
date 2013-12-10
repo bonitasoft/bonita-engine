@@ -33,7 +33,6 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.AfterClass;
@@ -45,6 +44,7 @@ import com.bonitasoft.engine.APITestSPUtil;
 import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
+import com.bonitasoft.engine.api.TenantModeException;
 
 @SuppressWarnings("javadoc")
 public class SPPlatformTest {
@@ -71,9 +71,11 @@ public class SPPlatformTest {
 
     private static PlatformSession session;
 
+    private static APITestSPUtil apiTestSpUtil = new APITestSPUtil();
+
     @BeforeClass
     public static void beforeClass() throws Exception {
-        session = APITestSPUtil.loginPlatform();
+        session = apiTestSpUtil.loginPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         createTenants(); // create tenants in before class because this actions takes a lot of time
     }
@@ -83,7 +85,7 @@ public class SPPlatformTest {
         platformAPI.deleteTenant(tenantId1);
         platformAPI.deleteTenant(tenantId2);
         platformAPI.deleteTenant(tenantId3);
-        APITestUtil.logoutPlatform(session);
+        apiTestSpUtil.logoutPlatform(session);
     }
 
     private static void createTenants() throws Exception {
@@ -240,7 +242,7 @@ public class SPPlatformTest {
             platformAPI.createTenant(new TenantCreator("test", "test create tenant", "testIconName", "testIconPath", "name", "123"));
             fail("can't get platform api with null session");
         } finally {
-            session = APITestSPUtil.loginPlatform();
+            session = apiTestSpUtil.loginPlatform();
             platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         }
     }
@@ -513,7 +515,7 @@ public class SPPlatformTest {
     }
 
     @Test(expected = NodeNotStartedException.class)
-    public void cannotCreateTeantWithNodeStopped() throws BonitaException {
+    public void cannotCreateTenantWithNodeStopped() throws BonitaException {
         platformAPI.stopNode();
         try {
             createATenant("TENANT_1");
@@ -672,6 +674,11 @@ public class SPPlatformTest {
         } finally {
             platformAPI.startNode();
         }
+    }
+
+    @Test(expected = TenantModeException.class)
+    public void cannotAccessTenantAPIsOnMaintenanceTenant() throws BonitaException {
+        // FIXME: not yet implemented
     }
 
 }
