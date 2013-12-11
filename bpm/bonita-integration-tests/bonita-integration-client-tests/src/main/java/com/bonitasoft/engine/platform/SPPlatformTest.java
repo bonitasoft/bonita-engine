@@ -44,7 +44,6 @@ import com.bonitasoft.engine.APITestSPUtil;
 import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
-import com.bonitasoft.engine.api.TenantModeException;
 
 @SuppressWarnings("javadoc")
 public class SPPlatformTest {
@@ -674,11 +673,6 @@ public class SPPlatformTest {
         } finally {
             platformAPI.startNode();
         }
-    }
-
-    @Test(expected = TenantModeException.class)
-    public void cannotAccessTenantAPIsOnMaintenanceTenant() throws BonitaException {
-        // FIXME: not yet implemented
     }
 
 }
