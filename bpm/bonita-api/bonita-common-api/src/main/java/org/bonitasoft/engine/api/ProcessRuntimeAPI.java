@@ -102,7 +102,7 @@ public interface ProcessRuntimeAPI {
     SearchResult<HumanTaskInstance> searchPendingHiddenTasks(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * List all open process instances.
+     * List all open root process instances.
      * 
      * @param searchOptions
      *            the search criterion.
@@ -112,6 +112,18 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     SearchResult<ProcessInstance> searchOpenProcessInstances(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * List all process instances.
+     *
+     * @param searchOptions
+     *            the search criterion.
+     * @return a processInstance object.
+     * @throws SearchException
+     *             if an exception occurs when getting the list of tasks.
+     * @since 6.2
+     */
+    SearchResult<ProcessInstance> searchProcessInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
      * List all open process instances supervised by a user.
