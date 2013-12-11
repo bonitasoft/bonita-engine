@@ -116,14 +116,14 @@
             <type>link</type>
             <page>profilelisting</page>
           </profileEntry>
+	  <profileEntry name="Look &amp; Feel">
+            <parentName>Portal</parentName>
+            <index>2</index>
+            <description>LooknFeel</description>
+            <type>link</type>
+            <page>thememoredetailsadminext</page>
+          </profileEntry>
         </childrenEntries>
-      </parentProfileEntry>  
-	  <parentProfileEntry name="Look &amp; Feel">
-        <parentName>NULL</parentName>
-        <index>8</index>
-        <description>LooknFeel</description>
-        <type>link</type>
-        <page>thememoredetailsadminext</page>
       </parentProfileEntry>	
     </profileEntries>
   </profile>
