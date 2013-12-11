@@ -13,13 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.io.Serializable;
+import org.bonitasoft.engine.api.*;
 
-import org.bonitasoft.engine.api.APIAccessor;
-import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProfileAPI;
+import java.io.Serializable;
 
 /**
  * @author Matthieu Chaffotte
@@ -46,6 +42,11 @@ public class APIAccessorImpl implements APIAccessor, Serializable {
     @Override
     public ProfileAPI getProfileAPI() {
         return new ProfileAPIImpl();
+    }
+
+    @Override
+    public RepairAPI getRepairAPI() {
+        return new RepairAPIImpl();
     }
 
 }
