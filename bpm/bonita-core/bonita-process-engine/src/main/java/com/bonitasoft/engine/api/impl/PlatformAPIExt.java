@@ -23,6 +23,7 @@ import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
+import org.bonitasoft.engine.api.impl.PlatformAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
@@ -102,6 +103,14 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
 
     private static final String PROFILES_FILE_SP = "profiles-sp.xml";
+
+    public PlatformAPIExt() {
+        super();
+    }
+
+    public PlatformAPIExt(final PlatformAPIImplDelegate delegate) {
+        super(delegate);
+    }
 
     @Override
     protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
@@ -283,7 +292,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         createDefaultProfiles(tenantServiceAccessor);
 
                         // Create default theme
-                        createDefaultTheme(tenantServiceAccessor);
+                        getDelegate().createDefaultThemes(tenantServiceAccessor);
 
                         sessionService.deleteSession(session.getId());
                         return tenantId;

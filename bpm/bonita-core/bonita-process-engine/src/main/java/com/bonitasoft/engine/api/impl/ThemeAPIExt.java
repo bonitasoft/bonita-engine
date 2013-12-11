@@ -84,9 +84,10 @@ public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ThemeService themeService = tenantAccessor.getThemeService();
-
+        final SThemeType sType = SThemeType.valueOf(type.name());
         try {
-            return SPModelConvertor.toTheme(themeService.restoreDefaultTheme(SThemeType.valueOf(type.name())));
+            themeService.restoreDefaultTheme(sType);
+            return SPModelConvertor.toTheme(themeService.getTheme(sType, true));
         } catch (final SBonitaException e) {
             throw new RestoreThemeException(e);
         }
@@ -98,8 +99,9 @@ public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
         try {
             final long creationDate = System.currentTimeMillis();
 
-            final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(content, cssContent, false, type,
+            final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(content, false, type,
                     creationDate);
+            sThemeBuilder.setCSSContent(cssContent);
             final STheme theme = themeService.createTheme(sThemeBuilder.done());
             return SPModelConvertor.toTheme(theme);
         } catch (final SThemeCreationException e) {

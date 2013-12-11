@@ -16,7 +16,6 @@ import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.profile.ProfileTests;
 import com.bonitasoft.engine.reporting.ReportingAPIIT;
 import com.bonitasoft.engine.search.SearchEntitiesTests;
-import com.bonitasoft.engine.theme.ThemeTest;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
@@ -28,7 +27,6 @@ import com.bonitasoft.engine.theme.ThemeTest;
         MultiInstanceTest.class,
         ProcessTests.class,
         ProfileTests.class,
-        ThemeTest.class,
         RemoteConnectorExecutionTestSP.class,
         MonitoringAPITest.class,
         SearchEntitiesTests.class,
