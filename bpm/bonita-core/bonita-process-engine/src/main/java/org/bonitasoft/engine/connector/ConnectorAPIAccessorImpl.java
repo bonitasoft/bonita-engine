@@ -82,11 +82,6 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
         return getAPI(ProfileAPI.class, getAPISession());
     }
 
-    @Override
-    public RepairAPI getRepairAPI() {
-        return getAPI(RepairAPI.class, getAPISession());
-    }
-
     private static ServerAPI getServerAPI() {
         return new ServerAPIImpl(false);
     }
