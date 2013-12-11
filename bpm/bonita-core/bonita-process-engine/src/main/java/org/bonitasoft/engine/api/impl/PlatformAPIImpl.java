@@ -572,7 +572,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         final IdentityService identityService = tenantServiceAccessor.getIdentityService();
 
         final String xmlContent;
-        final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROFILES_FILE);
+        final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(getProfileFileName());
         if (inputStream == null) {
             // no default profiles
             return;
