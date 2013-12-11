@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.api;
 
-import java.lang.reflect.Proxy;
-import java.util.Map;
-
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.LocalServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
@@ -24,6 +21,9 @@ import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.util.APITypeManager;
+
+import java.lang.reflect.Proxy;
+import java.util.Map;
 
 /**
  * <b>Accessor class that retrieve APIs</b>
@@ -97,6 +97,10 @@ public final class TenantAPIAccessor {
 
     public static ProfileAPI getProfileAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ProfileAPI.class, session);
+    }
+
+    public static RepairAPI getRepairAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getAPI(RepairAPI.class, session);
     }
 
 }
