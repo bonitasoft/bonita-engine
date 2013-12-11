@@ -118,7 +118,7 @@
           </profileEntry>
         </childrenEntries>
       </parentProfileEntry>  
-	  <parentProfileEntry name="Look & Feel">
+	  <parentProfileEntry name="Look &amp; Feel">
         <parentName>NULL</parentName>
         <index>8</index>
         <description>LooknFeel</description>
