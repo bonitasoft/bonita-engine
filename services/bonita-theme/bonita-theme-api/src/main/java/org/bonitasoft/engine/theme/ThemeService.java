@@ -95,7 +95,7 @@ public interface ThemeService {
      *             If an exception is thrown when the default theme is restored
      * @since 6.2
      */
-    STheme restoreDefaultTheme(SThemeType type) throws SRestoreThemeException;
+    void restoreDefaultTheme(SThemeType type) throws SRestoreThemeException;
 
     /**
      * Get theme by its id

@@ -205,32 +205,11 @@ public class ThemeServiceImplTest {
      * 
      * @throws SRestoreThemeException
      * @throws SRecorderException
-     * @throws SBonitaReadException
      * 
      */
     @Test
-    public final void restoreDefaultTheme() throws SRestoreThemeException, SRecorderException, SBonitaReadException {
-        final STheme sTheme = mock(STheme.class);
-
+    public final void restoreDefaultTheme() throws SRestoreThemeException, SRecorderException {
         doNothing().when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
-        doReturn(sTheme).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<STheme>> any());
-
-        final STheme defaultTheme = themeServiceImpl.restoreDefaultTheme(SThemeType.MOBILE);
-        assertEquals(sTheme, defaultTheme);
-    }
-
-    @Test(expected = SRestoreThemeException.class)
-    public void restoreNoDefaultTheme() throws Exception {
-        doNothing().when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenReturn(null);
-
-        themeServiceImpl.restoreDefaultTheme(SThemeType.MOBILE);
-    }
-
-    @Test(expected = SRestoreThemeException.class)
-    public void restoreDefaultThemeThrowExceptionWhenGetDefault() throws Exception {
-        doNothing().when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
-        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<STheme>> any())).thenThrow(new SBonitaReadException(""));
 
         themeServiceImpl.restoreDefaultTheme(SThemeType.MOBILE);
     }

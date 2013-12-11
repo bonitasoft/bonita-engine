@@ -1089,8 +1089,10 @@ public class APITestUtil {
     }
 
     public static void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
-        stopPlatformAndTenant(platformAPI, undeployCommands);
-        cleanPlatform(platformAPI);
+        if (platformAPI.isNodeStarted()) {
+            stopPlatformAndTenant(platformAPI, undeployCommands);
+            cleanPlatform(platformAPI);
+        }
     }
 
     public static void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {

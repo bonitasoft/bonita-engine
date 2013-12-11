@@ -3,7 +3,7 @@ CREATE TABLE theme (
   id NUMERIC(19, 0) NOT NULL,
   isDefault BIT NOT NULL,
   content VARBINARY(MAX) NOT NULL,
-  cssContent VARBINARY(MAX) NOT NULL,
+  cssContent VARBINARY(MAX),
   type NVARCHAR(50) NOT NULL,
   lastUpdateDate NUMERIC(19, 0) NOT NULL,
   CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),

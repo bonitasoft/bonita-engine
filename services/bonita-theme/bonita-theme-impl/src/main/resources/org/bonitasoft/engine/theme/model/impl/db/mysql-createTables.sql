@@ -3,7 +3,7 @@ CREATE TABLE theme (
   id BIGINT NOT NULL,
   isDefault BOOLEAN NOT NULL,
   content LONGBLOB NOT NULL,
-  cssContent LONGBLOB NOT NULL,
+  cssContent LONGBLOB,
   type VARCHAR(50) NOT NULL,
   lastUpdateDate BIGINT NOT NULL,
   CONSTRAINT "UK_Theme" UNIQUE (tenantId, isDefault, type),

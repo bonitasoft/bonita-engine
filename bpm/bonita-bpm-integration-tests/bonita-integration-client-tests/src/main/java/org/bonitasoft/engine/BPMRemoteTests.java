@@ -19,7 +19,6 @@ import org.bonitasoft.engine.process.SupervisorTest;
 import org.bonitasoft.engine.process.task.ManualTasksTest;
 import org.bonitasoft.engine.profile.ProfileTests;
 import org.bonitasoft.engine.search.SearchEntitiesTests;
-import org.bonitasoft.engine.theme.ThemeTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
@@ -29,7 +28,6 @@ import org.junit.runners.Suite.SuiteClasses;
         PlatformCommandTest.class,
         ProcessTests.class,
         ProfileTests.class,
-        ThemeTest.class,
         SearchEntitiesTests.class,
         EventTests.class,
         IdentityTests.class,

@@ -100,11 +100,6 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.theme.ThemeService;
-import org.bonitasoft.engine.theme.builder.SThemeBuilder;
-import org.bonitasoft.engine.theme.builder.SThemeBuilderFactory;
-import org.bonitasoft.engine.theme.exception.SThemeCreationException;
-import org.bonitasoft.engine.theme.model.SThemeType;
 import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
@@ -125,17 +120,23 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private static final String PROFILES_FILE = "profiles.xml";
 
-    private static final String DEFAULT_THEME = "defaultTheme";
-
-    private static final String PORTAL = "-Portal";
-
-    private static final String MOBILE = "-Mobile";
-
-    private static final String ZIP = ".zip";
-
-    private static final String CSS = ".css";
-
     private static boolean isNodeStarted = false;
+
+    private final PlatformAPIImplDelegate delegate;
+
+    public PlatformAPIImpl() {
+        super();
+        delegate = new PlatformAPIImplDelegate();
+    }
+
+    public PlatformAPIImpl(final PlatformAPIImplDelegate delegate) {
+        super();
+        this.delegate = delegate;
+    }
+
+    protected PlatformAPIImplDelegate getDelegate() {
+        return delegate;
+    }
 
     @Override
     @CustomTransactions
@@ -553,8 +554,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             // Create default profiles
             createDefaultProfiles(tenantServiceAccessor);
 
-            // Create default theme
-            createDefaultTheme(tenantServiceAccessor);
+            // Create default themes : Portal and Mobile
+            getDelegate().createDefaultThemes(tenantServiceAccessor);
 
             sessionService.deleteSession(session.getId());
         } catch (final Exception e) {
@@ -564,45 +565,22 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void createDefaultTheme(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
-        final ThemeService themeService = tenantServiceAccessor.getThemeService();
-        createDefaultThemeByType(themeService, PORTAL);
-        createDefaultThemeByType(themeService, MOBILE);
-    }
-
-    private void createDefaultThemeByType(final ThemeService themeService, final String type) throws IOException, SThemeCreationException {
-        final long lastUpdateDate = System.currentTimeMillis();
-        final byte[] defaultThemeZip = getFileContent(DEFAULT_THEME + type + ZIP).getBytes();
-        final byte[] defaultThemeCss = getFileContent(DEFAULT_THEME + type + CSS).getBytes();
-        final SThemeType sThemeType = PORTAL.equals(type) ? SThemeType.PORTAL : SThemeType.MOBILE;
-        final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(defaultThemeZip, defaultThemeCss, true,
-                sThemeType, lastUpdateDate);
-        themeService.createTheme(sThemeBuilder.done());
-    }
-
-    private String getFileContent(final String fileName) throws IOException {
-        final InputStream defaultThemeZipIS = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-        if (defaultThemeZipIS == null) {
-            // no default file
-            return null;
-        }
-        try {
-            return IOUtils.toString(defaultThemeZipIS, org.bonitasoft.engine.io.IOUtil.fEncoding);
-        } finally {
-            defaultThemeZipIS.close();
-        }
-    }
-
     @SuppressWarnings("unchecked")
     protected void createDefaultProfiles(final TenantServiceAccessor tenantServiceAccessor) throws Exception {
         final Parser parser = tenantServiceAccessor.getProfileParser();
         final ProfileService profileService = tenantServiceAccessor.getProfileService();
         final IdentityService identityService = tenantServiceAccessor.getIdentityService();
 
-        final String xmlContent = getFileContent(PROFILES_FILE);
-        if (xmlContent == null) {
+        final String xmlContent;
+        final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROFILES_FILE);
+        if (inputStream == null) {
             // no default profiles
             return;
+        }
+        try {
+            xmlContent = IOUtils.toString(inputStream, org.bonitasoft.engine.io.IOUtil.fEncoding);
+        } finally {
+            inputStream.close();
         }
 
         StringReader reader = new StringReader(xmlContent);

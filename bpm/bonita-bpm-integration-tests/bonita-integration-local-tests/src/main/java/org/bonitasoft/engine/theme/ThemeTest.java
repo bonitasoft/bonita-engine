@@ -7,7 +7,6 @@ import java.util.Date;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ThemeAPI;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -19,14 +18,14 @@ import org.junit.Test;
  */
 public class ThemeTest extends CommonAPITest {
 
-    @After
-    public void afterTest() throws BonitaException {
-        logout();
+    @Before
+    public void before() throws Exception {
+        login();
     }
 
-    @Before
-    public void beforeTest() throws BonitaException {
-        login();
+    @After
+    public void after() throws Exception {
+        logout();
     }
 
     @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Get default", "Mobile" }, jira = "BS-2396, BS-2397")
@@ -52,11 +51,9 @@ public class ThemeTest extends CommonAPITest {
         final Theme defaultTheme = getThemeAPI().getDefaultTheme(type);
         assertEquals(type, defaultTheme.getType());
         assertNotNull(defaultTheme.getLastUpdatedDate());
-
         final Theme currentTheme = getThemeAPI().getCurrentTheme(type);
         assertEquals(type, currentTheme.getType());
         assertEquals(defaultTheme, currentTheme);
-
         final Date lastUpdateDate = getThemeAPI().getLastUpdateDate(type);
         assertEquals(defaultTheme.getLastUpdatedDate(), lastUpdateDate);
     }
@@ -73,7 +70,8 @@ public class ThemeTest extends CommonAPITest {
         getThemeAPI().getCurrentTheme(null);
     }
 
-    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Get last update date", "Wrong parameter" }, jira = "BS-2396, BS-2397")
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Get last update date", "Wrong parameter" }, jira =
+            "BS-2396, BS-2397")
     @Test(expected = RuntimeException.class)
     public void cantGetLastUpdateDateWithoutType() {
         getThemeAPI().getLastUpdateDate(null);

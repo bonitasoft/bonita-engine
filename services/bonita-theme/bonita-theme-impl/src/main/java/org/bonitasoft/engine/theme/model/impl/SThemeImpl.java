@@ -40,17 +40,17 @@ public class SThemeImpl extends PersistentObjectId implements STheme {
         super();
     }
 
-    public SThemeImpl(final byte[] content, final byte[] cssContent, final boolean isDefault, final SThemeType type, final long lastUpdatedDate) {
+    public SThemeImpl(final byte[] content, final boolean isDefault, final SThemeType type, final long lastUpdatedDate) {
         super();
         this.content = content;
-        this.cssContent = cssContent;
         this.isDefault = isDefault;
         this.lastUpdateDate = lastUpdatedDate;
         this.type = type;
     }
 
     public SThemeImpl(final STheme theme) {
-        this(theme.getContent(), theme.getCssContent(), theme.isDefault(), theme.getType(), theme.getLastUpdateDate());
+        this(theme.getContent(), theme.isDefault(), theme.getType(), theme.getLastUpdateDate());
+        setCssContent(theme.getCssContent());
     }
 
     @Override

@@ -144,7 +144,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public STheme restoreDefaultTheme(final SThemeType type) throws SRestoreThemeException {
+    public void restoreDefaultTheme(final SThemeType type) throws SRestoreThemeException {
         try {
             final FilterOption defaultFilter = new FilterOption(STheme.class, SThemeBuilderFactory.IS_DEFAULT, false);
             final FilterOption typeFilter = new FilterOption(STheme.class, SThemeBuilderFactory.TYPE, type.name());
@@ -155,11 +155,6 @@ public class ThemeServiceImpl implements ThemeService {
             recorder.recordDeleteAll(record);
         } catch (final SRecorderException e) {
             throw new SRestoreThemeException("Can't delete custom themes for type = " + type, e);
-        }
-        try {
-            return getTheme(type, true);
-        } catch (final SBonitaException e) {
-            throw new SRestoreThemeException(e);
         }
     }
 

@@ -787,7 +787,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             } catch (final ActorMappingExportException e) {
                 throw new ProcessExportException(e);
             }
-            IOUtil.write(actormappF, xmlcontent);
+            IOUtil.writeContentToFile(xmlcontent, actormappF);
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             final ZipOutputStream zos = new ZipOutputStream(baos);

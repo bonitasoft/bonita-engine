@@ -35,6 +35,6 @@ public interface SThemeBuilderFactory {
 
     SThemeBuilder createNewInstance(STheme theme);
 
-    SThemeBuilder createNewInstance(byte[] content, byte[] cssContent, boolean isDefault, SThemeType type, long lastUpdateDate);
+    SThemeBuilder createNewInstance(byte[] content, boolean isDefault, SThemeType type, long lastUpdateDate);
 
 }

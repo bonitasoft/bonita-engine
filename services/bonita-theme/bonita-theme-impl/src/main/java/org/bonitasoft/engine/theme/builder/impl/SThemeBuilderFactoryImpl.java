@@ -25,9 +25,8 @@ import org.bonitasoft.engine.theme.model.impl.SThemeImpl;
 public class SThemeBuilderFactoryImpl implements SThemeBuilderFactory {
 
     @Override
-    public SThemeBuilder createNewInstance(final byte[] content, final byte[] cssContent, final boolean isDefault, final SThemeType type,
-            final long lastUpdateDate) {
-        final SThemeImpl theme = new SThemeImpl(content, cssContent, isDefault, type, lastUpdateDate);
+    public SThemeBuilder createNewInstance(final byte[] content, final boolean isDefault, final SThemeType type, final long lastUpdateDate) {
+        final SThemeImpl theme = new SThemeImpl(content, isDefault, type, lastUpdateDate);
         return new SThemeBuilderImpl(theme);
     }
 

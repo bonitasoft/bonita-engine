@@ -37,16 +37,6 @@ public class IOUtilTest {
     private static String lineSeparator = System.getProperty("line.separator");
 
     @Test
-    public void testWriteFileByteArray() throws Exception {
-        final File file = File.createTempFile("test", "test");
-
-        IOUtil.write(file, "theContent\ncontent".getBytes());
-
-        assertArrayEquals("theContent\ncontent".getBytes(), IOUtil.getAllContentFrom(file));
-        file.delete();
-    }
-
-    @Test
     public void testGetResources() throws Exception {
         final Map<String, byte[]> resources = IOUtil.getResources(IOUtilTest.class, IOUtil.class);
 
@@ -74,7 +64,7 @@ public class IOUtilTest {
     @Test
     public void testGetAllContentFromFile() throws Exception {
         final File file = File.createTempFile("test", "test");
-        IOUtil.write(file, "theContent\nVeryGreatContent");
+        IOUtil.writeContentToFile("theContent\nVeryGreatContent", file);
 
         assertArrayEquals("theContent\nVeryGreatContent".getBytes(), IOUtil.getAllContentFrom(file));
 
@@ -85,7 +75,7 @@ public class IOUtilTest {
     public void testGetAllContentFromURL() throws Exception {
 
         final File file = File.createTempFile("test", "test");
-        IOUtil.write(file, "theContent\nVeryGreatContent");
+        IOUtil.writeContentToFile("theContent\nVeryGreatContent", file);
 
         assertArrayEquals("theContent\nVeryGreatContent".getBytes(), IOUtil.getAllContentFrom(file.toURI().toURL()));
 
@@ -98,7 +88,7 @@ public class IOUtilTest {
         folder.delete();
         folder.mkdir();
         final File file = new File(folder, "aFile");
-        IOUtil.write(file, "content");
+        IOUtil.writeContentToFile("content", file);
 
         assertTrue(IOUtil.deleteDir(folder));
 
@@ -112,7 +102,7 @@ public class IOUtilTest {
         folder.delete();
         folder.mkdir();
         final File file = new File(folder, "aFile");
-        IOUtil.write(file, "content");
+        IOUtil.writeContentToFile("content", file);
 
         assertTrue(IOUtil.deleteDir(folder, 5, 1));
 
@@ -160,7 +150,7 @@ public class IOUtilTest {
     public void testWriteFileString() throws Exception {
         final File file = File.createTempFile("test", "test");
 
-        IOUtil.write(file, "theContent\ncontent");
+        IOUtil.writeContentToFile("theContent\ncontent", file);
 
         assertEquals("theContent\ncontent", new String(IOUtil.getAllContentFrom(file)));
         file.delete();
@@ -182,7 +172,7 @@ public class IOUtilTest {
     public void testReadFile() throws Exception {
         final File file = File.createTempFile("test", "test");
         final String content = "theContent" + lineSeparator + "VeryGreatContent";
-        IOUtil.write(file, content);
+        IOUtil.writeContentToFile(content, file);
 
         assertEquals(content, IOUtil.read(file));
 
