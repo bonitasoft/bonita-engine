@@ -462,7 +462,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         return new ProcessManagementAPIImplDelegate();
     }
 
-    protected static TenantServiceAccessor getTenantAccessor() {
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -1101,7 +1101,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance startProcess(final long processDefinitionId) throws ProcessActivationException, ProcessExecutionException {
         try {
-            return startProcess(SessionInfos.getUserIdFromSession(), processDefinitionId);
+            return startProcess(getUserId(), processDefinitionId);
         } catch (final ProcessDefinitionNotFoundException e) {
             throw new ProcessExecutionException(e);
         }
@@ -3173,7 +3173,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SOperationBuilders sOperationBuilders = tenantAccessor.getSOperationBuilders();
         final SExpressionBuilders sExpressionBuilders = tenantAccessor.getSExpressionBuilders();
         final long starterId;
-        final long userIdFromSession = SessionInfos.getUserIdFromSession();
+        final long userIdFromSession = getUserId();
         if (userId == 0) {
             starterId = userIdFromSession;
         } else {
@@ -4130,7 +4130,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
         final SProcessDocumentBuilders documentBuilders = tenantAccessor.getProcessDocumentBuilders();
-        final long author = SessionInfos.getUserIdFromSession();
+        final long author = getUserId();
         try {
             final SProcessDocument document = attachDocument(processInstanceId, documentName, fileName, mimeType, url, processDocumentService,
                     documentBuilders, author);
@@ -4182,7 +4182,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
         final SProcessDocumentBuilders documentBuilders = tenantAccessor.getProcessDocumentBuilders();
-        final long authorId = SessionInfos.getUserIdFromSession();
+        final long authorId = getUserId();
         try {
             final SProcessDocument document = attachDocument(processInstanceId, documentName, fileName, mimeType, documentContent, processDocumentService,
                     documentBuilders, authorId);
@@ -4206,7 +4206,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
         final SProcessDocumentBuilders documentBuilders = tenantAccessor.getProcessDocumentBuilders();
-        final long authorId = SessionInfos.getUserIdFromSession();
+        final long authorId = getUserId();
         try {
             final SProcessDocument attachment = buildExternalProcessDocumentReference(documentBuilders, processInstanceId, documentName, fileName, mimeType,
                     authorId, url);
@@ -4225,7 +4225,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
         final SProcessDocumentBuilders documentBuilders = tenantAccessor.getProcessDocumentBuilders();
-        final long authorId = SessionInfos.getUserIdFromSession();
+        final long authorId = getUserId();
         try {
             final SProcessDocument attachment = buildProcessDocument(documentBuilders, processInstanceId, documentName, contentFileName, contentMimeType,
                     authorId);
@@ -4613,24 +4613,18 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void cancelProcessInstance(final long processInstanceId) throws RetrieveException, UpdateException {
+    public void cancelProcessInstance(final long processInstanceId) throws ProcessInstanceNotFoundException, UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-
-        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final LockService lockService = tenantAccessor.getLockService();
-
-        final TransactionalProcessInstanceInterruptor processInstanceInterruptor = new TransactionalProcessInstanceInterruptor(bpmInstanceBuilders,
-                processInstanceService, activityInstanceService, processExecutor, tenantAccessor.getTechnicalLoggerService());
-
+        final TransactionalProcessInstanceInterruptor processInstanceInterruptor = buildProcessInstanceInterruptor(tenantAccessor);
         // lock process execution
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         BonitaLock lock = null;
         try {
             lock = lockService.lock(processInstanceId, objectType, tenantAccessor.getTenantId());
-            processInstanceInterruptor.interruptProcessInstance(processInstanceId, SStateCategory.CANCELLING, SessionInfos.getUserIdFromSession());
+            processInstanceInterruptor.interruptProcessInstance(processInstanceId, SStateCategory.CANCELLING, getUserId());
+        } catch (final SProcessInstanceNotFoundException spinfe) {
+            throw new ProcessInstanceNotFoundException(processInstanceId);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
@@ -4641,6 +4635,19 @@ public class ProcessAPIImpl implements ProcessAPI {
                 // ignore it
             }
         }
+    }
+
+    protected long getUserId() {
+        return SessionInfos.getUserIdFromSession();
+    }
+
+    protected TransactionalProcessInstanceInterruptor buildProcessInstanceInterruptor(final TenantServiceAccessor tenantAccessor) {
+        final BPMInstanceBuilders bpmInstanceBuilders = tenantAccessor.getBPMInstanceBuilders();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
+        return new TransactionalProcessInstanceInterruptor(bpmInstanceBuilders, processInstanceService, activityInstanceService, processExecutor,
+                tenantAccessor.getTechnicalLoggerService());
     }
 
     @Override
@@ -4822,7 +4829,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             flowNodeExecutor.setStateByStateId(processDefinitionId, activity.getId(), stateId);
             // execute the flow node only if it is not the final state
             if (!state.isTerminal()) {
-                final long userIdFromSession = SessionInfos.getUserIdFromSession();
+                final long userIdFromSession = getUserId();
                 // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                 processExecutor.executeFlowNode(activityInstanceId, null, null, activity.getParentProcessInstanceId(), userIdFromSession, userIdFromSession);
             }

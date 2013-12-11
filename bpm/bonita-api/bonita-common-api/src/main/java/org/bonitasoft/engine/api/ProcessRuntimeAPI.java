@@ -1116,16 +1116,16 @@ public interface ProcessRuntimeAPI {
     Map<Long, Long> getNumberOfOverdueOpenTasks(List<Long> userIds);
 
     /**
-     * Cancel a specified process instance.
+     * Cancels the process instance and all of its active flownodes.
      * 
      * @param processInstanceId
      *            the identifier of the process instance.
-     * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
      * @throws ProcessInstanceNotFoundException
-     *             if there is no process instance with the specified identifier.
-     * @throws RetrieveException
-     *             if an error occurs while retreiving the process instance.
+     *             If the process instance identifier does not refer to a process instance.
+     * @throws UpdateException
+     *             If an exception occurs during the process instance canceling.
+     * @throws InvalidSessionException
+     *             If the session is invalid (expired, unknown, ...)
      * @since 6.0
      */
     void cancelProcessInstance(long processInstanceId) throws ProcessInstanceNotFoundException, UpdateException;
@@ -1347,7 +1347,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     ArchivedComment getArchivedComment(long archivedCommentId) throws NotFoundException;
-    
+
     /**
      * Search for connector instances.
      * 

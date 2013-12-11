@@ -18,6 +18,9 @@ import java.util.List;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -42,8 +45,7 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
     private final ContainerRegistry containerRegistry;
 
     public TransactionContainedProcessInstanceInterruptor(final BPMInstanceBuilders bpmInstanceBuilders, final ProcessInstanceService processInstanceService,
-            final FlowNodeInstanceService flowNodeInstanceService, final ContainerRegistry containerRegistry,
-            final TechnicalLoggerService logger) {
+            final FlowNodeInstanceService flowNodeInstanceService, final ContainerRegistry containerRegistry, final TechnicalLoggerService logger) {
         super(bpmInstanceBuilders, logger);
         this.processInstanceService = processInstanceService;
         this.flowNodeInstanceService = flowNodeInstanceService;
@@ -51,7 +53,8 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
     }
 
     @Override
-    protected void setProcessStateCategory(final long processInstanceId, final SStateCategory stateCategory) throws SBonitaException {
+    protected void setProcessStateCategory(final long processInstanceId, final SStateCategory stateCategory) throws SProcessInstanceNotFoundException,
+            SProcessInstanceReadException, SProcessInstanceModificationException {
         final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
         processInstanceService.setStateCategory(processInstance, stateCategory);
     }
