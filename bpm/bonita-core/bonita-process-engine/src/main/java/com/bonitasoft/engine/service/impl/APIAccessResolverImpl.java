@@ -21,15 +21,16 @@ import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformLoginAPIImpl;
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
+import org.bonitasoft.engine.api.impl.ThemeAPIImpl;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.service.APIAccessResolver;
 
 import com.bonitasoft.engine.api.LogAPI;
-import com.bonitasoft.engine.api.ThemeAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.api.NodeAPI;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
@@ -37,7 +38,6 @@ import com.bonitasoft.engine.api.impl.CommandAPIExt;
 import com.bonitasoft.engine.api.impl.IdentityAPIExt;
 import com.bonitasoft.engine.api.impl.LogAPIExt;
 import com.bonitasoft.engine.api.impl.LoginAPIExt;
-import com.bonitasoft.engine.api.impl.ThemeAPIExt;
 import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.NodeAPIImpl;
 import com.bonitasoft.engine.api.impl.PlatformAPIExt;
@@ -45,6 +45,7 @@ import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.ProcessAPIExt;
 import com.bonitasoft.engine.api.impl.ProfileAPIExt;
 import com.bonitasoft.engine.api.impl.ReportingAPIExt;
+import com.bonitasoft.engine.api.impl.ThemeAPIExt;
 
 /**
  * @author Matthieu Chaffotte
@@ -75,7 +76,8 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(com.bonitasoft.engine.api.ReportingAPI.class.getName(), new ReportingAPIExt());
         apis.put(ProfileAPI.class.getName(), new ProfileAPIImpl());
         apis.put(com.bonitasoft.engine.api.ProfileAPI.class.getName(), new ProfileAPIExt());
-        apis.put(ThemeAPI.class.getName(), new ThemeAPIExt());
+        apis.put(ThemeAPI.class.getName(), new ThemeAPIImpl());
+        apis.put(com.bonitasoft.engine.api.ThemeAPI.class.getName(), new ThemeAPIExt());
     }
 
     @Override
