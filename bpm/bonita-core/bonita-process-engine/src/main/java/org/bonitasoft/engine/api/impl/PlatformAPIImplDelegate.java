@@ -44,7 +44,7 @@ public class PlatformAPIImplDelegate {
 
     private final String mobileDefaultThemeFilename;
 
-    private final File unzippedCssPortalThemeFolder;
+    private File unzippedCssPortalThemeFolder;
 
     public PlatformAPIImplDelegate() {
         this(BONITA_PORTAL_THEME_DEFAULT, BONITA_MOBILE_THEME_DEFAULT);
@@ -56,11 +56,15 @@ public class PlatformAPIImplDelegate {
         this.mobileDefaultThemeFilename = mobileDefaultThemeFilename;
 
         try {
-            final InputStream inputStream = getResourceAsStream(portalDefaultThemeFilename + "-css" + ZIP);
-            unzippedCssPortalThemeFolder = IOUtil.createTempDirectory(portalDefaultThemeFilename + "-css");
-            IOUtil.unzipToFolder(inputStream, unzippedCssPortalThemeFolder);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            final InputStream defaultThemeCssZip = getResourceAsStream(portalDefaultThemeFilename + "-css" + ZIP);
+            if (defaultThemeCssZip != null) {
+                unzippedCssPortalThemeFolder = IOUtil.createTempDirectory(portalDefaultThemeFilename + "-css");
+                IOUtil.unzipToFolder(defaultThemeCssZip, unzippedCssPortalThemeFolder);
+            } else {
+                unzippedCssPortalThemeFolder = null;
+            }
+        } catch (final IOException e) {
+            unzippedCssPortalThemeFolder = null;
         }
     }
 
@@ -76,11 +80,13 @@ public class PlatformAPIImplDelegate {
     private void createDefaultPortalTheme(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
         final ThemeService themeService = tenantServiceAccessor.getThemeService();
         final byte[] defaultThemeZip = getFileContent(portalDefaultThemeFilename + ZIP);
-        final byte[] defaultThemeCss = IOUtil.getAllContentFrom(new File(unzippedCssPortalThemeFolder, "bonita.css"));
 
-        if (defaultThemeZip != null && defaultThemeCss != null) {
-            final STheme sTheme = createTheme(defaultThemeZip, defaultThemeCss, SThemeType.PORTAL);
-            themeService.createTheme(sTheme);
+        if (defaultThemeZip != null && unzippedCssPortalThemeFolder != null) {
+            final byte[] defaultThemeCss = IOUtil.getAllContentFrom(new File(unzippedCssPortalThemeFolder, "bonita.css"));
+            if (defaultThemeCss != null) {
+                final STheme sTheme = buildSTheme(defaultThemeZip, defaultThemeCss, SThemeType.PORTAL);
+                themeService.createTheme(sTheme);
+            }
         }
     }
 
@@ -88,13 +94,13 @@ public class PlatformAPIImplDelegate {
         final ThemeService themeService = tenantServiceAccessor.getThemeService();
         final byte[] defaultThemeZip = getFileContent(mobileDefaultThemeFilename + ZIP);
         if (defaultThemeZip != null) {
-            final STheme sTheme = createTheme(defaultThemeZip, null, SThemeType.MOBILE);
+            final STheme sTheme = buildSTheme(defaultThemeZip, null, SThemeType.MOBILE);
             themeService.createTheme(sTheme);
         }
     }
 
     // default visibility for testing
-    STheme createTheme(final byte[] defaultThemeZip, final byte[] defaultThemeCss, final SThemeType type) {
+    STheme buildSTheme(final byte[] defaultThemeZip, final byte[] defaultThemeCss, final SThemeType type) {
         final long lastUpdateDate = System.currentTimeMillis();
         final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(defaultThemeZip,
                 true, type, lastUpdateDate);

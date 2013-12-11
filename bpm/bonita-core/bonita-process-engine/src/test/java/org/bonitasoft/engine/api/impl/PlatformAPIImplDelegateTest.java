@@ -54,8 +54,10 @@ public class PlatformAPIImplDelegateTest {
         final PlatformAPIImplDelegate delegate = spy(new PlatformAPIImplDelegate());
         try {
             final STheme sTheme = mock(STheme.class);
-            doReturn(sTheme).when(delegate).createTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+            doReturn(sTheme).when(delegate).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+
             delegate.createDefaultThemes(tenantServiceAccessor);
+
             // Call 2 times : one for portal, and one for mobile
             verify(themeService, times(2)).createTheme(any(STheme.class));
         } finally {
@@ -64,6 +66,48 @@ public class PlatformAPIImplDelegateTest {
         }
     }
 
+    @Test
+    public final void should_dont_call_create_theme_from_theme_service_when_creating_default_themes_from_portal_zip_not_in_classpath()
+            throws SThemeCreationException, IOException {
+        final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
+        final ThemeService themeService = mock(ThemeService.class);
+        doReturn(themeService).when(tenantServiceAccessor).getThemeService();
+
+        final PlatformAPIImplDelegate delegate = spy(new PlatformAPIImplDelegate("portal_not_in_classpath", "bonita-mobile-theme"));
+        final STheme sTheme = mock(STheme.class);
+        doReturn(sTheme).when(delegate).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+
+        delegate.createDefaultThemes(tenantServiceAccessor);
+
+        // Call 1 times : Mobile
+        verify(themeService, times(1)).createTheme(any(STheme.class));
+    }
+
+    @Test
+    public final void should_dont_call_create_theme_from_theme_service_when_creating_default_themes_from_mobile_zip_not_in_classpath()
+            throws SThemeCreationException, IOException {
+        final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
+        final ThemeService themeService = mock(ThemeService.class);
+        doReturn(themeService).when(tenantServiceAccessor).getThemeService();
+
+        final PlatformAPIImplDelegate delegate = spy(new PlatformAPIImplDelegate("bonita-portal-theme", "mobile_not_in_classpath"));
+        try {
+            final STheme sTheme = mock(STheme.class);
+            doReturn(sTheme).when(delegate).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+
+            delegate.createDefaultThemes(tenantServiceAccessor);
+
+            // Call 1 times : Portal
+            verify(themeService, times(1)).createTheme(any(STheme.class));
+        } finally {
+            // Clean up
+            delegate.cleanUnzippedFolder();
+        }
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.api.impl.PlatformAPIImplDelegate#getFileContent(java.lang.String)}.
+     */
     @Test
     public void should_return_null_when_getting_content_from_filename_not_in_classpath() throws IOException {
         final PlatformAPIImplDelegate delegate = new PlatformAPIImplDelegate();
