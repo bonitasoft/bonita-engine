@@ -17,6 +17,17 @@
 		<fileSet>
 			<outputDirectory>home</outputDirectory>
 			<directory>common</directory>
+			<excludes>
+				<exclude>server/platform/conf/VERSION</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>home/server/platform/conf/</outputDirectory>
+			<directory>common/server/platform/conf/</directory>
+			<includes>
+				<include>VERSION</include>
+			</includes>
+			<filtered>true</filtered>
 		</fileSet>
 	</fileSets>
 </assembly>
