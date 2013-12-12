@@ -53,7 +53,7 @@ public class BusinessDataRepositoryImpl implements BusinessDataRespository {
 
     @Override
     public void start() {
-        final Configuration cfg = new Configuration().configure();
+        final Configuration cfg = new Configuration().configure("/hibernate3.cfg.xml");
         cfg.getProperties().remove("hibernate.hbm2ddl.auto");
         sessionFactory = cfg.buildSessionFactory();
 
