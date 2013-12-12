@@ -55,9 +55,8 @@ public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
 
     @Override
     public Theme setCustomTheme(final byte[] content, final byte[] cssContent, final ThemeType type) throws SetThemeException {
-        if (content == null || content.length == 0 || cssContent == null || cssContent.length == 0 || type == null) {
-            throw new SetThemeException("Content, cssContent and type are required.");
-        }
+
+        validateSetCustomThemeInput(content, cssContent, type);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ThemeService themeService = tenantAccessor.getThemeService();
@@ -73,6 +72,23 @@ public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
             throw new SetThemeException(e);
         } catch (final SBonitaException e) {
             throw new SetThemeException(e);
+        }
+    }
+
+    private void validateSetCustomThemeInput(final byte[] content, final byte[] cssContent, final ThemeType type) throws SetThemeException {
+
+        if (type == null) {
+            throw new SetThemeException("Type is required.");
+        }
+
+        if (ThemeType.PORTAL.equals(type)) {
+            if (content == null || content.length == 0 || cssContent == null || cssContent.length == 0) {
+                throw new SetThemeException("Content and cssContent are required.");
+            }
+        } else if (ThemeType.MOBILE.equals(type)) {
+            if (content == null || content.length == 0) {
+                throw new SetThemeException("Content is required.");
+            }
         }
     }
 

@@ -93,7 +93,21 @@ public class ThemeTest extends CommonAPISPTest {
 
     @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Set custom", "Wrong parameter" }, jira = "BS-2396, BS-2397")
     @Test(expected = SetThemeException.class)
-    public void cantSetCustomThemeWithoutCssContent() throws Exception {
+    public void cantSetCustomThemeWithoutCssContentInPortal() throws Exception {
+        final ThemeType type = ThemeType.PORTAL;
+        final Theme defaultTheme = getThemeAPI().getDefaultTheme(type);
+
+        final byte[] content = "plop".getBytes();
+        try {
+            getThemeAPI().setCustomTheme(content, null, type);
+        } finally {
+            assertEquals(defaultTheme, getThemeAPI().getDefaultTheme(type));
+        }
+    }
+
+    @Cover(classes = ThemeAPI.class, concept = BPMNConcept.NONE, keywords = { "Theme", "Set custom", "Without cssContent", "mobile" }, jira = "BS-2396, BS-2397")
+    @Test
+    public void setCustomThemeWithoutCssContentInMobile() throws Exception {
         final ThemeType type = ThemeType.MOBILE;
         final Theme defaultTheme = getThemeAPI().getDefaultTheme(type);
 
