@@ -160,7 +160,6 @@
 									<classifier>${bonita.home.classifier}</classifier>
 								</artifactItem>
 							</artifactItems>
-							<includes>**/*.*</includes>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
