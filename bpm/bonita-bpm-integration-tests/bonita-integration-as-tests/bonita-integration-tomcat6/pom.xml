@@ -221,13 +221,12 @@
 											<pathelement path="${test_classpath}" />
 										</path>
 
-
 										<waitfor maxwait="1" maxwaitunit="minute">
 											<socket server="localhost" port="${provider.port}" />
 										</waitfor>
 
 										<mkdir dir="${report.xml}" />
-										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="512m">
+										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="1024m">
 											<!-- <jvmarg line="-Xdebug -Xmx512m -Xms128m -XX:MaxPermSize=256m -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8500"/> -->
 											<jvmarg line="-Xmx512m -Xms128m -XX:MaxPermSize=256m" />
 											<classpath refid="test.path" />
