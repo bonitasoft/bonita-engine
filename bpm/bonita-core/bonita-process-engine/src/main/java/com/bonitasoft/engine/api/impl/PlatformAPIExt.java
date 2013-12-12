@@ -288,10 +288,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         // Create default commands
                         createDefaultCommands(tenantServiceAccessor);
 
+                        // Create default reports
+                        deployTenantReports(tenantId, tenantServiceAccessor);
+
                         // Create default profiles
                         createDefaultProfiles(tenantServiceAccessor);
 
-                        // Create default theme
+                        // Create default themes
                         getDelegate().createDefaultThemes(tenantServiceAccessor);
 
                         sessionService.deleteSession(session.getId());
