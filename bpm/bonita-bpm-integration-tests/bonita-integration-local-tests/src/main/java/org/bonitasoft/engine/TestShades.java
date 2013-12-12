@@ -49,6 +49,7 @@ public class TestShades {
         }
         assertTrue("build was not successfull", outputOfMaven.contains("BUILD SUCCESS"));
         outputOfMaven = outputOfMaven.replaceAll("\n?.*Downloading.*\n", "");
+        outputOfMaven = outputOfMaven.replaceAll("\n?.*Downloaded.*\n", "");
         outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-server", "");
         outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-client", "");
         outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-common", "");

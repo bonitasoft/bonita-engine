@@ -9,3 +9,4 @@ bpm/bonita-bpm-integration-tests/bonita-bpm-services-integration-tests/src/test/
 TemporaryLocalIntegrationTests.java
 bpm/bonita-bpm-integration-tests/bonita-integration-local-tests/src/test/java/org/bonitasoft/engine/DeployBarTest.java
 *.iml
+*.orig
