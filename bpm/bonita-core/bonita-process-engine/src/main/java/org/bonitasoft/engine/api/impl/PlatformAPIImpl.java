@@ -237,11 +237,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             try {
                 final PlatformService platformService = platformAccessor.getPlatformService();
                 final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
-                final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService);
+                final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService, BonitaHomeServer.getInstance());
                 executor.execute(checkPlatformVersion);
                 if (!checkPlatformVersion.sameVersion()) {
-                    throw new StartNodeException("The version of the platform is not the same: expected:" + checkPlatformVersion.getPlatform().getVersion()
-                            + " got: " + checkPlatformVersion.getPlatformProperties().getPlatformVersion());
+                    throw new StartNodeException(checkPlatformVersion.getErrorMessage());
                 }
                 for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
                     serviceWithLifecycle.start();
@@ -485,7 +484,8 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             // add tenant to database
             final String createdBy = "defaultUser";
-            final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true)
+            final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
+                    .createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true)
                     .setDescription(description).done();
             final Long tenantId = platformService.createTenant(tenant);
 

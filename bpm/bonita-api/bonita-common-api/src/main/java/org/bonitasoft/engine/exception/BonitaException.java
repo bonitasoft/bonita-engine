@@ -26,7 +26,7 @@ public class BonitaException extends Exception {
     }
 
     public BonitaException(final String message, final Throwable cause) {
-        super(message);
+        super(message, cause);
     }
 
     public BonitaException(final Throwable cause) {
