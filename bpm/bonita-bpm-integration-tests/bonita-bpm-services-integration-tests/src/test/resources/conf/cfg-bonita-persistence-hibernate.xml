@@ -30,7 +30,7 @@
 				<prop key="hibernate.connection.datasource">${database.journal.datasource.name}</prop>
 				<prop key="hibernate.current_session_context_class">jta</prop>
 				<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>
-				<prop key="hibernate.transaction.manager_lookup_class">${hibernate.transaction.manager_lookup_class}</prop>
+				<prop key="hibernate.transaction.jta.platform">${hibernate.transaction.jta_platform}</prop>
 				<prop key="hibernate.dialect">${hibernate.journal.dialect}</prop>
 				<prop key="hibernate.interceptor">${hibernate.journal.interceptor}</prop>
 				<prop key="hibernate.show_sql">${hibernate.journal.show_sql}</prop>
