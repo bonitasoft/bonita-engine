@@ -36,7 +36,7 @@ ALTER TABLE profile DROP FOREIGN KEY fk_profile_tenantId;
 ALTER TABLE profileentry DROP FOREIGN KEY fk_profileentry_tenantId;
 ALTER TABLE profilemember DROP FOREIGN KEY fk_profilemember_tenantId;
 ALTER TABLE role DROP FOREIGN KEY fk_role_tenantId;
-ALTER TABLE theme DROP CONSTRAINT fk_theme_tenantId;
+ALTER TABLE theme DROP FOREIGN KEY fk_theme_tenantId;
 ALTER TABLE user_ DROP FOREIGN KEY fk_user__tenantId;
 ALTER TABLE user_membership DROP FOREIGN KEY fk_user_membership_tenantId;
 ALTER TABLE waiting_event DROP FOREIGN KEY fk_waiting_event_tenantId;
