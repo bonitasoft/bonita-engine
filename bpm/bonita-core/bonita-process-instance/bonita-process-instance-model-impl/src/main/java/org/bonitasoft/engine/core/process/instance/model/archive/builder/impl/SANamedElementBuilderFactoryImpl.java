@@ -20,7 +20,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SANamed
  */
 public class SANamedElementBuilderFactoryImpl implements SANamedElementBuilderFactory {
 
-    protected static final String ARCHIVED_DATE = "archivedDate";
+    protected static final String ARCHIVED_DATE = "archiveDate";
 
     protected static final String ID_KEY = "id";
 

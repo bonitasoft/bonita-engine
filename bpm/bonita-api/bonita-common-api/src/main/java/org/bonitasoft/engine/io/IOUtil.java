@@ -354,7 +354,7 @@ public class IOUtil {
         return read(scanner);
     }
 
-    public static void unzipToFolder(final InputStream inputStream, final File folder) throws IOException, FileNotFoundException {
+    public static void unzipToFolder(final InputStream inputStream, final File folder) throws IOException {
         final ZipInputStream zipInputstream = new ZipInputStream(inputStream);
         ZipEntry zipentry = zipInputstream.getNextEntry();
         final byte[] buf = new byte[BUFF_SIZE];
