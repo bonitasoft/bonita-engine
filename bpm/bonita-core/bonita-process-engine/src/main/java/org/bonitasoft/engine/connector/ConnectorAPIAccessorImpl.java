@@ -13,13 +13,7 @@
  **/
 package org.bonitasoft.engine.connector;
 
-import java.lang.reflect.Proxy;
-
-import org.bonitasoft.engine.api.APIAccessor;
-import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.IdentityAPI;
-import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.*;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ServerAPIImpl;
 import org.bonitasoft.engine.api.internal.ServerAPI;
@@ -31,6 +25,8 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+
+import java.lang.reflect.Proxy;
 
 /**
  * 
@@ -84,6 +80,11 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     @Override
     public ProfileAPI getProfileAPI() {
         return getAPI(ProfileAPI.class, getAPISession());
+    }
+
+    @Override
+    public RepairAPI getRepairAPI() {
+        return getAPI(RepairAPI.class, getAPISession());
     }
 
     private static ServerAPI getServerAPI() {
