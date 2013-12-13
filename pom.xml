@@ -47,7 +47,6 @@
 				<artifactId>hazelcast-spring</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
 
