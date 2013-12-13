@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,16 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.dependency.model.builder;
+package org.bonitasoft.engine.scheduler.exception.failedJob;
 
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 
-<<<<<<< HEAD
-=======
+/**
+ * @author Celine Souchet
+ */
+public class SFailedJobReadException extends SSchedulerException {
 
->>>>>>> fix services tests
-public interface SPlatformDependencyMappingBuilder {
+    private static final long serialVersionUID = -226779259333121029L;
 
-    SDependencyMapping done();
+    public SFailedJobReadException(final String message) {
+        super(message);
+    }
+
+    public SFailedJobReadException(final Exception e) {
+        super(e);
+    }
+
+    public SFailedJobReadException(final String message, final Exception exception) {
+        super(message, exception);
+    }
 
 }

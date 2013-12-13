@@ -210,8 +210,8 @@ public class SelectDescriptorBuilder {
     public static SelectListDescriptor<SActivityInstance> getActivitiesFromProcessInstance(final long rootContainerId, final int fromIndex,
             final int maxResults, final String field, final OrderByType orderByType) {
         final Map<String, Object> parameters = Collections.singletonMap("rootContainerId", (Object) rootContainerId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SFlowNodeInstance.class, field, orderByType);
-        return new SelectListDescriptor<SActivityInstance>("getActivitiesFromProcessInstance", parameters, SFlowNodeInstance.class, queryOptions);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SActivityInstance.class, field, orderByType);
+        return new SelectListDescriptor<SActivityInstance>("getActivitiesFromProcessInstance", parameters, SActivityInstance.class, queryOptions);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfActivitiesFromProcessInstance(final long rootContainerId) {

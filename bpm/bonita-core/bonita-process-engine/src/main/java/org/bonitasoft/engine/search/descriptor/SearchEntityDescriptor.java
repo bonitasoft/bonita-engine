@@ -102,6 +102,10 @@ public abstract class SearchEntityDescriptor {
                 return new FilterOption(FilterOperationType.AND);
             case OR:
                 return new FilterOption(FilterOperationType.OR);
+            case L_PARENTHESIS:
+                return new FilterOption(FilterOperationType.L_PARENTHESIS);
+            case R_PARENTHESIS:
+                return new FilterOption(FilterOperationType.R_PARENTHESIS);
             default:
                 return null;
         }

@@ -30,7 +30,7 @@ CREATE TABLE data_mapping (
 	containerType VARCHAR(60),
 	dataName VARCHAR(50),
 	dataInstanceId BIGINT NOT NULL,
-	UNIQUE (containerId, containerType, dataName),
+	UNIQUE (tenantId, containerId, containerType, dataName),
 	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 

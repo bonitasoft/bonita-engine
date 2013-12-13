@@ -253,11 +253,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             try {
                 final PlatformService platformService = platformAccessor.getPlatformService();
                 final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
-                final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService);
+                final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService, BonitaHomeServer.getInstance());
                 executor.execute(checkPlatformVersion);
                 if (!checkPlatformVersion.sameVersion()) {
-                    throw new StartNodeException("The version of the platform is not the same: expected:" + checkPlatformVersion.getPlatform().getVersion()
-                            + " got: " + checkPlatformVersion.getPlatformProperties().getPlatformVersion());
+                    throw new StartNodeException(checkPlatformVersion.getErrorMessage());
                 }
                 for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
                     serviceWithLifecycle.start();

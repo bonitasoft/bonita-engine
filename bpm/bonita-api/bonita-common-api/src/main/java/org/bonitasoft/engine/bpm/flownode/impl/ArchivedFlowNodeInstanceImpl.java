@@ -37,6 +37,8 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
     private long processDefinitionId;
 
     private long processInstanceId;
+    
+    private long parentActivityInstanceId;
 
     private String displayName;
 
@@ -110,6 +112,16 @@ public abstract class ArchivedFlowNodeInstanceImpl extends NamedElementImpl impl
 
     public void setProcessInstanceId(long processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+    
+    
+    public long getParentActivityInstanceId() {
+        return parentActivityInstanceId;
+    }
+    
+    
+    public void setParentActivityInstanceId(long parentActivityInstanceId) {
+        this.parentActivityInstanceId = parentActivityInstanceId;
     }
 
     @Override

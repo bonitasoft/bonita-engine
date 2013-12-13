@@ -27,6 +27,11 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.scheduler.JobService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
+import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
+import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
+import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
@@ -37,6 +42,7 @@ import org.quartz.JobExecutionException;
 /**
  * @author Celine Souchet
  * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
 public class JDBCJobListener extends AbstractJobListener {
 
@@ -73,32 +79,49 @@ public class JDBCJobListener extends AbstractJobListener {
             if (jobException != null) {
                 final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId);
                 if (!jobLogs.isEmpty()) {
-                    final SJobLogImpl jobLog = (SJobLogImpl) jobLogs.get(0);
-                    jobLog.setLastMessage(getStackTrace(jobException));
-                    jobLog.setLastUpdateDate(System.currentTimeMillis());
-                    jobLog.setRetryNumber(jobLog.getRetryNumber() + 1);
+                    updateJobLog(jobException, jobLogs);
                 } else {
-                    final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
-                    jobLog.setLastMessage(getStackTrace(jobException));
-                    jobLog.setRetryNumber(Long.valueOf(0));
-                    jobLog.setLastUpdateDate(System.currentTimeMillis());
-                    jobService.createJobLog(jobLog);
+                    createJobLog(jobException, jobDescriptorId);
                 }
             } else {
-                final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId);
-                if (!jobLogs.isEmpty()) {
-                    jobService.deleteJobLog(jobLogs.get(0));
-                }
-                final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
-                if (!getSchedulerService().isStillScheduled(jobDescriptor)) {
-                    getSchedulerService().delete(jobDescriptor.getJobName());
-                }
+                cleanJobLogIfAny(jobDescriptorId);
+                deleteJobIfNotScheduledAnyMore(jobDescriptorId);
             }
         } catch (final SBonitaException sbe) {
             final Long tenantId = (Long) jobDetail.getJobDataMap().getWrappedMap().get("tenantId");
             final Incident incident = new Incident("An exception occurs during the job execution of the job descriptor" + jobDescriptorId, "", jobException,
                     sbe);
             incidentService.report(tenantId, incident);
+        }
+    }
+
+    private void createJobLog(final JobExecutionException jobException, final Long jobDescriptorId) throws SJobLogCreationException {
+        final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
+        jobLog.setLastMessage(getStackTrace(jobException));
+        jobLog.setRetryNumber(Long.valueOf(0));
+        jobLog.setLastUpdateDate(System.currentTimeMillis());
+        jobService.createJobLog(jobLog);
+    }
+
+    private void updateJobLog(final JobExecutionException jobException, final List<SJobLog> jobLogs) {
+        final SJobLogImpl jobLog = (SJobLogImpl) jobLogs.get(0);
+        jobLog.setLastMessage(getStackTrace(jobException));
+        jobLog.setLastUpdateDate(System.currentTimeMillis());
+        jobLog.setRetryNumber(jobLog.getRetryNumber() + 1);
+    }
+
+    private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SJobDescriptorNotFoundException, SJobDescriptorReadException,
+            SSchedulerException {
+        final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
+        if (!getSchedulerService().isStillScheduled(jobDescriptor)) {
+            getSchedulerService().delete(jobDescriptor.getJobName());
+        }
+    }
+
+    private void cleanJobLogIfAny(final Long jobDescriptorId) throws SBonitaSearchException, SJobLogDeletionException {
+        final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId);
+        if (!jobLogs.isEmpty()) {
+            jobService.deleteJobLog(jobLogs.get(0));
         }
     }
 

@@ -36,35 +36,8 @@ import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.ActivityStates;
-import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ActivationState;
-import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessActivationException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
+import org.bonitasoft.engine.bpm.flownode.*;
+import org.bonitasoft.engine.bpm.process.*;
 import org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.TransitionDefinitionBuilder;
@@ -72,33 +45,14 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
-import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.identity.Group;
-import org.bonitasoft.engine.identity.GroupCreator;
-import org.bonitasoft.engine.identity.GroupCriterion;
-import org.bonitasoft.engine.identity.Role;
-import org.bonitasoft.engine.identity.RoleCreator;
-import org.bonitasoft.engine.identity.RoleCriterion;
-import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserCreator;
-import org.bonitasoft.engine.identity.UserCriterion;
-import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.identity.*;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.operation.LeftOperand;
-import org.bonitasoft.engine.operation.LeftOperandBuilder;
-import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.operation.*;
 import org.bonitasoft.engine.platform.PlatformState;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -106,26 +60,17 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.check.CheckNbOfActivities;
-import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivities;
-import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivityInstances;
-import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
-import org.bonitasoft.engine.test.check.CheckNbOfOpenActivities;
-import org.bonitasoft.engine.test.check.CheckNbOfProcessInstances;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
-import org.bonitasoft.engine.test.check.CheckProcessInstanceIsArchived;
-import org.bonitasoft.engine.test.wait.WaitForActivity;
-import org.bonitasoft.engine.test.wait.WaitForArchivedActivity;
-import org.bonitasoft.engine.test.wait.WaitForCompletedArchivedStep;
-import org.bonitasoft.engine.test.wait.WaitForEvent;
-import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
-import org.bonitasoft.engine.test.wait.WaitForFlowNode;
-import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
-import org.bonitasoft.engine.test.wait.WaitForStep;
-import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
+import org.bonitasoft.engine.test.check.*;
+import org.bonitasoft.engine.test.wait.*;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Emmanuel Duchastenier
@@ -693,11 +638,11 @@ public class APITestUtil {
         getProcessAPI().executeFlowNode(flowNodeId);
     }
 
-    public HumanTaskInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws TimeoutException, Exception {
+    public HumanTaskInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws Exception {
         return waitForUserTask(taskName, processInstance.getId(), DEFAULT_TIMEOUT);
     }
 
-    public HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId) throws TimeoutException, Exception {
+    public HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId) throws Exception {
         return waitForUserTask(taskName, processInstanceId, DEFAULT_TIMEOUT);
     }
 

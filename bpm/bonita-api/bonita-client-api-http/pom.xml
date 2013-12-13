@@ -13,6 +13,10 @@
 
 	<name>Bonita Client API: HTTP</name>
 
+	<properties>
+		<jetty.version>8.1.14.v20131031</jetty.version>
+	</properties>	
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
@@ -34,6 +38,10 @@
 			<artifactId>httpmime</artifactId>
 			<version>${httpclient.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.apache.httpcomponents</groupId> -->
 		<!-- <artifactId>httpnio</artifactId> -->
@@ -49,14 +57,56 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-jndi</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-plus</artifactId>
+			<version>${jetty.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>**/Test*.java</include>
+						<include>**/*Test.java</include>
+						<include>**/*IT.java</include>
+					</includes>	
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

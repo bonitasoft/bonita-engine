@@ -7,7 +7,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderServiceTest;
 import org.bonitasoft.engine.command.CommandServiceIntegrationTest;
 import org.bonitasoft.engine.continuation.WorkServiceTest;
 import org.bonitasoft.engine.data.DataTest;
-import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
+import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImplIT;
 import org.bonitasoft.engine.dependency.DependencyServiceTest;
 import org.bonitasoft.engine.exceptions.impl.ExceptionsManagerTests;
 import org.bonitasoft.engine.expression.ExpressionServiceTest;
@@ -44,7 +44,7 @@ import org.junit.runners.Suite.SuiteClasses;
         PlatformAuthenticationServiceTest.class,
         SessionServiceTest.class,
         PlatformSessionServiceTest.class,
-        DataInstanceServiceTest.class,
+        DataInstanceServiceImplIT.class,
         DependencyServiceTest.class,
         WorkServiceTest.class,
 

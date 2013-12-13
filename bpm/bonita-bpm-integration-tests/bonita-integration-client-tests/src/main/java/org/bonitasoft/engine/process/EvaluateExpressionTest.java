@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -305,7 +306,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "taskAssigneeId" }, story = "Evaluate engine constant expression taskAssigneeID.", jira = "ENGINE-1256")
     @Test
     public void evaluateAssigneeId() throws Exception {
-        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
+        final ActivityInstance userTaskInstance = waitForUserTaskAndAssigneIt(STEP1_NAME, processInstance, user);
 
         final Expression taskAssigneeExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.TASK_ASSIGNEE_ID);
         final Expression engineExecContextExpr = new ExpressionBuilder().createEngineConstant(ExpressionConstants.ENGINE_EXECUTION_CONTEXT);

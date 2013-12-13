@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,30 +11,21 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.dependency.model.builder;
+package org.bonitasoft.engine.scheduler.impl;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
+/**
+ * @author Celine Souchet
+ */
 
-public interface SPlatformDependencyMappingBuilderFactory {
+@RunWith(Suite.class)
+@SuiteClasses({
+        JobServiceImplForJobDescriptorTest.class, JobServiceImplForJobParameterTest.class, JobServiceImplForJobLogTest.class,
+        JobServiceImplForFailedJobTest.class
+})
+public class JobServiceImplTests {
 
-    SPlatformDependencyMappingBuilder createNewInstance(long dependencyId, long artifactId, String artifactType);
-<<<<<<< HEAD
-=======
-
-    String getIdKey();
-
-    String getDependencyIdKey();
-
-    String getArtifactIdKey();
-
-    String getArtifactTypeKey();
->>>>>>> fix services tests
-
-    String getIdKey();
-
-    String getDependencyIdKey();
-
-    String getArtifactIdKey();
-
-    String getArtifactTypeKey();
 }

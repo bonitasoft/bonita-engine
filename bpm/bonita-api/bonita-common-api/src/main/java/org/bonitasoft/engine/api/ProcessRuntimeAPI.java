@@ -102,7 +102,7 @@ public interface ProcessRuntimeAPI {
     SearchResult<HumanTaskInstance> searchPendingHiddenTasks(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * List all open process instances.
+     * List all open root process instances.
      * 
      * @param searchOptions
      *            the search criterion.
@@ -112,6 +112,18 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     SearchResult<ProcessInstance> searchOpenProcessInstances(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * List all process instances.
+     *
+     * @param searchOptions
+     *            the search criterion.
+     * @return a processInstance object.
+     * @throws SearchException
+     *             if an exception occurs when getting the list of tasks.
+     * @since 6.2
+     */
+    SearchResult<ProcessInstance> searchProcessInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
      * List all open process instances supervised by a user.
@@ -1725,7 +1737,7 @@ public interface ProcessRuntimeAPI {
     SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(long managerUserId, SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Search for archived process instances.
+     * Search for archived process instances. Only archived process instances in states COMPLETED, ABORTED, CANCELED and FAILED will be retrieved.
      * 
      * @param searchOptions
      *            the search options (pagination, filter, order sort).
@@ -1737,6 +1749,17 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Search for archived process instances in all states (even intermediate states). Depending on used filters several ArchivedProcessInstance will be
+     * retrieved for a single ProcessInstance (one for each reached state).
+     * 
+     * @param searchOptions the search options (pagination, filter, order sort).
+     * @return  the archived process instances in all states that match the search options.
+     * @throws SearchException if the search could not be completed correctly.
+     * @since 6.2
+     */
+    SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInAllStates(SearchOptions searchOptions) throws SearchException;
 
     /**
      * Search for archived process instances supervised by the specified user.
