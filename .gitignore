@@ -9,3 +9,4 @@ TemporaryAllBPMSPTestsWithJNDI.java
 TemporarySlowExecutionLocalIntegrationTestsSP.java
 bpm/bonita-integration-tests/bonita-integration-local-tests/src/test/java/com/bonitasoft/engine/DeployBarTest.java
 *.iml
+*.orig

@@ -30,7 +30,7 @@
 			<dependency>
 				<groupId>com.bonitasoft.manager</groupId>
 				<artifactId>manager</artifactId>
-				<version>1.1.4</version>
+				<version>1.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
@@ -96,8 +96,9 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
+							<id>attach-sources</id>
 								<goals>
-									<goal>jar</goal>
+									<goal>jar-no-fork</goal>
 								</goals>
 							</execution>
 						</executions>
@@ -118,8 +119,9 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
+							<id>attach-sources</id>
 								<goals>
-									<goal>jar</goal>
+									<goal>jar-no-fork</goal>
 								</goals>
 							</execution>
 						</executions>
@@ -140,8 +142,9 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
+							<id>attach-sources</id>
 								<goals>
-									<goal>jar</goal>
+									<goal>jar-no-fork</goal>
 								</goals>
 							</execution>
 						</executions>
