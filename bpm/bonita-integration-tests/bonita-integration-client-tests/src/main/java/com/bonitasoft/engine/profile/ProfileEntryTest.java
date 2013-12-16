@@ -244,7 +244,9 @@ public class ProfileEntryTest extends AbstractProfileTest {
         builder.filter(ProfileEntrySearchDescriptor.PROFILE_ID, profileId);
         builder.filter(ProfileEntrySearchDescriptor.PARENT_ID, folderProfileEntry.getId());
         final List<ProfileEntry> resultProfileEntries = getProfileAPI().searchProfileEntries(builder.done()).getResult();
-        assertEquals(profileEntries, resultProfileEntries);
+        for (final ProfileEntry resultProfileEntry : resultProfileEntries) {
+            assertEquals(profileEntries.get(resultProfileEntries.indexOf(resultProfileEntry)).getId(), resultProfileEntry.getId());
+        }
         assertEquals(0L, resultProfileEntries.get(0).getIndex());
         assertEquals(2L, resultProfileEntries.get(1).getIndex());
         assertEquals(4L, resultProfileEntries.get(2).getIndex());
