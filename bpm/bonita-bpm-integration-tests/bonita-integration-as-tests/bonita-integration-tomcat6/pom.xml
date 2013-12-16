@@ -26,6 +26,9 @@
 		<bonita.home>${tomcat.home}/bonita</bonita.home>
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
 		<db.vendor>h2</db.vendor>
+		<cargo.jvmargs>-Xms128m -Xmx512m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+		<!-- -Xdebug -->
+		<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE -->
 	</properties>
 
 	<dependencies>
@@ -54,7 +57,6 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
@@ -288,13 +290,7 @@
 								<home>${tomcat.home}</home>
 								<properties>
 									<cargo.servlet.port>${provider.port}</cargo.servlet.port>
-									<cargo.jvmargs>
-									<!-- -Xdebug -->
-									<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -->
-									<!-- -Xnoagent -->
-									<!-- -Djava.compiler=NONE -->
-									 -XX:+HeapDumpOnOutOfMemoryError
-									</cargo.jvmargs>
+									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
 								</properties>
 							</configuration>
 							<wait>false</wait>
