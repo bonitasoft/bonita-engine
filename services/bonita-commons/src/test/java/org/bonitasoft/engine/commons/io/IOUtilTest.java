@@ -2,9 +2,14 @@ package org.bonitasoft.engine.commons.io;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -49,5 +54,27 @@ public class IOUtilTest {
 		}
 		byte[] byteArray = IOUtil.toByteArray(document);
 		assertThat(byteArray).isNotNull();
+	}
+	
+	@Test
+	public void shouldAddJarEntry_AddAnEntryInExistingJar() throws Exception {
+		byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
+		byte[] entryContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("persistence.xml").getFile()));
+		String entryName = "META-INF/persistence.xml";
+		byte[] updatedJar = IOUtil.addJarEntry(jarContent, entryName, entryContent);
+		assertThat(updatedJar).isNotNull();
+		
+		ByteArrayInputStream bais = new ByteArrayInputStream(updatedJar);
+		JarInputStream jis = new JarInputStream(bais);
+		JarEntry entry = null;
+		Map<String,byte[]> entryNames = new HashMap<String, byte[]>();
+		while ((entry = jis.getNextJarEntry()) != null) {
+			byte[] currentEntryContent = new byte[(int) entry.getSize()];
+			jis.read(currentEntryContent);
+			entryNames.put(entry.getName(),currentEntryContent);
+		}
+		jis.close();
+		assertThat(entryNames.keySet()).contains(entryName);
+		assertThat(entryNames.get(entryName)).isEqualTo(entryContent);
 	}
 }

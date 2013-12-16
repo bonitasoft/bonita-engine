@@ -414,4 +414,29 @@ public class IOUtil {
 		}
 	}
 
+	public static byte[] addJarEntry(byte[] jarToUpdate, String entryName,byte[] entryContent) throws IOException {
+		ByteArrayOutputStream out = null;
+		JarOutputStream tempJar = null;
+		try {
+			out = new ByteArrayOutputStream();
+			out.write(jarToUpdate);
+
+			tempJar = new JarOutputStream(out);
+			
+			JarEntry entry = new JarEntry(entryName);
+			tempJar.putNextEntry(entry);
+			tempJar.write(entryContent);
+			tempJar.closeEntry();
+			tempJar.finish();
+			return out.toByteArray();
+		}finally{
+			if(tempJar != null){
+				tempJar.close();
+			}
+			if(out != null){
+				out.close();
+			}
+		}
+	}
+
 }
