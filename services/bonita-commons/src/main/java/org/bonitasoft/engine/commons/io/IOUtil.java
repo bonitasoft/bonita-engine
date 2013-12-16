@@ -17,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,9 +30,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipInputStream;
 
@@ -52,6 +56,30 @@ public class IOUtil {
             file.mkdirs();
         }
         return file;
+    }
+
+    public static List<String> getClassNameList(final byte[] jarContent) throws IOException {
+        final List<String> classes = new ArrayList<String>(10);
+        JarInputStream stream = null;
+        try {
+            stream = new JarInputStream(new ByteArrayInputStream(jarContent));
+            JarEntry nextJarEntry = null;
+            while ((nextJarEntry = stream.getNextJarEntry()) != null) {
+                String name = nextJarEntry.getName();
+                if (name.endsWith(".class")) {
+                    classes.add(toQualifiedClassName(name));
+                }
+            }
+        } finally {
+            if (stream != null) {
+                stream.close();
+            }
+        }
+        return classes;
+    }
+
+    private static String toQualifiedClassName(final String name) {
+        return name.replace('/', '.').replaceAll(".class", "");
     }
 
     public static File createTempFile(final String prefix, final String suffix, final File directory) throws IOException {
@@ -280,6 +308,27 @@ public class IOUtil {
         }
         return retries > 0;
     }
+
+    //
+    // public static String getFileContent(final byte[] textFileContent) {
+    // final StringBuilder sb = new StringBuilder();
+    // try {
+    // final BufferedInputStream is = new BufferedInputStream(new ByteArrayInputStream(textFileContent));
+    // try {
+    // byte[] buff = new byte[256];
+    // int read = 0;
+    // while ((read = is.read(buff)) != 0) {
+    // sb.append(buff);
+    // }
+    // } finally {
+    // is.close();
+    // }
+    // } catch (final IOException ex) {
+    // ex.printStackTrace();
+    // }
+    //
+    // return sb.toString();
+    // }
 
     public static String getFileContent(final File file) {
         final StringBuilder sb = new StringBuilder();
