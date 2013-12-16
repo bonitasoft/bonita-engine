@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-scheduler</artifactId>
 		<groupId>org.bonitasoft.engine.scheduler</groupId>
-		<version>6.2.0.alpha-TestOneClick</version>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-scheduler-quartz</artifactId>

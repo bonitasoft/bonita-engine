@@ -6,7 +6,7 @@
   <parent>
     <artifactId>bonita-lock</artifactId>
     <groupId>org.bonitasoft.engine.lock</groupId>
-    <version>6.2.0.alpha-TestOneClick</version>
+    <version>6.2.0-SNAPSHOT</version>
   </parent>
   
   <artifactId>bonita-lock-api</artifactId>
