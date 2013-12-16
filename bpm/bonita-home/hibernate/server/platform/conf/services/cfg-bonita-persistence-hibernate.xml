@@ -86,6 +86,7 @@
 				<entry key="org.bonitasoft.engine.profile.model.SProfile" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
 				<entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
 				<entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
+				<entry key="org.bonitasoft.engine.theme.model.STheme" value="org.bonitasoft.engine.theme.model.impl.SThemeImpl" />
 
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SABooleanDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABooleanDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAIntegerDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAIntegerDataInstanceImpl" />
@@ -294,6 +295,7 @@
 				<ref bean="hbm-bos-process-document-mapping-model" />
 				<ref bean="hbm-bos-process-document-mapping-model-arch" />
 				<ref bean="hbm-bos-profile-model" />
+				<ref bean="hbm-bos-theme-model" />
 				<ref bean="hbm-bos-supervisor-mapping" />
 				<ref bean="hbm-bos-external-identity-mapping" />
 				<ref bean="hbm-bos-reporting-model" />
@@ -332,6 +334,7 @@
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="read-write" />
+				<entry key="org.bonitasoft.engine.theme.model.impl.SThemeImpl" value="read-write"/>
 				<entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="read-write" />

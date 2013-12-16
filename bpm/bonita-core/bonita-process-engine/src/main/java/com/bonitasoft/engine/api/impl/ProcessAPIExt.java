@@ -639,7 +639,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     parasF.createNewFile();
                 }
                 final String content = IOUtil.read(currentParasF);
-                IOUtil.write(parasF, content);
+                IOUtil.writeContentToFile(content, parasF);
             }
 
             // export actormapping
@@ -653,7 +653,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             } catch (final ActorMappingExportException e) {
                 throw new ProcessExportException(e);
             }
-            IOUtil.write(actormappF, xmlcontent);
+            IOUtil.writeContentToFile(xmlcontent, actormappF);
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             final ZipOutputStream zos = new ZipOutputStream(baos);
@@ -1018,7 +1018,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
         try {
             final SearchProcessInstances searchProcessInstances = new SearchProcessInstances(processInstanceService,
-                    searchEntitiesDescriptor.getProcessInstanceDescriptor(), searchOptions, processDefinitionService);
+                    searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), searchOptions, processDefinitionService);
             searchProcessInstances.execute();
             return searchProcessInstances.getResult();
         } catch (final SBonitaException sbe) {
