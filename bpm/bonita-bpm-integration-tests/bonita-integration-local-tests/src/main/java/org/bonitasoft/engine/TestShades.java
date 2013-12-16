@@ -37,7 +37,7 @@ public class TestShades {
         String outputOfMaven;
         try {
             File file2 = new File(file, "pom.xml");
-            IOUtil.write(file2, thePom);
+            IOUtil.writeContentToFile(thePom, file2);
             System.out.println("building " + file2.getAbsolutePath());
             System.out.println("Run mvn in " + file.getAbsolutePath());
             Process exec = Runtime.getRuntime().exec(mvn + " dependency:tree", null, file);

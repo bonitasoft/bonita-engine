@@ -81,7 +81,7 @@ public class BusinessArchiveTests {
             final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
             BusinessArchiveFactory.writeBusinessArchiveToFolder(businessArchive, tempFolder);
             final File infoFile = new File(tempFolder, ProcessDefinitionBARContribution.PROCESS_INFOS_FILE);
-            IOUtil.write(infoFile, "bad process infos");
+            IOUtil.writeContentToFile("bad process infos", infoFile);
             BusinessArchiveFactory.readBusinessArchive(tempFolder);
         } finally {
             deleteDir(tempFolder);
@@ -1043,7 +1043,7 @@ public class BusinessArchiveTests {
         fileContent = fileContent.replace("</processDefinition", "</porcessDefinition");
         file.delete();
         file.createNewFile();
-        IOUtil.write(file, fileContent);
+        IOUtil.writeContentToFile(fileContent, file);
         try {
             BusinessArchiveFactory.readBusinessArchive(tempFile);
         } finally {
@@ -1083,7 +1083,7 @@ public class BusinessArchiveTests {
         fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
         file.delete();
         file.createNewFile();
-        IOUtil.write(file, fileContent);
+        IOUtil.writeContentToFile(fileContent, file);
         try {
             BusinessArchiveFactory.readBusinessArchive(tempFile);
         } finally {

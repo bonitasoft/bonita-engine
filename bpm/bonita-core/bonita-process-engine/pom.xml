@@ -168,6 +168,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.bonitasoft.engine.theme</groupId>
+            <artifactId>bonita-theme-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.scheduler</groupId>
             <artifactId>bonita-scheduler-api</artifactId>
             <version>${project.version}</version>

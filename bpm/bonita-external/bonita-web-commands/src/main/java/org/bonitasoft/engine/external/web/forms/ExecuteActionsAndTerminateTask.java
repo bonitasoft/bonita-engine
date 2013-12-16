@@ -113,7 +113,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         try {
             while (iterator.hasNext()) {
                 final Operation entry = iterator.next();
-                operationService.execute(ModelConvertor.constructSOperation(entry, tenantAccessor), activityInstanceId,
+                operationService.execute(ModelConvertor.constructSOperation(entry), activityInstanceId,
                         DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
             }
         } catch (final SBonitaException e) {

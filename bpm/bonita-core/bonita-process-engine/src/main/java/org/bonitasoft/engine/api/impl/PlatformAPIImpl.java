@@ -122,6 +122,22 @@ public class PlatformAPIImpl implements PlatformAPI {
 
     private static boolean isNodeStarted = false;
 
+    private final PlatformAPIImplDelegate delegate;
+
+    public PlatformAPIImpl() {
+        super();
+        delegate = new PlatformAPIImplDelegate();
+    }
+
+    public PlatformAPIImpl(final PlatformAPIImplDelegate delegate) {
+        super();
+        this.delegate = delegate;
+    }
+
+    protected PlatformAPIImplDelegate getDelegate() {
+        return delegate;
+    }
+
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
@@ -518,25 +534,28 @@ public class PlatformAPIImpl implements PlatformAPI {
                 deleteTenant(tenant.getId());
                 throw new STenantCreationException("Access File Exception!");
             }
+
+            // Create session
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final CommandService commandService = tenantServiceAccessor.getCommandService();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
-
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
-
             sessionAccessor.setSessionInfo(session.getId(), tenantId);// necessary to create default data source
-            createDefaultDataSource(dataService);
-            final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
-            createDefaultCommands(commandService, defaultCommandProvider);
-            final Parser profileParser = tenantServiceAccessor.getProfileParser();
-            final ProfileService profileService = tenantServiceAccessor.getProfileService();
-            final IdentityService identityService = tenantServiceAccessor.getIdentityService();
-            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-            createDefaultProfiles(tenantId, profileParser, profileService, identityService, logger);
+
+            // Create default data source
+            createDefaultDataSource(tenantServiceAccessor);
+
+            // Create default commands
+            createDefaultCommands(tenantServiceAccessor);
+
+            // Create default profiles
+            createDefaultProfiles(tenantServiceAccessor);
+
+            // Create default themes : Portal and Mobile
+            getDelegate().createDefaultThemes(tenantServiceAccessor);
+
             sessionService.deleteSession(session.getId());
         } catch (final Exception e) {
             throw new STenantCreationException("Unable to create tenant " + tenantName, e);
@@ -546,19 +565,23 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     @SuppressWarnings("unchecked")
-    protected void createDefaultProfiles(final Long tenantId, final Parser parser, final ProfileService profileService, final IdentityService identityService,
-            final TechnicalLoggerService logger) throws Exception {
-        final InputStream profilesIS = Thread.currentThread().getContextClassLoader().getResourceAsStream(getProfileFileName());
-        if (profilesIS == null) {
+    protected void createDefaultProfiles(final TenantServiceAccessor tenantServiceAccessor) throws Exception {
+        final Parser parser = tenantServiceAccessor.getProfileParser();
+        final ProfileService profileService = tenantServiceAccessor.getProfileService();
+        final IdentityService identityService = tenantServiceAccessor.getIdentityService();
+
+        final String xmlContent;
+        final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(getProfileFileName());
+        if (inputStream == null) {
             // no default profiles
             return;
         }
-        final String xmlContent;
         try {
-            xmlContent = IOUtils.toString(profilesIS, org.bonitasoft.engine.io.IOUtil.fEncoding);
+            xmlContent = IOUtils.toString(inputStream, org.bonitasoft.engine.io.IOUtil.fEncoding);
         } finally {
-            profilesIS.close();
+            inputStream.close();
         }
+
         StringReader reader = new StringReader(xmlContent);
         List<ExportedProfile> profiles;
         try {
@@ -574,10 +597,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected String getProfileFileName() {
-        return PROFILES_FILE;
-    }
-
     protected void cleanSessionAccessor(final SessionAccessor sessionAccessor, final long platformSessionId) {
         if (sessionAccessor != null) {
             sessionAccessor.deleteSessionId();
@@ -587,8 +606,10 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void createDefaultCommands(final CommandService commandService, final DefaultCommandProvider provider)
+    protected void createDefaultCommands(final TenantServiceAccessor tenantServiceAccessor)
             throws SCommandAlreadyExistsException, SCommandCreationException {
+        final CommandService commandService = tenantServiceAccessor.getCommandService();
+        final DefaultCommandProvider provider = tenantServiceAccessor.getDefaultCommandProvider();
         final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
         for (final CommandDescriptor command : provider.getDefaultCommands()) {
             final SCommand sCommand = fact.createNewInstance(command.getName(), command.getDescription(), command.getImplementation())
@@ -597,8 +618,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void createDefaultDataSource(final DataService dataService)
-            throws SDataSourceAlreadyExistException, SDataException {
+    protected void createDefaultDataSource(final TenantServiceAccessor tenantServiceAccessor) throws SDataSourceAlreadyExistException, SDataException {
+        final DataService dataService = tenantServiceAccessor.getDataService();
         final SDataSource bonitaDataSource = BuilderFactory.get(SDataSourceBuilderFactory.class)
                 .createNewInstance("bonita_data_source", "6.0", SDataSourceState.ACTIVE, "org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl")
                 .done();
@@ -811,6 +832,11 @@ public class PlatformAPIImpl implements PlatformAPI {
     @AvailableOnStoppedNode
     public boolean isNodeStarted() {
         return isNodeStarted;
+    }
+
+    // Overrided in SP
+    protected String getProfileFileName() {
+        return PROFILES_FILE;
     }
 
 }

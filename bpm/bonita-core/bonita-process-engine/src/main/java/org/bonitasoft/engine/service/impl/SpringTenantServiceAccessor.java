@@ -88,6 +88,7 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
+import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.ElementBinding;
@@ -217,6 +218,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private SchedulerService schedulerService;
 
     private JobService jobService;
+
+    private ThemeService themeService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -737,6 +740,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             jobService = beanAccessor.getService(JobService.class);
         }
         return jobService;
+    }
+
+    @Override
+    public ThemeService getThemeService() {
+        if (themeService == null) {
+            themeService = beanAccessor.getService(ThemeService.class);
+        }
+        return themeService;
     }
 
     @Override

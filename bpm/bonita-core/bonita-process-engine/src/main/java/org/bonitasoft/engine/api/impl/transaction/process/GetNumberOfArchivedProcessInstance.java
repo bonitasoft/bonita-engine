@@ -50,7 +50,7 @@ public class GetNumberOfArchivedProcessInstance implements TransactionContentWit
     @Override
     public void execute() throws SBonitaException {
         final SearchArchivedProcessInstances searchProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
-                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), null);
+                searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), null);
         final SAProcessInstanceBuilderFactory saProcessInstanceBuilder = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
         final List<FilterOption> filterOptions = new ArrayList<FilterOption>(2);
         filterOptions.add(new FilterOption(SAProcessInstance.class, saProcessInstanceBuilder.getStateIdKey(), ProcessInstanceState.COMPLETED.getId()));

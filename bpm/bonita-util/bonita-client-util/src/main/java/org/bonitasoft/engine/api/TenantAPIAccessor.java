@@ -72,7 +72,7 @@ public final class TenantAPIAccessor {
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI, session);
         return (T) Proxy.newProxyInstance(APIAccessor.class.getClassLoader(), new Class[] { clazz }, sessionInterceptor);
     }
-    
+
     private static <T> T getAPI(final Class<T> clazz) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         final ServerAPI serverAPI = getServerAPI();
         final ClientInterceptor sessionInterceptor = new ClientInterceptor(clazz.getName(), serverAPI);
@@ -80,7 +80,7 @@ public final class TenantAPIAccessor {
     }
 
     public static LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-    	return getAPI(LoginAPI.class);
+        return getAPI(LoginAPI.class);
     }
 
     public static IdentityAPI getIdentityAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
@@ -97,6 +97,10 @@ public final class TenantAPIAccessor {
 
     public static ProfileAPI getProfileAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ProfileAPI.class, session);
+    }
+
+    public static ThemeAPI getThemeAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getAPI(ThemeAPI.class, session);
     }
 
 }
