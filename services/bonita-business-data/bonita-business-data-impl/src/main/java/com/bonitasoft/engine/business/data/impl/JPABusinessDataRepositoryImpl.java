@@ -20,32 +20,79 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.xml.sax.SAXException;
+import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.dependency.SDependencyAlreadyExistsException;
+import org.bonitasoft.engine.dependency.SDependencyCreationException;
+import org.bonitasoft.engine.dependency.SDependencyException;
+import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Romain Bioteau
  */
 public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 
 	private EntityManagerFactory entityManagerFactory;
 
+	private DependencyService dependencyService;
+
+	public JPABusinessDataRepositoryImpl(DependencyService dependencyService) {
+		this.dependencyService = dependencyService;
+	}
+
 	@Override
-	public void deploy(final byte[] bdrArchive) {
-		transformBDRArchive(bdrArchive);
+	public void deploy(final byte[] bdrArchive,long tenantId) throws SBusinessDataRepositoryException {
+		byte[] transformedBdrArchive = null;
+		try {
+			transformedBdrArchive = transformBDRArchive(bdrArchive);
+		}  catch (IOException e) {
+			throw new SBusinessDataRepositoryDeploymentException(e);
+		} catch (TransformerException e) {
+			throw new SBusinessDataRepositoryDeploymentException(e);
+		}
+		
+		final SDependency sDependency = createSDependency(transformedBdrArchive);
+		try {
+			dependencyService.createDependency(sDependency);
+		} catch (SDependencyAlreadyExistsException e) {
+			throw new SBusinessDataRepositoryDeploymentException(e);
+		} catch (SDependencyCreationException e) {
+			throw new SBusinessDataRepositoryDeploymentException(e);
+		}
+		final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
+		try {
+			dependencyService.createDependencyMapping(sDependencyMapping);
+		} catch (SDependencyException e) {
+			throw new SBusinessDataRepositoryDeploymentException(e);
+		}
 
 	}
 
-	protected void transformBDRArchive(final byte[] bdrArchive) {
+	protected SDependencyMapping createDependencyMapping(long tenantId,
+			final SDependency sDependency) {
+		return BuilderFactory.get(SDependencyMappingBuilderFactory.class)
+				.createNewInstance(sDependency.getId(),tenantId , "tenant").done();
+	}
+
+	protected SDependency createSDependency(byte[] transformedBdrArchive) {
+		return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance("BDR", "1.0", "BDR.jar", transformedBdrArchive).done();
+	}
+
+	protected byte[] transformBDRArchive(final byte[] bdrArchive) throws SBusinessDataRepositoryDeploymentException, IOException, TransformerException {
 		List<String> classNameList = null;
 		try {
 			classNameList = IOUtil.getClassNameList(bdrArchive);
@@ -56,23 +103,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 		if (classNameList == null || classNameList.isEmpty()) {
 			throw new IllegalStateException("No entity found in bdr archive");
 		}
-		byte[] persistenceFileContent = null;
-		try {
-			persistenceFileContent = getPersistenceFileContentFor(classNameList);
-		} catch (ParserConfigurationException e) {
-			throw new SBonitaRuntimeException(e);
-		} catch (SAXException e) {
-			throw new SBonitaRuntimeException(e);
-		} catch (IOException e) {
-			throw new SBonitaRuntimeException(e);
-		} catch (TransformerFactoryConfigurationError e) {
-			throw new SBonitaRuntimeException(e);
-		} catch (TransformerException e) {
-			throw new SBonitaRuntimeException(e);
-		}
+		byte[] persistenceFileContent = getPersistenceFileContentFor(classNameList);
+		return IOUtil.addJarEntry(bdrArchive,"META-INF/persistence.xml",persistenceFileContent);
+
 	}
 
-	protected byte[] getPersistenceFileContentFor(final List<String> classNames) throws IOException, TransformerException, ParserConfigurationException, SAXException {
+	protected byte[] getPersistenceFileContentFor(final List<String> classNames) throws SBusinessDataRepositoryDeploymentException, IOException, TransformerException {
 		PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
 		for(String classname : classNames){
 			builder.addClass(classname);

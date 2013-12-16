@@ -29,6 +29,7 @@ import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
 /**
  * @author Matthieu Chaffotte
@@ -52,7 +53,7 @@ public class BusinessDataRepositoryImpl implements BusinessDataRespository {
     }
 
     @Override
-    public void deploy(final byte[] bdrArchive) {
+    public void deploy(final byte[] bdrArchive,long tenantId) throws SBusinessDataRepositoryException{
         // does nothing for now, this implem will disappear.
     }
 

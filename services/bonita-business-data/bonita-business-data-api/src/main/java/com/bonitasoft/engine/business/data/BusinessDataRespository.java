@@ -26,6 +26,6 @@ public interface BusinessDataRespository {
 
     void persist(Object entity);
 
-    void deploy(byte[] bdrArchive);
+    void deploy(byte[] bdrArchive,long tenantId) throws SBusinessDataRepositoryException;
 
 }

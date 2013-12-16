@@ -5,7 +5,6 @@
 	<persistence-unit name="BDR" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:comp/env/bonitaDS</jta-data-source>
-<!-- 		<class>org.bonita.pojo.Employee</class> -->
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />

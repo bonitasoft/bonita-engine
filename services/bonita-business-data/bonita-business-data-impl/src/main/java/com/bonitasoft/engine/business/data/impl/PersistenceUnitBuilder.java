@@ -25,12 +25,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 
 /**
  * @author Romain Bioteau
@@ -41,39 +42,39 @@ public class PersistenceUnitBuilder {
 	private Document document;
 	private Set<String> classes = new HashSet<String>();
 
-	public PersistenceUnitBuilder(){
+	public PersistenceUnitBuilder() throws SBusinessDataRepositoryDeploymentException{
 		document = initializeDefaultPersistenceDocument();
 	}
 
-	protected Document initializeDefaultPersistenceDocument() {
+	protected Document initializeDefaultPersistenceDocument() throws SBusinessDataRepositoryDeploymentException {
 		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setValidating(false);
 		DocumentBuilder documentBuilder = null;
 		try {
 			documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			throw new SBonitaRuntimeException(e);
+			throw new SBusinessDataRepositoryDeploymentException(e);
 		}
 		InputStream is = null ;
 		try{
 			is = JPABusinessDataRepositoryImpl.class.getResourceAsStream("persistence.xml");
 			return documentBuilder.parse(is);
 		} catch (SAXException e) {
-			throw new SBonitaRuntimeException(e);
+			throw new SBusinessDataRepositoryDeploymentException(e);
 		} catch (IOException e) {
-			throw new SBonitaRuntimeException(e);
+			throw new SBusinessDataRepositoryDeploymentException(e);
 		}finally{
 			if(is != null){
 				try {
 					is.close();
 				} catch (IOException e) {
-					throw new SBonitaRuntimeException(e);
+					throw new SBusinessDataRepositoryDeploymentException(e);
 				}
 			}
 		}
 	}
 
-	public Document done() throws ParserConfigurationException, SAXException, IOException {
+	public Document done() {
 		insertClasses();
 		return document;
 	}
@@ -90,10 +91,7 @@ public class PersistenceUnitBuilder {
 
 	private Node getPersistenceUnitNode() {
 		NodeList parentElement = document.getElementsByTagName("persistence-unit");
-		if (parentElement.getLength() > 0) {
-			return parentElement.item(0);
-		}
-		return null;
+		return parentElement.item(0);
 	}
 
 	public PersistenceUnitBuilder addClass(String classname) {
