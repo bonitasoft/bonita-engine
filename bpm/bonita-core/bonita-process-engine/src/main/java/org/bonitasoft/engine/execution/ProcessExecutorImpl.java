@@ -100,6 +100,11 @@ import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
+import org.bonitasoft.engine.execution.flowmerger.FlowMerger;
+import org.bonitasoft.engine.execution.flowmerger.FlowNodeTransitionsWrapper;
+import org.bonitasoft.engine.execution.flowmerger.SFlowNodeWrapper;
+import org.bonitasoft.engine.execution.flowmerger.TokenInfo;
+import org.bonitasoft.engine.execution.flowmerger.TokenProvider;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.WorkFactory;
@@ -785,8 +790,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // token we merged
         final int numberOfTokenToMerge = getNumberOfTokenToMerge(child);
         final SFlowNodeDefinition flowNode = sProcessDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
-        FlowNodeTransitionsDescriptor transitionsDescriptor = getTransitionsDescriptor(flowNode, sProcessDefinition, child);
-        GatewayMergeDescriptor mergeDescriptor = new GatewayMergeDescriptor(child, sProcessInstance, flowNode, transitionsDescriptor, tokenService);;
+        SFlowNodeWrapper flowNodeWrapper = new SFlowNodeWrapper(flowNode);
+        FlowNodeTransitionsWrapper transitionsDescriptor = getTransitionsDescriptor(flowNode, sProcessDefinition, child);
+        TokenProvider tokenProvider = new TokenProvider(child, sProcessInstance, flowNodeWrapper, transitionsDescriptor, tokenService);
+        FlowMerger mergeDescriptor = new FlowMerger(flowNodeWrapper, transitionsDescriptor, tokenProvider);
         
         archiveInvalidTransitions(child, transitionsDescriptor);
 
@@ -806,10 +813,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         archiveFlowNodeInstance(sProcessDefinition, child, sProcessInstance);
 
+        TokenInfo outputTokenInfo = mergeDescriptor.getOutputTokenInfo();
         // execute transition/activities
-        createAndExecuteActivities(sProcessDefinition.getId(), child, sProcessInstance.getId(), chosenFlowNode, child.getRootProcessInstanceId(), mergeDescriptor.getOutputTokenRefId());
+        createAndExecuteActivities(sProcessDefinition.getId(), child, sProcessInstance.getId(), chosenFlowNode, child.getRootProcessInstanceId(), outputTokenInfo.outputTokenRefId);
         for (STransitionDefinition sTransitionDefinition : chosenGatewaysTransitions) {
-            executeGateway(sProcessDefinition, sTransitionDefinition, child, mergeDescriptor.getOutputTokenRefId());
+            executeGateway(sProcessDefinition, sTransitionDefinition, child, outputTokenInfo.outputTokenRefId);
         }
 
         return updateTokens(sProcessDefinition, child, sProcessInstance, numberOfTokenToMerge, transitionsDescriptor, mergeDescriptor);
@@ -824,7 +832,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private int updateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
-            final int numberOfTokenToMerge, FlowNodeTransitionsDescriptor transitionsDescriptor, GatewayMergeDescriptor mergeDescriptor)
+            final int numberOfTokenToMerge, FlowNodeTransitionsWrapper transitionsDescriptor, FlowMerger mergeDescriptor)
             throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
             WorkRegisterException, SBonitaException {
         // handle token creation/deletion
@@ -832,7 +840,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             tokenService.deleteTokens(sProcessInstance.getId(), child.getTokenRefId(), numberOfTokenToMerge);
         }
         if (mergeDescriptor.mustCreateToken()) {
-            tokenService.createTokens(sProcessInstance.getId(), mergeDescriptor.getOutputTokenRefId(), mergeDescriptor.getOutputParentTokenRefId(), transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
+            TokenInfo outputTokenInfo = mergeDescriptor.getOutputTokenInfo();
+            tokenService.createTokens(sProcessInstance.getId(), outputTokenInfo.outputTokenRefId, outputTokenInfo.outputParentTokenRefId, transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
         }
         if (mergeDescriptor.isImplicitEnd()) {
             final Long tokenRefId = child.getTokenRefId();
@@ -844,7 +853,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return tokenService.getNumberOfToken(sProcessInstance.getId());
     }
 
-    private void archiveInvalidTransitions(final SFlowNodeInstance child, FlowNodeTransitionsDescriptor transitionsDescriptor)
+    private void archiveInvalidTransitions(final SFlowNodeInstance child, FlowNodeTransitionsWrapper transitionsDescriptor)
             throws STransitionCreationException {
         for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getAllOutgoingTransitionDefinitions()) {
             if (!transitionsDescriptor.getValidOutgoingTransitionDefinitions().contains(sTransitionDefinition)) {
@@ -854,8 +863,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    private FlowNodeTransitionsDescriptor getTransitionsDescriptor(final SFlowNodeDefinition flowNode, SProcessDefinition sProcessDefinition, SFlowNodeInstance child) throws SBonitaException {
-        FlowNodeTransitionsDescriptor transitionsDescriptor = new FlowNodeTransitionsDescriptor();
+    private FlowNodeTransitionsWrapper getTransitionsDescriptor(final SFlowNodeDefinition flowNode, SProcessDefinition sProcessDefinition, SFlowNodeInstance child) throws SBonitaException {
+        FlowNodeTransitionsWrapper transitionsDescriptor = new FlowNodeTransitionsWrapper();
         // Retrieve all outgoing transitions
         if (flowNode == null) {
             // not in definition
