@@ -28,7 +28,7 @@ import org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl;
 public class SDataInstanceBuilderImpl implements SDataInstanceBuilder {
 
     private final SDataInstanceImpl dataInstanceImpl;
-    
+
     public SDataInstanceBuilderImpl(final SDataInstanceImpl dataInstanceImpl) {
         super();
         this.dataInstanceImpl = dataInstanceImpl;
