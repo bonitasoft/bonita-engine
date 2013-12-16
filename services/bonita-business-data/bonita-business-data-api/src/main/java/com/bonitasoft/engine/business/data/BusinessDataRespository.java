@@ -26,4 +26,6 @@ public interface BusinessDataRespository {
 
     void persist(Object entity);
 
+    void deploy(byte[] bdrArchive);
+
 }

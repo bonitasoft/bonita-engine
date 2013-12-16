@@ -52,6 +52,11 @@ public class BusinessDataRepositoryImpl implements BusinessDataRespository {
     }
 
     @Override
+    public void deploy(final byte[] bdrArchive) {
+        // does nothing for now, this implem will disappear.
+    }
+
+    @Override
     public void start() {
         final Configuration cfg = new Configuration().configure("/hibernate3.cfg.xml");
         cfg.getProperties().remove("hibernate.hbm2ddl.auto");
