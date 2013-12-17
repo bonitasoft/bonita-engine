@@ -9,15 +9,20 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+
+import org.hibernate.dialect.Dialect;
 
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
@@ -35,9 +40,31 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
         final Map<String, Object> configOverrides = new HashMap<String, Object>();
         configOverrides.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
         entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configOverrides);
+        Properties properties = toProperties(entityManagerFactory.getProperties());
+		Dialect dialect = Dialect.getDialect(properties);
+		try {
+			executeQueries(new SchemaGenerator(dialect,properties).generate());
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
     }
+    
+    private void executeQueries(final String... sqlQuerys) {
+        final EntityManager entityManager = getEntityManager();
+        for (final String sqlQuery : sqlQuerys) {
+        	System.out.println(sqlQuery);
+            final Query query = entityManager.createNativeQuery(sqlQuery);
+            query.executeUpdate();
+        }
+    }
+    
+    private Properties toProperties(Map<String, Object> propertiesAsMap) {
+		Properties properties = new Properties();
+		properties.putAll(propertiesAsMap);
+		return properties;
+	}
 
-    @Override
+	@Override
     public void stop() {
         if (entityManagerFactory != null) {
             entityManagerFactory.close();
