@@ -195,6 +195,24 @@ public class IOUtil {
 		return baos.toByteArray();
 	}
 
+	public static void generateJar(byte[] content,File targetJarFile) throws IOException {
+		if (content == null || content.length == 0) {
+			final String message = "No content available";
+			throw new IOException(message);
+		}
+		FileOutputStream fos = null;
+
+		try {
+			fos = new FileOutputStream(targetJarFile);
+			fos.write(content);
+			fos.flush();
+		} finally {
+			if (fos != null) {
+				fos.close();
+			}
+		}
+	}
+
 	/**
 	 * Return the whole underlying stream content into a single String.
 	 * Warning: the whole content of stream will be kept in memory!! Use with
@@ -416,27 +434,46 @@ public class IOUtil {
 
 	public static byte[] addJarEntry(byte[] jarToUpdate, String entryName,byte[] entryContent) throws IOException {
 		ByteArrayOutputStream out = null;
-		JarOutputStream tempJar = null;
+		ByteArrayInputStream bais = null;
+		JarOutputStream jos = null;
+		JarInputStream jis = null;
+		byte[] buffer = new byte[4096];
 		try {
+			bais = new ByteArrayInputStream(jarToUpdate);
+			jis = new JarInputStream(bais);
 			out = new ByteArrayOutputStream();
-			out.write(jarToUpdate);
-
-			tempJar = new JarOutputStream(out);
-			
+			jos = new JarOutputStream(out);
+			JarEntry inEntry;
+			while ((inEntry=(JarEntry)jis.getNextEntry())!=null){
+				if (!inEntry.getName().equals(entryName)){
+					jos.putNextEntry(new JarEntry(inEntry));
+				}else {
+					throw new IllegalArgumentException("Jar entry " +entryName +" already exists in jar to update");
+				}
+				int len;
+				while ((len=jis.read(buffer))>0) {
+					jos.write(buffer, 0, len);
+				}
+				jos.flush();
+			}
 			JarEntry entry = new JarEntry(entryName);
-			tempJar.putNextEntry(entry);
-			tempJar.write(entryContent);
-			tempJar.closeEntry();
-			tempJar.finish();
+			jos.putNextEntry(entry);
+			jos.write(entryContent);
+			jos.closeEntry();
+			jos.finish();
+			out.flush();
 			return out.toByteArray();
 		}finally{
-			if(tempJar != null){
-				tempJar.close();
+			if(jos != null){
+				jos.close();
 			}
 			if(out != null){
 				out.close();
 			}
-		}
+			if(jis != null){
+				jis.close();
+			}
+		} 
 	}
 
 }

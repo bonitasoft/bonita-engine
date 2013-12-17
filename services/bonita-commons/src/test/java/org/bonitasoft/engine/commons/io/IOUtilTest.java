@@ -3,6 +3,7 @@ package org.bonitasoft.engine.commons.io;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -60,7 +61,7 @@ public class IOUtilTest {
 	public void shouldAddJarEntry_AddAnEntryInExistingJar() throws Exception {
 		byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
 		byte[] entryContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("persistence.xml").getFile()));
-		String entryName = "META-INF/persistence.xml";
+		String entryName = "META-INF/myNewEntry.xml";
 		byte[] updatedJar = IOUtil.addJarEntry(jarContent, entryName, entryContent);
 		assertThat(updatedJar).isNotNull();
 		
@@ -68,13 +69,28 @@ public class IOUtilTest {
 		JarInputStream jis = new JarInputStream(bais);
 		JarEntry entry = null;
 		Map<String,byte[]> entryNames = new HashMap<String, byte[]>();
+		byte[] buffer = new byte[4096];
 		while ((entry = jis.getNextJarEntry()) != null) {
-			byte[] currentEntryContent = new byte[(int) entry.getSize()];
-			jis.read(currentEntryContent);
-			entryNames.put(entry.getName(),currentEntryContent);
+			if(!entry.isDirectory()){
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				int len;
+				while ((len=jis.read(buffer))>0) {
+					baos.write(buffer, 0, len);
+				}
+				baos.close();
+				entryNames.put(entry.getName(),baos.toByteArray());
+			}
 		}
 		jis.close();
 		assertThat(entryNames.keySet()).contains(entryName);
 		assertThat(entryNames.get(entryName)).isEqualTo(entryContent);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddJarEntry_ThrowIllegalArgumentExceptionIfEntryAlreadyExists() throws Exception {
+		byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
+		byte[] entryContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("persistence.xml").getFile()));
+		String entryName = "META-INF/persistence.xml";
+		IOUtil.addJarEntry(jarContent, entryName, entryContent);
 	}
 }
