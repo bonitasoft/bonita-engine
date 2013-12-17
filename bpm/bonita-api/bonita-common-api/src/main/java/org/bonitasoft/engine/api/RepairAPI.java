@@ -17,6 +17,7 @@
 
 package org.bonitasoft.engine.api;
 
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.operation.Operation;
 
 import java.io.Serializable;
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 public interface RepairAPI {
 
-    public void startProcess(long startedBy,
+    public ProcessInstance startProcess(long startedBy,
                              List<String> activityNames,
                              final List<Operation> operations,
                              final Map<String, Serializable> context);
