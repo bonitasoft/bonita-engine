@@ -18,6 +18,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import org.bonitasoft.engine.api.RepairAPI;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.operation.Operation;
 
 import java.io.Serializable;
@@ -32,7 +33,7 @@ import java.util.Map;
 public class RepairAPIImpl implements RepairAPI {
 
     @Override
-    public void startProcess(long startedBy, List<String> activityNames, List<Operation> operations, Map<String, Serializable> context) {
-
+    public ProcessInstance startProcess(long startedBy, List<String> activityNames, List<Operation> operations, Map<String, Serializable> context) {
+        return null;
     }
 }
