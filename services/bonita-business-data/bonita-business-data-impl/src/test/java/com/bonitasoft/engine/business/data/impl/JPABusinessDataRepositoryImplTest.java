@@ -68,7 +68,7 @@ public class JPABusinessDataRepositoryImplTest {
 	@Test
 	public void shouldTransformBDRArchive_ReturnAJarWithAValidPersistenceXMLEntry() throws Exception {
 		JPABusinessDataRepositoryImpl bdrService = new JPABusinessDataRepositoryImpl(dependencyService);
-		byte[] bdrArchive = IOUtil.getAllContentFrom(JPABusinessDataRepositoryImplTest.class.getResourceAsStream("bdr-without-persistence-jar.bak"));
+		byte[] bdrArchive = IOUtil.getAllContentFrom(JPABusinessDataRepositoryImplTest.class.getResourceAsStream("bdr-with-relations-without-persistence-jar.bak"));
 		byte[] updatedJar = bdrService.transformBDRArchive(bdrArchive);
 		assertThat(updatedJar).isNotNull();
 		ByteArrayInputStream bais = new ByteArrayInputStream(updatedJar);
@@ -98,13 +98,13 @@ public class JPABusinessDataRepositoryImplTest {
 		Document document = documentBuilder.parse(is);
 		is.close();
 		assertThat(document).isNotNull();
-		assertThat(document.getElementsByTagName("class").getLength()).isEqualTo(1);
+		assertThat(document.getElementsByTagName("class").getLength()).isEqualTo(3);
 		NodeList nodeList = document.getElementsByTagName("class");
 		Set<String> classnames = new HashSet<String>();
 		for(int i = 0 ; i<nodeList.getLength();i++){
 			classnames.add(nodeList.item(i).getTextContent());
 		}
-		assertThat(classnames).containsOnly("org.bonita.pojo.Employee");
+		assertThat(classnames).containsOnly("org.bonitasoft.hr.LeaveRequest","org.bonitasoft.hr.LeaveItem","org.bonitasoft.hr.Employee");
 	}
 
 	@Test

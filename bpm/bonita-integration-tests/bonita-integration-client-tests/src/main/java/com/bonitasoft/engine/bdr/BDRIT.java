@@ -78,6 +78,7 @@ public class BDRIT extends CommonAPISPTest {
         final byte[] jar = IOUtils.toByteArray(stream);
         getTenantManagementAPI().deployBusinessDataRepository(jar);
 
+        
         final Expression employeeExpression = new ExpressionBuilder()
                 .createGroovyScriptExpression("createNewEmployee",
                         "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;",
