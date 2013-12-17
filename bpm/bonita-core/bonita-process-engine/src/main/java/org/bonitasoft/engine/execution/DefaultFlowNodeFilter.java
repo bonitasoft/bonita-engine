@@ -23,21 +23,10 @@ import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefi
  * @author Elias Ricken de Medeiros
  *
  */
-public class DefaultFlowNodeFilter implements Filter<SFlowNodeDefinition>{
+public class DefaultFlowNodeFilter implements Filter<SFlowNodeDefinition> {
     
-    private long targetSFlowNodeDefinitionId;
-
-    public DefaultFlowNodeFilter(final long targetSFlowNodeDefinitionId) {
-        this.targetSFlowNodeDefinitionId = targetSFlowNodeDefinitionId;
-    }
-
     @Override
     public boolean select(SFlowNodeDefinition flowNode) {
-        if (targetSFlowNodeDefinitionId != -1) {
-            // When call start by event triggers, run only the target of trigger
-            // The starterId equals 0, when start process in work (See InstantiateProcessWork)
-            return flowNode.getId() == targetSFlowNodeDefinitionId;
-        }
         // Not started by an event: start all elements that are start point and are not triggered by an event
         return flowNode.getIncomingTransitions().isEmpty()
                 && !(SFlowNodeType.SUB_PROCESS.equals(flowNode.getType()) && ((SSubProcessDefinition) flowNode).isTriggeredByEvent())
