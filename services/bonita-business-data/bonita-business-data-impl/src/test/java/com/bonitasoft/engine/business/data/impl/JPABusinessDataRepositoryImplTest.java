@@ -1,7 +1,7 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -9,6 +9,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,21 +58,34 @@ public class JPABusinessDataRepositoryImplTest {
 		assertTrue("missing bean 3", persistenceXMLFileAsString.contains("<class>" + classname3 + "</class>"));
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldTransformBDRArchive_ThrowIllegalArgumentExceptionIfPersistenceXMLAlreadyExists() throws Exception {
+		JPABusinessDataRepositoryImpl bdrService = new JPABusinessDataRepositoryImpl(dependencyService);
+		byte[] bdrArchive = IOUtil.getAllContentFrom(JPABusinessDataRepositoryImplTest.class.getResourceAsStream("bdr-jar.bak"));
+		bdrService.transformBDRArchive(bdrArchive);
+	}
+
 	@Test
 	public void shouldTransformBDRArchive_ReturnAJarWithAValidPersistenceXMLEntry() throws Exception {
 		JPABusinessDataRepositoryImpl bdrService = new JPABusinessDataRepositoryImpl(dependencyService);
-		byte[] bdrArchive = IOUtil.getAllContentFrom(JPABusinessDataRepositoryImplTest.class.getResourceAsStream("bdr-jar.bak"));
+		byte[] bdrArchive = IOUtil.getAllContentFrom(JPABusinessDataRepositoryImplTest.class.getResourceAsStream("bdr-without-persistence-jar.bak"));
 		byte[] updatedJar = bdrService.transformBDRArchive(bdrArchive);
 		assertThat(updatedJar).isNotNull();
-
 		ByteArrayInputStream bais = new ByteArrayInputStream(updatedJar);
 		JarInputStream jis = new JarInputStream(bais);
 		JarEntry entry = null;
 		Map<String,byte[]> entryNames = new HashMap<String, byte[]>();
+		byte[] buffer = new byte[4096];
 		while ((entry = jis.getNextJarEntry()) != null) {
-			byte[] currentEntryContent = new byte[(int) entry.getSize()];
-			jis.read(currentEntryContent);
-			entryNames.put(entry.getName(),currentEntryContent);
+			if(!entry.isDirectory()){
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				int len;
+				while ((len=jis.read(buffer))>0) {
+					baos.write(buffer, 0, len);
+				}
+				baos.close();
+				entryNames.put(entry.getName(),baos.toByteArray());
+			}
 		}
 		jis.close();
 		assertThat(entryNames.keySet()).contains("META-INF/persistence.xml");
@@ -92,7 +106,7 @@ public class JPABusinessDataRepositoryImplTest {
 		}
 		assertThat(classnames).containsOnly("org.bonita.pojo.Employee");
 	}
-	
+
 	@Test
 	public void shouldDeploy_AddATenantDependency() throws Exception {
 		JPABusinessDataRepositoryImpl bdrService = spy(new JPABusinessDataRepositoryImpl(dependencyService));
@@ -100,9 +114,9 @@ public class JPABusinessDataRepositoryImplTest {
 		SDependencyMapping dependencyMapping = mock(SDependencyMapping.class);
 		doReturn(sDependency).when(bdrService).createSDependency(any(byte[].class));
 		doReturn(dependencyMapping).when(bdrService).createDependencyMapping(1, sDependency);
-		byte[] bdrArchive = IOUtil.getAllContentFrom(JPABusinessDataRepositoryImplTest.class.getResourceAsStream("bdr-jar.bak"));
+		byte[] bdrArchive = IOUtil.getAllContentFrom(JPABusinessDataRepositoryImplTest.class.getResourceAsStream("bdr-without-persistence-jar.bak"));
 		bdrService.deploy(bdrArchive, 1);
-		
+
 		verify(dependencyService).createDependency(sDependency);
 		verify(bdrService).createDependencyMapping(1, sDependency);
 		verify(dependencyService).createDependencyMapping(dependencyMapping);

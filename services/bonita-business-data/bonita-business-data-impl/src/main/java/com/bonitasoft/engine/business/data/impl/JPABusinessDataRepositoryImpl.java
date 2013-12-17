@@ -105,7 +105,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 		}
 		byte[] persistenceFileContent = getPersistenceFileContentFor(classNameList);
 		return IOUtil.addJarEntry(bdrArchive,"META-INF/persistence.xml",persistenceFileContent);
-
 	}
 
 	protected byte[] getPersistenceFileContentFor(final List<String> classNames) throws SBusinessDataRepositoryDeploymentException, IOException, TransformerException {

@@ -81,10 +81,11 @@ public class PersistenceUnitBuilder {
 
 	protected void insertClasses() {
 		Node persistenceUnitNode = getPersistenceUnitNode();
+		Node refChild = ((Element)persistenceUnitNode).getElementsByTagName("properties").item(0);
 		for(String classname : classes){
 			Element classNode = document.createElement("class");
 			classNode.setTextContent(classname);
-			persistenceUnitNode.appendChild(classNode);
+			persistenceUnitNode.insertBefore(classNode, refChild);
 		}
 
 	}
