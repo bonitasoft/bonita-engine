@@ -2,6 +2,7 @@ package com.bonitasoft.engine.business.data.impl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 
 import org.hibernate.cfg.Configuration;
@@ -19,7 +20,7 @@ public class SchemaGenerator {
 	private Configuration cfg;
 	private Dialect dialect;
 
-	public SchemaGenerator(Dialect dialect,Properties properties){
+	public SchemaGenerator(Dialect dialect,Properties properties, List<String> classNameList){
 		this.cfg = new Configuration();
 		this.cfg.setProperties(properties);
 		this.cfg.setProperty("hibernate.hbm2ddl.auto","update");
@@ -29,6 +30,17 @@ public class SchemaGenerator {
 		this.cfg.setProperty("hibernate.connection.datasource",properties.getProperty("hibernate.connection.datasource"));
 		this.dialect = dialect;
 		this.cfg.setProperty("hibernate.dialect", dialect.getClass().getName());
+		for(String className : classNameList){
+			Class<?> annotatedClass;
+			try {
+				annotatedClass = Thread.currentThread().getContextClassLoader().loadClass(className);
+				cfg.addAnnotatedClass(annotatedClass);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		
+		}
+		
 	}
 
 	/**

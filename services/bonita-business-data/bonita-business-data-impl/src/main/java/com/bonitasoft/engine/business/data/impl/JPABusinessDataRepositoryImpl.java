@@ -54,6 +54,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 
 	private DependencyService dependencyService;
 
+	private List<String> classNameList;
+
 
 	public JPABusinessDataRepositoryImpl(DependencyService dependencyService) {
 		this.dependencyService = dependencyService;
@@ -98,7 +100,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 	}
 
 	protected byte[] transformBDRArchive(final byte[] bdrArchive) throws SBusinessDataRepositoryDeploymentException, IOException, TransformerException {
-		List<String> classNameList = null;
 		try {
 			classNameList = IOUtil.getClassNameList(bdrArchive);
 		} catch (IOException e) {
@@ -128,7 +129,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 		Properties properties = toProperties(entityManagerFactory.getProperties());
 		Dialect dialect = Dialect.getDialect(properties);
 		try {
-			executeQueries(new SchemaGenerator(dialect,properties).generate());
+			executeQueries(new SchemaGenerator(dialect,properties,classNameList).generate());
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
