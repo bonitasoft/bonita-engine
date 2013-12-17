@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.bonitasoft.engine.activity.MultiInstanceTest;
+import com.bonitasoft.engine.bdr.BDRIT;
 import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
 import com.bonitasoft.engine.external.ExternalCommandsTestSP;
 import com.bonitasoft.engine.log.LogTest;
@@ -32,7 +33,8 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         SearchEntitiesTests.class,
         ReportingAPIIT.class,
         PlatformMonitoringAPITest.class,
-        TenantTest.class
+        TenantTest.class,
+        BDRIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class BPMRemoteSPTests {
