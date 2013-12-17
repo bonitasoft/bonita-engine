@@ -137,7 +137,6 @@
 									<type>zip</type>
 								</artifactItem>
 							</artifactItems>
-							<includes>**/*.*</includes>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>

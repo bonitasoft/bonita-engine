@@ -67,7 +67,7 @@ public class GetArchivedProcessInstanceList implements TransactionContentWithRes
     @Override
     public void execute() throws SBonitaException {
         final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
-                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptionsBuilder.done());
+                searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptionsBuilder.done());
         searchArchivedProcessInstances.execute();
         processInstanceList = searchArchivedProcessInstances.getResult().getResult();
     }

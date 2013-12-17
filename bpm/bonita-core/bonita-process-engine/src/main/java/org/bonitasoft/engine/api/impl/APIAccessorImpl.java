@@ -13,14 +13,19 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.api.*;
-
-import java.io.Serializable;
+import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.RepairAPI;
+import org.bonitasoft.engine.api.ThemeAPI;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
-public class APIAccessorImpl implements APIAccessor, Serializable {
+public class APIAccessorImpl implements APIAccessor {
 
     private static final long serialVersionUID = -3640389067358848759L;
 
@@ -42,6 +47,12 @@ public class APIAccessorImpl implements APIAccessor, Serializable {
     @Override
     public ProfileAPI getProfileAPI() {
         return new ProfileAPIImpl();
+    }
+
+    @Override
+    public ThemeAPI getThemeAPI() {
+        return new ThemeAPIImpl();
+
     }
 
     @Override

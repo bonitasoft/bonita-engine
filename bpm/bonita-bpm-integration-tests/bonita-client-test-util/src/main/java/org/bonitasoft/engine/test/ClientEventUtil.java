@@ -114,7 +114,7 @@ public class ClientEventUtil {
         LOGGER.debug("commands deployed");
     }
 
-    static Long executeWaitServerCommand(final CommandAPI commandAPI, final Map<String, Serializable> event, final int defaultTimeout)
+    public static Long executeWaitServerCommand(final CommandAPI commandAPI, final Map<String, Serializable> event, final int defaultTimeout)
             throws CommandNotFoundException, CommandParameterizationException, CommandExecutionException, TimeoutException {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>(2);
         parameters.put("event", (Serializable) event);

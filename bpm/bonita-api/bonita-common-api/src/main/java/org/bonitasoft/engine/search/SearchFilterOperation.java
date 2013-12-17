@@ -17,5 +17,5 @@ package org.bonitasoft.engine.search;
  * @author Emmanuel Duchastenier
  */
 public enum SearchFilterOperation {
-    EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL, LESS_OR_EQUAL, DIFFERENT, BETWEEN, OR, AND
+    EQUALS, GREATER_THAN, LESS_THAN, GREATER_OR_EQUAL, LESS_OR_EQUAL, DIFFERENT, BETWEEN, OR, AND, L_PARENTHESIS, R_PARENTHESIS
 }

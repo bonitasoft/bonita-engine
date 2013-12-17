@@ -15,12 +15,14 @@ package org.bonitasoft.engine.api.impl.transaction.platform;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
 public class CheckPlatformVersion implements TransactionContent {
 
@@ -32,17 +34,39 @@ public class CheckPlatformVersion implements TransactionContent {
 
     private SPlatformProperties platformProperties;
 
-    public CheckPlatformVersion(final PlatformService platformService) {
+    private final BonitaHomeServer bonitaHomeServer;
+
+    private String errorMessage;
+
+    public CheckPlatformVersion(final PlatformService platformService, final BonitaHomeServer bonitaHomeServer) {
         this.platformService = platformService;
+        this.bonitaHomeServer = bonitaHomeServer;
     }
 
     @Override
     public void execute() throws SBonitaException {
+        // the database version
         platform = platformService.getPlatform();
+        String dbVersion = platform.getVersion();
+        // the version in jars
         platformProperties = platformService.getSPlatformProperties();
-        final String platformMinorVersion = format(platform.getVersion());
-        final String propertiesMinorVersion = format(platformProperties.getPlatformVersion());
+        String jarVersion = platformProperties.getPlatformVersion();
+        // the version in bonita home
+        String bonitaHomeVersion;
+        bonitaHomeVersion = bonitaHomeServer.getVersion();
+        final String platformMinorVersion = format(dbVersion);
+        final String propertiesMinorVersion = format(jarVersion);
         same = platformMinorVersion.equals(propertiesMinorVersion);
+        if (!same) {
+            errorMessage = "The version of the platform in database is not the same as expected: bonita-server version is <" + jarVersion
+                    + "> and database version is <" + dbVersion + ">";
+        } else {
+            same = bonitaHomeVersion.equals(jarVersion);
+            if (!same) {
+                errorMessage = "The version of the bonita home is not the same as expected: bonita-server version is <" + jarVersion
+                        + "> and bonita home version is <" + bonitaHomeVersion + ">";
+            }
+        }
     }
 
     private String format(final String version) {
@@ -66,4 +90,7 @@ public class CheckPlatformVersion implements TransactionContent {
         return platformProperties;
     }
 
+    public String getErrorMessage() {
+        return errorMessage;
+    }
 }

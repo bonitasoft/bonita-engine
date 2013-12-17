@@ -65,6 +65,7 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
+import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.Parser;
@@ -196,6 +197,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     SchedulerService getSchedulerService();
 
     JobService getJobService();
+
+    ThemeService getThemeService();
 
     void destroy();
 

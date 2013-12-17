@@ -31,6 +31,12 @@ public interface ArchivedFlowNodeInstance extends NamedElement, BaseElement, Arc
     long getProcessDefinitionId();
 
     long getProcessInstanceId();
+    
+    /**
+     * @return the parent activity instance id
+     * @since 6.2
+     */
+    long getParentActivityInstanceId();
 
     String getState();
 

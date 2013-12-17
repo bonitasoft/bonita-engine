@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.theme.model.impl">
+
+	<filter-def name="tenantFilter" condition=":tenantId = tenantId">
+		<filter-param name="tenantId" type="long" />
+	</filter-def>
+
+	<class name="SThemeImpl" table="theme">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="isDefault" column="isDefault" />
+		<property name="content" column="content" />
+		<property name="cssContent" column="cssContent" />
+		<property name="lastUpdateDate" column="lastUpdateDate" />
+		<property name="type" column="type">
+			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
+				<param name="enumClass">
+					org.bonitasoft.engine.theme.model.SThemeType
+				</param>
+			</type>
+		</property>
+		<filter name="tenantFilter" />
+	</class>
+
+</hibernate-mapping>

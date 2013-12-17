@@ -75,7 +75,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
         final ProcessInstanceService processInstanceService = this.tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = searchEntitiesDescriptor.getProcessInstanceDescriptor();
+        final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = searchEntitiesDescriptor.getSearchProcessInstanceDescriptor();
 
         final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService, searchProcessInstanceDescriptor,
                 processInstanceId);
@@ -119,7 +119,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
             final SearchOptionsImpl searchOptions = new SearchOptionsImpl(0, 10);
             searchOptions.addFilter("id", processInstanceId);
             final SearchOpenProcessInstancesInvolvingUser searchOpenProcessInstances = new SearchOpenProcessInstancesInvolvingUser(processInstanceService,
-                    searchEntitiesDescriptor.getProcessInstanceDescriptor(), userId, searchOptions, processDefinitionService);
+                    searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), userId, searchOptions, processDefinitionService);
             SearchResult<ProcessInstance> processInstanceRes = null;
             try {
                 searchOpenProcessInstances.execute();
@@ -132,7 +132,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                 isHas = true;
             } else {
                 final SearchArchivedProcessInstancesInvolvingUser archivedSearcher = new SearchArchivedProcessInstancesInvolvingUser(userId,
-                        processInstanceService, searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptions);
+                        processInstanceService, searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
                 try {
                     archivedSearcher.execute();
                 } catch (final SBonitaException e) {

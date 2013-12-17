@@ -121,7 +121,7 @@ public class ProfileAPIImpl implements ProfileAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchProfiles searchProfileTransaction = new SearchProfiles(profileService, searchEntitiesDescriptor.getProfileDescriptor(), options);
+        final SearchProfiles searchProfileTransaction = new SearchProfiles(profileService, searchEntitiesDescriptor.getSearchProfileDescriptor(), options);
         try {
             searchProfileTransaction.execute();
             return searchProfileTransaction.getResult();
@@ -197,13 +197,13 @@ public class ProfileAPIImpl implements ProfileAPI {
     private SearchEntityDescriptor getProfileMemberDescriptor(final SearchEntitiesDescriptor searchEntitiesDescriptor, final String memberType)
             throws SBonitaSearchException {
         if (ProfileMemberUtils.USER_TYPE.equals(memberType)) {
-            return searchEntitiesDescriptor.getProfileMemberUserDescriptor();
+            return searchEntitiesDescriptor.getSearchProfileMemberUserDescriptor();
         } else if (ProfileMemberUtils.GROUP_TYPE.equals(memberType)) {
-            return searchEntitiesDescriptor.getProfileMemberGroupDescriptor();
+            return searchEntitiesDescriptor.getSearchProfileMemberGroupDescriptor();
         } else if (ProfileMemberUtils.ROLE_TYPE.equals(memberType)) {
-            return searchEntitiesDescriptor.getProfileMemberRoleDescriptor();
+            return searchEntitiesDescriptor.getSearchProfileMemberRoleDescriptor();
         } else if (ProfileMemberUtils.ROLE_AND_GROUP_TYPE.equals(memberType)) {
-            return searchEntitiesDescriptor.getProfileMemberRoleAndGroupDescriptor();
+            return searchEntitiesDescriptor.getSearchProfileMemberRoleAndGroupDescriptor();
         } else {
             throw new SBonitaSearchException("Member type must be equalse to user,group,role or roleAndGroup.");
         }
@@ -229,7 +229,7 @@ public class ProfileAPIImpl implements ProfileAPI {
         final ProfileService profileService = tenantAccessor.getProfileService();
 
         final SearchProfileEntries searchProfileEntries = new SearchProfileEntries(profileService, tenantAccessor.getSearchEntitiesDescriptor()
-                .getProfileEntryDescriptor(), options);
+                .getSearchProfileEntryDescriptor(), options);
         try {
             searchProfileEntries.execute();
             return searchProfileEntries.getResult();
@@ -282,7 +282,6 @@ public class ProfileAPIImpl implements ProfileAPI {
             throw new CreationException("Unable to create a profile member with a null creator!");
         }
 
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SProfileMember sProfileMember = ModelConvertor.constructSProfileMember(creator);
         return createProfileMember(sProfileMember.getProfileId(), sProfileMember.getUserId(), sProfileMember.getGroupId(), sProfileMember.getRoleId());
     }
@@ -290,7 +289,7 @@ public class ProfileAPIImpl implements ProfileAPI {
     protected void checkIfProfileMemberExists(final TenantServiceAccessor tenantAccessor, final ProfileService profileService, final Long profileId,
             final Long userId, final Long groupId, final Long roleId, final MemberType memberType) throws SBonitaException {
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchEntityDescriptor searchDescriptor = searchEntitiesDescriptor.getProfileMemberUserDescriptor();
+        final SearchEntityDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProfileMemberUserDescriptor();
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1);
         searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, profileId);
 

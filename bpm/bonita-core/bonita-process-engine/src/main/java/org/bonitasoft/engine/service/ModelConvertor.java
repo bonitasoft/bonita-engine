@@ -269,6 +269,10 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
+import org.bonitasoft.engine.theme.Theme;
+import org.bonitasoft.engine.theme.ThemeType;
+import org.bonitasoft.engine.theme.impl.ThemeImpl;
+import org.bonitasoft.engine.theme.model.STheme;
 
 /**
  * @author Matthieu Chaffotte
@@ -664,6 +668,7 @@ public class ModelConvertor {
         aFlowNode.setSourceObjectId(saFlowNode.getSourceObjectId());
         aFlowNode.setProcessDefinitionId(saFlowNode.getLogicalGroup(0));
         aFlowNode.setProcessInstanceId(saFlowNode.getLogicalGroup(1));
+        aFlowNode.setParentActivityInstanceId(saFlowNode.getLogicalGroup(2));
         aFlowNode.setDescription(saFlowNode.getDescription());
         aFlowNode.setDisplayName(saFlowNode.getDisplayName());
         aFlowNode.setDisplayDescription(saFlowNode.getDisplayDescription());
@@ -1668,14 +1673,6 @@ public class ModelConvertor {
         }
     }
 
-    public static SOperation constructSOperation(final Operation operation, final TenantServiceAccessor serviceAccessor) {
-        final SExpression rightOperand = constructSExpression(operation.getRightOperand());
-        final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = constructSLeftOperand(operation.getLeftOperand());
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
-                .setType(operatorType).setLeftOperand(sLeftOperand).done();
-    }
-
     public static SOperation constructSOperation(final Operation operation) {
         final SExpression rightOperand = constructSExpression(operation.getRightOperand());
         final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
@@ -1685,7 +1682,8 @@ public class ModelConvertor {
     }
 
     private static SLeftOperand constructSLeftOperand(final LeftOperand variableToSet) {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).setExternal(variableToSet.isExternal()).done();
+        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName())
+                .setExternal(variableToSet.isExternal()).done();
     }
 
     public static List<ConnectorImplementationDescriptor> toConnectorImplementationDescriptors(
@@ -1949,7 +1947,8 @@ public class ModelConvertor {
 
     public static SProfileMember constructSProfileMember(final ProfileMemberCreator creator) {
         final Map<ProfileMemberField, Serializable> fields = creator.getFields();
-        final SProfileMemberBuilder newSProfileMemberBuilder = BuilderFactory.get(SProfileMemberBuilderFactory.class).createNewInstance((Long) fields.get(ProfileMemberField.PROFILE_ID));
+        final SProfileMemberBuilder newSProfileMemberBuilder = BuilderFactory.get(SProfileMemberBuilderFactory.class).createNewInstance(
+                (Long) fields.get(ProfileMemberField.PROFILE_ID));
         final Long groupeId = (Long) fields.get(ProfileMemberField.GROUP_ID);
         if (groupeId != null) {
             newSProfileMemberBuilder.setGroupId(groupeId);
@@ -1982,4 +1981,19 @@ public class ModelConvertor {
         return failedJob;
     }
 
+    public static List<Theme> toThemes(final List<STheme> sThemes) {
+        final List<Theme> themes = new ArrayList<Theme>(sThemes.size());
+        for (final STheme sTheme : sThemes) {
+            final Theme theme = toTheme(sTheme);
+            themes.add(theme);
+        }
+        return themes;
+    }
+
+    public static Theme toTheme(final STheme sTheme) {
+        final ThemeType type = ThemeType.valueOf(sTheme.getType().name());
+        final Date lastUpdateDate = new Date(sTheme.getLastUpdateDate());
+        final ThemeImpl themeImpl = new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
+        return themeImpl;
+    }
 }

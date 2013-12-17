@@ -428,7 +428,7 @@
 	</query>
 	
 	<query name="getNumberOfSAProcessInstance">
-		SELECT COUNT(DISTINCT ap.sourceObjectId)
+		SELECT COUNT(ap.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
 	</query>
 

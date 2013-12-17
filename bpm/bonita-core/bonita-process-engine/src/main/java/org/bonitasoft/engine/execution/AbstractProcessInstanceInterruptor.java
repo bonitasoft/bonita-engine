@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
@@ -45,7 +46,8 @@ public abstract class AbstractProcessInstanceInterruptor {
 		logger = technicalLoggerService;
 	}
 
-	public void interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory, final long userId) throws SBonitaException {
+    public void interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory, final long userId)
+            throws SProcessInstanceNotFoundException, SBonitaException {
 		setProcessStateCategory(processInstanceId, stateCategory);
 		final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory);
 		if (stableChildrenIds != null) {
@@ -56,11 +58,9 @@ public abstract class AbstractProcessInstanceInterruptor {
 	}
 
 	public void interruptProcessInstance(final long processInstanceId, final SStateCategory stateCategory, final long userId, final long exceptionChildId)
-			throws SBonitaException {
-
+            throws SProcessInstanceNotFoundException, SBonitaException {
 		setProcessStateCategory(processInstanceId, stateCategory);
 		final List<Long> stableChildrenIds = interruptChildrenFlowNodeInstances(processInstanceId, stateCategory, exceptionChildId);
-
 		if (stableChildrenIds != null) {
 			for (final Long childId : stableChildrenIds) {
 				resumeStableChildExecution(childId, processInstanceId, userId);
@@ -81,7 +81,8 @@ public abstract class AbstractProcessInstanceInterruptor {
 		}
 	}
 
-	protected abstract void setProcessStateCategory(long processInstanceId, SStateCategory stateCategory) throws SBonitaException;
+    protected abstract void setProcessStateCategory(long processInstanceId, SStateCategory stateCategory) throws SProcessInstanceNotFoundException,
+            SBonitaException;
 
 	protected abstract void resumeStableChildExecution(long childId, long processInstanceId, long userId) throws SBonitaException;
 
