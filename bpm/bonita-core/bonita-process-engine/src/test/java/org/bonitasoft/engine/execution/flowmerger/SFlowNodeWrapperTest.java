@@ -24,6 +24,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,9 @@ public class SFlowNodeWrapperTest {
     
     @Mock
     private SGatewayDefinition gateway;
+    
+    @Mock
+    private SSubProcessDefinition subprocess;
 
     @Mock
     private SCatchEventDefinition catchEvent;
@@ -55,6 +59,8 @@ public class SFlowNodeWrapperTest {
 
     private SFlowNodeWrapper catchEventWrapper;
 
+    private SFlowNodeWrapper subProcessWrapper;
+
     private SFlowNodeWrapper nullFlowNodewrapper;
     
     @Before
@@ -62,9 +68,11 @@ public class SFlowNodeWrapperTest {
         flowNodeWrapper = new SFlowNodeWrapper(flowNode);
         gatewayWrapper = new SFlowNodeWrapper(gateway);
         catchEventWrapper = new SFlowNodeWrapper(catchEvent);
+        subProcessWrapper = new SFlowNodeWrapper(subprocess);
         nullFlowNodewrapper = new SFlowNodeWrapper(null);
         
         doReturn(SFlowNodeType.GATEWAY).when(gateway).getType();
+        doReturn(SFlowNodeType.SUB_PROCESS).when(subprocess).getType();
     }
     
     @Test
@@ -168,6 +176,40 @@ public class SFlowNodeWrapperTest {
     public void is_not_interrupting_if_non_interrupting_catch_event() throws Exception {
         doReturn(false).when(catchEvent).isInterrupting();
         assertFalse(catchEventWrapper.isInterrupting());
+    }
+    
+    @Test
+    public void hasIncommingTransitions_return_true_if_flownode_hasIncommingTransitions() throws Exception {
+        doReturn(true).when(flowNode).hasIncomingTransitions();
+        assertTrue(flowNodeWrapper.hasIncomingTransitions());
+    }
+
+    @Test
+    public void hasIncommingTransitions_return_false_if_flownode_doesnt_have_IncommingTransitions() throws Exception {
+        doReturn(false).when(flowNode).hasIncomingTransitions();
+        assertFalse(flowNodeWrapper.hasIncomingTransitions());
+    }
+    
+    @Test
+    public void isEventSubProcess_return_true_if_is_subp_process_triggered_by_event() {
+        doReturn(true).when(subprocess).isTriggeredByEvent();
+        assertTrue(subProcessWrapper.isEventSubProcess());
+    }
+
+    @Test
+    public void isEventSubProcess_return_false_if_is_not_subprocess() {
+        assertFalse(flowNodeWrapper.isEventSubProcess());
+    }
+
+    @Test
+    public void isEventSubProcess_return_false_if_is_subprocess_not_triggered_by_event() {
+        doReturn(false).when(subprocess).isTriggeredByEvent();
+        assertFalse(subProcessWrapper.isEventSubProcess());
+    }
+
+    @Test
+    public void isEventSubProcess_return_false_if_flownode_is_null() {
+        assertFalse(nullFlowNodewrapper.isEventSubProcess());
     }
     
     @Test

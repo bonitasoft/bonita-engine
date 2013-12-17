@@ -17,6 +17,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
 
 
@@ -80,5 +81,15 @@ public class SFlowNodeWrapper {
         return flowNode == null;
     }
     
+    public boolean hasIncomingTransitions() {
+        return flowNode.hasIncomingTransitions();
+    }
+
+    public boolean isEventSubProcess() {
+        if(isNull()) {
+            return false;
+        }
+        return SFlowNodeType.SUB_PROCESS.equals(flowNode.getType()) && ((SSubProcessDefinition) flowNode).isTriggeredByEvent();
+    }
 
 }
