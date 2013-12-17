@@ -1,5 +1,12 @@
 package org.bonitasoft.engine.repair.helper.design;
 
+import static junit.framework.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
@@ -8,15 +15,12 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.repair.helper.designer.*;
+import org.bonitasoft.engine.repair.helper.designer.EndEvent;
+import org.bonitasoft.engine.repair.helper.designer.Gateway;
+import org.bonitasoft.engine.repair.helper.designer.SimpleProcessDesigner;
+import org.bonitasoft.engine.repair.helper.designer.StartEvent;
+import org.bonitasoft.engine.repair.helper.designer.UserTask;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by Vincent Elcrin
@@ -121,6 +125,7 @@ public class SimpleProcessDesignerTest {
     }
 
     interface Stringifier<O> {
+
         String stringify(O object);
     }
 
