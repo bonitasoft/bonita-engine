@@ -32,6 +32,6 @@ public interface TenantServiceAccessor extends org.bonitasoft.engine.service.Ten
     @Override
     SearchEntitiesDescriptor getSearchEntitiesDescriptor();
 
-    BusinessDataRespository getBusinessDataRespository();
+    BusinessDataRespository getBusinessDataRepository();
 
 }

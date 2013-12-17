@@ -1,6 +1,7 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -11,6 +12,7 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.UserTransaction;
 
+import org.bonitasoft.engine.dependency.DependencyService;
 import org.dbunit.DataSourceDatabaseTester;
 import org.dbunit.IDatabaseTester;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
@@ -18,6 +20,7 @@ import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -32,13 +35,15 @@ public class JPABusinessDataRepositoryImplIT {
 
 	private IDatabaseTester databaseTester;
 
+	private DependencyService dependencyService;
+
 	private static PoolingDataSource ds1;
 
 	@BeforeClass
 	public static void initDatasource() throws NamingException, SQLException {
 		System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
 		TransactionManagerServices.getConfiguration().setJournal(null);
-		
+
 		ds1 = new PoolingDataSource();
 		ds1.setUniqueName("java:/comp/env/jdbc/PGDS1");
 		ds1.setClassName("org.h2.jdbcx.JdbcDataSource");
@@ -77,10 +82,17 @@ public class JPABusinessDataRepositoryImplIT {
 		}
 	}
 
+
+	@Before
+	public void setUp() throws Exception {
+		dependencyService = mock(DependencyService.class);
+	}
+
+
 	@Test
 	public void findAnEmployeeByPrimaryKey() throws Exception {
 		final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl();
+		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl(dependencyService);
 		try {
 			ut.begin();
 			businessDataRepository.start();
@@ -96,10 +108,11 @@ public class JPABusinessDataRepositoryImplIT {
 		}
 	}
 
+
 	@Test(expected = BusinessDataNotFoundException.class)
 	public void throwExceptionWhenEmployeeNotFound() throws Exception {
 		final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl();
+		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl(dependencyService);
 		try {
 			ut.begin();
 			businessDataRepository.start();
@@ -110,10 +123,12 @@ public class JPABusinessDataRepositoryImplIT {
 		}
 	}
 
+
+
 	@Test
 	public void persistNewEmployee() throws Exception {
 		UserTransaction ut = TransactionManagerServices.getTransactionManager();
-		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl();
+		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl(dependencyService);
 		final Employee employee = new Employee("Marja", "Halonen");
 		try {
 			ut.begin();
@@ -123,21 +138,12 @@ public class JPABusinessDataRepositoryImplIT {
 			ut.commit();
 		}
 		assertThat(employee.getId()).isNotNull();
-
-		ut = TransactionManagerServices.getTransactionManager();
-		try {
-			ut.begin();
-			businessDataRepository.find(Employee.class, employee.getId());
-		} finally {
-			businessDataRepository.stop();
-			ut.commit();
-		}
 	}
 
 	@Test
 	public void persistANullEmployee() throws Exception {
 		final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl();
+		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl(dependencyService);
 		try {
 			ut.begin();
 			businessDataRepository.start();
@@ -150,10 +156,11 @@ public class JPABusinessDataRepositoryImplIT {
 		}
 	}
 
+
 	@Test
 	public void findAnEmployeeUsingParameterizedQuery() throws Exception {
 		final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl();
+		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl(dependencyService);
 		try {
 			ut.begin();
 			businessDataRepository.start();
@@ -166,11 +173,10 @@ public class JPABusinessDataRepositoryImplIT {
 			ut.commit();
 		}
 	}
-
 	@Test(expected = NonUniqueResultException.class)
 	public void throwExceptionWhenFindingAnEmployeeButGettingSeveral() throws Exception {
 		final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl();
+		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl(dependencyService);
 		try {
 			ut.begin();
 			businessDataRepository.start();
@@ -186,7 +192,7 @@ public class JPABusinessDataRepositoryImplIT {
 	@Test(expected = BusinessDataNotFoundException.class)
 	public void throwExceptionWhenFindingAnUnknownEmployee() throws Exception {
 		final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl();
+		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl(dependencyService);
 		try {
 			ut.begin();
 			businessDataRepository.start();
@@ -202,7 +208,7 @@ public class JPABusinessDataRepositoryImplIT {
 	@Test(expected = IllegalStateException.class)
 	public void throwExceptionWhenUsingBDRWihtoutStartingIt() throws Exception {
 		final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl();
+		final JPABusinessDataRepositoryImpl businessDataRepository = new JPABusinessDataRepositoryImpl(dependencyService);
 		try {
 			ut.begin();
 			final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Makkinen");

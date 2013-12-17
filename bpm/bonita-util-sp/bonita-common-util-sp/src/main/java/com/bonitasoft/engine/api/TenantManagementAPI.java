@@ -11,6 +11,7 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
 
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 
 /**
@@ -20,7 +21,7 @@ import com.bonitasoft.engine.platform.TenantNotFoundException;
  */
 public interface TenantManagementAPI {
 
-    void deployBusinessDataRepository(final byte[] jar) throws CreationException;
+    void deployBusinessDataRepository(final byte[] jar) throws CreationException,BusinessDataRepositoryException;
 
     /**
      * Allows to set the tenand mode.

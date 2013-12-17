@@ -13,9 +13,24 @@
 	<name>Bonita Business Data: Repository Implementation</name>
 
 	<dependencies>
+	<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-builder</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<artifactId>bonita-dependency-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.data</groupId>
 			<artifactId>bonita-business-data-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -53,6 +68,11 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

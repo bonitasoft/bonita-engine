@@ -83,7 +83,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     }
 
     @Override
-    public BusinessDataRespository getBusinessDataRespository() {
+    public BusinessDataRespository getBusinessDataRepository() {
         if (businessDataRespository == null) {
             businessDataRespository = lookupService(BusinessDataRespository.class);
         }

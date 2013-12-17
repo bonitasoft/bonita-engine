@@ -1,6 +1,8 @@
 package com.bonitasoft.engine.business.data;
 
-public class NonUniqueResultException extends Exception {
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+
+public class NonUniqueResultException extends SBonitaException {
 
     private static final long serialVersionUID = 7573132495695445017L;
 
