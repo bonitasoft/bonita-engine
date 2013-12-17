@@ -195,23 +195,6 @@ public class IOUtil {
 		return baos.toByteArray();
 	}
 
-	public static void generateJar(byte[] content,File targetJarFile) throws IOException {
-		if (content == null || content.length == 0) {
-			final String message = "No content available";
-			throw new IOException(message);
-		}
-		FileOutputStream fos = null;
-
-		try {
-			fos = new FileOutputStream(targetJarFile);
-			fos.write(content);
-			fos.flush();
-		} finally {
-			if (fos != null) {
-				fos.close();
-			}
-		}
-	}
 
 	/**
 	 * Return the whole underlying stream content into a single String.
