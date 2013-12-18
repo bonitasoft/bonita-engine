@@ -174,6 +174,16 @@ public class TokenProviderTest {
         assertEquals(Long.valueOf(PARENT_TOKEN_REF_ID), gateWayTokenProvider.getOutputTokenInfo().outputTokenRefId);
         assertNull(gateWayTokenProvider.getOutputTokenInfo().outputParentTokenRefId);
     }
+
+    @Test
+    public void return_flow_node_id_if_isManyToOne_is_ParalelOrInclusive_and_parent_token_is_null() throws Exception {
+        doReturn(true).when(flowNodeTransitionsWrapper).isManyToOne();
+        doReturn(true).when(flowNodeWrapper).isParalleleOrInclusive();
+        doReturn(null).when(token).getParentRefId();
+        
+        assertEquals(Long.valueOf(FLOW_NODE_INSTANCE_ID), gateWayTokenProvider.getOutputTokenInfo().outputTokenRefId);
+        assertNull(gateWayTokenProvider.getOutputTokenInfo().outputParentTokenRefId);
+    }
     
     @Test
     public void return_child_token_ref_id_if_isManyToOne_and_not_is_ParalelOrInclusive() throws Exception {
