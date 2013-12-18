@@ -20,7 +20,6 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
-import org.bonitasoft.engine.api.RepairAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ServerAPIImpl;
@@ -90,11 +89,6 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     @Override
     public ThemeAPI getThemeAPI() {
         return getAPI(ThemeAPI.class, getAPISession());
-    }
-
-    @Override
-    public RepairAPI getRepairAPI() {
-        return getAPI(RepairAPI.class, getAPISession());
     }
 
     private static ServerAPI getServerAPI() {

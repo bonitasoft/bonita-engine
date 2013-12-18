@@ -1,9 +1,9 @@
-package org.bonitasoft.engine.repair.helper;
+package org.bonitasoft.engine.command.helper;
 
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.repair.helper.designer.SimpleProcessDesigner;
+import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
 
 /**
  * Created by Vincent Elcrin

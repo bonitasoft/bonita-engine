@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.repair.helper.design;
+package org.bonitasoft.engine.command.helper.design;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -15,11 +15,11 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.repair.helper.designer.EndEvent;
-import org.bonitasoft.engine.repair.helper.designer.Gateway;
-import org.bonitasoft.engine.repair.helper.designer.SimpleProcessDesigner;
-import org.bonitasoft.engine.repair.helper.designer.StartEvent;
-import org.bonitasoft.engine.repair.helper.designer.UserTask;
+import org.bonitasoft.engine.command.helper.designer.EndEvent;
+import org.bonitasoft.engine.command.helper.designer.Gateway;
+import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
+import org.bonitasoft.engine.command.helper.designer.StartEvent;
+import org.bonitasoft.engine.command.helper.designer.UserTask;
 import org.junit.Test;
 
 /**

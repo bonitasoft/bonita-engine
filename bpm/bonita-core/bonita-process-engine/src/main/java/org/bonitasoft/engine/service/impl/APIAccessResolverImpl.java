@@ -26,7 +26,6 @@ import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
-import org.bonitasoft.engine.api.RepairAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
@@ -36,7 +35,6 @@ import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformLoginAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
-import org.bonitasoft.engine.api.impl.RepairAPIImpl;
 import org.bonitasoft.engine.api.impl.ThemeAPIImpl;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.service.APIAccessResolver;
@@ -61,7 +59,6 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(CommandAPI.class.getName(), new CommandAPIImpl());
         apis.put(ProfileAPI.class.getName(), new ProfileAPIImpl());
         apis.put(ThemeAPI.class.getName(), new ThemeAPIImpl());
-        apis.put(RepairAPI.class.getName(), new RepairAPIImpl());
     }
 
     @Override

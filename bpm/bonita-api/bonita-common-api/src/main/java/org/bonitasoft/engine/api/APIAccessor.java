@@ -31,6 +31,4 @@ public interface APIAccessor extends Serializable {
 
     ThemeAPI getThemeAPI();
 
-    RepairAPI getRepairAPI();
-
 }

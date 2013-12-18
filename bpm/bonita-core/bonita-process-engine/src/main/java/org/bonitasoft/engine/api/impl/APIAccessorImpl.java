@@ -18,7 +18,6 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
-import org.bonitasoft.engine.api.RepairAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 
 /**
@@ -53,11 +52,6 @@ public class APIAccessorImpl implements APIAccessor {
     public ThemeAPI getThemeAPI() {
         return new ThemeAPIImpl();
 
-    }
-
-    @Override
-    public RepairAPI getRepairAPI() {
-        return new RepairAPIImpl();
     }
 
 }

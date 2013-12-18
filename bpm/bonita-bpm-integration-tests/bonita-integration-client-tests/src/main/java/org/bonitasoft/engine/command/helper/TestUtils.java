@@ -1,12 +1,12 @@
-package org.bonitasoft.engine.repair.helper;
+package org.bonitasoft.engine.command.helper;
+
+import static org.junit.Assert.fail;
+
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.identity.User;
-
-import java.util.concurrent.TimeoutException;
-
-import static org.junit.Assert.fail;
 
 /**
  * Created by Vincent Elcrin
