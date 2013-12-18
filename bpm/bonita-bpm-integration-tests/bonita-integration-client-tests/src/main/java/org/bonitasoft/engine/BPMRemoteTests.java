@@ -5,6 +5,7 @@ import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.activity.CallActivityTest;
 import org.bonitasoft.engine.activity.LoopTest;
 import org.bonitasoft.engine.activity.MultiInstanceTest;
+import org.bonitasoft.engine.command.AdvancedStartProcessCommandTest;
 import org.bonitasoft.engine.command.CommandTest;
 import org.bonitasoft.engine.command.web.ExternalCommandsTest;
 import org.bonitasoft.engine.connectors.RemoteConnectorExecutionTest;
@@ -42,7 +43,8 @@ import org.junit.runners.Suite.SuiteClasses;
         LoopTest.class,
         MultiInstanceTest.class,
         TenantAccessorTest.class,
-        MultiThreadCallsTest.class
+        MultiThreadCallsTest.class,
+        AdvancedStartProcessCommandTest.class
 })
 @Initializer(TestsInitializer.class)
 public class BPMRemoteTests {

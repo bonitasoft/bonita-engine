@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.repair.helper.designer;
+package org.bonitasoft.engine.command.helper.designer;
 
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;

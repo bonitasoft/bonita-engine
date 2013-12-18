@@ -1,24 +1,29 @@
-package org.bonitasoft.engine.repair;
+package org.bonitasoft.engine.command;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
-import org.bonitasoft.engine.api.RepairAPI;
-import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.command.helper.ProcessDeployer;
+import org.bonitasoft.engine.command.helper.TestUtils;
+import org.bonitasoft.engine.command.helper.designer.Gateway;
+import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
+import org.bonitasoft.engine.command.helper.designer.UserTask;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.repair.helper.ProcessDeployer;
-import org.bonitasoft.engine.repair.helper.TestUtils;
-import org.bonitasoft.engine.repair.helper.designer.Gateway;
-import org.bonitasoft.engine.repair.helper.designer.SimpleProcessDesigner;
-import org.bonitasoft.engine.repair.helper.designer.UserTask;
+import org.bonitasoft.engine.operation.Operation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +33,7 @@ import org.junit.Test;
  * Date: 11/12/13
  * Time: 09:45
  */
-public class RepairAPITest extends CommonAPITest {
-
-    RepairAPI repairAPI;
+public class AdvancedStartProcessCommandTest extends CommonAPITest {
 
     static final String JOHN = "john";
 
@@ -48,7 +51,7 @@ public class RepairAPITest extends CommonAPITest {
         john = createUser(JOHN, "bpm");
         logout();
         loginWith(JOHN, "bpm");
-        repairAPI = TenantAPIAccessor.getRepairAPI(getSession());
+        // deploy command AdvancedStartProcess
     }
 
     @After
@@ -71,8 +74,7 @@ public class RepairAPITest extends CommonAPITest {
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"), null, null));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"));
 
         process.expect("step 2").toBeStarted();
     }
@@ -89,8 +91,7 @@ public class RepairAPITest extends CommonAPITest {
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"), null, null));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"));
         process.execute(john, "step 1", "step 2");
 
         process.expect("step 3").toBeStarted();
@@ -108,8 +109,7 @@ public class RepairAPITest extends CommonAPITest {
                 .then(new UserTask("step 2"), new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"), null, null));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
         process.execute(john, "step 1");
 
         process.expect("step 2", "step 3").toBeStarted();
@@ -129,8 +129,7 @@ public class RepairAPITest extends CommonAPITest {
                 .then(new UserTask("step 4"))
                 .end());
 
-        TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"), null, null));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
         process.execute(john, "step 1", "step 2", "step 3");
 
         process.expect("step 4").toBeStarted();
@@ -148,8 +147,7 @@ public class RepairAPITest extends CommonAPITest {
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"), null, null));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"));
         process.execute(john, "step 2");
 
         process.expect("step 3").toBeStarted();
@@ -170,8 +168,7 @@ public class RepairAPITest extends CommonAPITest {
                         new UserTask("step 3").setCondition(TRUE))
                 .end());
 
-        TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"), null, null));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
         process.execute(john, "step 1");
 
         process.expect("step 3").toBeStarted();
@@ -183,6 +180,33 @@ public class RepairAPITest extends CommonAPITest {
                 .addActor("actor")
                 .addDescription("Coding all-night-long");
         return builder;
+    }
+
+    private TestUtils.Process startProcess(long startedBy,
+                                           long processDefinitionId,
+                                           List<String> activityNames) throws Exception {
+        return startProcess(startedBy, processDefinitionId, activityNames, null, null);
+    }
+
+    private TestUtils.Process startProcess(
+            long startedBy,
+            long processDefinitionId,
+            List<String> activityNames,
+            List<Operation> operations,
+            Map<String, Serializable> context) throws Exception {
+
+        Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("started_by", startedBy);
+        parameters.put("process_definition_id", processDefinitionId);
+        parameters.put("activity_names", new ArrayList<String>(activityNames));
+        if(operations != null) {
+            parameters.put("operations", new ArrayList<Operation>(operations));
+        }
+        if(context != null) {
+            parameters.put("context", new HashMap<String, Serializable>(context));
+        }
+
+        return wrapper.wrap((ProcessInstance) getCommandAPI().execute("advancedStartProcessCommand", parameters));
     }
 
     private ProcessDeployer getProcessDeployer() {

@@ -52,27 +52,32 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Vincent Elcrin
  *
  */
 public class ProcessStarter {
-    
-    
+
     private long userId;
     private long processDefinitionId;
     private List<Operation> operations;
     private Map<String, Serializable> context;
-    private List<String> activityNames;
+    private final Filter<SFlowNodeDefinition> filter;
 
-    public ProcessStarter(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context) {
+    private ProcessStarter(long userId, long processDefinitionId, List<Operation> operations,
+                           Map<String, Serializable> context, Filter<SFlowNodeDefinition> filter) {
         this.userId = userId;
         this.processDefinitionId = processDefinitionId;
         this.operations = operations;
         this.context = context;
+        this.filter = filter;
+    }
+
+    public ProcessStarter(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context) {
+        this(userId, processDefinitionId, operations, context, new StartFlowNodeFilter());
     }
 
     public ProcessStarter(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context, List<String> activityNames) {
-        this(userId, processDefinitionId, operations, context);
-        this.activityNames = activityNames;
+        this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames));
     }
     
     public ProcessInstance start() throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
@@ -109,8 +114,13 @@ public class ProcessStarter {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            FlowNodeSelector selector = getSelector(sProcessDefinition);
-            startedInstance = processExecutor.start(starterId, userIdFromSession, sOperations, operationContext, null, selector);
+            startedInstance = processExecutor.start(
+                    starterId,
+                    userIdFromSession,
+                    sOperations,
+                    operationContext,
+                    null,
+                    new FlowNodeSelector(sProcessDefinition, filter));
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
         }// FIXME in case process instance creation exception -> put it in failed
@@ -139,18 +149,6 @@ public class ProcessStarter {
         return processInstance;
     }
 
-    private FlowNodeSelector getSelector(final SProcessDefinition sProcessDefinition) {
-        FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter());
-        return selector;
-    }
-
-    private Filter<SFlowNodeDefinition> getFilter() {
-        if(activityNames == null) {
-            return new StartFlowNodeFilter();
-        }
-        return new FlowNodeNameFilter(activityNames);
-    }
-    
     protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
