@@ -50,53 +50,49 @@ public class TokenProvider {
         if(tokenInfo != null) {
             return tokenInfo;
         }
-        // not in the definition: no merge no split no implicit end
+        tokenInfo = calculateTokenInfo();
+        return tokenInfo;
+    }
+    
+    private TokenInfo calculateTokenInfo() throws SObjectReadException, SObjectNotFoundException {
+     // not in the definition: no merge no split no implicit end
         if (flowNodeWrapper.isNull() || transitionsDescriptor.isLastFlowNode()) {
-            tokenInfo = new TokenInfo();
-            return tokenInfo;
+            return new TokenInfo();
         }
 
         if (flowNodeWrapper.isBoundaryEvent()) {
-            tokenInfo = getOutputTokenRefIdFromBoundaryEvent();
-            return tokenInfo;
+            return getOutputTokenRefIdFromBoundaryEvent();
         }
 
         if (flowNodeWrapper.isExclusive() || transitionsDescriptor.isSimpleMerge()) {
             // always transmit token
-            
-            tokenInfo = transmitToken();
-            return tokenInfo;
+            return transmitToken();
         }
         
         if (transitionsDescriptor.isSimpleToMany()) {
             // 1 input , >1 output
             // create children input token
-            tokenInfo = new TokenInfo(child.getId(), child.getTokenRefId());
-            return tokenInfo;
+            return new TokenInfo(child.getId(), child.getTokenRefId());
         }
         
         if (transitionsDescriptor.isManyToMany()) {
             if(flowNodeWrapper.isParalleleOrInclusive()) {
-                tokenInfo = new TokenInfo(child.getId(), getParentTokenRefId());
-                return tokenInfo;
+                return new TokenInfo(child.getId(), getParentTokenRefId());
             }
-            tokenInfo = new TokenInfo(child.getId(), child.getTokenRefId());
-            return tokenInfo;
+            return  new TokenInfo(child.getId(), child.getTokenRefId());
         }
         
         if (transitionsDescriptor.isManyToOne()) {
             if (flowNodeWrapper.isParalleleOrInclusive()) {
-                tokenInfo = new TokenInfo(getParentTokenRefId());
-                return tokenInfo;
+                return new TokenInfo(getParentTokenRefId());
             } else {
-                tokenInfo = new TokenInfo(child.getTokenRefId());
-                return tokenInfo;
+                return new TokenInfo(child.getTokenRefId());
             }
         }
         
-        tokenInfo = new TokenInfo();
-        return tokenInfo;
+        return new TokenInfo();
     }
+    
 
     private Long getParentTokenRefId() throws SObjectReadException, SObjectNotFoundException {
         SToken token = tokenService.getToken(processInstance.getId(), child.getTokenRefId());
