@@ -24,6 +24,7 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -43,8 +44,9 @@ public class BDRIT extends CommonAPISPTest {
         deleteUser(matti);
         logout();
     }
-
-    // @Test
+    
+   @Test
+   @Ignore("Disabled until we support undeploy of a bdr, otherwise the second test fails")
     public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException, IOException {
         final InputStream stream = BDRIT.class.getResourceAsStream("/bdr-jar.bak");
         assertNotNull(stream);
