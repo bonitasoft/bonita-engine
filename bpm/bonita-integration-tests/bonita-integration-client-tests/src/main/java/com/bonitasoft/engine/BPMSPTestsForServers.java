@@ -15,20 +15,20 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({
-        BPMSPTests.class
-})
+@SuiteClasses({ BPMSPTests.class })
 @Initializer(BPMSPTestsForServers.class)
 public class BPMSPTestsForServers {
 
     public static void beforeAll() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.beforeClass()");
         APITestSPUtil.createPlatformStructure();
+        APITestSPUtil.initializeAndStartPlatformWithDefaultTenant(true);
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
     }
 
     public static void afterAll() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.afterClass()");
+        APITestSPUtil.stopAndCleanPlatformAndTenant(true);
         APITestSPUtil.deletePlatformStructure();
     }
 
