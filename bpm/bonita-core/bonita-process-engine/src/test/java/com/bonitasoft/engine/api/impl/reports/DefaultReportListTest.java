@@ -56,6 +56,6 @@ public class DefaultReportListTest {
             }
         });
 
-        assertEquals("[case_avg_time, case_list, task_list]", reports.toString());
+        assertEquals("[case_avg_time, case_list, task_list, case_history]", reports.toString());
     }
 }
