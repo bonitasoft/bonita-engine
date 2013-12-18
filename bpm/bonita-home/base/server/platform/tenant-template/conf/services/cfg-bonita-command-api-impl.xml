@@ -42,6 +42,7 @@
 				<ref bean="addBreakpointCommand" />
 				<ref bean="removeBreakpointCommand" />
 				<ref bean="getBreakpointsCommand" />
+                <ref bean="advancedStartProcessCommand" />
 			</list>
 		</property>
 	</bean>
@@ -417,4 +418,16 @@
 			<value>com.bonitasoft.engine.command.GetBreakpointsCommand</value>
 		</constructor-arg>
 	</bean>
+
+    <bean id="advancedStartProcessCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+        <constructor-arg name="name">
+            <value>advancedStartProcessCommand</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Advanced start process.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>org.bonitasoft.engine.command.AdvancedStartProcessCommand</value>
+        </constructor-arg>
+    </bean>
 </beans>
