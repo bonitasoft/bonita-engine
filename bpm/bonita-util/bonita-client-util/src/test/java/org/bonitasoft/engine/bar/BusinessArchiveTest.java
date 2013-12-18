@@ -66,7 +66,7 @@ import org.junit.Test;
 /**
  * @author Baptiste Mesta
  */
-public class BusinessArchiveTests {
+public class BusinessArchiveTest {
 
     private static final String ASSIGN_OPERATOR = "=";
 
@@ -1161,7 +1161,7 @@ public class BusinessArchiveTests {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void testReadBarWithConnectorFailActionsFails() throws Exception {
-        BusinessArchiveFactory.readBusinessArchive(BusinessArchiveTests.class.getResourceAsStream("testBuy_a_mini_extended--6.1.bar"));
+        BusinessArchiveFactory.readBusinessArchive(BusinessArchiveTest.class.getResourceAsStream("testBuy_a_mini_extended--6.1.bar"));
     }
 
 }
