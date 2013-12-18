@@ -38,7 +38,7 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
 
     public static final String ACTIVITY_NAMES = "activity_names";
 
-    public static final String OPERATIONS = "operation";
+    public static final String OPERATIONS = "operations";
 
     public static final String CONTEXT = "context";
 
