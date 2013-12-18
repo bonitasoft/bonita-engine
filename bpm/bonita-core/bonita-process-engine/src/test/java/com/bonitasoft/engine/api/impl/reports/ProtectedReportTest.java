@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -13,23 +13,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ **/
 
 package com.bonitasoft.engine.api.impl.reports;
+
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 /**
- * Created by Vincent Elcrin
- * Date: 03/12/13
- * Time: 14:14
+ * @author Vincent Elcrin
+ *
  */
 public class ProtectedReportTest {
 
@@ -46,14 +45,14 @@ public class ProtectedReportTest {
         doThrow(IllegalStateException.class).when(checker).checkLicenceAndFeature("feature");
         ProtectedReport report = new ProtectedReport("myreport", "feature", checker);
 
-        report.deploy("src/test/resources", null);
+        report.deploy("path/to/report", null);
     }
 
     @Test
     public void should_deploy_report_if_license_is_valid() throws Exception {
         ProtectedReport report = new ProtectedReport("myreport", "feature", checker);
 
-        report.deploy("src/test/resources", new ReportDeployer() {
+        report.deploy("src/test/resources/reports", new ReportDeployer() {
 
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws Exception {
