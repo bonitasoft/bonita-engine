@@ -18,9 +18,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 /**
- * Created by Vincent Elcrin
- * Date: 03/12/13
- * Time: 14:14
+ * @author Vincent Elcrin
+ *
  */
 public class ProtectedReportTest {
 
@@ -37,14 +36,14 @@ public class ProtectedReportTest {
         doThrow(IllegalStateException.class).when(checker).checkLicenceAndFeature("feature");
         ProtectedReport report = new ProtectedReport("myreport", "feature", checker);
 
-        report.deploy("src/test/resources", null);
+        report.deploy("path/to/report", null);
     }
 
     @Test
     public void should_deploy_report_if_license_is_valid() throws Exception {
         ProtectedReport report = new ProtectedReport("myreport", "feature", checker);
 
-        report.deploy("src/test/resources", new ReportDeployer() {
+        report.deploy("src/test/resources/reports", new ReportDeployer() {
 
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws Exception {

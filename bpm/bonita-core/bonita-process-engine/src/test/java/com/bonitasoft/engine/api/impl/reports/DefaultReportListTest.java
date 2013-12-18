@@ -20,9 +20,8 @@ import static junit.framework.Assert.assertEquals;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 /**
- * Created by Vincent Elcrin
- * Date: 02/12/13
- * Time: 16:42
+ * @author Vincent Elcrin
+ *
  */
 public class DefaultReportListTest {
 
@@ -37,7 +36,7 @@ public class DefaultReportListTest {
     @Test
     public void test_we_can_deploy_all_default_reports() throws Exception {
 
-        DefaultReportList defaultReports = new DefaultReportList(logger, "src/test/resources");
+        DefaultReportList defaultReports = new DefaultReportList(logger, "src/test/resources/reports");
         final List<String> reports = new ArrayList<String>();
 
         defaultReports.deploy(new ReportDeployer() {
