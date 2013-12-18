@@ -883,7 +883,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             throws SProcessInstanceCreationException {
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-            FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new FlowNodeIdFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
+            FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
             return start(starterId, starterDelegateId, expressionContext, operations, context,
                     connectorsWithInput, callerId, selector);
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -891,6 +891,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         } catch (final SProcessDefinitionReadException e) {
             throw new SProcessInstanceCreationException(e);
         }
+    }
+
+    private Filter<SFlowNodeDefinition> getFilter(final long targetSFlowNodeDefinitionId) {
+        if(targetSFlowNodeDefinitionId == -1) {
+            return new StartableFlowNodeFilter();
+        }
+        return new FlowNodeIdFilter(targetSFlowNodeDefinitionId);
     }
 
     @Override
