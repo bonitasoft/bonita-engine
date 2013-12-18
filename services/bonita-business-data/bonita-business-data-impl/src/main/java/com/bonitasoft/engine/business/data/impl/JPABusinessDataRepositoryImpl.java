@@ -113,6 +113,14 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 		return IOUtil.addJarEntry(bdrArchive,"META-INF/persistence.xml",persistenceFileContent);
 	}
 
+	public List<String> getClassNameList() {
+		return classNameList;
+	}
+
+	public void setClassNameList(List<String> classNameList) {
+		this.classNameList = classNameList;
+	}
+
 	protected byte[] getPersistenceFileContentFor(final List<String> classNames) throws SBusinessDataRepositoryDeploymentException, IOException, TransformerException {
 		PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
 		for(String classname : classNames){
@@ -122,16 +130,16 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 	}
 
 	@Override
-	public void start() {
+	public void start() throws SBusinessDataRepositoryDeploymentException {
 		final Map<String, Object> configOverrides = new HashMap<String, Object>();
 		configOverrides.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
 		entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configOverrides);
 		Properties properties = toProperties(entityManagerFactory.getProperties());
 		Dialect dialect = Dialect.getDialect(properties);
 		try {
-			executeQueries(new SchemaGenerator(dialect,properties,classNameList).generate());
+			executeQueries(new SchemaGenerator(dialect,properties,getClassNameList()).generate());
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			throw new SBusinessDataRepositoryDeploymentException(e);
 		}
 	}
 
@@ -139,7 +147,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 	private void executeQueries(final String... sqlQuerys) {
 		final EntityManager entityManager = getEntityManager();
 		for (final String sqlQuery : sqlQuerys) {
-			System.out.println(sqlQuery);
 			final Query query = entityManager.createNativeQuery(sqlQuery);
 			query.executeUpdate();
 		}

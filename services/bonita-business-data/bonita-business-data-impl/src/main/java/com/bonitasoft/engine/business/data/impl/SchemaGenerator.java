@@ -11,6 +11,8 @@ import org.hibernate.connection.ConnectionProviderFactory;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+
 /**
  * @author Romain Bioteau
  *
@@ -20,7 +22,7 @@ public class SchemaGenerator {
 	private Configuration cfg;
 	private Dialect dialect;
 
-	public SchemaGenerator(Dialect dialect,Properties properties, List<String> classNameList){
+	public SchemaGenerator(Dialect dialect,Properties properties, List<String> classNameList) throws SBusinessDataRepositoryDeploymentException{
 		this.cfg = new Configuration();
 		this.cfg.setProperties(properties);
 		this.cfg.setProperty("hibernate.hbm2ddl.auto","update");
@@ -36,11 +38,11 @@ public class SchemaGenerator {
 				annotatedClass = Thread.currentThread().getContextClassLoader().loadClass(className);
 				cfg.addAnnotatedClass(annotatedClass);
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				throw new SBusinessDataRepositoryDeploymentException(e);
 			}
-		
+
 		}
-		
+
 	}
 
 	/**
@@ -49,7 +51,6 @@ public class SchemaGenerator {
 	 * @throws SQLException 
 	 */
 	public String[] generate() throws SQLException{
-		
 		final ConnectionProvider connectionProvider = ConnectionProviderFactory.newConnectionProvider(cfg.getProperties());
 		final Connection connection = connectionProvider.getConnection();
 		final DatabaseMetadata databaseMetadata = new DatabaseMetadata(connection, dialect);

@@ -6,11 +6,8 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:/comp/env/jdbc/PGDS1</jta-data-source>
 		<class>com.bonitasoft.pojo.Employee</class>
-<!-- 		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode> -->
-<!-- 		<validation-mode>CALLBACK</validation-mode> -->
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
-			<!-- <property name="hibernate.hbm2ddl.auto" value="update" /> -->
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.BTMTransactionManagerLookup" />

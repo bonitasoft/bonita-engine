@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface BusinessDataRespository {
 
-    void start();
+    void start() throws SBusinessDataRepositoryException;
 
     void stop();
 
