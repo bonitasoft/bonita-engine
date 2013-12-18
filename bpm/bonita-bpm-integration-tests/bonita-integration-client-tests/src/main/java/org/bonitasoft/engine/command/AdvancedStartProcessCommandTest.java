@@ -3,6 +3,7 @@ package org.bonitasoft.engine.command;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,18 +15,21 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.command.helper.ProcessDeployer;
-import org.bonitasoft.engine.command.helper.TestUtils;
 import org.bonitasoft.engine.command.helper.designer.Gateway;
 import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
 import org.bonitasoft.engine.command.helper.designer.UserTask;
+import org.bonitasoft.engine.command.helper.expectation.TestUtils;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -51,7 +55,6 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
         john = createUser(JOHN, "bpm");
         logout();
         loginWith(JOHN, "bpm");
-        // deploy command AdvancedStartProcess
     }
 
     @After
@@ -62,9 +65,6 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
         logout();
     }
 
-    /*
-     * start -> step 1 -> step 2(s-e) -> step 3 -> end
-     */
     @Test
     public void should_start_a_process_giving_an_activity_name_to_start_from() throws Exception {
         ProcessDefinition processDefinition = processDeployer.deploy(designer
@@ -76,12 +76,34 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
 
         TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"));
 
-        process.expect("step 2").toBeStarted();
+        process.expect("step 2").toBeReady();
+        process.expect("start", "step 1").toNotHaveArchives();
     }
 
-    /*
-     * start -> task 1(s) // task 2(s) + task 3(e) -> end
-     */
+    @Test
+    public void should_start_a_process_with_variables() throws Exception {
+        ProcessDefinitionBuilder builder = getProcessDefinitionBuilder();
+        builder.addShortTextData("variable", new ExpressionBuilder().createConstantStringExpression("default"));
+        SimpleProcessDesigner designer = new SimpleProcessDesigner(builder);
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
+                .start()
+                .then(new UserTask("step 1"))
+                .then(new UserTask("step 2"))
+                .then(new UserTask("step 3"))
+                .end());
+
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(),
+                Arrays.asList("step 2"),
+                Arrays.asList(createSetDataOperation("variable", "Done!")),
+                Collections.<String, Serializable> emptyMap());
+
+        process.expectVariable("variable").toBe("Done!");
+    }
+
+    private Operation createSetDataOperation(String name, String value) throws InvalidExpressionException {
+        return new OperationBuilder().createSetDataOperation(name, new ExpressionBuilder().createConstantStringExpression(value));
+    }
+
     @Test
     public void should_be_able_to_start_a_process_containing_a_parallel_gateway_which_merge_steps() throws Exception {
         ProcessDefinition processDefinition = processDeployer.deploy(designer
@@ -92,14 +114,12 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"));
-        process.execute(john, "step 1", "step 2");
+        process.execute(john, "step 1", "step 2", "step 3");
 
-        process.expect("step 3").toBeStarted();
+        process.isExpected().toFinish();
+        process.expect("start").toNotHaveArchives();
     }
 
-    /*
-     * start -> task 1(s) + task 2(e) // task 3(e) -> end
-     */
     @Test
     public void should_be_able_to_start_a_process_containing_a_parallel_gateway_which_split_steps() throws Exception {
         ProcessDefinition processDefinition = processDeployer.deploy(designer
@@ -110,14 +130,13 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
-        process.execute(john, "step 1");
+        process.execute(john, "step 1", "step 2", "step 3");
 
-        process.expect("step 2", "step 3").toBeStarted();
+        process.isExpected().toFinish();
+        process.expect("start").toNotHaveArchives();
     }
 
-    /*
-     * start -> step 1(s) o step 2 // step 3 o step 4(e) -> end
-     */
+    @Ignore
     @Test
     public void should_be_able_to_start_a_process_containing_an_inclusive_gateway() throws Exception {
         ProcessDefinition processDefinition = processDeployer.deploy(designer
@@ -130,14 +149,12 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
-        process.execute(john, "step 1", "step 2", "step 3");
+        process.execute(john, "step 1", "step 2", "step 3", "step 4");
 
-        process.expect("step 4").toBeStarted();
+        process.isExpected().toFinish();
+        process.expect("start").toNotHaveArchives();
     }
 
-    /*
-     * start -> step 1 // step 2(s) x step 3(e) -> end
-     */
     @Test
     public void should_be_able_to_start_a_process_containing_an_exclusive_gateway_which_merge() throws Exception {
         ProcessDefinition processDefinition = processDeployer.deploy(designer
@@ -148,14 +165,12 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"));
-        process.execute(john, "step 2");
+        process.execute(john, "step 2", "step 3");
 
-        process.expect("step 3").toBeStarted();
+        process.isExpected().toFinish();
+        process.expect("start").toNotHaveArchives();
     }
 
-    /*
-     * start -> step 1(s) x step 2(d) // step 3(c-e) -> end
-     */
     @Test
     public void should_be_able_to_start_a_process_containing_an_exclusive_gateway_which_split() throws Exception {
         Expression TRUE = new ExpressionBuilder().createConstantBooleanExpression(true);
@@ -169,9 +184,29 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
-        process.execute(john, "step 1");
+        process.execute(john, "step 1", "step 3");
 
-        process.expect("step 3").toBeStarted();
+        process.isExpected().toFinish();
+        process.expect("start").toNotHaveArchives();
+    }
+
+    @Test
+    public void should_be_able_to_start_an_inclusive_gateway_right_in_the_middle() throws Exception {
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
+                .start()
+                .then(new UserTask("step 1"))
+                .then(new Gateway("inclusive 1", GatewayType.INCLUSIVE))
+                .then(new UserTask("step 2"), new UserTask("step 3"))
+                .then(new Gateway("inclusive 2", GatewayType.INCLUSIVE))
+                .then(new UserTask("step 4"))
+                .end());
+
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2", "step 3"));
+        process.execute(john, "step 2", "step 3", "step 4");
+
+        process.isExpected().toFinish();
+        process.expect("step 1").toNotHaveArchives();
+        process.expect("step 4").toBeExecuted(1);
     }
 
     private ProcessDefinitionBuilder getProcessDefinitionBuilder() {
