@@ -14,8 +14,8 @@ public abstract class ProcessDeployer {
 
     ProcessDefinition processDefinition;
 
-    public void deploy(SimpleProcessDesigner design) throws BonitaException {
-        processDefinition = deploy(design.done());
+    public ProcessDefinition deploy(SimpleProcessDesigner design) throws BonitaException {
+        return processDefinition = deploy(design.done());
     };
 
     public abstract ProcessDefinition deploy(DesignProcessDefinition design) throws BonitaException;

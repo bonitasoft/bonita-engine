@@ -28,11 +28,14 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.execution.Filter;
+import org.bonitasoft.engine.execution.FlowNodeNameFilter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartableFlowNodeFilter;
@@ -58,6 +61,7 @@ public class ProcessStarter {
     private long processDefinitionId;
     private List<Operation> operations;
     private Map<String, Serializable> context;
+    private List<String> activityNames;
 
     public ProcessStarter(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context) {
         this.userId = userId;
@@ -65,19 +69,16 @@ public class ProcessStarter {
         this.operations = operations;
         this.context = context;
     }
+
+    public ProcessStarter(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context, List<String> activityNames) {
+        this(userId, processDefinitionId, operations, context);
+        this.activityNames = activityNames;
+    }
     
     public ProcessInstance start() throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final long starterId;
-        final long userIdFromSession = SessionInfos.getUserIdFromSession();
-        if (userId == 0) {
-            starterId = userIdFromSession;
-        } else {
-            starterId = userId;
-        }
         // Retrieval of the process definition:
         final SProcessDefinition sProcessDefinition;
         try {
@@ -91,6 +92,14 @@ public class ProcessStarter {
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
+        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
+        final long starterId;
+        final long userIdFromSession = SessionInfos.getUserIdFromSession();
+        if (userId == 0) {
+            starterId = userIdFromSession;
+        } else {
+            starterId = userId;
+        }
         final SProcessInstance startedInstance;
         try {
             final List<SOperation> sOperations = ModelConvertor.toSOperation(operations);
@@ -100,7 +109,7 @@ public class ProcessStarter {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new StartableFlowNodeFilter());
+            FlowNodeSelector selector = getSelector(sProcessDefinition);
             startedInstance = processExecutor.start(starterId, userIdFromSession, sOperations, operationContext, null, selector);
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
@@ -128,6 +137,18 @@ public class ProcessStarter {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());
         }
         return processInstance;
+    }
+
+    private FlowNodeSelector getSelector(final SProcessDefinition sProcessDefinition) {
+        FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter());
+        return selector;
+    }
+
+    private Filter<SFlowNodeDefinition> getFilter() {
+        if(activityNames == null) {
+            return new StartableFlowNodeFilter();
+        }
+        return new FlowNodeNameFilter(activityNames);
     }
     
     protected TenantServiceAccessor getTenantAccessor() {

@@ -17,13 +17,16 @@
 
 package org.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.api.RepairAPI;
-import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.operation.Operation;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
+import org.bonitasoft.engine.api.RepairAPI;
+import org.bonitasoft.engine.bpm.process.ProcessActivationException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.operation.Operation;
 
 /**
  * Created by Vincent Elcrin
@@ -33,7 +36,8 @@ import java.util.Map;
 public class RepairAPIImpl implements RepairAPI {
 
     @Override
-    public ProcessInstance startProcess(long startedBy, List<String> activityNames, List<Operation> operations, Map<String, Serializable> context) {
-        return null;
+    public ProcessInstance startProcess(long startedBy, long processDefinitionId, List<String> activityNames, List<Operation> operations, Map<String, Serializable> context) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
+        ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context, activityNames);
+        return starter.start();
     }
 }

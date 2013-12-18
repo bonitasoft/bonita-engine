@@ -1,5 +1,7 @@
 package org.bonitasoft.engine.repair;
 
+import java.util.Arrays;
+
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.RepairAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
@@ -20,8 +22,6 @@ import org.bonitasoft.engine.repair.helper.designer.UserTask;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 /**
  * Created by Vincent Elcrin
@@ -45,10 +45,10 @@ public class RepairAPITest extends CommonAPITest {
     @Before
     public void beforeTest() throws BonitaException {
         login();
-        repairAPI = TenantAPIAccessor.getRepairAPI(getSession());
         john = createUser(JOHN, "bpm");
         logout();
         loginWith(JOHN, "bpm");
+        repairAPI = TenantAPIAccessor.getRepairAPI(getSession());
     }
 
     @After
@@ -64,7 +64,7 @@ public class RepairAPITest extends CommonAPITest {
      */
     @Test
     public void should_start_a_process_giving_an_activity_name_to_start_from() throws Exception {
-        processDeployer.deploy(designer
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new UserTask("step 2"))
@@ -72,7 +72,7 @@ public class RepairAPITest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), Arrays.asList("step 2"), null, null));
+                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"), null, null));
 
         process.expect("step 2").toBeStarted();
     }
@@ -82,7 +82,7 @@ public class RepairAPITest extends CommonAPITest {
      */
     @Test
     public void should_be_able_to_start_a_process_containing_a_parallel_gateway_which_merge_steps() throws Exception {
-        processDeployer.deploy(designer
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"), new UserTask("step 2"))
                 .then(new Gateway("merge", GatewayType.PARALLEL))
@@ -90,7 +90,7 @@ public class RepairAPITest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), Arrays.asList("step 1", "step 2"), null, null));
+                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"), null, null));
         process.execute(john, "step 1", "step 2");
 
         process.expect("step 3").toBeStarted();
@@ -101,7 +101,7 @@ public class RepairAPITest extends CommonAPITest {
      */
     @Test
     public void should_be_able_to_start_a_process_containing_a_parallel_gateway_which_split_steps() throws Exception {
-        processDeployer.deploy(designer
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new Gateway("split", GatewayType.PARALLEL))
@@ -109,7 +109,7 @@ public class RepairAPITest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), Arrays.asList("step 1"), null, null));
+                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"), null, null));
         process.execute(john, "step 1");
 
         process.expect("step 2", "step 3").toBeStarted();
@@ -120,7 +120,7 @@ public class RepairAPITest extends CommonAPITest {
      */
     @Test
     public void should_be_able_to_start_a_process_containing_an_inclusive_gateway() throws Exception {
-        processDeployer.deploy(designer
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new Gateway("inclusive 1", GatewayType.INCLUSIVE))
@@ -130,7 +130,7 @@ public class RepairAPITest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), Arrays.asList("step 1"), null, null));
+                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"), null, null));
         process.execute(john, "step 1", "step 2", "step 3");
 
         process.expect("step 4").toBeStarted();
@@ -141,7 +141,7 @@ public class RepairAPITest extends CommonAPITest {
      */
     @Test
     public void should_be_able_to_start_a_process_containing_an_exclusive_gateway_which_merge() throws Exception {
-        processDeployer.deploy(designer
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"), new UserTask("step 2"))
                 .then(new Gateway("exclusive", GatewayType.EXCLUSIVE))
@@ -149,7 +149,7 @@ public class RepairAPITest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), Arrays.asList("step 2"), null, null));
+                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"), null, null));
         process.execute(john, "step 2");
 
         process.expect("step 3").toBeStarted();
@@ -161,7 +161,7 @@ public class RepairAPITest extends CommonAPITest {
     @Test
     public void should_be_able_to_start_a_process_containing_an_exclusive_gateway_which_split() throws Exception {
         Expression TRUE = new ExpressionBuilder().createConstantBooleanExpression(true);
-        processDeployer.deploy(designer
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new Gateway("exclusive", GatewayType.EXCLUSIVE))
@@ -171,7 +171,7 @@ public class RepairAPITest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = wrapper.wrap(
-                repairAPI.startProcess(john.getId(), Arrays.asList("step 1"), null, null));
+                repairAPI.startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"), null, null));
         process.execute(john, "step 1");
 
         process.expect("step 3").toBeStarted();
@@ -190,7 +190,7 @@ public class RepairAPITest extends CommonAPITest {
 
             @Override
             public ProcessDefinition deploy(DesignProcessDefinition design) throws BonitaException {
-                return deployAndEnableWithActor(design, ACTOR_NAME, john);
+                return deployAndEnableWithActor(design, "actor", john);
             }
 
             @Override
