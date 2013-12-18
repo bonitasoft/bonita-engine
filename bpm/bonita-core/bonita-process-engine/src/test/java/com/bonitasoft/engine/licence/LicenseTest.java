@@ -19,13 +19,13 @@ public class LicenseTest {
 
     @Test
     public void validateLicence() {
-       final Manager manager = Manager.getInstance();
-		Assert.assertTrue("The license should be valid because of: " + manager.getErrorMessage(), manager.isValid());
+        final Manager manager = Manager.getInstance();
+        Assert.assertTrue("The license should be valid because of: " + manager.getErrorMessage(), manager.isValid());
     }
 
     private void valideFeature(final String feature) {
         try {
-            Assert.assertTrue("The feature: ' " + feature + "' is not active.",Manager.getInstance().isFeatureActive(feature));
+            Assert.assertTrue("The feature: ' " + feature + "' is not active.", Manager.getInstance().isFeatureActive(feature));
         } catch (final ConfigurationError exception) {
             Assert.assertTrue("The feature : '" + feature + "' is not supported due to an invalid license.", false);
         }
@@ -94,6 +94,11 @@ public class LicenseTest {
     @Test
     public void setConnectorStateFeature() {
         valideFeature(Features.SET_CONNECTOR_STATE);
+    }
+
+    @Test
+    public void traceability() {
+        valideFeature(Features.TRACEABILITY);
     }
 
 }

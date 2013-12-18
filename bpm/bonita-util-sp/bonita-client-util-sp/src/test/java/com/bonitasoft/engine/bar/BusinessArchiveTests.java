@@ -512,7 +512,7 @@ public class BusinessArchiveTests {
         fileContent = fileContent.replace("</processDefinition", "</porcessDefinition");
         file.delete();
         file.createNewFile();
-        IOUtil.write(file, fileContent);
+        IOUtil.writeContentToFile(fileContent, file);
         try {
             BusinessArchiveFactory.readBusinessArchive(tempFile);
         } finally {
@@ -553,7 +553,7 @@ public class BusinessArchiveTests {
         fileContent = fileContent.replace("<processDefinition", "<porcessDefinition");
         file.delete();
         file.createNewFile();
-        IOUtil.write(file, fileContent);
+        IOUtil.writeContentToFile(fileContent, file);
         try {
             BusinessArchiveFactory.readBusinessArchive(tempFile);
         } finally {

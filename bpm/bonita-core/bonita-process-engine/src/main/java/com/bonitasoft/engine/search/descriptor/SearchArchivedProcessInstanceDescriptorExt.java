@@ -19,9 +19,9 @@ import com.bonitasoft.engine.core.process.instance.model.archive.builder.SAProce
 /**
  * @author Celine Souchet
  */
-public class SearchArchivedProcessInstancesDescriptorExt extends SearchArchivedProcessInstancesDescriptor {
+public class SearchArchivedProcessInstanceDescriptorExt extends SearchArchivedProcessInstancesDescriptor {
 
-    public SearchArchivedProcessInstancesDescriptorExt() {
+    public SearchArchivedProcessInstanceDescriptorExt() {
         super();
 
         final SAProcessInstanceBuilderFactory keyProvider = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);

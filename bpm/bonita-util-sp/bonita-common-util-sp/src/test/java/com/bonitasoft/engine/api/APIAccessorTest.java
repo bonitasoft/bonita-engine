@@ -52,6 +52,12 @@ public class APIAccessorTest {
     }
 
     @Test
+    public void checkgetThemeAPI() throws SecurityException {
+        final Method method = getAPIMethod("getThemeAPI");
+        assertEquals("com.bonitasoft.engine.api.ThemeAPI", method.getReturnType().getName());
+    }
+
+    @Test
     public void checkNodeAPI() throws SecurityException {
         final Method method = getAPIMethod("getNodeAPI");
         assertEquals("com.bonitasoft.engine.api.NodeAPI", method.getReturnType().getName());

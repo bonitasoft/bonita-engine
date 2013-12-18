@@ -188,7 +188,7 @@ public class ProfileTest extends AbstractProfileTest {
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Update", "Profile", "Custom" }, story = "Update custom profile fails.", jira = "ENGINE-2011")
     @Test(expected = AlreadyExistsException.class)
-    public void cannotUpdateProfileWithExistingName() throws BonitaException {
+    public void cantUpdateProfileWithExistingName() throws BonitaException {
         final Profile profile1 = getProfileAPI().createProfile("Profile1", "Description profile1", "IconPath profile1");
         final Profile profile2 = getProfileAPI().createProfile("Profile2", "Description profile2", "IconPath profile2");
 

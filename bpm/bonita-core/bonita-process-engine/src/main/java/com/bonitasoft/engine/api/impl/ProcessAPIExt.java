@@ -87,6 +87,7 @@ import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -142,7 +143,8 @@ import com.bonitasoft.manager.Features;
  */
 public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
-    protected static TenantServiceAccessor getTenantAccessor() {
+    @Override
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -637,7 +639,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                     parasF.createNewFile();
                 }
                 final String content = IOUtil.read(currentParasF);
-                IOUtil.write(parasF, content);
+                IOUtil.writeContentToFile(content, parasF);
             }
 
             // export actormapping
@@ -651,7 +653,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             } catch (final ActorMappingExportException e) {
                 throw new ProcessExportException(e);
             }
-            IOUtil.write(actormappF, xmlcontent);
+            IOUtil.writeContentToFile(xmlcontent, actormappF);
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             final ZipOutputStream zos = new ZipOutputStream(baos);
@@ -693,7 +695,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         try {
             final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                    tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1, BuilderFactory.get(SAProcessInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
+                    tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1,
+                    BuilderFactory.get(SAProcessInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
             getArchivedProcessInstanceList.execute();
             final ArchivedProcessInstance saprocessInstance = getArchivedProcessInstanceList.getResult().get(0);
             final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
@@ -755,10 +758,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilderFactory = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
         try {
             final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-            final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getParentContainerId());
+            final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getLogicalGroup(sUserTaskInstanceBuilderFactory
+                    .getParentProcessInstanceIndex()));
             final long processDefinitionId = processInstance.getProcessDefinitionId();
             final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
@@ -1013,7 +1018,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
         try {
             final SearchProcessInstances searchProcessInstances = new SearchProcessInstances(processInstanceService,
-                    searchEntitiesDescriptor.getProcessInstanceDescriptor(), searchOptions, processDefinitionService);
+                    searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), searchOptions, processDefinitionService);
             searchProcessInstances.execute();
             return searchProcessInstances.getResult();
         } catch (final SBonitaException sbe) {
