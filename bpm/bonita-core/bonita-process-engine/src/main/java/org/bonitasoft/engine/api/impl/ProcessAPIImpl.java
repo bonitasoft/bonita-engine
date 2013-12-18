@@ -324,11 +324,11 @@ import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionExcept
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.execution.DefaultFlowNodeFilter;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
+import org.bonitasoft.engine.execution.StartableFlowNodeFilter;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -3195,7 +3195,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new DefaultFlowNodeFilter(-1));
+            FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new StartableFlowNodeFilter());
             startedInstance = processExecutor.start(starterId, userIdFromSession, sOperations, operationContext, null, selector);
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
