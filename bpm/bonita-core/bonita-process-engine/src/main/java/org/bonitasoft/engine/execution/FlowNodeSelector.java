@@ -16,7 +16,10 @@ package org.bonitasoft.engine.execution;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 
 
 /**
@@ -26,22 +29,46 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 public class FlowNodeSelector {
 
     
-    private List<SFlowNodeDefinition> flowNodes;
     private Filter<SFlowNodeDefinition> selector;
+    private SProcessDefinition definition;
+    private long subProcessDefinitionId = -1;
 
-    public FlowNodeSelector(List<SFlowNodeDefinition> flowNodes, Filter<SFlowNodeDefinition> select) {
-        this.flowNodes = flowNodes;
-        this.selector = select;
+    public FlowNodeSelector(SProcessDefinition definition, Filter<SFlowNodeDefinition> filter) {
+        this.definition = definition;
+        this.selector = filter;
+    }
+
+    public FlowNodeSelector(SProcessDefinition definition, Filter<SFlowNodeDefinition> filter, final long subProcessDefinitionId) {
+        this(definition, filter);
+        this.subProcessDefinitionId  = subProcessDefinitionId;
     }
     
     public List<SFlowNodeDefinition> getFilteredElements() {
+        SFlowElementContainerDefinition container = getContainer();
         ArrayList<SFlowNodeDefinition> selectedFlowNodes = new ArrayList<SFlowNodeDefinition>();
-        for (SFlowNodeDefinition flowNodeDefinition : flowNodes) {
+        for (SFlowNodeDefinition flowNodeDefinition : container.getFlowNodes()) {
             if(selector.select(flowNodeDefinition)) {
                 selectedFlowNodes.add(flowNodeDefinition);
             }
         }
         return selectedFlowNodes;
     }
+
+    public SFlowElementContainerDefinition getContainer() {
+        if(subProcessDefinitionId == -1) {
+            return definition.getProcessContainer();
+        }
+        final SSubProcessDefinition subProcDef = (SSubProcessDefinition) definition.getProcessContainer().getFlowNode(subProcessDefinitionId);
+        return subProcDef.getSubProcessContainer();
+    }
     
+    
+    public SProcessDefinition getProcessDefinition() {
+        return definition;
+    }
+    
+    
+    public long getSubProcessDefinitionId() {
+        return subProcessDefinitionId;
+    }
 }

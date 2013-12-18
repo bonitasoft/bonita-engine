@@ -324,7 +324,9 @@ import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionExcept
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.execution.DefaultFlowNodeFilter;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
+import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
@@ -3193,7 +3195,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            startedInstance = processExecutor.start(sProcessDefinition, starterId, userIdFromSession, sOperations, operationContext, null);
+            FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new DefaultFlowNodeFilter(-1));
+            startedInstance = processExecutor.start(starterId, userIdFromSession, sOperations, operationContext, null, selector);
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
         }// FIXME in case process instance creation exception -> put it in failed
