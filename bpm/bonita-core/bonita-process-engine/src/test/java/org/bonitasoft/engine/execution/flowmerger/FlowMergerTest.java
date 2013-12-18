@@ -74,6 +74,7 @@ public class FlowMergerTest {
         doReturn(false).when(transitionDependentFlowNodeWrapper).isNull();
         doReturn(false).when(transitionDependentFlowNodeWrapper).isBoundaryEvent();
         doReturn(false).when(transitionDependentFlowNodeWrapper).isExclusive();
+        doReturn(false).when(transitionsDescriptor).isLastFlowNode();
     }
     
     @Test
@@ -115,6 +116,15 @@ public class FlowMergerTest {
     public void should_create_token_if_depend_on_transitons_and_has_multiple_outgoing_transitions() throws SObjectReadException, SObjectNotFoundException {
         doReturn(false).when(transitionsDescriptor).isLastFlowNode();
         doReturn(true).when(transitionsDescriptor).hasMultipleOutgoingTransitions();
+        
+        assertTrue(transitionDependentFlowNodeMerger.mustCreateToken());
+    }
+
+    @Test
+    public void should_create_token_if_depend_on_transitons_isManyToOne_And_parent_token_is_null() throws SObjectReadException, SObjectNotFoundException {
+        doReturn(true).when(transitionsDescriptor).isManyToOne();
+        TokenInfo tokenInfo = new TokenInfo(1L);
+        doReturn(tokenInfo).when(tokenProvider).getOutputTokenInfo();
         
         assertTrue(transitionDependentFlowNodeMerger.mustCreateToken());
     }

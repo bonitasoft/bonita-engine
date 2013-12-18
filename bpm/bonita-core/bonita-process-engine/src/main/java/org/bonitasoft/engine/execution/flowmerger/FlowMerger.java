@@ -43,12 +43,18 @@ public class FlowMerger {
             && transitionsWrapper.hasMultipleIncomingTransitions();
     }
     
-    public boolean mustCreateToken() {
-        if(flowNodewrapper.isNull() || flowNodewrapper.isBoundaryEvent() || flowNodewrapper.isExclusive()) {
+    public boolean mustCreateToken() throws SObjectReadException, SObjectNotFoundException {
+        if(flowNodewrapper.isNull() || flowNodewrapper.isBoundaryEvent() || flowNodewrapper.isExclusive() || transitionsWrapper.isLastFlowNode()) {
             return false;
         }
-        return !transitionsWrapper.isLastFlowNode()
-                && transitionsWrapper.hasMultipleOutgoingTransitions();
+        if (transitionsWrapper.hasMultipleOutgoingTransitions()) {
+            return true;
+        }
+        if(!transitionsWrapper.isManyToOne()) {
+            return false;
+        }
+        TokenInfo tokenInfo = tokenProvider.getOutputTokenInfo();
+        return tokenInfo.outputParentTokenRefId == null;
     }
     
     public boolean isImplicitEnd() {
