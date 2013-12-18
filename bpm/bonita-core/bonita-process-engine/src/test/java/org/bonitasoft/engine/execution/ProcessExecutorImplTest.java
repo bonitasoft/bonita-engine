@@ -3,8 +3,8 @@ package org.bonitasoft.engine.execution;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,7 +28,9 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -153,12 +155,13 @@ public class ProcessExecutorImplTest {
         final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
-        when(mockedProcessExecutorImpl.start(sProcessDefinition, -1, starterId, starterDelegateId, null, operations, context, null, -1, -1)).thenReturn(
+        FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null);
+        when(mockedProcessExecutorImpl.start(starterId, starterDelegateId, null, operations, context, null, -1, selector)).thenReturn(
                 sProcessInstance);
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(sProcessDefinition, starterId, starterDelegateId, operations, context, null);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(sProcessDefinition, starterId, starterDelegateId, operations, context, null);
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterDelegateId, operations, context, null, selector);
+        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterDelegateId, operations, context, null, selector);
 
         assertNotNull(result);
         assertEquals(sProcessInstance, result);
@@ -180,19 +183,24 @@ public class ProcessExecutorImplTest {
 
         final ProcessExecutorImpl mockedProcessExecutorImpl = mock(ProcessExecutorImpl.class, withSettings().spiedInstance(processExecutorImpl));
         final SProcessDefinition sProcessDefinition = mock(SProcessDefinition.class);
+        SSubProcessDefinition subProcessDef = mock(SSubProcessDefinition.class);
+        SFlowElementContainerDefinition rootContainerDefinition = mock(SFlowElementContainerDefinition.class);
+        doReturn(rootContainerDefinition).when(sProcessDefinition).getProcessContainer();
+        doReturn(subProcessDef).when(rootContainerDefinition).getFlowNode(subProcessDefinitionId);
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
-        when(mockedProcessExecutorImpl.startElements(sProcessDefinition, sProcessInstance, subProcessDefinitionId, -1)).thenReturn(sProcessInstance);
+        FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, null, subProcessDefinitionId);
+        when(mockedProcessExecutorImpl.startElements(sProcessInstance, selector)).thenReturn(sProcessInstance);
         when(mockedProcessExecutorImpl.createProcessInstance(sProcessDefinition, starterId, starterDelegateId, subProcessDefinitionId)).thenReturn(
                 sProcessInstance);
 
         // Let's call it for real:
-        doCallRealMethod().when(mockedProcessExecutorImpl).start(sProcessDefinition, -1, starterId, starterDelegateId, expressionContext, operations, context,
-                connectors, callerId, subProcessDefinitionId);
-        final SProcessInstance result = mockedProcessExecutorImpl.start(sProcessDefinition, -1, starterId, starterDelegateId, expressionContext, operations,
-                context, connectors, callerId, subProcessDefinitionId);
+        doCallRealMethod().when(mockedProcessExecutorImpl).start(starterId, starterDelegateId, expressionContext, operations, context,
+                connectors, callerId, selector);
+        final SProcessInstance result = mockedProcessExecutorImpl.start(starterId, starterDelegateId, expressionContext, operations,
+                context, connectors, callerId, selector);
 
         // and check methods are called:
-        verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessDefinition.class), any(SProcessInstance.class), anyLong(), anyLong());
+        verify(mockedProcessExecutorImpl, times(1)).startElements(any(SProcessInstance.class), any(FlowNodeSelector.class));
         verify(mockedProcessExecutorImpl).createProcessInstance(sProcessDefinition, starterId, starterDelegateId, subProcessDefinitionId);
 
         assertNotNull(result);

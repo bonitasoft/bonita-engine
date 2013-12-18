@@ -19,11 +19,19 @@ import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 
@@ -35,6 +43,45 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class FlowNodeSelectorTest {
     
+    /**
+     * 
+     */
+    private static final long SUB_PROCESS_DEFINITION_ID = 10L;
+
+    @Mock
+    private SFlowElementContainerDefinition rootContainer;
+
+    @Mock
+    private SFlowElementContainerDefinition subProcessContainer;
+    
+    @Mock
+    private SProcessDefinition definition;
+    
+    @Mock
+    private SSubProcessDefinition subProcessDefinition;
+    
+    @Before
+    public void setUp() {
+        doReturn(rootContainer).when(definition).getProcessContainer();
+        doReturn(subProcessDefinition).when(rootContainer).getFlowNode(SUB_PROCESS_DEFINITION_ID);
+        doReturn(subProcessContainer).when(subProcessDefinition).getSubProcessContainer();
+        
+        Set<SFlowNodeDefinition> flowNodes = new HashSet<SFlowNodeDefinition>(Arrays.asList(creatFlowNode("step1"), creatFlowNode("step2"), creatFlowNode("step3")));
+        doReturn(flowNodes).when(rootContainer).getFlowNodes();
+    }
+    
+    @Test
+    public void getContainer_return_root_container_if_subprocess_id_is_not_set() throws Exception {
+        FlowNodeSelector selector = new FlowNodeSelector(definition, null);
+        assertEquals(rootContainer, selector.getContainer());
+    }
+
+    @Test
+    public void getContainer_return_subprocess_container_if_subprocess_id_is_set() throws Exception {
+        FlowNodeSelector selector = new FlowNodeSelector(definition, null, SUB_PROCESS_DEFINITION_ID);
+        assertEquals(subProcessContainer, selector.getContainer());
+    }
+    
     private SFlowNodeDefinition creatFlowNode(String name) {
         SFlowNodeDefinition flowNodeDefinition = mock(SFlowNodeDefinition.class);
         doReturn(name).when(flowNodeDefinition).getName();
@@ -43,8 +90,7 @@ public class FlowNodeSelectorTest {
     
     @Test
     public void getStartNodes_return_all_selected_elements() throws Exception {
-        List<SFlowNodeDefinition> flowNodes = Arrays.asList(creatFlowNode("step1"), creatFlowNode("step2"), creatFlowNode("step3"));
-        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(flowNodes, new FlowNodeNameFilter(Arrays.asList("step1", "step3")));
+        FlowNodeSelector flowNodeSelector = new FlowNodeSelector(definition, new FlowNodeNameFilter(Arrays.asList("step1", "step3")));
         assertEquals("[step1, step3]", stringfy(flowNodeSelector.getFilteredElements()));
     }
 
@@ -53,9 +99,21 @@ public class FlowNodeSelectorTest {
         for (SFlowNodeDefinition sFlowNodeDefinition : elements) {
             elementNames.add(sFlowNodeDefinition.getName());
         }
+        Collections.sort(elementNames);
         return elementNames.toString();
     }
     
+    @Test
+    public void get_process_definition_returns_process_definition_given_in_constructor() throws Exception {
+        FlowNodeSelector selector = new FlowNodeSelector(definition, null);
+        assertEquals(definition, selector.getProcessDefinition());
+    }
+    
+    @Test
+    public void get_subProcess_definition_returns_the_id_given_in_constructor() throws Exception {
+        FlowNodeSelector selector = new FlowNodeSelector(null, null, SUB_PROCESS_DEFINITION_ID);
+        assertEquals(SUB_PROCESS_DEFINITION_ID, selector.getSubProcessDefinitionId());
+    }
     
             
 }
