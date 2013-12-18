@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -13,29 +13,28 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ **/
 
 package com.bonitasoft.engine.api.impl.reports;
-
-import org.junit.Test;
-
-import java.io.File;
-import java.util.Arrays;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
+import java.io.File;
+import java.util.Arrays;
+
+import org.junit.Test;
+
 /**
- * Created by Vincent Elcrin
- * Date: 03/12/13
- * Time: 13:52
+ * @author Vincent Elcrin
+ *
  */
 public class ZipReaderTest {
 
     @Test
     public void should_extract_a_zip_and_expose_content() throws Exception {
-        ZipReader zip = new ZipReader("src/test/resources", "myreport-content.zip");
+        ZipReader zip = new ZipReader("src/test/resources/reports", "myreport-content.zip");
 
         zip.read(new Reader() {
             @Override
@@ -49,7 +48,7 @@ public class ZipReaderTest {
 
     @Test
     public void should_remove_temporary_files_once_finish() throws Exception {
-        ZipReader zip = new ZipReader("src/test/resources", "myreport-content.zip");
+        ZipReader zip = new ZipReader("src/test/resources/reports", "myreport-content.zip");
         final File[] files = {null};
 
         zip.read(new Reader() {
