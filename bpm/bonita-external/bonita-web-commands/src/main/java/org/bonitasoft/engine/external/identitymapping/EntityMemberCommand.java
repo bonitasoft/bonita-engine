@@ -34,7 +34,7 @@ public abstract class EntityMemberCommand extends ExternalIdentityMappingCommand
     protected SearchResult<EntityMember> searchEntityMembersInvolvingUser(final String kind, final long userId, final String externalId,
             final SearchOptions searchOptions) throws SCommandExecutionException {
         EntityMemberSearchEntityForUser transactionContent = new EntityMemberSearchEntityForUser(serviceAccessor.getSearchEntitiesDescriptor()
-                .getEntityMemberUserDescriptor(), kind, userId, externalId, searchOptions);
+                .getSearchEntityMemberUserDescriptor(), kind, userId, externalId, searchOptions);
         try {
             transactionContent.execute();
         } catch (SBonitaException e) {

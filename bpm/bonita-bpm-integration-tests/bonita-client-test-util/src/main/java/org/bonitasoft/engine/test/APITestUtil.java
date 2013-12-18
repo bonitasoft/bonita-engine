@@ -1,6 +1,31 @@
 package org.bonitasoft.engine.test;
 
-import org.bonitasoft.engine.api.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
+
+import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformAPIAccessor;
+import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
@@ -74,6 +99,8 @@ public class APITestUtil {
 
     private ProfileAPI profileAPI;
 
+    private ThemeAPI themeAPI;
+
     public static final String DEFAULT_TENANT = "default";
 
     public static final String ACTOR_NAME = "Employee actor";
@@ -109,6 +136,7 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
     }
 
     protected void login() throws BonitaException {
@@ -117,6 +145,7 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
     }
 
     protected void logout() throws BonitaException {
@@ -126,6 +155,7 @@ public class APITestUtil {
         setProcessAPI(null);
         setCommandAPI(null);
         setProfileAPI(null);
+        setThemeAPI(null);
     }
 
     public void logoutThenlogin() throws BonitaException {
@@ -1004,8 +1034,10 @@ public class APITestUtil {
     }
 
     public static void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
-        stopPlatformAndTenant(platformAPI, undeployCommands);
-        cleanPlatform(platformAPI);
+        if (platformAPI.isNodeStarted()) {
+            stopPlatformAndTenant(platformAPI, undeployCommands);
+            cleanPlatform(platformAPI);
+        }
     }
 
     public static void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
@@ -1575,6 +1607,14 @@ public class APITestUtil {
 
     protected void setProfileAPI(final ProfileAPI profileAPI) {
         this.profileAPI = profileAPI;
+    }
+
+    protected ThemeAPI getThemeAPI() {
+        return themeAPI;
+    }
+
+    protected void setThemeAPI(ThemeAPI themeAPI) {
+        this.themeAPI = themeAPI;
     }
 
     protected void setSession(final APISession session) {

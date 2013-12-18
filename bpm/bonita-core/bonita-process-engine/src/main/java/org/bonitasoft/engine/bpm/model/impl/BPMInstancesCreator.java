@@ -545,6 +545,11 @@ public class BPMInstancesCreator {
                 final EvaluateExpression evaluateExpression = new EvaluateExpression(expressionResolverService, currentExpressionContext, expression);
                 evaluateExpression.execute();
                 defaultValue = evaluateExpression.getResult();
+            } else if (sDataDefinition.isTransientData()) {
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                            "Creating a transient data instance with a null expression is not a good practice.");
+                }
             }
             try {
                 final SDataInstance dataInstance = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(sDataDefinition).setContainerId(processInstance.getId())
@@ -563,7 +568,7 @@ public class BPMInstancesCreator {
             transaction.execute();
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            StringBuilder stb = new StringBuilder();
+            final StringBuilder stb = new StringBuilder();
             stb.append("Initialized variables for process instance [name: <");
             stb.append(processInstance.getName());
             stb.append(">, version: <");
@@ -574,15 +579,14 @@ public class BPMInstancesCreator {
             stb.append(processInstance.getRootProcessInstanceId());
             stb.append(">, process definition: <");
             stb.append(processInstance.getProcessDefinitionId());
-            if(processInstance.getCallerId() > 0) {
+            if (processInstance.getCallerId() > 0) {
                 stb.append(">, caller id: <");
                 stb.append(processInstance.getCallerId());
                 stb.append(">, caller type: <");
                 stb.append(processInstance.getCallerType());
             }
             stb.append(">]");
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                    stb.toString());
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
         }
     }
 
@@ -628,6 +632,11 @@ public class BPMInstancesCreator {
                 final SExpression defaultValueExpression = dataDefinition.getDefaultValueExpression();
                 if (defaultValueExpression != null) {
                     dataValue = (Serializable) expressionResolverService.evaluate(dataDefinition.getDefaultValueExpression(), expressionContext);
+                } else if (dataDefinition.isTransientData()) {
+                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                        logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                                "Creating a transient data instance with a null expression is not a good practice.");
+                    }
                 }
             }
             final SDataInstance dataInstance;
@@ -681,8 +690,8 @@ public class BPMInstancesCreator {
                     createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
                             expressionResolverService, dataInstanceService);
                 }
-                if (! sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                    String message = "Initialized variables for flow node" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                if (!sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                    final String message = "Initialized variables for flow node" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
                     logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
                 }
                 return sDataDefinitions.size() > 0;
@@ -693,7 +702,6 @@ public class BPMInstancesCreator {
         return false;
     }
 
-    
     public TechnicalLoggerService getLogger() {
         return logger;
     }

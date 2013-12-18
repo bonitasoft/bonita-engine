@@ -31,6 +31,7 @@ import java.lang.reflect.Proxy;
 /**
  * 
  * @author Baptiste Mesta
+ * @author Celine Souchet
  * 
  */
 public class ConnectorAPIAccessorImpl implements APIAccessor {
@@ -80,6 +81,11 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     @Override
     public ProfileAPI getProfileAPI() {
         return getAPI(ProfileAPI.class, getAPISession());
+    }
+
+    @Override
+    public ThemeAPI getThemeAPI() {
+        return getAPI(ThemeAPI.class, getAPISession());
     }
 
     private static ServerAPI getServerAPI() {

@@ -316,7 +316,7 @@ public class CommandAPIImpl implements CommandAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CommandService commandService = tenantAccessor.getCommandService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchCommands searchCommands = new SearchCommands(commandService, searchEntitiesDescriptor.getCommandDescriptor(), searchOptions);
+        final SearchCommands searchCommands = new SearchCommands(commandService, searchEntitiesDescriptor.getSearchCommandDescriptor(), searchOptions);
         try {
             searchCommands.execute();
             return searchCommands.getResult();

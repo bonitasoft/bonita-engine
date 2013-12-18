@@ -15,6 +15,8 @@ import org.junit.Test;
 
 public class TestShades {
 
+    private static final String ORG_BONITASOFT_ENGINE = "org.bonitasoft.engine";
+
     @Test
     public void testShades() throws IOException {
         String mvn = System.getProperty("path.to.mvn", "mvn");// to be overwritten in CI
@@ -35,7 +37,7 @@ public class TestShades {
         String outputOfMaven;
         try {
             File file2 = new File(file, "pom.xml");
-            IOUtil.write(file2, thePom);
+            IOUtil.writeContentToFile(thePom, file2);
             System.out.println("building " + file2.getAbsolutePath());
             System.out.println("Run mvn in " + file.getAbsolutePath());
             Process exec = Runtime.getRuntime().exec(mvn + " dependency:tree", null, file);
@@ -50,9 +52,7 @@ public class TestShades {
         assertTrue("build was not successfull", outputOfMaven.contains("BUILD SUCCESS"));
         outputOfMaven = outputOfMaven.replaceAll("\n?.*Downloading.*\n", "");
         outputOfMaven = outputOfMaven.replaceAll("\n?.*Downloaded.*\n", "");
-        outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-server", "");
-        outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-client", "");
-        outputOfMaven = outputOfMaven.replaceAll("bonitasoft.engine:bonita-common", "");
+        outputOfMaven = removedIgnoredBonitaDeps(outputOfMaven);
         if (outputOfMaven.contains("bonitasoft")) {
             String str = "bonitasoft";
             int indexOf = outputOfMaven.indexOf(str);
@@ -62,6 +62,13 @@ public class TestShades {
             fail("the dependency tree contains other modules than server/client/common: \"" + part1 + " =====>>>>>" + part2 + " <<<<<=====" + part3);
         }
 
+    }
+
+    protected String removedIgnoredBonitaDeps(String outputOfMaven) {
+        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_ENGINE + ":bonita-server", "");
+        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_ENGINE + ":bonita-client", "");
+        outputOfMaven = outputOfMaven.replaceAll(ORG_BONITASOFT_ENGINE + ":bonita-common", "");
+        return outputOfMaven;
     }
 
     private String getPom(final String version) {
@@ -79,8 +86,8 @@ public class TestShades {
     }
 
     protected String generateDependencies(final String version) {
-        String pom2 = generateDependency("bonita-server", "org.bonitasoft.engine", version);
-        pom2 += generateDependency("bonita-client", "org.bonitasoft.engine", version);
+        String pom2 = generateDependency("bonita-server", ORG_BONITASOFT_ENGINE, version);
+        pom2 += generateDependency("bonita-client", ORG_BONITASOFT_ENGINE, version);
         return pom2;
     }
 
