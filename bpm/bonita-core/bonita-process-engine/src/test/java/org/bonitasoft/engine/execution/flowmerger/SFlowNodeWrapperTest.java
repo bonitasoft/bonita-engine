@@ -26,6 +26,8 @@ import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayType;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,10 +50,16 @@ public class SFlowNodeWrapperTest {
     private SGatewayDefinition gateway;
     
     @Mock
-    private SSubProcessDefinition subprocess;
+    private SSubProcessDefinition subProcess;
 
     @Mock
     private SCatchEventDefinition catchEvent;
+
+    @Mock
+    private SStartEventDefinition startEvent;
+
+    @Mock
+    private SEventTriggerDefinition eventTrigger;
     
     private SFlowNodeWrapper flowNodeWrapper;
     
@@ -62,17 +70,21 @@ public class SFlowNodeWrapperTest {
     private SFlowNodeWrapper subProcessWrapper;
 
     private SFlowNodeWrapper nullFlowNodewrapper;
+
+    private SFlowNodeWrapper startEventWrapper;
     
     @Before
     public void setUp() throws SObjectReadException, SObjectNotFoundException {
         flowNodeWrapper = new SFlowNodeWrapper(flowNode);
         gatewayWrapper = new SFlowNodeWrapper(gateway);
         catchEventWrapper = new SFlowNodeWrapper(catchEvent);
-        subProcessWrapper = new SFlowNodeWrapper(subprocess);
+        subProcessWrapper = new SFlowNodeWrapper(subProcess);
         nullFlowNodewrapper = new SFlowNodeWrapper(null);
+        startEventWrapper = new SFlowNodeWrapper(startEvent);
         
         doReturn(SFlowNodeType.GATEWAY).when(gateway).getType();
-        doReturn(SFlowNodeType.SUB_PROCESS).when(subprocess).getType();
+        doReturn(SFlowNodeType.SUB_PROCESS).when(subProcess).getType();
+        doReturn(SFlowNodeType.START_EVENT).when(startEvent).getType();
     }
     
     @Test
@@ -191,19 +203,19 @@ public class SFlowNodeWrapperTest {
     }
     
     @Test
-    public void isEventSubProcess_return_true_if_is_subp_process_triggered_by_event() {
-        doReturn(true).when(subprocess).isTriggeredByEvent();
+    public void isEventSubProcess_return_true_if_is_sub_process_triggered_by_event() {
+        doReturn(true).when(subProcess).isTriggeredByEvent();
         assertTrue(subProcessWrapper.isEventSubProcess());
     }
 
     @Test
-    public void isEventSubProcess_return_false_if_is_not_subprocess() {
+    public void isEventSubProcess_return_false_if_is_not_sub_process() {
         assertFalse(flowNodeWrapper.isEventSubProcess());
     }
 
     @Test
-    public void isEventSubProcess_return_false_if_is_subprocess_not_triggered_by_event() {
-        doReturn(false).when(subprocess).isTriggeredByEvent();
+    public void isEventSubProcess_return_false_if_is_sub_process_not_triggered_by_event() {
+        doReturn(false).when(subProcess).isTriggeredByEvent();
         assertFalse(subProcessWrapper.isEventSubProcess());
     }
 
@@ -216,5 +228,4 @@ public class SFlowNodeWrapperTest {
     public void getFlowNode() throws Exception {
         assertEquals(flowNode, flowNodeWrapper.getFlowNode());
     }
-
 }

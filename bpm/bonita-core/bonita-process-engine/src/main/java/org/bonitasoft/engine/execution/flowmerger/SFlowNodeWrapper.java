@@ -30,7 +30,6 @@ public class SFlowNodeWrapper {
     private SFlowNodeDefinition flowNode;
 
     public SFlowNodeWrapper(final SFlowNodeDefinition flowNode) {
-        super();
         this.flowNode = flowNode;
     }
 

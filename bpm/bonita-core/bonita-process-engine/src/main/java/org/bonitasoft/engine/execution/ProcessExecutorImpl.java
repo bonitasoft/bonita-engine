@@ -895,7 +895,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private Filter<SFlowNodeDefinition> getFilter(final long targetSFlowNodeDefinitionId) {
         if(targetSFlowNodeDefinitionId == -1) {
-            return new StartableFlowNodeFilter();
+            return new StartFlowNodeFilter();
         }
         return new FlowNodeIdFilter(targetSFlowNodeDefinitionId);
     }

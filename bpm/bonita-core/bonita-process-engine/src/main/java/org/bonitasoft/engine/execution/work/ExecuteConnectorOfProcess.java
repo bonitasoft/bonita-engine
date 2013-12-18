@@ -44,7 +44,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.StartableFlowNodeFilter;
+import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -91,7 +91,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance, activationEvent, connectorService);
         if (!connectorTriggered) {
             if (activationEvent == ConnectorEvent.ON_ENTER) {
-                FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new StartableFlowNodeFilter());
+                FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new StartFlowNodeFilter());
                 processExecutor.startElements(intTxProcessInstance, selector);
             } else {
                 processExecutor.handleProcessCompletion(sProcessDefinition, intTxProcessInstance, false);
