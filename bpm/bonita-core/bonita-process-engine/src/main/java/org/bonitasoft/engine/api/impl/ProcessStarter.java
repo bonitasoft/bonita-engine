@@ -38,7 +38,7 @@ import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.FlowNodeNameFilter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
-import org.bonitasoft.engine.execution.StartableFlowNodeFilter;
+import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
@@ -146,7 +146,7 @@ public class ProcessStarter {
 
     private Filter<SFlowNodeDefinition> getFilter() {
         if(activityNames == null) {
-            return new StartableFlowNodeFilter();
+            return new StartFlowNodeFilter();
         }
         return new FlowNodeNameFilter(activityNames);
     }

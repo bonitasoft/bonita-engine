@@ -361,4 +361,8 @@ public abstract class SFlowNodeDefinitionImpl extends SNamedElementImpl implemen
         return index;
     }
 
+    @Override
+    public boolean isStartable() {
+        return !hasIncomingTransitions();
+    }
 }
