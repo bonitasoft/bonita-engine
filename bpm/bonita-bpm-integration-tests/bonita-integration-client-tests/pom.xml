@@ -162,9 +162,6 @@
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
 					</systemPropertyVariables>
-					<includes>
-						<include>org/bonitasoft/engine/test/ClientTests.java</include>
-					</includes>
 				</configuration>
 			</plugin>
 		</plugins>
