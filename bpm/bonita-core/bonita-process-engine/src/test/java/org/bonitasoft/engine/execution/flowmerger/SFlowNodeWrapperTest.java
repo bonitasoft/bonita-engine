@@ -102,7 +102,7 @@ public class SFlowNodeWrapperTest {
     }
 
     @Test
-    public void exclusive_if_ecllusive_gateway() throws Exception {
+    public void exclusive_if_exclusive_gateway() throws Exception {
         doReturn(SGatewayType.EXCLUSIVE).when(gateway).getGatewayType();
         
         assertTrue(gatewayWrapper.isExclusive());
