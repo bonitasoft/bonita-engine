@@ -103,9 +103,6 @@
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
 					</systemPropertyVariables>
-					<includes>
-						<include>com/bonitasoft/engine/licence/LicenseTest.java</include>
-					</includes>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -13,25 +13,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ **/
 
 package com.bonitasoft.engine.api.impl.reports;
+
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.MockitoAnnotations.initMocks;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 /**
- * Created by Vincent Elcrin
- * Date: 02/12/13
- * Time: 16:42
+ * @author Vincent Elcrin
+ *
  */
 public class DefaultReportListTest {
 
@@ -46,7 +45,7 @@ public class DefaultReportListTest {
     @Test
     public void test_we_can_deploy_all_default_reports() throws Exception {
 
-        DefaultReportList defaultReports = new DefaultReportList(logger, "src/test/resources");
+        DefaultReportList defaultReports = new DefaultReportList(logger, "src/test/resources/reports");
         final List<String> reports = new ArrayList<String>();
 
         defaultReports.deploy(new ReportDeployer() {
@@ -57,6 +56,6 @@ public class DefaultReportListTest {
             }
         });
 
-        assertEquals("[case_avg_time, case_list, task_list]", reports.toString());
+        assertEquals("[case_avg_time, case_list, task_list, case_history]", reports.toString());
     }
 }
