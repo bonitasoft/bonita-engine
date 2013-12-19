@@ -27,8 +27,6 @@ import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
 import org.bonitasoft.engine.bpm.actor.ActorUpdater;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.category.CategoryNotFoundException;
@@ -90,8 +88,6 @@ public interface ProcessManagementAPI {
      * @throws ProcessDeployException
      *             if an exception occurs when deploying the archive.
      * @see BusinessArchive
-     * @see BusinessArchiveBuilder
-     * @see BusinessArchiveFactory
      * @since 6.0
      */
     ProcessDefinition deploy(BusinessArchive businessArchive) throws AlreadyExistsException, ProcessDeployException;
