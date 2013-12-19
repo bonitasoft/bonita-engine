@@ -41,6 +41,9 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+ 							<excludePackageNames>org.bonitasoft.engine.expression.*:org.bonitasoft.engine.operation.*</excludePackageNames>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
