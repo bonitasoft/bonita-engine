@@ -24,7 +24,6 @@ public class TokenInfo {
 
     public final Long outputParentTokenRefId;
     
-    
     public TokenInfo() {
         this.outputTokenRefId = null;
         this.outputParentTokenRefId = null;
@@ -41,5 +40,12 @@ public class TokenInfo {
         this.outputTokenRefId = outputTokenRefId;
         this.outputParentTokenRefId = outputParentTokenRefId;
     }
+    
+    
+    public boolean mustCreateToken() {
+        return outputTokenRefId == null;
+    }
+    
+    
 
 }

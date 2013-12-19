@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.flowmerger;
 
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 
@@ -50,11 +51,11 @@ public class FlowMerger {
         if (transitionsWrapper.hasMultipleOutgoingTransitions()) {
             return true;
         }
-        if(!transitionsWrapper.isManyToOne()) {
-            return false;
-        }
-        TokenInfo tokenInfo = tokenProvider.getOutputTokenInfo();
-        return tokenInfo.outputParentTokenRefId == null;
+//        if(transitionsWrapper.isManyToOne()) {
+//            return tokenProvider.mustCreateToken();
+//        }
+
+        return false;
     }
     
     public boolean isImplicitEnd() {
@@ -64,7 +65,7 @@ public class FlowMerger {
         return transitionsWrapper.isLastFlowNode();
     }
 
-    public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException {
+    public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException {
         return tokenProvider.getOutputTokenInfo();
     }
 

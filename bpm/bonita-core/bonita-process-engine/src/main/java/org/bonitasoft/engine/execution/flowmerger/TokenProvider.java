@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.flowmerger;
 
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -46,7 +47,7 @@ public class TokenProvider {
         this.tokenService = tokenService;
     }
 
-    public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException {
+    public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException {
         if(tokenInfo != null) {
             return tokenInfo;
         }
@@ -54,7 +55,7 @@ public class TokenProvider {
         return tokenInfo;
     }
     
-    private TokenInfo calculateTokenInfo() throws SObjectReadException, SObjectNotFoundException {
+    private TokenInfo calculateTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException {
      // not in the definition: no merge no split no implicit end
         if (flowNodeWrapper.isNull() || transitionsDescriptor.isLastFlowNode()) {
             return new TokenInfo();
@@ -84,7 +85,13 @@ public class TokenProvider {
         
         if (transitionsDescriptor.isManyToOne()) {
             if (flowNodeWrapper.isParalleleOrInclusive()) {
-                return new TokenInfo(getParentTokenRefId());
+                Long parentTokenRefId = getParentTokenRefId();
+                if(parentTokenRefId == null) {
+                    // the parent token ref id can be null in the case of process started by the AdvancedProcessAPI
+                    tokenService.createToken(processInstance.getId(), child.getId(), null);
+                    return new TokenInfo(child.getId()); 
+                }
+                return new TokenInfo(parentTokenRefId);
             } else {
                 return new TokenInfo(child.getTokenRefId());
             }
@@ -96,7 +103,7 @@ public class TokenProvider {
 
     private Long getParentTokenRefId() throws SObjectReadException, SObjectNotFoundException {
         SToken token = tokenService.getToken(processInstance.getId(), child.getTokenRefId());
-        return token.getParentRefId() != null ? token.getParentRefId() : child.getId();
+        return token.getParentRefId();
     }
 
     private TokenInfo transmitToken() {

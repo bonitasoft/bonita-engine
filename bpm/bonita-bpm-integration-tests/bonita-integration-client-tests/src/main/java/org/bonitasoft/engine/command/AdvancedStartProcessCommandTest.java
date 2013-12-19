@@ -29,7 +29,6 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -136,7 +135,6 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
         process.expect("start").toNotHaveArchives();
     }
 
-    @Ignore
     @Test
     public void should_be_able_to_start_a_process_containing_an_inclusive_gateway() throws Exception {
         ProcessDefinition processDefinition = processDeployer.deploy(designer

@@ -121,15 +121,6 @@ public class FlowMergerTest {
     }
 
     @Test
-    public void should_create_token_if_depend_on_transitons_isManyToOne_And_parent_token_is_null() throws SObjectReadException, SObjectNotFoundException {
-        doReturn(true).when(transitionsDescriptor).isManyToOne();
-        TokenInfo tokenInfo = new TokenInfo(1L);
-        doReturn(tokenInfo).when(tokenProvider).getOutputTokenInfo();
-        
-        assertTrue(transitionDependentFlowNodeMerger.mustCreateToken());
-    }
-    
-    @Test
     public void should_not_consume_token_if_flowNode_is_null() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(flowNodeWrapper).isNull();
         assertFalse(flowNodeMerger.mustConsumeInputToken());
