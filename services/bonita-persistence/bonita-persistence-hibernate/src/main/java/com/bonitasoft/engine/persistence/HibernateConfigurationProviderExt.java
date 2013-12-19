@@ -42,11 +42,6 @@ public class HibernateConfigurationProviderExt extends HibernateConfigurationPro
         this.cacheQueries = cacheQueries;
     }
 
-    /**
-     * @param properties
-     * @param cacheProperties
-     * @return
-     */
     private static Properties merge(final Properties normalProperties, final Properties cacheProperties) {
         final String cache1 = cacheProperties.getProperty("hibernate.cache.provider_class");
         final String cache2 = cacheProperties.getProperty("hibernate.cache.region.factory_class");
