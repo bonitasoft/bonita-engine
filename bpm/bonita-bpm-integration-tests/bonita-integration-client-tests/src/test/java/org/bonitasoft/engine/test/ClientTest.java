@@ -23,6 +23,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         BonitaClientXMLTest.class
 })
-public class ClientTests {
+public class ClientTest {
 
 }
