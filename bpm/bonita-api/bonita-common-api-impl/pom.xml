@@ -1,23 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bonita-api</artifactId>
 		<groupId>org.bonitasoft.engine.api</groupId>
-		<version>6.2.2-SNAPSHOT</version>
+		<artifactId>bonita-api</artifactId>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-common-api</artifactId>
-	<name>Bonita Common APIs</name>
+	<artifactId>bonita-common-api-impl</artifactId>
+	<name>Bonita Commons Impl</name>
 
 	<dependencies>
 		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-common-api</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Tests -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -29,21 +28,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>javadoc-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 </project>
