@@ -15,12 +15,16 @@
 package org.bonitasoft.engine.bpm.comment;
 
 import org.bonitasoft.engine.bpm.BonitaObject;
+import org.bonitasoft.engine.session.APISession;
 
 /**
  * @author Hongwen Zang
  */
 public interface Comment extends BonitaObject {
 
+	/**
+	 * @deprecated As of 6.1 use {@link APISession#getTenantId()} instead
+	 */
     @Deprecated
     long getTenantId();
 
