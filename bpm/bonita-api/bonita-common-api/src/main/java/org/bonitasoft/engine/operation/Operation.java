@@ -35,6 +35,9 @@ public interface Operation extends Serializable {
      */
     LeftOperand getLeftOperand();
 
+    /**
+     * @deprecated As of 6.0 replaced by {@link #getLeftOperand()}
+     */
     @Deprecated
     LeftOperand getVariableToSet();
 
