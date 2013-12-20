@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>services</artifactId>
+		<groupId>org.bonitasoft.engine</groupId>
+		<version>6.2.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.theme</groupId>
+	<artifactId>bonita-theme</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita Theme</name>
+
+	<modules>
+		<module>bonita-theme-api</module>
+		<module>bonita-theme-impl</module>
+		<module>bonita-theme-impl-hibernate</module>
+	</modules>
+</project>

@@ -127,7 +127,8 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
                 dependencies.add(toSExpression(dependency));
             }
         }
-        final SExpression sExpression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(exp.getName()).setContent(exp.getContent())
+        final SExpression sExpression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(exp.getName())
+                .setContent(exp.getContent())
                 .setExpressionType(exp.getExpressionType()).setInterpreter(exp.getInterpreter()).setReturnType(exp.getReturnType())
                 .setDependencies(dependencies).done();
         return sExpression;
@@ -164,7 +165,8 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
             throws ProcessInstanceNotFoundException {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getProcessInstanceDescriptor();
+        final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
+                .getSearchProcessInstanceDescriptor();
 
         final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService, searchProcessInstanceDescriptor,
                 processInstanceId);

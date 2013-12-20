@@ -26,10 +26,12 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
@@ -1349,6 +1351,39 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         for (final ProcessDeploymentInfo info : infos) {
             disableAndDeleteProcess(info.getProcessId());
         }
+    }
+    
+    @Test
+    public void search_process_instances_in_all_states_retrieves_all_process_states() throws Exception {
+        //deploy and start a process
+        final ProcessDefinition simpleProcess = deployProcessWithHumanTask(ACTOR_NAME, "step1");
+        final ProcessInstance procInst = getProcessAPI().startProcess(simpleProcess.getId());
+        
+        //execute it until the end
+        long processInstanceId = procInst.getId();
+        waitForUserTaskAndExecuteIt("step1", processInstanceId, user.getId());
+        waitForProcessToFinish(processInstanceId);
+        
+        //search archived process instances: all states must be retrieved
+        SearchResult<ArchivedProcessInstance> searchResult = searchAchivedProcessInstancesInAllStates(processInstanceId);
+        
+        assertEquals(3, searchResult.getCount());
+        List<ArchivedProcessInstance> archivedProcesses = searchResult.getResult();
+        assertEquals(ProcessInstanceState.INITIALIZING.getId(), archivedProcesses.get(0).getStateId());
+        assertEquals(ProcessInstanceState.STARTED.getId(), archivedProcesses.get(1).getStateId());
+        assertEquals(ProcessInstanceState.COMPLETED.getId(), archivedProcesses.get(2).getStateId());
+        
+        deleteProcessInstanceAndArchived(simpleProcess.getId());
+        disableAndDeleteProcess(simpleProcess.getId());
+    }
+
+    private SearchResult<ArchivedProcessInstance> searchAchivedProcessInstancesInAllStates(long processInstanceId) throws SearchException {
+        SearchOptionsBuilder optionsBuilder = new SearchOptionsBuilder(0, 10);
+        optionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId);
+        optionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.CALLER_ID, -1L);
+        optionsBuilder.sort(ArchivedProcessInstancesSearchDescriptor.ID, Order.ASC);
+        SearchResult<ArchivedProcessInstance> searchResult = getProcessAPI().searchArchivedProcessInstancesInAllStates(optionsBuilder.done());
+        return searchResult;
     }
 
 }

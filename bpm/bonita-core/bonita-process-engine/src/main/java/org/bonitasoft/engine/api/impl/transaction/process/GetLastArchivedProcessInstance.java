@@ -56,7 +56,7 @@ public class GetLastArchivedProcessInstance implements TransactionContentWithRes
         searchOptionsBuilder.filter(ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID, processInstanceId);
 
         final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
-                searchEntitiesDescriptor.getArchivedProcessInstancesDescriptor(), searchOptionsBuilder.done());
+                searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptionsBuilder.done());
         searchArchivedProcessInstances.execute();
         try {
             processInstance = searchArchivedProcessInstances.getResult().getResult().get(0);

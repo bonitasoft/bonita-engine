@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.flownode;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Elias Ricken de Medeiros
  */
 public class ArchivedFlowNodeInstanceSearchDescriptor {
 
@@ -37,5 +38,11 @@ public class ArchivedFlowNodeInstanceSearchDescriptor {
     public static final String ORIGINAL_FLOW_NODE_ID = "sourceObjectId";
 
     public static final String TERMINAL = "terminal";
+
+    public static final String REACHED_STATE_DATE = "reachedStateDate";
+
+    public static final String ARCHIVE_DATE = "archiveDate";
+
+    public static final String STATE_ID = "stateId";
 
 }

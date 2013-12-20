@@ -251,7 +251,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
                 fout.close();
             }
             final String infos = generateInfosFromDefinition(processDefinition);
-            IOUtil.write(new File(barFolder, PROCESS_INFOS_FILE), getProcessInfos(infos));
+            IOUtil.writeContentToFile(getProcessInfos(infos), new File(barFolder, PROCESS_INFOS_FILE));
         } catch (final FileNotFoundException e) {
             throw new IOException(e);
         }

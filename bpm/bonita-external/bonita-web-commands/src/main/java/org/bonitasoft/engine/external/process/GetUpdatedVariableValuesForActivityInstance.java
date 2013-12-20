@@ -76,7 +76,7 @@ public class GetUpdatedVariableValuesForActivityInstance extends UpdateVariableV
     protected void executeOperation(final Operation operation, final Map<String, Serializable> operationsInputValues,
             final Map<String, Serializable> currentVariableValues, final long activityInstanceId) throws SBonitaException {
         if (currentVariableValues != null) {
-            final SOperation sOperation = ModelConvertor.constructSOperation(operation, serviceAccessor);
+            final SOperation sOperation = ModelConvertor.constructSOperation(operation);
             final Map<String, Serializable> inputValues = operationsInputValues;
             inputValues.putAll(currentVariableValues);
             final SExpressionContext sec = new SExpressionContext();

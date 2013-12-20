@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 
 /**
@@ -26,6 +27,8 @@ import org.bonitasoft.engine.io.PropertiesManager;
  * @author Matthieu Chaffotte
  */
 public class BonitaHomeServer extends BonitaHome {
+
+    private static final String VERSION_FILE_NAME = "VERSION";
 
     private static final String TENANT_CONFIGURATION_FILE = "bonita-server.properties";
 
@@ -54,6 +57,8 @@ public class BonitaHomeServer extends BonitaHome {
     private String serverPath;
 
     private Properties platformProperties;
+
+    private String version;
 
     public static final BonitaHomeServer INSTANCE = new BonitaHomeServer();
 
@@ -197,6 +202,27 @@ public class BonitaHomeServer extends BonitaHome {
             platformProperties = PropertiesManager.getProperties(getPlatformFile());
         }
         return platformProperties;
+    }
+
+    public String getVersion() {
+        if (version == null) {
+            String platformConfFolder = null;
+            try {
+                platformConfFolder = getPlatformConfFolder();
+                File file = new File(new File(platformConfFolder), VERSION_FILE_NAME);
+                version = IOUtil.read(file);
+            } catch (Exception e) {
+                buildUnreadableVersionException(platformConfFolder);
+            }
+            if (version == null) {
+                buildUnreadableVersionException(platformConfFolder);
+            }
+        }
+        return version;
+    }
+
+    private void buildUnreadableVersionException(final String platformConfFolder) {
+        throw new IllegalStateException(VERSION_FILE_NAME + " file not present or invalid in folder: " + platformConfFolder);
     }
 
     public Properties getTenantProperties(final long tenantId) throws BonitaHomeNotSetException, IOException {

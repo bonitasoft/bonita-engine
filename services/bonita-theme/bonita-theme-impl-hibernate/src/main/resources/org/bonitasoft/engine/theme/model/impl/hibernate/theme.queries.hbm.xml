@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<query name="getNumberOfSTheme">
+		SELECT COUNT(theme)
+		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+	</query>
+
+	<query name="searchSTheme">
+		SELECT theme
+		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+	</query>
+	
+	<query name="getTheme">
+		SELECT theme
+		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		WHERE isDefault = :isDefault
+			AND type = :type
+	</query>
+	
+	<query name="getLastModifiedTheme">
+		SELECT theme
+		FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS theme
+		WHERE type = :type
+			AND lastUpdateDate IN (
+			SELECT MAX(lastUpdateDate)
+			FROM org.bonitasoft.engine.theme.model.impl.SThemeImpl AS t
+			WHERE t.type = :type
+				AND t.tenantId = theme.tenantId
+			)
+	</query>
+</hibernate-mapping>

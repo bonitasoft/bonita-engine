@@ -28,7 +28,7 @@ public enum SStateCategory {
     ABORTING,
 
     /**
-     * The state is part o canceling states
+     * The state is part of canceling states
      */
     CANCELLING
 

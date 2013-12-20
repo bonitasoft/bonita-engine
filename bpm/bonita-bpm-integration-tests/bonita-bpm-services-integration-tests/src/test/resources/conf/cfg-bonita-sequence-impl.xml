@@ -95,6 +95,7 @@
 				<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobParameterImpl" value="71" />
 				<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl" value="72" />
 				<entry key="org.bonitasoft.engine.command.model.SCommandImpl" value="90" />
+				<entry key="org.bonitasoft.engine.theme.model.impl.SThemeImpl" value="9890" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="9990" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="9991" />
 				<entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="9992" />

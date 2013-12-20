@@ -45,7 +45,7 @@ public class GetNumberOfProcessInstance implements TransactionContentWithResult<
     @Override
     public void execute() throws SBonitaException {
         final SearchProcessInstances searchProcessInstances = new SearchProcessInstances(processInstanceService,
-                searchEntitiesDescriptor.getProcessInstanceDescriptor(), null, processDefinitionService);
+                searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), null, processDefinitionService);
         final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
         number = searchProcessInstances.executeCount(queryOptions);
     }

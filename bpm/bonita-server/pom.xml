@@ -630,10 +630,17 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Web Profile (???) -->
+		<!-- Web Profile -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.profile</groupId>
 			<artifactId>bonita-profile-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- Web Theme -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.theme</groupId>
+			<artifactId>bonita-theme-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -898,6 +905,10 @@
 									<include>org.bonitasoft.engine.profile:bonita-profile-api</include>
 									<include>org.bonitasoft.engine.profile:bonita-profile-impl</include>
 									<include>org.bonitasoft.engine.profile:bonita-profile-impl-hibernate</include>
+									<!-- Web Theme -->
+									<include>org.bonitasoft.engine.theme:bonita-theme-api</include>
+									<include>org.bonitasoft.engine.theme:bonita-theme-impl</include>
+									<include>org.bonitasoft.engine.theme:bonita-theme-impl-hibernate</include>
 									<!-- Engine -->
 									<include>org.bonitasoft.engine.core:bonita-process-engine</include>
 								</includes>

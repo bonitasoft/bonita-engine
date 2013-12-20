@@ -53,6 +53,7 @@
 		<module>bonita-services-test-conf</module>
 		<module>bonita-incident</module>
 		<module>bonita-builder</module>
+		<module>bonita-theme</module>
 	</modules>
 	
 	<profiles>
@@ -71,7 +72,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -105,7 +106,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>

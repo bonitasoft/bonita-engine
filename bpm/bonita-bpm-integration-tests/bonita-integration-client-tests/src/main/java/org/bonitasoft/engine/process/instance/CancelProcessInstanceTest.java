@@ -33,6 +33,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
@@ -113,8 +114,8 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         disableAndDeleteProcess(targetProcessDef);
     }
 
-    private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType, final Expression timerValue,
-            final String stepName) throws BonitaException {
+    private ProcessDefinition deployProcessWithTimerIntermediateCatchEvent(final TimerType timerType, final Expression timerValue, final String stepName)
+            throws BonitaException {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0");
         processDefinitionBuilder.addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue);
         processDefinitionBuilder.addAutomaticTask(stepName);
@@ -218,6 +219,11 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         checkWasntExecuted(receiveProcessInstance, nextStep);
 
         disableAndDeleteProcess(receiveProcess);
+    }
+
+    @Test(expected = ProcessInstanceNotFoundException.class)
+    public void cancelUnknownProcessInstance() throws Exception {
+        getProcessAPI().cancelProcessInstance(45);
     }
 
 }

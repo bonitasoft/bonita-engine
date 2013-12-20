@@ -227,7 +227,8 @@ public class IdentityAPIImpl implements IdentityAPI {
         final EntityUpdateDescriptor proDataChangeDescriptor = getUserContactInfoUpdateDescriptor(updater.getProContactUpdater());
 
         try {
-            final UpdateUser updateUserTransaction = new UpdateUser(identityService, userId, userChangeDescriptor, persoDataChangeDescriptor, proDataChangeDescriptor);
+            final UpdateUser updateUserTransaction = new UpdateUser(identityService, userId, userChangeDescriptor, persoDataChangeDescriptor,
+                    proDataChangeDescriptor);
             updateUserTransaction.execute();
             return ModelConvertor.toUser(updateUserTransaction.getResult());
         } catch (final SUserNotFoundException sunfe) {
@@ -505,7 +506,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchUsers searchUsers = new SearchUsers(identityService, searchEntitiesDescriptor.getUserDescriptor(), options);
+        final SearchUsers searchUsers = new SearchUsers(identityService, searchEntitiesDescriptor.getSearchUserDescriptor(), options);
         try {
             searchUsers.execute();
             return searchUsers.getResult();
@@ -838,7 +839,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchRoles searchRoles = new SearchRoles(identityService, searchEntitiesDescriptor.getRoleDescriptor(), options);
+        final SearchRoles searchRoles = new SearchRoles(identityService, searchEntitiesDescriptor.getSearchRoleDescriptor(), options);
         try {
             searchRoles.execute();
             return searchRoles.getResult();
@@ -1066,7 +1067,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchGroups searchGroups = new SearchGroups(identityService, searchEntitiesDescriptor.getGroupDescriptor(), options);
+        final SearchGroups searchGroups = new SearchGroups(identityService, searchEntitiesDescriptor.getSearchGroupDescriptor(), options);
         try {
             searchGroups.execute();
             return searchGroups.getResult();
@@ -1231,7 +1232,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     public UserMembership updateUserMembership(final long userMembershipId, final long newGroupId, final long newRoleId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final IdentityService identityService = tenantAccessor.getIdentityService();
-        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserMembershipUpdateBuilderFactory.class).createNewInstance().updateGroupId(newGroupId)
+        final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SUserMembershipUpdateBuilderFactory.class).createNewInstance()
+                .updateGroupId(newGroupId)
                 .updateRoleId(newRoleId).done();
         try {
             final TransactionContent transactionContent = new UpdateMembershipByRoleIdAndGroupId(userMembershipId, identityService, changeDescriptor);
@@ -1331,10 +1333,12 @@ public class IdentityAPIImpl implements IdentityAPI {
                 // orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedByKey(), OrderByType.DESC);
                 // break;
                 case ASSIGNED_DATE_ASC:
-                    orderByOption = new OrderByOption(SUserMembership.class, BuilderFactory.get(SUserMembershipBuilderFactory.class).getAssignedDateKey(), OrderByType.ASC);
+                    orderByOption = new OrderByOption(SUserMembership.class, BuilderFactory.get(SUserMembershipBuilderFactory.class).getAssignedDateKey(),
+                            OrderByType.ASC);
                     break;
                 case ASSIGNED_DATE_DESC:
-                    orderByOption = new OrderByOption(SUserMembership.class, BuilderFactory.get(SUserMembershipBuilderFactory.class).getAssignedDateKey(), OrderByType.DESC);
+                    orderByOption = new OrderByOption(SUserMembership.class, BuilderFactory.get(SUserMembershipBuilderFactory.class).getAssignedDateKey(),
+                            OrderByType.DESC);
                     break;
                 case ROLE_NAME_ASC:
                 default:

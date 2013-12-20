@@ -28,7 +28,7 @@ public class FlowNodeInstanceSearchDescriptor {
 
     public static final String PARENT_ACTIVITY_INSTANCE_ID = "parentActivityInstanceId";
 
-    public static final String ROOT_PROCESS_INSTANCE_ID = "rootProcessInsanceId";
+    public static final String ROOT_PROCESS_INSTANCE_ID = "rootProcessInstanceId";
 
     public static final String DISPLAY_NAME = "displayName";
 

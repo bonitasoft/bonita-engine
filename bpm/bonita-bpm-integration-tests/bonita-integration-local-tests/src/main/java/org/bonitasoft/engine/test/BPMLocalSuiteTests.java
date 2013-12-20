@@ -5,6 +5,7 @@ import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.TestsInitializer;
 import org.bonitasoft.engine.event.LocalTimerEventTest;
 import org.bonitasoft.engine.job.JobExecutionTest;
+import org.bonitasoft.engine.theme.ThemeTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
@@ -17,7 +18,8 @@ import org.junit.runners.Suite.SuiteClasses;
         LocalTimerEventTest.class,
         DataInstanceIntegrationLocalTest.class,
         GatewayExecutionLocalTest.class,
-        JobExecutionTest.class
+        JobExecutionTest.class,
+        ThemeTest.class
 })
 @Initializer(TestsInitializer.class)
 public class BPMLocalSuiteTests {

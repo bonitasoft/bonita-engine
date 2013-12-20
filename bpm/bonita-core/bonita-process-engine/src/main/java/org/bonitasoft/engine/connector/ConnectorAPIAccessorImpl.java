@@ -20,6 +20,7 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
@@ -34,6 +35,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ConnectorAPIAccessorImpl implements APIAccessor {
 
@@ -82,6 +84,11 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     @Override
     public ProfileAPI getProfileAPI() {
         return getAPI(ProfileAPI.class, getAPISession());
+    }
+
+    @Override
+    public ThemeAPI getThemeAPI() {
+        return getAPI(ThemeAPI.class, getAPISession());
     }
 
     private static ServerAPI getServerAPI() {

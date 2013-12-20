@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -25,6 +24,7 @@ import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
@@ -156,6 +156,8 @@ public class APITestUtil {
 
     private ProfileAPI profileAPI;
 
+    private ThemeAPI themeAPI;
+
     public static final String DEFAULT_TENANT = "default";
 
     public static final String ACTOR_NAME = "Employee actor";
@@ -191,6 +193,7 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
     }
 
     protected void login() throws BonitaException {
@@ -199,6 +202,7 @@ public class APITestUtil {
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
+        setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
     }
 
     protected void logout() throws BonitaException {
@@ -208,6 +212,7 @@ public class APITestUtil {
         setProcessAPI(null);
         setCommandAPI(null);
         setProfileAPI(null);
+        setThemeAPI(null);
     }
 
     public void logoutThenlogin() throws BonitaException {
@@ -690,11 +695,11 @@ public class APITestUtil {
         getProcessAPI().executeFlowNode(flowNodeId);
     }
 
-    public HumanTaskInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws TimeoutException, Exception {
+    public HumanTaskInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws Exception {
         return waitForUserTask(taskName, processInstance.getId(), DEFAULT_TIMEOUT);
     }
 
-    public HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId) throws TimeoutException, Exception {
+    public HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId) throws Exception {
         return waitForUserTask(taskName, processInstanceId, DEFAULT_TIMEOUT);
     }
 
@@ -1090,8 +1095,10 @@ public class APITestUtil {
     }
 
     public void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
-        stopPlatformAndTenant(platformAPI, undeployCommands);
-        cleanPlatform(platformAPI);
+        if (platformAPI.isNodeStarted()) {
+            stopPlatformAndTenant(platformAPI, undeployCommands);
+            cleanPlatform(platformAPI);
+        }
     }
 
     public void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
@@ -1665,6 +1672,14 @@ public class APITestUtil {
 
     protected void setProfileAPI(final ProfileAPI profileAPI) {
         this.profileAPI = profileAPI;
+    }
+
+    protected ThemeAPI getThemeAPI() {
+        return themeAPI;
+    }
+
+    protected void setThemeAPI(final ThemeAPI themeAPI) {
+        this.themeAPI = themeAPI;
     }
 
     protected void setSession(final APISession session) {

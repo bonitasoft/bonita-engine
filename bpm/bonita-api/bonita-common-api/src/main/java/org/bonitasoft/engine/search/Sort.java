@@ -17,10 +17,11 @@ import java.io.Serializable;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
 public class Sort implements Serializable {
 
-    private static final long serialVersionUID = 8165006330270193316L;
+    private static final long serialVersionUID = -8803283884140398833L;
 
     private final Order order;
 
@@ -38,6 +39,34 @@ public class Sort implements Serializable {
 
     public String getField() {
         return field;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((field == null) ? 0 : field.hashCode());
+        result = prime * result + ((order == null) ? 0 : order.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Sort other = (Sort) obj;
+        if (field == null) {
+            if (other.field != null)
+                return false;
+        } else if (!field.equals(other.field))
+            return false;
+        if (order != other.order)
+            return false;
+        return true;
     }
 
 }

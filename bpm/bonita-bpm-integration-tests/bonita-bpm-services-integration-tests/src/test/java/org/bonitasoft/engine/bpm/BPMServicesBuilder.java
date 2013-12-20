@@ -103,6 +103,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.test.util.ServicesAccessor;
+import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.ElementBinding;
@@ -535,6 +536,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(JobService.class);
     }
 
+    @Override
+    public ThemeService getThemeService() {
+        return getInstanceOf(ThemeService.class);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public List<ServiceWithLifecycle> getServicesToStart() {
@@ -549,4 +555,5 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     public void destroy() {
         accessor.destroy();
     }
+
 }
