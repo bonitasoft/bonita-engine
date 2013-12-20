@@ -32,10 +32,14 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
+ * GroupAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on Groups: creation, deletion, updating,
+ * search, etc...
+ * 
  * @author Zhao Na
  * @author Bole Zhang
  * @author Matthieu Chaffotte
  * @author Hongwen Zang
+ * @see Group
  */
 public interface GroupAPI {
 

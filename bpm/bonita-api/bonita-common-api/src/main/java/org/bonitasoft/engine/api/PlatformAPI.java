@@ -34,6 +34,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * @author Lu Kai
  * @author Zhang Bole
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
 public interface PlatformAPI {
 
@@ -85,9 +86,7 @@ public interface PlatformAPI {
      * <p>
      * The node is the currently Java Virtual Machine on which Bonita Engine is running
      * <p>
-     * Starting the node make the {@link org.bonitasoft.engine.scheduler.SchedulerService Scheduler service} to start and restart elements that were not
-     * finished by the {@link org.bonitasoft.engine.work.WorkService Work
-     * service} on the previous shutdown.
+     * Starting the node make the Scheduler service to start and restart elements that were not finished by the Work service on the previous shutdown.
      * 
      * @throws InvalidSessionException
      *             occurs if API Session is invalid, e.g session has expired.
@@ -101,7 +100,7 @@ public interface PlatformAPI {
      * <p>
      * The node is the currently Java Virtual Machine on which Bonita Engine is running
      * <p>
-     * Stopping the node make the {@link org.bonitasoft.engine.scheduler.SchedulerService Scheduler service} to stop.
+     * Stopping the node make the Scheduler service to stop.
      * 
      * @throws InvalidSessionException
      *             occurs if API Session is invalid, e.g session has expired.

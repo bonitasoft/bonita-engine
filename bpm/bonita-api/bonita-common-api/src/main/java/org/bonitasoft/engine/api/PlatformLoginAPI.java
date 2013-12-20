@@ -19,12 +19,11 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 
 /**
- * <b>Manage the login on the platform</b>
+ * <b>Manage the login on the platform.</b>
  * <p>
- * Using this API you can obtain a {@link PlatformSession} that can be used to retreive a {@link org.bonitasoft.engine.api.PlatformAPIAccessor
- * PlatformAPIAccessor}
+ * Using this API you can obtain a {@link PlatformSession} that can be used to retreive a PlatformAPIAccessor.
  * <p>
- * Platform session allows to access only to platform APIs:
+ * <code>PlatformSession</code> gives access to platform APIs only:
  * <ul>
  * <li>{@link PlatformAPI}</li>
  * <li>{@link PlatformCommandAPI}</li>
@@ -32,6 +31,7 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
  * 
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  */
 public interface PlatformLoginAPI {
 
@@ -47,20 +47,20 @@ public interface PlatformLoginAPI {
      * @throws PlatformLoginException
      *             occurs when an exception is thrown during login the platform
      */
-	@NoSessionRequired
+    @NoSessionRequired
     PlatformSession login(String userName, String password) throws PlatformLoginException;
 
     /**
      * Logout from a platform.
      * 
-     * @param the
-     *            platform session to logout from
+     * @param session
+     *            the platform session to logout from.
      * @throws PlatformLogoutException
      *             occurs when an exception is thrown during logout the platform
      * @throws SessionNotFoundException
      *             if the session is not found on the server side. This may occurs when the session has expired.
      */
-	@NoSessionRequired
+    @NoSessionRequired
     void logout(PlatformSession session) throws PlatformLogoutException, SessionNotFoundException;
 
 }

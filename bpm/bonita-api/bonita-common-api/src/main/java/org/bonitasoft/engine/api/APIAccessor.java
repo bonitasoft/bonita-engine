@@ -16,19 +16,47 @@ package org.bonitasoft.engine.api;
 import java.io.Serializable;
 
 /**
+ * Gives access to some common APIs.
+ * 
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 public interface APIAccessor extends Serializable {
 
+    /**
+     * Gives access to the <code>IdentityAPI</code>
+     * 
+     * @return an <code>IdentityAPI</code>
+     */
     IdentityAPI getIdentityAPI();
 
+    /**
+     * Gives access to the <code>ProcessAPI</code>
+     * 
+     * @return an <code>ProcessAPI</code>
+     */
     ProcessAPI getProcessAPI();
 
+    /**
+     * Gives access to the <code>CommandAPI</code>
+     * 
+     * @return an <code>CommandAPI</code>
+     */
     CommandAPI getCommandAPI();
 
+    /**
+     * Gives access to the <code>ProfileAPI</code>
+     * 
+     * @return an <code>ProfileAPI</code>
+     */
     ProfileAPI getProfileAPI();
 
+    /**
+     * Gives access to the <code>ThemeAPI</code>
+     * 
+     * @return an <code>ThemeAPI</code>
+     */
     ThemeAPI getThemeAPI();
 
 }
