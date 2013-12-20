@@ -55,6 +55,7 @@ public interface User extends BonitaObject {
     boolean isEnabled();
 
     /**
+     * @deprecated As of 6.0 Use {@link #getManagerUserId()} instead
      * FIXME Remove ASAP
      */
     @Deprecated
