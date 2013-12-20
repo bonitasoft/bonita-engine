@@ -684,6 +684,20 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Theme -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.theme</groupId>
+			<artifactId>bonita-theme-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.theme</groupId>
+			<artifactId>bonita-theme-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- Transaction -->
 		<dependency>
@@ -899,7 +913,10 @@
 						<configuration>
 							<target name="copy-bos-home">
 								<copy todir="${bonita.home}">
-									<fileset dir="${basedir}/home" excludes="**/.svn" />
+									<fileset dir="${basedir}/home" />
+									<filterset>
+										<filter token="VERSION" value="${project.version}" />
+									</filterset>
 								</copy>
 								<copy todir="${bonita.home}/server/licenses" failonerror="true">
 									<fileset dir="${user.home}/lic" includes="*.lic" />

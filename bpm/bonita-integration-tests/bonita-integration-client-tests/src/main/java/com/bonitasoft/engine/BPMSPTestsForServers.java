@@ -15,7 +15,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({ BPMSPTests.class })
+@SuiteClasses({
+    BPMSPTests.class
+})
 @Initializer(BPMSPTestsForServers.class)
 public class BPMSPTestsForServers {
 

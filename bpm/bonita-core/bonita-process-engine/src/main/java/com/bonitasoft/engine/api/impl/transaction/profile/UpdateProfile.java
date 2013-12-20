@@ -37,13 +37,11 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
 
     private final ProfileUpdater updateDescriptor;
 
-
     private final long lastUpdatorId;
 
     private SProfile sProfile = null;
 
-    public UpdateProfile(final ProfileService profileService, final Long profileId,
-            final ProfileUpdater updateDescriptor, final long lastUpdatorId) {
+    public UpdateProfile(final ProfileService profileService, final Long profileId, final ProfileUpdater updateDescriptor, final long lastUpdatorId) {
         super();
         this.profileService = profileService;
         this.profileId = profileId;
@@ -55,8 +53,7 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
     public void execute() throws SBonitaException {
         sProfile = profileService.getProfile(profileId);
         if (!sProfile.isDefault()) {
-            profileService.updateProfile(sProfile, getProfileUpdateDescriptor());
-            sProfile = profileService.getProfile(profileId);
+            sProfile = profileService.updateProfile(sProfile, getProfileUpdateDescriptor());
         } else {
             throw new SProfileUpdateException("Can't update a default profile. Profile id = <" + profileId + ">, name = <" + sProfile.getName() + ">");
         }
@@ -64,7 +61,7 @@ public class UpdateProfile implements TransactionContentWithResult<SProfile> {
 
     @Override
     public SProfile getResult() {
-        return this.sProfile;
+        return sProfile;
     }
 
     private EntityUpdateDescriptor getProfileUpdateDescriptor() {

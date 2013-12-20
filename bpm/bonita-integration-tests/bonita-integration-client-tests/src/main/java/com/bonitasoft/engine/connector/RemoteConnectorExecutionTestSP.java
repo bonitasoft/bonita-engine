@@ -38,6 +38,7 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -71,6 +72,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
@@ -453,7 +455,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector instance with failure information",
-            "exception on connector execution" }, jira="")
+            "exception on connector execution" }, jira = "")
     @Test
     public void getConnectorWithFailureInformationOnConnectorExecution() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithFaillingConnector();
@@ -789,17 +791,61 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        // get activityInstanceId
-        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 5);
-        final ActivityInstance activity = activities.get(0);
-
-        waitForUserTask("step0", processInstance);
+        final HumanTaskInstance step0 = waitForUserTask("step0", processInstance);
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
                 Arrays.asList(valueOfInput1, valueOfInput2));
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
-                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, activity.getId());
+                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, step0.getId());
+
+        assertEquals(resContent, res.get(mainInputName1));
+        assertTrue((Boolean) res.get("hasBeenValidated"));
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance", "Loop" }, story = "Execute connector on a loop.", jira = "BS-2090")
+    @Test
+    public void executeConnectorOnActivityInstanceWithLoop() throws Exception {
+        final String valueOfInput1 = "Lily";
+        final String valueOfInput2 = "Lucy";
+        final String valueOfInput3 = "Mett";
+        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
+        final String inputName1 = "valueOfInput1";
+        final String inputName2 = "valueOfInput2";
+        final String inputName3 = "valueOfInput3";
+        final String mainInputName1 = "param1";
+        final String resContent = "welcome Lily and Lucy and Mett";
+
+        // Input expression
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        // Data expression
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+
+        // Main Expression
+        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+
+        final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
+
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addEndEvent("End").addTerminateEventTrigger();
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addLoop(false, condition).addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addTransition("step0", "End");
+
+        final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        final HumanTaskInstance step0 = waitForUserTask("step0", processInstance);
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
+                Arrays.asList(valueOfInput1, valueOfInput2));
+
+        final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
+                ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, step0.getId());
 
         assertEquals(resContent, res.get(mainInputName1));
         assertTrue((Boolean) res.get("hasBeenValidated"));

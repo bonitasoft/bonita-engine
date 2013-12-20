@@ -43,4 +43,12 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
      */
     ReportingAPI getReportingAPI();
 
+    /**
+     * Gives access to ThemeAPI
+     * 
+     * @return The ThemeAPI, giving access to all theme methods.
+     * @since 6.2
+     */
+    ThemeAPI getThemeAPI();
+
 }

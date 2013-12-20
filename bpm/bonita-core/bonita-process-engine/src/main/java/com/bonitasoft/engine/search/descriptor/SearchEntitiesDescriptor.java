@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.search.descriptor;
 
-
 /**
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
@@ -16,34 +15,34 @@ package com.bonitasoft.engine.search.descriptor;
  */
 public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor {
 
-    private final SearchLogDescriptor logDescriptor;
+    private final SearchLogDescriptor searchLogDescriptor;
 
-    protected final SearchProcessInstanceDescriptorExt processInstanceDescriptorExt;
+    protected final SearchProcessInstanceDescriptorExt searchProcessInstanceDescriptorExt;
 
-    protected final SearchArchivedProcessInstancesDescriptorExt archivedProcessInstanceDescriptorExt;
+    protected final SearchArchivedProcessInstanceDescriptorExt searchArchivedProcessInstanceDescriptorExt;
 
     public SearchEntitiesDescriptor() {
         super();
-        logDescriptor = new SearchLogDescriptor();
-        processInstanceDescriptorExt = new SearchProcessInstanceDescriptorExt();
-        archivedProcessInstanceDescriptorExt = new SearchArchivedProcessInstancesDescriptorExt();
+        searchLogDescriptor = new SearchLogDescriptor();
+        searchProcessInstanceDescriptorExt = new SearchProcessInstanceDescriptorExt();
+        searchArchivedProcessInstanceDescriptorExt = new SearchArchivedProcessInstanceDescriptorExt();
     }
 
-    public SearchLogDescriptor getLogDescriptor() {
-        return logDescriptor;
-    }
-
-    @Override
-    public SearchArchivedProcessInstancesDescriptorExt getArchivedProcessInstancesDescriptor() {
-        return archivedProcessInstanceDescriptorExt;
+    public SearchLogDescriptor getSearchLogDescriptor() {
+        return searchLogDescriptor;
     }
 
     @Override
-    public SearchProcessInstanceDescriptorExt getProcessInstanceDescriptor() {
-        return processInstanceDescriptorExt;
+    public SearchProcessInstanceDescriptorExt getSearchProcessInstanceDescriptor() {
+        return searchProcessInstanceDescriptorExt;
     }
 
-    public SearchReportDescriptor getReportDescriptor() {
+    @Override
+    public SearchArchivedProcessInstanceDescriptorExt getSearchArchivedProcessInstanceDescriptor() {
+        return searchArchivedProcessInstanceDescriptorExt;
+    }
+
+    public SearchReportDescriptor getSearchReportDescriptor() {
         return new SearchReportDescriptor();
     }
 

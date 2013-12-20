@@ -74,9 +74,9 @@ public class ReportingAPIIT extends CommonAPISPTest {
     public void searchReportsWithNoResults() throws BonitaException {
         final SearchOptions options = new SearchOptionsImpl(0, 10);
         SearchResult<Report> reports = getReportingAPI().searchReports(options);
-        assertEquals(3, reports.getCount());
+        assertEquals(4, reports.getCount());
         final List<Report> r = reports.getResult();
-        getReportingAPI().deleteReports(Arrays.asList(r.get(0).getId(), r.get(1).getId(), r.get(2).getId()));
+        getReportingAPI().deleteReports(Arrays.asList(r.get(0).getId(), r.get(1).getId(), r.get(2).getId(), r.get(3).getId()));
         reports = getReportingAPI().searchReports(options);
         assertEquals(0, reports.getCount());
     }
@@ -466,8 +466,8 @@ public class ReportingAPIIT extends CommonAPISPTest {
         try {
             final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10).done();
             final SearchResult<Report> searchReports = getReportingAPI().searchReports(searchOptions);
-            // 3 reports by default:
-            assertEquals(3, searchReports.getCount());
+            // 4 reports by default:
+            assertEquals(4, searchReports.getCount());
         } finally {
             // cleanup:
             logout();

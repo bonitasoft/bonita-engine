@@ -240,10 +240,6 @@ public final class SPModelConvertor extends ModelConvertor {
     public static SReport constructSReport(final ReportCreator creator, final long creatorUserId) {
         final Map<ReportField, Serializable> fields = creator.getFields();
         final String name = (String) fields.get(ReportField.NAME);
-        // Boolean isProvided = (Boolean) fields.get(ReportField.PROVIDED);
-        // if (isProvided == null) {
-        // isProvided = false;
-        // }
         final SReportBuilder newSReportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, System.currentTimeMillis(),
                 creatorUserId, false);
         final String description = (String) fields.get(ReportField.DESCRIPTION);

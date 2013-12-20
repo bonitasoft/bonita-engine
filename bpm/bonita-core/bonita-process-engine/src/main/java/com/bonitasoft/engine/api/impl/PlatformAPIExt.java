@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.api.impl;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -23,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
+import org.bonitasoft.engine.api.impl.PlatformAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
@@ -31,13 +31,10 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.command.DefaultCommandProvider;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -48,7 +45,6 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -62,7 +58,6 @@ import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
-import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -72,9 +67,10 @@ import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
-import org.bonitasoft.engine.xml.Parser;
 
 import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.impl.reports.DefaultReportList;
+import com.bonitasoft.engine.api.impl.reports.ReportDeployer;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
@@ -108,6 +104,14 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     private static final String STATUS_DEACTIVATED = "DEACTIVATED";
 
     private static final String PROFILES_FILE_SP = "profiles-sp.xml";
+
+    public PlatformAPIExt() {
+        super();
+    }
+
+    public PlatformAPIExt(final PlatformAPIImplDelegate delegate) {
+        super(delegate);
+    }
 
     @Override
     protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
@@ -264,13 +268,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
 
             final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-            final DataService dataService = tenantServiceAccessor.getDataService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final CommandService commandService = tenantServiceAccessor.getCommandService();
-            final Parser profileParser = tenantServiceAccessor.getProfileParser();
-            final ProfileService profileService = tenantServiceAccessor.getProfileService();
-            final IdentityService identityService = tenantServiceAccessor.getIdentityService();
-            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             final Callable<Long> initializeTenant = new Callable<Long>() {
 
                 @Override
@@ -278,19 +276,28 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                     SessionAccessor sessionAccessor = null;
                     long platformSessionId = -1;
                     try {
+                        // Create session
                         sessionAccessor = serviceAccessorFactory.createSessionAccessor();
                         final SSession session = sessionService.createSession(tenantId, -1L, userName, true);
-
                         platformSessionId = sessionAccessor.getSessionId();
                         sessionAccessor.deleteSessionId();
-
                         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
 
-                        createDefaultDataSource(dataService);
-                        final DefaultCommandProvider defaultCommandProvider = tenantServiceAccessor.getDefaultCommandProvider();
-                        createDefaultCommands(commandService, defaultCommandProvider);
+                        // Create default data source
+                        createDefaultDataSource(tenantServiceAccessor);
+
+                        // Create default commands
+                        createDefaultCommands(tenantServiceAccessor);
+
+                        // Create default reports
                         deployTenantReports(tenantId, tenantServiceAccessor);
-                        createDefaultProfiles(tenantId, profileParser, profileService, identityService, logger);
+
+                        // Create default profiles
+                        createDefaultProfiles(tenantServiceAccessor);
+
+                        // Create default themes
+                        getDelegate().createDefaultThemes(tenantServiceAccessor);
+
                         sessionService.deleteSession(session.getId());
                         return tenantId;
                     } finally {
@@ -304,80 +311,23 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws IOException, BonitaHomeNotSetException,
-            SBonitaException {
-        final String reportFolder = BonitaHomeServer.getInstance().getTenantReportFolder(tenantId);
-        final String reportListFilename = reportFolder + File.separator + "reports.lst";
-        final File reportListFile = new File(reportListFilename);
-        if (!reportListFile.exists()) {
-            return;
-        }
-        final Properties properties = PropertiesManager.getProperties(reportListFile);
-        for (final Entry<Object, Object> reports : properties.entrySet()) {
-            final String reportName = (String) reports.getKey();
-            final String reportDescription = (String) reports.getValue();
-            final byte[] content = getReportContent(reportFolder, reportName);
-            final byte[] screenshot = getReportScreenshot(reportFolder, reportName);
+    public void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws Exception {
 
-            final ReportingService reportingService = tenantAccessor.getReportingService();
-            final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(reportName, /* system user */-1, true,
-                    reportDescription, screenshot);
-            final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-            // Here we are already in a transaction, so we can call execute() directly:
-            addReport.execute();
-        }
-    }
+        DefaultReportList reports = new DefaultReportList(tenantAccessor.getTechnicalLoggerService(), BonitaHomeServer.getInstance().getTenantReportFolder(
+                tenantId));
 
-    /**
-     * Get the binary content of a report, from its name.
-     * 
-     * @param reportFolder
-     *            the folder where to look.
-     * @param reportName
-     *            the name of the report. The content must match <report_name>-content* to be recognized as the report content.
-     * @return the binary content, if found, null otherwise. If several report contents match this pattern, the first one
-     * @throws IOException
-     *             if an I/O error occurs while reading the report content.
-     */
-    protected byte[] getReportContent(final String reportFolder, final String reportName) throws IOException {
-        final File[] fileContents = new File(reportFolder).listFiles(new FilenameFilter() {
+        reports.deploy(new ReportDeployer() {
 
             @Override
-            public boolean accept(final File dir, final String name) {
-                return name.startsWith(reportName + "-content");
+            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
+                final ReportingService reportingService = tenantAccessor.getReportingService();
+                final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
+                        description, screenShot);
+                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
+                // Here we are already in a transaction, so we can call execute() directly:
+                addReport.execute();
             }
         });
-        if (fileContents.length > 0) {
-            return IOUtil.getAllContentFrom(fileContents[0].getAbsoluteFile());
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Get the binary screenshot of a report, from its name.
-     * 
-     * @param reportFolder
-     *            the folder where to look.
-     * @param reportName
-     *            the name of the report. The screenshot must match <report_name>-screenshot* to be recognized as the report screenshot.
-     * @return the binary screenshot, if found, null otherwise. If several report screenshots match this pattern, the first one
-     * @throws IOException
-     *             if an I/O error occurs while reading the report screenshot.
-     */
-    protected byte[] getReportScreenshot(final String reportFolder, final String reportName) throws IOException {
-        final File[] filescreenshots = new File(reportFolder).listFiles(new FilenameFilter() {
-
-            @Override
-            public boolean accept(final File dir, final String name) {
-                return name.startsWith(reportName + "-screenshot");
-            }
-        });
-        if (filescreenshots.length > 0) {
-            return IOUtil.getAllContentFrom(filescreenshots[0].getAbsoluteFile());
-        } else {
-            return null;
-        }
     }
 
     // modify user name and password
@@ -683,14 +633,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             throw new UpdateException(e);
         } catch (final BonitaHomeNotSetException e) {
             throw new UpdateException(e);
-        } catch (final BonitaHomeConfigurationException e) {
-            throw new UpdateException(e);
-        } catch (final InstantiationException e) {
-            throw new UpdateException(e);
-        } catch (final IllegalAccessException e) {
-            throw new UpdateException(e);
-        } catch (final ClassNotFoundException e) {
-            throw new UpdateException(e);
         } catch (final IOException e) {
             throw new UpdateException(e);
         } catch (final SBonitaException e) {
@@ -700,8 +642,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private EntityUpdateDescriptor getTenantUpdateDescriptor(final TenantUpdater udpateDescriptor) throws BonitaHomeNotSetException,
-            BonitaHomeConfigurationException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
+    private EntityUpdateDescriptor getTenantUpdateDescriptor(final TenantUpdater udpateDescriptor) {
         final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
