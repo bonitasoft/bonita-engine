@@ -9,15 +9,22 @@ import org.bonitasoft.engine.transaction.synchronization.SimpleSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronizationResult;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public abstract class TransactionSynchronizationTest {
 
     protected abstract TransactionService getTxService() throws Exception;
+    TransactionService txService;
+
+    @Before
+    public void before() throws Exception {
+        txService = getTxService();
+    }
 
     @After
     public void closeTransactions() throws Exception {
-        TestUtil.closeTransactionIfOpen(getTxService());
+        txService.complete();
     }
 
     // @Test
@@ -49,7 +56,6 @@ public abstract class TransactionSynchronizationTest {
 
     @Test
     public void testSimpleRegisterSynchronization() throws Exception {
-        final TransactionService txService = getTxService();
         txService.begin();
 
         final SimpleSynchronization simpleSynchronization = new SimpleSynchronization();
@@ -63,7 +69,6 @@ public abstract class TransactionSynchronizationTest {
     }
 
     private void testSynchronizationStatus(final boolean rollback, final TransactionState expectedStatus) throws Exception {
-        final TransactionService txService = getTxService();
         txService.begin();
 
         final SimpleSynchronization synchs[] = new SimpleSynchronization[] { new SimpleSynchronization(), new SimpleSynchronization() };
@@ -103,7 +108,6 @@ public abstract class TransactionSynchronizationTest {
     private void testRegisteredSynchronizationsOrder(final boolean rollback, final StaticSynchronization... synchronizations) throws Exception {
         // in fact the same on commit or rollback... Synchronizations are always
         // called
-        final TransactionService txService = getTxService();
         txService.begin();
 
         StaticSynchronizationResult.reset();
@@ -116,7 +120,7 @@ public abstract class TransactionSynchronizationTest {
             if (!rollback) {
                 beforeBuilder.append(synchronization.getBeforeCompletionComment());
             }
-           afterBuilder.append(synchronization.getAfterCompletionComment());
+            afterBuilder.append(synchronization.getAfterCompletionComment());
         }
 
         final String expected = beforeBuilder.toString() + afterBuilder.toString();
