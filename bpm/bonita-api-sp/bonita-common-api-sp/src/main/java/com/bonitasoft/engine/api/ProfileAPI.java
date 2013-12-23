@@ -27,8 +27,15 @@ import com.bonitasoft.engine.profile.ProfileEntryUpdater;
 import com.bonitasoft.engine.profile.ProfileUpdater;
 
 /**
+ * Profiles are a notion used in Bonita BPM Portal to give and control access to some specific features of the Bonita BPM suite.
+ * Profiles are associated to Bonita Identity / Organization notions: users, groups, roles, memberships. <code>ProfileAPI</code> gives FULL access on
+ * profile administation: creation / update / removal of profiles, adding / removing members to / from a profile, retrieving / searching for profiles. <br/>
+ * Import / export of all profiles is also part of this API. <br/>
+ * ProfileAPI also gives access to ProfileEntry management, which are a way to map profiles to features / pages in Bonita BPM Portal *
+ * 
  * @author Celine Souchet
  * @author Matthieu Chaffotte
+ * @see ProfileEntry
  */
 public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
 
