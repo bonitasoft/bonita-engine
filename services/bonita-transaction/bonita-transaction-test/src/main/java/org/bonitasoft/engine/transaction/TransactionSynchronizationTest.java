@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.synchronization.SimpleSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronization;
 import org.bonitasoft.engine.transaction.synchronization.StaticSynchronizationResult;
@@ -24,7 +23,9 @@ public abstract class TransactionSynchronizationTest {
 
     @After
     public void closeTransactions() throws Exception {
-        txService.complete();
+        if (txService.isTransactionActive()) {
+            txService.complete();
+        }
     }
 
     // @Test

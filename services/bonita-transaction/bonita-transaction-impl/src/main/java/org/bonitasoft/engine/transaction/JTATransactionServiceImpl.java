@@ -21,6 +21,7 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
+import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
@@ -35,6 +36,8 @@ public class JTATransactionServiceImpl implements TransactionService {
     private final TransactionManager txManager;
 
     private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
+
+    private final ThreadLocal<AtomicLong> counter = new ThreadLocal<AtomicLong>();
 
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup) {
         this(logger, txManagerLookup.getTransactionManager());
@@ -51,30 +54,45 @@ public class JTATransactionServiceImpl implements TransactionService {
     @Override
     public void begin() throws STransactionCreationException {
         try {
+            AtomicLong counterTL = counter.get();
+            synchronized(counter) {
+                if (counterTL == null) {
+                    counterTL = new AtomicLong();
+                    counter.set(counterTL);
+                }
+            }
+            if (counterTL.get() == 1) {
+                throw new STransactionCreationException("We do not support nested calls to the transaction service.");
+            }
+            counterTL.getAndIncrement();
+
             if (txManager.getStatus() == Status.STATUS_NO_TRANSACTION) {
                 boolean transactionStarted = false;
                 try {
                     txManager.begin();
                     transactionStarted = true;
-                    numberOfActiveTransactions.getAndIncrement();
 
                     final Transaction tx = txManager.getTransaction();
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
                         logger.log(getClass(), TechnicalLogSeverity.TRACE,
                                 "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
                     }
+                    // Avoid a memory-leak by cleaning the ThreadLocal after the transaction's completion
+                    tx.registerSynchronization(new ResetCounterSynchronization(this));
+
+                    // Ensuite the monitoring of numberOfActiveTransactions is up-to-date.
+                    numberOfActiveTransactions.getAndIncrement();
+                    tx.registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
+
                 } catch (final NotSupportedException e) {
                     // Should never happen as we do not want to support nested transaction
                     throw new STransactionCreationException(e);
                 } catch (final Throwable t) {
                     if (transactionStarted) {
                         txManager.rollback();
-                        numberOfActiveTransactions.getAndDecrement();
                     }
                     throw new STransactionCreationException(t);
                 }
-            } else {
-                throw new STransactionCreationException("We do not support nested transaction.");
             }
         } catch (final SystemException e) {
             throw new STransactionCreationException(e);
@@ -83,6 +101,7 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     @Override
     public void complete() throws STransactionCommitException, STransactionRollbackException {
+
         // Depending of the txManager status we either commit or rollback.
         try {
             final Transaction tx = txManager.getTransaction();
@@ -91,6 +110,16 @@ public class JTATransactionServiceImpl implements TransactionService {
             }
 
             final int status = txManager.getStatus();
+
+            if (status == Status.STATUS_NO_TRANSACTION) {
+                throw new RuntimeException("No transaction started.");
+            }
+
+            final AtomicLong counterTL = counter.get();
+            counterTL.getAndDecrement();
+            if (counterTL.get() != 0) {
+                return; // We do not manage the transaction boundaries
+            }
 
             if (status == Status.STATUS_MARKED_ROLLBACK) {
                 try {
@@ -103,8 +132,6 @@ public class JTATransactionServiceImpl implements TransactionService {
                     throw new STransactionRollbackException("", e);
                 } catch (final SecurityException e) {
                     throw new STransactionRollbackException("", e);
-                } finally {
-                    numberOfActiveTransactions.getAndDecrement();
                 }
             } else {
                 try {
@@ -119,8 +146,6 @@ public class JTATransactionServiceImpl implements TransactionService {
                     throw new STransactionCommitException("", e);
                 } catch (final HeuristicRollbackException e) {
                     throw new STransactionCommitException("", e);
-                } finally {
-                    numberOfActiveTransactions.getAndDecrement();
                 }
             }
         } catch (final SystemException e) {
@@ -136,18 +161,18 @@ public class JTATransactionServiceImpl implements TransactionService {
             final int status = txManager.getStatus();
 
             switch (status) {
-                case Status.STATUS_ACTIVE:
-                    return TransactionState.ACTIVE;
-                case Status.STATUS_COMMITTED:
-                    return TransactionState.COMMITTED;
-                case Status.STATUS_MARKED_ROLLBACK:
-                    return TransactionState.ROLLBACKONLY;
-                case Status.STATUS_ROLLEDBACK:
-                    return TransactionState.ROLLEDBACK;
-                case Status.STATUS_NO_TRANSACTION:
-                    return TransactionState.NO_TRANSACTION;
-                default:
-                    throw new STransactionException("Can't map the JTA status : " + status);
+            case Status.STATUS_ACTIVE:
+                return TransactionState.ACTIVE;
+            case Status.STATUS_COMMITTED:
+                return TransactionState.COMMITTED;
+            case Status.STATUS_MARKED_ROLLBACK:
+                return TransactionState.ROLLBACKONLY;
+            case Status.STATUS_ROLLEDBACK:
+                return TransactionState.ROLLEDBACK;
+            case Status.STATUS_NO_TRANSACTION:
+                return TransactionState.NO_TRANSACTION;
+            default:
+                throw new STransactionException("Can't map the JTA status : " + status);
             }
         } catch (final SystemException e) {
             throw new STransactionException("", e);
@@ -216,6 +241,47 @@ public class JTATransactionServiceImpl implements TransactionService {
     @Override
     public long getNumberOfActiveTransactions() {
         return numberOfActiveTransactions.get();
+    }
+
+
+    private class ResetCounterSynchronization implements Synchronization {
+
+        private final JTATransactionServiceImpl txService;
+
+        public ResetCounterSynchronization(final JTATransactionServiceImpl txService) {
+            this.txService = txService;
+        }
+
+        @Override
+        public void beforeCompletion() {
+            // Nothing to do
+        }
+
+        @Override
+        public void afterCompletion(final int status) {
+            // Whatever the tx status, reset the counter
+            txService.counter.set(null);
+        }
+    }
+
+    private class DecrementNumberOfActiveTransactionsSynchronization implements Synchronization {
+
+        private final JTATransactionServiceImpl txService;
+
+        public DecrementNumberOfActiveTransactionsSynchronization(final JTATransactionServiceImpl txService) {
+            this.txService = txService;
+        }
+
+        @Override
+        public void beforeCompletion() {
+            // Nothing to do
+        }
+
+        @Override
+        public void afterCompletion(final int status) {
+            // Whatever the status, decrement the number of active transactions
+            txService.numberOfActiveTransactions.getAndDecrement();
+        }
     }
 
 }

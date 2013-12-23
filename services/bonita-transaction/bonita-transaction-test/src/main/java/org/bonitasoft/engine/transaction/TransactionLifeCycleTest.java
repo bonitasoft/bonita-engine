@@ -23,7 +23,9 @@ public abstract class TransactionLifeCycleTest {
     @After
     public void closeTransactions() throws Exception {
         // Do not forget to close the transaction
-        txService.complete();
+        if (txService.isTransactionActive()) {
+            txService.complete();
+        }
 
     }
 
@@ -50,6 +52,7 @@ public abstract class TransactionLifeCycleTest {
         txService.setRollbackOnly();
 
         assertEquals(TransactionState.ROLLBACKONLY, txService.getState());
+        txService.complete();
     }
 
     @Test
@@ -96,6 +99,7 @@ public abstract class TransactionLifeCycleTest {
         txService.begin();
         txService.setRollbackOnly();
         assertTrue(txService.isRollbackOnly());
+        txService.complete();
     }
 
     @Test
@@ -103,6 +107,7 @@ public abstract class TransactionLifeCycleTest {
         txService.begin();
         txService.setRollbackOnly();
         assertEquals(TransactionState.ROLLBACKONLY, txService.getState());
+        txService.complete();
     }
 
     @Test
