@@ -14,12 +14,20 @@
 package org.bonitasoft.engine.bpm.process;
 
 /**
- * @author Celine Souchet
+ * Activation state of a process
  * 
- *         Set by the API
+ * @author Celine Souchet
  */
 public enum ActivationState {
 
-    ENABLED, DISABLED
+    /**
+     * The process is enabled and instances of the process can be started.
+     */
+    ENABLED,
+
+    /**
+     * The process is disabled and no instance can be started.
+     */
+    DISABLED
 
 }

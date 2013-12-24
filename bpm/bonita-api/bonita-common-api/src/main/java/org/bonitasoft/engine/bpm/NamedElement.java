@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.bpm;
 
 /**
- * Any element that have a name in Bonita BPM implements this interface.
+ * Any element that has a name in Bonita BPM implements this interface.
  * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
