@@ -152,7 +152,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             If can't create the new profile entry
      * @since 6.0
      */
-    ProfileEntry createProfileEntry(ProfileEntryCreator creator) throws AlreadyExistsException, CreationException;
+    ProfileEntry createProfileEntry(ProfileEntryCreator creator) throws CreationException;
 
     /**
      * Create a new profile entry
@@ -170,7 +170,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             If can't create the new profile entry
      * @since 6.0
      */
-    ProfileEntry createProfileEntry(String name, String description, long profileId, String type) throws AlreadyExistsException, CreationException;
+    ProfileEntry createProfileEntry(String name, String description, long profileId, String type) throws CreationException;
 
     /**
      * Create a new profile entry
@@ -190,7 +190,7 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      *             If can't create the new profile entry
      * @since 6.0
      */
-    ProfileEntry createProfileEntry(String name, String description, long profileId, String type, String page) throws AlreadyExistsException, CreationException;
+    ProfileEntry createProfileEntry(String name, String description, long profileId, String type, String page) throws CreationException;
 
     /**
      * Delete a specific profile entry
@@ -211,6 +211,8 @@ public interface ProfileAPI extends org.bonitasoft.engine.api.ProfileAPI {
      * @param updater
      *            the attributes to update
      * @return the updated profile entry
+     * @throws ProfileEntryNotFoundException
+     *             if no <code>ProfileEntry</code> can be found with the provided ID.
      * @throws UpdateException
      *             If can't update the profile entry
      *             Index must be an odd long value if index is updated

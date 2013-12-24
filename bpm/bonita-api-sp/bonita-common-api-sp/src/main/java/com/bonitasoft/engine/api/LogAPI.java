@@ -21,15 +21,23 @@ import com.bonitasoft.engine.log.LogCriterion;
 import com.bonitasoft.engine.log.LogNotFoundException;
 
 /**
+ * When some actions are performed in Bonita BPM Execution Engine, some business logs are stored.<br/>
+ * The LogAPI allows to get / search those logs.
+ * <p>
+ * The stored logs depend on which bonita objects have been enabled for logging (this is configurable in bonita-home configuration files)
+ * </p>
+ * 
  * @author Bole Zhang
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
+ * @see "QueriableLoggerService implementations and configuration (in bonita-home)"
  */
 public interface LogAPI {
 
     /**
      * Retrieves the log.
      * 
-     * @param roleId
+     * @param logId
      *            the identifier of the log
      * @return the role
      * @throws LogNotFoundException
@@ -77,7 +85,7 @@ public interface LogAPI {
     /**
      * Searches logs according to the criteria containing in the options.
      * 
-     * @param options
+     * @param searchOptions
      *            the search criteria
      * @return the search result
      * @throws SearchException

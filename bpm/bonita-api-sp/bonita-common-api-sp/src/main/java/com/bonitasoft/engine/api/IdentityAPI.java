@@ -9,8 +9,13 @@
 package com.bonitasoft.engine.api;
 
 /**
+ * This API does not contain anymore anything Subscription-specific. It is here for backwards compatibility. All usable methods come from superinterface
+ * {@link org.bonitasoft.engine.api.IdentityAPI}.
+ * 
  * @author Celine Souchet
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
+ * @see org.bonitasoft.engine.api.IdentityAPI
  */
 public interface IdentityAPI extends org.bonitasoft.engine.api.IdentityAPI {
 
