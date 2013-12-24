@@ -75,6 +75,11 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
+ * <code>ProcessRuntimeAPI</code> deals with Process runtime notions such as starting a new instance of a process, retrieving and executing tasks, accessing to
+ * all types of tasks, assigning a user to a task, retrieving archived versions of a task, accessing / updating data / variable values, adding / retrieving
+ * process comments ...
+ * It generally allows all BPM runtime actions, that is, once process instances are running of finished executing.
+ * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
@@ -283,13 +288,29 @@ public interface ProcessRuntimeAPI {
      * @throws DeletionException
      *             if other deletion problem occurs.
      * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int)} and {@link #deleteArchivedProcessInstances(long, int, int)}
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int)} and {@link #deleteArchivedProcessInstances(long, int, int)}.
+     *             As these new methods are paginated, to delete ALL archived and non-archived process instances, use some code like:
+     * 
+     *             <pre>
+     * <blockquote>
+     * long nbDeleted = 0;
+     * processAPI.disableProcess(processDefinitionId);
+     * do {
+     *     nbDeleted = processAPI.deleteProcessInstances(processDefinitionId, 0, 100);
+     * } while (nbDeleted > 0);
+     * do {
+     *     nbDeleted = processAPI.deleteArchivedProcessInstances(processDefinitionId, 0, 100);
+     * } while (nbDeleted > 0);
+     * </blockquote>
+     * </pre>
      */
     @Deprecated
     void deleteProcessInstances(long processDefinitionId) throws DeletionException;
 
     /**
-     * Delete active process instances, and their elements, of process definition given as input parameter respecting the pagination parameters
+     * Delete active process instances, and their elements, of process definition given as input parameter respecting the pagination parameters.
+     * Passing {@link Long#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
+     * Instead, to delete all Process instances of a specific process definition, should you should use a loop and delete instances in bulk.
      * 
      * @param processDefinitionId
      *            Identifier of the processDefinition
@@ -305,7 +326,9 @@ public interface ProcessRuntimeAPI {
     long deleteProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
 
     /**
-     * Delete archived process instances of process definition given as input parameter respecting the pagination parameters
+     * Delete archived process instances of process definition given as input parameter respecting the pagination parameters.
+     * Passing {@link Long#MAX_VALUE} as maxResults is discouraged as the amount of operations may be large and may thus result in timeout operation.
+     * Instead, to delete all archived process instances of a specific process definition, you should use a loop and delete archived instances in bulk.
      * 
      * @param processDefinitionId
      *            Identifier of the processDefinition

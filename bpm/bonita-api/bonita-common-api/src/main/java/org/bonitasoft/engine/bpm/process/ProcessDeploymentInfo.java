@@ -19,13 +19,19 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
+ * Gives access to deployment information of a process.
+ * 
  * @author Baptiste Mesta
  * @author Yanyan Liu
  * @author Hongwen Zang
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
 
+    /**
+     * @return the ID of the process, which is the same of the process definition.
+     */
     long getProcessId();
 
     String getVersion();
