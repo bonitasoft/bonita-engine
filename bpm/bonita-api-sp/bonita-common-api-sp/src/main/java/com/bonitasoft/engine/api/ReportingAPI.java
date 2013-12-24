@@ -23,7 +23,14 @@ import com.bonitasoft.engine.reporting.ReportCreator;
 import com.bonitasoft.engine.reporting.ReportNotFoundException;
 
 /**
- * This API gives access to all reporting features.
+ * This API gives access to all reporting features. Reporting is a way to execute custom queries on Bonita BPM Database, knowing the DB structure, for custom
+ * specific queries.
+ * <p>
+ * Only "select" statements are allowed.
+ * </p>
+ * <p>
+ * Also allows to manipulate <code>Report</code>s, through creation, deletion, search.
+ * </p>
  * 
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -47,7 +54,10 @@ public interface ReportingAPI {
     String selectList(String selectQuery) throws ExecutionException;
 
     /**
+     * Retrieves a report from its ID.
+     * 
      * @param reportId
+     *            the Identifier of the report to retrieve
      * @return the found report
      * @throws ReportNotFoundException
      *             if no report can be found with the provided ID.

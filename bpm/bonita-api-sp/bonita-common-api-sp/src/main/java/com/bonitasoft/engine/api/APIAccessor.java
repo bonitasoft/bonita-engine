@@ -11,8 +11,11 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.api.CommandAPI;
 
 /**
+ * Gives access to Subscription edition specific APIs.
+ * 
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
 
@@ -28,27 +31,44 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
     @Override
     ProfileAPI getProfileAPI();
 
+    /**
+     * @return the <code>MonitoringAPI</code>
+     * @since 6.0
+     */
     MonitoringAPI getMonitoringAPI();
 
+    /**
+     * @return the <code>PlatformMonitoringAPI</code>
+     * @since 6.0
+     */
     PlatformMonitoringAPI getPlatformMonitoringAPI();
 
+    /**
+     * @return the <code>LogAPI</code>
+     * @since 6.0
+     */
     LogAPI getLogAPI();
 
+    /**
+     * @return the <code>NodeAPI</code>
+     * @since 6.1
+     */
     NodeAPI getNodeAPI();
 
     /**
-     * Gives access to ReportingAPI
+     * Gives access to ReportingAPI.
      * 
      * @return the ReportingAPI, giving access to all reporting methods.
      */
     ReportingAPI getReportingAPI();
 
     /**
-     * Gives access to ThemeAPI
+     * Gives access to ThemeAPI.
      * 
      * @return The ThemeAPI, giving access to all theme methods.
      * @since 6.2
      */
+    @Override
     ThemeAPI getThemeAPI();
 
 }

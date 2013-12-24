@@ -27,6 +27,9 @@ import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 
 /**
+ * * {@link ProcessManagementAPI} extends {@link org.bonitasoft.engine.api.ProcessManagementAPI} and adds capabilities on <code>Parameter</code>s, activity
+ * replay, connector implementation hot-replace.
+ * 
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
@@ -90,6 +93,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws ParameterNotFoundException
      *             Error thrown if the given parameter is not found.
      * @throws UpdateException
+     *             if the update cannot be fullfilled.
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
@@ -119,8 +123,11 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @param activityInstanceId
      *            the id of the element on which we want the connector instances
      * @param startIndex
+     *            Index of the page to be returned. First page has index 0.
      * @param maxResults
+     *            Number of result per page. Maximum number of result returned.
      * @param sortingCriterion
+     *            The criterion to sort the result
      * @return
      *         the list of connector instance on this element
      * @since 6.0
@@ -133,8 +140,11 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @param processInstanceId
      *            the id of the element on which we want the connector instances
      * @param startIndex
+     *            Index of the page to be returned. First page has index 0.
      * @param maxResults
+     *            Number of result per page. Maximum number of result returned.
      * @param sortingCriterion
+     *            The criterion to sort the result
      * @return
      *         the list of connector instance on this element
      * @since 6.0
@@ -149,8 +159,9 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @param state
      *            the state to set on the connector
      * @throws UpdateException
+     *             if the set operation cannot be fullfilled.
      * @throws ConnectorInstanceNotFoundException
-     *             TODO
+     *             if the connector instance cannot be found with the provided connectorInstanceId
      * @throws InvalidSessionException
      *             if no current valid engine session is found
      * @since 6.0
@@ -164,9 +175,9 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      *            a Map containing, as key, the connector instance id, and as value, the <code>ConnectorStateReset</code> value to reset the connector instance
      *            to.
      * @throws ConnectorInstanceNotFoundException
-     *             TODO
+     *             if the connector instance cannot be found with the provided connectorInstanceId
      * @throws UpdateException
-     *             TODO
+     *             if the set operation cannot be fullfilled.
      * @throws InvalidSessionException
      *             if no current valid engine session is found
      * @since 6.0
@@ -188,6 +199,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @throws InvalidConnectorImplementationException
      *             if the implementation is not valid. (e.g. wrong format)
      * @throws UpdateException
+     *             if the set operation cannot be fullfilled.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -204,9 +216,9 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * @param connectorsToReset
      *            Map of connectors to reset before retrying the task
      * @throws ActivityInstanceNotFoundException
-     *             errors thrown if can't find corresponding activity
+     *             if no activity instance can be found with the provided activityInstanceId
      * @throws ActivityExecutionException
-     *             TODO
+     *             if the activity failed to replay.
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
@@ -221,14 +233,14 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * 
      * @param activityInstanceId
      *            the activity to replay
-     * @throws ActivityExecutionException
-     *             TODO
      * @throws ActivityInstanceNotFoundException
-     *             TODO
+     *             if no activity instance can be found with the provided activityInstanceId
+     * @throws ActivityExecutionException
+     *             if the activity failed to replay.
      * @throws InvalidSessionException
      *             When the activity can't be modified
      * @since 6.0
      */
-    void replayActivity(long activityInstanceId) throws ActivityExecutionException, ActivityInstanceNotFoundException;
+    void replayActivity(long activityInstanceId) throws ActivityInstanceNotFoundException, ActivityExecutionException;
 
 }

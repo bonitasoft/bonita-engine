@@ -17,6 +17,9 @@ import com.bonitasoft.engine.monitoring.MonitoringException;
 import com.bonitasoft.engine.monitoring.UnavailableInformationException;
 
 /**
+ * The <code>PlatformMonitoringAPI</code> allows to monitor certains indicator at platform level.
+ * Some indicators are based on the JVM running the platform.
+ * 
  * @author Zhao Na
  * @author Elias Ricken de Medeiros
  * @author Feng Hui
@@ -32,7 +35,7 @@ public interface PlatformMonitoringAPI {
      *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since6.0
+     * @since 6.0
      */
     long getCurrentMemoryUsage() throws MonitoringException;
 
@@ -45,7 +48,7 @@ public interface PlatformMonitoringAPI {
      *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since6.0
+     * @since 6.0
      */
     float getMemoryUsagePercentage() throws MonitoringException;
 
@@ -62,7 +65,7 @@ public interface PlatformMonitoringAPI {
      *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since6.0
+     * @since 6.0
      */
     double getSystemLoadAverage() throws MonitoringException;
 
@@ -74,7 +77,7 @@ public interface PlatformMonitoringAPI {
      *             occurs when an exception is thrown during monitoring
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @since6.0
+     * @since 6.0
      */
     long getUpTime() throws MonitoringException;
 
@@ -88,7 +91,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     long getStartTime() throws MonitoringException;
 
@@ -101,7 +104,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     long getTotalThreadsCpuTime() throws MonitoringException;
 
@@ -113,7 +116,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     int getThreadCount() throws MonitoringException;
 
@@ -125,7 +128,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     int getAvailableProcessors() throws MonitoringException;
 
@@ -137,7 +140,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     String getOSArch() throws MonitoringException;
 
@@ -149,7 +152,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     String getOSName() throws MonitoringException;
 
@@ -161,7 +164,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     String getOSVersion() throws MonitoringException;
 
@@ -173,7 +176,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     String getJvmName() throws MonitoringException;
 
@@ -185,7 +188,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     String getJvmVendor() throws MonitoringException;
 
@@ -197,7 +200,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     String getJvmVersion() throws MonitoringException;
 
@@ -209,7 +212,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     Map<String, String> getJvmSystemProperties() throws MonitoringException;
 
@@ -222,7 +225,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     boolean isSchedulerStarted() throws MonitoringException;
 
@@ -235,7 +238,7 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     long getNumberOfActiveTransactions() throws MonitoringException;
 
@@ -248,83 +251,91 @@ public interface PlatformMonitoringAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @throws UnavailableInformationException
+     *             if the Process CPU time is not available for the current JVM.
+     * @since 6.0
      */
     long getProcessCpuTime() throws MonitoringException, UnavailableInformationException;
 
     /**
      * Returns the amount of virtual memory that is guaranteed to be available to the running process in bytes, or -1 if this operation is not supported.
      * 
+     * @return the amount of virtual memory
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
      * @throws UnavailableInformationException
      *             if the information is not available for the current JVM
-     * @since6.0
+     * @since 6.0
      */
     long getCommittedVirtualMemorySize() throws MonitoringException, UnavailableInformationException;
 
     /**
-     * Returns the total amount of swap space in bytes.
+     * Get the total amount of swap space in bytes.
      * 
+     * @return the total amount of swap space in bytes
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
      * @throws UnavailableInformationException
      *             if the information is not available for the current JVM
-     * @since6.0
+     * @since 6.0
      */
     long getTotalSwapSpaceSize() throws MonitoringException, UnavailableInformationException;
 
     /**
-     * Returns the amount of free swap space in bytes.
+     * Get the amount of free swap space in bytes.
      * 
+     * @return the amount of free swap space in bytes
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
      * @throws UnavailableInformationException
      *             if the information is not available for the current JVM
-     * @since6.0
+     * @since 6.0
      */
     long getFreeSwapSpaceSize() throws MonitoringException, UnavailableInformationException;
 
     /**
-     * Returns the amount of free physical memory in bytes.
+     * Get the amount of free physical memory in bytes.
      * 
+     * @return the amount of free physical memory in bytes.
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
      * @throws UnavailableInformationException
      *             if the information is not available for the current JVM
-     * @since6.0
+     * @since 6.0
      */
     long getFreePhysicalMemorySize() throws MonitoringException, UnavailableInformationException;
 
     /**
-     * Returns the total amount of physical memory in bytes.
+     * Get the total amount of physical memory in bytes.
      * 
+     * @return the total amount of physical memory in bytes
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
      * @throws UnavailableInformationException
      *             if the information is not available for the current JVM
-     * @since6.0
+     * @since 6.0
      */
     long getTotalPhysicalMemorySize() throws MonitoringException, UnavailableInformationException;
 
     /**
      * Returns true if engine is running on top of a SUN/Oracle JVM
      * 
+     * @return true if engine is running on top of a SUN/Oracle JVM, false otherwise
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws MonitoringException
      *             occurs when an exception is thrown during monitoring
-     * @since6.0
+     * @since 6.0
      */
     boolean isOptionalMonitoringInformationAvailable() throws MonitoringException;
 
@@ -341,7 +352,7 @@ public interface PlatformMonitoringAPI {
      *             occurs when an exception is thrown during monitoring
      * @throws UnavailableInformationException
      *             if the information is not available for the current JVM
-     * @since6.0
+     * @since 6.0
      */
     Map<String, GcInfo> getLastGcInfo() throws MonitoringException, UnavailableInformationException;
 

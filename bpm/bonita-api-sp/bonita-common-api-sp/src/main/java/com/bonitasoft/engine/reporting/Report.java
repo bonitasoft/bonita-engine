@@ -12,8 +12,14 @@ import java.util.Date;
 
 import org.bonitasoft.engine.bpm.BaseElement;
 
+import com.bonitasoft.engine.api.ReportingAPI;
+
 /**
+ * A Report is a way to store, amongst other things, a binary screenshot and a binary content.
+ * It is used by Bonita BPM Portal to store specific reporting behaviour.
+ * 
  * @author Matthieu Chaffotte
+ * @see ReportingAPI
  */
 public interface Report extends BaseElement {
 

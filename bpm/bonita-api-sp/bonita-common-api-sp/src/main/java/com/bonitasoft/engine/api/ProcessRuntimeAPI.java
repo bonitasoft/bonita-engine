@@ -32,7 +32,11 @@ import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 
 /**
+ * {@link ProcessRuntimeAPI} extends {@link org.bonitasoft.engine.api.ProcessRuntimeAPI} and adds capabilities on Manual tasks, connector execution (directly
+ * available at API level), search index updating.
+ * 
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
 public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRuntimeAPI {
 
@@ -43,10 +47,12 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            the manual task creator
      * @return the matching an instance of manual task
      * @throws CreationException
+     *             if the manual task cannot be created.
      * @throws AlreadyExistsException
+     *             if the provided manual task already exists.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
-     *             since 6.0
+     * @since 6.0
      */
     ManualTaskInstance addManualUserTask(ManualTaskCreator creator) throws CreationException, AlreadyExistsException;
 
@@ -107,9 +113,9 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the process instance
      * @return a map with new values of elements set by the operations
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -133,9 +139,9 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the activity instance
      * @return a map with connector parameter name and parameter value object
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -158,14 +164,14 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @param operations
      *            map of operations having each a special context (input values)
      * @param operationsInputValues
-     *            TODO
+     *            the map of input name-value pairs used by operation executions.
      * @param activityInstanceId
      *            Identifier of the activity instance
      * @return a map with new values of elements set by the operations
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -189,9 +195,9 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the activity instance
      * @return a map with connector parameter name and parameter value object
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -214,14 +220,14 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @param operations
      *            map of operations having each a special context (input values)
      * @param operationsInputValues
-     *            TODO
+     *            the map of input name-value pairs used by operation executions.
      * @param activityInstanceId
      *            Identifier of the activity instance
      * @return a map with new values of elements set by the operations
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -245,9 +251,9 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the process instance
      * @return a map with connector parameter name and parameter value object
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -270,14 +276,14 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @param operations
      *            map of operations having each a special context (input values)
      * @param operationsInputValues
-     *            TODO
+     *            the map of input name-value pairs used by operation executions.
      * @param processInstanceId
      *            Identifier of the process instance
      * @return a map with new values of elements set by the operations
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -301,9 +307,9 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      *            Identifier of the process instance
      * @return a map with connector parameter name and parameter value object
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -328,11 +334,12 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @param operations
      *            map of operations having each a special context (input values)
      * @param operationsInputValues
+     *            the map of input name-value pairs used by operation executions.
      * @return a map with new values of elements set by the operations
      * @throws ConnectorExecutionException
-     *             TODO
+     *             if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             TODO
+     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -378,7 +385,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @since 6.0
      */
     ProcessInstance updateProcessInstance(long processInstanceId, ProcessInstanceUpdater updater) throws ProcessInstanceNotFoundException, UpdateException;
-    
+
     /**
      * Retrieves a <code>ConnectorInstanceWithFailureInfo</code> specified by its identifier.
      * 
