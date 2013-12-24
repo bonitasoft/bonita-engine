@@ -42,6 +42,7 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
+        					<stylesheetfile>stylesheet.css</stylesheetfile>
  							<excludePackageNames>org.bonitasoft.engine.expression.*:org.bonitasoft.engine.operation.*</excludePackageNames>
 						</configuration>
 					</execution>
