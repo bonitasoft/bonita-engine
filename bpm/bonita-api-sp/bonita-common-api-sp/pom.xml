@@ -35,6 +35,7 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
+							<includeDependencySources>true</includeDependencySources>
         					<stylesheetfile>stylesheet.css</stylesheetfile>
 						</configuration>
 					</execution>
