@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.api</groupId>
 		<artifactId>bonita-api-sp</artifactId>
-		<version>6.2.1-SNAPSHOT</version>
+		<version>6.2.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-common-api-sp</artifactId>
@@ -35,6 +35,7 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
+							<includeDependencySources>true</includeDependencySources>
         					<stylesheetfile>stylesheet.css</stylesheetfile>
 						</configuration>
 					</execution>
