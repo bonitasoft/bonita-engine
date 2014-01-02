@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-engine-sp</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.2.0-SNAPSHOT</version>
+		<version>6.2.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bpm</artifactId>
@@ -20,6 +20,7 @@
 		<module>bonita-deploy</module>
 		<module>bonita-util-sp</module>
 		<module>bonita-synchro-repository-sp</module>
+		<module>bonita-api-sp</module>
 	</modules>
 
 	<profiles>

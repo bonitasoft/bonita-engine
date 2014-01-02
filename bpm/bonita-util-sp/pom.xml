@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.2.0-SNAPSHOT</version>
+		<version>6.2.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -15,7 +15,6 @@
 	<name>Bonita Util</name>
 
 	<modules>
-		<module>bonita-common-util-sp</module>
 		<module>bonita-client-util-sp</module>
 	</modules>
 </project>
