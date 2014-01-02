@@ -27,8 +27,6 @@ import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.actor.ActorNotFoundException;
 import org.bonitasoft.engine.bpm.actor.ActorUpdater;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.category.CategoryNotFoundException;
@@ -76,6 +74,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  * @author Arthur Freycon
+ * @author Emmanuel Duchastenier
  */
 public interface ProcessManagementAPI {
 
@@ -90,8 +89,6 @@ public interface ProcessManagementAPI {
      * @throws ProcessDeployException
      *             if an exception occurs when deploying the archive.
      * @see BusinessArchive
-     * @see BusinessArchiveBuilder
-     * @see BusinessArchiveFactory
      * @since 6.0
      */
     ProcessDefinition deploy(BusinessArchive businessArchive) throws AlreadyExistsException, ProcessDeployException;
@@ -179,9 +176,9 @@ public interface ProcessManagementAPI {
      *             if an exception occurs during process deletion.
      * @throws ProcessInstanceHierarchicalDeletionException
      *             if a process instance cannot be deleted because of a parent that is still active
-     * @see #deleteProcessDefinitions(List<Long>)
+     * @see #deleteProcessDefinitions(List)
      * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinitions(List<Long>)}
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinitions(List)}
      */
     @Deprecated
     void deleteProcesses(List<Long> processDefinitionIds) throws DeletionException;
@@ -377,9 +374,9 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns a paged list of members of an actor.
-     * An actor member can be a user,
-     * a role, a group, or a membership. An actor member is created when a
-     * user, role, group, or membership is mapped to the actor.
+     * An actor member can be a user, a role, a group, or a membership. An actor member is created when a user, role, group, or membership is mapped to the
+     * actor.
+     * No ordering must be assumed on the list of results.
      * 
      * @param actorId
      *            the identifier of the actor.
@@ -387,9 +384,7 @@ public interface ProcessManagementAPI {
      *            the index of the first result (starting from 0).
      * @param maxResults
      *            the maximum number of actor members per page.
-     * @param sort
-     *            the sorting criterion.
-     * @return the ordered list of actor members.
+     * @return the list of actor members.
      * @since 6.0
      */
     List<ActorMember> getActorMembers(long actorId, int startIndex, int maxResults);
@@ -723,7 +718,7 @@ public interface ProcessManagementAPI {
      * @throws AlreadyExistsException
      *             if the association category/process already exists.
      * @throws CreationException
-     *             TODO if an exception occurs while adding the process to the category.
+     *             if an exception occurs while adding the process to the category.
      * @since 6.0
      */
     void addProcessDefinitionToCategory(long categoryId, long processDefinitionId) throws AlreadyExistsException, CreationException;
@@ -738,7 +733,7 @@ public interface ProcessManagementAPI {
      * @throws AlreadyExistsException
      *             if an association category/process already exists.
      * @throws CreationException
-     *             TODO if an exception occurs while adding the process to the category.
+     *             if an exception occurs while adding the process to the category.
      * @since 6.0
      */
     void addProcessDefinitionsToCategory(long categoryId, List<Long> processDefinitionIds) throws AlreadyExistsException, CreationException;
@@ -1157,7 +1152,7 @@ public interface ProcessManagementAPI {
      *            the search criteria.
      * @return the number and the list of uncategorized processes.
      * @throws SearchException
-     *             TODO if an exception occurs when searching the process deployment information.
+     *             if an exception occurs when searching the process deployment information.
      * @since 6.0
      */
     SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
@@ -1171,7 +1166,7 @@ public interface ProcessManagementAPI {
      *            the search criteria.
      * @return the number and the list of uncategorized processes that the user can start.
      * @throws SearchException
-     *             TODO if an exception occurs when searching the process deployment information.
+     *             if an exception occurs when searching the process deployment information.
      * @since 6.0
      */
     SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosUserCanStart(long userId, SearchOptions searchOptions) throws SearchException;
@@ -1335,6 +1330,7 @@ public interface ProcessManagementAPI {
      * @param sortingCriterion
      *            the sort criterion.
      * @return the processes that the user is the last actor.
+     * @see #getProcessDeploymentInfosWithActorOnlyForUsers(List, int, int, ProcessDeploymentInfoCriterion)
      * @since 6.0
      */
     List<ProcessDeploymentInfo> getProcessDeploymentInfosWithActorOnlyForUser(long userId, int startIndex, int maxResults,
@@ -1352,7 +1348,7 @@ public interface ProcessManagementAPI {
      * @param sortingCriterion
      *            the sort criterion.
      * @return the processes that the users are the last actor(s).
-     * @see #getProcessesWithActorOnlyForUser
+     * @see #getProcessDeploymentInfosWithActorOnlyForUser(long, int, int, ProcessDeploymentInfoCriterion)
      * @since 6.0
      */
     List<ProcessDeploymentInfo> getProcessDeploymentInfosWithActorOnlyForUsers(List<Long> userIds, int startIndex, int maxResults,
@@ -1437,6 +1433,7 @@ public interface ProcessManagementAPI {
      * @throws CreationException
      *             if an exception occurs when creating the process supervisor.
      * @throws AlreadyExistsException
+     *             if the provided role is already a supervisor for the provided process.
      * @since 6.0
      */
     ProcessSupervisor createProcessSupervisorForRole(long processDefinitionId, long roleId) throws CreationException, AlreadyExistsException;
@@ -1457,6 +1454,7 @@ public interface ProcessManagementAPI {
      * @throws CreationException
      *             if an exception occurs when creating the process supervisor.
      * @throws AlreadyExistsException
+     *             if the provided group is already a supervisor for the provided process.
      * @since 6.0
      */
     ProcessSupervisor createProcessSupervisorForGroup(long processDefinitionId, long groupId) throws CreationException, AlreadyExistsException;
@@ -1479,6 +1477,7 @@ public interface ProcessManagementAPI {
      * @throws CreationException
      *             if an exception occurs when creating the process supervisor.
      * @throws AlreadyExistsException
+     *             if the provided membership (group + role) is already a supervisor for the provided process.
      * @since 6.0
      */
     ProcessSupervisor createProcessSupervisorForMembership(long processDefinitionId, long groupId, long roleId) throws CreationException,
@@ -1508,8 +1507,7 @@ public interface ProcessManagementAPI {
     void deleteSupervisor(long supervisorId) throws DeletionException;
 
     /**
-     * TODO hard to use
-     * Delete the {@link ProcessSupervisor} object that is identified by this processDefinitionId, userId, roleId and groupId
+     * Delete the {@link ProcessSupervisor} object that is identified by this processDefinitionId, userId, roleId and groupId.
      * <p>
      * e.g. to delete the process supervisor that is set for userId 12 and process id 255 call deleteSupervisor(255, 12, null, null)
      * <p>
@@ -1517,10 +1515,15 @@ public interface ProcessManagementAPI {
      * {@link ProcessSupervisor} that link the user to the process
      * 
      * @param processDefinitionId
+     *            the Identifier of the process definition to delete the supervisor for.
      * @param userId
+     *            the Id of the user used as a supervisor for the given process. Can be null.
      * @param roleId
+     *            the Id of the role used as a supervisor for the given process. Can be null.
      * @param groupId
+     *            the Id of the group used as a supervisor for the given process. Can be null.
      * @throws DeletionException
+     *             if a problem occurs while deleting the supervisor for the given process.
      * @since 6.0
      */
     void deleteSupervisor(Long processDefinitionId, Long userId, Long roleId, Long groupId) throws DeletionException;
@@ -1620,7 +1623,7 @@ public interface ProcessManagementAPI {
      *            Identifier of the processDefinition
      * @return An array of byte
      * @throws ProcessExportException
-     *             TODO
+     *             if an export problem occurs
      * @since 6.0
      */
     byte[] exportBarProcessContentUnderHome(long processDefinitionId) throws ProcessExportException;

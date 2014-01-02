@@ -14,11 +14,16 @@
 package org.bonitasoft.engine.bpm;
 
 /**
+ * Any element that has a name in Bonita BPM implements this interface.
+ * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
 public interface NamedElement extends BonitaObject {
 
+    /**
+     * @return the name of the element
+     */
     String getName();
 
 }

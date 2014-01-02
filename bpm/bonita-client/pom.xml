@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.2.0-SNAPSHOT</version>
+		<version>6.2.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-client</artifactId>
@@ -72,24 +72,6 @@
 							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
 							<createDependencyReducedPom>true</createDependencyReducedPom>
 							<createSourcesJar>true</createSourcesJar>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>javadoc-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<includeDependencySources>true</includeDependencySources>
-							<dependencySourceIncludes>
-								<dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude>
-							</dependencySourceIncludes>
 						</configuration>
 					</execution>
 				</executions>
