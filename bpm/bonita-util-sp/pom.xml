@@ -15,7 +15,6 @@
 	<name>Bonita Util</name>
 
 	<modules>
-		<module>bonita-common-util-sp</module>
 		<module>bonita-client-util-sp</module>
 	</modules>
 </project>
