@@ -2,24 +2,33 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.bonitasoft.engine.api</groupId>
-		<artifactId>bonita-api-sp</artifactId>
-		<version>6.2.1-SNAPSHOT</version>
+		<artifactId>bonita-util-sp</artifactId>
+		<groupId>com.bonitasoft.engine.util</groupId>
+		<version>6.3.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
 	</parent>
-
-	<artifactId>bonita-common-api-impl-sp</artifactId>
 	
+	<artifactId>bonita-common-util-sp</artifactId>
+
+	<name>Bonita Common Util</name>
+
 	<dependencies>
 		<dependency>
-			<groupId>com.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api-sp</artifactId>
+			<groupId>org.bonitasoft.engine.util</groupId>
+			<artifactId>bonita-common-util</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api-impl</artifactId>
-			<version>${project.version}</version>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
 		</dependency>
+        <!-- Stored in internal artifact repository -->
+        <dependency>
+            <groupId>com.sap</groupId>
+            <artifactId>sapjco</artifactId>
+            <version>3.0.3</version><!-- Update version for local tests if needed -->
+            <scope>provided</scope>
+        </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -40,12 +49,6 @@
 			<artifactId>powermock-api-mockito</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- Stored in internal artifact repository -->
-        <dependency>
-            <groupId>com.sap</groupId>
-            <artifactId>sapjco</artifactId>
-            <version>3.0.3</version><!-- Update version for local tests if needed -->
-            <scope>provided</scope>
-        </dependency>
 	</dependencies>
+
 </project>
