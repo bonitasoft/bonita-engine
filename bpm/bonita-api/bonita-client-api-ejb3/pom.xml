@@ -5,12 +5,13 @@
 	<parent>
 		<artifactId>bonita-api</artifactId>
 		<groupId>org.bonitasoft.engine.api</groupId>
-		<version>6.2.1-SNAPSHOT</version>
+		<version>6.3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-client-api-ejb3</artifactId>
 
 	<name>Bonita Client API: EJB3</name>
+
 	
 	<dependencies>
 		<dependency>
