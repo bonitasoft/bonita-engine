@@ -31,6 +31,13 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
+ * 
+ * Manipulate tenant commands, it can be registered, unregistered and executed with parameters.<br/>
+ * These command are executed in a platform scope, see {@link CommandAPI} for more explanations on how to deploy, execute and undeploy a command. The only
+ * difference with {@link CommandAPI} is that here commands must extends {@link org.bonitasoft.engine.command.PlatformCommand}.
+ * 
+ * 
+ * @see CommandAPI
  * @author Matthieu Chaffotte
  */
 public interface PlatformCommandAPI {

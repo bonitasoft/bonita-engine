@@ -33,6 +33,11 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
+ * Accessor for tenant level engine's services.
+ * <p>
+ * All server side services of the platform can be accessed using this class. Using server side services instead of API might cause unexpected behaviors and
+ * damage your data.
+ * 
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  * @author Zhao Na

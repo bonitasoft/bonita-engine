@@ -73,6 +73,13 @@ import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.XMLWriter;
 
 /**
+ * 
+ * Accessor for tenant level engine's services.
+ * <p>
+ * All server side services of a tenant can be accessed using this class. Using server side services instead of API might cause unexpected behaviors and damage
+ * your data.
+ * 
+ * 
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Hongwen Zang

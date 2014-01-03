@@ -16,13 +16,41 @@ package org.bonitasoft.engine.command;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.service.ServiceAccessor;
 
 /**
+ * 
+ * A command is a class that is called from the API and executed server side.<br/>
+ * It is intended to extends the engine behavior. See {@link CommandAPI} for explanations on how to deploy, undeploy and execute a command. <br/>
+ * <br/>
+ * This class should not be directly subclassed by implementors, use {@link PlatformCommand} or {@link TenantCommand} instead.
+ * 
+ * @see CommandAPI
+ * @see PlatformCommand
+ * @see TenantCommand
  * @author Matthieu Chaffotte
  */
 public interface Command<T extends ServiceAccessor> {
 
+    /**
+     * Method that will be called by the engine on server side when {@link CommandAPI#execute(String, Map)} is called by the client with the name or id of this
+     * command.
+     * 
+     * Implementors of commands must implement must put here the code to be executed server side.
+     * 
+     * 
+     * @param parameters
+     *            a map of parameters that can be used by the command and that is given by the client when executing the command
+     * @param serviceAccessor
+     *            the TenantServiceAccessor or PlatformServiceAccessor that allow to access engine's server side services
+     * @return
+     *         a result that will be returned to the client
+     * @throws SCommandParameterizationException
+     *             can be thrown if insufficient or wrong parameters are given by the client
+     * @throws SCommandExecutionException
+     *             can be thrown when something unexpected happens while executing the command
+     */
     Serializable execute(Map<String, Serializable> parameters, T serviceAccessor) throws SCommandParameterizationException, SCommandExecutionException;
 
 }

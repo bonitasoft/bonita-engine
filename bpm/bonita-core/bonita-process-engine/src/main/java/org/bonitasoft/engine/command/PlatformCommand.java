@@ -13,9 +13,13 @@
  **/
 package org.bonitasoft.engine.command;
 
+import org.bonitasoft.engine.api.PlatformCommandAPI;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 
 /**
+ * Class to be subclassed by implementors of platform scoped {@link Command}, it is design to be executed by {@link PlatformCommandAPI}.
+ * 
+ * @see PlatformCommandAPI
  * @author Matthieu Chaffotte
  */
 public abstract class PlatformCommand implements Command<PlatformServiceAccessor> {
