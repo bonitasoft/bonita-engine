@@ -63,6 +63,7 @@
 		<sonar.jacoco.itReportPath>${user.home}/jacoco-engine-it.exec</sonar.jacoco.itReportPath>
 		<!-- Tests -->
 		<powermock.version>1.5.1</powermock.version>
+		<festassert.version>1.4</festassert.version>
 	</properties>
 
 	<dependencyManagement>
@@ -102,6 +103,11 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.11</version>
+			</dependency>
+			<dependency>
+				<groupId>org.easytesting</groupId>
+				<artifactId>fest-assert</artifactId>
+				<version>${festassert.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
