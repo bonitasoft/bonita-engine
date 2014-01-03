@@ -2,7 +2,6 @@ package org.bonitasoft.engine.transaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -17,7 +16,6 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -72,14 +70,17 @@ public class JTATransactionServiceImplTest {
     }
 
     @Test
-    @Ignore
-    public void completeTransactionFailed() throws Exception {
+    public void numberOfActiveTransactionsWhenCompleteFailed() throws Exception {
         TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        TransactionManager txManager = spy(new MyTransactionManager());
 
-//        when(txManager.getStatus()).thenReturn(Status.STATUS_NO_TRANSACTION).thenReturn(Status.STATUS_ACTIVE);
-//        when(txManager.getTransaction()).thenReturn(mock(Transaction.class));
-        doThrow(new SystemException("Mocked")).when(txManager).commit();
+        MyTransactionManager.MyTransaction transaction = new MyTransactionManager.MyTransaction() {
+            @Override
+            public int internalCommit() throws SystemException {
+                throw new SystemException("Mocked");
+            }
+        };
+
+        TransactionManager txManager = spy(new MyTransactionManager(transaction));
 
         JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
 

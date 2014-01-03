@@ -37,7 +37,7 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
 
-    private final ThreadLocal<AtomicLong> counter = new ThreadLocal<AtomicLong>();
+    private final ThreadLocal<TransactionServiceContext> txContext = new ThreadLocal<TransactionServiceContext>();
 
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup) {
         this(logger, txManagerLookup.getTransactionManager());
@@ -54,19 +54,21 @@ public class JTATransactionServiceImpl implements TransactionService {
     @Override
     public void begin() throws STransactionCreationException {
         try {
-            AtomicLong counterTL = counter.get();
-            synchronized(counter) {
-                if (counterTL == null) {
-                    counterTL = new AtomicLong();
-                    counter.set(counterTL);
+            final int txManagerStatus = txManager.getStatus();
+
+            TransactionServiceContext txContextTL = txContext.get();
+            synchronized(this) {
+                if (txContextTL == null) {
+                    txContextTL = new TransactionServiceContext(txManagerStatus == Status.STATUS_ACTIVE);
+                    txContext.set(txContextTL);
                 }
             }
-            if (counterTL.get() == 1) {
+            if (txContextTL.reentrantCounter() == 1) {
                 throw new STransactionCreationException("We do not support nested calls to the transaction service.");
             }
-            counterTL.getAndIncrement();
+            txContextTL.incrementReentrantCounter();
 
-            if (txManager.getStatus() == Status.STATUS_NO_TRANSACTION) {
+            if (txManagerStatus == Status.STATUS_NO_TRANSACTION) {
                 boolean transactionStarted = false;
                 try {
                     txManager.begin();
@@ -74,13 +76,12 @@ public class JTATransactionServiceImpl implements TransactionService {
 
                     final Transaction tx = txManager.getTransaction();
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
-                        logger.log(getClass(), TechnicalLogSeverity.TRACE,
-                                "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
+                        logger.log(getClass(), TechnicalLogSeverity.TRACE, "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
                     }
                     // Avoid a memory-leak by cleaning the ThreadLocal after the transaction's completion
                     tx.registerSynchronization(new ResetCounterSynchronization(this));
 
-                    // Ensuite the monitoring of numberOfActiveTransactions is up-to-date.
+                    // Then the monitoring of numberOfActiveTransactions is up-to-date.
                     numberOfActiveTransactions.getAndIncrement();
                     tx.registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
 
@@ -115,9 +116,8 @@ public class JTATransactionServiceImpl implements TransactionService {
                 throw new RuntimeException("No transaction started.");
             }
 
-            final AtomicLong counterTL = counter.get();
-            counterTL.getAndDecrement();
-            if (counterTL.get() != 0) {
+            if (txContext.get().isAlreadyManaged()) {
+                txContext.get().decrementReentrantCounter();
                 return; // We do not manage the transaction boundaries
             }
 
@@ -244,7 +244,7 @@ public class JTATransactionServiceImpl implements TransactionService {
     }
 
 
-    private class ResetCounterSynchronization implements Synchronization {
+    private static class ResetCounterSynchronization implements Synchronization {
 
         private final JTATransactionServiceImpl txService;
 
@@ -259,12 +259,12 @@ public class JTATransactionServiceImpl implements TransactionService {
 
         @Override
         public void afterCompletion(final int status) {
-            // Whatever the tx status, reset the counter
-            txService.counter.set(null);
+            // Whatever the tx status, reset the context
+            txService.txContext.set(null);
         }
     }
 
-    private class DecrementNumberOfActiveTransactionsSynchronization implements Synchronization {
+    private static class DecrementNumberOfActiveTransactionsSynchronization implements Synchronization {
 
         private final JTATransactionServiceImpl txService;
 
@@ -281,6 +281,32 @@ public class JTATransactionServiceImpl implements TransactionService {
         public void afterCompletion(final int status) {
             // Whatever the status, decrement the number of active transactions
             txService.numberOfActiveTransactions.getAndDecrement();
+        }
+    }
+
+    private static class TransactionServiceContext {
+
+        private final AtomicLong reentrantCounter = new AtomicLong();
+        private final boolean boundaryManagedOutside;
+
+        public TransactionServiceContext(final boolean boundaryManagedOutside) {
+            this.boundaryManagedOutside = boundaryManagedOutside;
+        }
+
+        public long incrementReentrantCounter() {
+            return reentrantCounter.getAndIncrement();
+        }
+
+        public long decrementReentrantCounter() {
+            return reentrantCounter.getAndDecrement();
+        }
+
+        public long reentrantCounter() {
+            return reentrantCounter.get();
+        }
+
+        public boolean isAlreadyManaged() {
+            return boundaryManagedOutside;
         }
     }
 
