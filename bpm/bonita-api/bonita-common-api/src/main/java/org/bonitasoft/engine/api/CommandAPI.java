@@ -36,21 +36,19 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
- * 
- * Manipulate tenant commands, it can be registered, unregistered and executed with parameters.
+ * Manipulate tenant commands. A command can be registered, unregistered, and executed with parameters.
  * <p>
- * Commands are intended to extends engine behavior, they are classes that are called from this API and executed server side.</br> A command is composed of a
- * jar containing at least one class that implements {@link org.bonitasoft.engine.command.TenantCommand},
- * {@link org.bonitasoft.engine.command.system.CommandWithParameters} can be use in order to handle parameter more easily. The behavior of the command must be
- * defined in the execute method of this class.<br/>
+ * Commands are used to extend engine behavior, and are classes that are called from this API and executed on the server side. <br/>
+ * A command is composed of a jar containing at least one class that implements {@link org.bonitasoft.engine.command.TenantCommand}.
+ * {@link org.bonitasoft.engine.command.system.CommandWithParameters} can be used to handle parameter more easily. The behavior of the command must be defined
+ * in the execute method of this class.<br/>
  * <p>
- * The jar containing the command class must be added to the engine using addDependency method with a name to identify the dependency and to be able to remove
- * it later.<br/>
- * Then the command must be register using {@link CommandAPI#register(String, String, String)} with a name to identify it and an implementation that is the
+ * The jar containing the command class must be added to the engine using the {@link addDependency} method with a name to identify the dependency so that it can
+ * be removed later.<br/>
+ * Then the command must be registered using {@link CommandAPI#register(String, String, String)} with a name to identify it and an implementation that is the
  * fully qualified name of the command class.<br/>
- * At this point the command can be executed using {@link CommandAPI#execute(long, Map)} with the id returned by the register method or
+ * After registration, the command can be executed using {@link CommandAPI#execute(long, Map)} with the id returned by the register method or
  * {@link CommandAPI#execute(String, Map)} with the name of the command and with a map of parameters required by the command.<br/>
- * 
  * Finally the command can be removed using both {@link CommandAPI#unregister(long)} or {@link CommandAPI#unregister(String)} and
  * {@link CommandAPI#removeDependency(String)}
  * 
@@ -58,7 +56,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * Code example: 
  *  
  * {@code
- * byte[] byteArray = /* read the jar as byte array * /
+ * byte[] byteArray = /* read the jar as a byte array * /
  * 
  *  //deploy
  * getCommandAPI().addDependency("myCommandDependency", byteArray);
@@ -75,9 +73,6 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * getCommandAPI().removeDependency("myCommandDependency");
  * }
  * </pre>
- * 
- * 
- * 
  * 
  * @author Matthieu Chaffotte
  * @author Yanyan Liu

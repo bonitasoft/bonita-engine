@@ -17,7 +17,7 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * Class to be subclassed by implementors of tenants scoped {@link Command}, it is design to be executed by {@link CommandAPI}.
+ * Class to be subclassed by implementors of a tenant scope {@link Command}. It is design to be executed by the {@link CommandAPI}.
  * 
  * @see CommandAPI
  * @author Matthieu Chaffotte

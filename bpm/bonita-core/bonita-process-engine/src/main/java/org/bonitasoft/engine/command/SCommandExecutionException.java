@@ -16,8 +16,7 @@ package org.bonitasoft.engine.command;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * 
- * Thrown by {@link Command}s when something unexpected happens while their execution.
+ * Thrown by a {@link Command} when something unexpected happens during execution.
  * 
  * @author Matthieu Chaffotte
  */
