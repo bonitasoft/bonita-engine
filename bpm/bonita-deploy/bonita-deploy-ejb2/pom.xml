@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-deploy</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.2.1.alpha-01</version>
+		<version>6.2.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-deploy-ejb2</artifactId>
