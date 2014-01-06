@@ -17,7 +17,7 @@ import javax.transaction.xa.XAResource;
 
 public class MyTransactionManager implements TransactionManager {
 
-    Transaction transaction;
+    private Transaction transaction;
     private final Transaction mockTransaction;
 
     public MyTransactionManager(final Transaction mockTransaction) {
@@ -26,12 +26,17 @@ public class MyTransactionManager implements TransactionManager {
 
     @Override
     public void begin() throws NotSupportedException, SystemException {
-        transaction = this.mockTransaction != null ?mockTransaction :new MyTransaction();
+        if (transaction == null) {
+            transaction = this.mockTransaction != null ?mockTransaction :new MyTransaction();
+        } else {
+            throw new SystemException("A transaction has already begun.");
+        }
     }
 
     @Override
     public void commit() throws RollbackException, HeuristicMixedException, HeuristicRollbackException, SecurityException, IllegalStateException, SystemException {
         transaction.commit();
+        transaction = null;
     }
 
     @Override
@@ -52,6 +57,7 @@ public class MyTransactionManager implements TransactionManager {
     @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
         transaction.rollback();
+        transaction = null;
     }
 
     @Override
@@ -61,7 +67,7 @@ public class MyTransactionManager implements TransactionManager {
 
     @Override
     public void setTransactionTimeout(final int seconds) throws SystemException {
-        // TODO Auto-generated method stub
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override

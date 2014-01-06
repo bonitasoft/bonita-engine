@@ -37,7 +37,7 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
 
-    private final ThreadLocal<TransactionServiceContext> txContext = new ThreadLocal<TransactionServiceContext>();
+    private final TransactionServiceContextThreadLocal txContextThreadLocal;
 
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup) {
         this(logger, txManagerLookup.getTransactionManager());
@@ -49,42 +49,30 @@ public class JTATransactionServiceImpl implements TransactionService {
             throw new IllegalArgumentException("The parameter txManager can't be null.");
         }
         this.txManager = txManager;
+        this.txContextThreadLocal = new TransactionServiceContextThreadLocal(txManager);
     }
 
     @Override
     public void begin() throws STransactionCreationException {
         try {
-            final int txManagerStatus = txManager.getStatus();
-
-            TransactionServiceContext txContextTL = txContext.get();
-            synchronized(this) {
-                if (txContextTL == null) {
-                    txContextTL = new TransactionServiceContext(txManagerStatus == Status.STATUS_ACTIVE);
-                    txContext.set(txContextTL);
-                }
-            }
-            if (txContextTL.reentrantCounter() == 1) {
+            TransactionServiceContext txContext = txContextThreadLocal.get();
+            if (txContext.reentrantCounter() == 1) {
                 throw new STransactionCreationException("We do not support nested calls to the transaction service.");
             }
-            txContextTL.incrementReentrantCounter();
+            txContext.incrementReentrantCounter();
 
-            if (txManagerStatus == Status.STATUS_NO_TRANSACTION) {
+            if (!txContext.isAlreadyManaged()) {
                 boolean transactionStarted = false;
                 try {
                     txManager.begin();
                     transactionStarted = true;
 
-                    final Transaction tx = txManager.getTransaction();
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                        final Transaction tx = txManager.getTransaction();
                         logger.log(getClass(), TechnicalLogSeverity.TRACE, "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
                     }
-                    // Avoid a memory-leak by cleaning the ThreadLocal after the transaction's completion
-                    tx.registerSynchronization(new ResetCounterSynchronization(this));
 
-                    // Then the monitoring of numberOfActiveTransactions is up-to-date.
                     numberOfActiveTransactions.getAndIncrement();
-                    tx.registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
-
                 } catch (final NotSupportedException e) {
                     // Should never happen as we do not want to support nested transaction
                     throw new STransactionCreationException(e);
@@ -95,6 +83,26 @@ public class JTATransactionServiceImpl implements TransactionService {
                     throw new STransactionCreationException(t);
                 }
             }
+
+            // Either we initiated the transaction or it has already been initiated outside of the service :
+            // in both cases, register a synchronization to clean the ThreadLocal variables.
+            final Transaction tx = txManager.getTransaction();
+
+            // Ensure the transaction is created and not set to rollback.
+            if (tx != null) {
+                try {
+                    // Avoid a memory-leak by cleaning the ThreadLocal after the transaction's completion
+                    tx.registerSynchronization(new ResetCounterSynchronization(this));
+
+                    // Then the monitoring of numberOfActiveTransactions is up-to-date.
+                    tx.registerSynchronization(new DecrementNumberOfActiveTransactionsSynchronization(this));
+                } catch (IllegalStateException e) {
+                    throw new STransactionCreationException(e);
+                } catch (RollbackException e) {
+                    throw new STransactionCreationException(e);
+                }
+            }
+
         } catch (final SystemException e) {
             throw new STransactionCreationException(e);
         }
@@ -116,8 +124,9 @@ public class JTATransactionServiceImpl implements TransactionService {
                 throw new RuntimeException("No transaction started.");
             }
 
-            if (txContext.get().isAlreadyManaged()) {
-                txContext.get().decrementReentrantCounter();
+            final TransactionServiceContext txContext = txContextThreadLocal.get();
+            if (txContext.isAlreadyManaged()) {
+                txContext.decrementReentrantCounter();
                 return; // We do not manage the transaction boundaries
             }
 
@@ -233,6 +242,9 @@ public class JTATransactionServiceImpl implements TransactionService {
         } catch (final Exception e) {
             setRollbackOnly();
             throw e;
+        } catch (final Throwable t) {
+            setRollbackOnly();
+            throw new RuntimeException(t);
         } finally {
             complete();
         }
@@ -260,7 +272,7 @@ public class JTATransactionServiceImpl implements TransactionService {
         @Override
         public void afterCompletion(final int status) {
             // Whatever the tx status, reset the context
-            txService.txContext.set(null);
+            txService.txContextThreadLocal.remove();
         }
     }
 
@@ -307,6 +319,24 @@ public class JTATransactionServiceImpl implements TransactionService {
 
         public boolean isAlreadyManaged() {
             return boundaryManagedOutside;
+        }
+    }
+
+    private static class TransactionServiceContextThreadLocal extends ThreadLocal<TransactionServiceContext> {
+
+        private final TransactionManager txManager;
+
+        public TransactionServiceContextThreadLocal(final TransactionManager txManager) {
+            this.txManager = txManager;
+        }
+
+        @Override
+        protected TransactionServiceContext initialValue() {
+            try {
+                return new TransactionServiceContext(txManager.getStatus() == Status.STATUS_ACTIVE);
+            } catch (SystemException e) {
+                throw new RuntimeException(e); // TODO change this.
+            }
         }
     }
 
