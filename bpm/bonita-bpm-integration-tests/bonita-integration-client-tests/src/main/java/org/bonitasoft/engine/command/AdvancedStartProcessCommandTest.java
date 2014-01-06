@@ -1,4 +1,23 @@
+/**
+ * Copyright (C) 2012 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.bonitasoft.engine.command;
+
+import static org.bonitasoft.engine.command.helper.designer.Condition.defaults;
+import static org.bonitasoft.engine.command.helper.designer.Condition.meet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -99,10 +118,6 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
         process.expectVariable("variable").toBe("Done!");
     }
 
-    private Operation createSetDataOperation(String name, String value) throws InvalidExpressionException {
-        return new OperationBuilder().createSetDataOperation(name, new ExpressionBuilder().createConstantStringExpression(value));
-    }
-
     @Test
     public void should_be_able_to_start_a_process_containing_a_parallel_gateway_which_merge_steps() throws Exception {
         ProcessDefinition processDefinition = processDeployer.deploy(designer
@@ -177,8 +192,8 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
                 .then(new UserTask("step 1"))
                 .then(new Gateway("exclusive", GatewayType.EXCLUSIVE))
                 .then(
-                        new UserTask("step 2").setDefault(true),
-                        new UserTask("step 3").setCondition(TRUE))
+                        new UserTask("step 2").when("exclusive", defaults()),
+                        new UserTask("step 3").when("exclusive", meet(TRUE)))
                 .end());
 
         TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
@@ -205,6 +220,10 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
         process.isExpected().toFinish();
         process.expect("step 1").toNotHaveArchives();
         process.expect("step 4").toBeExecuted(1);
+    }
+
+    private Operation createSetDataOperation(String name, String value) throws InvalidExpressionException {
+        return new OperationBuilder().createSetDataOperation(name, new ExpressionBuilder().createConstantStringExpression(value));
     }
 
     private ProcessDefinitionBuilder getProcessDefinitionBuilder() {

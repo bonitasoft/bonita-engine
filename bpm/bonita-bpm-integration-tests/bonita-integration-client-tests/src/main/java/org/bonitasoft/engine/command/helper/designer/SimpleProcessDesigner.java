@@ -1,12 +1,28 @@
+/**
+ * Copyright (C) 2012 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.bonitasoft.engine.command.helper.designer;
-
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 
 /**
  * Created by Vincent Elcrin
@@ -17,9 +33,7 @@ public class SimpleProcessDesigner {
 
     private final ProcessDefinitionBuilder builder;
 
-    private List<FlowNode> currents = new ArrayList<FlowNode>();
-
-    public static final String ACTOR_NAME = "Employee actor";
+    private List<FlowNode> origins = new ArrayList<FlowNode>();
 
     public SimpleProcessDesigner(ProcessDefinitionBuilder builder) {
         this.builder = builder;
@@ -29,32 +43,31 @@ public class SimpleProcessDesigner {
         return startWith(new StartEvent("start"));
     }
 
+    public SimpleProcessDesigner branch() {
+        return new SimpleProcessDesigner(builder);
+    }
+
     public SimpleProcessDesigner startWith(FlowNode start) {
-        currents.add(start);
+        origins.add(start);
         start.build(builder);
         return this;
     }
 
-    public SimpleProcessDesigner then(FlowNode... flownodes) {
-        assert !currents.isEmpty() : "startWith method need to be called first";
-
-        for (FlowNode flownode : flownodes) {
-            flownode.build(builder);
-            addTransitions(currents, flownode);
-        }
-        currents.clear();
-        currents.addAll(Arrays.asList(flownodes));
+    public SimpleProcessDesigner then(SimpleProcessDesigner... branches) {
         return this;
     }
 
-    private void addTransitions(List<FlowNode> currents, FlowNode flownode) {
-        for (FlowNode current : currents) {
-            if(flownode.isDefault()) {
-                builder.addDefaultTransition(current.getName(), flownode.getName());
-            } else {
-                builder.addTransition(current.getName(), flownode.getName(), flownode.getCondition());
-            }
+    public SimpleProcessDesigner then(FlowNode... targets) {
+        assert !origins.isEmpty() : "startWith method need to be called first";
+
+        for (FlowNode target : targets) {
+            target.build(builder);
+            target.bind(origins, builder);
         }
+
+        origins.clear();
+        origins.addAll(Arrays.asList(targets));
+        return this;
     }
 
     public SimpleProcessDesigner end() {

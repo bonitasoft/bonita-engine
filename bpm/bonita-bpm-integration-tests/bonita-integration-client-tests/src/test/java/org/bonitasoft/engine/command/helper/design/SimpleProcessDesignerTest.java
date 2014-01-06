@@ -1,6 +1,8 @@
 package org.bonitasoft.engine.command.helper.design;
 
 import static junit.framework.Assert.assertEquals;
+import static org.bonitasoft.engine.command.helper.designer.Condition.defaults;
+import static org.bonitasoft.engine.command.helper.designer.Condition.meet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,13 +15,13 @@ import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.command.helper.designer.EndEvent;
 import org.bonitasoft.engine.command.helper.designer.Gateway;
 import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
 import org.bonitasoft.engine.command.helper.designer.StartEvent;
 import org.bonitasoft.engine.command.helper.designer.UserTask;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.junit.Test;
 
 /**
@@ -72,15 +74,33 @@ public class SimpleProcessDesignerTest {
     }
 
     @Test
-    public void should_be_able_to_design_a_process_with_conditions() throws Exception {
+    public void should_be_able_to_design_a_process_multiple_incoming_conditions() throws Exception {
+        Expression TRUE = new ExpressionBuilder().createConstantBooleanExpression(true);
+        DesignProcessDefinition design = new SimpleProcessDesigner(builder)
+                .startWith(new StartEvent("A"))
+                .then(new UserTask("B"))
+                .then(new UserTask("C1"), new UserTask("C2"))
+                .then(new Gateway("D", GatewayType.EXCLUSIVE)
+                                .when("C1", defaults())
+                                .when("C2", meet(TRUE)))
+                .then(new EndEvent("F"))
+                .done();
+
+        assertEquals("[B, C1 (C1_->_D), C2]", getActivities(design));
+        assertEquals("[D]", getGateways(design));
+        assertEquals("[A_->_B, B_->_C1, B_->_C2, C1_->_D, C2_->_D (true), D_->_F]", getTransactions(design));
+    }
+
+    @Test
+    public void should_be_able_to_design_a_process_with_multiple_outgoing_conditions() throws Exception {
         Expression TRUE = new ExpressionBuilder().createConstantBooleanExpression(true);
         DesignProcessDefinition design = new SimpleProcessDesigner(builder)
                 .startWith(new StartEvent("A"))
                 .then(new UserTask("B"))
                 .then(new Gateway("C", GatewayType.EXCLUSIVE))
                 .then(
-                        new UserTask("D1").setDefault(true),
-                        new UserTask("D2").setCondition(TRUE))
+                        new UserTask("D1").when("C", defaults()),
+                        new UserTask("D2").when("C", meet(TRUE)))
                 .then(new EndEvent("E"))
                 .done();
 
@@ -94,7 +114,7 @@ public class SimpleProcessDesignerTest {
             @Override
             public String stringify(GatewayDefinition gateway) {
                 String text = gateway.getName();
-                if(gateway.getDefaultTransition() != null) {
+                if (gateway.getDefaultTransition() != null) {
                     text += " (" + gateway.getDefaultTransition().getName() + ")";
                 }
                 return text;
@@ -106,7 +126,11 @@ public class SimpleProcessDesignerTest {
         return stringify(design.getProcessContainer().getActivities(), new Stringifier<ActivityDefinition>() {
             @Override
             public String stringify(ActivityDefinition activity) {
-                return activity.getName();
+                String text = activity.getName();
+                if (activity.getDefaultTransition() != null) {
+                    text += " (" + activity.getDefaultTransition().getName() + ")";
+                }
+                return text;
             }
         });
     }
@@ -115,8 +139,8 @@ public class SimpleProcessDesignerTest {
         return stringify(design.getProcessContainer().getTransitions(), new Stringifier<TransitionDefinition>() {
             @Override
             public String stringify(TransitionDefinition transition) {
-                String text =  transition.getName();
-                if(transition.getCondition() != null) {
+                String text = transition.getName();
+                if (transition.getCondition() != null) {
                     text += " (" + transition.getCondition().getName() + ")";
                 }
                 return text;
