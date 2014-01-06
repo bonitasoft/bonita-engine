@@ -1,20 +1,23 @@
 package org.bonitasoft.engine.command.helper.designer;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.expression.Expression;
 
 /**
  * Created by Vincent Elcrin
  * Date: 16/12/13
  * Time: 14:20
  */
-public abstract class FlowNode {
+public abstract class FlowNode implements Buildable, Linkable {
 
     private String name;
 
-    private Expression condition;
+    private Map<String, Condition> conditions = new HashMap<String, Condition>();
 
-    private boolean defaultTransition;
+    private Transition transition = new Transition(this);
 
     protected FlowNode(String name) {
         this.name = name;
@@ -26,21 +29,15 @@ public abstract class FlowNode {
 
     public abstract void build(ProcessDefinitionBuilder builder);
 
-    public FlowNode setCondition(Expression condition) {
-        this.condition = condition;
+    public FlowNode when(String step, Condition condition) {
+        conditions.put(step, condition);
         return this;
     }
 
-    public FlowNode setDefault(boolean defaultTransition) {
-        this.defaultTransition = defaultTransition;
-        return this;
-    }
-
-    public Expression getCondition() {
-        return condition;
-    }
-
-    public boolean isDefault() {
-        return defaultTransition;
+    @Override
+    public void bind(List<FlowNode> origins, ProcessDefinitionBuilder builder) {
+        for (FlowNode origin : origins) {
+            transition.bind(origin, conditions.get(origin.getName()), builder);
+        }
     }
 }
