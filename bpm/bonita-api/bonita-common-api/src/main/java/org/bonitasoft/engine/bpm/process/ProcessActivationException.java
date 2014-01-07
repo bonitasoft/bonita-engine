@@ -16,7 +16,10 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
+ * Thrown when a process cannot be enabled / disabled, or when a startProcess cannot be performed because the process is not enabled.
+ * 
  * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  */
 public class ProcessActivationException extends ExecutionException {
 

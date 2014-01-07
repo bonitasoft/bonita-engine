@@ -6,9 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that a Bonita API method does not need to have a valid session to be called
- * 
- * No session required means that there is no transaction
+ * Indicates that a Bonita API method does not need to have a valid session to be called.
+ * No session required means that there is no transaction.
  * 
  * @author Emmanuel Duchastenier
  */

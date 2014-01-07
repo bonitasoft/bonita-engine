@@ -16,7 +16,10 @@ package org.bonitasoft.engine.bpm.connector;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
+ * Thrown when a referenced connector cannot be found (generally from its ID + Version).
+ * 
  * @author Yanyan Liu
+ * @author Emmanuel Duchastenier
  */
 public class ConnectorNotFoundException extends NotFoundException {
 

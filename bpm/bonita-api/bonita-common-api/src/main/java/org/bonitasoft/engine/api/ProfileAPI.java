@@ -35,8 +35,14 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
+ * Profiles are a notion used in BonitaBPM Portal to give and control access to some specific features of the Bonita BPM suite.
+ * Profiles are associated to Bonita Identity / Organization notions: users, groups, roles, memberships. <code>ProfileAPI</code> gives access to some of the
+ * profile administation: adding / removing members to / from a profile, retrieving / searching for profiles. <br/>
+ * Full control on profiles is part of <b>Subscription</b> editions of Bonita BPM suite.
+ * 
  * @author Celine Souchet
  * @author Matthieu Chaffotte
+ * @see SearchResult SearchResult for general knowledege on Search mechanism in Bonita BPM.
  */
 public interface ProfileAPI {
 

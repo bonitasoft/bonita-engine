@@ -128,12 +128,12 @@ public class PlatformCommandTest extends CommonAPITest {
     public void deletePlatformCommand() throws BonitaException {
         platformCommandAPI.addDependency("commands", "jar".getBytes());
         platformCommandAPI.register("platformCommand1", "command description", "implementation");
-        final CommandDescriptor command = platformCommandAPI.get("platformCommand1");
+        final CommandDescriptor command = platformCommandAPI.getCommand("platformCommand1");
         assertNotNull(command);
         platformCommandAPI.unregister("platformCommand1");
         platformCommandAPI.removeDependency("commands");
         try {
-            platformCommandAPI.get("platformCommand1");
+            platformCommandAPI.getCommand("platformCommand1");
         } catch (final CommandNotFoundException e) {
         }
     }

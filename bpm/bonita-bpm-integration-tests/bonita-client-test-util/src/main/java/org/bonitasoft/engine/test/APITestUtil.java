@@ -622,8 +622,10 @@ public class APITestUtil {
     }
 
     protected void deleteProcessInstanceAndArchived(final long processDefinitionId) throws BonitaException {
-        getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 10000);
-        getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 10000);
+        while (getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 10) != 0) {
+        }
+        while (getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 10) != 0) {
+        }
     }
 
     protected void deleteProcessInstanceAndArchived(final ProcessDefinition... processDefinitions) throws BonitaException {
@@ -1668,7 +1670,7 @@ public class APITestUtil {
         return themeAPI;
     }
 
-    protected void setThemeAPI(ThemeAPI themeAPI) {
+    protected void setThemeAPI(final ThemeAPI themeAPI) {
         this.themeAPI = themeAPI;
     }
 

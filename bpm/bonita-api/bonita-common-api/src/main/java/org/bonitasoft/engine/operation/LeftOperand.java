@@ -24,9 +24,15 @@ public interface LeftOperand extends Serializable {
 
     String getName();
 
+    /**
+     * @deprecated As of 6.0 replaced by {@link #getName()}
+     */
     @Deprecated
     String getDataName();
 
+    /**
+     * @deprecated As of 6.0 use {@link Operation#getType()} instead
+     */
     @Deprecated
     LeftOperandType getType();
 

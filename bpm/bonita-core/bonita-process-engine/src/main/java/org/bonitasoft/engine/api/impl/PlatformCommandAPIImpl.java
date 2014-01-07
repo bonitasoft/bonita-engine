@@ -77,8 +77,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
         final long artifactId = classLoaderService.getGlobalClassLoaderId();
         final String artifactType = classLoaderService.getGlobalClassLoaderType();
-        final AddSPlatformCommandDependency addSDependency = new AddSPlatformCommandDependency(dependencyService, name, jar,
-                artifactId, artifactType);
+        final AddSPlatformCommandDependency addSDependency = new AddSPlatformCommandDependency(dependencyService, name, jar, artifactId, artifactType);
         try {
             addSDependency.execute();
         } catch (final SBonitaException sbe) {
@@ -116,7 +115,8 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
 
-        final SPlatformCommand sPlatformCommand = BuilderFactory.get(SPlatformCommandBuilderFactory.class).createNewInstance(name, description, implementation).done();
+        final SPlatformCommand sPlatformCommand = BuilderFactory.get(SPlatformCommandBuilderFactory.class).createNewInstance(name, description, implementation)
+                .done();
         try {
             final CreateSPlatformCommand createPlatformCommand = new CreateSPlatformCommand(platformCommandService, sPlatformCommand);
             createPlatformCommand.execute();
@@ -171,6 +171,11 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
 
     @Override
     public CommandDescriptor get(final String platformCommandName) throws CommandNotFoundException {
+        return getCommand(platformCommandName);
+    }
+
+    @Override
+    public CommandDescriptor getCommand(final String platformCommandName) throws CommandNotFoundException {
         final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
 
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
@@ -207,8 +212,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final PlatformCommandService platformCommandService = platformAccessor.getPlatformCommandService();
 
         try {
-            final UpdateSPlatformCommand updatePlatformCommand = new UpdateSPlatformCommand(platformCommandService,
-                    platformCommandName, updater);
+            final UpdateSPlatformCommand updatePlatformCommand = new UpdateSPlatformCommand(platformCommandService, platformCommandName, updater);
             updatePlatformCommand.execute();
         } catch (final SCommandNotFoundException scnfe) {
             throw new UpdateException(scnfe);
