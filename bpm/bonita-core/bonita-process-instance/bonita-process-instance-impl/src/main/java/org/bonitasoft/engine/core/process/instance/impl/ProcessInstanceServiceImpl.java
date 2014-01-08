@@ -148,12 +148,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     private final TokenService tokenService;
 
     public ProcessInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
-            final ActivityInstanceService activityService, final TechnicalLoggerService logger,
-            final EventInstanceService bpmEventInstanceService, final DataInstanceService dataInstanceService, final ArchiveService archiveService,
-            final QueriableLoggerService queriableLoggerService, final TransitionService transitionService,
-            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final ProcessDocumentService processDocumentService, final SCommentService commentService,
-            final TokenService tokenService) {
+            final ActivityInstanceService activityService, final TechnicalLoggerService logger, final EventInstanceService bpmEventInstanceService,
+            final DataInstanceService dataInstanceService, final ArchiveService archiveService, final QueriableLoggerService queriableLoggerService,
+            final TransitionService transitionService, final ProcessDefinitionService processDefinitionService,
+            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
+            final ProcessDocumentService processDocumentService, final SCommentService commentService, final TokenService tokenService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.eventService = eventService;
@@ -211,17 +210,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public long deleteParentProcessInstanceAndElements(final List<SProcessInstance> sProcessInstances) {
+    public long deleteParentProcessInstanceAndElements(final List<SProcessInstance> sProcessInstances) throws SFlowNodeReadException,
+            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         long nbDeleted = 0;
         for (final SProcessInstance sProcessInstance : sProcessInstances) {
-            try {
-                deleteParentProcessInstanceAndElements(sProcessInstance);
-                nbDeleted++;
-            } catch (final SBonitaException e) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e.getMessage() + ". It has probably completed.");
-                }
-            }
+            deleteParentProcessInstanceAndElements(sProcessInstance);
+            nbDeleted++;
         }
         return nbDeleted;
     }
@@ -235,31 +229,64 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     protected void deleteParentProcessInstanceAndElements(final SProcessInstance sProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
+
         checkIfCallerIsNotActive(sProcessInstance.getCallerId());
-        deleteProcessInstance(sProcessInstance);
+
+        try {
+            deleteProcessInstance(sProcessInstance);
+        } catch (final SProcessInstanceModificationException e) {
+            try {
+                getProcessInstance(sProcessInstance.getId());
+                // process is still here, that's not normal. The problem must be raised:
+                throw e;
+            } catch (SProcessInstanceReadException e1) {
+                logProcessInstanceNotFound(e);
+            } catch (SProcessInstanceNotFoundException e1) {
+                logProcessInstanceNotFound(e);
+            }
+        }
+    }
+
+    protected void logProcessInstanceNotFound(final SProcessInstanceModificationException e) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e.getMessage() + ". It has probably completed.");
+        }
+    }
+
+    protected void logArchivedProcessInstanceNotFound(final SBonitaException e) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
+        }
     }
 
     @Override
-    public long deleteParentArchivedProcessInstancesAndElements(final List<SAProcessInstance> saProcessInstances) {
+    public long deleteParentArchivedProcessInstancesAndElements(final List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
+            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         long nbDeleted = 0;
         for (final SAProcessInstance saProcessInstance : saProcessInstances) {
-            try {
-                deleteParentArchivedProcessInstanceAndElements(saProcessInstance);
-                nbDeleted ++;
-            } catch (final SBonitaException e) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
-                }
-            }
+            deleteParentArchivedProcessInstanceAndElements(saProcessInstance);
+            nbDeleted++;
         }
         return nbDeleted;
     }
 
-    private void deleteParentArchivedProcessInstanceAndElements(final SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
+    protected void deleteParentArchivedProcessInstanceAndElements(final SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         checkIfCallerIsNotActive(saProcessInstance.getCallerId());
-        deleteArchivedProcessInstanceElements(saProcessInstance.getSourceObjectId(), saProcessInstance.getProcessDefinitionId());
-        deleteArchivedProcessInstance(saProcessInstance);
+        try {
+            deleteArchivedProcessInstanceElements(saProcessInstance.getSourceObjectId(), saProcessInstance.getProcessDefinitionId());
+            deleteArchivedProcessInstance(saProcessInstance);
+        } catch (final SProcessInstanceModificationException e) {
+            try {
+                getArchivedProcessInstance(saProcessInstance.getId());
+                // archived process is still here, that's not normal. The problem must be raised:
+                throw e;
+            } catch (SProcessInstanceReadException e1) {
+                logArchivedProcessInstanceNotFound(e);
+            } catch (SProcessInstanceNotFoundException e1) {
+                logArchivedProcessInstanceNotFound(e);
+            }
+        }
     }
 
     @Override
@@ -267,7 +294,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final DeleteRecord deleteRecord = new DeleteRecord(archivedProcessInstance);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESSINSTANCE).setObject(archivedProcessInstance).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESSINSTANCE).setObject(archivedProcessInstance)
+                    .done();
         }
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);
@@ -349,8 +377,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final OrderByType sortingOrder) throws SProcessInstanceReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final String saCommentSourceObjectId = BuilderFactory.get(SACommentBuilderFactory.class).getSourceObjectId();
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SAProcessInstance.class, saCommentSourceObjectId,
-                sortingOrder);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SAProcessInstance.class, saCommentSourceObjectId, sortingOrder);
         try {
             return persistenceService.selectList(SelectDescriptorBuilder.getSourceProcesInstanceIdsOfArchProcessInstancesFromDefinition(processDefinitionId,
                     queryOptions));
@@ -370,7 +397,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final DeleteRecord deleteRecord = new DeleteRecord(sProcessInstance);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESSINSTANCE).setObject(sProcessInstance).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESSINSTANCE).setObject(sProcessInstance)
+                        .done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SBonitaException e) {
@@ -380,7 +408,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    private void checkIfCallerIsNotActive(final long callerId) throws SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException {
+    protected void checkIfCallerIsNotActive(final long callerId) throws SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException {
         if (callerId > 0) {
             try {
                 final SFlowNodeInstance flowNodeInstance = activityService.getFlowNodeInstance(callerId);
@@ -830,7 +858,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(processInstance, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(PROCESSINSTANCE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSINSTANCE).setObject(processInstance).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSINSTANCE).setObject(processInstance)
+                        .done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
         } catch (final SRecorderException e) {
