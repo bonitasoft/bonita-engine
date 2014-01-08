@@ -2,7 +2,7 @@ CREATE TABLE group_ (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   name VARCHAR2(50) NOT NULL,
-  parentPath VARCHAR2(50),
+  parentPath VARCHAR2(1024),
   displayName VARCHAR2(75),
   description VARCHAR2(1024),
   iconName VARCHAR2(50),
