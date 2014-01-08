@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.reporting;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -85,6 +86,32 @@ public class ReportingServiceImplTest {
 
         final String actual = serviceImpl.selectList(sql);
         final String expected = "ID,NAME" + lineSeparator + "1,step1" + lineSeparator + "424,step2" + lineSeparator;
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void should_selectList_escaping_comma_quotes() throws Exception {
+        final EventService eventService = mock(EventService.class);
+        final String sql = "SELECT id, name  FROM activities;";
+        final DataSource dataSource = mock(DataSource.class);
+        final ReportingServiceImpl serviceImpl = new ReportingServiceImpl(dataSource, null, null, eventService, null, null);
+        final Connection connection = mock(Connection.class);
+        when(dataSource.getConnection()).thenReturn(connection);
+        final Statement statement = mock(Statement.class);
+        when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
+        final ResultSet resultSet = mock(ResultSet.class);
+        when(statement.getResultSet()).thenReturn(resultSet);
+        final ResultSetMetaData metaData = mock(ResultSetMetaData.class);
+        when(resultSet.getMetaData()).thenReturn(metaData);
+        when(metaData.getColumnCount()).thenReturn(2);
+        when(resultSet.next()).thenReturn(true, true, false);
+        when(metaData.getColumnLabel(1)).thenReturn("id");
+        when(metaData.getColumnLabel(2)).thenReturn("name");
+        when(resultSet.getObject(1)).thenReturn(1l, 424l);
+        when(resultSet.getObject(2)).thenReturn("\"dsd\" , s tep1", "s\"t\"ep2");
+
+        final String actual = serviceImpl.selectList(sql);
+        final String expected = "ID,NAME" + lineSeparator + "1,\"\"\"dsd\"\" , s tep1\"" + lineSeparator + "424,\"s\"\"t\"\"ep2\"" + lineSeparator;
         Assert.assertEquals(expected, actual);
     }
 

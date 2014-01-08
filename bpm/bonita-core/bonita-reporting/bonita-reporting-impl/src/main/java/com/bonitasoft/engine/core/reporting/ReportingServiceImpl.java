@@ -50,6 +50,10 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
  */
 public class ReportingServiceImpl implements ReportingService {
 
+    private static final CharSequence COMMA = ",";
+
+    private static final CharSequence SEMICOLON = ";";
+
     private final DataSource dataSource;
 
     private final ReadPersistenceService persistenceService;
@@ -104,13 +108,31 @@ public class ReportingServiceImpl implements ReportingService {
                     }
                     final Object value = resultSet.getObject(columns);
                     // Special treatment of last record (to avoid having extra comma at the end):
-                    builder.append(value).append(newline);
+                    builder.append(protect(String.valueOf(value))).append(newline);
                 }
             }
             return builder.toString();
         } finally {
             connection.close();
         }
+    }
+
+    private String protect(String value) {
+        if (isDangerous(value)) {
+            return "\"" + escape(value) + "\"";
+        }
+        return value;
+    }
+
+    private boolean isDangerous(String value) {
+        return value.contains(COMMA) || value.contains(SEMICOLON) || value.contains("\"");
+    }
+
+    private String escape(String value) {
+        if (value.contains("\"")) {
+            return value.replaceAll("\"", "\"\"");
+        }
+        return value;
     }
 
     @Override
