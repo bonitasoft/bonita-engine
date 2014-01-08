@@ -522,4 +522,21 @@ public class GroupTest extends CommonAPITest {
         getIdentityAPI().deleteGroup(group.getId());
     }
 
+    @Test
+    @Cover(classes = { Group.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-2423", keywords = { "group" }, story = "create a lot of groups make long parent path and it should work")
+    public void should_be_able_to_create_big_groups_hierarchy() throws BonitaException {
+        // this should work
+        // acme -> Site -> Service -> Departement -> Back Office & Logistique
+        createGroup("acme");
+        createGroup("Site", "/acme");
+        createGroup("Service", "/acme/Site");
+        createGroup("Departement", "/acme/Site/Service");
+        createGroup("Back Office & Logistique", "/acme/Site/Service/Departement");
+        createGroup("Administration Titres", "/acme/Site/Service/Departement/Back Office & Logistique");
+
+        assertEquals("Administration Titres", getIdentityAPI().getGroupByPath("/acme/Site/Service/Departement/Back Office & Logistique/Administration Titres")
+                .getName());
+        deleteGroups(getIdentityAPI().getGroupByPath("/acme"));
+
+    }
 }
