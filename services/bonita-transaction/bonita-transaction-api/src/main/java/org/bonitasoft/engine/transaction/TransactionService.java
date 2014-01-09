@@ -13,15 +13,11 @@
  **/
 package org.bonitasoft.engine.transaction;
 
-import java.util.concurrent.Callable;
-
-import org.omg.CORBA.SystemException;
-
 /**
  * @author Matthieu Chaffotte
  * @author Laurent Vaills
  */
-public interface TransactionService {
+public interface TransactionService extends UserTransactionService {
 
     // EVENTS
     String TRANSACTION_ACTIVE_EVT = "TRANSACTION_ACTIVE";
@@ -53,7 +49,7 @@ public interface TransactionService {
      * @return The transaction status. If no transaction is associated with
      *         the current thread, this method returns the Status.NoTransaction
      *         value.
-     * @exception SystemException
+     * @exception STransactionException
      *                Thrown if the transaction manager
      *                encounters an unexpected error condition.
      */
@@ -70,21 +66,13 @@ public interface TransactionService {
      * @exception IllegalStateException
      *                Thrown if the current thread is
      *                not associated with a transaction.
-     * @exception SystemException
+     * @exception STransactionException
      *                Thrown if the transaction manager
      *                encounters an unexpected error condition.
      */
     void setRollbackOnly() throws STransactionException;
 
     boolean isRollbackOnly() throws STransactionException;
-
-    /**
-     * Execute the given callable inside a transaction.
-     * @param callable
-     * @return
-     * @throws Exception
-     */
-    <T> T executeInTransaction(Callable<T> callable) throws Exception;
 
     /**
      * Register a synchronization object for the transaction currently
@@ -103,7 +91,7 @@ public interface TransactionService {
      *                Thrown if the transaction in the
      *                target object is in the prepared state or the transaction is
      *                inactive.
-     * @exception SystemException
+     * @exception STransactionNotFoundException
      *                Thrown if the transaction manager
      *                encounters an unexpected error condition.
      */
