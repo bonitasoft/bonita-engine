@@ -103,15 +103,17 @@ public class ReportingServiceImplTest {
         when(statement.getResultSet()).thenReturn(resultSet);
         final ResultSetMetaData metaData = mock(ResultSetMetaData.class);
         when(resultSet.getMetaData()).thenReturn(metaData);
-        when(metaData.getColumnCount()).thenReturn(2);
+        when(metaData.getColumnCount()).thenReturn(3);
         when(resultSet.next()).thenReturn(true, true, false);
         when(metaData.getColumnLabel(1)).thenReturn("id");
         when(metaData.getColumnLabel(2)).thenReturn("name");
+        when(metaData.getColumnLabel(3)).thenReturn("counter");
         when(resultSet.getObject(1)).thenReturn(1l, 424l);
         when(resultSet.getObject(2)).thenReturn("\"dsd\" , s tep1", "s\"t\"ep2");
+        when(resultSet.getObject(3)).thenReturn(1, 2);
 
         final String actual = serviceImpl.selectList(sql);
-        final String expected = "ID,NAME" + lineSeparator + "1,\"\"\"dsd\"\" , s tep1\"" + lineSeparator + "424,\"s\"\"t\"\"ep2\"" + lineSeparator;
+        final String expected = "ID,NAME,COUNTER" + lineSeparator + "1,\"\"\"dsd\"\" , s tep1\",1" + lineSeparator + "424,\"s\"\"t\"\"ep2\",2" + lineSeparator;
         Assert.assertEquals(expected, actual);
     }
 

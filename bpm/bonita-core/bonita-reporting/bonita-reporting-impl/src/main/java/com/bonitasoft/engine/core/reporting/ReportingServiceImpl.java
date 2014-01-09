@@ -104,7 +104,7 @@ public class ReportingServiceImpl implements ReportingService {
                 while (resultSet.next()) {
                     for (int j = 1; j < columns; j++) {
                         final Object value = resultSet.getObject(j);
-                        builder.append(value).append(",");
+                        builder.append(protect(String.valueOf(value))).append(",");
                     }
                     final Object value = resultSet.getObject(columns);
                     // Special treatment of last record (to avoid having extra comma at the end):
