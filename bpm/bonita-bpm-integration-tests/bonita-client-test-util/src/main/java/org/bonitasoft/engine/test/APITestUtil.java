@@ -1330,7 +1330,7 @@ public class APITestUtil {
 
     @Deprecated
     private CheckNbOfHumanTasks checkNbOfHumanTasks(final int repeatEach, final int timeout, final int nbHumanTaks) throws Exception {
-        final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, true, nbHumanTaks, new SearchOptionsBuilder(0, 15)
+        final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, false, nbHumanTaks, new SearchOptionsBuilder(0, 15)
                 .filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC)
                 .done(), getProcessAPI());
         final boolean waitUntil = checkNbOfHumanTasks.waitUntil();
