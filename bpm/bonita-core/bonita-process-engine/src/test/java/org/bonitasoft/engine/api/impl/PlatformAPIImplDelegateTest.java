@@ -34,7 +34,6 @@ import org.junit.Test;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class PlatformAPIImplDelegateTest {
 
@@ -67,7 +66,33 @@ public class PlatformAPIImplDelegateTest {
     }
 
     @Test
-    public final void should_dont_call_create_theme_from_theme_service_when_creating_default_themes_from_portal_zip_not_in_classpath()
+    public final void should_not_call_create_theme_for_empty_portal_zip() throws SThemeCreationException, IOException {
+        final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
+        final ThemeService themeService = mock(ThemeService.class);
+        doReturn(themeService).when(tenantServiceAccessor).getThemeService();
+
+        final PlatformAPIImplDelegate delegate = spy(new PlatformAPIImplDelegate("empty-theme", "not_used_in_this_test"));
+
+        delegate.createDefaultPortalTheme(tenantServiceAccessor);
+
+        verify(themeService, times(0)).createTheme(any(STheme.class));
+    }
+
+    @Test
+    public final void should_not_call_create_theme_for_empty_mobile_zip() throws SThemeCreationException, IOException {
+        final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
+        final ThemeService themeService = mock(ThemeService.class);
+        doReturn(themeService).when(tenantServiceAccessor).getThemeService();
+
+        final PlatformAPIImplDelegate delegate = spy(new PlatformAPIImplDelegate("not_used_in_this_test", "empty-theme"));
+
+        delegate.createDefaultMobileTheme(tenantServiceAccessor);
+
+        verify(themeService, times(0)).createTheme(any(STheme.class));
+    }
+
+    @Test
+    public final void should_not_call_create_theme_from_theme_service_when_creating_default_themes_from_portal_zip_not_in_classpath()
             throws SThemeCreationException, IOException {
         final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
         final ThemeService themeService = mock(ThemeService.class);
@@ -84,7 +109,7 @@ public class PlatformAPIImplDelegateTest {
     }
 
     @Test
-    public final void should_dont_call_create_theme_from_theme_service_when_creating_default_themes_from_mobile_zip_not_in_classpath()
+    public final void should_not_call_create_theme_from_theme_service_when_creating_default_themes_from_mobile_zip_not_in_classpath()
             throws SThemeCreationException, IOException {
         final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
         final ThemeService themeService = mock(ThemeService.class);
