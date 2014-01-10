@@ -15,10 +15,10 @@
 
 	<name>BonitaBPM Engine</name>
 	<description>BonitaBPM Engine is a workflow engine which can be embedded inside your own applications.</description>
-	<url>http://www.bonitasoft.org</url>
+	<url>http://community.bonitasoft.com/</url>
 	<organization>
-		<name>BonitaSoft</name>
-		<url>http://www.bonitasoft.org</url>
+		<name>Bonitasoft S.A.</name>
+		<url>http://community.bonitasoft.com/</url>
 	</organization>
 	<licenses>
 		<license>
@@ -32,8 +32,8 @@
 		<developer>
 			<id>bonita-engine-team</id>
 			<name>The Bonita Engine Development Team</name>
-			<organization>BonitaSoft</organization>
-			<organizationUrl>http://www.bonitasoft.org</organizationUrl>
+			<organization>Bonitasoft S.A.</organization>
+			<organizationUrl>http://community.bonitasoft.com/</organizationUrl>
 		</developer>
 	</developers>
 
