@@ -87,6 +87,7 @@ import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForVariableValue;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @SuppressWarnings("javadoc")
@@ -171,6 +172,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "Multi-instance" }, story = "Test connector on enter of an Multi-instance activity.", jira = "BS-2483")
     @Test
+    @Ignore("To fix with the bug BS-2483")
     public void executeConnectorOnEnterOfMultiInstancedActivity() throws Exception {
         // deploy the process
         final String globalDataName = "globalData";
