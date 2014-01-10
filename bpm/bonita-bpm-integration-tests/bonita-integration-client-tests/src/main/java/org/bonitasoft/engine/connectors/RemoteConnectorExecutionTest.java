@@ -87,6 +87,7 @@ import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForVariableValue;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @SuppressWarnings("javadoc")
@@ -166,6 +167,26 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
         assertEquals(valueOfInput1, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
 
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "Multi-instance" }, story = "Test connector on enter of an Multi-instance activity.", jira = "BS-2483")
+    @Test
+    @Ignore("To fix with the bug BS-2483")
+    public void executeConnectorOnEnterOfMultiInstancedActivity() throws Exception {
+        // deploy the process
+        final String globalDataName = "globalData";
+        final ProcessDefinition processDefinition = deployProcessWithConnectorOnMutiInstance(globalDataName, "step2", "multi", false, 3,
+                ConnectorEvent.ON_ENTER);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        checkNbOfHumanTasks(3);
+
+        // Check the data value
+        final DataInstance globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
+        assertEquals(3L, globalData.getValue());
+
+        // delete process
         disableAndDeleteProcess(processDefinition);
     }
 
