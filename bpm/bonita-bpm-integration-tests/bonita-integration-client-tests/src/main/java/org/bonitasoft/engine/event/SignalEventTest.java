@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.event;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -22,7 +21,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,8 +89,7 @@ public class SignalEventTest extends CommonAPITest {
         assertEquals(1, taskInstances.size());
         assertEquals("Task1", taskInstances.get(0).getName());
 
-        disableAndDeleteProcess(processDefinitionWithStartSignal);
-        disableAndDeleteProcess(processDefinitionWithEndSignal);
+        disableAndDeleteProcess(processDefinitionWithStartSignal, processDefinitionWithEndSignal);
     }
 
     @Cover(classes = { EventInstance.class, IntermediateCatchEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal event",
@@ -118,21 +115,12 @@ public class SignalEventTest extends CommonAPITest {
         logout();
         loginWith("john", "bpm");
         final ProcessInstance instance = getProcessAPI().startProcess(startSignal.getId());
-
         waitForEvent(instance, "OnSignal", TestStates.getWaitingState());
 
         getProcessAPI().startProcess(endSignal.getId());
+        waitForUserTask("Task1");
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 10000, true, 1, john);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("Task1", taskInstance.getName());
-
-        disableAndDeleteProcess(startSignal);
-        disableAndDeleteProcess(endSignal);
+        disableAndDeleteProcess(startSignal, endSignal);
     }
 
     @Cover(classes = { EventInstance.class, IntermediateThrowEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Signal event",
@@ -161,17 +149,9 @@ public class SignalEventTest extends CommonAPITest {
         loginWith("john", "bpm");
 
         getProcessAPI().startProcess(endSignal.getId());
+        waitForUserTask("Task1");
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 5000, true, 1, john);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("Task1", taskInstance.getName());
-
-        disableAndDeleteProcess(startSignal);
-        disableAndDeleteProcess(endSignal);
+        disableAndDeleteProcess(startSignal, endSignal);
     }
 
     @Cover(classes = { ProcessRuntimeAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "signal", "throw event", "send signal", "start event" }, jira = "ENGINE-455")
@@ -188,14 +168,7 @@ public class SignalEventTest extends CommonAPITest {
         loginWith("john", "bpm");
 
         getProcessAPI().sendSignal("GO");
-
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 5000, true, 1, john);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("Task1", taskInstance.getName());
+        waitForUserTask("Task1");
 
         disableAndDeleteProcess(startSignal);
     }
@@ -215,14 +188,7 @@ public class SignalEventTest extends CommonAPITest {
         waitForEvent(instance, "OnSignal", TestStates.getWaitingState());
 
         getProcessAPI().sendSignal("GO");
-
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 5000, true, 1, john);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("Task1", taskInstance.getName());
+        waitForUserTask("Task1");
 
         disableAndDeleteProcess(intermediateSignal);
     }

@@ -40,6 +40,9 @@ public class CommentImpl implements Comment {
         super();
     }
 
+    /**
+     * @deprecated As of 6.1 use {@link #CommentImpl()} and the setters
+     */
     @Deprecated
     public CommentImpl(final long id, final long tenantId, final long userId, final long processInstanceId, final long postDate, final String content) {
         super();

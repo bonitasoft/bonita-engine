@@ -86,6 +86,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.wait.WaitForVariableValue;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @SuppressWarnings("javadoc")
@@ -96,7 +97,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     private static final String CONNECTOR_INPUT_NAME = "input1";
 
     private static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
-
+    
     private static final String FLOWNODE = "flowNode";
 
     private static final String PROCESS = "process";
@@ -129,46 +130,34 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForProcessToBeInState(processInstance, ProcessInstanceState.COMPLETED);
 
-        // quelle api pour trouver une data dans une instance archiv�e?
-        // Assert.assertEquals(processDefinition.getId(), getProcessAPI().getProcessDataInstance("processId", processInstance.getId()).getValue());
-
         disableAndDeleteProcess(processDefinition);
-    }
-
-    private void addConnectorToBusinessArchive(final BusinessArchiveBuilder businessArchiveBuilder, final Class<? extends Connector> clazz) throws IOException {
-        final String fileBaseName = clazz.getSimpleName();
-        final String connectorImplResource = "/" + clazz.getName().replaceAll("\\.", "/") + ".impl";
-        final byte[] descByteArray = IOUtil.getAllContentFrom(clazz.getResourceAsStream(connectorImplResource));
-        businessArchiveBuilder.addConnectorImplementation(new BarResource(fileBaseName + ".impl", descByteArray));
-        businessArchiveBuilder.addClasspathResource(new BarResource(fileBaseName + ".jar", IOUtil.generateJar(clazz)));
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Automatic activity", "Data output" }, story = "Test connector on finish of an automatic activity with data output.", jira = "")
     @Test
     public void executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput() throws Exception {
-        final String delivery = "Delivery men";
         final String valueOfInput1 = "valueOfInput1";
         final String defaultValue = "default";
+        final String dataName = "myData1";
+
         final Expression dataDefaultValue = new ExpressionBuilder().createConstantStringExpression(defaultValue);
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression(valueOfInput1);
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
                 "executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput", "1.0");
-        final String dataName = "myData1";
         designProcessDefinition.addShortTextData(dataName, dataDefaultValue);
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        final String inputName = CONNECTOR_INPUT_NAME;
-        designProcessDefinition.addUserTask("step0", delivery);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         designProcessDefinition
                 .addAutomaticTask("step1")
                 .addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
-                .addInput(inputName, input1Expression)
+                .addInput(CONNECTOR_INPUT_NAME, input1Expression)
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        designProcessDefinition.addUserTask("step2", delivery);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step0", "step1");
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
         waitForUserTaskAndExecuteIt("step0", startProcess, johnUserId);
@@ -180,34 +169,49 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "multi-instance", "activitity data" }, story = "Test connector on finish of an multi-instance activity with local data expression.", jira = "")
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "Multi-instance" }, story = "Test connector on enter of an Multi-instance activity.", jira = "BS-2483")
+    @Test
+    @Ignore("To fix with the bug BS-2483")
+    public void executeConnectorOnEnterOfMultiInstancedActivity() throws Exception {
+        // deploy the process
+        final String globalDataName = "globalData";
+        final ProcessDefinition processDefinition = deployProcessWithConnectorOnMutiInstance(globalDataName, "step2", "multi", false, 3,
+                ConnectorEvent.ON_ENTER);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        checkNbOfHumanTasks(3);
+
+        // Check the data value
+        final DataInstance globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
+        assertEquals(3L, globalData.getValue());
+
+        // delete process
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Multi-instance", "activitity data" }, story = "Test connector on finish of an Multi-instance activity with local data expression.", jira = "")
     @Test
     public void executeConnectorOnFinishOfMultiInstancedActivity() throws Exception {
         // deploy the process
         final String globalDataName = "globalData";
-        final String localDataValue = "entry";
         final String userTaskName = "step2";
         final String multiTaskName = "multi";
-        final String outputValue = "result";
-        final ProcessDefinition processDefinition = deployProcessWithConnectorOnMutiInstance("localData", globalDataName, localDataValue, userTaskName,
-                multiTaskName, outputValue, 2);
+        final ProcessDefinition processDefinition = deployProcessWithConnectorOnMutiInstance(globalDataName, userTaskName, multiTaskName, true, 2,
+                ConnectorEvent.ON_FINISH);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        // wait for the first multi-instance and execute it: the connector must be executed
+        // wait for the first Multi-instance and execute it: the connector must be executed
         waitForUserTaskAndExecuteIt(multiTaskName, processInstance, johnUserId);
 
-        // wait for the second multi-instance
+        // wait for the second Multi-instance
         final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance);
 
         // check the data value
         DataInstance globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
-        assertEquals(outputValue, globalData.getValue());
+        assertEquals(1L, globalData.getValue());
 
-        // change the data value to be sure that the connector will be executed in the second instance
-        getProcessAPI().updateProcessDataInstance(globalDataName, processInstance.getId(), "updated");
-
-        // execute the second multi-instance: the connector must be executed again
+        // execute the second Multi-instance: the connector must be executed again
         assignAndExecuteStep(multiInstance, johnUserId);
 
         // wait for user task that follows the multi task
@@ -215,39 +219,65 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
         // check the data value
         globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
-        assertEquals(outputValue, globalData.getValue());
+        assertEquals(2L, globalData.getValue());
 
         // delete process
         disableAndDeleteProcess(processDefinition);
     }
 
-    private ProcessDefinition deployProcessWithConnectorOnMutiInstance(final String localDataName, final String globalDataName, final String localDataValue,
-            final String userTaskName, final String multiTaskName, final String outputValue, final int nbOfInstances) throws BonitaException, IOException {
+    private ProcessDefinition deployProcessWithConnectorOnMutiInstance(final String globalDataName, final String userTaskName, final String multiTaskName,
+            final boolean isSequential, final int nbOfInstances, final ConnectorEvent activationEvent) throws BonitaException, IOException {
+        final String localDataName = "localData";
+
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("connectorOnMultiInstance", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addShortTextData(globalDataName, new ExpressionBuilder().createConstantStringExpression("initial"));
+        builder.addLongData(globalDataName, new ExpressionBuilder().createConstantLongExpression(0L));
         builder.addStartEvent("start");
+
         final UserTaskDefinitionBuilder taskBuilder = builder.addUserTask(multiTaskName, ACTOR_NAME);
-        taskBuilder.addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(nbOfInstances));
-        taskBuilder.addShortTextData(localDataName, new ExpressionBuilder().createConstantStringExpression(localDataValue));
+        taskBuilder.addMultiInstance(isSequential, new ExpressionBuilder().createConstantIntegerExpression(nbOfInstances));
+        taskBuilder.addLongData(localDataName, new ExpressionBuilder().createConstantLongExpression(1L));
         taskBuilder
-                .addConnector("connectorOnFinish", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
-                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createDataExpression(localDataName, String.class.getName()))
-                .addOutput(new LeftOperandBuilder().createDataLeftOperand(globalDataName), OperatorType.ASSIGNMENT, "=", "",
-                        new ExpressionBuilder().createConstantStringExpression(outputValue));
+                .addConnector("connector", "connectorInJar", "1.0.0", activationEvent)
+                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createDataExpression(localDataName, Long.class.getName()))
+                .addOutput(
+                        new LeftOperandBuilder().createDataLeftOperand(globalDataName),
+                        OperatorType.ASSIGNMENT, "=", "",
+                        new ExpressionBuilder().createGroovyScriptExpression("Script", globalDataName + " + 1", Long.class.getName(),
+                                new ExpressionBuilder().createDataExpression(globalDataName, Long.class.getName())));
+
+        // final UserTaskDefinitionBuilder taskBuilder = builder.addUserTask(multiTaskName, ACTOR_NAME);
+        // taskBuilder.addMultiInstance(isSequential, new ExpressionBuilder().createConstantIntegerExpression(nbOfInstances));
+        // taskBuilder.addLongData(localDataName, new ExpressionBuilder().createConstantLongExpression(1L));
+        // taskBuilder
+        // .addConnector("connector", CONNECTOR_WITH_OUTPUT_ID, "1.0", activationEvent)
+        // .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createDataExpression(localDataName, Long.class.getName()))
+        // .addOutput(
+        // new LeftOperandBuilder().createDataLeftOperand(globalDataName),
+        // OperatorType.ASSIGNMENT, "=", "",
+        // new ExpressionBuilder().createGroovyScriptExpression("Script", globalDataName + " + 1", Long.class.getName(),
+        // new ExpressionBuilder().createDataExpression(globalDataName, Long.class.getName())));
+
         builder.addUserTask(userTaskName, ACTOR_NAME);
         builder.addEndEvent("end");
         builder.addTransition("start", multiTaskName);
         builder.addTransition(multiTaskName, userTaskName);
         builder.addTransition(userTaskName, "end");
 
-        return deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
+        final List<BarResource> resources = new ArrayList<BarResource>();
+        addResource(resources, "/org/bonitasoft/engine/connectors/TestConnectorInJar.impl", "TestConnectorInJar.impl");
+        addResource(resources, "/org/bonitasoft/engine/connectors/connector-in-jar.jar.bak", "connector-in-jar.jar");
+        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
+        businessArchiveBuilder.addConnectorImplementation(resources.get(0));
+        businessArchiveBuilder.addClasspathResource(resources.get(1));
+        businessArchiveBuilder.setProcessDefinition(builder.done());
+
+        return deployAndEnableWithActor(businessArchiveBuilder.done(), ACTOR_NAME, johnUser);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Multiple", "On activity" }, story = "Test multiple connectors on one activity.", jira = "")
     @Test
     public void executeConnectorMultipleConnectorsOnOneActivity() throws Exception {
-        final String delivery = "Delivery men";
         final String defaultValue = "a";
         final String dataName = "myData1";
         final Expression dataDefaultValue = new ExpressionBuilder().createConstantStringExpression(defaultValue);
@@ -255,9 +285,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(
                 "executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput", "1.0");
         designProcessDefinition.addShortTextData(dataName, dataDefaultValue);
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         final String inputName = CONNECTOR_INPUT_NAME;
-        designProcessDefinition.addUserTask("step0", delivery);
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step1");
         final int nbOfConnectors = 25;
         for (int i = 0; i < nbOfConnectors; i++) {
@@ -273,11 +303,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                                     new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()),
                                     new ExpressionBuilder().createDataExpression("myData1", String.class.getName())));
         }
-        designProcessDefinition.addUserTask("step2", delivery);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step0", "step1");
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
         waitForUserTaskAndExecuteIt("step0", startProcess, johnUserId);
@@ -295,20 +325,18 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "No connector implementation", "Redeploy process" }, story = "Test process redeployment with no connector implementation.", jira = "")
     @Test
     public void redeployProcessWithNoConnectorImplem() throws Exception {
-        final String delivery = "Delivery men";
-
         final ProcessDefinitionBuilder processDefBuilder = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        processDefBuilder.addActor(delivery).addDescription("Delivery all day and night long");
-        processDefBuilder.addUserTask("step0", delivery);
+        processDefBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        processDefBuilder.addUserTask("step0", ACTOR_NAME);
 
-        final ProcessDefinition processDefinition1 = deployProcessWithExternalTestConnector(processDefBuilder, delivery, johnUserId);
+        final ProcessDefinition processDefinition1 = deployProcessWithExternalTestConnector(processDefBuilder, ACTOR_NAME, johnUserId);
         List<ConnectorImplementationDescriptor> connectorImplems = getProcessAPI().getConnectorImplementations(processDefinition1.getId(), 0, 100, null);
         assertEquals(1, getProcessAPI().getNumberOfConnectorImplementations(processDefinition1.getId()));
         assertEquals(1, connectorImplems.size());
         disableAndDeleteProcess(processDefinition1);
 
         // redeploy same process:
-        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(processDefBuilder.done(), delivery, johnUser);
+        final ProcessDefinition processDefinition2 = deployAndEnableWithActor(processDefBuilder.done(), ACTOR_NAME, johnUser);
         connectorImplems = getProcessAPI().getConnectorImplementations(processDefinition2.getId(), 0, 100, null);
         assertEquals(0, connectorImplems.size());
 
@@ -374,9 +402,8 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "")
     @Test
     public void executeConnectorInJar() throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("testConnectorWithExecutionTooLong", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "connectorInJar", "1.0.0", ConnectorEvent.ON_ENTER);
 
         final List<BarResource> resources = new ArrayList<BarResource>();
@@ -387,7 +414,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         businessArchiveBuilder.addClasspathResource(resources.get(1));
         businessArchiveBuilder.setProcessDefinition(designProcessDefinition.done());
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(delivery, johnUserId, processDefinition);
+        addMappingOfActorsForUser(ACTOR_NAME, johnUserId, processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
         waitForProcessToFinish(process);
@@ -401,23 +428,18 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
     @Test
     public void getConnectorImplementations() throws Exception {
-        final String delivery = "Delivery men";
         // connector information
         final String connectorId = "org.bonitasoft.connector.testConnector";
-        final String connectorId2 = CONNECTOR_WITH_OUTPUT_ID;
-        final String connectorVersion = "1.0";
-        final String inputName = CONNECTOR_INPUT_NAME;
-        final String valueOfInput = "valueOfInput";
-        final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression(valueOfInput);
+        final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("valueOfInput");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
 
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", connectorId, connectorVersion, ConnectorEvent.ON_ENTER)
-                .addInput(inputName, input1Expression);
-        designProcessDefinition.addUserTask("step2", delivery);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", connectorId, "1.0", ConnectorEvent.ON_ENTER)
+                .addInput(CONNECTOR_INPUT_NAME, input1Expression);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final long processDefinitionId = processDefinition.getId();
         assertEquals(3, getProcessAPI().getNumberOfConnectorImplementations(processDefinitionId));
         // test ASC
@@ -426,14 +448,14 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertNotNull(connectorImplementations);
         assertEquals(2, connectorImplementations.size());
         assertEquals(connectorId, connectorImplementations.get(0).getDefinitionId());
-        assertEquals(connectorId2, connectorImplementations.get(1).getDefinitionId());
+        assertEquals(CONNECTOR_WITH_OUTPUT_ID, connectorImplementations.get(1).getDefinitionId());
 
         connectorImplementations = getProcessAPI().getConnectorImplementations(processDefinitionId, 0, 1, ConnectorCriterion.DEFINITION_ID_ASC);
         assertEquals(1, connectorImplementations.size());
         assertEquals(connectorId, connectorImplementations.get(0).getDefinitionId());
         connectorImplementations = getProcessAPI().getConnectorImplementations(processDefinitionId, 1, 1, ConnectorCriterion.DEFINITION_ID_ASC);
         assertEquals(1, connectorImplementations.size());
-        assertEquals(connectorId2, connectorImplementations.get(0).getDefinitionId());
+        assertEquals(CONNECTOR_WITH_OUTPUT_ID, connectorImplementations.get(0).getDefinitionId());
         // test DESC
         connectorImplementations = getProcessAPI().getConnectorImplementations(processDefinitionId, 2, 1, ConnectorCriterion.DEFINITION_ID_DESC);
         assertNotNull(connectorImplementations);
@@ -445,26 +467,22 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
     @Test
     public void longConnectorOutputStoredInProcessVariableShouldThrowANiceException() throws Exception {
-        final String delivery = "Delivery men";
         // connector information
-        final String connectorId2 = CONNECTOR_WITH_OUTPUT_ID;
-        final String connectorVersion = "1.0";
-        final String inputName = CONNECTOR_INPUT_NAME;
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final Expression groovyExpression = new ExpressionBuilder().createGroovyScriptExpression("generateLongOutput", "'a'*1000", String.class.getName());
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
 
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
 
         designProcessDefinition
                 .addAutomaticTask("step1")
-                .addConnector("theConnector", connectorId2, connectorVersion, ConnectorEvent.ON_ENTER)
-                .addInput(inputName, groovyExpression)
+                .addConnector("theConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
+                .addInput(CONNECTOR_INPUT_NAME, groovyExpression)
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final long processDefinitionId = processDefinition.getId();
 
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
@@ -507,17 +525,16 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, the activity fails as well.", jira = "ENGINE-885")
     @Test
     public void connectorThatThrowExceptionFailPolicyOnTaskInput() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        builder.addActor(delivery).addDescription("Delivery all day and night long");
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         builder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("step1", delivery);
+        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException",
                 "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput("kind", new ExpressionBuilder().createGroovyScriptExpression("fails", "8/0", String.class.getName()));
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, builder);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, builder);
 
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
@@ -527,24 +544,23 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
         assertEquals(ConnectorState.FAILED, instance.getState());
-
+        
         disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, ignore the connector and continue.", jira = "ENGINE-987")
     @Test
     public void connectorThatThrowExceptionIgnorePolicyOnTaskInput() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        builder.addActor(delivery).addDescription("Delivery all day and night long");
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         builder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("step1", delivery);
+        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException",
                 "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput("kind", new ExpressionBuilder().createGroovyScriptExpression("fails", "8/0", String.class.getName()));
         addConnector.ignoreError();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, builder);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, builder);
 
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
@@ -561,17 +577,16 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, the activity fails as well.", jira = "ENGINE-885")
     @Test
     public void connectorThatThrowExceptionFailPolicyOnProcessInput() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        builder.addActor(delivery).addDescription("Delivery all day and night long");
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         builder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        builder.addUserTask("step1", delivery);
+        builder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = builder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0",
                 ConnectorEvent.ON_ENTER);
         addConnector.addInput("kind", new ExpressionBuilder().createGroovyScriptExpression("fails", "8/0", String.class.getName()));
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, builder);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, builder);
 
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
@@ -588,21 +603,20 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, the activity throw error event.", jira = "ENGINE-987")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnTaskInput() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1inputfail", delivery);
+        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1inputfail", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException",
                 "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput("kind", new ExpressionBuilder().createGroovyScriptExpression("fails", "8/0", String.class.getName()));
         addConnector.throwErrorEventWhenFailed("error");
         final BoundaryEventDefinitionBuilder boundaryEvent = userTaskBuilder.addBoundaryEvent("errorBoundary", true);
         boundaryEvent.addErrorEventTrigger("error");
-        designProcessDefinition.addUserTask("errorTask", delivery);
+        designProcessDefinition.addUserTask("errorTask", ACTOR_NAME);
         designProcessDefinition.addTransition("errorBoundary", "errorTask");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
         final ActivityInstance errorTask = waitForUserTask("errorTask", startProcess);
@@ -615,10 +629,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Automatic task" }, story = "When a connector fails during inputs' setting, the automatic activity throw error event.", jira = "ENGINE-1304")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnAutomaticTask() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final AutomaticTaskDefinitionBuilder taskBuilder = designProcessDefinition.addAutomaticTask("step1inputfail");
         final ConnectorDefinitionBuilder addConnector = taskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0",
@@ -627,9 +640,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         addConnector.throwErrorEventWhenFailed("error");
         final BoundaryEventDefinitionBuilder boundaryEvent = taskBuilder.addBoundaryEvent("errorBoundary");
         boundaryEvent.addErrorEventTrigger("error");
-        designProcessDefinition.addUserTask("errorTask", delivery);
+        designProcessDefinition.addUserTask("errorTask", ACTOR_NAME);
         designProcessDefinition.addTransition("errorBoundary", "errorTask");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
         final ActivityInstance errorTask = waitForUserTask("errorTask", startProcess);
@@ -642,10 +655,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Receive task" }, story = "When a connector fails during inputs' setting, the receive task throw error event.", jira = "ENGINE-1304")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnReceiveTask() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final ReceiveTaskDefinitionBuilder taskBuilder = designProcessDefinition.addReceiveTask("step1inputfail", "m1");
         final ConnectorDefinitionBuilder addConnector = taskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0",
@@ -654,9 +666,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         addConnector.throwErrorEventWhenFailed("error");
         final BoundaryEventDefinitionBuilder boundaryEvent = taskBuilder.addBoundaryEvent("errorBoundary");
         boundaryEvent.addErrorEventTrigger("error");
-        designProcessDefinition.addUserTask("errorTask", delivery);
+        designProcessDefinition.addUserTask("errorTask", ACTOR_NAME);
         designProcessDefinition.addTransition("errorBoundary", "errorTask");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
         final ActivityInstance errorTask = waitForUserTask("errorTask", startProcess);
@@ -669,10 +681,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Send task" }, story = "When a connector fails during inputs' setting, the send task throw error event.", jira = "ENGINE-1304")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnSendTask() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         final SendTaskDefinitionBuilder taskBuilder = designProcessDefinition.addSendTask("step1inputfail", "m1",
                 new ExpressionBuilder().createConstantStringExpression("p2"));
@@ -682,9 +693,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         addConnector.throwErrorEventWhenFailed("error");
         final BoundaryEventDefinitionBuilder boundaryEvent = taskBuilder.addBoundaryEvent("errorBoundary");
         boundaryEvent.addErrorEventTrigger("error");
-        designProcessDefinition.addUserTask("errorTask", delivery);
+        designProcessDefinition.addUserTask("errorTask", ACTOR_NAME);
         designProcessDefinition.addTransition("errorBoundary", "errorTask");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
         final ActivityInstance errorTask = waitForUserTask("errorTask", startProcess);
@@ -697,12 +708,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during outputs' setting, the activity throw error event.", jira = "ENGINE-987")
     @Test
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnTaskOutput() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1inputfail", delivery);
+        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1inputfail", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("a"));
         addConnector.addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(), OperatorType.ASSIGNMENT, "=", "",
@@ -710,9 +720,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         addConnector.throwErrorEventWhenFailed("error");
         final BoundaryEventDefinitionBuilder boundaryEvent = userTaskBuilder.addBoundaryEvent("errorBoundary", true);
         boundaryEvent.addErrorEventTrigger("error");
-        designProcessDefinition.addUserTask("errorTask", delivery);
+        designProcessDefinition.addUserTask("errorTask", ACTOR_NAME);
         designProcessDefinition.addTransition("errorBoundary", "errorTask");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
         final ActivityInstance errorTask = waitForUserTask("errorTask", startProcess);
@@ -725,17 +735,16 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during inputs' setting, the error is ignored.", jira = "ENGINE-987")
     @Test
     public void ignoreErrorConnectorOnBoundaryWhenInputFail() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", delivery);
+        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException",
                 "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput("kind", new ExpressionBuilder().createGroovyScriptExpression("fails", "8/0", String.class.getName()));
         addConnector.ignoreError();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
         final ActivityInstance errorTask = waitForUserTask("step1", startProcess);
@@ -748,18 +757,17 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during outputs' setting, the activity throw error event.", jira = "ENGINE-987")
     @Test
     public void connectorThatThrowExceptionIgnorePolicyOnTaskOutput() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", delivery);
+        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("a"));
         addConnector.addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(), OperatorType.ASSIGNMENT, "=", "",
                 new ExpressionBuilder().createGroovyScriptExpression("concat", "8/0", String.class.getName()));
         addConnector.ignoreError();
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
         final ActivityInstance errorTask = waitForUserTask("step1", startProcess);
@@ -772,20 +780,17 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Failed state", "Connector", "Activity" }, story = "When a connector fails during outputs' setting, the activity fails as well.", jira = "ENGINE-885")
     @Test
     public void connectorThatThrowExceptionFailPolicyOnTaskOutput() throws Exception {
-        final String delivery = "Delivery men";
-        final String dataName = "result";
-        final String defaultValue = "NaN";
-        final Expression dataDefaultValue = new ExpressionBuilder().createConstantStringExpression(defaultValue);
+        final Expression dataDefaultValue = new ExpressionBuilder().createConstantStringExpression("NaN");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        builder.addActor(delivery).addDescription("Delivery all day and night long");
-        builder.addShortTextData(dataName, dataDefaultValue);
-        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("step1", delivery);
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        builder.addShortTextData("result", dataDefaultValue);
+        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector = userTaskBuilder.addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("a"));
         addConnector.addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(), OperatorType.ASSIGNMENT, "=", "",
                 new ExpressionBuilder().createGroovyScriptExpression("concat", "8/0", String.class.getName()));
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, builder);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, builder);
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
         final ActivityInstance activityInstance = waitForTaskToFail(startProcess);
@@ -794,7 +799,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
         assertEquals(ConnectorState.FAILED, instance.getState());
-
+        
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -922,16 +927,15 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
     private ProcessDefinition getProcessWithConnectorThatThrowError(final String exceptionType, final FailAction failAction, final boolean onProcess,
             final boolean withUserTask, final boolean onEnter) throws BonitaException, IOException {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        builder.addActor(delivery).addDescription("Delivery all day and night long");
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         builder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
 
         // Add a task
         final ActivityDefinitionBuilder activityDefinitionBuilder;
         if (withUserTask) {
-            activityDefinitionBuilder = builder.addUserTask("step1", delivery);
+            activityDefinitionBuilder = builder.addUserTask("step1", ACTOR_NAME);
         } else {
             activityDefinitionBuilder = builder.addAutomaticTask("step1");
         }
@@ -957,7 +961,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 addConnector.throwErrorEventWhenFailed("error");
                 final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess("errorSub", true).getSubProcessBuilder();
                 subProcessBuilder.addStartEvent("errorstart").addErrorEventTrigger("error");
-                subProcessBuilder.addUserTask("errorTask", delivery);
+                subProcessBuilder.addUserTask("errorTask", ACTOR_NAME);
                 subProcessBuilder.addTransition("errorstart", "errorTask");
                 break;
             case IGNORE:
@@ -968,7 +972,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 break;
         }
 
-        return deployAndEnableProcessWithTestConnector(delivery, johnUserId, builder);
+        return deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, builder);
     }
 
     private ProcessDefinition getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter(final String exceptionType, final FailAction failAction,
@@ -990,21 +994,20 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
             "throw", "event", "human task", "connector", "aborted" }, jira = "ENGINE-767, ENGINE-1226", story = "throw error event connector should be catch by boundary event")
     public void connectorThatThrowExceptionErrorEventPolicyBoundaryOnTask() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", delivery);
+        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector;
         addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput("kind", new ExpressionBuilder().createConstantStringExpression("normal"));
         addConnector.throwErrorEventWhenFailed("error");
         final BoundaryEventDefinitionBuilder boundaryEvent = userTaskBuilder.addBoundaryEvent("errorBoundary", true);
         boundaryEvent.addErrorEventTrigger("error");
-        designProcessDefinition.addUserTask("errorTask", delivery);
+        designProcessDefinition.addUserTask("errorTask", ACTOR_NAME);
         designProcessDefinition.addTransition("errorBoundary", "errorTask");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
         try {
@@ -1028,17 +1031,16 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
             "event", "call activity", "connector" }, jira = "ENGINE-767", story = "throw error event connector is not catch, activity should fail")
     public void connectorThatThrowExceptionErrorEventPolicyNotCatchOnTask() throws Exception {
-        final String delivery = "Delivery men";
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", delivery);
+        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector;
         addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput("kind", new ExpressionBuilder().createConstantStringExpression("normal"));
         addConnector.throwErrorEventWhenFailed("error");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
 
         // the connector must trigger this exception step
@@ -1052,28 +1054,27 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = { ErrorEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "error", "boundary",
             "event", "call activity", "connector" }, jira = "ENGINE-767", story = "throw error event connector should be catch by boundary event")
     public void connectorThatThrowExceptionErrorEventPolicyCallActivityOnTask() throws Exception {
-        final String delivery = "Delivery men";
         // create the process with connector throwing error
         final Expression outputOfConnectorExpression = new ExpressionBuilder().createConstantStringExpression("outputExpression");
         ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("outputOfConnector", outputOfConnectorExpression);
-        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", delivery);
+        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ConnectorDefinitionBuilder addConnector;
         addConnector = userTaskBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER);
         addConnector.addInput("kind", new ExpressionBuilder().createConstantStringExpression("normal"));
         addConnector.throwErrorEventWhenFailed("error");
-        final ProcessDefinition calledProcess = deployAndEnableProcessWithTestConnector(delivery, johnUserId, designProcessDefinition);
+        final ProcessDefinition calledProcess = deployAndEnableProcessWithTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         // create parent process with call activity and boundary
         designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("parentProcess", "1.0");
-        designProcessDefinition.addActor(delivery);
+        designProcessDefinition.addActor(ACTOR_NAME);
         final CallActivityBuilder callActivityBuilder = designProcessDefinition.addCallActivity("processWithConnector",
                 new ExpressionBuilder().createConstantStringExpression("processWithConnector"), new ExpressionBuilder().createConstantStringExpression("1.0"));
         final BoundaryEventDefinitionBuilder boundaryEvent = callActivityBuilder.addBoundaryEvent("errorBoundary", true);
         boundaryEvent.addErrorEventTrigger("error");
-        designProcessDefinition.addUserTask("errorTask", delivery);
+        designProcessDefinition.addUserTask("errorTask", ACTOR_NAME);
         designProcessDefinition.addTransition("errorBoundary", "errorTask");
-        final ProcessDefinition callingProcess = deployAndEnableWithActor(designProcessDefinition.done(), delivery, johnUser);
+        final ProcessDefinition callingProcess = deployAndEnableWithActor(designProcessDefinition.done(), ACTOR_NAME, johnUser);
         // start parent
         final ProcessInstance startProcess = getProcessAPI().startProcess(callingProcess.getId());
 
@@ -1089,9 +1090,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = {}, concept = BPMNConcept.CONNECTOR, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode", "connector" }, story = "elements must be restarted when connectors were not completed when the node was shut down")
     public void restartElementsWithConnector() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithTransition", "1.0");
-        builder.addActor("actor");
+        builder.addActor(ACTOR_NAME);
         builder.addShortTextData("data", new ExpressionBuilder().createConstantStringExpression("default"));
-        final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step1", "actor");
+        final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step1", ACTOR_NAME);
         taskDefinitionBuilder
                 .addConnector("myConnector1", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"))
@@ -1106,10 +1107,10 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value2"))
                 .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        builder.addUserTask("step2", "actor");
+        builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
         // start check value1,stop, check still value1, start, check value 2, check step2 is active
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector("actor", johnUserId, builder, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, johnUser);
         final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
@@ -1132,7 +1133,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = {}, concept = BPMNConcept.CONNECTOR, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode", "connector" }, story = "elements must be restarted when connectors were not completed when the node was shut down")
     public void restartProcessWithConnector() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithTransition", "1.0");
-        builder.addActor("actor");
+        builder.addActor(ACTOR_NAME);
         builder.addShortTextData("data", new ExpressionBuilder().createConstantStringExpression("default"));
         builder.addConnector("myConnector1", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"))
@@ -1146,9 +1147,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value2"))
                 .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        builder.addUserTask("step1", "actor");
+        builder.addUserTask("step1", ACTOR_NAME);
         // start check value1,stop, check still value1, start, check value 2, check step2 is active
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector("actor", johnUserId, builder, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
@@ -1176,16 +1177,14 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = ConnectorInstance.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Search" }, story = "Search connector instances", jira = "")
     @Test
     public void searchConnectorInstances() throws Exception {
-        final String delivery = "Delivery men";
-
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("searchConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addUserTask("step0", delivery);
+        designProcessDefinition.addActor(ACTOR_NAME).addUserTask("step0", ACTOR_NAME);
         designProcessDefinition.addConnector("onEnterConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER).addInput(CONNECTOR_INPUT_NAME,
                 new ExpressionBuilder().createConstantStringExpression("test"));;
         designProcessDefinition.addConnector("onFinishConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH).addInput(CONNECTOR_INPUT_NAME,
                 new ExpressionBuilder().createConstantStringExpression("test"));
 
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step0", processInstance.getId());
         SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(processInstance.getId(), PROCESS).done();
@@ -1206,16 +1205,15 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance" }, story = "search for archived connector instances and check they are deleted at the deletion of the definition", jira = "ENGINE-651")
     @Test
     public void searchArchivedConnectorInstance() throws Exception {
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addConnector("myConnectorOnProcess", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER).addInput(CONNECTOR_INPUT_NAME,
                 new ExpressionBuilder().createConstantStringExpression("value1"));
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnectorOnStep", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
                 .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"));
-        designProcessDefinition.addUserTask("step2", delivery);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, johnUserId, designProcessDefinition, false);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
         // search with filter on name
@@ -1260,13 +1258,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     public void connectorWithExternalLibraryInInputAndOutput() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder();
         final ProcessDefinitionBuilder pBuilder = processDefinitionBuilder.createNewInstance("emptyProcess", String.valueOf(System.currentTimeMillis()));
-        final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor("actor")
-        // .addData(
-        // "data",
-        // "org.bonitasoft.dfgdfg.Restaurant",
-        // new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org..Restaurant()",
-        // "org.bonitasoft.dfgdfg.Restaurant"))
-                .addUserTask("step1", "actor");
+        final UserTaskDefinitionBuilder addUserTask = pBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME);
         addUserTask.addData("dataActivity", java.lang.Object.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));
         addUserTask
@@ -1283,20 +1275,16 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         builder.addClasspathResource(getResource("/org.bonitasoft.dfgdfg.bak", "org.bonitasoft.dfgdfg.jar"));
         final BusinessArchive businessArchive = builder.done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-        addMappingOfActorsForUser("actor", johnUserId, processDefinition);
+        addMappingOfActorsForUser(ACTOR_NAME, johnUserId, processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step1", processInstance);
-        // work only in local
-        // assertEquals("org.bonitasoft.dfgdfg.Restaurant", getProcessAPI().getActivityDataInstance("dataActivity",
-        // task.getId()).getValue().getClass().getName());
         disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Operation" }, story = "execute connector on activity instance and execute operations", jira = "ENGINE-1037")
     @Test
     public void executeConnectorOnProcessDefinitionWithOperations() throws Exception {
-        final String delivery = "Delivery men";
         final Expression input1Expression = new ExpressionBuilder().createInputExpression("valueOfInput1", String.class.getName());
         final Expression input2Expression = new ExpressionBuilder().createInputExpression("valueOfInput2", String.class.getName());
         final Expression mainExp = new ExpressionBuilder().createExpression("param1", "'welcome '+valueOfInput1+' and '+valueOfInput2",
@@ -1304,9 +1292,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
         // process with data "Mett"
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addUserTask("step1", delivery);
-        final ProcessDefinition processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, delivery, johnUserId);
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
+        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployProcessWithExternalTestConnector(designProcessDefinition, ACTOR_NAME, johnUserId);
 
         // execute connector with operations:
         // connector return param1="welcome Lily and Lucy and Mett"
@@ -1357,46 +1345,44 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // expression to get the list size
         final Expression rightSideOperation = new ExpressionBuilder().createJavaMethodCallExpression("getOutPut", "size", Integer.class.getName(),
                 connectorOutPutExpr);
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
-        builder.addActor(delivery).addDescription("Delivery all day and night long");
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         builder.addIntegerData(dataName, null);// data to store the list size
-        builder.addUserTask(userTaskName, delivery)
+        builder.addUserTask(userTaskName, ACTOR_NAME)
                 .addConnector("myConnector", "org.bonitasoft.connector.testConnectorWithConnectedResource", "1.0", ConnectorEvent.ON_ENTER)
                 .addOutput(new OperationBuilder().createSetDataOperation(dataName, rightSideOperation));
 
-        return deployProcessWithDefaultTestConnector(delivery, johnUserId, builder, false);
+        return deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "User filter", "Connector", "On enter" }, jira = "ENGINE-1305")
     @Test
     public void executeConnectorOnEnterAfterUserFilter() throws Exception {
-        final String delivery = "Delivery men";
         final String dataName = "taskAssignee";
 
         final User jack = createUser("jack", "bpm");
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addLongData(dataName, null);
 
         // expression to get the connector output
         final Expression connectorOutPutExpr = new ExpressionBuilder().createInputExpression(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(),
                 Long.class.getName());
 
-        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step1", delivery);
+        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         addUserTask.addConnector("myConnector", "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", ConnectorEvent.ON_ENTER).addOutput(
                 new OperationBuilder().createSetDataOperation(dataName, connectorOutPutExpr));
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterWithAutoAssign", "1.0").addInput("userId",
                 new ExpressionBuilder().createConstantLongExpression(johnUserId));
 
-        designProcessDefinition.addUserTask("step2", delivery);
+        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
         final ArrayList<Long> userIds = new ArrayList<Long>();
         userIds.add(johnUserId);
         userIds.add(jack.getId());
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, userIds, designProcessDefinition, true);
+        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, userIds, designProcessDefinition, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, jack);
         waitForUserTask("step2", processInstance);
@@ -1432,17 +1418,16 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final Expression connectorOutPutExpr = new ExpressionBuilder().createInputExpression(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(),
                 Long.class.getName());
 
-        final String delivery = "Delivery men";
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
-        builder.addActor(delivery).addDescription("Delivery all day and night long");
+        builder.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         builder.addLongData(dataName, null);// data to store the connector output
-        builder.addUserTask(step1, delivery)
+        builder.addUserTask(step1, ACTOR_NAME)
                 .addConnector("myConnector", "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", ConnectorEvent.ON_FINISH)
                 .addOutput(new OperationBuilder().createSetDataOperation(dataName, connectorOutPutExpr));
-        builder.addUserTask(step2, delivery);
+        builder.addUserTask(step2, ACTOR_NAME);
         builder.addTransition(step1, step2);
 
-        return deployProcessWithDefaultTestConnector(delivery, johnUserId, builder, false);
+        return deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
     }
 
     @Test
@@ -1453,7 +1438,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 TestConnectorWithOutput.class.getName());
 
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithConnector", "1.12");
-        builder.addActor("actor");
+        builder.addActor(ACTOR_NAME);
         builder.addLongData("numberOfUser", new ExpressionBuilder().createConstantLongExpression(-1));
         ConnectorDefinitionBuilder connector = builder.addAutomaticTask("step1").addConnector("theConnector", definitionId, definitionVersion,
                 ConnectorEvent.ON_ENTER);
@@ -1469,14 +1454,14 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                         new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID)));
         connector.addOutput(new OperationBuilder().createSetDataOperation("numberOfUser",
                 new ExpressionBuilder().createInputExpression("output1", Long.class.getName())));
-        builder.addUserTask("step2", "actor");
+        builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
 
         BusinessArchiveBuilder barBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         barBuilder.addConnectorImplementation(new BarResource("connector.impl", connectorImplementationFile));
         barBuilder.addClasspathResource(new BarResource("connector.jar", IOUtil.generateJar(TestConnectorWithOutput.class)));
         barBuilder.setProcessDefinition(builder.done());
-        ProcessDefinition processDefinition = deployAndEnableWithActor(barBuilder.done(), "actor", johnUser);
+        ProcessDefinition processDefinition = deployAndEnableWithActor(barBuilder.done(), ACTOR_NAME, johnUser);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step2", processInstance);
         DataInstance numberOfUser = getProcessAPI().getProcessDataInstance("numberOfUser", processInstance.getId());

@@ -71,6 +71,7 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandSearchDescriptor;
+import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -624,8 +625,10 @@ public class APITestUtil {
     }
 
     protected void deleteProcessInstanceAndArchived(final long processDefinitionId) throws BonitaException {
-        getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 10000);
-        getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 10000);
+        while (getProcessAPI().deleteArchivedProcessInstances(processDefinitionId, 0, 10) != 0) {
+        }
+        while (getProcessAPI().deleteProcessInstances(processDefinitionId, 0, 10) != 0) {
+        }
     }
 
     protected void deleteProcessInstanceAndArchived(final ProcessDefinition... processDefinitions) throws BonitaException {
@@ -814,7 +817,8 @@ public class APITestUtil {
     }
 
     public void waitForProcessToBeInState(final ProcessInstance processInstance, final ProcessInstanceState state) throws Exception {
-        ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getProcessInstanceInState(processInstance.getId(), state.getId()), 7000);
+        ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getProcessInstanceInState(processInstance.getId(), state.getId()),
+                DEFAULT_TIMEOUT);
     }
 
     @Deprecated
@@ -1337,7 +1341,7 @@ public class APITestUtil {
 
     @Deprecated
     private CheckNbOfHumanTasks checkNbOfHumanTasks(final int repeatEach, final int timeout, final int nbHumanTaks) throws Exception {
-        final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, true, nbHumanTaks, new SearchOptionsBuilder(0, 15)
+        final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, false, nbHumanTaks, new SearchOptionsBuilder(0, 15)
                 .filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC)
                 .done(), getProcessAPI());
         final boolean waitUntil = checkNbOfHumanTasks.waitUntil();
@@ -1709,4 +1713,11 @@ public class APITestUtil {
         return new BarResource(name, data);
     }
 
+    public void addConnectorToBusinessArchive(final BusinessArchiveBuilder businessArchiveBuilder, final Class<? extends Connector> clazz) throws IOException {
+        final String fileBaseName = clazz.getSimpleName();
+        final String connectorImplResource = "/" + clazz.getName().replaceAll("\\.", "/") + ".impl";
+        final byte[] descByteArray = IOUtil.getAllContentFrom(clazz.getResourceAsStream(connectorImplResource));
+        businessArchiveBuilder.addConnectorImplementation(new BarResource(fileBaseName + ".impl", descByteArray));
+        businessArchiveBuilder.addClasspathResource(buildBarResource(clazz, fileBaseName + ".jar"));
+    }
 }

@@ -435,8 +435,6 @@ public class MultiInstanceTest extends CommonAPITest {
      */
     @Test
     public void executeAMultiInstanceSequentialWithConpletionConditionTrue() throws Exception {
-        final String ACTOR_NAME = "ACTOR_NAME men";
-
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceSequentialWithCompletionConditionTrue",
                 PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addDescription("Deliver all day and night long");
@@ -461,8 +459,6 @@ public class MultiInstanceTest extends CommonAPITest {
      */
     @Test
     public void executeAMultiInstanceParallelWithConpletionConditionTrue() throws Exception {
-        final String ACTOR_NAME = "ACTOR_NAME men";
-
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAMultiInstanceSequentialWithCompletionConditionTrue",
                 PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addDescription("Deliver all day and night long");

@@ -32,9 +32,15 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
+ * RoleAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on Roles: creation, deletion,
+ * search, etc...
+ * 
  * @author Feng Hui
  * @author Matthieu Chaffotte
  * @author Hongwen Zang
+ * @author Emmanuel Duchastenier
+ * @see SearchResult SearchResult for general knowledege on Search mechanism in Bonita BPM.
+ * @see Role
  */
 public interface RoleAPI {
 

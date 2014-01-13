@@ -17,6 +17,8 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
+ * Represents a connector, once instanciated by the containinig activity or process at runtime.
+ * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
@@ -26,16 +28,36 @@ public interface ConnectorInstance extends NamedElement, BaseElement {
 
     String PROCESS_TYPE = "process";
 
+    /**
+     * @return the ID of the containing element (process or activity)
+     */
     long getContainerId();
 
+    /**
+     * @return the type of the connector container (PROCESS or ACTIVITY)
+     */
     String getContainerType();
 
+    /**
+     * @return the ID of the connector.
+     */
     String getConnectorId();
 
+    /**
+     * @return the version of the connector.
+     */
     String getVersion();
 
+    /**
+     * @return where this connector should be activated.
+     * @see ConnectorEvent
+     */
     ConnectorEvent getActivationEvent();
 
+    /**
+     * @return the state of the connector ({@link ConnectorState#TO_BE_EXECUTED} before the first execution)
+     * @see ConnectorState
+     */
     ConnectorState getState();
 
 }

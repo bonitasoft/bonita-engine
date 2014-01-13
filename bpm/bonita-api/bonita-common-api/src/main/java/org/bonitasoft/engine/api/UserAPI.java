@@ -35,15 +35,21 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
+ * UserAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on Users: creation, deletion, certain
+ * specific getXXX() methods, generic search methods, etc...
+ * It also to retrieve user ContactData.
+ * 
  * @author Feng Hui
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  * @author Celine Souchet
+ * @see ContactData
+ * @see SearchResult SearchResult for general knowledege on Search mechanism in Bonita BPM.
  */
 public interface UserAPI {
 
     /**
      * Creates a user.
-     * <b>
      * The password can't be empty.
      * 
      * @param userName
@@ -63,7 +69,6 @@ public interface UserAPI {
 
     /**
      * Creates a user.
-     * <b>
      * The password can't be empty.
      * 
      * @param userName
@@ -87,7 +92,6 @@ public interface UserAPI {
 
     /**
      * Creates a user.
-     * <b>
      * It takes the values of the creator in order to create the user.
      * 
      * @param creator
@@ -162,7 +166,6 @@ public interface UserAPI {
 
     /**
      * Retrieves the user.
-     * <b>
      * It throws a {@link UserNotFoundException} if the user identifier equals the technical user identifier (-1).
      * 
      * @param userId
@@ -260,7 +263,6 @@ public interface UserAPI {
 
     /**
      * Retrieves the users. The map contains the couples userId/User.
-     * <b>
      * If a user does not exists, no exception is thrown and no value is added in the map.
      * 
      * @param userIds
@@ -276,7 +278,6 @@ public interface UserAPI {
 
     /**
      * Retrieves the identifiers of the named users. The map contains the couples userName/User.
-     * <b>
      * If a user does not exists, no exception is thrown and no value is added in the map.
      * 
      * @param userNames
@@ -320,7 +321,6 @@ public interface UserAPI {
 
     /**
      * Retrieves the paginated list of roles.
-     * <b>
      * It retrieves from the startIndex to the startIndex + maxResults.
      * 
      * @param roleId
@@ -356,7 +356,6 @@ public interface UserAPI {
 
     /**
      * Retrieves the paginated list of groups.
-     * <b>
      * It retrieves from the startIndex to the startIndex + maxResults.
      * 
      * @param groupId

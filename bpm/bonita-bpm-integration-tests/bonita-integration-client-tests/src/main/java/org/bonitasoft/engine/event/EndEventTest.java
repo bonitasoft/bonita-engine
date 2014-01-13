@@ -109,12 +109,11 @@ public class EndEventTest extends CommonAPITest {
     @Test
     public void terminateEndEventWithTasks() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
-        final String actorName = "actor";
-        builder.addActor(actorName);
-        builder.addUserTask("step1", actorName);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME);
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         waitForProcessToFinish(startProcess);
@@ -125,14 +124,13 @@ public class EndEventTest extends CommonAPITest {
     @Test
     public void terminateEndEventWithNotFinishedBranch() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
-        final String actorName = "actor";
-        builder.addActor(actorName);
-        builder.addUserTask("step1", actorName);
-        builder.addUserTask("step2", actorName);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME);
+        builder.addUserTask("step2", ACTOR_NAME);
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
         builder.addTransition("step2", "stop");
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
@@ -146,16 +144,15 @@ public class EndEventTest extends CommonAPITest {
     @Test
     public void terminateEndEvendWithNotFinishedBranch2() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
-        final String actorName = "actor";
-        builder.addActor(actorName);
-        builder.addUserTask("step1", actorName);
-        builder.addUserTask("step2", actorName);
-        builder.addUserTask("step3", actorName);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME);
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addUserTask("step3", ACTOR_NAME);
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
         builder.addTransition("step2", "step3");
         builder.addTransition("step3", "stop");
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
@@ -170,16 +167,15 @@ public class EndEventTest extends CommonAPITest {
     @Test
     public void terminateEndEvendWithNotFinishedMultipleBranch() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Proc", "1.0");
-        final String actorName = "actor";
-        builder.addActor(actorName);
-        builder.addUserTask("step1", actorName);
+        builder.addActor(ACTOR_NAME);
+        builder.addUserTask("step1", ACTOR_NAME);
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
         for (int i = 2; i < 15; i++) {
-            builder.addUserTask("step" + i, actorName);
+            builder.addUserTask("step" + i, ACTOR_NAME);
             builder.addTransition("step" + i, "stop");
         }
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         checkNbOfHumanTasks(14);
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
@@ -209,18 +205,14 @@ public class EndEventTest extends CommonAPITest {
     @Test
     public void terminateEventWithMultiInstanceSequential() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("terminateEventWithMultiInstance", "1.0");
-        final String actorName = "actor";
-
-        builder.addActor(actorName).addUserTask("step1", actorName).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(3));
+        builder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addEndEvent("stop").addTerminateEventTrigger().addTransition("step1", "stop");
 
-        final long userId = getIdentityAPI().getUserByUserName(user.getUserName()).getId();
-        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), actorName, user);
+        final ProcessDefinition process = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
         for (int i = 0; i < 3; i++) {
-            final ActivityInstance task = waitForUserTask("step1", processInstance.getId());
-            assignAndExecuteStep(task, userId);
+            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), user.getId());
         }
 
         waitForProcessToFinish(processInstance);
