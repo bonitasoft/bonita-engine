@@ -8,8 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.reporting;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -74,7 +74,7 @@ public class ReportingServiceImplTest {
         final Statement statement = mock(Statement.class);
         when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         final ResultSet resultSet = mock(ResultSet.class);
-        when(statement.getResultSet()).thenReturn(resultSet);
+        when(statement.executeQuery(anyString())).thenReturn(resultSet);
         final ResultSetMetaData metaData = mock(ResultSetMetaData.class);
         when(resultSet.getMetaData()).thenReturn(metaData);
         when(metaData.getColumnCount()).thenReturn(2);
@@ -100,7 +100,7 @@ public class ReportingServiceImplTest {
         final Statement statement = mock(Statement.class);
         when(connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         final ResultSet resultSet = mock(ResultSet.class);
-        when(statement.getResultSet()).thenReturn(resultSet);
+        when(statement.executeQuery(anyString())).thenReturn(resultSet);
         final ResultSetMetaData metaData = mock(ResultSetMetaData.class);
         when(resultSet.getMetaData()).thenReturn(metaData);
         when(metaData.getColumnCount()).thenReturn(3);
