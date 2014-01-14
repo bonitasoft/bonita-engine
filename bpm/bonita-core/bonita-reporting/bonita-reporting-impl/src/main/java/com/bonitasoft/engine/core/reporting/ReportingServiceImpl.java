@@ -10,6 +10,7 @@ package com.bonitasoft.engine.core.reporting;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
@@ -80,22 +81,27 @@ public class ReportingServiceImpl implements ReportingService {
         final StringBuilder builder = new StringBuilder();
         final Connection connection = dataSource.getConnection();
         try {
-            // connection.setAutoCommit(false);
+            connection.setAutoCommit(false);
             final Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             try {
-                statement.execute(selectQuery);
-                final ResultSet resultSet = statement.getResultSet();
+                final ResultSet resultSet = statement.executeQuery(selectQuery);
                 try {
-                    if (resultSet != null) {
-                        final int columns = resultSet.getMetaData().getColumnCount();
-                        while (resultSet.next()) {
-                            for (int j = 1; j <= columns; j++) {
-                                final Object value = resultSet.getObject(j);
-                                builder.append(value).append(", ");
-                            }
-                            builder.append("\n");
+                    final String newline = "\n";
+
+                    // generate header with column names:
+                    final int columns = appendUpperCaseColumnNames(builder, resultSet.getMetaData(), newline);
+
+                    while (resultSet.next()) {
+                        for (int j = 1; j < columns; j++) {
+                            final Object value = resultSet.getObject(j);
+                            builder.append(value).append(",");
                         }
+                        final Object value = resultSet.getObject(columns);
+
+                        // Special treatment of last record (to avoid having extra comma at the end):
+                        builder.append(String.valueOf(value)).append(newline);
                     }
+                    return builder.toString();
                 } finally {
                     if (resultSet != null) {
                         resultSet.close();
@@ -106,10 +112,25 @@ public class ReportingServiceImpl implements ReportingService {
                     statement.close();
                 }
             }
-            return builder.toString();
         } finally {
             connection.close();
         }
+    }
+
+    protected int appendUpperCaseColumnNames(final StringBuilder builder, final ResultSetMetaData metaData, final String newline) throws SQLException {
+        final int columns = metaData.getColumnCount();
+        for (int i = 1; i <= columns; i++) {
+            final String columnName = metaData.getColumnLabel(i);
+            // in order to use the same case for all database
+            builder.append(columnName.toUpperCase());
+            if (i < columns) {
+                builder.append(",");
+            } else {
+                // Special treatment of last column (to avoid having extra comma at the end):
+                builder.append(newline);
+            }
+        }
+        return columns;
     }
 
     @Override
