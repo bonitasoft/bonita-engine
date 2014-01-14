@@ -11,18 +11,18 @@ import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
  */
 public class ThrowsExceptionJob implements StatelessJob {
 
-    private static final long serialVersionUID = 3528070481384646426L;
+    private static final long serialVersionUID = 1L;
 
-    private boolean throwException = true;
+    private Boolean throwException = null;
 
     @Override
     public String getDescription() {
-        return "Job to throw a exception";
+        return "Job that throws an exception";
     }
 
     @Override
     public void execute() throws SJobExecutionException {
-        if (throwException) {
+        if (throwException != null && throwException) {
             throw new SJobExecutionException("exception");
         }
     }
