@@ -428,7 +428,7 @@
 		WHERE c.containerId = :containerId
 		AND c.containerType = :containerType
 		AND c.activationEvent = :activationEvent
-		AND (c.state = 'TO_BE_EXECUTED' OR c.state = 'TO_RE_EXECUTE')
+		AND (c.state = 'TO_BE_EXECUTED' OR c.state = 'TO_RE_EXECUTE' OR c.state = 'EXECUTING')
 		ORDER BY c.executionOrder
 	</query>
 	<query name="getConnectorInstances">

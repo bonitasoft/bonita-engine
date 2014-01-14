@@ -36,16 +36,51 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
- * Commands in the <b>BonitaBPM Execution Engine</b> are an extension point that allows to add / call behaviour that is not available by default through
- * provided APIs.
- * The CommandAPI gives access to command registration / unregistration to 'deploy' new commands.
- * The commands must be packed in jars and deployed /undeployed in the Engine as dependencies using methods {@link CommandAPI#addDependency(String, byte[])},
- * {@link #removeDependency(String)}
+ * Manipulate tenant commands. A command can be registered, unregistered, and executed with parameters.
+ * <p>
+ * Commands are used to extend engine behavior, and are classes that are called from this API and executed on the server side. <br/>
+ * A command is composed of a jar containing at least one class that implements {@link org.bonitasoft.engine.command.TenantCommand}.
+ * {@link org.bonitasoft.engine.command.system.CommandWithParameters} can be used to handle parameter more easily. The behavior of the command must be defined
+ * in the execute method of this class.
+ * </p>
+ * <p>
+ * The jar containing the command class must be added to the engine using the {@link addDependency} method with a name to identify the dependency so that it can
+ * be removed later.<br/>
+ * Then the command must be registered using {@link CommandAPI#register(String, String, String)} with a name to identify it and an implementation that is the
+ * fully qualified name of the command class.<br/>
+ * After registration, the command can be executed using {@link CommandAPI#execute(long, Map)} with the id returned by the register method or
+ * {@link CommandAPI#execute(String, Map)} with the name of the command and with a map of parameters required by the command.<br/>
+ * Finally the command can be removed using both {@link CommandAPI#unregister(long)} or {@link CommandAPI#unregister(String)} and
+ * {@link CommandAPI#removeDependency(String)}
+ * </p>
+ * 
+ * <pre>
+ * Code example: 
+ *  
+ * {@code
+ * byte[] byteArray = /* read the jar as a byte array * /
+ * 
+ *  //deploy
+ * getCommandAPI().addDependency("myCommandDependency", byteArray);
+ * getCommandAPI().register("myCommandName", "Retrieving the integer value", "org.bonitasoft.engine.command.IntergerCommand");
+ * 
+ *  //execute
+ * final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+ * parameters.put("aParamterName", "aParameterValue");
+ * parameters.put("anIntParameter", 42);
+ * Integer theResultOfTheCommandExecution = (Integer) getCommandAPI().execute("myCommandName", parameters);
+ * 
+ *  //undeploy
+ * getCommandAPI().unregister("myCommandName");
+ * getCommandAPI().removeDependency("myCommandDependency");
+ * }
+ * </pre>
  * 
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
+ * @author Baptiste Mesta
  * @see CommandDescriptor
  * @see #register(String, String, String)
  * @see #unregister(long)

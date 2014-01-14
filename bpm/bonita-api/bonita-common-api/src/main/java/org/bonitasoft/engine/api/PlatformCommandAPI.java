@@ -37,6 +37,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * The commands must be packed in jars and deployed /undeployed in the Engine as dependencies using methods {@link CommandAPI#addDependency(String, byte[])},
  * {@link #removeDependency(String)}
  * 
+ * @see CommandAPI
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  * @see CommandDescriptor
