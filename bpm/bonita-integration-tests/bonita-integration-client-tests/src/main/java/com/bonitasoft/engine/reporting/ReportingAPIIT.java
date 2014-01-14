@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -518,9 +517,9 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("INNER JOIN process_definition APS ON CS.PROCESSDEFINITIONID = APS.PROCESSID ");
         builder.append("WHERE CS.TENANTID = $P{BONITA_TENANT_ID} ");
         builder.append("AND APS.TENANTID = $P{BONITA_TENANT_ID} ");
+        builder.append("AND CS.STARTEDBY = 0 ");
         builder.append("$P!{__p_state_name} ");
         builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to} ");
-        builder.append("AND CS.STARTEDBY = 0 ");
         builder.append("$P!{_p_apps_id} ");
         builder.append("UNION ");
         builder.append("SELECT ");
@@ -563,7 +562,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("AND APS.TENANTID = $P{BONITA_TENANT_ID} ");
         builder.append("AND CS.STARTEDBY = 0 ");
         builder.append("$P!{__p_state_name} ");
-        builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to} ");
+        builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to}");
 
         String query = builder.toString();
         query = query.replace("$P{BONITA_TENANT_ID}", "1");
@@ -581,8 +580,9 @@ public class ReportingAPIIT extends CommonAPISPTest {
         final BusinessArchive endSignalArchive = archiveBuilder.done();
 
         processBuilder = new ProcessDefinitionBuilder();
+        String targetUserTask = "getAllArchivedProcessInstances_Task2";
         processBuilder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal").addSignalEventTrigger("GO")
-                .addUserTask("Task1", ACTOR_NAME).addTransition("StartOnSignal", "Task1");
+                .addUserTask(targetUserTask, ACTOR_NAME).addTransition("StartOnSignal", targetUserTask);
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(processBuilder.done());
         final BusinessArchive startSignalArchive = archiveBuilder.done();
 
@@ -596,29 +596,22 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
         // Check that the process with trigger signal on start is not started, before send signal
         final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
-        waitForUserTask("step1", processInstanceWithEndSignal);
+        HumanTaskInstance step1 = waitForUserTask("step1", processInstanceWithEndSignal);
         checkNbOfProcessInstances(1);
 
-        List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        assertEquals("step1", taskInstances.get(0).getName());
-
         // Send signal
-        assignAndExecuteStep(taskInstances.get(0), john.getId());
+        assignAndExecuteStep(step1, john.getId());
         waitForProcessToFinish(processInstanceWithEndSignal.getId());
 
         // Check that the process with trigger signal on start is started, after send signal
-        waitForUserTask("Task1");
+        HumanTaskInstance task2 = waitForUserTask(targetUserTask);
 
         String selectList = getReportingAPI().selectList(query);
         String[] split = selectList.split("\n");
         assertEquals(3, split.length);
 
-        taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        assertEquals("Task1", taskInstances.get(0).getName());
-        assignAndExecuteStep(taskInstances.get(0), john.getId());
-        waitForProcessToFinish(taskInstances.get(0).getParentContainerId());
+        assignAndExecuteStep(task2, john.getId());
+        waitForProcessToFinish(task2.getParentContainerId());
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         final SearchResult<ArchivedProcessInstance> search = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done());

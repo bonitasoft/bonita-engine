@@ -22,7 +22,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
         </property>
     </bean>  
 
-  <bean id="bonitaSequenceManagerDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close" depends-on="dataSourceDependency">
+  <bean id="bonitaSequenceManagerDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
     <property name="driverClass" value="${jdbc.driverClass}"/>
     <property name="jdbcUrl" value="${jdbc.url}"/>
     <property name="username" value="${jdbc.user}"/>
