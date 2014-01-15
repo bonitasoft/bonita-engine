@@ -1604,25 +1604,26 @@ public class ModelConvertor {
     }
 
     public static ProcessInstanceState getProcessInstanceState(final String state) {
-        ProcessInstanceState pis = null;
-        if (state.equalsIgnoreCase(ProcessInstanceState.ABORTED.toString())) {
-            pis = ProcessInstanceState.ABORTED;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.CANCELLED.toString())) {
-            pis = ProcessInstanceState.CANCELLED;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.COMPLETED.toString())) {
-            pis = ProcessInstanceState.COMPLETED;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.COMPLETING.toString())) {
-            pis = ProcessInstanceState.COMPLETING;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.ERROR.toString())) {
-            pis = ProcessInstanceState.ERROR;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.INITIALIZING.toString())) {
-            pis = ProcessInstanceState.INITIALIZING;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.STARTED.toString())) {
-            pis = ProcessInstanceState.STARTED;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.SUSPENDED.toString())) {
-            pis = ProcessInstanceState.SUSPENDED;
+        if (state != null) {
+            if (state.equalsIgnoreCase(ProcessInstanceState.ABORTED.toString())) {
+                return ProcessInstanceState.ABORTED;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.CANCELLED.toString())) {
+                return ProcessInstanceState.CANCELLED;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.COMPLETED.toString())) {
+                return ProcessInstanceState.COMPLETED;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.COMPLETING.toString())) {
+                return ProcessInstanceState.COMPLETING;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.ERROR.toString())) {
+                return ProcessInstanceState.ERROR;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.INITIALIZING.toString())) {
+                return ProcessInstanceState.INITIALIZING;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.STARTED.toString())) {
+                return ProcessInstanceState.STARTED;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.SUSPENDED.toString())) {
+                return ProcessInstanceState.SUSPENDED;
+            }
         }
-        return pis;
+        throw new IllegalArgumentException("Invalid process instance state: " + state);
     }
 
     public static Comment toComment(final SComment sComment) {
