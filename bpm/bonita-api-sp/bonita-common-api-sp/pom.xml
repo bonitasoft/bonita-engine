@@ -35,6 +35,8 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
+							<doctitle>BonitaB PM Engine ${project.version} API</doctitle>
+							<finalName>BonitaBPM-Engine-${project.version}</finalName>
 							<includeDependencySources>true</includeDependencySources>
         					<stylesheetfile>stylesheet.css</stylesheetfile>
 						</configuration>
