@@ -148,17 +148,7 @@ public class JobTest extends CommonServiceTest {
 
     @Test
     public void getFailedJobs_shouldRetrieveJobsIfAndOnlyIfThereAreFailedJobs() throws Exception {
-        int waitingIsGoodForYou = 0;
-        for (int i = 0; i < 100; i++) {
-            System.err.println("iteration " + i);
-            getFailedJobs_shouldRetrieveJobsIfAndOnlyIfThereAreFailedJobs__();
-        }
-        System.err.println("Waiting fixed " + waitingIsGoodForYou + " iterations over 50");
-    }
-
-    public void getFailedJobs_shouldRetrieveJobsIfAndOnlyIfThereAreFailedJobs__() throws Exception {
         final Date now = new Date();
-        getTransactionService().begin();
         final Trigger trigger = new OneExecutionTrigger("logevents", now, 10);
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(ThrowsExceptionJob.class.getName(), "ThrowExceptionJob2").done();
@@ -167,6 +157,7 @@ public class JobTest extends CommonServiceTest {
                 .createNewInstance(ThrowsExceptionJob.THROW_EXCEPTION, Boolean.TRUE).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>(1);
         parameters.add(parameter);
+        getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
 
