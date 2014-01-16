@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api;
@@ -164,7 +164,7 @@ public interface CommandAPI {
      * @since 6.0
      */
     Serializable execute(String name, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
-            CommandExecutionException;
+    CommandExecutionException;
 
     /**
      * Execute a command according to its id and a map of parameters.
@@ -185,7 +185,7 @@ public interface CommandAPI {
      * @since 6.0
      */
     Serializable execute(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
-            CommandExecutionException;
+    CommandExecutionException;
 
     /**
      * Delete a command through its name.
@@ -295,7 +295,7 @@ public interface CommandAPI {
      * 
      * @param commandId
      *            identifier of command to indicate which command will be updated
-     * @param updater
+     * @param updateDescriptor
      *            the update descriptor
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
@@ -305,7 +305,7 @@ public interface CommandAPI {
      *             occurs when an exception is thrown during command update
      * @since 6.0
      */
-    void update(long commandId, CommandUpdater updater) throws CommandNotFoundException, UpdateException;
+    void update(long commandId, CommandUpdater updateDescriptor) throws CommandNotFoundException, UpdateException;
 
     /**
      * Delete a command through its id.

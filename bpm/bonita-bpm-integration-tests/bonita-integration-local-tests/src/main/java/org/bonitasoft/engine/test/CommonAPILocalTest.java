@@ -45,12 +45,12 @@ public class CommonAPILocalTest extends CommonAPITest {
         }
     }
 
-    protected void setSessionInfo(final APISession session) throws Exception {
+    protected static void setSessionInfo(final APISession session) throws Exception {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
     }
 
-    protected void cleanSession() throws Exception {
+    protected static void cleanSession() throws Exception {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         sessionAccessor.deleteSessionId();
     }

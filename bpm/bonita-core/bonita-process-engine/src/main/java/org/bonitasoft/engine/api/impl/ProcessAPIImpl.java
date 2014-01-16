@@ -219,6 +219,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -433,7 +434,7 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilder;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorBuilderFactory;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.XMLWriter;
 
@@ -522,9 +523,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         // multiple tx here because we must lock instances when deleting them
         // but if the second tx crash we can relaunch delete process without issues
-        final TransactionService transactionService = tenantAccessor.getTransactionService();
+        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         try {
-            transactionService.executeInTransaction(new Callable<Void>() {
+            userTransactionService.executeInTransaction(new Callable<Void>() {
 
                 @Override
                 public Void call() throws Exception {
@@ -2836,14 +2837,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int assignedUserTaskInstanceNumber = (int) getNumberOfAssignedHumanTaskInstances(userId);
         final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
                 ActivityInstanceCriterion.DEFAULT);
-        String stateName;
-        if (userTaskInstances.size() != 0) {
-            for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
-                stateName = userTaskInstance.getState();
-                final long userTaskInstanceId = userTaskInstance.getId();
-                if (stateName.equals(ActivityStates.READY_STATE) && userTaskInstance.getParentContainerId() == processInstanceId) {
-                    return userTaskInstanceId;
-                }
+        for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
+            String stateName = userTaskInstance.getState();
+            final long userTaskInstanceId = userTaskInstance.getId();
+            if (stateName.equals(ActivityStates.READY_STATE) && userTaskInstance.getParentContainerId() == processInstanceId) {
+                return userTaskInstanceId;
             }
         }
         return -1;
@@ -2862,22 +2860,19 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int assignedUserTaskInstanceNumber = (int) getNumberOfAssignedHumanTaskInstances(userId);
         final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
                 ActivityInstanceCriterion.DEFAULT);
-        String stateName;
-        if (userTaskInstances.size() != 0) {
-            for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
-                stateName = userTaskInstance.getState();
-                ProcessInstance processInstance;
-                try {
-                    final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService,
-                            searchProcessInstanceDescriptor, userTaskInstance.getRootContainerId());
-                    getProcessInstance.execute();
-                    processInstance = getProcessInstance.getResult();
-                } catch (final SBonitaException e) {
-                    throw new RetrieveException(e);
-                }
-                if (stateName.equals(ActivityStates.READY_STATE) && processInstance.getProcessDefinitionId() == processDefinitionId) {
-                    return userTaskInstance.getId();
-                }
+        for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
+            String stateName = userTaskInstance.getState();
+            ProcessInstance processInstance;
+            try {
+                final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService,
+                        searchProcessInstanceDescriptor, userTaskInstance.getRootContainerId());
+                getProcessInstance.execute();
+                processInstance = getProcessInstance.getResult();
+            } catch (final SBonitaException e) {
+                throw new RetrieveException(e);
+            }
+            if (stateName.equals(ActivityStates.READY_STATE) && processInstance.getProcessDefinitionId() == processDefinitionId) {
+                return userTaskInstance.getId();
             }
         }
         return -1;
@@ -3372,17 +3367,21 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void deleteProcessInstanceInTransaction(final TenantServiceAccessor tenantAccessor, final long processInstanceId) throws SBonitaException {
-        final TransactionService transactionService = tenantAccessor.getTransactionService();
+        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
 
-        transactionService.begin();
         try {
-            processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
+            userTransactionService.executeInTransaction(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
+                    return null;
+                };
+            });
         } catch (final SBonitaException e) {
-            transactionService.setRollbackOnly();
             throw e;
-        } finally {
-            transactionService.complete();
+        } catch (Exception e) {
+            throw new SBonitaRuntimeException("Error while deleting the parent process instance and elements", e);
         }
     }
 
@@ -3391,18 +3390,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     public long deleteProcessInstances(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-        final TransactionService txService = tenantAccessor.getTransactionService();
+        final UserTransactionService userTxService = tenantAccessor.getUserTransactionService();
         try {
-            txService.begin();
-            final List<SProcessInstance> sProcessInstances;
-            try {
-                sProcessInstances = searchProcessInstancesFromProcessDefinition(processInstanceService, processDefinitionId, startIndex, maxResults);
-            } catch (final SBonitaSearchException e) {
-                txService.setRollbackOnly();
-                throw e;
-            } finally {
-                txService.complete();
-            }
+            final List<SProcessInstance> sProcessInstances = userTxService.executeInTransaction(new Callable<List<SProcessInstance>>() {
+                @Override
+                public List<SProcessInstance> call() throws SBonitaSearchException {
+                    return searchProcessInstancesFromProcessDefinition(processInstanceService, processDefinitionId, startIndex, maxResults);
+                }
+            });
 
             if (sProcessInstances.isEmpty()) {
                 return 0;
@@ -3413,20 +3408,17 @@ public class ProcessAPIImpl implements ProcessAPI {
             List<BonitaLock> locks = null;
             try {
                 locks = createLockProcessInstances(lockService, objectType, sProcessInstances, tenantAccessor.getTenantId());
-                txService.begin();
-                try {
-                    return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
-                } catch (final Exception e) {
-                    txService.setRollbackOnly();
-                    throw new DeletionException(e);
-                } finally {
-                    txService.complete();
-                }
+                return userTxService.executeInTransaction(new Callable<Long>() {
+                    @Override
+                    public Long call() throws Exception {
+                        return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
+                    }
+                });
             } finally {
                 releaseLocks(tenantAccessor, lockService, locks, tenantAccessor.getTenantId());
             }
 
-        } catch (final SBonitaException e) {
+        } catch (final Exception e) {
             throw new DeletionException(e);
         }
     }

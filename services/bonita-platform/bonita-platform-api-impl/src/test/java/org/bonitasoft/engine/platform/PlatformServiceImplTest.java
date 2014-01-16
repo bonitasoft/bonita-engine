@@ -47,7 +47,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -84,7 +83,7 @@ public class PlatformServiceImplTest {
         when(sTenantFactory.getNameKey()).thenReturn("name");
         when(sTenantFactory.getStatusKey()).thenReturn("status");
     }
-    
+
     /**
      * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getDefaultTenant()}.
      */

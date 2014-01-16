@@ -75,29 +75,6 @@ public interface TransactionService extends UserTransactionService {
     boolean isRollbackOnly() throws STransactionException;
 
     /**
-     * Register a synchronization object for the transaction currently
-     * associated with the target object. The transaction manager invokes
-     * the beforeCompletion method prior to starting the two-phase transaction
-     * commit process. After the transaction is completed, the transaction
-     * manager invokes the afterCompletion method.
-     *
-     * @param txSync
-     *            The Synchronization object for the transaction associated
-     *            with the target object.
-     * @exception RollbackException
-     *                Thrown to indicate that
-     *                the transaction has been marked for rollback only.
-     * @exception IllegalStateException
-     *                Thrown if the transaction in the
-     *                target object is in the prepared state or the transaction is
-     *                inactive.
-     * @exception STransactionNotFoundException
-     *                Thrown if the transaction manager
-     *                encounters an unexpected error condition.
-     */
-    void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException;
-
-    /**
      * Get the number of active transactions (i.e. transactions that opened but not yet completed or rolledback).
      * A transaction that was just mark as "rollbackOnly" is considered as an active one.
      * @return
