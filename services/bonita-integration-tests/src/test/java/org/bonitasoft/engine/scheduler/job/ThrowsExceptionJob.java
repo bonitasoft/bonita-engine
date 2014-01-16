@@ -13,6 +13,8 @@ public class ThrowsExceptionJob implements StatelessJob {
 
     private static final long serialVersionUID = 1L;
 
+    public static final String THROW_EXCEPTION = "throwException";
+
     private Boolean throwException = null;
 
     @Override
@@ -23,18 +25,18 @@ public class ThrowsExceptionJob implements StatelessJob {
     @Override
     public void execute() throws SJobExecutionException {
         if (throwException != null && throwException) {
-            throw new SJobExecutionException("exception");
+            throw new SJobExecutionException("This job throws an arbitrary exception");
         }
     }
 
     @Override
     public String getName() {
-        return "exception";
+        return "ThrowsExceptionJob";
     }
 
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) {
-        final Boolean result = (Boolean) attributes.get("throwException");
+        final Boolean result = (Boolean) attributes.get(THROW_EXCEPTION);
         if (result != null) {
             throwException = result;
         }
