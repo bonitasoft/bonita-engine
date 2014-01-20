@@ -15,15 +15,31 @@ package org.bonitasoft.engine.bpm.actor;
 
 import java.io.Serializable;
 
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+
 /**
+ * ActorDefinition forms part of the ProcessDefinition. It is used to design an actor in the context of a process.
+ * 
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
+ * @see ProcessDefinition
+ * @see "The BPMN specification"
  */
 public interface ActorDefinition extends Serializable {
 
+    /**
+     * @return the logical name of the actor.
+     */
     String getName();
 
+    /**
+     * @return the description given to this actor.
+     */
     String getDescription();
 
+    /**
+     * @return true if this actor is the actor initiator of the process, that is, the actor that can start the process.
+     */
     boolean isInitiator();
 
 }
