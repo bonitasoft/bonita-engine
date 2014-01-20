@@ -20,6 +20,7 @@
 		<module>bonita-deploy</module>
 		<module>bonita-util-sp</module>
 		<module>bonita-synchro-repository-sp</module>
+		<module>bonita-api-sp</module>
 	</modules>
 
 	<profiles>

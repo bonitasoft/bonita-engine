@@ -16,7 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author Emmanuel Duchastenier
  */
 @RunWith(Suite.class)
-@SuiteClasses({ BusinessArchiveTests.class, org.bonitasoft.engine.bar.BusinessArchiveTests.class })
+@SuiteClasses({ BusinessArchiveTests.class, org.bonitasoft.engine.bar.BusinessArchiveTest.class })
 public class BusinessArchiveTestSuite {
 
 }
