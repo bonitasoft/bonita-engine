@@ -25,6 +25,12 @@
 
 	<profiles>
 		<profile>
+			<id>javadoc</id>
+			<modules>
+				<module>bonita-global-javadoc</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>tests</id>
 			<modules>
 				<module>bonita-integration-tests</module>
