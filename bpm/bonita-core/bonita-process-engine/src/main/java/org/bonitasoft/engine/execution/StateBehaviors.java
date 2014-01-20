@@ -77,6 +77,7 @@ import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
