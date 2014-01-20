@@ -47,6 +47,7 @@
 						</goals>
 						<configuration>
 							<doctitle>Bonita BPM Engine ${project.version} API</doctitle>
+							<windowtitle>Bonita BPM Engine ${project.version} API</windowtitle>
 							<finalName>Bonita-BPM-Engine-${project.version}</finalName>
         					<stylesheetfile>stylesheet.css</stylesheetfile>
 							<includeDependencySources>true</includeDependencySources>
