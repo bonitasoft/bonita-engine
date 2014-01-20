@@ -38,6 +38,8 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * 
  * @see CommandAPI
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
+ * @see CommandDescriptor
  */
 public interface PlatformCommandAPI {
 
@@ -134,9 +136,24 @@ public interface PlatformCommandAPI {
      *             occurs when the session is not valid
      * @throws CommandNotFoundException
      *             occurs when the command name does not refer to an existing command.
-     * @throws CreationException
+     * @deprecated As of release 6.2.1, replaced by {@link #getCommand(String)} that does not throw CreationException.
      */
+    @Deprecated
     CommandDescriptor get(String name) throws CommandNotFoundException, CreationException;
+
+    /**
+     * Returns the command descriptor corresponding to the command name passed as parameter.
+     * 
+     * @param commandName
+     *            the name of the command.
+     * @return the descriptor of the command
+     * @throws InvalidSessionException
+     *             occurs when the session is not valid
+     * @throws CommandNotFoundException
+     *             occurs when the command name does not refer to an existing command.
+     * @since 6.2.1
+     */
+    CommandDescriptor getCommand(String commandName) throws CommandNotFoundException;
 
     /**
      * Returns the paginated list of command descriptors according to the sort criterion.

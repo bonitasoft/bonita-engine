@@ -84,6 +84,12 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * @author Yanyan Liu
  * @author Celine Souchet
  * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
+ * @see CommandDescriptor
+ * @see #register(String, String, String)
+ * @see #unregister(long)
+ * @see #addDependency(String, byte[])
+ * @see #removeDependency(String)
  */
 public interface CommandAPI {
 
@@ -248,7 +254,7 @@ public interface CommandAPI {
      * 
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws CommandDeletionException
+     * @throws DeletionException
      *             occurs when an exception is thrown during command (unregistering) deletion
      * @since 6.0
      */
@@ -295,7 +301,7 @@ public interface CommandAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the command id does not refer to any existing command
-     * @throws CommandUpdateException
+     * @throws UpdateException
      *             occurs when an exception is thrown during command update
      * @since 6.0
      */
@@ -310,7 +316,7 @@ public interface CommandAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the name does not refer to any existing command.
-     * @throws CommandDeletionException
+     * @throws DeletionException
      *             occurs when an exception is thrown during command deletion
      * @since 6.0
      */

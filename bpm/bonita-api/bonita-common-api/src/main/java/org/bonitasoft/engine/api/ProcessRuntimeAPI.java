@@ -82,6 +82,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * @author Frederic Bouquet
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 public interface ProcessRuntimeAPI {
 
@@ -115,7 +116,7 @@ public interface ProcessRuntimeAPI {
 
     /**
      * List all process instances.
-     *
+     * 
      * @param searchOptions
      *            the search criterion.
      * @return a processInstance object.
@@ -234,6 +235,8 @@ public interface ProcessRuntimeAPI {
      * @return the number of open activity instances.
      *         #throws ProcessInstanceNotFoundException
      *         if the specified process instacne id does not refer to a process instance.
+     * @throws ProcessInstanceNotFoundException
+     *             if no matching process definition is found for parameter processInstanceId
      * @since 6.0
      */
     int getNumberOfOpenedActivityInstances(long processInstanceId) throws ProcessInstanceNotFoundException;
@@ -280,8 +283,7 @@ public interface ProcessRuntimeAPI {
      * @throws DeletionException
      *             if other deletion problem occurs.
      * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int, ProcessInstanceCriterion)} and
-     *             {@link #deleteArchivedProcessInstances(long, int, int)}
+     * @deprecated As of release 6.1, replaced by {@link #deleteProcessInstances(long, int, int)} and {@link #deleteArchivedProcessInstances(long, int, int)}
      */
     @Deprecated
     void deleteProcessInstances(long processDefinitionId) throws DeletionException;
@@ -384,10 +386,14 @@ public interface ProcessRuntimeAPI {
      * @param processDefinitionId
      *            the identifier of the process definition for which an instance will be started.
      * @return an instance of the process.
+     * @throws UserNotFoundException
+     *             if the given user does not exist.
      * @throws ProcessDefinitionNotFoundException
      *             if no matching process definition is found.
      * @throws ProcessActivationException
      *             if a problem occurs when starting the process.
+     * @throws ProcessExecutionException
+     *             if an execution problem occurs when starting the process.
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
@@ -497,6 +503,8 @@ public interface ProcessRuntimeAPI {
      * @param flowNodeInstanceId
      *            the identifier of the flow node instance.
      * @return the matching flow node instance.
+     * @throws FlowNodeInstanceNotFoundException
+     *             if the given flownode instance does not exist.
      * @since 6.0
      */
     FlowNodeInstance getFlowNodeInstance(final long flowNodeInstanceId) throws FlowNodeInstanceNotFoundException;
@@ -745,6 +753,8 @@ public interface ProcessRuntimeAPI {
      *            the name of the data instance.
      * @param activityInstanceId
      *            the identifier of the activity instance.
+     * @param dataValue
+     *            the new value of the data to set.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws UpdateException
@@ -777,6 +787,8 @@ public interface ProcessRuntimeAPI {
      *            the activity identifier.
      * @param variables
      *            a map which contains several pairs of variable name and value.
+     * @throws UpdateException
+     *             if a problem occurs while updating one of the data instance value.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -808,8 +820,10 @@ public interface ProcessRuntimeAPI {
      *            teh identifier of the task to update.
      * @param dueDate
      *            the new due date for the task.
+     * @throws UpdateException
+     *             if the activity does not exist or the update cannot be fulfilled.
      * @throws InvalidSessionException
-     *             if the activity does not exist.
+     *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     void updateDueDateOfTask(long userTaskId, Date dueDate) throws UpdateException;
@@ -822,6 +836,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *            the identifier of the user.
      * @return the id of a user task from the process instance that is assigned to the user.
+     * @throws ProcessInstanceNotFoundException
+     *             if the given process instance does not exist.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws UserNotFoundException
@@ -840,6 +856,10 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *            the identifier of a user.
      * @return the id of a user task from the process definition that is assigned to the user.
+     * @throws ProcessDefinitionNotFoundException
+     *             if the given process definition does not exist.
+     * @throws UserNotFoundException
+     *             if the given user does not exist.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @throws RetrieveException
@@ -890,6 +910,8 @@ public interface ProcessRuntimeAPI {
      *             if the session is invalid, e.g. the session has expired.
      * @throws ActivityInstanceNotFoundException
      *             if the activity cannot be found.
+     * @throws UpdateException
+     *             if a problem occurs while release (un-assigning) the user task.
      * @since 6.0
      */
     void releaseUserTask(long userTaskId) throws ActivityInstanceNotFoundException, UpdateException;
@@ -921,6 +943,8 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *            the identifier of the process instance.
      * @return an archived process instance.
+     * @throws ArchivedProcessInstanceNotFoundException
+     *             if no archived process instance can be found with the provided Id.
      * @throws InvalidSessionException
      *             if no current valid session is found.
      * @throws RetrieveException
@@ -1051,6 +1075,8 @@ public interface ProcessRuntimeAPI {
      * @param searchOptions
      *            the search conditions and the options for sorting and paging the results.
      * @return the archived human tasks that match the search conditions.
+     * @throws SearchException
+     *             if the search could not be completed correctly.
      * @throws InvalidSessionException
      *             if the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1474,7 +1500,7 @@ public interface ProcessRuntimeAPI {
      *             if the session is invalid, e.g session has expired.
      * @throws SearchException
      *             if an exception occurs during the search.
-     * @see {@link ArchivedFlowNodeInstance}
+     * @see ArchivedFlowNodeInstance
      * @since 6.0
      */
     SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstances(SearchOptions searchOptions) throws SearchException;
@@ -1754,9 +1780,11 @@ public interface ProcessRuntimeAPI {
      * Search for archived process instances in all states (even intermediate states). Depending on used filters several ArchivedProcessInstance will be
      * retrieved for a single ProcessInstance (one for each reached state).
      * 
-     * @param searchOptions the search options (pagination, filter, order sort).
-     * @return  the archived process instances in all states that match the search options.
-     * @throws SearchException if the search could not be completed correctly.
+     * @param searchOptions
+     *            the search options (pagination, filter, order sort).
+     * @return the archived process instances in all states that match the search options.
+     * @throws SearchException
+     *             if the search could not be completed correctly.
      * @since 6.2
      */
     SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInAllStates(SearchOptions searchOptions) throws SearchException;

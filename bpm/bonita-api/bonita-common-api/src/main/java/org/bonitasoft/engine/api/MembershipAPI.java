@@ -26,13 +26,17 @@ import org.bonitasoft.engine.identity.UserMembershipCriterion;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
+ * MembershipAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on <code>UserMembership</code>s:
+ * creation, deletion, updating, retrieval, etc...
+ * 
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
+ * @see UserMembership
  */
 public interface MembershipAPI {
 
     /**
      * Associates the user with the group and the role.
-     * <b>
      * The association is called a user membership.
      * 
      * @param userId
@@ -54,7 +58,6 @@ public interface MembershipAPI {
 
     /**
      * Associates the users with the group and the role.
-     * <b>
      * The association is called a user membership.
      * 
      * @param userIds
@@ -63,7 +66,6 @@ public interface MembershipAPI {
      *            the identifier of the group
      * @param roleId
      *            the identifier of the role
-     * @return the user membership
      * @throws AlreadyExistsException
      *             If the triplet userId/groupId/roleId is already taken by an existing user membership
      * @throws CreationException
@@ -76,7 +78,6 @@ public interface MembershipAPI {
 
     /**
      * Changes the association of the user membership.
-     * <b>
      * It associates the user membership to the new role and group identifiers.
      * 
      * @param userMembershipId
@@ -146,8 +147,9 @@ public interface MembershipAPI {
     /**
      * Retrieves the user membership.
      * 
-     * @param userMembershipId
-     *            the identifier of the user membership
+     * @param membershipId
+     *            the identifier of the user membership to retrieve.
+     * @return the found <code>UserMembership</code> with the provided id
      * @throws MembershipNotFoundException
      *             If the identifier of the user membership does not refer to an existing user membership
      * @throws RetrieveException
@@ -172,7 +174,6 @@ public interface MembershipAPI {
 
     /**
      * Retrieves the paginated list of user memberships of the user.
-     * <b>
      * It retrieves from the startIndex to the startIndex + maxResults.
      * 
      * @param userId
@@ -194,7 +195,6 @@ public interface MembershipAPI {
 
     /**
      * Retrieves the paginated list of user memberships of the group.
-     * <b>
      * It retrieves from the startIndex to the startIndex + maxResults.
      * 
      * @param groupId
@@ -214,7 +214,6 @@ public interface MembershipAPI {
 
     /**
      * Retrieves the paginated list of user memberships of the role.
-     * <b>
      * It retrieves from the startIndex to the startIndex + maxResults.
      * 
      * @param roleId

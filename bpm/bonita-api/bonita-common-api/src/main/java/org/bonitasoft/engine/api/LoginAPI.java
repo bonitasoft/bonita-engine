@@ -19,8 +19,12 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 
 /**
+ * The LoginAPI allows to log in (and out) onto the Engine. This is a mandatory step to go further using the Engine APIs.
+ * Other Engine APIs are only accessible through the returned APISession.
+ * 
  * @author Matthieu Chaffotte
  * @author Zhang Bole
+ * @see APISession
  */
 public interface LoginAPI {
 
@@ -35,7 +39,7 @@ public interface LoginAPI {
      * @throws LoginException
      *             occurs when an exception is thrown during login
      */
-	@NoSessionRequired
+    @NoSessionRequired
     APISession login(String userName, String password) throws LoginException;
 
     /**
@@ -48,7 +52,7 @@ public interface LoginAPI {
      * @throws LogoutException
      *             occurs when an exception is thrown during the logout
      */
-	@NoSessionRequired
+    @NoSessionRequired
     void logout(APISession session) throws SessionNotFoundException, LogoutException;
 
 }
