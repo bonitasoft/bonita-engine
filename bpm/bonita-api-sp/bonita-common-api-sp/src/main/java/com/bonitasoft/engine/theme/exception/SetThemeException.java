@@ -11,7 +11,10 @@ package com.bonitasoft.engine.theme.exception;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Thrown when setting a new custom theme cannot be fulfilled.
+ * 
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 public class SetThemeException extends BonitaException {
 
