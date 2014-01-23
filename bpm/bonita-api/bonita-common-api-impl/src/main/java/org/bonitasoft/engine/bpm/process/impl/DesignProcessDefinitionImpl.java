@@ -212,6 +212,16 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     }
 
     @Override
+    public String toString() {
+        return "DesignProcessDefinitionImpl [displayName=" + displayName + ", displayDescription=" + displayDescription + ", parameters=" + parameters
+                + ", actors=" + actors + ", actorInitiator=" + actorInitiator + ", flowElementContainer=" + flowElementContainer + ", stringIndexLabel1="
+                + stringIndexLabel1 + ", stringIndexLabel2=" + stringIndexLabel2 + ", stringIndexLabel3=" + stringIndexLabel3 + ", stringIndexLabel4="
+                + stringIndexLabel4 + ", stringIndexLabel5=" + stringIndexLabel5 + ", stringIndexValue1=" + stringIndexValue1 + ", stringIndexValue2="
+                + stringIndexValue2 + ", stringIndexValue3=" + stringIndexValue3 + ", stringIndexValue4=" + stringIndexValue4 + ", stringIndexValue5="
+                + stringIndexValue5 + "]";
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -235,140 +245,95 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(final Object obj) {
+        if (this == obj)
             return true;
-        }
-        if (!super.equals(obj)) {
+        if (!super.equals(obj))
             return false;
-        }
-        if (!(obj instanceof DesignProcessDefinitionImpl)) {
+        if (getClass() != obj.getClass())
             return false;
-        }
         DesignProcessDefinitionImpl other = (DesignProcessDefinitionImpl) obj;
         if (actorInitiator == null) {
-            if (other.actorInitiator != null) {
+            if (other.actorInitiator != null)
                 return false;
-            }
-        } else if (!actorInitiator.equals(other.actorInitiator)) {
+        } else if (!actorInitiator.equals(other.actorInitiator))
             return false;
-        }
         if (actors == null) {
-            if (other.actors != null) {
+            if (other.actors != null)
                 return false;
-            }
-        } else if (!actors.equals(other.actors)) {
+        } else if (!actors.equals(other.actors))
             return false;
-        }
         if (displayDescription == null) {
-            if (other.displayDescription != null) {
+            if (other.displayDescription != null)
                 return false;
-            }
-        } else if (!displayDescription.equals(other.displayDescription)) {
+        } else if (!displayDescription.equals(other.displayDescription))
             return false;
-        }
         if (displayName == null) {
-            if (other.displayName != null) {
+            if (other.displayName != null)
                 return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
+        } else if (!displayName.equals(other.displayName))
             return false;
-        }
         if (flowElementContainer == null) {
-            if (other.flowElementContainer != null) {
+            if (other.flowElementContainer != null)
                 return false;
-            }
-        } else if (!flowElementContainer.equals(other.flowElementContainer)) {
+        } else if (!flowElementContainer.equals(other.flowElementContainer))
             return false;
-        }
         if (parameters == null) {
-            if (other.parameters != null) {
+            if (other.parameters != null)
                 return false;
-            }
-        } else if (!parameters.equals(other.parameters)) {
+        } else if (!parameters.equals(other.parameters))
             return false;
-        }
         if (stringIndexLabel1 == null) {
-            if (other.stringIndexLabel1 != null) {
+            if (other.stringIndexLabel1 != null)
                 return false;
-            }
-        } else if (!stringIndexLabel1.equals(other.stringIndexLabel1)) {
+        } else if (!stringIndexLabel1.equals(other.stringIndexLabel1))
             return false;
-        }
         if (stringIndexLabel2 == null) {
-            if (other.stringIndexLabel2 != null) {
+            if (other.stringIndexLabel2 != null)
                 return false;
-            }
-        } else if (!stringIndexLabel2.equals(other.stringIndexLabel2)) {
+        } else if (!stringIndexLabel2.equals(other.stringIndexLabel2))
             return false;
-        }
         if (stringIndexLabel3 == null) {
-            if (other.stringIndexLabel3 != null) {
+            if (other.stringIndexLabel3 != null)
                 return false;
-            }
-        } else if (!stringIndexLabel3.equals(other.stringIndexLabel3)) {
+        } else if (!stringIndexLabel3.equals(other.stringIndexLabel3))
             return false;
-        }
         if (stringIndexLabel4 == null) {
-            if (other.stringIndexLabel4 != null) {
+            if (other.stringIndexLabel4 != null)
                 return false;
-            }
-        } else if (!stringIndexLabel4.equals(other.stringIndexLabel4)) {
+        } else if (!stringIndexLabel4.equals(other.stringIndexLabel4))
             return false;
-        }
         if (stringIndexLabel5 == null) {
-            if (other.stringIndexLabel5 != null) {
+            if (other.stringIndexLabel5 != null)
                 return false;
-            }
-        } else if (!stringIndexLabel5.equals(other.stringIndexLabel5)) {
+        } else if (!stringIndexLabel5.equals(other.stringIndexLabel5))
             return false;
-        }
         if (stringIndexValue1 == null) {
-            if (other.stringIndexValue1 != null) {
+            if (other.stringIndexValue1 != null)
                 return false;
-            }
-        } else if (!stringIndexValue1.equals(other.stringIndexValue1)) {
+        } else if (!stringIndexValue1.equals(other.stringIndexValue1))
             return false;
-        }
         if (stringIndexValue2 == null) {
-            if (other.stringIndexValue2 != null) {
+            if (other.stringIndexValue2 != null)
                 return false;
-            }
-        } else if (!stringIndexValue2.equals(other.stringIndexValue2)) {
+        } else if (!stringIndexValue2.equals(other.stringIndexValue2))
             return false;
-        }
         if (stringIndexValue3 == null) {
-            if (other.stringIndexValue3 != null) {
+            if (other.stringIndexValue3 != null)
                 return false;
-            }
-        } else if (!stringIndexValue3.equals(other.stringIndexValue3)) {
+        } else if (!stringIndexValue3.equals(other.stringIndexValue3))
             return false;
-        }
         if (stringIndexValue4 == null) {
-            if (other.stringIndexValue4 != null) {
+            if (other.stringIndexValue4 != null)
                 return false;
-            }
-        } else if (!stringIndexValue4.equals(other.stringIndexValue4)) {
+        } else if (!stringIndexValue4.equals(other.stringIndexValue4))
             return false;
-        }
         if (stringIndexValue5 == null) {
-            if (other.stringIndexValue5 != null) {
+            if (other.stringIndexValue5 != null)
                 return false;
-            }
-        } else if (!stringIndexValue5.equals(other.stringIndexValue5)) {
+        } else if (!stringIndexValue5.equals(other.stringIndexValue5))
             return false;
-        }
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return "DesignProcessDefinitionImpl [displayName=" + displayName + ", displayDescription=" + displayDescription + ", parameters=" + parameters
-                + ", actors=" + actors + ", actorInitiator=" + actorInitiator + ", flowElementContainer=" + flowElementContainer + ", stringIndexLabel1="
-                + stringIndexLabel1 + ", stringIndexLabel2=" + stringIndexLabel2 + ", stringIndexLabel3=" + stringIndexLabel3 + ", stringIndexLabel4="
-                + stringIndexLabel4 + ", stringIndexLabel5=" + stringIndexLabel5 + ", stringIndexValue1=" + stringIndexValue1 + ", stringIndexValue2="
-                + stringIndexValue2 + ", stringIndexValue3=" + stringIndexValue3 + ", stringIndexValue4=" + stringIndexValue4 + ", stringIndexValue5="
-                + stringIndexValue5 + "]";
     }
 
 }

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.BaseElement;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -42,7 +43,6 @@ public interface FlowElementContainerDefinition extends BaseElement {
     Set<TransitionDefinition> getTransitions();
 
     /**
-     * 
      * @return A set of GatewayDefinition
      * @see #getGatewaysList()
      * @since 6.0
@@ -52,7 +52,6 @@ public interface FlowElementContainerDefinition extends BaseElement {
     Set<GatewayDefinition> getGateways();
 
     /**
-     * 
      * @return A list of GatewayDefinition
      * @since 6.1
      */
@@ -69,6 +68,8 @@ public interface FlowElementContainerDefinition extends BaseElement {
     List<EndEventDefinition> getEndEvents();
 
     List<DataDefinition> getDataDefinitions();
+
+    List<BusinessDataDefinition> getBusinessDataDefinitions();
 
     List<DocumentDefinition> getDocumentDefinitions();
 
