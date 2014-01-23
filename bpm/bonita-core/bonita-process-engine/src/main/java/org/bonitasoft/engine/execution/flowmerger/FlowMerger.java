@@ -48,14 +48,7 @@ public class FlowMerger {
         if(flowNodewrapper.isNull() || flowNodewrapper.isBoundaryEvent() || flowNodewrapper.isExclusive() || transitionsWrapper.isLastFlowNode()) {
             return false;
         }
-        if (transitionsWrapper.hasMultipleOutgoingTransitions()) {
-            return true;
-        }
-//        if(transitionsWrapper.isManyToOne()) {
-//            return tokenProvider.mustCreateToken();
-//        }
-
-        return false;
+        return transitionsWrapper.hasMultipleOutgoingTransitions();
     }
     
     public boolean isImplicitEnd() {
