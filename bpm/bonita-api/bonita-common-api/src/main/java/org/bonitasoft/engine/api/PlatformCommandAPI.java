@@ -31,13 +31,14 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
- * Commands in the <b>BonitaBPM Execution Engine</b> are an extension point that allows to add / call behaviour that is not available by default through
- * provided APIs.
- * The PlatformCommandAPI gives access to command registration / unregistration to 'deploy' new commands at platform level.
- * The commands must be packed in jars and deployed /undeployed in the Engine as dependencies using methods {@link CommandAPI#addDependency(String, byte[])},
- * {@link #removeDependency(String)}
  * 
- * @see CommandAPI
+ * Manipulate tenant commands. A command can be registered, unregistered, and executed with parameters.<br/>
+ * These command are executed in the platform scope. See {@link CommandAPI} for more explanations of how to deploy, execute and undeploy a command. The only
+ * difference between API and {@link CommandAPI} is that these commands must extend {@link org.bonitasoft.engine.command.PlatformCommand}.
+ * Manipulate tenant commands, it can be registered, unregistered and executed with parameters.<br/>
+ * These command are executed in a platform scope, see {@link CommandAPI} for more explanations on how to deploy, execute and undeploy a command. The only
+ * difference with {@link CommandAPI} is that here commands must extends {@link org.bonitasoft.engine.command.PlatformCommand}.
+ * 
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  * @see CommandDescriptor

@@ -18,6 +18,8 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -48,8 +50,13 @@ public class WorkFactory {
                 contextDependency, processInstanceId)), processInstanceId));
     }
 
-    public static BonitaWork createExecuteMessageCoupleWork(final long messageInstanceId, final long waitingMessageId) {
-        return new FailureHandlingBonitaWork(new TxBonitaWork(new ExecuteMessageCoupleWork(messageInstanceId, waitingMessageId)));
+    public static BonitaWork createExecuteMessageCoupleWork(final SMessageInstance messageInstance, final SWaitingMessageEvent waitingMessage) {
+        // no target process: we do not wrap in a LockProcessInstanceWork
+        BonitaWork work = new TxBonitaWork(new ExecuteMessageCoupleWork(messageInstance.getId(), waitingMessage.getId()));
+        if (waitingMessage.getParentProcessInstanceId() > 0) {
+            work = new LockProcessInstanceWork(work, waitingMessage.getParentProcessInstanceId());
+        }
+        return new FailureHandlingBonitaWork(work);
     }
 
     public static BonitaWork createNotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,

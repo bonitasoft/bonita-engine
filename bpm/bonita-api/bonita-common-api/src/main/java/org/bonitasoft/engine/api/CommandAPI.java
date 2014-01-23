@@ -39,10 +39,11 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * Manipulate tenant commands. A command can be registered, unregistered, and executed with parameters.
  * <p>
  * Commands are used to extend engine behavior, and are classes that are called from this API and executed on the server side. <br/>
- * A command is composed of a jar containing at least one class that implements {@link org.bonitasoft.engine.command.TenantCommand}.
- * {@link org.bonitasoft.engine.command.system.CommandWithParameters} can be used to handle parameter more easily. The behavior of the command must be defined
- * in the execute method of this class.
- * </p>
+ * <p>
+ * A command is composed of a jar containing at least one class that implements org.bonitasoft.engine.command.TenantCommand.
+ * org.bonitasoft.engine.command.system.CommandWithParameters can be used to handle parameter more easily. The behavior of the command must be defined in the
+ * execute method of this class.<br/>
+ * TenantCommand is a class available only in bonita-server.jar. In order to create the jar you will need to have a dependency on that jar.
  * <p>
  * The jar containing the command class must be added to the engine using the {@link addDependency} method with a name to identify the dependency so that it can
  * be removed later.<br/>
@@ -55,14 +56,18 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * </p>
  * 
  * <pre>
- * Code example: 
+ * Code example:<br/> 
+ * 
+ * In this example we deploy a command named "myCommandName". The class that implements TenantCommand is org.bonitasoft.engine.command.IntegerCommand and 
+ * is contained in the jar we deploy using CommandAPI.addDependency.
  *  
  * {@code
- * byte[] byteArray = /* read the jar as a byte array * /
+ *  
+ * byte[] byteArray = /* read the jar containing the command as a byte array * /
  * 
  *  //deploy
  * getCommandAPI().addDependency("myCommandDependency", byteArray);
- * getCommandAPI().register("myCommandName", "Retrieving the integer value", "org.bonitasoft.engine.command.IntergerCommand");
+ * getCommandAPI().register("myCommandName", "Retrieving the integer value", "org.bonitasoft.engine.command.IntegerCommand");
  * 
  *  //execute
  * final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
@@ -81,6 +86,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
  * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  * @see CommandDescriptor
  * @see #register(String, String, String)
  * @see #unregister(long)

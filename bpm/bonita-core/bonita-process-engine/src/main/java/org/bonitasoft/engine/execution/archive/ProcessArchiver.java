@@ -146,7 +146,7 @@ public class ProcessArchiver {
     }
 
     private static void archiveProcessInstance(final SProcessInstance processInstance, final ArchiveService archiveService,
-            final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger, 
+            final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger,
             final SAProcessInstance saProcessInstance, final long archiveDate) throws SArchivingException {
         try {
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saProcessInstance);
@@ -246,33 +246,35 @@ public class ProcessArchiver {
         try {
             final long archiveDate = System.currentTimeMillis();
             // Remove data instance + data visibility mapping
-            if (deleteAfterArchive && flowNodeInstance instanceof SActivityInstance) {
-                final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
-                        flowNodeInstance.getFlowNodeDefinitionId());
-                // only do search for data instances with there are data definitions. Can be null if it's a manual data add at runtime
-                if (activityDef != null && !activityDef.getSDataDefinitions().isEmpty()) {
-                    try {
-                        /*
-                         * Delete data instances defined at activity level:
-                         * We do not archive because it's done after update not before update
-                         */
-                        List<SDataInstance> dataInstances;
-                        do {
-                            dataInstances = dataInstanceService.getLocalDataInstances(flowNodeInstance.getId(),
-                                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-                            for (final SDataInstance sDataInstance : dataInstances) {
-                                dataInstanceService.deleteDataInstance(sDataInstance);
-                            }
-                        } while (dataInstances != null && dataInstances.size() > 0);
-                        dataInstanceService.removeContainer(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-                    } catch (final SDataInstanceException e) {
-                        throw new SActivityExecutionException(e);
+            if (deleteAfterArchive) {
+                if (flowNodeInstance instanceof SActivityInstance) {
+                    final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
+                            flowNodeInstance.getFlowNodeDefinitionId());
+                    // only do search for data instances with there are data definitions. Can be null if it's a manual data add at runtime
+                    if (activityDef != null && !activityDef.getSDataDefinitions().isEmpty()) {
+                        try {
+                            /*
+                             * Delete data instances defined at activity level:
+                             * We do not archive because it's done after update not before update
+                             */
+                            List<SDataInstance> dataInstances;
+                            do {
+                                dataInstances = dataInstanceService.getLocalDataInstances(flowNodeInstance.getId(),
+                                        DataInstanceContainer.ACTIVITY_INSTANCE.toString(), 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+                                for (final SDataInstance sDataInstance : dataInstances) {
+                                    dataInstanceService.deleteDataInstance(sDataInstance);
+                                }
+                            } while (dataInstances != null && dataInstances.size() > 0);
+                        } catch (final SDataInstanceException e) {
+                            throw new SActivityExecutionException(e);
+                        }
+                    }
+
+                    if (activityDef != null && !activityDef.getConnectors().isEmpty()) {
+                        archiveConnectors(connectorInstanceService, archiveDate, flowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
                     }
                 }
-
-                if (activityDef != null && !activityDef.getConnectors().isEmpty()) {
-                    archiveConnectors(connectorInstanceService, archiveDate, flowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
-                }
+                dataInstanceService.removeContainer(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
             }
             // then archive the flownode instance:
             SAFlowNodeInstance saFlowNodeInstance = null;
@@ -282,14 +284,16 @@ public class ProcessArchiver {
                             .createNewAutomaticTaskInstance((SAutomaticTaskInstance) flowNodeInstance).done();
                     break;
                 case GATEWAY:
-                    saFlowNodeInstance = BuilderFactory.get(SAGatewayInstanceBuilderFactory.class).createNewGatewayInstance((SGatewayInstance) flowNodeInstance).done();
+                    saFlowNodeInstance = BuilderFactory.get(SAGatewayInstanceBuilderFactory.class)
+                            .createNewGatewayInstance((SGatewayInstance) flowNodeInstance).done();
                     break;
                 case MANUAL_TASK:
                     saFlowNodeInstance = BuilderFactory.get(SAManualTaskInstanceBuilderFactory.class)
                             .createNewManualTaskInstance((SManualTaskInstance) flowNodeInstance).done();
                     break;
                 case USER_TASK:
-                    saFlowNodeInstance = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class).createNewUserTaskInstance((SUserTaskInstance) flowNodeInstance)
+                    saFlowNodeInstance = BuilderFactory.get(SAUserTaskInstanceBuilderFactory.class)
+                            .createNewUserTaskInstance((SUserTaskInstance) flowNodeInstance)
                             .done();
                     break;
                 case RECEIVE_TASK:
@@ -297,7 +301,8 @@ public class ProcessArchiver {
                             .createNewReceiveTaskInstance((SReceiveTaskInstance) flowNodeInstance).done();
                     break;
                 case SEND_TASK:
-                    saFlowNodeInstance = BuilderFactory.get(SASendTaskInstanceBuilderFactory.class).createNewSendTaskInstance((SSendTaskInstance) flowNodeInstance)
+                    saFlowNodeInstance = BuilderFactory.get(SASendTaskInstanceBuilderFactory.class)
+                            .createNewSendTaskInstance((SSendTaskInstance) flowNodeInstance)
                             .done();
                     break;
                 case LOOP_ACTIVITY:
