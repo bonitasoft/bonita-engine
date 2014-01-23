@@ -25,18 +25,14 @@ public class TokenInfo {
     public final Long outputParentTokenRefId;
     
     public TokenInfo() {
-        this.outputTokenRefId = null;
-        this.outputParentTokenRefId = null;
+        this(null, null);
     }
 
     public TokenInfo(Long outputTokenRefId) {
-        super();
-        this.outputTokenRefId = outputTokenRefId;
-        this.outputParentTokenRefId = null;
+        this(outputTokenRefId, null);
     }
 
     public TokenInfo(Long outputTokenRefId, Long outputParentTokenRefId) {
-        super();
         this.outputTokenRefId = outputTokenRefId;
         this.outputParentTokenRefId = outputParentTokenRefId;
     }
