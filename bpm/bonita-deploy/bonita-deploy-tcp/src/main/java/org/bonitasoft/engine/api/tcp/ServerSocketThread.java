@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
+import org.bonitasoft.engine.exception.StackTraceTransformer;
 
 public class ServerSocketThread extends Thread {
 
@@ -46,8 +47,7 @@ public class ServerSocketThread extends Thread {
         } catch (ServerWrappedException e) {
             // System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + "got an exception during the invokeMethod: " + e.getClass() + ": "
             // + e.getMessage());
-            e.printStackTrace();
-            return e;
+            return StackTraceTransformer.mergeStackTraces(e);
         }
     }
 
