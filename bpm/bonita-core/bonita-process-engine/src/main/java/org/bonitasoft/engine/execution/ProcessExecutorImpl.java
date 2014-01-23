@@ -746,9 +746,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final int numberOfTokenToMerge = getNumberOfTokenToMerge(child);
         final SFlowNodeDefinition flowNode = sProcessDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
         SFlowNodeWrapper flowNodeWrapper = new SFlowNodeWrapper(flowNode);
-        FlowNodeTransitionsWrapper transitionsDescriptor = getTransitionsDescriptor(flowNode, sProcessDefinition, child);
+        FlowNodeTransitionsWrapper transitionsDescriptor = buildTransitionsWrapper(flowNode, sProcessDefinition, child);
         TokenProvider tokenProvider = new TokenProvider(child, sProcessInstance, flowNodeWrapper, transitionsDescriptor, tokenService);
-        FlowMerger mergeDescriptor = new FlowMerger(flowNodeWrapper, transitionsDescriptor, tokenProvider);
+        FlowMerger merger = new FlowMerger(flowNodeWrapper, transitionsDescriptor, tokenProvider);
         
         archiveInvalidTransitions(child, transitionsDescriptor);
 
@@ -768,14 +768,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         archiveFlowNodeInstance(sProcessDefinition, child, sProcessInstance);
 
-        TokenInfo outputTokenInfo = mergeDescriptor.getOutputTokenInfo();
+        TokenInfo outputTokenInfo = merger.getOutputTokenInfo();
         // execute transition/activities
         createAndExecuteActivities(sProcessDefinition.getId(), child, sProcessInstance.getId(), chosenFlowNode, child.getRootProcessInstanceId(), outputTokenInfo.outputTokenRefId);
         for (STransitionDefinition sTransitionDefinition : chosenGatewaysTransitions) {
             executeGateway(sProcessDefinition, sTransitionDefinition, child, outputTokenInfo.outputTokenRefId);
         }
 
-        return updateTokens(sProcessDefinition, child, sProcessInstance, numberOfTokenToMerge, transitionsDescriptor, mergeDescriptor);
+        return updateTokens(sProcessDefinition, child, sProcessInstance, numberOfTokenToMerge, transitionsDescriptor, merger);
     }
 
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
@@ -787,18 +787,18 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private int updateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
-            final int numberOfTokenToMerge, FlowNodeTransitionsWrapper transitionsDescriptor, FlowMerger mergeDescriptor)
+            final int numberOfTokenToMerge, FlowNodeTransitionsWrapper transitionsDescriptor, FlowMerger merger)
             throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
             WorkRegisterException, SBonitaException {
         // handle token creation/deletion
-        if (mergeDescriptor.mustConsumeInputToken()) {
+        if (merger.mustConsumeInputToken()) {
             tokenService.deleteTokens(sProcessInstance.getId(), child.getTokenRefId(), numberOfTokenToMerge);
         }
-        if (mergeDescriptor.mustCreateToken()) {
-            TokenInfo outputTokenInfo = mergeDescriptor.getOutputTokenInfo();
+        if (merger.mustCreateToken()) {
+            TokenInfo outputTokenInfo = merger.getOutputTokenInfo();
             tokenService.createTokens(sProcessInstance.getId(), outputTokenInfo.outputTokenRefId, outputTokenInfo.outputParentTokenRefId, transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
         }
-        if (mergeDescriptor.isImplicitEnd()) {
+        if (merger.isImplicitEnd()) {
             final Long tokenRefId = child.getTokenRefId();
             if (tokenRefId == null) {
                 throw new SObjectNotFoundException("no token ref id set for " + child);
@@ -818,7 +818,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    private FlowNodeTransitionsWrapper getTransitionsDescriptor(final SFlowNodeDefinition flowNode, SProcessDefinition sProcessDefinition, SFlowNodeInstance child) throws SBonitaException {
+    private FlowNodeTransitionsWrapper buildTransitionsWrapper(final SFlowNodeDefinition flowNode, SProcessDefinition sProcessDefinition, SFlowNodeInstance child) throws SBonitaException {
         FlowNodeTransitionsWrapper transitionsDescriptor = new FlowNodeTransitionsWrapper();
         // Retrieve all outgoing transitions
         if (flowNode == null) {

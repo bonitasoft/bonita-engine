@@ -51,7 +51,7 @@ public class SFlowNodeWrapper {
     }
 
     private boolean isGateway() {
-        if(flowNode == null) {
+        if(isNull()) {
             return false;
         }
         return SFlowNodeType.GATEWAY.equals(flowNode.getType());
@@ -63,14 +63,14 @@ public class SFlowNodeWrapper {
     
     
     public boolean isBoundaryEvent() {
-        if(flowNode == null) {
+        if(isNull()) {
             return false;
         }
         return SFlowNodeType.BOUNDARY_EVENT.equals(flowNode.getType());
     }
     
     public boolean isInterrupting() {
-        if(flowNode == null || !(flowNode instanceof SCatchEventDefinition)) {
+        if(isNull() || !(flowNode instanceof SCatchEventDefinition)) {
             return false;
         }
         return ((SCatchEventDefinition) flowNode).isInterrupting();
