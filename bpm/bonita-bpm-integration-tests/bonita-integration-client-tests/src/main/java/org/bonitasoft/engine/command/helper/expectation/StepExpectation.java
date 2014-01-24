@@ -55,13 +55,19 @@ public class StepExpectation {
 
     public void toNotHaveArchives() throws Exception {
         for (String step : steps) {
-            hasArchives(0, step, false);
+            assertEquals(0, getArchives(step, false, null).getCount());
         }
     }
 
     public void toBeExecuted(int times) throws SearchException {
         for (String step : steps) {
-            hasArchives(times, step, true);
+            assertEquals(times, getArchives(step, true, "completed").getCount());
+        }
+    }
+
+    public void toBeAborted() throws SearchException {
+        for (String step : steps) {
+            assertEquals(1, getArchives(step, true, "aborted").getCount());
         }
     }
 
@@ -73,19 +79,17 @@ public class StepExpectation {
         }
     }
 
-    private void hasArchives(int times, String step, boolean terminal) throws SearchException {
+
+    private SearchResult<ArchivedFlowNodeInstance> getArchives(String step, boolean terminal, String state) throws SearchException {
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 0);
         builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, step);
         builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, process.getId());
         if(terminal) {
             builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true);
         }
-        SearchResult<ArchivedFlowNodeInstance> result = testCase.getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
-        assertEquals(times, result.getCount());
-    }
-
-
-    public void toBeAborted() {
-
+        if(state != null) {
+            builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, state);
+        }
+        return testCase.getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
     }
 }
