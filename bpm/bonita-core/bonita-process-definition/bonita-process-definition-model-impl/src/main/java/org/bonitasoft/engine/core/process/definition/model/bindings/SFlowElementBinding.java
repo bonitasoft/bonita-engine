@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
@@ -59,6 +60,8 @@ public class SFlowElementBinding extends ElementBinding {
 
     private final List<SDataDefinition> dataDefinitions = new ArrayList<SDataDefinition>();
 
+    private final List<SBusinessDataDefinition> businessDataDefinitions = new ArrayList<SBusinessDataDefinition>();
+
     private final List<SDocumentDefinition> documentDefinitions = new ArrayList<SDocumentDefinition>();
 
     private final List<SConnectorDefinition> connectors = new ArrayList<SConnectorDefinition>();
@@ -82,6 +85,8 @@ public class SFlowElementBinding extends ElementBinding {
             activities.add((SActivityDefinitionImpl) value);
         } else if (XMLSProcessDefinition.CONNECTOR_NODE.equals(name)) {
             connectors.add((SConnectorDefinition) value);
+        } else if (XMLSProcessDefinition.BUSINESS_DATA_DEFINITION_NODE.equals(name)) {
+            businessDataDefinitions.add((SBusinessDataDefinition) value);
         } else if (XMLSProcessDefinition.DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
         } else if (XMLSProcessDefinition.TEXT_DATA_DEFINITION_NODE.equals(name)) {
@@ -121,6 +126,9 @@ public class SFlowElementBinding extends ElementBinding {
         }
         for (final SConnectorDefinition connector : connectors) {
             container.addConnector(connector);
+        }
+        for (final SBusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+            container.addBusinessDataDefinition(businessDataDefinition);
         }
         for (final SDataDefinition dataDefinition : dataDefinitions) {
             container.addDataDefinition(dataDefinition);
