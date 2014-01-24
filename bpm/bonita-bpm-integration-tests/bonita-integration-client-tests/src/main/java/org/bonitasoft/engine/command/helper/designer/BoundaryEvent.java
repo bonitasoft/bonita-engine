@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -14,23 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.bonitasoft.engine.command.helper.designer;
 
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 
 /**
  * @author Vincent Elcrin
  */
-public class Transition {
+public class BoundaryEvent {
 
-    public void bind(String source, String target, Condition condition, ProcessDefinitionBuilder builder) {
-        if(condition == null) {
-            builder.addTransition(source, target);
-        } else if(condition.isDefault()) {
-            builder.addDefaultTransition(source, target);
-        } else {
-            builder.addTransition(source, target, condition.getExpression());
-        }
+    private final String name;
+
+    private final Fragment flowsOut;
+
+    private Trigger trigger;
+
+    Transition transition = new Transition();
+
+    public BoundaryEvent(String name, Fragment flowsOut) {
+        this.name = name;
+        this.flowsOut = flowsOut;
     }
+
+    public void attach(UserTaskDefinitionBuilder task, ProcessDefinitionBuilder builder) {
+        trigger.listen(task.addBoundaryEvent(name));
+        flowsOut.build(builder);
+        transition.bind(name, flowsOut.getName(), null, builder);
+    }
+
+    public BoundaryEvent triggeredBy(Trigger trigger) {
+        this.trigger = trigger;
+        return this;
+    }
+
 }

@@ -21,6 +21,4 @@ public class Gateway extends FlowNode {
     public void build(ProcessDefinitionBuilder builder) {
         builder.addGateway(getName(), type);
     }
-
-
 }

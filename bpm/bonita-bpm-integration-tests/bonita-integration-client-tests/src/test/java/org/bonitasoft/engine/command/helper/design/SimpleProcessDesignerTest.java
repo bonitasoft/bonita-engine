@@ -4,17 +4,10 @@ import static junit.framework.Assert.assertEquals;
 import static org.bonitasoft.engine.command.helper.designer.Condition.defaults;
 import static org.bonitasoft.engine.command.helper.designer.Condition.meet;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
-import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
-import org.bonitasoft.engine.bpm.flownode.TransitionDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.command.helper.designer.Branch;
 import org.bonitasoft.engine.command.helper.designer.EndEvent;
 import org.bonitasoft.engine.command.helper.designer.Gateway;
 import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
@@ -42,8 +35,8 @@ public class SimpleProcessDesignerTest {
                 .then(new EndEvent("D"))
                 .done();
 
-        assertEquals("[B, C]", getActivities(design));
-        assertEquals("[A_->_B, B_->_C, C_->_D]", getTransactions(design));
+        assertEquals("[B, C]", DesignerTestUtils.getActivities(design));
+        assertEquals("[A_->_B, B_->_C, C_->_D]", DesignerTestUtils.getTransactions(design));
     }
 
     @Test
@@ -56,9 +49,9 @@ public class SimpleProcessDesignerTest {
                 .then(new EndEvent("E"))
                 .done();
 
-        assertEquals("[B, D]", getActivities(design));
-        assertEquals("[C]", getGateways(design));
-        assertEquals("[A_->_B, B_->_C, C_->_D, D_->_E]", getTransactions(design));
+        assertEquals("[B, D]", DesignerTestUtils.getActivities(design));
+        assertEquals("[C]", DesignerTestUtils.getGateways(design));
+        assertEquals("[A_->_B, B_->_C, C_->_D, D_->_E]", DesignerTestUtils.getTransactions(design));
     }
 
     @Test
@@ -69,97 +62,80 @@ public class SimpleProcessDesignerTest {
                 .then(new EndEvent("C"))
                 .done();
 
-        assertEquals("[B1, B2]", getActivities(design));
-        assertEquals("[A_->_B1, A_->_B2, B1_->_C, B2_->_C]", getTransactions(design));
+        assertEquals("[B1, B2]", DesignerTestUtils.getActivities(design));
+        assertEquals("[A_->_B1, A_->_B2, B1_->_C, B2_->_C]", DesignerTestUtils.getTransactions(design));
     }
 
     @Test
     public void should_be_able_to_design_a_process_multiple_incoming_conditions() throws Exception {
-        Expression TRUE = new ExpressionBuilder().createConstantBooleanExpression(true);
+        Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
         DesignProcessDefinition design = new SimpleProcessDesigner(builder)
                 .startWith(new StartEvent("A"))
                 .then(new UserTask("B"))
                 .then(new UserTask("C1"), new UserTask("C2"))
                 .then(new Gateway("D", GatewayType.EXCLUSIVE)
-                                .when("C1", defaults())
-                                .when("C2", meet(TRUE)))
+                        .when("C1", defaults())
+                        .when("C2", meet(condition)))
                 .then(new EndEvent("F"))
                 .done();
 
-        assertEquals("[B, C1 (C1_->_D), C2]", getActivities(design));
-        assertEquals("[D]", getGateways(design));
-        assertEquals("[A_->_B, B_->_C1, B_->_C2, C1_->_D, C2_->_D (true), D_->_F]", getTransactions(design));
+        assertEquals("[B, C1 (C1_->_D), C2]", DesignerTestUtils.getActivities(design));
+        assertEquals("[D]", DesignerTestUtils.getGateways(design));
+        assertEquals("[A_->_B, B_->_C1, B_->_C2, C1_->_D, C2_->_D (true), D_->_F]", DesignerTestUtils.getTransactions(design));
     }
 
     @Test
     public void should_be_able_to_design_a_process_with_multiple_outgoing_conditions() throws Exception {
-        Expression TRUE = new ExpressionBuilder().createConstantBooleanExpression(true);
+        Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
         DesignProcessDefinition design = new SimpleProcessDesigner(builder)
                 .startWith(new StartEvent("A"))
                 .then(new UserTask("B"))
                 .then(new Gateway("C", GatewayType.EXCLUSIVE))
                 .then(
                         new UserTask("D1").when("C", defaults()),
-                        new UserTask("D2").when("C", meet(TRUE)))
+                        new UserTask("D2").when("C", meet(condition)))
                 .then(new EndEvent("E"))
                 .done();
 
-        assertEquals("[B, D1, D2]", getActivities(design));
-        assertEquals("[C (C_->_D1)]", getGateways(design));
-        assertEquals("[A_->_B, B_->_C, C_->_D1, C_->_D2 (true), D1_->_E, D2_->_E]", getTransactions(design));
+        assertEquals("[B, D1, D2]", DesignerTestUtils.getActivities(design));
+        assertEquals("[C (C_->_D1)]", DesignerTestUtils.getGateways(design));
+        assertEquals("[A_->_B, B_->_C, C_->_D1, C_->_D2 (true), D1_->_E, D2_->_E]", DesignerTestUtils.getTransactions(design));
     }
 
-    private String getGateways(DesignProcessDefinition design) {
-        return stringify(design.getProcessContainer().getGatewaysList(), new Stringifier<GatewayDefinition>() {
-            @Override
-            public String stringify(GatewayDefinition gateway) {
-                String text = gateway.getName();
-                if (gateway.getDefaultTransition() != null) {
-                    text += " (" + gateway.getDefaultTransition().getName() + ")";
-                }
-                return text;
-            }
-        });
+    @Test
+    public void should_be_able_to_design_a_process_with_complex_branch() throws Exception {
+        DesignProcessDefinition design = new SimpleProcessDesigner(builder)
+                .startWith(new StartEvent("A"))
+                .then(new UserTask("B"))
+                .then(new Gateway("C", GatewayType.PARALLEL))
+                .then(
+                        new Branch().start(new UserTask("D1")).then(new UserTask("D2")),
+                        new UserTask("E"))
+                .then(new Gateway("F", GatewayType.PARALLEL))
+                .then(new EndEvent("G"))
+                .done();
+
+        assertEquals("[B, D1, D2, E]", DesignerTestUtils.getActivities(design));
+        assertEquals("[C, F]", DesignerTestUtils.getGateways(design));
+        assertEquals("[A_->_B, B_->_C, C_->_D1, C_->_E, D1_->_D2, D2_->_F, E_->_F, F_->_G]", DesignerTestUtils.getTransactions(design));
     }
 
-    private String getActivities(DesignProcessDefinition design) {
-        return stringify(design.getProcessContainer().getActivities(), new Stringifier<ActivityDefinition>() {
-            @Override
-            public String stringify(ActivityDefinition activity) {
-                String text = activity.getName();
-                if (activity.getDefaultTransition() != null) {
-                    text += " (" + activity.getDefaultTransition().getName() + ")";
-                }
-                return text;
-            }
-        });
-    }
+    @Test
+    public void should_be_able_to_design_a_process_with_complex_() throws Exception {
+        DesignProcessDefinition design = new SimpleProcessDesigner(builder)
+                .startWith(new StartEvent("A"))
+                .then(
+                        new UserTask("B"),
+                        new Branch()
+                                .start(new Gateway("C", GatewayType.PARALLEL))
+                                .then(new UserTask("D"), new UserTask("E"))
+                                .then(new Gateway("F", GatewayType.PARALLEL)))
+                .then(new Gateway("G", GatewayType.PARALLEL))
+                .then(new UserTask("H"))
+                .then(new EndEvent("I"))
+                .done();
 
-    private String getTransactions(DesignProcessDefinition design) {
-        return stringify(design.getProcessContainer().getTransitions(), new Stringifier<TransitionDefinition>() {
-            @Override
-            public String stringify(TransitionDefinition transition) {
-                String text = transition.getName();
-                if (transition.getCondition() != null) {
-                    text += " (" + transition.getCondition().getName() + ")";
-                }
-                return text;
-            }
-        });
-    }
-
-    interface Stringifier<O> {
-
-        String stringify(O object);
-    }
-
-    private <O> String stringify(Collection<O> items, Stringifier<O> stringifier) {
-        List<String> strings = new ArrayList<String>(items.size());
-        for (O item : items) {
-            strings.add(stringifier.stringify(item));
-        }
-        Collections.sort(strings);
-        return strings.toString();
+        assertEquals("[A_->_B, A_->_C, B_->_G, C_->_D, C_->_E, D_->_F, E_->_F, F_->_G, G_->_H, H_->_I]", DesignerTestUtils.getTransactions(design));
     }
 
     private ProcessDefinitionBuilder getProcessDefinitionBuilder() {

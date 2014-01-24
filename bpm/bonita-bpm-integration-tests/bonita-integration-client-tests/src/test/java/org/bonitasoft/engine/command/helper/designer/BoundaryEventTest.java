@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -14,17 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.bonitasoft.engine.command.helper.designer;
-
-import java.util.List;
-
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 
 /**
  * @author Vincent Elcrin
  */
-public interface Linkable {
-
-    public void bind(List<FlowNode> origins, ProcessDefinitionBuilder builder);
+public class BoundaryEventTest {
 }

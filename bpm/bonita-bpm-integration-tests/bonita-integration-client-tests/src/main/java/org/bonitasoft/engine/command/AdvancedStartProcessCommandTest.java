@@ -34,7 +34,9 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.command.helper.ProcessDeployer;
+import org.bonitasoft.engine.command.helper.designer.BoundaryEvent;
 import org.bonitasoft.engine.command.helper.designer.Gateway;
+import org.bonitasoft.engine.command.helper.designer.Signal;
 import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
 import org.bonitasoft.engine.command.helper.designer.UserTask;
 import org.bonitasoft.engine.command.helper.expectation.TestUtils;
@@ -186,14 +188,14 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
 
     @Test
     public void should_be_able_to_start_a_process_containing_an_exclusive_gateway_which_split() throws Exception {
-        Expression TRUE = new ExpressionBuilder().createConstantBooleanExpression(true);
+        Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
         ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new Gateway("exclusive", GatewayType.EXCLUSIVE))
                 .then(
                         new UserTask("step 2").when("exclusive", defaults()),
-                        new UserTask("step 3").when("exclusive", meet(TRUE)))
+                        new UserTask("step 3").when("exclusive", meet(condition)))
                 .end());
 
         TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
@@ -204,7 +206,7 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
     }
 
     @Test
-    public void should_be_able_to_start_an_inclusive_gateway_right_in_the_middle() throws Exception {
+    public void should_be_able_to_start_between_two_inclusive_gateway() throws Exception {
         ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
@@ -220,6 +222,30 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
         process.isExpected().toFinish();
         process.expect("step 1").toNotHaveArchives();
         process.expect("step 4").toBeExecuted(1);
+    }
+
+    @Test
+    public void should_be_able_to_start_an_exclusive_gateway_with_condition() throws Exception {
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
+                .start()
+                .then(new UserTask("step 1"))
+                .then(new Gateway("inclusive 1", GatewayType.INCLUSIVE))
+                .then(
+                        new UserTask("step 2"),
+                        new UserTask("step 3").with(
+                                new BoundaryEvent("boundary", new UserTask("step 4")).triggeredBy(new Signal("foo"))))
+                .then(new Gateway("inclusive 2", GatewayType.INCLUSIVE))
+                .then(new UserTask("step 5"))
+                .end());
+
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2", "step 3"));
+        process.execute(john, "step 2");
+        process.sendSignal("foo");
+        process.execute(john, "step 4", "step 5");
+
+        process.isExpected().toFinish();
+        process.expect("step 2", "step 4", "step 5").toBeExecuted(1);
+        process.expect("step 3").toBeAborted();
     }
 
     private Operation createSetDataOperation(String name, String value) throws InvalidExpressionException {

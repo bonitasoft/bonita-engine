@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -14,23 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.bonitasoft.engine.command.helper.designer;
 
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.BoundaryEventDefinitionBuilder;
 
 /**
  * @author Vincent Elcrin
  */
-public class Transition {
+public interface Trigger {
 
-    public void bind(String source, String target, Condition condition, ProcessDefinitionBuilder builder) {
-        if(condition == null) {
-            builder.addTransition(source, target);
-        } else if(condition.isDefault()) {
-            builder.addDefaultTransition(source, target);
-        } else {
-            builder.addTransition(source, target, condition.getExpression());
-        }
-    }
+    void listen(BoundaryEventDefinitionBuilder builder);
 }

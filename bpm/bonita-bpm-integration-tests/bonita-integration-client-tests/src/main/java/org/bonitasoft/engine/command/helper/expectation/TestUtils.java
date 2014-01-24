@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.command.helper.expectation;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.identity.User;
 
@@ -45,6 +46,10 @@ public class TestUtils {
 
         public VariableExpectation expectVariable(String name) {
             return new VariableExpectation(testCase, process);
+        }
+
+        public void sendSignal(String name) throws SendEventException {
+            testCase.getProcessAPI().sendSignal(name);
         }
     }
 }

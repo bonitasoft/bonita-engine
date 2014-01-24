@@ -17,4 +17,6 @@ public class EndEvent extends FlowNode {
     public void build(ProcessDefinitionBuilder builder) {
         builder.addEndEvent(getName());
     }
+
+
 }

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -14,16 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.bonitasoft.engine.command.helper.designer;
 
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.BoundaryEventDefinitionBuilder;
 
 /**
  * @author Vincent Elcrin
  */
-public interface Buildable {
+public class Signal implements Trigger {
 
-    public void build(ProcessDefinitionBuilder builder);
+    private String name;
 
+    public Signal(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void listen(BoundaryEventDefinitionBuilder builder) {
+        builder.addSignalEventTrigger(name);
+    }
 }
