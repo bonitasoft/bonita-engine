@@ -53,13 +53,16 @@ public class TransientDataServiceImpl implements TransientDataService {
 
     @Override
     public List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId, final String containerType) throws SDataInstanceException {
-        // TODO Auto-generated method stub
-        return null;
+        ArrayList<SDataInstance> data = new ArrayList<SDataInstance>(dataNames.size());
+        for (String dataName : dataNames) {
+            data.add(getDataInstance(dataName, containerId, containerType));
+        }
+        return data;
     }
 
     @Override
     public long getNumberOfDataInstances(final long containerId, final DataInstanceContainer containerType) throws SDataInstanceException {
-        // TODO Auto-generated method stub
+        // TODO get it from definition
         return 0;
     }
 
