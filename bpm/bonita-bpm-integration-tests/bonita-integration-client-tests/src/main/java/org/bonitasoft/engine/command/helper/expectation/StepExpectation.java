@@ -85,4 +85,7 @@ public class StepExpectation {
     }
 
 
+    public void toBeAborted() {
+
+    }
 }

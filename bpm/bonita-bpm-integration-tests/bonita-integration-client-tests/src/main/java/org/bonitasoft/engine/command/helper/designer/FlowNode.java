@@ -1,43 +1,43 @@
+/**
+ * Copyright (C) 2012 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.bonitasoft.engine.command.helper.designer;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 
 /**
- * Created by Vincent Elcrin
- * Date: 16/12/13
- * Time: 14:20
+ * @author Vincent Elcrin
  */
-public abstract class FlowNode implements Buildable, Linkable {
+public abstract class FlowNode extends Fragment {
 
     private String name;
 
-    private Map<String, Condition> conditions = new HashMap<String, Condition>();
-
-    private Transition transition = new Transition(this);
+    private Transition transition = new Transition();
 
     protected FlowNode(String name) {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public abstract void build(ProcessDefinitionBuilder builder);
-
-    public FlowNode when(String step, Condition condition) {
-        conditions.put(step, condition);
-        return this;
+    @Override
+    public void bind(String source, Condition condition, ProcessDefinitionBuilder builder) {
+        transition.bind(source, name, condition, builder);
     }
 
     @Override
-    public void bind(List<FlowNode> origins, ProcessDefinitionBuilder builder) {
-        for (FlowNode origin : origins) {
-            transition.bind(origin, conditions.get(origin.getName()), builder);
-        }
+    public String getName() {
+        return name;
     }
 }

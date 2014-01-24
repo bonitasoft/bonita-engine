@@ -16,10 +16,6 @@
  */
 package org.bonitasoft.engine.command.helper.designer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -31,42 +27,27 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
  */
 public class SimpleProcessDesigner {
 
-    private final ProcessDefinitionBuilder builder;
+    private final Branch branch;
 
-    private List<FlowNode> origins = new ArrayList<FlowNode>();
+    private ProcessDefinitionBuilder builder;
 
     public SimpleProcessDesigner(ProcessDefinitionBuilder builder) {
         this.builder = builder;
+        this.branch = new Branch();
     }
 
     public SimpleProcessDesigner start() {
-        return startWith(new StartEvent("start"));
-    }
-
-    public SimpleProcessDesigner branch() {
-        return new SimpleProcessDesigner(builder);
-    }
-
-    public SimpleProcessDesigner startWith(FlowNode start) {
-        origins.add(start);
-        start.build(builder);
+        startWith(new StartEvent("start"));
         return this;
     }
 
-    public SimpleProcessDesigner then(SimpleProcessDesigner... branches) {
+    public SimpleProcessDesigner startWith(StartEvent start) {
+        branch.start(start);
         return this;
     }
 
-    public SimpleProcessDesigner then(FlowNode... targets) {
-        assert !origins.isEmpty() : "startWith method need to be called first";
-
-        for (FlowNode target : targets) {
-            target.build(builder);
-            target.bind(origins, builder);
-        }
-
-        origins.clear();
-        origins.addAll(Arrays.asList(targets));
+    public SimpleProcessDesigner then(Fragment... targets) {
+        branch.then(targets);
         return this;
     }
 
@@ -75,6 +56,7 @@ public class SimpleProcessDesigner {
     }
 
     public DesignProcessDefinition done() throws InvalidProcessDefinitionException {
+        branch.build(builder);
         return builder.done();
     }
 
