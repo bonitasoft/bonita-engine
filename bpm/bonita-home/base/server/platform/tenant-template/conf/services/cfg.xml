@@ -46,6 +46,7 @@
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="transientDataService" ref="transientDataService" />
 	</bean>
 
 	<bean id="flowNodeStateManager" class="com.bonitasoft.engine.execution.FlowNodeStateManagerExt">
@@ -85,6 +86,7 @@
 		<constructor-arg name="processInstanceService" ref="processInstanceService"/>
 		<constructor-arg name="tokenService" ref="tokenService"/>
 		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="transientDataService" ref="transientDataService" />
 	</bean>
 	
 	<bean id="processExecutor" class="com.bonitasoft.engine.execution.ProcessExecutorExt">
