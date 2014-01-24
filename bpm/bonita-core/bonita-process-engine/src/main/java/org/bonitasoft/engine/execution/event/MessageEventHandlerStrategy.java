@@ -20,6 +20,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -86,14 +87,17 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private final ProcessDefinitionService processDefinitionService;
 
+    private final TransientDataService transientDataService;
+
     public MessageEventHandlerStrategy(final ExpressionResolverService expressionResolverService,
             final EventInstanceService eventInstanceService, final BPMInstancesCreator bpmInstancesCreator, final DataInstanceService dataInstanceService,
-            final ProcessDefinitionService processDefinitionService) {
+            final ProcessDefinitionService processDefinitionService, final TransientDataService transientDataService) {
         super(eventInstanceService);
         this.expressionResolverService = expressionResolverService;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.dataInstanceService = dataInstanceService;
         this.processDefinitionService = processDefinitionService;
+        this.transientDataService = transientDataService;
     }
 
     @Override
@@ -107,14 +111,17 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         switch (eventDefinition.getType()) {
             case BOUNDARY_EVENT:
                 builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageBoundaryEventInstance(processDefinition.getId(),
-                        eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(), eventInstance.getId(), messageName, processName, eventInstance.getFlowNodeDefinitionId(),
+                        eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(), eventInstance.getId(), messageName, processName,
+                        eventInstance.getFlowNodeDefinitionId(),
                         eventInstance.getName());
                 expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
                         processDefinition.getId());
                 break;
             case INTERMEDIATE_CATCH_EVENT:
-                builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageIntermediateEventInstance(processDefinition.getId(),
-                        eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(), eventInstance.getId(), messageName, processName, eventInstance.getFlowNodeDefinitionId(),
+                builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageIntermediateEventInstance(
+                        processDefinition.getId(),
+                        eventInstance.getRootContainerId(), eventInstance.getParentProcessInstanceId(), eventInstance.getId(), messageName, processName,
+                        eventInstance.getFlowNodeDefinitionId(),
                         eventInstance.getName());
                 expressionContext = new SExpressionContext(eventInstance.getParentContainerId(), getParentContainerType(eventInstance).name(),
                         processDefinition.getId());
@@ -142,7 +149,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         SExpressionContext expressionContext;
 
         builder = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageIntermediateEventInstance(processDefinition.getId(),
-                receiveTaskInstance.getRootContainerId(), receiveTaskInstance.getParentProcessInstanceId(), receiveTaskInstance.getId(), messageName, processName, receiveTaskInstance.getFlowNodeDefinitionId(),
+                receiveTaskInstance.getRootContainerId(), receiveTaskInstance.getParentProcessInstanceId(), receiveTaskInstance.getId(), messageName,
+                processName, receiveTaskInstance.getFlowNodeDefinitionId(),
                 receiveTaskInstance.getName());
         expressionContext = new SExpressionContext(receiveTaskInstance.getParentContainerId(), getParentContainerType(receiveTaskInstance).name(),
                 processDefinition.getId());
@@ -205,7 +213,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         // create data
         if (!messageTrigger.getDataDefinitions().isEmpty()) {
             bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE,
-                    expressionContext, expressionResolverService, dataInstanceService);
+                    expressionContext, expressionResolverService, dataInstanceService, transientDataService);
             dataInstanceService.createDataContainer(messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE.name());
             TechnicalLoggerService logger = bpmInstancesCreator.getLogger();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -296,7 +304,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
             throws SBonitaException {
         final SWaitingMessageEventBuilderFactory builderFact = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class);
         final SMessageEventTriggerDefinition messageEventTriggerDefinition = (SMessageEventTriggerDefinition) sEventTriggerDefinition;
-        final SWaitingMessageEventBuilder builder = builderFact.createNewWaitingMessageEventSubProcInstance(processDefinition.getId(), parentProcessInstance.getId(),
+        final SWaitingMessageEventBuilder builder = builderFact.createNewWaitingMessageEventSubProcInstance(processDefinition.getId(),
+                parentProcessInstance.getId(),
                 parentProcessInstance.getRootProcessInstanceId(), messageEventTriggerDefinition.getMessageName(), processDefinition.getName(),
                 eventDefinition.getId(), eventDefinition.getName(), subProcessId);
         final SExpressionContext expressionContext = new SExpressionContext(parentProcessInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),

@@ -65,7 +65,7 @@ public class BPMInstancesCreatorTest {
     @Before
     public void setUp() {
         PowerMockito.mockStatic(BuilderFactory.class);
-        
+
         connectorBuilderFact = mock(SConnectorInstanceBuilderFactory.class);
         Mockito.when(BuilderFactory.get(SConnectorInstanceBuilderFactory.class)).thenReturn(connectorBuilderFact);
     }
@@ -73,7 +73,7 @@ public class BPMInstancesCreatorTest {
     @Test
     public void testExecutionOrder() throws Exception {
         final BPMInstancesCreator bpmInstancesCreator = new BPMInstancesCreator(null, null, null, null, connectorInstanceService, null,
-                null, null);
+                null, null, null);
         final SConnectorInstance connectorInstance = mock(SConnectorInstance.class);
         final SConnectorInstanceBuilder connectorBuilder = mock(SConnectorInstanceBuilder.class);
         when(connectorBuilderFact.createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), anyInt()))
@@ -84,8 +84,10 @@ public class BPMInstancesCreatorTest {
         final List<SConnectorDefinition> connectors = getConnectorList();
 
         bpmInstancesCreator.createConnectorInstances(container, connectors, SConnectorInstance.FLOWNODE_TYPE);
-        verify(connectorBuilderFact, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), eq(0));
-        verify(connectorBuilderFact, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class), eq(1));
+        verify(connectorBuilderFact, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class),
+                eq(0));
+        verify(connectorBuilderFact, times(1)).createNewInstance(anyString(), anyLong(), anyString(), anyString(), anyString(), any(ConnectorEvent.class),
+                eq(1));
         ignoreStubs(transactionExecutor);
         ignoreStubs(connectorInstanceService);
     }
