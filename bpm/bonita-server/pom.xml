@@ -581,7 +581,7 @@
 		<!-- Transient Data -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.data</groupId>
-			<artifactId>bonita-data-instance-transient-data-source</artifactId>
+			<artifactId>bonita-data-instance-transient</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -882,7 +882,7 @@
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>
 									<!-- Transient Data -->
-									<include>org.bonitasoft.engine.core.data:bonita-data-instance-transient-data-source</include>
+									<include>org.bonitasoft.engine.core.data:bonita-data-instance-transient</include>
 									<!-- Technical Logs -->
 									<include>org.bonitasoft.engine.log:bonita-log-technical-api</include>
 									<include>org.bonitasoft.engine.log:bonita-log-technical-slf4j</include>
