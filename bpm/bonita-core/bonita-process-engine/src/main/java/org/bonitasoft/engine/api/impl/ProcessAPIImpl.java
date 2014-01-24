@@ -1659,8 +1659,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(
-                processInstanceService, searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
+        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
+                searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
         try {
             searchArchivedProcessInstances.execute();
         } catch (final SBonitaException e) {
@@ -4319,8 +4319,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SCommentService commentService = tenantAccessor.getCommentService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchCommentsInvolvingUser searchComments = new SearchCommentsInvolvingUser(searchEntitiesDescriptor.getSearchCommentDescriptor(),
-                searchOptions,
-                commentService, userId);
+                searchOptions, commentService, userId);
         try {
             searchComments.execute();
             return searchComments.getResult();
@@ -4552,6 +4551,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SetProcessInstanceState transactionContent = new SetProcessInstanceState(processInstanceService, processInstance.getId(),
                     processInstanceState);
             transactionContent.execute();
+        } catch (final IllegalArgumentException e) {
+            throw new UpdateException(e.getMessage());
         } catch (final SBonitaException e) {
             throw new UpdateException(e.getMessage());
         }

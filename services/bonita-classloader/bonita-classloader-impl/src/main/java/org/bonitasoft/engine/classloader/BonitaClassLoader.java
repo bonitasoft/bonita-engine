@@ -120,17 +120,21 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     @Override
     protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
         Class<?> c = null;
-        //me
-        if (c == null) {
-            c = findLoadedClass(name);
-        }
+        c = findLoadedClass(name);
         if (c == null) {
             try {
                 c = findClass(name);
             } catch (ClassNotFoundException e) {
-                //ignore
+                // ignore
+            } catch (LinkageError le) {
+                // might be because of a duplicate loading (concurrency loading), retry to find it one time See BS-2483
+                c = findLoadedClass(name);
+                if (c == null) {
+                    // was not because of duplicate loading: throw the exception
+                    throw le;
+                }
             }
-        }    
+        }
 
         if (c == null) {
             c = getParent().loadClass(name);
@@ -139,7 +143,6 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         if (resolve) {
             resolveClass(c);
         }
-        // TODO FIXME logger LOG.fine("loadClass: " + name + ", result: " + c);
         return c;
     }
 

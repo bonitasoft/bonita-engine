@@ -30,24 +30,32 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>javadoc-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-        					<stylesheetfile>stylesheet.css</stylesheetfile>
- 							<excludePackageNames>org.bonitasoft.engine.expression.*:org.bonitasoft.engine.operation.*</excludePackageNames>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+	<profiles>
+		<profile>
+			<id>javadoc</id>
+			<properties>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>javadoc-jar</id>
+								<phase>package</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<stylesheetfile>stylesheet.css</stylesheetfile>
+									<excludePackageNames>org.bonitasoft.engine.expression.*:org.bonitasoft.engine.operation.*</excludePackageNames>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

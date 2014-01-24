@@ -20,6 +20,6 @@ package org.bonitasoft.engine.bpm.connector;
  */
 public enum ConnectorState {
 
-    TO_BE_EXECUTED, TO_RE_EXECUTE, DONE, FAILED, SKIPPED
+    TO_BE_EXECUTED, EXECUTING, TO_RE_EXECUTE, DONE, FAILED, SKIPPED
 
 }

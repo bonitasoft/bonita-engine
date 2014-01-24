@@ -30,7 +30,6 @@ import org.bonitasoft.engine.theme.model.SThemeType;
 
 /**
  * @author Celine Souchet
- * 
  */
 public class PlatformAPIImplDelegate {
 
@@ -77,11 +76,11 @@ public class PlatformAPIImplDelegate {
         createDefaultPortalTheme(tenantServiceAccessor);
     }
 
-    private void createDefaultPortalTheme(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
+    protected void createDefaultPortalTheme(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
         final ThemeService themeService = tenantServiceAccessor.getThemeService();
         final byte[] defaultThemeZip = getFileContent(portalDefaultThemeFilename + ZIP);
 
-        if (defaultThemeZip != null && unzippedCssPortalThemeFolder != null) {
+        if (defaultThemeZip != null && unzippedCssPortalThemeFolder != null && defaultThemeZip.length > 0) {
             final byte[] defaultThemeCss = IOUtil.getAllContentFrom(new File(unzippedCssPortalThemeFolder, "bonita.css"));
             if (defaultThemeCss != null) {
                 final STheme sTheme = buildSTheme(defaultThemeZip, defaultThemeCss, SThemeType.PORTAL);
@@ -90,10 +89,10 @@ public class PlatformAPIImplDelegate {
         }
     }
 
-    private void createDefaultMobileTheme(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
+    protected void createDefaultMobileTheme(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
         final ThemeService themeService = tenantServiceAccessor.getThemeService();
         final byte[] defaultThemeZip = getFileContent(mobileDefaultThemeFilename + ZIP);
-        if (defaultThemeZip != null) {
+        if (defaultThemeZip != null && defaultThemeZip.length > 0) {
             final STheme sTheme = buildSTheme(defaultThemeZip, null, SThemeType.MOBILE);
             themeService.createTheme(sTheme);
         }
@@ -102,8 +101,7 @@ public class PlatformAPIImplDelegate {
     // default visibility for testing
     STheme buildSTheme(final byte[] defaultThemeZip, final byte[] defaultThemeCss, final SThemeType type) {
         final long lastUpdateDate = System.currentTimeMillis();
-        final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(defaultThemeZip,
-                true, type, lastUpdateDate);
+        final SThemeBuilder sThemeBuilder = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(defaultThemeZip, true, type, lastUpdateDate);
         if (SThemeType.PORTAL.equals(type)) {
             sThemeBuilder.setCSSContent(defaultThemeCss);
         }

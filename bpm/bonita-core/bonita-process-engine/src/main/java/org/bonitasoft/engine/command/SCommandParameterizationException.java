@@ -16,6 +16,8 @@ package org.bonitasoft.engine.command;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
+ * Thrown by a {@link Command} that is called using insufficient or wrong parameters.
+ * 
  * @author Matthieu Chaffotte
  */
 public class SCommandParameterizationException extends SBonitaException {

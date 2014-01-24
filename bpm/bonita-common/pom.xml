@@ -58,24 +58,16 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>javadoc-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<includeDependencySources>true</includeDependencySources>
-							<dependencySourceIncludes>
-								<dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude>
-							</dependencySourceIncludes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>javadoc</id>
+			<properties>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
+			</properties>
+		</profile>
+	</profiles>
+
 </project>

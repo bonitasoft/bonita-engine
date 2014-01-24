@@ -1,3 +1,5 @@
+WARNING: If some states change, it requires migration
+
 PROCESS
 0 InitializingProcessInstanceStateImpl
 1 StartedProcessInstanceStateImpl

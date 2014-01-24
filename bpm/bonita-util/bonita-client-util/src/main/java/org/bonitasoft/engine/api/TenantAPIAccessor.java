@@ -26,12 +26,11 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.util.APITypeManager;
 
 /**
- * <b>Accessor class that retrieve APIs</b>
- * <p>
+ * Accessor class that retrieve APIs in Bonita BPM <b>Community</b> Edition.
  * <ul>
- * <li>{@link ProcessAPI}</li>
- * <li>{@link CommandAPI}</li>
- * <li>{@link IdentityAPI}</li>
+ * <li>{@link ProcessAPI},</li>
+ * <li>{@link CommandAPI},</li>
+ * <li>{@link IdentityAPI},</li>
  * <li>{@link LoginAPI}</li>
  * </ul>
  * 
@@ -63,6 +62,12 @@ public final class TenantAPIAccessor {
         }
     }
 
+    /**
+     * Refreshes the way the engine client communicates to the engine server.
+     * 
+     * @see APITypeManager
+     * @see ApiAccessType
+     */
     public static void refresh() {
         APITypeManager.refresh();
     }

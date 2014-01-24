@@ -102,7 +102,8 @@ public interface ProcessInstanceService {
      * @return Number of deleted process instances
      * @since 6.1
      */
-    long deleteParentProcessInstanceAndElements(List<SProcessInstance> sProcessInstances);
+    long deleteParentProcessInstanceAndElements(List<SProcessInstance> sProcessInstances) throws SFlowNodeReadException,
+            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete the specified process instance with id, and its elements archived and not, if are not a subProcess
@@ -173,9 +174,13 @@ public interface ProcessInstanceService {
      * @param saProcessInstances
      *            List of archived process instances to delete
      * @return Number of deleted archived process instances
+     * @throws SProcessInstanceModificationException
+     * @throws SProcessInstanceHierarchicalDeletionException
+     * @throws SFlowNodeReadException
      * @since 6.1
      */
-    long deleteParentArchivedProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances);
+    long deleteParentArchivedProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
+            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete all archived elements related to the specified process instance, even the archived process instances
