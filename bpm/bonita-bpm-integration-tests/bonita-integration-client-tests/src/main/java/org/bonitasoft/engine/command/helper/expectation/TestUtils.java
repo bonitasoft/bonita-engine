@@ -45,7 +45,7 @@ public class TestUtils {
         }
 
         public VariableExpectation expectVariable(String name) {
-            return new VariableExpectation(testCase, process);
+            return new VariableExpectation(testCase, process, name);
         }
 
         public void sendSignal(String name) throws SendEventException {
