@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -35,6 +36,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.command.helper.ProcessDeployer;
 import org.bonitasoft.engine.command.helper.designer.BoundaryEvent;
+import org.bonitasoft.engine.command.helper.designer.Branch;
 import org.bonitasoft.engine.command.helper.designer.Gateway;
 import org.bonitasoft.engine.command.helper.designer.Signal;
 import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
@@ -50,6 +52,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -246,6 +249,50 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
         process.isExpected().toFinish();
         process.expect("step 2", "step 4", "step 5").toBeExecuted(1);
         process.expect("step 3").toBeAborted();
+    }
+
+    @Ignore
+    @Test
+    public void should_be_able_to_start_a_process_with_consecutive_gateways() throws Exception {
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
+                .start()
+                .then(
+                        new UserTask("step 1"),
+                        new Branch().start(new Gateway("parallel 1", GatewayType.PARALLEL))
+                                .then(new UserTask("step 2"), new UserTask("step 3"))
+                                .then(new Gateway("parallel 2", GatewayType.PARALLEL)))
+                .then(new Gateway("parallel 3", GatewayType.PARALLEL))
+                .then(new UserTask("step 4"))
+                .end());
+
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2", "step 3"));
+        process.execute(john, "step 1", "step 2", "step 3", "step 4");
+
+        process.isExpected().toFinish();
+        process.expect("step 1", "step 2", "step 3", "step 4").toBeExecuted(1);
+    }
+
+    @Ignore
+    @Test
+    public void should_be_able_to_start_a_process_with_a_document() throws Exception {
+        ProcessDefinitionBuilder builder = getProcessDefinitionBuilder();
+        builder.addData("document", DocumentValue.class.getName(), null);
+        ProcessDefinition processDefinition = processDeployer.deploy(designer
+                .start()
+                .then(new UserTask("step 1"))
+                .then(new UserTask("step 2"))
+                .then(new UserTask("step 3"))
+                .end());
+
+        TestUtils.Process process = startProcess(john.getId(),
+                processDefinition.getId(),
+                Arrays.asList("step 2"),
+                Collections.singletonList(new OperationBuilder().createSetDocument("document",
+                        new ExpressionBuilder().createInputExpression("value", DocumentValue.class.getName()))),
+                Collections.<String, Serializable> singletonMap(
+                        "value", new DocumentValue("content".getBytes(), "plain/text", "document")));
+
+        process.expectVariable("document").toBe("file");
     }
 
     private Operation createSetDataOperation(String name, String value) throws InvalidExpressionException {

@@ -34,13 +34,16 @@ public class VariableExpectation {
 
     private ProcessInstance process;
 
-    public VariableExpectation(CommonAPITest testCase, ProcessInstance process) {
+    private String name;
+
+    public VariableExpectation(CommonAPITest testCase, ProcessInstance process, String name) {
         this.testCase = testCase;
         this.process = process;
+        this.name = name;
     }
 
     public void toBe(Serializable variable) throws DataNotFoundException {
-        assertEquals(variable, testCase.getProcessAPI().getProcessDataInstance("variable", process.getId()).getValue());
+        assertEquals(variable, testCase.getProcessAPI().getProcessDataInstance(name, process.getId()).getValue());
     }
 
 }
