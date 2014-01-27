@@ -77,10 +77,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     public static final String DATA_SOURCE_VERSION = "6.0";
 
-    public static final String TRANSIENT_DATA_SOURCE = "bonita_transient_data_source";
-
-    public static final String TRANSIENT_DATA_SOURCE_VERSION = "6.0";
-
     private final DataService dataSourceService;
 
     protected final Recorder recorder;
@@ -104,7 +100,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     @Override
     public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "createDataInstance");
-        final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(dataInstance.isTransientData());
+        final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource();
         dataInstanceDataSource.createDataInstance(dataInstance);
         archiveDataInstance(dataInstance);
         logAfterMethod(TechnicalLogSeverity.TRACE, "createDataInstance");
@@ -124,14 +120,9 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
     }
 
-    private DataInstanceDataSource getDataInstanceDataSource(final boolean isTransient) throws SDataInstanceException {
+    private DataInstanceDataSource getDataInstanceDataSource() throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource");
-        final DataInstanceDataSource dataInstanceDataSource;
-        if (isTransient) {
-            dataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
-        } else {
-            dataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
-        }
+        DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
         logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource");
         return dataInstanceDataSource;
     }
@@ -145,7 +136,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "Updating a transient data instance is not a good practice.");
             }
         }
-        final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(dataInstance.isTransientData());
+        final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource();
         dataInstanceDataSource.updateDataInstance(dataInstance, descriptor);
         logAfterMethod(TechnicalLogSeverity.TRACE, "updateDataInstance");
         archiveDataInstance(dataInstance);
@@ -191,7 +182,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "deleteDataInstance");
         NullCheckingUtil.checkArgsNotNull(dataInstance);
-        final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(dataInstance.isTransientData());
+        final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource();
         dataInstanceDataSource.deleteDataInstance(dataInstance);
         logAfterMethod(TechnicalLogSeverity.TRACE, "deleteDataInstance");
     }
@@ -226,14 +217,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     private SDataInstance getDataInstanceById(final long dataInstanceId) throws SDataInstanceException {
-        final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
-        try {
-            return transientDataInstanceDataSource.getDataInstance(dataInstanceId);
-        } catch (final SDataInstanceException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstance", e);
-            final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
-            return defaultDataInstanceDataSource.getDataInstance(dataInstanceId);
-        }
+        return getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION).getDataInstance(dataInstanceId);
     }
 
     private long getDataInstanceDataVisibilityMapping(final String dataName, final long containerId, final String containerType) throws SBonitaReadException {
@@ -326,13 +310,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstance");
         NullCheckingUtil.checkArgsNotNull(dataName);
         NullCheckingUtil.checkArgsNotNull(containerType);
-
-        // FIXME: update the service interface to take data source information as parameters instead of look for data in both datasources
-        final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
         try {
-            return transientDataInstanceDataSource.getDataInstance(dataName, containerId, containerType);
-        } catch (final SDataInstanceException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstance", e);
             final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
             return defaultDataInstanceDataSource.getDataInstance(dataName, containerId, containerType);
         } finally {
@@ -345,14 +323,9 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstances");
         NullCheckingUtil.checkArgsNotNull(containerType);
-        final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
         final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
         try {
-            final List<SDataInstance> transientDataInstances = transientDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex,
-                    numberOfResults);
-            final List<SDataInstance> dataInstances = defaultDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex, numberOfResults);
-            dataInstances.addAll(transientDataInstances);
-            return dataInstances;
+            return defaultDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex, numberOfResults);
         } catch (final SDataInstanceException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstances", e);
             throw e;
@@ -639,24 +612,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
         try {
             final List<Long> dataInstanceIds = getDataInstanceDataVisibilityMapping(dataNames, containerId, containerType);
-            final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
-            List<SDataInstance> result = null;
-            try {
-                result = transientDataInstanceDataSource.getDataInstances(dataInstanceIds);
-            } catch (final SDataInstanceException e) {
-                logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
-            }
-            if (result == null || result.size() < dataNames.size()) {
-                final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
-                final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
-                if (result != null) {
-                    finalResult.addAll(result);
-                }
-                finalResult.addAll(defaultDataInstanceDataSource.getDataInstances(dataInstanceIds));
-                result = finalResult;
-            }
+            final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
+            final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
+            finalResult.addAll(defaultDataInstanceDataSource.getDataInstances(dataInstanceIds));
             logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
-            return result;
+            return finalResult;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
             throw new SDataInstanceException("Unable to find the data in the data mapping with name = " + dataNames + ", containerId = " + containerId

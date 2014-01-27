@@ -46,7 +46,7 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
-        return evaluate(Arrays.asList(expression), dependencyValues, resolvedExpressions);
+        return evaluate(Arrays.asList(expression), dependencyValues, resolvedExpressions).get(0);
     }
 
     @Override

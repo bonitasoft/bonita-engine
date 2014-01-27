@@ -25,7 +25,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.impl.transaction.activity.CreateActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
-import org.bonitasoft.engine.api.impl.transaction.data.CreateSDataInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpression;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
@@ -61,6 +60,8 @@ import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -581,9 +582,8 @@ public class BPMInstancesCreator {
             }
         }
         if (hasLocalOrInheritedData(processDefinition, processContainer)) {
-            final CreateSDataInstances transaction = new CreateSDataInstances(sDataInstances, dataInstanceService, processInstance, activityInstanceService,
-                    processDefinition);
-            transaction.execute();
+            // we create here only normal data, not transient because there is no transient on process
+            createDataForProcess(processInstance, processDefinition, sDataInstances);
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
             final StringBuilder stb = new StringBuilder();
@@ -605,6 +605,32 @@ public class BPMInstancesCreator {
             }
             stb.append(">]");
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
+        }
+    }
+
+    private void createDataForProcess(final SProcessInstance processInstance, final SProcessDefinition processDefinition,
+            final List<SDataInstance> sDataInstances)
+            throws SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
+        if (!sDataInstances.isEmpty()) {
+            for (final SDataInstance sDataInstance : sDataInstances) {
+                dataInstanceService.createDataInstance(sDataInstance);
+            }
+        }
+
+        final boolean parentHasData = !processDefinition.getProcessContainer().getDataDefinitions().isEmpty();
+        if (!sDataInstances.isEmpty() || parentHasData) {
+            if (processInstance.getCallerId() > 0) {
+                final SFlowNodeInstance caller = activityInstanceService.getFlowNodeInstance(processInstance.getCallerId());
+                if (SFlowNodeType.SUB_PROCESS.equals(caller.getType())) {
+                    final SSubProcessActivityInstanceBuilderFactory keyProvider = BuilderFactory.get(SSubProcessActivityInstanceBuilderFactory.class);
+                    dataInstanceService.addChildContainer(caller.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()),
+                            DataInstanceContainer.PROCESS_INSTANCE.name(), processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                } else {
+                    dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                }
+            } else {
+                dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+            }
         }
     }
 

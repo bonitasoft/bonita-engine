@@ -181,7 +181,7 @@ public class ActivityCommandTest extends CommonAPITest {
                     .addInput(
                             "input1",
                             new ExpressionBuilder().createGroovyScriptExpression("concat", "dataName+\"a\"", String.class.getName(),
-                                    new ExpressionBuilder().createDataExpression("dataName", String.class.getName())))
+                                    new ExpressionBuilder().createTransientDataExpression("dataName", String.class.getName())))
                     .addOutput(
                             new OperationBuilder().createSetDataOperation("application",
                                     new ExpressionBuilder().createInputExpression("output1", String.class.getName())));

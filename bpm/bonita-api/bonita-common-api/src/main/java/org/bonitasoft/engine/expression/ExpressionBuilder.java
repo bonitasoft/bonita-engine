@@ -140,6 +140,10 @@ public class ExpressionBuilder {
         return createNewInstance(dataName).setContent(dataName).setExpressionType(ExpressionType.TYPE_VARIABLE.name()).setReturnType(dataType).done();
     }
 
+    public Expression createTransientDataExpression(final String dataName, final String dataType) throws InvalidExpressionException {
+        return createNewInstance(dataName).setContent(dataName).setExpressionType(ExpressionType.TYPE_TRANSIENT_VARIABLE.name()).setReturnType(dataType).done();
+    }
+
     public Expression createDocumentReferenceExpression(final String documentName) throws InvalidExpressionException {
         return createNewInstance(documentName).setContent(documentName).setExpressionType(ExpressionType.TYPE_DOCUMENT.name())
                 .setReturnType(Document.class.getName()).done();

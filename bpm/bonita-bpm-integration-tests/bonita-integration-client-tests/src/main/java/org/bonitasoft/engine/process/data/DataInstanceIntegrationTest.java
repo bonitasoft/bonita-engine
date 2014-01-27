@@ -981,7 +981,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         final Expression persistedVariableExpression = new ExpressionBuilder().createDataExpression("persistedVariable", String.class.getName());
-        final Expression transientVariableExpression = new ExpressionBuilder().createDataExpression("transientVariable", String.class.getName());
+        final Expression transientVariableExpression = new ExpressionBuilder().createTransientDataExpression("transientVariable", String.class.getName());
         expressions.put(persistedVariableExpression, (Map<String, Serializable>) null);
         expressions.put(transientVariableExpression, (Map<String, Serializable>) null);
 

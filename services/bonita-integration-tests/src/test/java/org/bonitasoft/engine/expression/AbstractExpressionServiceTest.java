@@ -22,7 +22,6 @@ import java.util.Map;
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
 import org.bonitasoft.engine.data.instance.DataInstanceDataSourceImpl;
@@ -53,8 +52,6 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
 
     private static SDataSource dataSource;
 
-    private static SDataSource transientDataSource;
-
     private static DataService dataSourceService;
 
     private static SDataSourceBuilderFactory dataSourceBuilderFactory;
@@ -76,14 +73,13 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
     public static void setUpPersistence() throws Exception {
         dataSource = createDataInstanceDataSource(DataInstanceServiceImpl.DEFAULT_DATA_SOURCE, DataInstanceServiceImpl.DATA_SOURCE_VERSION,
                 DataInstanceDataSourceImpl.class);
-        transientDataSource = createDataInstanceDataSource(DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE,
-                DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE_VERSION, TransientDataInstanceDataSource.class);
     }
 
     private static SDataSource createDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion,
             final Class<? extends DataInstanceDataSource> clazz) throws Exception {
         getTransactionService().begin();
-        final SDataSource dataSource = dataSourceBuilderFactory.createNewInstance(dataSourceName, dataSourceVersion, SDataSourceState.ACTIVE, clazz.getName()).done();
+        final SDataSource dataSource = dataSourceBuilderFactory.createNewInstance(dataSourceName, dataSourceVersion, SDataSourceState.ACTIVE, clazz.getName())
+                .done();
         dataSourceService.createDataSource(dataSource);
         getTransactionService().complete();
         return dataSource;
@@ -93,7 +89,6 @@ public abstract class AbstractExpressionServiceTest extends CommonServiceTest {
     public static void tearDownPersistence() throws Exception {
         TestUtil.closeTransactionIfOpen(getTransactionService());
         removeDataInstanceDataSource(dataSource);
-        removeDataInstanceDataSource(transientDataSource);
     }
 
     private static void removeDataInstanceDataSource(final SDataSource dataSource) throws Exception {

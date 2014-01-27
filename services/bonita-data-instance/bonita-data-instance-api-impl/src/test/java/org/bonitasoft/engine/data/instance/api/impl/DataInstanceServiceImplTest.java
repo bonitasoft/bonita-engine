@@ -105,8 +105,8 @@ public class DataInstanceServiceImplTest {
         // Throw exception when get transient data
         final SDataSource transientSDataSource = mock(SDataSource.class);
         doReturn(1L).when(transientSDataSource).getId();
-        doReturn(transientSDataSource).when(dataSourceService).getDataSource(DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE,
-                DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE_VERSION);
+        doReturn(transientSDataSource).when(dataSourceService).getDataSource(anyString(),
+                anyString());
         final DataInstanceDataSource dataInstanceDataSource = mock(DataInstanceDataSource.class);
         doReturn(dataInstanceDataSource).when(dataSourceService).getDataSourceImplementation(DataInstanceDataSource.class, 1L);
         doThrow(new SDataInstanceException("plop")).when(dataInstanceDataSource).getDataInstance(dataInstanceId);
@@ -117,7 +117,7 @@ public class DataInstanceServiceImplTest {
                 DataInstanceServiceImpl.DATA_SOURCE_VERSION);
         doReturn(2L).when(transientSDataSource).getId();
         final DataInstanceDataSource dataInstanceDataSource2 = mock(DataInstanceDataSource.class);
-        doReturn(dataInstanceDataSource2).when(dataSourceService).getDataSourceImplementation(DataInstanceDataSource.class, 2L);
+        doReturn(dataInstanceDataSource2).when(dataSourceService).getDataSourceImplementation(eq(DataInstanceDataSource.class), anyLong());
         final SDataInstance sDataInstance = mock(SDataInstance.class);
         doReturn(sDataInstance).when(dataInstanceDataSource2).getDataInstance(dataInstanceId);
 

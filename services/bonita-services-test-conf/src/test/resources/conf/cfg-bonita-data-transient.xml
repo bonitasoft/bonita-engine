@@ -7,4 +7,9 @@
 		<constructor-arg name="cacheService" ref="cacheService" />
 	</bean>
 
+	<bean id="transientDataExpressionExecutorStrategy"
+		class="org.bonitasoft.engine.core.data.instance.impl.TransientDataExpressionExecutorStrategy">
+		<constructor-arg name="transientDataService" ref="transientDataService" />
+	</bean>
+
 </beans>

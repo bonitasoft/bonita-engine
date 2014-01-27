@@ -17,7 +17,6 @@ import java.util.Map;
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
@@ -91,8 +90,6 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
     public static void setUpPersistence() throws Exception {
         dataSource = createDataInstanceDataSource(DataInstanceServiceImpl.DEFAULT_DATA_SOURCE, DataInstanceServiceImpl.DATA_SOURCE_VERSION,
                 DataInstanceDataSourceImpl.class);
-        transientDataSource = createDataInstanceDataSource(DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE,
-                DataInstanceServiceImpl.TRANSIENT_DATA_SOURCE_VERSION, TransientDataInstanceDataSource.class);
     }
 
     private static SDataSource createDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion,

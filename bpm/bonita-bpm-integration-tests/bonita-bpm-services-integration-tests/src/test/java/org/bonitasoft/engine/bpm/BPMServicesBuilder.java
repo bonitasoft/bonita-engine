@@ -40,6 +40,7 @@ import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.login.LoginService;
@@ -539,6 +540,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public ThemeService getThemeService() {
         return getInstanceOf(ThemeService.class);
+    }
+
+    @Override
+    public TransientDataService getTransientDataService() {
+        return getInstanceOf(TransientDataService.class);
     }
 
     @SuppressWarnings("unchecked")

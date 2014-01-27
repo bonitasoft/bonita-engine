@@ -38,6 +38,7 @@ import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.login.LoginService;
@@ -220,6 +221,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private JobService jobService;
 
     private ThemeService themeService;
+
+    private TransientDataService transientDataService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -751,8 +754,15 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
+    public TransientDataService getTransientDataService() {
+        if (transientDataService == null) {
+            transientDataService = beanAccessor.getService(TransientDataService.class);
+        }
+        return transientDataService;
+    }
+
+    @Override
     public void destroy() {
         beanAccessor.destroy();
     }
-
 }
