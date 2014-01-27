@@ -39,6 +39,7 @@
 								add up information in the same report, so that, it will give the cross-module 
 								code coverage. -->
 							<destFile>${sonar.jacoco.itReportPath}</destFile>
+							<append>true</append>
 						</configuration>
 						<executions>
 							<execution>

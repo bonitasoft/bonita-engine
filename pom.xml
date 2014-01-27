@@ -30,6 +30,7 @@
 		<sonar.jacoco.itReportPath>${user.home}/reports/jacoco/engine-sp-it.exec</sonar.jacoco.itReportPath>
 		<!-- Tells SonarQube where the unit tests code coverage report is -->
 		<sonar.jacoco.reportPath>${user.home}/reports/jacoco/engine-sp.exec</sonar.jacoco.reportPath>
+		<sonar.junit.reportsPath>${project.build.directory}/surefire-reports</sonar.junit.reportsPath>
 	</properties>
 
 	<dependencyManagement>
@@ -213,6 +214,9 @@
 								<include>org.bonitasoft.engine.*</include>
 								<include>com.bonitasoft.engine.*</include>
 							</includes>
+							<excludes>
+								<exclude>*Test*</exclude>
+							</excludes>
 							<append>true</append>
 						</configuration>
 						<executions>
