@@ -87,11 +87,13 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
                 final SBPMEventType waitingMessageEventType = couple.getWaitingMessageEventType();
 
                 // Mark messages that will be treated as "treatment in progress":
-                markMessageAsInProgress(messageInstanceId);
+                final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
+                final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
+                markMessageAsInProgress(messageInstance);
                 if (!START_WAITING_MESSAGE_LIST.contains(waitingMessageEventType)) {
-                    markWaitingMessageAsInProgress(waitingMessageId);
+                    markWaitingMessageAsInProgress(waitingMsg);
                 }
-                workService.registerWork(WorkFactory.createExecuteMessageCoupleWork(messageInstanceId, waitingMessageId));
+                workService.registerWork(WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMsg));
             }
         } catch (final SBonitaException e) {
             throw new SJobExecutionException(e);
@@ -134,19 +136,18 @@ public class BPMEventHandlingJob extends InternalJob implements Serializable {
         workService = getTenantServiceAccessor().getWorkService();
     }
 
-    private void markMessageAsInProgress(final long messageInstanceIdToUpdate) throws SMessageModificationException,
+    private void markMessageAsInProgress(final SMessageInstance messageInstance) throws SMessageModificationException,
             SMessageInstanceNotFoundException, SMessageInstanceReadException {
-        final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceIdToUpdate);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(BuilderFactory.get(SMessageInstanceBuilderFactory.class).getHandledKey(), true);
         eventInstanceService.updateMessageInstance(messageInstance, descriptor);
     }
 
-    private void markWaitingMessageAsInProgress(final long waitingMessageInstanceIdToUpdate) throws SWaitingEventModificationException,
+    private void markWaitingMessageAsInProgress(final SWaitingMessageEvent waitingMsg) throws SWaitingEventModificationException,
             SWaitingEventNotFoundException, SWaitingEventReadException {
-        final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageInstanceIdToUpdate);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(), SWaitingMessageEventBuilderFactory.PROGRESS_IN_TREATMENT_KEY);
+        descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(),
+                SWaitingMessageEventBuilderFactory.PROGRESS_IN_TREATMENT_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
     }
 

@@ -36,8 +36,10 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * The PlatformCommandAPI gives access to command registration / unregistration to 'deploy' new commands at platform level.
  * The commands must be packed in jars and deployed /undeployed in the Engine as dependencies using methods {@link CommandAPI#addDependency(String, byte[])},
  * {@link #removeDependency(String)}
+ * Manipulate tenant commands, it can be registered, unregistered and executed with parameters.<br/>
+ * These command are executed in a platform scope, see {@link CommandAPI} for more explanations on how to deploy, execute and undeploy a command. The only
+ * difference with {@link CommandAPI} is that here commands must extends {@link org.bonitasoft.engine.command.PlatformCommand}.
  * 
- * @see CommandAPI
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  * @see CommandDescriptor

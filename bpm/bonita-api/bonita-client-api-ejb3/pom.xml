@@ -11,7 +11,6 @@
 	<artifactId>bonita-client-api-ejb3</artifactId>
 
 	<name>Bonita Client API: EJB3</name>
-
 	
 	<dependencies>
 		<dependency>

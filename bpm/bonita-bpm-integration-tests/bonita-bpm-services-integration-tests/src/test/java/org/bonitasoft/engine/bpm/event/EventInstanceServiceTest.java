@@ -17,7 +17,6 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.event.SEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SStartEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingErrorEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
@@ -109,7 +108,8 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private List<SEventInstance> getEventInstances(final long processInstanceId, final int fromIndex,
             final int maxResult) throws SBonitaException {
-        return getEventInstances(processInstanceId, fromIndex, maxResult, BuilderFactory.get(SStartEventInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC);
+        return getEventInstances(processInstanceId, fromIndex, maxResult, BuilderFactory.get(SStartEventInstanceBuilderFactory.class).getNameKey(),
+                OrderByType.ASC);
     }
 
     private List<SEventInstance> getEventInstances(final long processInstanceId, final int fromIndex, final int maxResult, final String fieldName,
@@ -148,28 +148,34 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         assertEquals(expectedTriggerInstance.getEventInstanceId(), retrievedEventTriggerInstance.getEventInstanceId());
     }
 
-    private STimerEventTriggerInstance createTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue) throws SBonitaException {
-        final STimerEventTriggerInstance triggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class).createNewTimerEventTriggerInstance(eventInstanceId, timerType,
-                timerValue).done();
+    private STimerEventTriggerInstance createTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue)
+            throws SBonitaException {
+        final STimerEventTriggerInstance triggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
+                .createNewTimerEventTriggerInstance(eventInstanceId, timerType,
+                        timerValue).done();
         createEventTriggerInstance(triggerInstance);
         return triggerInstance;
     }
 
-    private SThrowMessageEventTriggerInstance createThrowMessageEventTriggerInstance(final long eventInstanceId, final String messageName, final String targetProcess, final String targetFlowNode) throws SBonitaException {
-        final SThrowMessageEventTriggerInstance messageTrigger = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, messageName, targetProcess,
-                targetFlowNode).done();
+    private SThrowMessageEventTriggerInstance createThrowMessageEventTriggerInstance(final long eventInstanceId, final String messageName,
+            final String targetProcess, final String targetFlowNode) throws SBonitaException {
+        final SThrowMessageEventTriggerInstance messageTrigger = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class)
+                .createNewInstance(eventInstanceId, messageName, targetProcess,
+                        targetFlowNode).done();
         createEventTriggerInstance(messageTrigger);
         return messageTrigger;
     }
 
     private SThrowSignalEventTriggerInstance createThrowSignalEventTriggerInstance(final long eventInstanceId, final String signalName) throws SBonitaException {
-        final SThrowSignalEventTriggerInstance signalTrigger = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, signalName).done();
+        final SThrowSignalEventTriggerInstance signalTrigger = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class)
+                .createNewInstance(eventInstanceId, signalName).done();
         createEventTriggerInstance(signalTrigger);
         return signalTrigger;
     }
 
     private SThrowErrorEventTriggerInstance createThrowErrorEventTriggerInstance(final long eventInstanceId, final String errorCode) throws SBonitaException {
-        final SThrowErrorEventTriggerInstance errorTriggerInstance = BuilderFactory.get(SThrowErrorEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, errorCode).done();
+        final SThrowErrorEventTriggerInstance errorTriggerInstance = BuilderFactory.get(SThrowErrorEventTriggerInstanceBuilderFactory.class)
+                .createNewInstance(eventInstanceId, errorCode).done();
         createEventTriggerInstance(errorTriggerInstance);
         return errorTriggerInstance;
     }
@@ -188,9 +194,12 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     private SEventInstance createBoundaryEventInstance(final String eventName,
             final long flowNodeDefinitionId, final long rootProcessInstanceId, final long processDefinitionId, final long parentProcessInstanceId,
-            final long activityInstanceId, boolean isInterrupting) throws SBonitaException {
-        final SEventInstance eventInstance = BuilderFactory.get(SBoundaryEventInstanceBuilderFactory.class).createNewBoundaryEventInstance(eventName, isInterrupting, flowNodeDefinitionId,
-                rootProcessInstanceId, parentProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, activityInstanceId).done();
+            final long activityInstanceId, final boolean isInterrupting) throws SBonitaException {
+        final SEventInstance eventInstance = BuilderFactory
+                .get(SBoundaryEventInstanceBuilderFactory.class)
+                .createNewBoundaryEventInstance(eventName, isInterrupting, flowNodeDefinitionId,
+                        rootProcessInstanceId, parentProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, activityInstanceId)
+                .done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
@@ -350,7 +359,8 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
         final SEventInstance eventInstance1 = createSEndEventInstance("EndEvent1", 1, processInstance.getId(), 5, processInstance.getId());
         final SEventInstance eventInstance2 = createSEndEventInstance("EndEvent2", 1, processInstance.getId(), 5, processInstance.getId());
-        final List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5, BuilderFactory.get(SEndEventInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC);
+        final List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5, BuilderFactory.get(SEndEventInstanceBuilderFactory.class)
+                .getNameKey(), OrderByType.ASC);
 
         assertEquals(2, eventInstances.size());
         checkEndEventInstance(eventInstance1, eventInstances.get(0));
@@ -365,7 +375,8 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
         final SEventInstance eventInstance1 = createSEndEventInstance("EndEvent1", 1, processInstance.getId(), 5, processInstance.getId());
         final SEventInstance eventInstance2 = createSEndEventInstance("EndEvent2", 1, processInstance.getId(), 5, processInstance.getId());
-        final List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5, BuilderFactory.get(SEndEventInstanceBuilderFactory.class).getNameKey(), OrderByType.DESC);
+        final List<SEventInstance> eventInstances = getEventInstances(processInstance.getId(), 0, 5, BuilderFactory.get(SEndEventInstanceBuilderFactory.class)
+                .getNameKey(), OrderByType.DESC);
 
         assertEquals(2, eventInstances.size());
         checkEndEventInstance(eventInstance2, eventInstances.get(0));
@@ -481,13 +492,15 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
         createTimerEventTriggerInstance(startEventInstance.getId(), STimerType.DURATION, 1000);
 
-        List<SEventTriggerInstance> eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10, BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getEventInstanceIdKey(),
+        List<SEventTriggerInstance> eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10,
+                BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getEventInstanceIdKey(),
                 OrderByType.ASC);
         assertEquals(1, eventTriggers.size());
 
         deleteSProcessInstance(processInstance);
 
-        eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10, BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getEventInstanceIdKey(), OrderByType.ASC);
+        eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10, BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class)
+                .getEventInstanceIdKey(), OrderByType.ASC);
         assertEquals(0, eventTriggers.size());
     }
 
@@ -504,12 +517,14 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         final long eventInstanceId = eventInstance.getId();
         checkWaitingEvents(0, waitingEventClass, processDefinitionIdKey, flowNodeInstanceIdKey, eventInstanceId);
 
-        final SWaitingMessageEvent messageWaitingEvent = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).createNewWaitingMessageIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
-                eventInstanceId, "m1", processInstance.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName()).done();
+        final SWaitingMessageEvent messageWaitingEvent = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
+                .createNewWaitingMessageIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
+                        eventInstanceId, "m1", processInstance.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName()).done();
         createWaitingEvent(messageWaitingEvent);
 
-        final SWaitingSignalEvent waitingSignalEvent = BuilderFactory.get(SWaitingSignalEventBuilderFactory.class).createNewWaitingSignalIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
-                eventInstanceId, "go", processInstance.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName()).done();
+        final SWaitingSignalEvent waitingSignalEvent = BuilderFactory.get(SWaitingSignalEventBuilderFactory.class)
+                .createNewWaitingSignalIntermediateEventInstance(5, processInstance.getId(), processInstance.getId(),
+                        eventInstanceId, "go", processInstance.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName()).done();
         createWaitingEvent(waitingSignalEvent);
 
         // search with SWaitingEvent

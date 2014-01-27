@@ -27,6 +27,8 @@ import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -56,7 +58,8 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
             ) throws SWaitingEventModificationException, SWaitingEventNotFoundException, SWaitingEventReadException {
         final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(), SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
+        descriptor
+                .addField(BuilderFactory.get(SWaitingMessageEventBuilderFactory.class).getProgressKey(), SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY);
         eventInstanceService.updateWaitingMessage(waitingMsg, descriptor);
     }
 
@@ -70,7 +73,8 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
 
     @Override
     public String getRecoveryProcedure() {
-        return "Change the 'progress' field of the waiting message having id " + waitingMessageId + " to " + SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY
+        return "Change the 'progress' field of the waiting message having id " + waitingMessageId + " to "
+                + SWaitingMessageEventBuilderFactory.PROGRESS_FREE_KEY
                 + " and "
                 + "the 'handled' field of the message instance  having id " + messageInstanceId + " to false";
     }
@@ -79,9 +83,13 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
     public void work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
+        DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final SWaitingMessageEvent waitingMessage = eventInstanceService.getWaitingMessage(waitingMessageId);
+        SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
         if (waitingMessage != null) {
             tenantAccessor.getEventsHandler().triggerCatchEvent(waitingMessage, messageInstanceId);
+            eventInstanceService.deleteMessageInstance(messageInstance);
+            dataInstanceService.deleteLocalDataInstances(messageInstanceId, DataInstanceContainer.MESSAGE_INSTANCE.name(), true);
         }
     }
 
