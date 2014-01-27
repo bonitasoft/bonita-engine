@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -10,6 +10,7 @@ package com.bonitasoft.engine.service.impl;
 
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
+import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.parameter.ParameterService;
@@ -34,8 +35,14 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
 
     private BusinessDataRespository businessDataRespository;
 
+    private RefBusinessDataService refBusinessDataService;
+
     public SpringTenantServiceAccessor(final Long tenantId) {
         super(tenantId);
+    }
+
+    private <T> T lookupService(final Class<T> clazz) {
+        return getBeanAccessor().getService(clazz);
     }
 
     @Override
@@ -78,16 +85,20 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
         return tenantMonitoringServie;
     }
 
-    private <T> T lookupService(final Class<T> clazz) {
-        return getBeanAccessor().getService(clazz);
-    }
-
     @Override
     public BusinessDataRespository getBusinessDataRepository() {
         if (businessDataRespository == null) {
             businessDataRespository = lookupService(BusinessDataRespository.class);
         }
         return businessDataRespository;
+    }
+
+    @Override
+    public RefBusinessDataService getRefBusinessDataService() {
+        if (refBusinessDataService == null) {
+            refBusinessDataService = lookupService(RefBusinessDataService.class);
+        }
+        return refBusinessDataService;
     }
 
 }

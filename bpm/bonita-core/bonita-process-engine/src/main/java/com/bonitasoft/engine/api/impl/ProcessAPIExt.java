@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -44,6 +44,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
+import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
@@ -108,6 +109,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.process.SearchProcessInstances;
@@ -126,6 +128,11 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
+import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
+import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
+import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 import com.bonitasoft.engine.execution.transaction.AddActivityInstanceTokenCount;
 import com.bonitasoft.engine.parameter.OrderBy;
 import com.bonitasoft.engine.parameter.ParameterService;
@@ -1041,6 +1048,26 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             throw new RetrieveException(e);
         }
         return ModelConvertor.toConnectorInstanceWithFailureInfo(serverObject);
+    }
+
+    @Override
+    public Serializable getBusinessDataInstance(final String dataName, final long processInstanceId) throws DataNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
+        try {
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(dataName, processInstanceId);
+            final BusinessDataRespository businessDataRepository = tenantAccessor.getBusinessDataRepository();
+            final Class<?> businessDataClass = Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
+            return (Serializable) businessDataRepository.find(businessDataClass, refBusinessDataInstance.getDataId());
+        } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {
+            throw new DataNotFoundException(srbdnfe);
+        } catch (final BusinessDataNotFoundException bdnfe) {
+            throw new DataNotFoundException(bdnfe);
+        } catch (final SBonitaReadException sbe) {
+            throw new RetrieveException(sbe);
+        } catch (final ClassNotFoundException cnfe) {
+            throw new RetrieveException(cnfe);
+        }
     }
 
 }
