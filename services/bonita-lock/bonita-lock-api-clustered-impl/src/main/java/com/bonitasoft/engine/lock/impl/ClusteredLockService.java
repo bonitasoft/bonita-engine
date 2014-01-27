@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.lock.impl;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
@@ -20,6 +19,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 
 /**
  * create and release locks using hazelcast
@@ -27,8 +27,6 @@ import com.hazelcast.core.HazelcastInstance;
  * @author Baptiste Mesta
  */
 public class ClusteredLockService implements LockService {
-
-    private final HazelcastInstance hazelcastInstance;
 
     private static final String SEPARATOR = "_";
 
@@ -40,16 +38,18 @@ public class ClusteredLockService implements LockService {
 
     private final boolean traceEnable;
 
+    private final IMap<Object, Object> lockMap;
+
     public ClusteredLockService(final HazelcastInstance hazelcastInstance, final TechnicalLoggerService logger,
             final int lockTimeout) {
         this.logger = logger;
         this.lockTimeout = lockTimeout;
         this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
         this.traceEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
-        this.hazelcastInstance = hazelcastInstance;
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
+        lockMap = hazelcastInstance.getMap("BONITA_LOCK_MAP");
     }
 
     @Override
@@ -74,10 +74,9 @@ public class ClusteredLockService implements LockService {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "lock id=" + key);
         }
         boolean lockObtained = false;
-        final Lock lock = hazelcastInstance.getLock(key);
         try {
-            lockObtained = lock.tryLock(timeout, timeUnit);
-        } catch (InterruptedException e) {
+            lockObtained = lockMap.tryLock(key, timeout, timeUnit);
+        } catch (Exception e) {
             throw new SLockException(e);
         }
 
@@ -97,7 +96,7 @@ public class ClusteredLockService implements LockService {
                 logger.log(getClass(), severity, new Exception("Stack trace : lock for the key " + key));
             }
         }
-        return new BonitaLock(lock, objectType, objectToLockId);
+        return new BonitaLock(null, objectType, objectToLockId);
     }
 
     @Override
@@ -106,8 +105,7 @@ public class ClusteredLockService implements LockService {
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
         }
-        final Lock lock = bonitaLock.getLock();
-        lock.unlock();
+        lockMap.unlock(key);
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "unlock " + bonitaLock.getLock().hashCode() + " id=" + key);
         }

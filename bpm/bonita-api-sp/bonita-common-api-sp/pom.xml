@@ -23,6 +23,7 @@
 		</dependency>
 	</dependencies>
 
+</project>
 	<build>
 		<plugins>
 			<plugin>

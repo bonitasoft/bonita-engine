@@ -147,20 +147,21 @@ public class HazelcastStatExtractor implements Runnable {
                     IQueue<?> queue = (IQueue<?>) distributedObject;
                     if (queue.getName().startsWith("ExecutingWorkQueue")) {
                         LocalQueueStats localQueueStats = queue.getLocalQueueStats();
-                        stats.put(EXECUTING_WORK_QUEUE_ITEM_COUNT, localQueueStats.getOwnedItemCount());
-                        stats.put(EXECUTING_WORK_QUEUE_OFFER_COUNT, localQueueStats.getOfferOperationCount());
-                        stats.put(EXECUTING_WORK_QUEUE_POLL_COUNT, localQueueStats.getPollOperationCount());
-                        stats.put(EXECUTING_WORK_QUEUE_AVG_AGE, localQueueStats.getAvgAge());
-                        stats.put(EXECUTING_WORK_QUEUE_MAX_AGE, localQueueStats.getMaxAge());
-                        stats.put(EXECUTING_WORK_QUEUE_REJECTED_OFFER, localQueueStats.getRejectedOfferOperationCount());
+                        putOrAdd(stats, EXECUTING_WORK_QUEUE_ITEM_COUNT, localQueueStats.getOwnedItemCount());
+                        putOrAdd(stats, EXECUTING_WORK_QUEUE_ITEM_COUNT, localQueueStats.getOwnedItemCount());
+                        putOrAdd(stats, EXECUTING_WORK_QUEUE_OFFER_COUNT, localQueueStats.getOfferOperationCount());
+                        putOrAdd(stats, EXECUTING_WORK_QUEUE_POLL_COUNT, localQueueStats.getPollOperationCount());
+                        putOrAdd(stats, EXECUTING_WORK_QUEUE_AVG_AGE, localQueueStats.getAvgAge());
+                        putOrAdd(stats, EXECUTING_WORK_QUEUE_MAX_AGE, localQueueStats.getMaxAge());
+                        putOrAdd(stats, EXECUTING_WORK_QUEUE_REJECTED_OFFER, localQueueStats.getRejectedOfferOperationCount());
                     } else if (queue.getName().startsWith("WorkQueue")) {
                         LocalQueueStats localQueueStats = queue.getLocalQueueStats();
-                        stats.put(WORK_QUEUE_ITEM_COUNT, localQueueStats.getOwnedItemCount());
-                        stats.put(WORK_QUEUE_OFFER_COUNT, localQueueStats.getOfferOperationCount());
-                        stats.put(WORK_QUEUE_POLL_COUNT, localQueueStats.getPollOperationCount());
-                        stats.put(WORK_QUEUE_AVG_AGE, localQueueStats.getAvgAge());
-                        stats.put(WORK_QUEUE_MAX_AGE, localQueueStats.getMaxAge());
-                        stats.put(WORK_QUEUE_REJECTED_OFFER, localQueueStats.getRejectedOfferOperationCount());
+                        putOrAdd(stats, WORK_QUEUE_ITEM_COUNT, localQueueStats.getOwnedItemCount());
+                        putOrAdd(stats, WORK_QUEUE_OFFER_COUNT, localQueueStats.getOfferOperationCount());
+                        putOrAdd(stats, WORK_QUEUE_POLL_COUNT, localQueueStats.getPollOperationCount());
+                        putOrAdd(stats, WORK_QUEUE_AVG_AGE, localQueueStats.getAvgAge());
+                        putOrAdd(stats, WORK_QUEUE_MAX_AGE, localQueueStats.getMaxAge());
+                        putOrAdd(stats, WORK_QUEUE_REJECTED_OFFER, localQueueStats.getRejectedOfferOperationCount());
                     }
                 }
                 if (distributedObject instanceof IMap) {
@@ -198,6 +199,22 @@ public class HazelcastStatExtractor implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 
+     * put the element or add it if it already exists (must do that because there may be more than one work queue)
+     * 
+     * @param stats
+     * @param executingWorkQueueItemCount
+     * @param ownedItemCount
+     */
+    private void putOrAdd(final HashMap<String, Long> stats, final String key, final long value) {
+        long sum = value;
+        if (stats.containsKey(key)) {
+            sum += stats.get(key);
+        }
+        stats.put(key, sum);
     }
 
     private void extractMapStats(final HashMap<String, Long> stats, final IMap<?, ?> map, final String mapName) {
