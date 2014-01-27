@@ -54,7 +54,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		
-		<!-- Sonar -->
 		<!-- Properties to enable jacoco code coverage analysis -->
 		<sonar.branch>MasterBugFixing</sonar.branch>
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -235,6 +234,11 @@
 					<version>1.4.5</version>
 				</plugin>
 				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.6.4.201312101107</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>2.8.1</version>
@@ -379,7 +383,6 @@
 				</plugins>
 			</build>
 		</profile>
-		
 		<profile>
 			<id>package-all</id>
 			<modules>
@@ -406,7 +409,6 @@
 				</plugins>
 			</build>
 		</profile>
-		
 		<profile>
 			<id>tests</id>
 			<properties>
@@ -433,19 +435,15 @@
 				</plugins>
 			</build>
 		</profile>
-		
 		<profile>
 			<id>sonar</id>
-			
 			<properties>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
 			</properties>
-			
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
 			</modules>
-			
 			<dependencies>
 				<dependency>
 					<groupId>org.codehaus.sonar-plugins.java</groupId>
@@ -454,17 +452,7 @@
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
-
 			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.jacoco</groupId>
-							<artifactId>jacoco-maven-plugin</artifactId>
-							<version>0.6.4.201312101107</version>
-						</plugin>
-					</plugins>
-				</pluginManagement>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
