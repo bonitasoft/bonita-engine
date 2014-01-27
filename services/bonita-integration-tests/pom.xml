@@ -713,7 +713,7 @@
 		<profile>
 			<id>sonar</id>
 			<properties>
-				<maven.javadoc.skip>true</maven.javadoc.skip>
+				<sonar.jacoco.itReportPath>../../target/jacoco-reports/engine-it.exec</sonar.jacoco.itReportPath>
 			</properties>
 			<build>
 				<plugins>
@@ -726,6 +726,12 @@
 								add up information in the same report, so that, it will give the cross-module 
 								code coverage. -->
 							<destFile>${sonar.jacoco.itReportPath}</destFile>
+							<includes>
+								<include>org.bonitasoft.engine.*</include>
+							</includes>
+							<excludes>
+								<exclude>*Test*</exclude>
+							</excludes>
 							<append>true</append>
 						</configuration>
 						<executions>
