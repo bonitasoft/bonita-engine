@@ -182,7 +182,7 @@ public class XMLProcessDefinition {
 
     public static final String STRING_INDEX = "stringIndex";
 
-    public static final String BUSINESS_DATA_DEFINITION_NODE = "businessdata";
+    public static final String BUSINESS_DATA_DEFINITION_NODE = "businessDataDefinition";
 
     public static final String BUSINESS_DATA_DEFINITIONS_NODE = "businessDataDefinitions";
 

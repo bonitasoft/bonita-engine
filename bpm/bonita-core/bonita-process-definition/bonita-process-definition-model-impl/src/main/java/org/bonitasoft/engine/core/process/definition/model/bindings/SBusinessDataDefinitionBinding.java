@@ -16,9 +16,9 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.data.definition.model.SDataDefinition;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
-import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
+import org.bonitasoft.engine.core.process.definition.model.builder.SBusinessDataDefinitionBuilder;
+import org.bonitasoft.engine.core.process.definition.model.builder.SBusinessDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
@@ -53,13 +53,14 @@ public class SBusinessDataDefinitionBinding extends SNamedElementBinding {
     }
 
     @Override
-    public SDataDefinition getObject() {
-        final SDataDefinitionBuilder dataDefinitionImpl = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(name, className);
+    public SBusinessDataDefinition getObject() {
+        final SBusinessDataDefinitionBuilder businessDataDefinitionImpl = BuilderFactory.get(SBusinessDataDefinitionBuilderFactory.class).createNewInstance(
+                name, className);
         if (description != null) {
-            dataDefinitionImpl.setDescription(description);
+            businessDataDefinitionImpl.setDescription(description);
         }
-        dataDefinitionImpl.setDefaultValue(defaultValue);
-        return dataDefinitionImpl.done();
+        businessDataDefinitionImpl.setDefaultValue(defaultValue);
+        return businessDataDefinitionImpl.done();
     }
 
     @Override

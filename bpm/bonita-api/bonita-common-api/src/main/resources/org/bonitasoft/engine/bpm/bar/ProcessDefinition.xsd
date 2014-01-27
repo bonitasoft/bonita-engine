@@ -118,7 +118,7 @@
 			<xs:element name="businessDataDefinitions">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element type="definition:BusinessDataDefinition" name="businessdata" minOccurs="0" maxOccurs="unbounded" />
+						<xs:element type="definition:BusinessDataDefinition" name="businessDataDefinition" minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
