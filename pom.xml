@@ -475,6 +475,9 @@
 							<includes>
 								<include>org.bonitasoft.engine.*</include>
 							</includes>
+							<excludes>
+								<exclude>*Test*</exclude>
+							</excludes>
 							<append>true</append>
 						</configuration>
 						<executions>
