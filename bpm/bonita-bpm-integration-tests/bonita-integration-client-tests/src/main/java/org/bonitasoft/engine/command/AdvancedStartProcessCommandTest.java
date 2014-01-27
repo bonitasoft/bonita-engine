@@ -272,11 +272,10 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
         process.expect("step 1", "step 2", "step 3", "step 4").toBeExecuted(1);
     }
 
-    @Ignore
     @Test
     public void should_be_able_to_start_a_process_with_a_document() throws Exception {
         ProcessDefinitionBuilder builder = getProcessDefinitionBuilder();
-        builder.addData("document", DocumentValue.class.getName(), null);
+        builder.addDocumentDefinition("document");
         ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
@@ -292,7 +291,7 @@ public class AdvancedStartProcessCommandTest extends CommonAPITest {
                 Collections.<String, Serializable> singletonMap(
                         "value", new DocumentValue("content".getBytes(), "plain/text", "document")));
 
-        process.expectVariable("document").toBe("file");
+        process.expectDocument("document").toBe("content");
     }
 
     private Operation createSetDataOperation(String name, String value) throws InvalidExpressionException {

@@ -48,6 +48,10 @@ public class TestUtils {
             return new VariableExpectation(testCase, process, name);
         }
 
+        public DocumentExpectation expectDocument(String name) {
+            return new DocumentExpectation(testCase, process, name);
+        }
+
         public void sendSignal(String name) throws SendEventException {
             testCase.getProcessAPI().sendSignal(name);
         }
