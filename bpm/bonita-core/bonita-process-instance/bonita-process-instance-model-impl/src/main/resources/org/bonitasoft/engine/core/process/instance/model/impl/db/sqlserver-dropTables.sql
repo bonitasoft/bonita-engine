@@ -18,3 +18,5 @@ DROP TABLE token
 GO
 DROP TABLE breakpoint
 GO
+DROP TABLE ref_business_data_inst
+GO
