@@ -24,27 +24,3 @@
 	</dependencies>
 
 </project>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>javadoc-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<doctitle>BonitaB PM Engine ${project.version} API</doctitle>
-							<finalName>BonitaBPM-Engine-${project.version}</finalName>
-							<includeDependencySources>true</includeDependencySources>
-        					<stylesheetfile>stylesheet.css</stylesheetfile>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
-</project>
