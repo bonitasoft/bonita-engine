@@ -18,19 +18,6 @@
 		<hazelcast.version>3.0.3</hazelcast.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		
-		<!-- Sonar -->
-		<!-- Properties to enable jacoco code coverage analysis -->
-		<sonar.branch>MasterBugFixing</sonar.branch>
-		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<!-- The destination file for the code coverage report has to be set to the same value in the parent pom and in each module pom. 
-		Then JaCoCo will add up information in the same report, so that, it will give the cross-module code coverage. -->
-		<!-- Tells SonarQube where the integration tests code coverage report is -->
-		<sonar.jacoco.itReportPath>${user.home}/reports/jacoco/engine-sp-it.exec</sonar.jacoco.itReportPath>
-		<!-- Tells SonarQube where the unit tests code coverage report is -->
-		<sonar.jacoco.reportPath>${user.home}/reports/jacoco/engine-sp.exec</sonar.jacoco.reportPath>
-		<sonar.junit.reportsPath>${project.build.directory}/surefire-reports</sonar.junit.reportsPath>
 	</properties>
 
 	<dependencyManagement>
@@ -165,6 +152,17 @@
 			
 			<properties>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
+				
+				<!-- Properties to enable jacoco code coverage analysis -->
+				<sonar.branch>MasterBugFixing</sonar.branch>
+				<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+				<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+				<!-- The destination file for the code coverage report has to be set to the same value in the parent pom and in each module pom. 
+				Then JaCoCo will add up information in the same report, so that, it will give the cross-module code coverage. -->
+				<!-- Tells SonarQube where the integration tests code coverage report is -->
+				<sonar.jacoco.itReportPath>${project.basedir}/jacoco-reports/engine-sp-it.exec</sonar.jacoco.itReportPath>
+				<!-- Tells SonarQube where the unit tests code coverage report is -->
+				<sonar.junit.reportsPath>${project.build.directory}/surefire-reports</sonar.junit.reportsPath>
 			</properties>
 			
 			<modules>
@@ -208,8 +206,6 @@
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
 						<configuration>
-							<!-- Where to put jacoco coverage report -->
-							<destFile>${sonar.jacoco.reportPath}</destFile>
 							<includes>
 								<include>org.bonitasoft.engine.*</include>
 								<include>com.bonitasoft.engine.*</include>

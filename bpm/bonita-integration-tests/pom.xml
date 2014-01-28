@@ -28,6 +28,9 @@
 			<modules>
 				<module>bonita-bpm-integration-tests</module>
 			</modules>
+			<properties>
+				<sonar.jacoco.itReportPath>${project.basedir}/../../jacoco-reports/engine-sp-it.exec</sonar.jacoco.itReportPath>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -39,6 +42,13 @@
 								add up information in the same report, so that, it will give the cross-module 
 								code coverage. -->
 							<destFile>${sonar.jacoco.itReportPath}</destFile>
+							<includes>
+								<include>org.bonitasoft.engine.*</include>
+								<include>com.bonitasoft.engine.*</include>
+							</includes>
+							<excludes>
+								<exclude>*Test*</exclude>
+							</excludes>
 							<append>true</append>
 						</configuration>
 						<executions>
