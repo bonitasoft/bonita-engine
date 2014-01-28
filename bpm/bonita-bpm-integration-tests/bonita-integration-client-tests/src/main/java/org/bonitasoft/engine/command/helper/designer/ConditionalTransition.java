@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -14,41 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.bonitasoft.engine.command.helper.designer;
 
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
- * @author Vincent Elcrin
+ * Created by vince on 1/28/14.
  */
-public class Condition {
+public class ConditionalTransition extends Transition {
+
+    private Fragment otherwise;
 
     private Expression expression;
 
-    private boolean defaults;
-
-    protected Condition(Expression expression) {
+    public ConditionalTransition(Expression expression) {
         this.expression = expression;
     }
 
-    protected Condition(boolean defaults) {
-        this.defaults = defaults;
+    @Override
+    public void bind(String source, String target, ProcessDefinitionBuilder builder) {
+        builder.addTransition(source, target, expression);
+
+        if(otherwise != null) {
+            otherwise.build(builder);
+            otherwise.bind(source, new DefaultTransition(), builder);
+        }
     }
 
-    protected Expression getExpression() {
-        return expression;
-    }
-
-    public static Condition meet(Expression expression) {
-        return new Condition(expression);
-    }
-
-    public static Condition defaults() {
-        return new Condition(true);
-    }
-
-    public boolean isDefault() {
-        return defaults;
+    public ConditionalTransition otherwise(Fragment otherwise) {
+        this.otherwise = otherwise;
+        return this;
     }
 }

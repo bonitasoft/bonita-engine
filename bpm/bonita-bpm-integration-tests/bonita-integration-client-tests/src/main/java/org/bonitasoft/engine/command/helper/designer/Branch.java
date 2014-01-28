@@ -33,8 +33,6 @@ public class Branch extends Fragment {
 
     private String name;
 
-    private Transition transition = new Transition();
-
     public Branch start(Fragment origin) {
         this.origin = origin;
         name = origin.getName();
@@ -60,8 +58,8 @@ public class Branch extends Fragment {
     }
 
     @Override
-    public void bind(String source, Condition condition, ProcessDefinitionBuilder builder) {
-        transition.bind(source, origin.getName(), condition, builder);
+    public void bind(String source, Transition transition, ProcessDefinitionBuilder builder) {
+        transition.bind(source, origin.getName(), builder);
     }
 
     @Override

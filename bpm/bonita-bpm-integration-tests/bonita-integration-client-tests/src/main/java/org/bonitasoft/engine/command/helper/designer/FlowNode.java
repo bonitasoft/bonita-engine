@@ -25,15 +25,13 @@ public abstract class FlowNode extends Fragment {
 
     private String name;
 
-    private Transition transition = new Transition();
-
     protected FlowNode(String name) {
         this.name = name;
     }
 
     @Override
-    public void bind(String source, Condition condition, ProcessDefinitionBuilder builder) {
-        transition.bind(source, name, condition, builder);
+    public void bind(String source, Transition transition, ProcessDefinitionBuilder builder) {
+        transition.bind(source, name, builder);
     }
 
     @Override
