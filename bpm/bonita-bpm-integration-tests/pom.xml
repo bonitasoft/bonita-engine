@@ -39,7 +39,7 @@
 				<module>bonita-bpm-services-integration-tests</module>
 			</modules>
 			<properties>
-				<sonar.jacoco.itReportPath>../../target/jacoco-reports/engine-it.exec</sonar.jacoco.itReportPath>
+				<sonar.jacoco.itReportPath>${project.basedir}/../../target/jacoco-reports/engine-it.exec</sonar.jacoco.itReportPath>
 			</properties>
 			<build>
 				<plugins>

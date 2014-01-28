@@ -435,7 +435,9 @@
 				<!-- The destination file for the code coverage report has to be set to the same value in the parent pom and in each module pom. 
 				Then JaCoCo will add up information in the same report, so that, it will give the cross-module code coverage. -->
 				<!-- Tells SonarQube where the integration tests code coverage report is -->
-				<sonar.jacoco.itReportPath>target/jacoco-reports/engine-it.exec</sonar.jacoco.itReportPath>
+				<sonar.jacoco.itReportPath>${project.basedir}/target/jacoco-reports/engine-it.exec</sonar.jacoco.itReportPath>
+				<!-- Tells SonarQube where the unit tests code coverage report is -->
+				<sonar.junit.reportsPath>${project.build.directory}/surefire-reports</sonar.junit.reportsPath>
 			</properties>
 			<modules>
 				<module>services</module>
