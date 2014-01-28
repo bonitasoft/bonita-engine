@@ -71,6 +71,8 @@ ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_tenantId
 GO
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_tenantId
 GO
+ALTER TABLE ref_business_data_inst DROP CONSTRAINT fk_ref_business_data_inst_tenantId
+GO
 ALTER TABLE role DROP CONSTRAINT fk_role_tenantId
 GO
 ALTER TABLE theme DROP CONSTRAINT fk_theme_tenantId

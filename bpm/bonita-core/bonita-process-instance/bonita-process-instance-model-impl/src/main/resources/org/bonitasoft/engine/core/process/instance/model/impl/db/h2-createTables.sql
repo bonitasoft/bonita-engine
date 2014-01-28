@@ -203,7 +203,7 @@ CREATE TABLE ref_business_data_inst (
   	id BIGINT NOT NULL,
   	name VARCHAR(255) NOT NULL,
   	proc_inst_id BIGINT NOT NULL,
-  	data_id INT NOT NULL,
+  	data_id INT NULL,
   	data_classname VARCHAR(255) NOT NULL,
   	UNIQUE (tenantid, proc_inst_id, name),
   	PRIMARY KEY (tenantid, id)

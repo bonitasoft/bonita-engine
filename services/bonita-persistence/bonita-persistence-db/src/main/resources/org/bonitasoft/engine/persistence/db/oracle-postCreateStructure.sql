@@ -3,6 +3,7 @@ ALTER TABLE datasourceparameter ADD CONSTRAINT fk_DSParam_tenId FOREIGN KEY (ten
 ALTER TABLE event_trigger_instance ADD CONSTRAINT fk_EvtTrig_tenId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE external_identity_mapping ADD CONSTRAINT fk_extIdMap_tenId FOREIGN KEY (tenantid) REFERENCES tenant(id);
 ALTER TABLE processcategorymapping ADD CONSTRAINT fk_procCatMap_tenId FOREIGN KEY (tenantid) REFERENCES tenant(id);
+ALTER TABLE ref_business_data_inst ADD CONSTRAINT fk_ref_business_data_inst_tenantId FOREIGN KEY (tenantId) REFERENCES tenant(id);
 ALTER TABLE theme ADD CONSTRAINT fk_theme_tenantId FOREIGN KEY (tenantId) REFERENCES tenant(id);
 
 ALTER TABLE arch_document_mapping ADD CONSTRAINT fk_ADocMap_tenId FOREIGN KEY (tenantid) REFERENCES tenant(id);
