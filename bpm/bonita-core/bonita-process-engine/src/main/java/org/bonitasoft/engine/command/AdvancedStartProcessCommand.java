@@ -26,6 +26,23 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
+ * This command start the process in the specified activity(ies).
+ * Parameters:
+ * - started_by: the user id (long) used as process starter. It's a mandatory parameter.
+ * - process_definition_id: the process definition id (long) of process to start. It's a mandatory parameter.
+ * - activity_names: the name of activities (List<String>) where the execution must starts. It's a mandatory parameter.
+ * - operations: the operations (List<Operation>) to execute when starting the process (set variables and documents). It's an optional parameter.
+ * - context: the context (Map<String, Serializable>) to be used during operations execution. It's an optional parameter.
+ * 
+ * Limitations:
+ * - It is not possible to start the execution of a process from a gateway, a boundary event or an event sub-process
+ * - The only use case where it's possible to start a process in several parallel branch is in the case where all these branches will merged with a exclusive
+ * gateway. In all others cases the process must be started when there is only one active branch. Examples:
+ * start -> step1 -> gateway1 -> (step2 || step3) -> gateway2 -> step4 -> end
+ * - Always Ok: start at "start" or "step1" or "step4" or "end"
+ * - OK if gateway2 is an exclusive gateway: start at "step2" and "step3"
+ * - All other start points are invalid. 
+ * 
  * @author Vincent Elcrin
  */
 public class AdvancedStartProcessCommand extends CommandWithParameters {
@@ -46,7 +63,6 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
         // get parameters
         long processDefinitionId = getProcessDefinitionId(parameters);
         List<String> activityNames = getActivityNames(parameters);
-        AdvancedStartProcessValidator validator = new AdvancedStartProcessValidator(serviceAccessor.getProcessDefinitionService(), processDefinitionId);
         long startedBy = getStartedBy(parameters);
         Map<String, Serializable> context = getContext(parameters);
         List<Operation> operations = getOperations(parameters);
@@ -54,6 +70,7 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
         ProcessInstance processInstance;
         try {
             // validate inputs
+            AdvancedStartProcessValidator validator = new AdvancedStartProcessValidator(serviceAccessor.getProcessDefinitionService(), processDefinitionId);
             List<String> problems = validator.validate(activityNames);
             handleProblems(problems);
 
