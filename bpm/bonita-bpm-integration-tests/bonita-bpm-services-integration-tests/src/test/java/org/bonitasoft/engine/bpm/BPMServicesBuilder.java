@@ -61,7 +61,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exceptions.ExceptionsManager;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -205,10 +204,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public EventService getEventService() {
         return getInstanceOf(EventService.class);
-    }
-
-    public ExceptionsManager getExceptionsManager() {
-        return getInstanceOf(ExceptionsManager.class);
     }
 
     public ProcessDefinitionService getProcessDefinitionManager() {

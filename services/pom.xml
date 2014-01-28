@@ -31,7 +31,6 @@
 		<module>bonita-data</module>
 		<module>bonita-dependency</module>
 		<module>bonita-platform</module>
-		<module>bonita-exceptions</module>
 		<module>bonita-test-util</module>
 		<module>bonita-archive</module>
 		<module>bonita-sql</module>

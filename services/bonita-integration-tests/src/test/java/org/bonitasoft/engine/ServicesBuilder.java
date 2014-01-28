@@ -9,7 +9,6 @@ import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.exceptions.ExceptionsManager;
 import org.bonitasoft.engine.expression.ExpressionService;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -144,10 +143,6 @@ public class ServicesBuilder {
 
     public EventService buildEventService() {
         return getAccessor().getInstanceOf(EventService.class);
-    }
-
-    public ExceptionsManager getExceptionsManager() {
-        return getAccessor().getInstanceOf(ExceptionsManager.class);
     }
 
     public CacheService buildCacheService() {
