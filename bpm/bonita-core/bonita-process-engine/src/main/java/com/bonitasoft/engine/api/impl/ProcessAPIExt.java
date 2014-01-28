@@ -1057,6 +1057,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         try {
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(dataName, processInstanceId);
             final BusinessDataRespository businessDataRepository = tenantAccessor.getBusinessDataRepository();
+            if (refBusinessDataInstance.getDataId() == null) {
+                return null;
+            }
             final Class<?> businessDataClass = Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
             return (Serializable) businessDataRepository.find(businessDataClass, refBusinessDataInstance.getDataId());
         } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {

@@ -6,21 +6,18 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.core.process.instance.model.builder;
+package com.bonitasoft.engine.core.process.instance.api.exceptions;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface SRefBusinessDataInstanceBuilderFactory {
+public class SRefBusinessDataInstanceModificationException extends SBonitaException {
 
-    SRefBusinessDataInstanceBuilder createNewInstance(String name, long processInstanceId, Long dataId, String dataClassName);
+    private static final long serialVersionUID = 3527430173631664746L;
 
-    String getNameKey();
-
-    String getProcessInstanceIdKey();
-
-    String getDataIdKey();
-
-    String getDataClassNameKey();
-
+    public SRefBusinessDataInstanceModificationException(final Throwable cause) {
+        super(cause);
+    }
 }

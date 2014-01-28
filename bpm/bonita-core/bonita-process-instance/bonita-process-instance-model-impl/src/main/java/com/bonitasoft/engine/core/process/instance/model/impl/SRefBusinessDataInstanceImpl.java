@@ -23,7 +23,7 @@ public class SRefBusinessDataInstanceImpl extends SPersistenceObjectImpl impleme
 
     private long processInstanceId;
 
-    private long dataId;
+    private Long dataId;
 
     private String dataClassName;
 
@@ -55,11 +55,11 @@ public class SRefBusinessDataInstanceImpl extends SPersistenceObjectImpl impleme
     }
 
     @Override
-    public long getDataId() {
+    public Long getDataId() {
         return dataId;
     }
 
-    public void setDataId(final long dataId) {
+    public void setDataId(final Long dataId) {
         this.dataId = dataId;
     }
 

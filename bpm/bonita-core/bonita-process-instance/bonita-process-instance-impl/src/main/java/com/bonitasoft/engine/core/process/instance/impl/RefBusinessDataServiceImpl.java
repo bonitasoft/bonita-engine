@@ -8,11 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.core.process.instance.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -24,11 +28,14 @@ import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceCreationException;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.builder.SRefBusinessDataInstanceLogBuilder;
@@ -108,6 +115,24 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
         final SQueriableLog log = logBuilder.done();
         if (queriableLoggerService.isLoggable(log.getActionType(), log.getSeverity())) {
             queriableLoggerService.log(this.getClass().getName(), callerMethodName, log);
+        }
+    }
+
+    @Override
+    public void updateRefBusinessDataInstance(final SRefBusinessDataInstance refBusinessDataInstance, final Long dataId)
+            throws SRefBusinessDataInstanceModificationException {
+        try {
+            final Map<String, Object> fields = new HashMap<String, Object>();
+            fields.put("dataId", dataId);
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(refBusinessDataInstance, fields);
+            SUpdateEvent updateEvent = null;
+            if (eventService.hasHandlers(REF_BUSINESS_DATA_INSTANCE, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(REF_BUSINESS_DATA_INSTANCE)
+                        .setObject(refBusinessDataInstance).done();
+            }
+            recorder.recordUpdate(updateRecord, updateEvent);
+        } catch (final SRecorderException sre) {
+            throw new SRefBusinessDataInstanceModificationException(sre);
         }
     }
 

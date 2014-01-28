@@ -12,8 +12,9 @@ public class Employee {
         super();
     }
 
-    public Employee(final String firstName, final String lastName) {
+    public Employee(final Long id, final String firstName, final String lastName) {
         super();
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
     }

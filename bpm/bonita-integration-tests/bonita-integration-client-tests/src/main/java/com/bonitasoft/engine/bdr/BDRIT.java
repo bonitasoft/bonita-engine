@@ -2,6 +2,7 @@ package com.bonitasoft.engine.bdr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,6 +85,7 @@ public class BDRIT extends CommonAPISPTest {
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addBusinessData("myEmployee", "org.bonita.pojo.Employee", null);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new LeftOperandBuilder().createNewInstance("myEmployee").done(),
                 OperatorType.CREATE_BUSINESS_DATA, null, null, employeeExpression);
 
@@ -91,8 +93,13 @@ public class BDRIT extends CommonAPISPTest {
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
         final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
+        Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
+        assertNull(businessDataInstance);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
         getProcessAPI().executeFlowNode(userTask.getId());
+
+        businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
+        assertNotNull(businessDataInstance);
 
         disableAndDeleteProcess(definition.getId());
     }

@@ -11,6 +11,7 @@ package com.bonitasoft.engine.core.process.instance.api;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceCreationException;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
@@ -24,5 +25,7 @@ public interface RefBusinessDataService {
             SBonitaReadException;
 
     SRefBusinessDataInstance addRefBusinessDataInstance(SRefBusinessDataInstance instance) throws SRefBusinessDataInstanceCreationException;
+
+    void updateRefBusinessDataInstance(SRefBusinessDataInstance refBusinessDataInstance, Long dataId) throws SRefBusinessDataInstanceModificationException;
 
 }

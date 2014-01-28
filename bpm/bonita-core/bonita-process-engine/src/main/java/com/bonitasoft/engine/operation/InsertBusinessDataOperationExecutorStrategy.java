@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,13 +8,20 @@
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
+import org.bonitasoft.engine.commons.ClassReflector;
+import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
+import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
 /**
  * @author Matthieu Chaffotte
@@ -23,9 +30,12 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
 
     private final BusinessDataRespository respository;
 
-    public InsertBusinessDataOperationExecutorStrategy(final BusinessDataRespository respository) {
+    private final RefBusinessDataService refBusinessDataService;
+
+    public InsertBusinessDataOperationExecutorStrategy(final BusinessDataRespository respository, final RefBusinessDataService refBusinessDataService) {
         super();
         this.respository = respository;
+        this.refBusinessDataService = refBusinessDataService;
     }
 
     @Override
@@ -41,6 +51,19 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
     public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         respository.persist(newValue);
+        try {
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(), containerId);
+            final Long id = ClassReflector.invokeGetter(newValue, "getId");
+            refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
+        } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
+            throw new SOperationExecutionException(srbdinfe);
+        } catch (final SBonitaReadException sbre) {
+            throw new SOperationExecutionException(sbre);
+        } catch (final ReflectException re) {
+            throw new SOperationExecutionException(re);
+        } catch (final SRefBusinessDataInstanceModificationException srbsme) {
+            throw new SOperationExecutionException(srbsme);
+        }
     }
 
     @Override
