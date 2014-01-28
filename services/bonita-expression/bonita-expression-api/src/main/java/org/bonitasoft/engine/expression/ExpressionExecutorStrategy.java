@@ -66,6 +66,8 @@ public interface ExpressionExecutorStrategy {
 
     String TYPE_XPATH_READ = "TYPE_XPATH_READ";
 
+    String TYPE_BUSINESS_DATA = "TYPE_BUSINESS_DATA";
+
     ExpressionKind KIND_CONSTANT = new ExpressionKind(TYPE_CONSTANT);
 
     ExpressionKind KIND_READ_ONLY_SCRIPT_GROOVY = new ExpressionKind(TYPE_READ_ONLY_SCRIPT, INTERPRETER_GROOVY);
@@ -88,11 +90,13 @@ public interface ExpressionExecutorStrategy {
 
     ExpressionKind KIND_XPATH_READ = new ExpressionKind(TYPE_XPATH_READ);
 
+    ExpressionKind KIND_BUSINESS_DATA = new ExpressionKind(TYPE_BUSINESS_DATA);
+
     /**
      * This list must contain only types with no dependencies
      */
     List<ExpressionKind> NO_DEPENDENCY_EXPRESSION_EVALUATION_ORDER = Arrays.asList(KIND_ENGINE_CONSTANT, KIND_VARIABLE, KIND_CONSTANT, KIND_INPUT,
-            KIND_PARAMETER, KIND_DOCUMENT/* , KIND_PATTERN, KIND_READ_ONLY_SCRIPT_GROOVY, KIND_LIST */);
+            KIND_PARAMETER, KIND_DOCUMENT, KIND_BUSINESS_DATA/* , KIND_PATTERN, KIND_READ_ONLY_SCRIPT_GROOVY, KIND_LIST */);
 
     /**
      * @param expression
