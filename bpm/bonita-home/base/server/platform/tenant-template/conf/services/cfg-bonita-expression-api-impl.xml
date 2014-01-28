@@ -22,8 +22,14 @@
 				<ref bean="javaMethodCallExpressionExecutorStrategy" />
 				<ref bean="parameterExpressionExecutorStrategy" />
 				<ref bean="xPathReadExpressionExecutorStrategy" />
+				<ref bean="businessDataExpressionExecutorStrategy" />
 			</list>
 		</property>
+	</bean>
+
+	<bean id="businessDataExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.BusinessDataExpressionExecutorStrategy" >
+		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
+		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
 	</bean>
 
 	<bean id="constantExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConstantExpressionExecutorStrategy" />
