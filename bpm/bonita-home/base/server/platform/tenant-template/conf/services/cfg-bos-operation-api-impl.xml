@@ -47,6 +47,7 @@
 
 	<bean id="createBusinessDataOperationExecutorStrategy" class="com.bonitasoft.engine.operation.InsertBusinessDataOperationExecutorStrategy">
 		<constructor-arg name="respository" ref="businessDataRepository" />
+		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
 	</bean>
 
 </beans>

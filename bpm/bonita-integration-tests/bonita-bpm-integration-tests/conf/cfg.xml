@@ -168,8 +168,10 @@
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
 	</bean>
-	
+
 	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />
 		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />

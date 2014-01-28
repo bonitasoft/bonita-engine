@@ -118,10 +118,8 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final List<SBusinessDataDefinition> businessDataDefinitions = sDefinition.getProcessContainer().getBusinessDataDefinitions();
             for (final SBusinessDataDefinition bdd : businessDataDefinitions) {
                 final SExpression expression = bdd.getDefaultValueExpression();
-                long primaryKey;
-                if (expression == null) {
-                    primaryKey = -1l;
-                } else {
+                Long primaryKey = null;
+                if (expression != null) {
                     final Object businessData = expressionResolverService.evaluate(expression);
                     businessDataRepository.persist(businessData);
                     primaryKey = ClassReflector.invokeGetter(businessData, "getId");

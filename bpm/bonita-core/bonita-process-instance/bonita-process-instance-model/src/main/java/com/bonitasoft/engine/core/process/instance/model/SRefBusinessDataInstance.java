@@ -19,7 +19,7 @@ public interface SRefBusinessDataInstance extends PersistentObject {
 
     long getProcessInstanceId();
 
-    long getDataId();
+    Long getDataId();
 
     String getDataClassName();
 

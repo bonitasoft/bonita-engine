@@ -17,8 +17,8 @@ public class SRefBusinessDataInstanceCreationException extends SBonitaException 
 
     private static final long serialVersionUID = 4703430668508021915L;
 
-    public SRefBusinessDataInstanceCreationException(final Exception e) {
-        super(e);
+    public SRefBusinessDataInstanceCreationException(final Throwable cause) {
+        super(cause);
     }
 
 }

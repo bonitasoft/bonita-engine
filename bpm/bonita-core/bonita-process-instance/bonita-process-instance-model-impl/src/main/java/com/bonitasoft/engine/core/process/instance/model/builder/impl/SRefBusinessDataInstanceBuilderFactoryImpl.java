@@ -18,7 +18,7 @@ import com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataIn
 public class SRefBusinessDataInstanceBuilderFactoryImpl implements SRefBusinessDataInstanceBuilderFactory {
 
     @Override
-    public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId, final long dataId, final String dataClassName) {
+    public SRefBusinessDataInstanceBuilder createNewInstance(final String name, final long processInstanceId, final Long dataId, final String dataClassName) {
         final SRefBusinessDataInstanceImpl entity = new SRefBusinessDataInstanceImpl();
         entity.setProcessInstanceId(processInstanceId);
         entity.setName(name);

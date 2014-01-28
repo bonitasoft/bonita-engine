@@ -113,4 +113,24 @@ public class ProcessAPIExtTest {
         spiAPI.getBusinessDataInstance("myLeaveRequest", processInstanceId);
     }
 
+    @Test
+    public void getTheBusinessDataInstanceReturnsNull() throws Exception {
+        final long processInstanceId = 45;
+        final ProcessAPIExt processAPI = new ProcessAPIExt();
+        final ProcessAPIExt spiAPI = spy(processAPI);
+        final TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
+        final RefBusinessDataService refBusinessDataService = mock(RefBusinessDataService.class);
+        final BusinessDataRespository businessDataRespository = mock(BusinessDataRespository.class);
+        final SRefBusinessDataInstance refBusinessDataInstance = mock(SRefBusinessDataInstance.class);
+        doReturn(tenantAccessor).when(spiAPI).getTenantAccessor();
+        when(tenantAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);
+        when(refBusinessDataService.getRefBusinessDataInstance("myLeaveRequest", processInstanceId)).thenReturn(refBusinessDataInstance);
+        when(tenantAccessor.getBusinessDataRepository()).thenReturn(businessDataRespository);
+        when(refBusinessDataInstance.getDataClassName()).thenReturn("org.bonitasoft.engine.LeaveRequest");
+        when(refBusinessDataInstance.getDataId()).thenReturn(null);
+
+        final Serializable businessDataInstance = spiAPI.getBusinessDataInstance("myLeaveRequest", processInstanceId);
+        assertThat(businessDataInstance).isNull();
+    }
+
 }
