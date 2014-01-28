@@ -141,10 +141,10 @@ public class BusinessDataExpressionExecutorStrategyTest {
         verifyZeroInteractions(flowNodeInstanceService);
     }
 
-    @Test
-    public void evaluate_should_resolve_multiple_expressions() throws Exception {
-
-    }
+    // @Test
+    // public void evaluate_should_resolve_multiple_expressions() throws Exception {
+    //
+    // }
 
     @Test
     public void evaluation_result_should_be_pushed_in_context() throws Exception {

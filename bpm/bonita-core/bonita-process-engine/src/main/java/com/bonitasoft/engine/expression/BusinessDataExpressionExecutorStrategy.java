@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.lang.model.SourceVersion;
-
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -26,7 +24,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -48,19 +45,10 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
     private final FlowNodeInstanceService flowNodeInstanceService;
 
     public BusinessDataExpressionExecutorStrategy(final RefBusinessDataService refBusinessDataService, final BusinessDataRespository businessDataRepository,
-            final FlowNodeInstanceService flowsNodeInstanceService) {
+            final FlowNodeInstanceService flowNodeInstanceService) {
         this.refBusinessDataService = refBusinessDataService;
         this.businessDataRepository = businessDataRepository;
-        flowNodeInstanceService = flowsNodeInstanceService;
-    }
-
-    @Override
-    public void validate(final SExpression expression) throws SInvalidExpressionException {
-        // $ can be part of variable name
-        super.validate(expression);
-        if (!SourceVersion.isIdentifier(expression.getContent())) {
-            throw new SInvalidExpressionException(expression.getContent() + " is not a valid business data name in expression: " + expression);
-        }
+        this.flowNodeInstanceService = flowNodeInstanceService;
     }
 
     @Override
@@ -111,7 +99,7 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
             throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         List<Object> objects = new ArrayList<Object>(expressions.size());
         for (SExpression sExpression : expressions) {
-
+            throw new RuntimeException("unimplemented yet");
         }
         return objects;
     }
