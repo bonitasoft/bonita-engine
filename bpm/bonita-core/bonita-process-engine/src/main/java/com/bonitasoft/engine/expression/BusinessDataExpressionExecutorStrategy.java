@@ -13,22 +13,29 @@
  **/
 package com.bonitasoft.engine.expression;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.lang.model.SourceVersion;
 
+import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
+import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
+import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
 /**
  * @author Colin Puy
@@ -40,18 +47,13 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
 
     private final BusinessDataRespository businessDataRepository;
 
-    public BusinessDataExpressionExecutorStrategy(final RefBusinessDataService refBusinessDataService, final BusinessDataRespository businessDataRepository) {
+    private final FlowNodeInstanceService flowNodeInstanceService;
+
+    public BusinessDataExpressionExecutorStrategy(final RefBusinessDataService refBusinessDataService, final BusinessDataRespository businessDataRepository,
+            final FlowNodeInstanceService flowsNodeInstanceService) {
         this.refBusinessDataService = refBusinessDataService;
         this.businessDataRepository = businessDataRepository;
-    }
-
-    @Override
-    public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
-        // return evaluate(Collections.singletonList(expression), dependencyValues, resolvedExpressions).get(0);
-        String bizDataName = expression.getContent();
-
-        return null;
+        flowNodeInstanceService = flowsNodeInstanceService;
     }
 
     @Override
@@ -69,6 +71,48 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
     }
 
     @Override
+    public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions)
+            throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+        String bizDataName = expression.getContent();
+        if (context.containsKey(bizDataName)) {
+            return context.get(bizDataName);
+        }
+        try {
+            long processInstanceId = getProcessInstanceId((Long) context.get(SExpressionContext.containerIdKey),
+                    (String) context.get(SExpressionContext.containerTypeKey));
+            SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
+            Class<?> bizClass = Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
+            return businessDataRepository.find(bizClass, refBusinessDataInstance.getDataId());
+        } catch (SRefBusinessDataInstanceNotFoundException e) {
+            throw new SExpressionEvaluationException("");
+        } catch (SBonitaReadException e) {
+            throw new SExpressionEvaluationException("");
+        } catch (BusinessDataNotFoundException e) {
+            throw new SExpressionEvaluationException("");
+        } catch (ClassNotFoundException e) {
+            throw new SExpressionEvaluationException("");
+        }
+    }
+
+    /**
+     * protected for testing
+     */
+    protected long getProcessInstanceId(final long containerId, final String containerType) throws SExpressionEvaluationException {
+        if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
+            return containerId;
+        } else if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(containerType)) {
+            SFlowNodeInstance flowNodeInstance;
+            try {
+                flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
+                return flowNodeInstance.getParentProcessInstanceId();
+            } catch (Exception e) {
+                throw new SExpressionEvaluationException("Process instance id not found in context");
+            }
+        }
+        throw new SExpressionEvaluationException("Invalid container type");
+    }
+
+    @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionDependencyMissingException, SExpressionEvaluationException {
         List<Object> objects = new ArrayList<Object>(expressions.size());
@@ -76,14 +120,6 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
 
         }
         return objects;
-    }
-
-    private List<Object> buildExpressionResultSameOrderAsInputList(final List<SExpression> expressions, final Map<String, Serializable> results) {
-        final ArrayList<Object> list = new ArrayList<Object>(expressions.size());
-        for (final SExpression expression : expressions) {
-            list.add(results.get(expression.getContent()));
-        }
-        return list;
     }
 
     @Override
