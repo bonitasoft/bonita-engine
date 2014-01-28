@@ -26,6 +26,15 @@ import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
 
 /**
+ * 
+ * A work factory that use a clustered Queue and a clustered executing work map
+ * <p>
+ * There is one shared queue by member.<br/>
+ * If a node crash during the execution of a work, other members are notified and the first to be notified get all executing works and queued works for himself
+ * 
+ * There is multiple shared queue to avoid collisions that happens when there is only one
+ * 
+ * 
  * @author Baptiste Mesta
  * @author Laurent Vaills
  */
@@ -96,7 +105,7 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
     @Override
     public void memberRemoved(final MembershipEvent membershipEvent) {
         Member member = membershipEvent.getMember();
-        ILock lock = hazelcastInstance.getLock("WorkLock@"+member.getUuid());
+        ILock lock = hazelcastInstance.getLock("WorkLock@" + member.getUuid());
         lock.lock();
         try {
             // Transfer the member's queues into my own queues

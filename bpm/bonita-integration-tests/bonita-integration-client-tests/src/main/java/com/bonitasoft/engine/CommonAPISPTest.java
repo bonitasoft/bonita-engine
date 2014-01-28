@@ -9,6 +9,9 @@
 package com.bonitasoft.engine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
@@ -73,7 +76,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
 
     /**
      * FIXME: clean actors!
-     *
+     * 
      * @return
      * @throws BonitaException
      */
@@ -97,9 +100,22 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
             messages.addAll(checkExistenceOfBreakpoints());
             messages.addAll(checkExistenceOfReports());
             messages.addAll(checkNoActiveTransactions());
+            messages.addAll(checkNoDataMapping());
             logout();
         }
         return messages;
+    }
+
+    /**
+     * @return
+     * @throws BonitaException
+     */
+    private Collection<? extends String> checkNoDataMapping() throws BonitaException {
+        Integer count = new Integer(getReportingAPI().selectList("SELECT count(*) FROM data_mapping").split("\n")[1]);
+        if (count == 0) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList("There is some data mapping present: " + count);
     }
 
 }
