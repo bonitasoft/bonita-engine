@@ -83,7 +83,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
      */
     private class SimpleBizData {
 
-        private Long id;
+        private final Long id;
 
         public SimpleBizData(final Long id) {
             this.id = id;
@@ -91,10 +91,6 @@ public class BusinessDataExpressionExecutorStrategyTest {
 
         public Long getId() {
             return id;
-        }
-
-        public void setId(final Long id) {
-            this.id = id;
         }
     }
 
@@ -146,7 +142,12 @@ public class BusinessDataExpressionExecutorStrategyTest {
     }
 
     @Test
-    public void mustPutEvaluatedExpressionInContextShouldReturnTrue() throws Exception {
+    public void evaluate_should_resolve_multiple_expressions() throws Exception {
+
+    }
+
+    @Test
+    public void evaluation_result_should_be_pushed_in_context() throws Exception {
         assertThat(businessDataExpressionExecutorStrategy.mustPutEvaluatedExpressionInContext()).isEqualTo(true);
     }
 
