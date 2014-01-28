@@ -40,7 +40,7 @@ public class BoundaryEvent {
     public void attach(UserTaskDefinitionBuilder task, ProcessDefinitionBuilder builder) {
         trigger.listen(task.addBoundaryEvent(name));
         flowsOut.build(builder);
-        transition.bind(name, flowsOut.getName(), null, builder);
+        transition.bind(name, flowsOut.getName(), builder);
     }
 
     public BoundaryEvent triggeredBy(Trigger trigger) {

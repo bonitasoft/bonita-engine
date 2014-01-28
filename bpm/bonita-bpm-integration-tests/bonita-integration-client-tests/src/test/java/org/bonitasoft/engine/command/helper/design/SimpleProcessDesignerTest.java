@@ -1,8 +1,8 @@
 package org.bonitasoft.engine.command.helper.design;
 
 import static junit.framework.Assert.assertEquals;
-import static org.bonitasoft.engine.command.helper.designer.Condition.defaults;
-import static org.bonitasoft.engine.command.helper.designer.Condition.meet;
+import static org.bonitasoft.engine.command.helper.designer.Transition.fails;
+import static org.bonitasoft.engine.command.helper.designer.Transition.meet;
 
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -74,7 +74,7 @@ public class SimpleProcessDesignerTest {
                 .then(new UserTask("B"))
                 .then(new UserTask("C1"), new UserTask("C2"))
                 .then(new Gateway("D", GatewayType.EXCLUSIVE)
-                        .when("C1", defaults())
+                        .when("C1", fails())
                         .when("C2", meet(condition)))
                 .then(new EndEvent("F"))
                 .done();
@@ -92,7 +92,7 @@ public class SimpleProcessDesignerTest {
                 .then(new UserTask("B"))
                 .then(new Gateway("C", GatewayType.EXCLUSIVE))
                 .then(
-                        new UserTask("D1").when("C", defaults()),
+                        new UserTask("D1").when("C", fails()),
                         new UserTask("D2").when("C", meet(condition)))
                 .then(new EndEvent("E"))
                 .done();
