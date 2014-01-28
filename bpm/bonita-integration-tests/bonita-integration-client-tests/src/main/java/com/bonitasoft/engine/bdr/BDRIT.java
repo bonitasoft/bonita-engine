@@ -76,7 +76,7 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
-    // @Ignore("Disabled until we support undeploy of a bdr, otherwise the second test fails")
+    @Ignore("Disabled until we support undeploy of a bdr, otherwise the second test fails")
     public void deployABDRAndCreateABusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder()
                 .createGroovyScriptExpression("createNewEmployee",
@@ -105,7 +105,6 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore
     public void deployABDRAndCreateADefaultBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder()
                 .createGroovyScriptExpression("createNewEmployee",
@@ -123,24 +122,6 @@ public class BDRIT extends CommonAPISPTest {
         waitForUserTask("step1", instance.getId());
         final Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
         assertNotNull(businessDataInstance);
-
-        disableAndDeleteProcess(definition.getId());
-    }
-
-    @Test
-    @Ignore("Disabled until we support undeploy of a bdr, otherwise the second test fails")
-    public void deployABDRAndCreateANullBusinessData() throws Exception {
-        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
-        processDefinitionBuilder.addBusinessData("myEmployee", "org.bonita.pojo.Employee", null);
-        processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
-
-        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
-        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
-
-        waitForUserTask("step1", instance.getId());
-        final Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
-        assertNull(businessDataInstance);
 
         disableAndDeleteProcess(definition.getId());
     }
