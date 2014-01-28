@@ -33,11 +33,6 @@ public class BusinessDataExpressionExecutorStrategyTest {
         assertThat(businessDataExpressionExecutorStrategy.getExpressionKind()).isEqualTo(ExpressionExecutorStrategy.KIND_BUSINESS_DATA);
     }
 
-    @Test(expected = SInvalidExpressionException.class)
-    public void validateWithWrongExpressionTypeShouldThrowException() throws Exception {
-        fail("NYI");
-    }
-
     @Test
     public void evaluateExistingBDExpressionShouldReturnFoundBusinessData() throws Exception {
         // given:
@@ -54,7 +49,13 @@ public class BusinessDataExpressionExecutorStrategyTest {
         assertThat(object).isInstanceOf(LeaveRequest.class);
     }
 
-    @Test
+//    @Test
+//	public void evaluateExistingBDExpressionShouldReturnFoundBusinessDataSuffix()
+//			throws Exception {
+//		throw new RuntimeException("not yet implemented");
+//	}
+
+	@Test
     public void mustPutEvaluatedExpressionInContextShouldReturnTrue() throws Exception {
         assertThat(businessDataExpressionExecutorStrategy.mustPutEvaluatedExpressionInContext()).isEqualTo(true);
     }
