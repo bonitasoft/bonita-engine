@@ -1,11 +1,28 @@
+/*******************************************************************************
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.expression;
 
+import static java.util.Arrays.asList;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
@@ -13,6 +30,8 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.ExpressionType;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,15 +67,24 @@ public class BusinessDataExpressionExecutorStrategyTest {
     }
 
     private SimpleBizData createAbizDataInRepository() throws Exception {
-        SimpleBizData bizData = new SimpleBizData(95L);
+        return createAbizDataInRepository(98L);
+    }
+
+    private SimpleBizData createAbizDataInRepository(final long bizDataId) throws Exception {
+        SimpleBizData bizData = new SimpleBizData(bizDataId);
         when(businessDataRepository.find(SimpleBizData.class, bizData.getId())).thenReturn(bizData);
         return bizData;
     }
 
     private SRefBusinessDataInstance createARefBizDataInRepository(final SimpleBizData bizData, final long processInstanceId) throws Exception {
+        return createARefBizDataInRepository(bizData, "bizDataName", processInstanceId);
+    }
+
+    private SRefBusinessDataInstance createARefBizDataInRepository(final SimpleBizData bizData, final String bizDataName, final long processInstanceId)
+            throws Exception {
         SRefBusinessDataInstance refBizData = mock(SRefBusinessDataInstance.class);
         when(refBizData.getDataClassName()).thenReturn(bizData.getClass().getName());
-        when(refBizData.getName()).thenReturn("bizDataName");
+        when(refBizData.getName()).thenReturn(bizDataName);
         when(refBizData.getProcessInstanceId()).thenReturn(processInstanceId);
         when(refBizData.getDataId()).thenReturn(bizData.getId());
         when(refBusinessDataService.getRefBusinessDataInstance(refBizData.getName(), processInstanceId)).thenReturn(refBizData);
@@ -76,22 +104,6 @@ public class BusinessDataExpressionExecutorStrategyTest {
         expression.setReturnType("com.bonitasoft.engine.expression.BusinessDataExpressionExecutorStrategyTest.LeaveRequest");
         expression.setExpressionType(ExpressionType.TYPE_BUSINESS_DATA.name());
         return expression;
-    }
-
-    /**
-     * Simple Business Data test class
-     */
-    private class SimpleBizData {
-
-        private final Long id;
-
-        public SimpleBizData(final Long id) {
-            this.id = id;
-        }
-
-        public Long getId() {
-            return id;
-        }
     }
 
     @Test
@@ -141,10 +153,36 @@ public class BusinessDataExpressionExecutorStrategyTest {
         verifyZeroInteractions(flowNodeInstanceService);
     }
 
-    // @Test
-    // public void evaluate_should_resolve_multiple_expressions() throws Exception {
-    //
-    // }
+    @Test
+    public void evaluate_should_resolve_multiple_expressions() throws Exception {
+        SimpleBizData firstBizData = createAbizDataInRepository(1L);
+        SimpleBizData secondBizData = createAbizDataInRepository(2L);
+        long aProcessInstanceId = 6L;
+        SRefBusinessDataInstance firstRefBizData = createARefBizDataInRepository(firstBizData, "dataOne", aProcessInstanceId);
+        SRefBusinessDataInstance secondRefBizData = createARefBizDataInRepository(secondBizData, "dataTwo", aProcessInstanceId);
+        HashMap<String, Object> context = buildBusinessDataExpressionContext(aProcessInstanceId, DataInstanceContainer.PROCESS_INSTANCE);
+        SExpression firstbuildBusinessDataExpression = buildBusinessDataExpression(firstRefBizData.getName());
+        SExpression secondbuildBusinessDataExpression = buildBusinessDataExpression(secondRefBizData.getName());
+
+        List<Object> fetchedBizDatas = businessDataExpressionExecutorStrategy.evaluate(
+                Arrays.asList(firstbuildBusinessDataExpression, secondbuildBusinessDataExpression), context, null);
+
+        assertThat(fetchedBizDatas).contains(firstBizData, secondBizData);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void evaluate_should_not_resolve_expression_with_same_content_as_already_resolved_one() throws Exception {
+        SExpression firstbuildBusinessDataExpression = buildBusinessDataExpression("sameName");
+        SExpression secondbuildBusinessDataExpression = buildBusinessDataExpression("sameName");
+        BusinessDataExpressionExecutorStrategy strategy = spy(new BusinessDataExpressionExecutorStrategy(refBusinessDataService, businessDataRepository,
+                flowNodeInstanceService));
+        doReturn(new Object()).when(strategy).evaluate(any(SExpression.class), anyMap(), anyMap());
+
+        strategy.evaluate(asList(firstbuildBusinessDataExpression, secondbuildBusinessDataExpression), null, null);
+
+        verify(strategy, times(1)).evaluate(any(SExpression.class), anyMap(), anyMap());
+    }
 
     @Test
     public void evaluation_result_should_be_pushed_in_context() throws Exception {
@@ -168,5 +206,10 @@ public class BusinessDataExpressionExecutorStrategyTest {
         long processInstanceId = businessDataExpressionExecutorStrategy.getProcessInstanceId(flowNode.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name());
 
         assertThat(processInstanceId).isEqualTo(flowNode.getParentProcessInstanceId());
+    }
+
+    @Test(expected = SExpressionEvaluationException.class)
+    public void getProcessInstanceId_should_throw_an_exception_for_a_not_supported_container_type() throws Exception {
+        businessDataExpressionExecutorStrategy.getProcessInstanceId(1L, DataInstanceContainer.MESSAGE_INSTANCE.name());
     }
 }
