@@ -11,15 +11,15 @@ package com.bonitasoft.engine.operation;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
+import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
@@ -28,7 +28,7 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanc
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class StringIndexOperationExecutorStrategy implements OperationExecutorStrategy {
+public class StringIndexLeftOperandHandler implements LeftOperandHandler {
 
     public static final String TYPE_STRING_INDEX = "STRING_INDEX";
 
@@ -36,26 +36,10 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
 
     private final ActivityInstanceService activityInstanceService;
 
-    public StringIndexOperationExecutorStrategy(final ProcessInstanceService processInstanceService,
+    public StringIndexLeftOperandHandler(final ProcessInstanceService processInstanceService,
             final ActivityInstanceService activityInstanceService) {
         this.processInstanceService = processInstanceService;
         this.activityInstanceService = activityInstanceService;
-    }
-
-    @Override
-    public String getOperationType() {
-        return TYPE_STRING_INDEX;
-    }
-
-    @Override
-    public boolean doUpdateData() {
-        return false;
-    }
-
-    @Override
-    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
-        return value;
     }
 
     @Override
@@ -104,6 +88,17 @@ public class StringIndexOperationExecutorStrategy implements OperationExecutorSt
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
+    }
+
+    @Override
+    public String getType() {
+        return TYPE_STRING_INDEX;
+    }
+
+    @Override
+    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
+        // don't retrieve it, not useful
+        return null;
     }
 
 }

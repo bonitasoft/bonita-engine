@@ -108,16 +108,11 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addUserTask("step1", actorName);
         designProcessDefinition.addUserTask("step3", actorName);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
-        addAutomaticTask.addOperation(new OperationBuilder().createSetStringIndexOperation(1,
-                new ExpressionBuilder().createConstantStringExpression("newValue1")));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(2), OperatorType.STRING_INDEX, null, "",
-                new ExpressionBuilder().createConstantStringExpression("newValue2"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(3), OperatorType.STRING_INDEX, null, "",
-                new ExpressionBuilder().createConstantStringExpression("newValue3"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(4), OperatorType.STRING_INDEX, null, "",
-                new ExpressionBuilder().createConstantStringExpression("newValue4"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(5), OperatorType.STRING_INDEX, null, "",
-                new ExpressionBuilder().createConstantStringExpression("newValue5"));
+        addAutomaticTask.addOperation(OperationBuilder.setStringIndex(1).with("newValue1").done());
+        addAutomaticTask.addOperation(OperationBuilder.setStringIndex(2).with("newValue2").done());
+        addAutomaticTask.addOperation(OperationBuilder.setStringIndex(3).with("newValue3").done());
+        addAutomaticTask.addOperation(OperationBuilder.setStringIndex(4).with("newValue4").done());
+        addAutomaticTask.addOperation(OperationBuilder.setStringIndex(5).with("newValue5").done());
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.setStringIndex(1, "label1", new ExpressionBuilder().createConstantStringExpression("value1"));
@@ -158,8 +153,8 @@ public class OperationTest extends CommonAPITest {
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
         addAutomaticTask.addOperation(new LeftOperandBuilder().createDataLeftOperand("baseData"), OperatorType.ASSIGNMENT, null, "",
                 new ExpressionBuilder().createConstantStringExpression("changedData"));
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(1), OperatorType.STRING_INDEX, null, "",
-                new ExpressionBuilder().createDataExpression("baseData", String.class.getName()));
+        addAutomaticTask.addOperation(OperationBuilder.setStringIndex(1).with(new ExpressionBuilder().createDataExpression("baseData", String.class.getName()))
+                .done());
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.setStringIndex(1, "label1", new ExpressionBuilder().createDataExpression("baseData", String.class.getName()));
@@ -184,7 +179,7 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addUserTask("step1", actorName);
         designProcessDefinition.addUserTask("step3", actorName);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step2");
-        addAutomaticTask.addOperation(new LeftOperandBuilder().createSearchIndexLeftOperand(1), OperatorType.STRING_INDEX, null, "", null);
+        addAutomaticTask.addOperation(OperationBuilder.setStringIndex(1).with(null).done());
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.done();
