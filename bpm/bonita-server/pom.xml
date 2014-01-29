@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <artifactId>bpm</artifactId>
     <groupId>com.bonitasoft.engine</groupId>
-    <version>6.2.0-SNAPSHOT</version>
+		<version>6.3.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>bonita-server-sp</artifactId>
@@ -818,14 +817,6 @@
       <groupId>com.hazelcast</groupId>
       <artifactId>hazelcast-spring</artifactId>
     </dependency>
-
-        <!-- Builder Factory -->
-        <dependency>
-            <groupId>com.bonitasoft.engine</groupId>
-            <artifactId>bonita-builder-sp</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
   </dependencies>
 
   <build>
@@ -1141,25 +1132,25 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>javadoc-jar</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <includeDependencySources>true</includeDependencySources>
-              <dependencySourceIncludes>
-                <dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude>
-                <dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude>
-              </dependencySourceIncludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+<!--       <plugin> -->
+<!--         <artifactId>maven-javadoc-plugin</artifactId> -->
+<!--         <executions> -->
+<!--           <execution> -->
+<!--             <id>javadoc-jar</id> -->
+<!--             <phase>package</phase> -->
+<!--             <goals> -->
+<!--               <goal>jar</goal> -->
+<!--             </goals> -->
+<!--             <configuration> -->
+<!--               <includeDependencySources>true</includeDependencySources> -->
+<!--               <dependencySourceIncludes> -->
+<!--                 <dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude> -->
+<!--                 <dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude> -->
+<!--               </dependencySourceIncludes> -->
+<!--             </configuration> -->
+<!--           </execution> -->
+<!--         </executions> -->
+<!--       </plugin> -->
     </plugins>
   </build>
 </project>

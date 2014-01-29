@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<artifactId>bonita-integration-as-tests</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.2.0-SNAPSHOT</version>
+		<version>6.3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-tomcat6</artifactId>
@@ -24,6 +25,7 @@
 		<tomcat.zip.folder>${user.home}</tomcat.zip.folder>
 		<bonita.home>${tomcat.home}/bonita</bonita.home>
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
+		<db.vendor>h2</db.vendor>
 	</properties>
 
 	<dependencies>
@@ -52,6 +54,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -67,6 +70,20 @@
 			<groupId>org.bonitasoft.tomcat</groupId>
 			<artifactId>bonita-tomcat-h2-listener</artifactId>
 			<version>1.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc</artifactId>
+			<version>6</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/ojdbc6.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.jdbc</groupId>
+			<artifactId>sqlserver</artifactId>
+			<version>4.0.2206.100</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/sqljdbc-4.0.2206.100.jar</systemPath>
 		</dependency>
 	</dependencies>
 
@@ -155,6 +172,23 @@
 											<fileset dir="tomcat/conf" />
 										</copy>
 
+										<!-- Update database configuration -->
+										<property file="tomcat/${db.vendor}/database.properties" />
+										<concat destfile="${tomcat.conf.dir}/bitronix-resources.properties" append="true">
+											<fileset file="tomcat/${db.vendor}/ds.properties" />
+										</concat>
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.datasource.classname#" value="${db.datasource.classname}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.servername#" value="${db.servername}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.port#" value="${db.port}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.databasename#" value="${db.databasename}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.url#" value="${db.url}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.username#" value="${db.username}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.password#" value="${db.password}" />
+										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.driver.classname#" value="${db.driver.classname}" />
+										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.url#" value="${db.url}" />
+										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.username#" value="${db.username}" />
+										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.password#" value="${db.password}" />
+
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;" value="&lt;Server port=&quot;${server.port}&quot;" />
 										<replace file="${tomcat.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;" value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
@@ -166,18 +200,22 @@
 											<fileset dir="target/tx-manager">
 												<include name="*jar" />
 											</fileset>
+											<fileset dir="lib">
+												<include name="*jar" />
+											</fileset>
 										</copy>
 										<copy tofile="${tomcat.deploy.dir}/bonita.war" file="${distrib.dir}/war/bonita-deploy-war-sp-${project.version}.war" />
-
+										
 										<!-- Create default bonita.home folder -->
 										<copy todir="${bonita.home}" verbose="true">
 											<fileset dir="${distrib.dir}/resources/home/" />
 										</copy>
+										
 
 										<copy todir="${bonita.home}/server/licenses" failonerror="true">
 											<fileset dir="${user.home}/lic" includes="*.lic" />
 										</copy>
-
+										
 										<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
 									</target>
 								</configuration>
@@ -202,7 +240,8 @@
 										</waitfor>
 
 										<mkdir dir="${report.xml}" />
-										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
+										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="512m">
+											<jvmarg line="-Xmx512m -Xms128m -XX:MaxPermSize=256m" />
 											<classpath refid="test.path" />
 											<sysproperty key="bonita.home" value="${bonita.home}" />
 											<formatter type="xml" />
@@ -246,7 +285,8 @@
 								<home>${tomcat.home}</home>
 								<systemProperties>
 									<bonita.home>${bonita.home}</bonita.home>
-									<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
+									<sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
+									<db.vendor>${db.vendor}</db.vendor>
 
 									<file.encoding>${project.build.sourceEncoding}</file.encoding>
 									<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
@@ -261,7 +301,12 @@
 								<home>${tomcat.home}</home>
 								<properties>
 									<cargo.servlet.port>${provider.port}</cargo.servlet.port>
-									<cargo.jvmargs>-Xms128m -Xmx512m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+									<cargo.jvmargs>
+										<!-- -Xdebug -->
+										<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -->
+										<!-- -Xnoagent -->
+										<!-- -Djava.compiler=NONE -->
+										-XX:+HeapDumpOnOutOfMemoryError
 								</properties>
 							</configuration>
 							<wait>false</wait>
