@@ -16,6 +16,8 @@ package org.bonitasoft.engine.expression;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * @deprecated As of 6.0 not thrown anymore
+ * 
  * @author Matthieu Chaffotte
  */
 @Deprecated

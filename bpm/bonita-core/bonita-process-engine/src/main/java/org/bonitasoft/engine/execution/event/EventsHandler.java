@@ -42,6 +42,8 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowM
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
@@ -65,7 +67,6 @@ import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.work.WorkRegisterException;
 
 /**
  * Handle event depending on its type
@@ -86,6 +87,7 @@ public class EventsHandler {
     private final Map<SEventTriggerType, EventHandlerStrategy> handlers;
 
     private final ContainerRegistry containerRegistry;
+
     private final ProcessDefinitionService processDefinitionService;
 
     private final TokenService tokenService;
@@ -249,7 +251,8 @@ public class EventsHandler {
              */
             final String errorCode = sThrowEventInstance.getName();
 
-            final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory.get(SThrowErrorEventTriggerDefinitionBuilderFactory.class).createNewInstance(errorCode).done();
+            final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory.get(SThrowErrorEventTriggerDefinitionBuilderFactory.class)
+                    .createNewInstance(errorCode).done();
             hasActionsToExecute = handlers.get(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, null, sThrowEventInstance,
                     errorEventTriggerDefinition, sFlowNodeInstance);
         } else {
@@ -367,7 +370,8 @@ public class EventsHandler {
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         } else if (isInterrupting) {
             // other interrupting catch
-            TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(processInstanceService, eventInstanceService, processExecutor, logger);
+            TransactionalProcessInstanceInterruptor interruptor = new TransactionalProcessInstanceInterruptor(processInstanceService, eventInstanceService,
+                    processExecutor, logger);
             interruptor.interruptProcessInstance(parentProcessInstanceId, SStateCategory.ABORTING, -1, subProcflowNodeInstance.getId());
         }
         processExecutor.start(processDefinitionId, targetSFlowNodeDefinitionId, 0, 0, operations.getContext(), operations.getOperations(),
@@ -391,8 +395,10 @@ public class EventsHandler {
     }
 
     private void executeFlowNode(final long flowNodeInstanceId, final OperationsWithContext operations, final long processInstanceId)
-            throws WorkRegisterException {
-        containerRegistry.executeFlowNode(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(),
+            throws SFlowNodeReadException, SFlowNodeExecutionException {
+        // in same thread because we delete the message instance after triggering the catch event. The data is of the message
+        // is deleted so we will be unable to execute the flow node instance
+        containerRegistry.executeFlowNodeInSameThread(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(),
                 processInstanceId);
     }
 

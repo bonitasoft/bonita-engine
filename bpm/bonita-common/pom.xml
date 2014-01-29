@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.2.0-SNAPSHOT</version>
+		<version>6.3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-common</artifactId>
@@ -20,12 +20,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api-ejb2</artifactId>
+			<artifactId>bonita-common-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.util</groupId>
-			<artifactId>bonita-common-util</artifactId>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-common-api-ejb2</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -45,8 +45,8 @@
 							<artifactSet>
 								<includes>
 									<include>org.bonitasoft.engine.api:bonita-common-api</include>
+									<include>org.bonitasoft.engine.api:bonita-common-api-impl</include>
 									<include>org.bonitasoft.engine.api:bonita-common-api-ejb2</include>
-									<include>org.bonitasoft.engine.util:bonita-common-util</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${project.build.directory}</outputDirectory>
@@ -58,24 +58,16 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>javadoc-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<includeDependencySources>true</includeDependencySources>
-							<dependencySourceIncludes>
-								<dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude>
-							</dependencySourceIncludes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>javadoc</id>
+			<properties>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
+			</properties>
+		</profile>
+	</profiles>
+
 </project>

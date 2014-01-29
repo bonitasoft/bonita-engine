@@ -25,6 +25,7 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.test.CommonAPILocalTest;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,11 +71,17 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
     private boolean containsTimerJob(final ProcessDefinition processDefinition, final String timerEventName) throws Exception {
         setSessionInfo(getSession());
         final SchedulerService schedulerService = getPlatformAccessor().getSchedulerService();
-        final List<String> jobs = schedulerService.getJobs();
-        for (final String jobName : jobs) {
-            if (jobName.contains("Timer_Ev_" + processDefinition.getId() + timerEventName)) {
-                return true;
+        TransactionService transactionService = getPlatformAccessor().getTransactionService();
+        transactionService.begin();
+        try {
+            final List<String> jobs = schedulerService.getJobs();
+            for (final String jobName : jobs) {
+                if (jobName.contains("Timer_Ev_" + processDefinition.getId() + timerEventName)) {
+                    return true;
+                }
             }
+        } finally {
+            transactionService.complete();
         }
         return false;
     }

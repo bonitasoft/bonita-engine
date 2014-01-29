@@ -38,6 +38,9 @@ public class OperationImpl implements Operation {
         this.leftOperand = leftOperand;
     }
 
+    /**
+     * @deprecated As of 6.0 replaced by {@link #setLeftOperand(LeftOperand)}
+     */
     @Deprecated
     public void setVariableToSet(final LeftOperand variableToSet) {
         leftOperand = variableToSet;
@@ -66,6 +69,9 @@ public class OperationImpl implements Operation {
         return leftOperand;
     }
 
+    /**
+     * @deprecated As of 6.0 replaced by {@link #getLeftOperand()}
+     */
     @Deprecated
     @Override
     public LeftOperand getVariableToSet() {

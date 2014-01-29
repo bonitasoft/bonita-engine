@@ -31,4 +31,14 @@ public class ModelConvertorTest {
         assertFalse(dataInstance.isTransientData());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void getProcessInstanceState_conversionOnUnknownStateShouldThrowException() throws Exception {
+        ModelConvertor.getProcessInstanceState("un_known_state");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getProcessInstanceState_conversionOnNullStateShouldThrowException() throws Exception {
+        ModelConvertor.getProcessInstanceState(null);
+    }
+
 }

@@ -136,7 +136,7 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDeploymentInfoImpl;
 import org.bonitasoft.engine.bpm.process.impl.ProcessInstanceBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
-import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorBuilder;
+import org.bonitasoft.engine.bpm.supervisor.impl.ProcessSupervisorImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandDescriptorImpl;
@@ -1398,8 +1398,7 @@ public class ModelConvertor {
         return userBuilder.done();
     }
 
-    public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal,
-            final long userId) {
+    public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal, final long userId) {
         final SContactInfoBuilder contactInfoBuilder = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, isPersonal);
         if (isPersonal) {
             contactInfoBuilder.setAddress(user.getPersonalAddress());
@@ -1523,13 +1522,13 @@ public class ModelConvertor {
     }
 
     public static ProcessSupervisor toProcessSupervisor(final SProcessSupervisor sSupervisor) {
-        final ProcessSupervisorBuilder processSupervisorBuilder = new ProcessSupervisorBuilder();
-        processSupervisorBuilder.setSupervisorId(sSupervisor.getId());
-        processSupervisorBuilder.setProcessDefinitionId(sSupervisor.getProcessDefId());
-        processSupervisorBuilder.setUserId(sSupervisor.getUserId());
-        processSupervisorBuilder.setGroupId(sSupervisor.getGroupId());
-        processSupervisorBuilder.setRoleId(sSupervisor.getRoleId());
-        return processSupervisorBuilder.done();
+        final ProcessSupervisorImpl supervisor = new ProcessSupervisorImpl();
+        supervisor.setId(sSupervisor.getId());
+        supervisor.setProcessDefinitionId(sSupervisor.getProcessDefId());
+        supervisor.setUserId(sSupervisor.getUserId());
+        supervisor.setGroupId(sSupervisor.getGroupId());
+        supervisor.setRoleId(sSupervisor.getRoleId());
+        return supervisor;
     }
 
     public static List<Document> toDocuments(final Collection<SProcessDocument> attachments) {
@@ -1605,25 +1604,26 @@ public class ModelConvertor {
     }
 
     public static ProcessInstanceState getProcessInstanceState(final String state) {
-        ProcessInstanceState pis = null;
-        if (state.equalsIgnoreCase(ProcessInstanceState.ABORTED.toString())) {
-            pis = ProcessInstanceState.ABORTED;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.CANCELLED.toString())) {
-            pis = ProcessInstanceState.CANCELLED;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.COMPLETED.toString())) {
-            pis = ProcessInstanceState.COMPLETED;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.COMPLETING.toString())) {
-            pis = ProcessInstanceState.COMPLETING;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.ERROR.toString())) {
-            pis = ProcessInstanceState.ERROR;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.INITIALIZING.toString())) {
-            pis = ProcessInstanceState.INITIALIZING;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.STARTED.toString())) {
-            pis = ProcessInstanceState.STARTED;
-        } else if (state.equalsIgnoreCase(ProcessInstanceState.SUSPENDED.toString())) {
-            pis = ProcessInstanceState.SUSPENDED;
+        if (state != null) {
+            if (state.equalsIgnoreCase(ProcessInstanceState.ABORTED.toString())) {
+                return ProcessInstanceState.ABORTED;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.CANCELLED.toString())) {
+                return ProcessInstanceState.CANCELLED;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.COMPLETED.toString())) {
+                return ProcessInstanceState.COMPLETED;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.COMPLETING.toString())) {
+                return ProcessInstanceState.COMPLETING;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.ERROR.toString())) {
+                return ProcessInstanceState.ERROR;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.INITIALIZING.toString())) {
+                return ProcessInstanceState.INITIALIZING;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.STARTED.toString())) {
+                return ProcessInstanceState.STARTED;
+            } else if (state.equalsIgnoreCase(ProcessInstanceState.SUSPENDED.toString())) {
+                return ProcessInstanceState.SUSPENDED;
+            }
         }
-        return pis;
+        throw new IllegalArgumentException("Invalid process instance state: " + state);
     }
 
     public static Comment toComment(final SComment sComment) {

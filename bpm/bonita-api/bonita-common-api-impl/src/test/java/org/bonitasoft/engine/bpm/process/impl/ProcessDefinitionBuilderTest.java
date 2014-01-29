@@ -1,27 +1,9 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
 package org.bonitasoft.engine.bpm.process.impl;
 
-import org.bonitasoft.engine.bpm.flownode.BoundaryEventInstance;
-import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -41,8 +23,6 @@ public class ProcessDefinitionBuilderTest {
     private ProcessDefinitionBuilder processDefinitionBuilder;
 
     // FIXME : Split all tests after, in several unit tests
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = {
-            "Event", "Boundary event", "Timer event", "Automatic task", "Outgoing transition" }, story = "Check that a boundary event musy have an outgoing transition.", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void boundaryEventMustHaveOutgoingTransition() throws Exception {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(100);
@@ -73,8 +53,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = {
-            "Event", "Boundary event", "Timer event", "Automatic task", "Outgoing transition" }, story = "Check that a boundary event must have an outgoing transition without condition.", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void boundaryEventMustHaveOutgoingTransitionWithoutCondition() throws Exception {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(100);
@@ -92,8 +70,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = {
-            "Event", "Boundary Event", "Trigger", "Automatic task" }, story = "Check that a boundary event must have a trigger", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void boundaryEventMustHaveATrigger() throws Exception {
         final String taskWithBoundary = "step1";
@@ -108,8 +84,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, exceptions = InvalidProcessDefinitionException.class, concept = BPMNConcept.EVENTS, keywords = {
-            "Event", "Boundary Event", "Trigger", "Automatic task" }, story = "Check that a boundary event must have a trigger", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void timerBoundaryEventCannotHasTypeCycle() throws Exception {
         final Expression timerValue = new ExpressionBuilder().createConstantStringExpression("0/5 * * * * ?");
@@ -170,7 +144,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Boundary", "Automatic task", "Timer" }, story = "Timer boundary events are not supported on automatic tasks", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void timerBoundaryEventsOnAutomaticTasksAreNotSupported() throws Exception {
         final String taskWithBoundary = "step1";
@@ -186,7 +159,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Boundary", "Automatic task", "Signal" }, story = "Signal boundary events are not supported on automatic tasks", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void signalBoundaryEventsOnAutomaticTasksAreNotSupported() throws Exception {
         final String taskWithBoundary = "step1";
@@ -201,7 +173,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Boundary", "Automatic task", "Message" }, story = "Message boundary events are not supported on automatic tasks", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void messageBoundaryEventsOnAutomaticTasksAreNotSupported() throws Exception {
         final String taskWithBoundary = "step1";
@@ -216,7 +187,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Boundary", "Receive task", "Timer" }, story = "Timer boundary events are not supported on receive tasks", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void timerBoundaryEventsOnReceiveTasksAreNotSupported() throws Exception {
         final String taskWithBoundary = "step1";
@@ -232,7 +202,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Boundary", "Receive task", "Signal" }, story = "Signal boundary events are not supported on receive tasks", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void signalBoundaryEventsOnReceiveTasksAreNotSupported() throws Exception {
         final String taskWithBoundary = "step1";
@@ -247,7 +216,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Boundary", "Receive task", "Message" }, story = "Message boundary events are not supported on receive tasks", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void messageBoundaryEventsOnReceiveTasksAreNotSupported() throws Exception {
         final String taskWithBoundary = "step1";
@@ -262,7 +230,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Boundary", "Send task", "Timer" }, story = "Timer boundary events are not supported on send tasks", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void timerBoundaryEventsOnSendTasksAreNotSupported() throws Exception {
         final String taskWithBoundary = "step1";
@@ -278,7 +245,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Boundary", "Send task", "Signal" }, story = "Signal boundary events are not supported on send tasks", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void signalBoundaryEventsOnSendTasksAreNotSupported() throws Exception {
         final String taskWithBoundary = "step1";
@@ -294,7 +260,6 @@ public class ProcessDefinitionBuilderTest {
         processDefinitionBuilder.done();
     }
 
-    @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Boundary", "Send task", "Message" }, story = "Message boundary events are not supported on send tasks", jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void messageBoundaryEventsOnSendTasksAreNotSupported() throws Exception {
         final String taskWithBoundary = "step1";
@@ -312,7 +277,6 @@ public class ProcessDefinitionBuilderTest {
 
     // EventSubProcessDefinitionTest
     @Test(expected = InvalidProcessDefinitionException.class)
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event subprocess" }, jira = "ENGINE-537", story = "Verify that a event sub-proces cannot have incomming transitions")
     public void eventSubProcessMusntHaveIncommingTransitions() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
@@ -329,7 +293,6 @@ public class ProcessDefinitionBuilderTest {
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event subprocess" }, jira = "ENGINE-537", story = "Verify that a event sub-proces cannot have outgoing transitions")
     public void eventSubProcessMusntHaveOutgoingTransitions() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
@@ -347,7 +310,6 @@ public class ProcessDefinitionBuilderTest {
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event subprocess" }, jira = "ENGINE-537", story = "Verify that a event sub-proces mus have a start event with a trigger")
     public void eventSubProcessMustHaveTrigger() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
@@ -362,7 +324,6 @@ public class ProcessDefinitionBuilderTest {
     }
 
     @Test(expected = InvalidProcessDefinitionException.class)
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event subprocess" }, jira = "ENGINE-537", story = "Verify that a event sub-proces mus have a start event with a trigger")
     public void eventSubProcessCannotHaveMoreThanOneStartEvent() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
@@ -382,7 +343,6 @@ public class ProcessDefinitionBuilderTest {
 
     // FIXME remove after adding ids in the flow nodes
     @Test(expected = InvalidProcessDefinitionException.class)
-    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event subprocess" }, jira = "ENGINE-537", story = "Verify that all names are unique")
     public void eventSubProcessCannotHaveTwoFlowNodesWithTheSameName() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
@@ -398,7 +358,6 @@ public class ProcessDefinitionBuilderTest {
     }
 
     // MessageEventsDefinitionTest
-    @Cover(classes = { CatchMessageEventTriggerDefinitionBuilder.class }, concept = BPMNConcept.EVENTS, keywords = { "Correlation", "Message start event" }, jira = "")
     @Test(expected = InvalidProcessDefinitionException.class)
     public void cannotHaveCorrelationInStartMessageOfRootProcess() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
@@ -412,7 +371,6 @@ public class ProcessDefinitionBuilderTest {
         builder.done();
     }
 
-    @Cover(classes = { CatchMessageEventTriggerDefinitionBuilder.class }, concept = BPMNConcept.EVENTS, keywords = { "Message", "Intermediate catch event" }, jira = "ENGINE-1652")
     @Test
     public void canStartOnIntermediateCatchEventMessage() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();

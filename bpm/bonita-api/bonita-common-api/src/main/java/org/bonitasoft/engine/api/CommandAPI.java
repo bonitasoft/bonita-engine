@@ -36,9 +36,64 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
+ * Manipulate tenant commands. A command can be registered, unregistered, and executed with parameters.
+ * <p>
+ * Commands are used to extend engine behavior, and are classes that are called from this API and executed on the server side. <br/>
+ * in the execute method of this class.
+ * </p>
+ * <p>
+ * A command is composed of a jar containing at least one class that implements org.bonitasoft.engine.command.TenantCommand.
+ * org.bonitasoft.engine.command.system.CommandWithParameters can be used to handle parameter more easily. The behavior of the command must be defined in the
+ * execute method of this class.<br/>
+ * TenantCommand is a class available only in bonita-server.jar. In order to create the jar you will need to have a dependency on that jar.
+ * <p>
+ * The jar containing the command class must be added to the engine using the {@link addDependency} method with a name to identify the dependency so that it can
+ * be removed later.<br/>
+ * Then the command must be registered using {@link CommandAPI#register(String, String, String)} with a name to identify it and an implementation that is the
+ * fully qualified name of the command class.<br/>
+ * After registration, the command can be executed using {@link CommandAPI#execute(long, Map)} with the id returned by the register method or
+ * {@link CommandAPI#execute(String, Map)} with the name of the command and with a map of parameters required by the command.<br/>
+ * Finally the command can be removed using both {@link CommandAPI#unregister(long)} or {@link CommandAPI#unregister(String)} and
+ * {@link CommandAPI#removeDependency(String)}
+ * </p>
+ * 
+ * <pre>
+ * Code example:<br/> 
+ * 
+ * In this example we deploy a command named "myCommandName". The class that implements TenantCommand is org.bonitasoft.engine.command.IntegerCommand and 
+ * is contained in the jar we deploy using CommandAPI.addDependency.
+ *  
+ * {@code
+ *  
+ * byte[] byteArray = /* read the jar containing the command as a byte array * /
+ * 
+ *  //deploy
+ * getCommandAPI().addDependency("myCommandDependency", byteArray);
+ * getCommandAPI().register("myCommandName", "Retrieving the integer value", "org.bonitasoft.engine.command.IntegerCommand");
+ * 
+ *  //execute
+ * final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+ * parameters.put("aParamterName", "aParameterValue");
+ * parameters.put("anIntParameter", 42);
+ * Integer theResultOfTheCommandExecution = (Integer) getCommandAPI().execute("myCommandName", parameters);
+ * 
+ *  //undeploy
+ * getCommandAPI().unregister("myCommandName");
+ * getCommandAPI().removeDependency("myCommandDependency");
+ * }
+ * </pre>
+ * 
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
+ * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
+ * @see CommandDescriptor
+ * @see #register(String, String, String)
+ * @see #unregister(long)
+ * @see #addDependency(String, byte[])
+ * @see #removeDependency(String)
  */
 public interface CommandAPI {
 
@@ -203,7 +258,7 @@ public interface CommandAPI {
      * 
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
-     * @throws CommandDeletionException
+     * @throws DeletionException
      *             occurs when an exception is thrown during command (unregistering) deletion
      * @since 6.0
      */
@@ -250,7 +305,7 @@ public interface CommandAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the command id does not refer to any existing command
-     * @throws CommandUpdateException
+     * @throws UpdateException
      *             occurs when an exception is thrown during command update
      * @since 6.0
      */
@@ -265,7 +320,7 @@ public interface CommandAPI {
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the name does not refer to any existing command.
-     * @throws CommandDeletionException
+     * @throws DeletionException
      *             occurs when an exception is thrown during command deletion
      * @since 6.0
      */

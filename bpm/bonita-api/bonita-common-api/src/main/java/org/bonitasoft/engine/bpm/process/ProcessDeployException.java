@@ -16,8 +16,13 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
+ * Thrown when a process fails to deploy.
+ * It also gives access to the ID of the process Definition that tried to be deployed, through method {@link #getProcessDefinitionId()}.
+ * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
+ * @see #getProcessDefinitionId()
  */
 public class ProcessDeployException extends ExecutionException {
 

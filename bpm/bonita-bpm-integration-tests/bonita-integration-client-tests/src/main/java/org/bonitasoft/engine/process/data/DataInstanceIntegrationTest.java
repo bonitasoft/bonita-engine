@@ -1010,5 +1010,4 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(builder.done(), ACTOR_NAME, user);
         return processDefinition;
     }
-
 }
