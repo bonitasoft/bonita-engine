@@ -29,6 +29,13 @@ public class LeftOperandImpl implements LeftOperand {
 
     private boolean external;
 
+    private LeftOperandType type;
+
+    public LeftOperandImpl() {
+        // default when not set
+        type = LeftOperandType.DATA;
+    }
+
     public void setName(final String name) {
         this.name = name;
     }
@@ -59,11 +66,21 @@ public class LeftOperandImpl implements LeftOperand {
     }
 
     @Override
+    public LeftOperandType getType() {
+        return type;
+    }
+
+    public void setType(final LeftOperandType type) {
+        this.type = type;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (external ? 1231 : 1237);
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
 
@@ -78,7 +95,10 @@ public class LeftOperandImpl implements LeftOperand {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final LeftOperandImpl other = (LeftOperandImpl) obj;
+        LeftOperandImpl other = (LeftOperandImpl) obj;
+        if (external != other.external) {
+            return false;
+        }
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -86,16 +106,15 @@ public class LeftOperandImpl implements LeftOperand {
         } else if (!name.equals(other.name)) {
             return false;
         }
-        if (external != other.external) {
+        if (type != other.type) {
             return false;
         }
         return true;
     }
 
     @Override
-    @Deprecated
-    public LeftOperandType getType() {
-        return null;
+    public String toString() {
+        return "LeftOperandImpl [name=" + name + ", external=" + external + ", type=" + type + "]";
     }
 
 }

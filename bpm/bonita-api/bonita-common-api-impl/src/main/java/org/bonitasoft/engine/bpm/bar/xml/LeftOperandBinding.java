@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.io.xml.ElementBinding;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.LeftOperandType;
 
 /**
  * @author Baptiste Mesta
@@ -24,6 +25,8 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 public class LeftOperandBinding extends ElementBinding {
 
     private String content;
+
+    private LeftOperandType type;
 
     @Override
     public String getElementTag() {
@@ -33,6 +36,7 @@ public class LeftOperandBinding extends ElementBinding {
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         content = attributes.get(XMLProcessDefinition.LEFT_OPERAND_NAME);
+        type = LeftOperandType.valueOf(attributes.get(XMLProcessDefinition.LEFT_OPERAND_TYPE));
 
     }
 
@@ -48,7 +52,7 @@ public class LeftOperandBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        return new LeftOperandBuilder().createNewInstance().setName(content).done();
+        return new LeftOperandBuilder().createNewInstance().setName(content).setType(type).done();
     }
 
 }

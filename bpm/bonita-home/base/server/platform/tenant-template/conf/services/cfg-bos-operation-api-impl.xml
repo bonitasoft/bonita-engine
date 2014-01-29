@@ -2,9 +2,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
-		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-		<constructor-arg name="operationExecutorStrategyProvider"
-			ref="operationExecutorStrategyProvider" />
+		<constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
+		<constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider" />
 		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
@@ -15,28 +14,35 @@
 				<ref bean="assignmentOperationExecutorStrategy" />
 				<ref bean="javaMethodOperationExecutorStrategy" />
 				<ref bean="xpathUpdateQueryOperationExecutorStrategy" />
-				<ref bean="documentOperationExecutorStrategy" />
 			</list>
 		</property>
 	</bean>
 
-	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy">
-		<constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
+	<bean id="leftOperandHandlerProvider" class="org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider">
+		<property name="leftOperandHandlers">
+			<list>
+				<ref bean="dataLeftOperandHandler" />
+				<ref bean="documentLeftOperandHandler" />
+			</list>
+		</property>
 	</bean>
 
-	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy">
+	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy" />
+
+	<bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.DataLeftOperandHandler">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 	</bean>
 
-	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy">
-		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-	</bean>
+	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy" />
 
-	<bean id="documentOperationExecutorStrategy" class="org.bonitasoft.engine.operation.DocumentOperationExecutorStrategy">
+	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy" />
+
+	<bean id="documentLeftOperandHandler" class="org.bonitasoft.engine.operation.DocumentLeftOperandHandler">
 		<constructor-arg name="processDocumentService" ref="processDocumentService" />
 		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 	</bean>
+	
 
 </beans>

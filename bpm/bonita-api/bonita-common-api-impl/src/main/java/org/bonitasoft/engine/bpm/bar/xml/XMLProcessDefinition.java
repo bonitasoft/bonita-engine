@@ -279,6 +279,8 @@ public class XMLProcessDefinition {
 
     public static final String LEFT_OPERAND_NAME = "name";
 
+    public static final String LEFT_OPERAND_TYPE = "type";
+
     public static final String CONNECTOR_INPUTS_NODE = "inputs";
 
     public static final String CONNECTOR_OUTPUTS_NODE = "outputs";
@@ -831,6 +833,7 @@ public class XMLProcessDefinition {
 
     private void fillLeftOperandNode(final XMLNode rightOperandNode, final LeftOperand leftOperand) {
         rightOperandNode.addAttribute(LEFT_OPERAND_NAME, leftOperand.getName());
+        rightOperandNode.addAttribute(LEFT_OPERAND_TYPE, leftOperand.getType().name());
     }
 
     private void fillUserFilterNode(final XMLNode userFilterNode, final UserFilterDefinition userFilter) {

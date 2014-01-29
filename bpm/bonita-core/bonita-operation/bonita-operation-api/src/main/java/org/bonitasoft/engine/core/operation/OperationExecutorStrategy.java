@@ -15,7 +15,6 @@ package org.bonitasoft.engine.core.operation;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
-import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 
 /**
@@ -29,10 +28,6 @@ public interface OperationExecutorStrategy {
     Object getValue(SOperation operation, Object value, long containerId, String containerType, SExpressionContext expressionContext)
             throws SOperationExecutionException;
 
-    void update(SLeftOperand sLeftOperand, Object newValue, long containerId, String containerType) throws SOperationExecutionException;
-
     String getOperationType();
-
-    boolean doUpdateData();
 
 }

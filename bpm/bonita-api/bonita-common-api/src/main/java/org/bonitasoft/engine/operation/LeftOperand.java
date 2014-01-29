@@ -19,6 +19,7 @@ import java.io.Serializable;
  * @author Zhang Bole
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @author Baptiste Mesta
  */
 public interface LeftOperand extends Serializable {
 
@@ -31,9 +32,13 @@ public interface LeftOperand extends Serializable {
     String getDataName();
 
     /**
-     * @deprecated As of 6.0 use {@link Operation#getType()} instead
+     * The type of the left operand
+     * 
+     * It define what kind of resource the operation will update
+     * 
+     * @return
+     *         the type of the left operand
      */
-    @Deprecated
     LeftOperandType getType();
 
     boolean isExternal();

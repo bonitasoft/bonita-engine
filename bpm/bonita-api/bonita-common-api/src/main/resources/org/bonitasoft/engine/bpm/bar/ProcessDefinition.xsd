@@ -668,6 +668,7 @@
 
 	<xs:complexType name="LeftOperand">
 		<xs:attribute name="name" />
+		<xs:attribute name="type" />
 	</xs:complexType>
 
 	<xs:complexType name="NamedElement">

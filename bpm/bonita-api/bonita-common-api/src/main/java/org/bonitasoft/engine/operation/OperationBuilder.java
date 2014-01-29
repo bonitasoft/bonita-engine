@@ -67,6 +67,19 @@ public class OperationBuilder {
     }
 
     /**
+     * Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
+     * 
+     * @param name
+     *            the name of the left operand
+     * @param external
+     * @return this builder itself, so that calls the various exposed methods can be chained.
+     */
+    public OperationBuilder setLeftOperand(final String name, final LeftOperandType type, final boolean external) {
+        operation.setLeftOperand(new LeftOperandBuilder().createNewInstance(name).setType(type).setExternal(external).done());
+        return this;
+    }
+
+    /**
      * @param operatorType
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
@@ -108,7 +121,7 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDataOperation(final String dataName, final Expression expression) {
-        return createNewInstance().setLeftOperand(dataName, false).setRightOperand(expression).setType(OperatorType.ASSIGNMENT).done();
+        return createNewInstance().setLeftOperand(dataName, LeftOperandType.DATA, false).setRightOperand(expression).setType(OperatorType.ASSIGNMENT).done();
     }
 
     /**
@@ -117,7 +130,7 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDocument(final String docName, final Expression expression) {
-        return createNewInstance().setLeftOperand(docName, false).setType(OperatorType.DOCUMENT_CREATE_UPDATE).setRightOperand(expression).done();
+        return createNewInstance().setLeftOperand(docName, LeftOperandType.DOCUMENT, false).setType(OperatorType.ASSIGNMENT).setRightOperand(expression).done();
     }
 
     /**
@@ -127,7 +140,8 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createXPathOperation(final String xmlName, final String xPath, final Expression setValue) {
-        return createNewInstance().setLeftOperand(xmlName, false).setType(OperatorType.XPATH_UPDATE_QUERY).setOperator(xPath).setRightOperand(setValue).done();
+        return createNewInstance().setLeftOperand(xmlName, LeftOperandType.DATA, false).setType(OperatorType.XPATH_UPDATE_QUERY).setOperator(xPath)
+                .setRightOperand(setValue).done();
     }
 
     /**
@@ -138,7 +152,7 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createJavaMethodOperation(final String objectName, final String methodName, final String methodParamType, final Expression methodParams) {
-        return createNewInstance().setLeftOperand(objectName, false).setType(OperatorType.JAVA_METHOD).setOperator(methodName)
+        return createNewInstance().setLeftOperand(objectName, LeftOperandType.DATA, false).setType(OperatorType.JAVA_METHOD).setOperator(methodName)
                 .setOperatorInputType(methodParamType).setRightOperand(methodParams).done();
     }
 
@@ -152,7 +166,7 @@ public class OperationBuilder {
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetStringIndexOperation(final int index, final Expression setValue) {
-        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createSearchIndexLeftOperand(index)).setType(OperatorType.STRING_INDEX)
+        return createNewInstance().setLeftOperand(new LeftOperandBuilder().createSearchIndexLeftOperand(index)).setType(OperatorType.ASSIGNMENT)
                 .setRightOperand(setValue).done();
     }
 
@@ -160,7 +174,36 @@ public class OperationBuilder {
      * @return the newly built <code>Operation</code>.
      */
     public Operation done() {
+        if (operation.getType() == null) {
+            throw new IllegalStateException("The type of the expression is not set");
+        }
         return operation;
+    }
+
+    /* =================== Fluent api ======================= */
+
+    public static OperationRightOperandBuilder setData(final String name) {
+        return new OperationRightOperandBuilder(new OperationBuilder().createNewInstance().setLeftOperand(name, LeftOperandType.DATA, false));
+    }
+
+    public static OperationRightOperandBuilder setStringIndex(final int index) {
+        return new OperationRightOperandBuilder(new OperationBuilder().createNewInstance().setLeftOperand(
+                new LeftOperandBuilder().createSearchIndexLeftOperand(index)));
+
+    }
+
+    public static OperationRightOperandBuilder setDocument(final String name) {
+        return new OperationRightOperandBuilder(new OperationBuilder().createNewInstance().setLeftOperand(name, LeftOperandType.DOCUMENT, false));
+
+    }
+
+    // OperationRightOperandBuilder setTransientData(final String name) {
+    //
+    // }
+
+    OperationRightOperandBuilder setExternalData(final String name) {
+        return new OperationRightOperandBuilder(new OperationBuilder().createNewInstance().setLeftOperand(name, LeftOperandType.DATA, true));
+
     }
 
 }

@@ -18,16 +18,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 
 /**
  * @author Zhang Bole
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class JavaMethodOperationExecutorStrategy extends UpdateOperationExecutorStrategy {
+public class JavaMethodOperationExecutorStrategy implements OperationExecutorStrategy {
 
     public static final String TYPE_JAVA_METHOD = "JAVA_METHOD";
 
@@ -56,8 +56,7 @@ public class JavaMethodOperationExecutorStrategy extends UpdateOperationExecutor
         autoboxableTypes.put(Boolean.class.getName(), boolean.class);
     }
 
-    public JavaMethodOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
-        super(dataInstanceService);
+    public JavaMethodOperationExecutorStrategy() {
     }
 
     private Method getMethod(final SOperation operation, final Class<?> dataType) throws NoSuchMethodException, ClassNotFoundException {

@@ -58,6 +58,11 @@ public class LeftOperandBuilder {
         return this;
     }
 
+    public LeftOperandBuilder setType(final LeftOperandType type) {
+        leftOperand.setType(type);
+        return this;
+    }
+
     /**
      * @param external
      * @return this builder itself, so that calls the various exposed methods can be chained.
@@ -72,11 +77,11 @@ public class LeftOperandBuilder {
     }
 
     public LeftOperand createSearchIndexLeftOperand(final int index) {
-        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).done();
+        return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).setType(LeftOperandType.SEARCH_INDEX).done();
     }
 
     public LeftOperand createDataLeftOperand(final String dataName, final boolean external) {
-        return new LeftOperandBuilder().createNewInstance(dataName).setExternal(external).done();
+        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.DATA).setExternal(external).done();
     }
 
     /**
@@ -87,7 +92,7 @@ public class LeftOperandBuilder {
      * @return the newly created <code>LeftOperand</code> object
      */
     public LeftOperand createDataLeftOperand(final String dataName) {
-        return new LeftOperandBuilder().createNewInstance(dataName).setExternal(false).done();
+        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.DATA).setExternal(false).done();
     }
 
 }

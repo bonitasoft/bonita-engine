@@ -243,6 +243,7 @@ import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.job.impl.FailedJobImpl;
 import org.bonitasoft.engine.operation.LeftOperand;
+import org.bonitasoft.engine.operation.LeftOperandType;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.operation.impl.LeftOperandImpl;
@@ -1733,11 +1734,12 @@ public class ModelConvertor {
         operationImpl.setRightOperand(toExpression(operation.getRightOperand()));
         operationImpl.setOperator(operation.getOperator());
         operationImpl.setType(toOperatorType(operation.getType()));
-        final LeftOperandImpl variableToSet = new LeftOperandImpl();
-        final SLeftOperand variableToSet2 = operation.getLeftOperand();
-        variableToSet.setName(variableToSet2.getName());
-        variableToSet.setExternal(variableToSet2.isExternal());
-        operationImpl.setLeftOperand(variableToSet);
+        final LeftOperandImpl leftOperand = new LeftOperandImpl();
+        final SLeftOperand sLeftOperand = operation.getLeftOperand();
+        leftOperand.setName(sLeftOperand.getName());
+        leftOperand.setExternal(sLeftOperand.isExternal());
+        leftOperand.setType(LeftOperandType.valueOf(sLeftOperand.getType().name()));
+        operationImpl.setLeftOperand(leftOperand);
         return operationImpl;
     }
 

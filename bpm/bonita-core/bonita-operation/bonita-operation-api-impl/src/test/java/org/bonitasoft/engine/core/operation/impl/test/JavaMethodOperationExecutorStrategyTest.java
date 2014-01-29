@@ -24,7 +24,6 @@ import org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStra
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.junit.Test;
 
@@ -35,8 +34,7 @@ public class JavaMethodOperationExecutorStrategyTest {
 
     @Test(expected = SOperationExecutionException.class)
     public void dontThrowNPEIfObjectDoesNotExist() throws Exception {
-        final DataInstanceService dataInstanceService = mock(DataInstanceService.class);
-        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy(dataInstanceService);
+        final JavaMethodOperationExecutorStrategy strategy = new JavaMethodOperationExecutorStrategy();
         final SOperation operation = mock(SOperation.class);
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
         final SExpression rightOperand = mock(SExpression.class);

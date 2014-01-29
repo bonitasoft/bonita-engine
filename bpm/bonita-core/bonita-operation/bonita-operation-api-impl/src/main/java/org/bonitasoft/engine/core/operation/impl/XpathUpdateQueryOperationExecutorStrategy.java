@@ -28,9 +28,9 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.xml.DocumentManager;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -45,12 +45,11 @@ import org.xml.sax.SAXException;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
-public class XpathUpdateQueryOperationExecutorStrategy extends UpdateOperationExecutorStrategy {
+public class XpathUpdateQueryOperationExecutorStrategy implements OperationExecutorStrategy {
 
     public static final String TYPE_XPATH_UPDATE_QUERY = "XPATH_UPDATE_QUERY";
 
-    public XpathUpdateQueryOperationExecutorStrategy(final DataInstanceService dataInstanceService) {
-        super(dataInstanceService);
+    public XpathUpdateQueryOperationExecutorStrategy() {
     }
 
     @Override

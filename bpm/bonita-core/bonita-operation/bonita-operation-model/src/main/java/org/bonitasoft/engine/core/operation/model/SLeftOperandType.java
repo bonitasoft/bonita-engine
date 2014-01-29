@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,23 +10,15 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.core.operation.model.builder;
-
-import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
+ ** 
+ * @since 6.2
+ */
+package org.bonitasoft.engine.core.operation.model;
 
 /**
- * @author Zhang Bole
+ * @author Baptiste Mesta
+ * 
  */
-public interface SLeftOperandBuilder {
-
-    SLeftOperandBuilder setName(final String dataName);
-
-    SLeftOperandBuilder setType(final SLeftOperandType type);
-
-    SLeftOperandBuilder setExternal(final boolean external);
-
-    SLeftOperand done();
-
+public enum SLeftOperandType {
+    DATA, SEARCH_INDEX, DOCUMENT
 }

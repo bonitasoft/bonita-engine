@@ -13,29 +13,26 @@
  **/
 package org.bonitasoft.engine.core.operation.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.LeftOperandHandler;
+import org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Zhang Bole
@@ -46,22 +43,27 @@ public class OperationServiceImpl implements OperationService {
 
     private final Map<String, OperationExecutorStrategy> operationExecutorsMap;
 
-    private final ExpressionResolverService expressionResolverService;
+    private final Map<String, LeftOperandHandler> leftOperandHandlersMap;
 
-    private final DataInstanceService dataInstanceService;
+    private final ExpressionResolverService expressionResolverService;
 
     private final TechnicalLoggerService logger;
 
     public OperationServiceImpl(final OperationExecutorStrategyProvider operationExecutorStrategyProvider,
-            final ExpressionResolverService expressionResolverService, final TechnicalLoggerService logger, final DataInstanceService dataInstanceService) {
+            final LeftOperandHandlerProvider leftOperandHandlerProvider,
+            final ExpressionResolverService expressionResolverService, final TechnicalLoggerService logger) {
         super();
         this.expressionResolverService = expressionResolverService;
-        this.dataInstanceService = dataInstanceService;
         this.logger = logger;
         final List<OperationExecutorStrategy> expressionExecutors = operationExecutorStrategyProvider.getOperationExecutors();
         operationExecutorsMap = new HashMap<String, OperationExecutorStrategy>(expressionExecutors.size());
         for (final OperationExecutorStrategy operationExecutorStrategy : expressionExecutors) {
             operationExecutorsMap.put(operationExecutorStrategy.getOperationType(), operationExecutorStrategy);
+        }
+        List<LeftOperandHandler> leftOperandHandlers = leftOperandHandlerProvider.getLeftOperandHandlers();
+        leftOperandHandlersMap = new HashMap<String, LeftOperandHandler>(leftOperandHandlers.size());
+        for (LeftOperandHandler leftOperandHandler : leftOperandHandlers) {
+            leftOperandHandlersMap.put(leftOperandHandler.getType(), leftOperandHandler);
         }
     }
 
@@ -109,18 +111,38 @@ public class OperationServiceImpl implements OperationService {
     @Override
     public void execute(final List<SOperation> operations, final long dataContainerId, final String dataContainerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
-        retrieveDataInstancesToSetAndPutItInExpressionContextIfNotIn(operations, expressionContext);
-        final Map<SLeftOperand, OperationExecutorStrategy> updates = new HashMap<SLeftOperand, OperationExecutorStrategy>();
+        // retrieve all left operand to set and put it in context
+        // TODO implement batch retrieve in leftOperandHandlers
+        try {
+            retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, expressionContext);
+        } catch (SBonitaReadException e) {
+            throw new SOperationExecutionException("Unable to retrieve value for all operations", e);
+        }
+
+        // execute operation and put it in context again
+        executeOperators(operations, dataContainerId, dataContainerType, expressionContext);
+
+        // update data
+        // TODO implement batch update in leftOperandHandlers
+        updateLeftOperands(operations, dataContainerId, dataContainerType, expressionContext);
+    }
+
+    void updateLeftOperands(final List<SOperation> operations, final long dataContainerId, final String dataContainerType,
+            final SExpressionContext expressionContext) throws SOperationExecutionException {
+        for (SOperation operation : operations) {
+            SLeftOperand leftOperand = operation.getLeftOperand();
+            getLeftOperandHandler(leftOperand).update(leftOperand, expressionContext.getInputValues().get(leftOperand.getName()), dataContainerId,
+                    dataContainerType);
+        }
+    }
+
+    void executeOperators(final List<SOperation> operations, final long dataContainerId, final String dataContainerType,
+            final SExpressionContext expressionContext) throws SOperationExecutionException {
         for (final SOperation operation : operations) {
             final Object operationValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
             final OperationExecutorStrategy operationExecutorStrategy = getOperationExecutorStrategy(operation);
             final Object value = operationExecutorStrategy.getValue(operation, operationValue, dataContainerId, dataContainerType, expressionContext);
-            if (!operationExecutorStrategy.doUpdateData()) {
-                operationExecutorStrategy.update(operation.getLeftOperand(), value, dataContainerId, dataContainerType);
-            } else {
-                expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
-                updates.put(operation.getLeftOperand(), operationExecutorStrategy);
-            }
+            expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 StringBuilder stb = new StringBuilder();
                 stb.append("Executed operation on container [id: '");
@@ -137,35 +159,29 @@ public class OperationServiceImpl implements OperationService {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
             }
         }
-        for (final Entry<SLeftOperand, OperationExecutorStrategy> update : updates.entrySet()) {
-            update.getValue().update(update.getKey(), expressionContext.getInputValues().get(update.getKey().getName()), dataContainerId, dataContainerType);
-        }
     }
 
-    private void retrieveDataInstancesToSetAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final SExpressionContext expressionContext)
-            throws SOperationExecutionException {
+    private LeftOperandHandler getLeftOperandHandler(final SLeftOperand leftOperand) throws SOperationExecutionException {
+        LeftOperandHandler leftOperandHandler = leftOperandHandlersMap.get(leftOperand.getType().name());
+        if (leftOperandHandler == null) {
+            throw new SOperationExecutionException("Left operand type not found: " + leftOperand.getType());
+        }
+        return leftOperandHandler;
+    }
+
+    private void retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(final List<SOperation> operations, final SExpressionContext expressionContext)
+            throws SOperationExecutionException, SBonitaReadException {
         if (expressionContext.getContainerId() != null) {
-            final HashSet<String> names = new HashSet<String>(operations.size());
+            final Map<String, Object> inputValues = expressionContext.getInputValues();
+
             for (final SOperation operation : operations) {
                 // this operation will set a data, we retrieve it and put it in context
-                if (getOperationExecutorStrategy(operation).doUpdateData()) {
-                    names.add(operation.getLeftOperand().getName());
-                }
-            }
-            List<SDataInstance> dataInstances;
-            try {
-                dataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(names), expressionContext.getContainerId(),
-                        expressionContext.getContainerType());
-            } catch (final SDataInstanceException e) {
-                throw new SOperationExecutionException(e);
-            }
-            final Map<String, Object> inputValues = expressionContext.getInputValues();
-            for (final SDataInstance dataInstance : dataInstances) {
-                if (!inputValues.containsKey(dataInstance.getName())) {
-                    inputValues.put(dataInstance.getName(), dataInstance.getValue());
+                SLeftOperand leftOperand = operation.getLeftOperand();
+                Object retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand, expressionContext);
+                if (retrieve != null /* some left operand don't retrieve it, e.g. document, it's heavy */&& !inputValues.containsKey(leftOperand.getName())) {
+                    inputValues.put(leftOperand.getName(), retrieve);
                 }
             }
         }
     }
-
 }

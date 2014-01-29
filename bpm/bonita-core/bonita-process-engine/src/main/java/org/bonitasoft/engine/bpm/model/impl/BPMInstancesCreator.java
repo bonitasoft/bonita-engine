@@ -34,6 +34,7 @@ import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
+import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -645,7 +646,8 @@ public class BPMInstancesCreator {
         boolean found = false;
         while (iterator.hasNext() && !found) {
             final SOperation operation = iterator.next();
-            if (SOperatorType.ASSIGNMENT.equals(operation.getType()) && dataName.equals(operation.getLeftOperand().getName())) {
+            if (SOperatorType.ASSIGNMENT.equals(operation.getType()) && SLeftOperandType.DATA == operation.getLeftOperand().getType()
+                    && dataName.equals(operation.getLeftOperand().getName())) {
                 found = true;
                 dataOperation = operation;
             }

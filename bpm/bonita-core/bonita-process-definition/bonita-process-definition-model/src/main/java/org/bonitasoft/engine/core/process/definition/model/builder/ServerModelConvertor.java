@@ -14,12 +14,14 @@
 package org.bonitasoft.engine.core.process.definition.model.builder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
@@ -59,13 +61,23 @@ public class ServerModelConvertor {
     }
 
     public static SOperation convertOperation(final Operation operation) {
+        if (operation == null) {
+            return null;
+        }
         return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator())
                 .setType(SOperatorType.valueOf(operation.getType().name()))
                 .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
-                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName()).done()).done();
+                .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
+                        .setName(operation.getLeftOperand().getName())
+                        .setType(SLeftOperandType.valueOf(operation.getLeftOperand().getType().name()))
+                        .done())
+                .done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
+        if (operations == null) {
+            return Collections.emptyList();
+        }
         final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
         for (final Operation operation : operations) {
             sOperations.add(convertOperation(operation));
@@ -81,14 +93,15 @@ public class ServerModelConvertor {
         if (dataDefinition instanceof XMLDataDefinition) {
             final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
             final SXMLDataDefinitionBuilderFactory fact = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class);
-            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(dataDefinition.getName()).setElement(xmlDataDef.getElement()).setNamespace(xmlDataDef.getNamespace());
+            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(dataDefinition.getName()).setElement(xmlDataDef.getElement())
+                    .setNamespace(xmlDataDef.getNamespace());
             builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
             builder.setDescription(dataDefinition.getDescription());
             builder.setTransient(dataDefinition.isTransientData());
             return builder.done();
         } else {
             final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
-            SDataDefinitionBuilder builder = null; 
+            SDataDefinitionBuilder builder = null;
             if (dataDefinition instanceof TextDataDefinition) {
                 final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
                 builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());

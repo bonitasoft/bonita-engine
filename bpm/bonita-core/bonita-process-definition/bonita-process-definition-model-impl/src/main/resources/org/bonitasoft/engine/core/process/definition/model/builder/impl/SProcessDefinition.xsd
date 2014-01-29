@@ -669,6 +669,7 @@
 
 	<xs:complexType name="SLeftOperand">
 		<xs:attribute name="name" />
+		<xs:attribute name="type" />
 	</xs:complexType>
 
 	<xs:complexType name="SNamedElement">

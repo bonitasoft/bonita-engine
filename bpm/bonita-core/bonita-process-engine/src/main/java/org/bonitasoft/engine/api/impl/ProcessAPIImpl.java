@@ -240,11 +240,7 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
-import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.SOperatorType;
-import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
@@ -2819,7 +2815,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             for (Operation operation : operations) {
                 String name = operation.getLeftOperand().getName();
                 if (transientDataNames.contains(name)) {
-                    final SOperation sOperation = toSOperation(operation);
+                    final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
                     final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
                             DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
                             activityInstance.getLogicalGroup(processDefinitionIndex));
@@ -2828,7 +2824,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 } else {
                     // same order between dataInstances and dataNames
                     SDataInstance dataInstance = dataInstances.get(dataNames.indexOf(name));
-                    final SOperation sOperation = toSOperation(operation);
+                    final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
                     final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
                             DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
                             activityInstance.getLogicalGroup(processDefinitionIndex));
@@ -3217,7 +3213,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
         final SProcessInstance startedInstance;
         try {
-            final List<SOperation> sOperations = toSOperation(operations);
+            final List<SOperation> sOperations = ServerModelConvertor.convertOperations(operations);
             Map<String, Object> operationContext;
             if (context != null) {
                 operationContext = new HashMap<String, Object>(context);
@@ -3251,33 +3247,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());
         }
         return processInstance;
-    }
-
-    private List<SOperation> toSOperation(final List<Operation> operations) {
-        if (operations == null) {
-            return null;
-        }
-        if (operations.isEmpty()) {
-            return Collections.emptyList();
-        }
-        final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
-        for (final Operation operation : operations) {
-            final SOperation sOperation = toSOperation(operation);
-            sOperations.add(sOperation);
-        }
-        return sOperations;
-    }
-
-    private SOperation toSOperation(final Operation operation) {
-        final SExpression rightOperand = ModelConvertor.constructSExpression(operation.getRightOperand());
-        final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
-                .setType(operatorType).setLeftOperand(sLeftOperand).done();
-    }
-
-    private SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
     }
 
     @Override

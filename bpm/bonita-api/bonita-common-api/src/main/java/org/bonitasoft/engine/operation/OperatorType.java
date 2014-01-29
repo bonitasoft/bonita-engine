@@ -18,6 +18,12 @@ package org.bonitasoft.engine.operation;
  */
 public enum OperatorType {
 
-    ASSIGNMENT, JAVA_METHOD, XPATH_UPDATE_QUERY, DOCUMENT_CREATE_UPDATE, STRING_INDEX
+    ASSIGNMENT,
+    JAVA_METHOD,
+    XPATH_UPDATE_QUERY,
+    @Deprecated
+    DOCUMENT_CREATE_UPDATE,
+    @Deprecated
+    STRING_INDEX
 
 }

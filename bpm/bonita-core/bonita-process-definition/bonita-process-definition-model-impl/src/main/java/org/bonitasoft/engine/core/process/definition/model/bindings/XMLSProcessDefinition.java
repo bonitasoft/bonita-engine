@@ -277,6 +277,8 @@ public class XMLSProcessDefinition {
 
     public static final String LEFT_OPERAND_NAME = "name";
 
+    public static final String LEFT_OPERAND_TYPE = "type";
+
     public static final String CONNECTOR_INPUTS_NODE = "inputs";
 
     public static final String CONNECTOR_OUTPUTS_NODE = "outputs";
@@ -807,6 +809,7 @@ public class XMLSProcessDefinition {
 
     private void fillLeftOperandNode(final XMLNode rightOperandNode, final SLeftOperand sLeftOperand) {
         rightOperandNode.addAttribute(LEFT_OPERAND_NAME, sLeftOperand.getName());
+        rightOperandNode.addAttribute(LEFT_OPERAND_TYPE, sLeftOperand.getType().name());
     }
 
     private void createAndfillCorrelations(final XMLNode messageEventTriggerNode, final List<SCorrelationDefinition> correlations) {

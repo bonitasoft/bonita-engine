@@ -752,18 +752,19 @@ public class ProcessManagementTest extends CommonAPITest {
         addUserTask.addShortTextData("g", new ExpressionBuilder().createConstantStringExpression("gacti")).isTransient();
 
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
-        HumanTaskInstance step1 = waitForUserTask("step1");
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
 
         List<DataInstance> dataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
-        assertThat(dataInstances).hasSize(5);
-        ArrayList<String> names = new ArrayList<String>(5);
-        ArrayList<String> values = new ArrayList<String>(5);
+        assertThat(dataInstances).hasSize(6);
+        ArrayList<String> names = new ArrayList<String>(6);
+        ArrayList<String> values = new ArrayList<String>(6);
         for (DataInstance dataInstance2 : dataInstances) {
             names.add(dataInstance2.getName());
             values.add((String) dataInstance2.getValue());
         }
-        assertThat(names).contains("a", "b", "c", "d", "e");
-        assertThat(values).contains("aacti", "bacti", "cprocess", "dprocess", "eprocess");
+        assertThat(names).contains("a", "b", "c", "d", "e", "f");
+        assertThat(values).contains("aacti", "bprocess", "cprocess", "dprocess", "eprocess", "facti");
         final List<Operation> operations = new ArrayList<Operation>();
         for (DataInstance dataInstance2 : dataInstances) {
             final Operation stringOperation = buildStringOperation(dataInstance2.getName(), dataInstance2.getValue() + "+up");
@@ -772,12 +773,12 @@ public class ProcessManagementTest extends CommonAPITest {
         getProcessAPI().updateActivityInstanceVariables(operations, step1.getId(), null);
 
         dataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
-        assertThat(dataInstances).hasSize(5);
-        values = new ArrayList<String>(5);
+        assertThat(dataInstances).hasSize(6);
+        values = new ArrayList<String>(6);
         for (DataInstance dataInstance2 : dataInstances) {
             values.add((String) dataInstance2.getValue());
         }
-        assertThat(values).contains("aacti+up", "bacti+up", "cprocess+up", "dprocess+up", "eprocess+up");
+        assertThat(values).contains("aacti+up", "bprocess+up", "cprocess+up", "dprocess+up", "eprocess+up", "facti+up");
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
     }

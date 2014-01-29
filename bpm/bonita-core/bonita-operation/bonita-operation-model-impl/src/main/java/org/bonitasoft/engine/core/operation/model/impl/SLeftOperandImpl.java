@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.operation.model.impl;
 
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
+import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -24,6 +25,21 @@ public class SLeftOperandImpl implements SLeftOperand {
     private static final long serialVersionUID = 1L;
 
     private String name;
+
+    private SLeftOperandType type;
+
+    public SLeftOperandImpl() {
+        type = SLeftOperandType.DATA;
+    }
+
+    @Override
+    public SLeftOperandType getType() {
+        return type;
+    }
+
+    public void setType(final SLeftOperandType type) {
+        this.type = type;
+    }
 
     private boolean external;
 
@@ -51,6 +67,7 @@ public class SLeftOperandImpl implements SLeftOperand {
         int result = 1;
         result = prime * result + (external ? 1231 : 1237);
         result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
 
@@ -65,7 +82,7 @@ public class SLeftOperandImpl implements SLeftOperand {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final SLeftOperandImpl other = (SLeftOperandImpl) obj;
+        SLeftOperandImpl other = (SLeftOperandImpl) obj;
         if (external != other.external) {
             return false;
         }
@@ -76,12 +93,19 @@ public class SLeftOperandImpl implements SLeftOperand {
         } else if (!name.equals(other.name)) {
             return false;
         }
+        if (type == null) {
+            if (other.type != null) {
+                return false;
+            }
+        } else if (!type.equals(other.type)) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "SLeftOperandImpl [name=" + name + ", external=" + external + "]";
+        return "SLeftOperandImpl [name=" + name + ", type=" + type + ", external=" + external + "]";
     }
 
 }

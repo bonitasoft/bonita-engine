@@ -23,10 +23,6 @@ public enum SOperatorType {
 
     JAVA_METHOD,
 
-    XPATH_UPDATE_QUERY,
-
-    DOCUMENT_CREATE_UPDATE,
-
-    STRING_INDEX
+    XPATH_UPDATE_QUERY
 
 }

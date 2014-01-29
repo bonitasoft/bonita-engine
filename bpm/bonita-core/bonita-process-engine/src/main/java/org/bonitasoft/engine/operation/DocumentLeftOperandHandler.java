@@ -17,10 +17,9 @@ import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
+import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
@@ -42,9 +41,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  * 
  * @author Baptiste Mesta
  */
-public class DocumentOperationExecutorStrategy implements OperationExecutorStrategy {
+public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
-    private static final String TYPE_DOCUMENT_CREATE_UPDATE = "DOCUMENT_CREATE_UPDATE";
+    public static final String TYPE_DOCUMENT = "DOCUMENT";
 
     ProcessDocumentService processDocumentService;
 
@@ -54,24 +53,12 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
 
     private final SessionService sessionService;
 
-    public DocumentOperationExecutorStrategy(final ProcessDocumentService processDocumentService, final ActivityInstanceService activityInstanceService,
+    public DocumentLeftOperandHandler(final ProcessDocumentService processDocumentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) {
-        super();
         this.processDocumentService = processDocumentService;
         this.activityInstanceService = activityInstanceService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
-    }
-
-    @Override
-    public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
-            final SExpressionContext expressionContext) {
-        return value;
-    }
-
-    @Override
-    public String getOperationType() {
-        return TYPE_DOCUMENT_CREATE_UPDATE;
     }
 
     @Override
@@ -154,8 +141,13 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
     }
 
     @Override
-    public boolean doUpdateData() {
-        return false;
+    public String getType() {
+        return TYPE_DOCUMENT;
+    }
+
+    @Override
+    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) {
+        return null;
     }
 
 }
