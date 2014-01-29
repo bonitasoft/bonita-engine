@@ -30,18 +30,24 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * Parameters:
  * - started_by: the user id (long) used as process starter. It's a mandatory parameter.
  * - process_definition_id: the process definition id (long) of process to start. It's a mandatory parameter.
- * - activity_names: the name of activities (List<String>) where the execution must starts. It's a mandatory parameter.
- * - operations: the operations (List<Operation>) to execute when starting the process (set variables and documents). It's an optional parameter.
- * - context: the context (Map<String, Serializable>) to be used during operations execution. It's an optional parameter.
- * 
+ * - activity_names: the name of activities (ArrayList<String>) where the execution must starts. It's a mandatory parameter.
+ * - operations: the operations (ArrayList<Operation>) to execute when starting the process (set variables and documents). It's an optional parameter.
+ * - context: the context (HashMap<String, Serializable>) to be used during operations execution. It's an optional parameter.
  * Limitations:
  * - It is not possible to start the execution of a process from a gateway, a boundary event or an event sub-process
- * - The only use case where it's possible to start a process in several parallel branch is in the case where all these branches will merged with a exclusive
- * gateway. In all others cases the process must be started when there is only one active branch. Examples:
- * start -> step1 -> gateway1 -> (step2 || step3) -> gateway2 -> step4 -> end
- * - Always Ok: start at "start" or "step1" or "step4" or "end"
+ * - if the process is started in several parallel branches these branches must not be merged or merged by an exclusive gateway. In all others cases the process
+ * must be started when there is only one active branch. Examples:
+ * Process 1:
+ * flow nodes: start, gateway1, step2, step3, gateway2, step4, end
+ * transitions: start -> step1, step1 -> gateway1, gateway1 -> step2, gateway1 -> step3, step2 -> gateway2, step3 -> gateway2, gateway2 -> step4, step4 -> end
+ * - Always Ok: start from "start" or "step1" or "step4" or "end"
  * - OK if gateway2 is an exclusive gateway: start at "step2" and "step3"
- * - All other start points are invalid. 
+ * - All other start points are invalid.
+ * Process 2:
+ * flow nodes: start, gateway1, step2, step3, end1, end2
+ * transitions: start -> step1, step1 -> gateway1, gateway1 -> step2, gateway1 -> step3, step2 -> end1, step3 -> end2
+ * - Always Ok: start from "start" or "step1" or "step2" or "step3" or "step2 and step3" or "end"
+ * - Not ok: start from gateway1
  * 
  * @author Vincent Elcrin
  */
