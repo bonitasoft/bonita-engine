@@ -35,7 +35,7 @@ ALTER TABLE processsupervisor DROP FOREIGN KEY fk_processsupervisor_tenantId;
 ALTER TABLE profile DROP FOREIGN KEY fk_profile_tenantId;
 ALTER TABLE profileentry DROP FOREIGN KEY fk_profileentry_tenantId;
 ALTER TABLE profilemember DROP FOREIGN KEY fk_profilemember_tenantId;
-ALTER TABLE ref_business_data_inst DROP CONSTRAINT fk_ref_business_data_inst_tenantId;
+ALTER TABLE ref_business_data_inst DROP FOREIGN KEY fk_ref_business_data_inst_tenantId;
 ALTER TABLE role DROP FOREIGN KEY fk_role_tenantId;
 ALTER TABLE theme DROP FOREIGN KEY fk_theme_tenantId;
 ALTER TABLE user_ DROP FOREIGN KEY fk_user__tenantId;
