@@ -15,14 +15,9 @@
 	<name>Bonita Engine SP</name>
 
 	<properties>
-		<jacoco.file>${user.home}/jacoco-engine.exec</jacoco.file>
-		<!-- Sonar -->
-		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<!-- The destination file for the code coverage report has to be set to the same value in the parent pom and in each module pom. Then JaCoCo will add up information 
-			in the same report, so that, it will give the cross-module code coverage. -->
-		<sonar.jacoco.reportPath>${jacoco.file}</sonar.jacoco.reportPath>
-        <hazelcast.version>3.0.3</hazelcast.version>
+		<hazelcast.version>3.0.3</hazelcast.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<dependencyManagement>
@@ -47,21 +42,8 @@
 				<artifactId>hazelcast-spring</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.6.0.201210061924</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 
 	<profiles>
 		<profile>
@@ -106,12 +88,16 @@
 				</plugins>
 			</build>
 		</profile>
+		
 		<profile>
 			<id>package-all</id>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
 			</modules>
+			<properties>
+				<skipTests>true</skipTests>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -129,6 +115,7 @@
 				</plugins>
 			</build>
 		</profile>
+		
 		<profile>
 			<id>tests</id>
 			<modules>
@@ -152,20 +139,69 @@
 				</plugins>
 			</build>
 		</profile>
+		
 		<profile>
 			<id>javadoc</id>
 			<properties>
 				<maven.javadoc.skip>false</maven.javadoc.skip>
 			</properties>
 		</profile>
+		
 		<profile>
 			<id>sonar</id>
+			
+			<properties>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+				
+				<!-- Properties to enable jacoco code coverage analysis -->
+				<sonar.branch>MasterBugFixing</sonar.branch>
+				<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+				<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+				<!-- The destination file for the code coverage report has to be set to the same value in the parent pom and in each module pom. 
+				Then JaCoCo will add up information in the same report, so that, it will give the cross-module code coverage. -->
+				<!-- Tells SonarQube where the integration tests code coverage report is -->
+				<sonar.jacoco.itReportPath>${project.basedir}/jacoco-reports/engine-sp-it.exec</sonar.jacoco.itReportPath>
+				<!-- Tells SonarQube where the unit tests code coverage report is -->
+				<sonar.junit.reportsPath>${project.build.directory}/surefire-reports</sonar.junit.reportsPath>
+			</properties>
+			
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
 			</modules>
+			
+			<dependencies>
+				<dependency>
+					<groupId>org.codehaus.sonar-plugins.java</groupId>
+					<artifactId>sonar-jacoco-listeners</artifactId>
+					<version>1.5</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+
 			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.jacoco</groupId>
+							<artifactId>jacoco-maven-plugin</artifactId>
+							<version>0.6.4.201312101107</version>
+						</plugin>
+					</plugins>
+				</pluginManagement>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<properties>
+								<property>
+									<name>listener</name>
+									<value>org.sonar.java.jacoco.JUnitListener</value>
+								</property>
+							</properties>
+						</configuration>
+					</plugin>
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
@@ -174,7 +210,9 @@
 								<include>org.bonitasoft.engine.*</include>
 								<include>com.bonitasoft.engine.*</include>
 							</includes>
-							<destFile>${jacoco.file}</destFile>
+							<excludes>
+								<exclude>*Test*</exclude>
+							</excludes>
 							<append>true</append>
 						</configuration>
 						<executions>
@@ -182,6 +220,13 @@
 								<id>pre-test</id>
 								<goals>
 									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>post-test</id>
+								<phase>test</phase>
+								<goals>
+									<goal>report</goal>
 								</goals>
 							</execution>
 						</executions>
