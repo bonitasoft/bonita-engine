@@ -931,8 +931,9 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
+				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
+              		<argLine>${it.failsafe.argLine}</argLine>
 					<properties>
 						<property>
 							<name>listener</name>
@@ -947,6 +948,15 @@
 						<include>com/bonitasoft/engine/bpm/test/AllBPMSPTestsWithJNDI.java</include>
 					</includes>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>  
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

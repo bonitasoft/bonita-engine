@@ -641,9 +641,19 @@
 	<build>
 		<plugins>
 			<plugin>
+				<!-- don't execute tests in test phase -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+              		<argLine>${it.failsafe.argLine}</argLine>
 					<properties>
 						<property>
 							<name>listener</name>
@@ -657,6 +667,15 @@
 						<include>com/bonitasoft/services/AllTestsSPWithJNDI.java</include>
 					</includes>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>  
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -665,39 +684,8 @@
 		<profile>
 			<id>sonar</id>
 			<properties>
-				<sonar.jacoco.itReportPath>${project.basedir}/../../jacoco-reports/engine-sp-it.exec</sonar.jacoco.itReportPath>
+				<itReportPath>${project.basedir}/../../jacoco-reports</itReportPath>
 			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<configuration>
-							<!-- The destination file for the code coverage report has to be set 
-								to the same value in the parent pom and in each module pom. Then JaCoCo will 
-								add up information in the same report, so that, it will give the cross-module 
-								code coverage. -->
-							<destFile>${sonar.jacoco.itReportPath}</destFile>
-							<includes>
-								<include>org.bonitasoft.engine.*</include>
-								<include>com.bonitasoft.engine.*</include>
-							</includes>
-							<excludes>
-								<exclude>*Test*</exclude>
-							</excludes>
-							<append>true</append>
-						</configuration>
-						<executions>
-							<execution>
-								<id>post-test</id>
-								<configuration>
-									<skip>true</skip>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 	</profiles>
 </project>
