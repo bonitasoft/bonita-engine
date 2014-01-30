@@ -86,11 +86,6 @@ public class TokenProvider {
         if (transitionsDescriptor.isManyToOne()) {
             if (flowNodeWrapper.isParalleleOrInclusive()) {
                 Long parentTokenRefId = getParentTokenRefId();
-                if(parentTokenRefId == null) {
-                    // the parent token ref id can be null in the case of process started by the AdvancedProcessAPI
-                    tokenService.createToken(processInstance.getId(), child.getId(), null);
-                    return new TokenInfo(child.getId()); 
-                }
                 return new TokenInfo(parentTokenRefId);
             } else {
                 return new TokenInfo(child.getTokenRefId());
