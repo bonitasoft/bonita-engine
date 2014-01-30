@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.bonitasoft.engine.authentication</groupId>
     <artifactId>bonita-authentication</artifactId>
-    <version>6.2.2-SNAPSHOT</version>
+    <version>6.2.3-SNAPSHOT</version>
   </parent>
   <artifactId>bonita-authentication-jaas</artifactId>
   
