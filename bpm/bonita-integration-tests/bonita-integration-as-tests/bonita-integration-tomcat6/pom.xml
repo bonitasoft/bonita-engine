@@ -307,6 +307,7 @@
 										<!-- -Xnoagent -->
 										<!-- -Djava.compiler=NONE -->
 										-XX:+HeapDumpOnOutOfMemoryError
+									</cargo.jvmargs>
 								</properties>
 							</configuration>
 							<wait>false</wait>
