@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.bonitasoft.engine</groupId>
     <artifactId>bonita-deploy</artifactId>
-    <version>6.2.2-SNAPSHOT</version>
+    <version>CITestTagToRemove</version>
   </parent>
   <artifactId>bonita-deploy-tcp</artifactId>
   
