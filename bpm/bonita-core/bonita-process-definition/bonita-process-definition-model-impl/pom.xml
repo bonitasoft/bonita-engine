@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>bonita-process-definition</artifactId>
 		<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-		<version>6.2.2.rc-02</version>
+		<version>CITestTagToRemove</version>
 	</parent>
 
 	<artifactId>bonita-process-definition-model-impl</artifactId>
