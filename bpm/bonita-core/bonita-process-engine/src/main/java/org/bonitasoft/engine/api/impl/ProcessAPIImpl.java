@@ -1663,8 +1663,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(
-                processInstanceService, searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
+        final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
+                searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
         try {
             searchArchivedProcessInstances.execute();
         } catch (final SBonitaException e) {
@@ -4408,8 +4408,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SCommentService commentService = tenantAccessor.getCommentService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchCommentsInvolvingUser searchComments = new SearchCommentsInvolvingUser(searchEntitiesDescriptor.getSearchCommentDescriptor(),
-                searchOptions,
-                commentService, userId);
+                searchOptions, commentService, userId);
         try {
             searchComments.execute();
             return searchComments.getResult();
@@ -5593,8 +5592,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
+            // pagination of this method is based on order by username:
             final List<Long> userIds = activityInstanceService.getPossibleUserIdsOfPendingTasks(humanTaskInstanceId, startIndex, maxResults);
             final IdentityService identityService = getTenantAccessor().getIdentityService();
+            // This method below is also ordered by username, so the order is preserved:
             final List<SUser> sUsers = identityService.getUsers(userIds);
             return ModelConvertor.toUsers(sUsers);
         } catch (final SBonitaException sbe) {

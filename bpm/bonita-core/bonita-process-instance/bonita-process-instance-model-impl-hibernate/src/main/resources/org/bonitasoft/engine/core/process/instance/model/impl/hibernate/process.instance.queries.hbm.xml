@@ -1339,7 +1339,8 @@
 				)
         	)
 		)
-		ORDER By user.userName
+		GROUP BY user.id
+		ORDER BY MIN(user.userName)
 	</query>
 	
 	<query name="getPossibleUserIdsOfPendingTasksWithoutMemberships">
