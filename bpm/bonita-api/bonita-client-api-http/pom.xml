@@ -105,13 +105,13 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-              		<argLine>${it.failsafe.argLine}</argLine>
 					<properties>
 						<property>
 							<name>listener</name>
 							<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
 						</property>
 					</properties>
+					<!-- FIXME: remove this below: -->
 					<includes>
 						<include>**/*IT.java</include>
 					</includes>
