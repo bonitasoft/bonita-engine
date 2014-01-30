@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-work</artifactId>
 		<groupId>com.bonitasoft.engine.work</groupId>
-		<version>CITestTagToRemove</version>
+		<version>6.2.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-work-parallel</artifactId>
