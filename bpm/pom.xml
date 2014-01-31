@@ -113,23 +113,5 @@
 				<module>bonita-synchro-repository</module>
 			</modules>
 		</profile>
-		<profile>
-			<id>sonar</id>
-			<modules>
-				<module>bonita-common</module>
-				<module>bonita-client</module>
-				<module>bonita-server</module>
-				<module>bonita-core</module>
-				<module>bonita-api</module>
-				<module>bonita-home</module>
-				<module>bonita-deploy</module>
-				<module>bonita-connector-service</module>
-				<module>bonita-expression-resolver</module>
-				<module>bonita-external</module>
-				<module>bonita-util</module>
-				<module>bonita-bpm-integration-tests</module>
-				<module>bonita-synchro-repository</module>
-			</modules>
-		</profile>
 	</profiles>
 </project>

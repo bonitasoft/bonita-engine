@@ -46,16 +46,6 @@
 			</modules>
 		</profile>
 		
-		<profile>
-			<id>sonar</id>
-			<modules>
-				<module>bonita-bpm-services-integration-tests</module>
-			</modules>
-			<properties>
-				<itReportPath>${project.basedir}/../../../jacoco-reports</itReportPath>
-				<sonar.junit.reportsPath>${project.build.directory}/failsafe-reports</sonar.junit.reportsPath>
-			</properties>
-		</profile>
 		
 		<profile>
 			<id>as-tests</id>

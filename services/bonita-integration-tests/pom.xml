@@ -729,13 +729,4 @@
 		</pluginManagement>
 	</build>
 
-	<profiles>
-		<profile>
-			<id>sonar</id>
-			<properties>
-				<itReportPath>${project.basedir}/../../jacoco-reports</itReportPath>
-				<sonar.junit.reportsPath>${project.build.directory}/failsafe-reports</sonar.junit.reportsPath>
-			</properties>
-		</profile>
-	</profiles>
 </project>
