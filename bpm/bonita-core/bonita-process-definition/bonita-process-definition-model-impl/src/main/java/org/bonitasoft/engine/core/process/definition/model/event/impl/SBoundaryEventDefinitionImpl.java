@@ -42,4 +42,8 @@ public class SBoundaryEventDefinitionImpl extends SCatchEventDefinitionImpl impl
         return SFlowNodeType.BOUNDARY_EVENT;
     }
 
+    @Override
+    public boolean isStartable() {
+        return false;
+    }
 }

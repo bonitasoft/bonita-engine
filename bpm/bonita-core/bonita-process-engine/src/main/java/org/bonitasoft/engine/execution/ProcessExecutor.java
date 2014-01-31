@@ -42,21 +42,17 @@ public interface ProcessExecutor extends ContainerExecutor {
             SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
             List<ConnectorDefinitionWithInputValues> connectors, long callerId, long subProcessDefinitionId) throws SProcessInstanceCreationException;
 
-    SProcessInstance start(SProcessDefinition processDefinition, long starterId, long starterDelegateId, List<SOperation> operations,
-            Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SProcessInstanceCreationException;
+    SProcessInstance start(long starterId, long starterDelegateId, List<SOperation> operations,
+            Map<String, Object> context, List<ConnectorDefinitionWithInputValues> connectorsWithInput, FlowNodeSelector selector) throws SProcessInstanceCreationException;
 
-    SProcessInstance start(SProcessDefinition sProcessDefinition, long targetSFlowNodeDefinitionId, long starterId, long starterDelegateId,
+    SProcessInstance start(long starterId, long starterDelegateId,
             SExpressionContext expressionContext, List<SOperation> operations, Map<String, Object> context,
-            List<ConnectorDefinitionWithInputValues> connectors, long callerId, long subProcessDefinitionId) throws SProcessInstanceCreationException;
+            List<ConnectorDefinitionWithInputValues> connectors, long callerId, FlowNodeSelector selector) throws SProcessInstanceCreationException;
 
     boolean executeConnectors(SProcessDefinition processDefinition, SProcessInstance sInstance, ConnectorEvent activationEvent,
             ConnectorService connectorService) throws SBonitaException;
 
-    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance) throws SProcessInstanceCreationException,
-            SFlowNodeExecutionException, SFlowNodeReadException;
-
-    SProcessInstance startElements(SProcessDefinition sDefinition, SProcessInstance sInstance, long subProcessDefinitionId,
-            final long targetSFlowNodeDefinitionId) throws SProcessInstanceCreationException, SFlowNodeExecutionException, SFlowNodeReadException;
+    SProcessInstance startElements(final SProcessInstance sProcessInstance, FlowNodeSelector selector) throws SProcessInstanceCreationException, SFlowNodeExecutionException, SFlowNodeReadException;
 
     void handleProcessCompletion(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final boolean hasActionsToExecute)
             throws SBonitaException;
