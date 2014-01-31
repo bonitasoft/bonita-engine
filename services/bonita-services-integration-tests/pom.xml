@@ -679,12 +679,4 @@
 		</plugins>
 	</build>
 	
-	<profiles>
-		<profile>
-			<id>sonar</id>
-			<properties>
-				<itReportPath>${project.basedir}/../../jacoco-reports</itReportPath>
-			</properties>
-		</profile>
-	</profiles>
 </project>

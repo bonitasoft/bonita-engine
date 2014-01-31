@@ -37,16 +37,6 @@
 		</profile>
 		
 		<profile>
-			<id>sonar</id>
-			<modules>
-				<module>bonita-bpm-integration-tests</module>
-			</modules>
-			<properties>
-				<itReportPath>${project.basedir}/../../../jacoco-reports</itReportPath>
-			</properties>
-		</profile>
-		
-		<profile>
 			<id>slow</id>
 			<modules>
 				<module>bonita-integration-as-tests</module>

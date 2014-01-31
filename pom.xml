@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -9,7 +10,6 @@
 
 	<groupId>com.bonitasoft.engine</groupId>
 	<artifactId>bonita-engine-sp</artifactId>
-	<version>6.3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Bonita BPM Engine SP</name>
@@ -78,7 +78,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -88,7 +88,7 @@
 				</plugins>
 			</build>
 		</profile>
-		
+
 		<profile>
 			<id>package-all</id>
 			<modules>
@@ -105,7 +105,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -115,9 +115,19 @@
 				</plugins>
 			</build>
 		</profile>
-		
+
+		<profile>
+			<id>javadoc</id>
+			<properties>
+				<maven.javadoc.skip>false</maven.javadoc.skip>
+			</properties>
+		</profile>
+
 		<profile>
 			<id>tests</id>
+			<properties>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
@@ -129,7 +139,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -139,98 +149,92 @@
 				</plugins>
 			</build>
 		</profile>
-		
-		<profile>
-			<id>javadoc</id>
-			<properties>
-				<maven.javadoc.skip>false</maven.javadoc.skip>
-			</properties>
-		</profile>
-		
 		<profile>
 			<id>sonar</id>
-			
-			<properties>
-				<!-- <maven.javadoc.skip>true</maven.javadoc.skip>
-				
-				Properties to enable jacoco code coverage analysis
-				<sonar.branch>MasterBugFixing</sonar.branch>
-				<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-				<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis> -->
-				<!-- The destination file for the code coverage report has to be set to the same value in the parent pom and in each module pom. 
-				Then JaCoCo will add up information in the same report, so that, it will give the cross-module code coverage. -->
-				<!-- Tells SonarQube where the integration tests code coverage report is -->
-				<!-- <itReportPath>${project.basedir}/jacoco-reports</itReportPath> -->
-				<sonar.jacoco.itReportPath>${itReportPath}/engine-sp-it.exec</sonar.jacoco.itReportPath>
-				<!-- Tells SonarQube where the unit tests code coverage report is -->
-				<!-- <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath> -->
-			</properties>
-			
-			<modules>
-				<module>services</module>
-				<module>bpm</module>
-			</modules>
-
 			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.jacoco</groupId>
-							<artifactId>jacoco-maven-plugin</artifactId>
-							<version>0.6.4.201312101107</version>
-						</plugin>
-					</plugins>
-				</pluginManagement>
 				<plugins>
 					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
-							<includes>
-								<include>org.bonitasoft.engine.*</include>
-								<include>com.bonitasoft.engine.*</include>
-							</includes>
-							<append>true</append>
+							<argLine>${jacoco.agent.ut.arg}</argLine>
+							<!-- Listener to show coverage for each test -->
+							<properties>
+								<property>
+									<name>listener</name>
+									<value>org.sonar.java.jacoco.JUnitListener</value>
+								</property>
+							</properties>
 						</configuration>
-						<executions>
-							<!-- Unit tests -->
-							<execution>
-								<id>pre-unit-test</id>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>post-unit-test</id>
-								<phase>test</phase>
-								<goals>
-									<goal>report</goal>
-								</goals>
-							</execution>
-							
-							<!-- Integration tests : before running tests run jacoco agent, which will gather statistics-->
-							<execution>
-					            <id>pre-integration-test</id>
-					            <phase>pre-integration-test</phase>
-					            <goals>
-					                <goal>prepare-agent</goal>
-					            </goals>
-					            <configuration>
-					                <destFile>${sonar.jacoco.itReportPath}</destFile>
-					                <propertyName>it.failsafe.argLine</propertyName>
-					            </configuration>
-					        </execution>
-						</executions>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<argLine>${it.failsafe.argLine}</argLine>
+							<argLine>-Xmx1024m -XX:MaxPermSize=256m ${jacoco.agent.it.arg}</argLine>
+							<!-- Listener to show coverage for each test -->
+							<properties>
+								<property>
+									<name>listener</name>
+									<value>org.sonar.java.jacoco.JUnitListener</value>
+								</property>
+							</properties>
+							<!-- workaround to have test report for IT in sonar, see http://stackoverflow.com/a/15567782/936729 -->
+							<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
 						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco.version}</version>
+						<configuration>
+							<includes>
+								<include>org.bonitasoft.engine.*</include>
+								<include>com.bonitasoft.engine.*</include>
+							</includes>
+						</configuration>
+						<executions>
+							<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info 
+								to be passed to the JVM hosting the code being tested. -->
+							<execution>
+								<id>prepare-ut-agent</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<destFile>${sonar.jacoco.reportPath}</destFile>
+									<propertyName>jacoco.agent.ut.arg</propertyName>
+									<append>true</append>
+								</configuration>
+							</execution>
+							<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info 
+								to be passed to the JVM hosting the code being tested. -->
+							<execution>
+								<id>prepare-it-agent</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<destFile>${sonar.jacoco.itReportPath}</destFile>
+									<propertyName>jacoco.agent.it.arg</propertyName>
+									<append>true</append>
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
+			<dependencies>
+				<dependency>
+					<groupId>org.codehaus.sonar-plugins.java</groupId>
+					<artifactId>sonar-jacoco-listeners</artifactId>
+					<version>${sonar-jacoco-listeners.version}</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
 		</profile>
+
 	</profiles>
 </project>
