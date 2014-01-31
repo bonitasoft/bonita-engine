@@ -57,12 +57,12 @@
 	</modules>
 	
 	<profiles>
-		<profile>
+		<!--<profile>
 			<id>tests</id>
 			<modules>
 				<module>bonita-integration-tests</module>
 			</modules>
-		</profile>
+		</profile>-->
 		
 		<profile>
 			<id>sonar</id>
