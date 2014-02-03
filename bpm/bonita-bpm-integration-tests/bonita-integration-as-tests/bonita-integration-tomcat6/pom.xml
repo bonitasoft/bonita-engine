@@ -273,6 +273,7 @@
 								<home>${tomcat.home}</home>
 								<systemProperties>
 									<bonita.home>${bonita.home}</bonita.home>
+									<sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
 									<db.vendor>${db.vendor}</db.vendor>
 
 									<file.encoding>${project.build.sourceEncoding}</file.encoding>
