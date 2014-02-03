@@ -18,6 +18,31 @@
 		<hazelcast.version>3.0.3</hazelcast.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		
+		<!-- ************************ -->
+		<!-- Sonar/Reporting settings -->
+		<!-- ************************ -->
+		<!-- Sonar/Jacoco integration. Note that these properties need to be defined 
+			outside the "coverage" profile because we want to be to able to execute mvn 
+			sonar:sonar without passing a profile -->
+		<!-- Tells Sonar to use jacoco for coverage results -->
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<!-- Jacoco version to use -->
+		<jacoco.version>0.6.4.201312101107</jacoco.version>
+		<!-- The Sonar Jacoco Listener for JUnit to extract coverage details per test -->
+		<sonar-jacoco-listeners.version>1.4</sonar-jacoco-listeners.version>
+		<!-- Don't let Sonar execute tests. We will ask it to Maven -->
+		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+		<!-- Report output directory, in Jenkins use: -Djacoco.outputDir=${WORKSPACE}-->
+		<jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
+		<!-- Jacoco output file for UTs -->
+		<jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
+		<!-- Tells Sonar where the Jacoco coverage result file is located for Unit Tests -->
+		<sonar.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</sonar.jacoco.reportPath>
+		<!-- Jacoco output file for ITs -->
+		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
+		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration Tests -->
+		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
 	</properties>
 
 	<dependencyManagement>
