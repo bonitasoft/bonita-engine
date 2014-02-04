@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== -->
+<!--                                                                        -->
+<!-- JBoss Server Configuration                                             -->
+<!--                                                                        -->
+<!-- ====================================================================== -->
+
+<datasources>
+	<!-- PostgreSQL Example -->
+	<xa-datasource>
+		<jndi-name>bonitaDS</jndi-name>
+		<use-java-context>false</use-java-context>
+		<xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
+		<xa-datasource-property name="ServerName">192.168.4.68</xa-datasource-property>
+		<xa-datasource-property name="portNumber">5432</xa-datasource-property>
+		<xa-datasource-property name="DatabaseName">bonita6_JBosspoll</xa-datasource-property>
+		<xa-datasource-property name="User">bonita6_JBosspoll</xa-datasource-property>
+		<xa-datasource-property name="Password">bonita6_JBosspoll</xa-datasource-property>
+		<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
+		<background-validation-millis>30000</background-validation-millis>
+		<track-connection-by-tx/>
+	</xa-datasource>
+
+	<no-tx-datasource>
+		<jndi-name>bonitaSequenceManagerDS</jndi-name>
+		<connection-url>jdbc:postgresql://192.168.4.68:5432/bonita</connection-url>
+		<driver-class>org.postgresql.Driver</driver-class>
+		<use-java-context>false</use-java-context>
+		<user-name>postgres</user-name>
+		<password>postgres</password>
+		<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
+		<background-validation-millis>30000</background-validation-millis>
+		<idle-timeout-minutes>0</idle-timeout-minutes>
+	</no-tx-datasource>
+</datasources>
