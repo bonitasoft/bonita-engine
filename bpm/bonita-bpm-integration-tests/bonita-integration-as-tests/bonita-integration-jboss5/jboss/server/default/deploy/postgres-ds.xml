@@ -27,8 +27,8 @@
 		<connection-url>jdbc:postgresql://192.168.4.68:5432/bonita</connection-url>
 		<driver-class>org.postgresql.Driver</driver-class>
 		<use-java-context>false</use-java-context>
-		<user-name>postgres</user-name>
-		<password>postgres</password>
+		<user-name>bonita6_JBosspoll</user-name>
+		<password>bonita6_JBosspoll</password>
 		<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
 		<background-validation-millis>30000</background-validation-millis>
 		<idle-timeout-minutes>0</idle-timeout-minutes>
