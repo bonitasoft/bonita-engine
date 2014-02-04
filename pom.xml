@@ -103,7 +103,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
+							<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -130,7 +130,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
+							<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -164,7 +164,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
+							<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -230,8 +230,8 @@
 								<configuration>
 									<destFile>${sonar.jacoco.reportPath}</destFile>
 									<propertyName>jacoco.agent.ut.arg</propertyName>
-									<append>true</append>
-								</configuration>
+							<append>true</append>
+						</configuration>
 							</execution>
 							<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info 
 								to be passed to the JVM hosting the code being tested. -->
