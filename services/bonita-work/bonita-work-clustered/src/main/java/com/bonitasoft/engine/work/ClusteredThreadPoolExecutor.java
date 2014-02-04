@@ -24,6 +24,13 @@ import com.hazelcast.core.MembershipListener;
 import com.hazelcast.core.MultiMap;
 
 /**
+ * A work factory that use a clustered Queue and a clustered executing work map
+ * <p>
+ * the queue of works is shared between all the nodes.<br/>
+ * If a node crash during the execution of a work, other members are notified and the first to be notified get all executing works of the failing node and
+ * requeue them
+ * 
+ * 
  * @author Baptiste Mesta
  */
 public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements MembershipListener {

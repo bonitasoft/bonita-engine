@@ -11,7 +11,10 @@ package com.bonitasoft.engine.theme.exception;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Thrown when restoring the default theme cannot be fulfilled.
+ * 
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 public class RestoreThemeException extends BonitaException {
 
