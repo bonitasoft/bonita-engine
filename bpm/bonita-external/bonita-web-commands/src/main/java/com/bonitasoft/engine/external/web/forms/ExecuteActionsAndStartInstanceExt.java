@@ -33,7 +33,9 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -117,7 +119,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         SProcessInstance startedInstance;
         try {
             final List<SOperation> sOperations = toSOperation(operations);
-            startedInstance = processExecutor.start(sDefinition, starterId, session.getUserId(), sOperations, context, connectorsWithInput);
+            startedInstance = processExecutor.start(starterId, session.getUserId(), sOperations, context, connectorsWithInput, new FlowNodeSelector(sDefinition, new StartFlowNodeFilter()));
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e);
