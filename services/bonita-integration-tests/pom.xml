@@ -202,14 +202,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Exception -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.exceptions</groupId>
-			<artifactId>bonita-exceptions-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Expression -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
