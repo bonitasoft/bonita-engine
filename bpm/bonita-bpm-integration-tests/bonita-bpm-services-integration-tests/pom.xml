@@ -16,7 +16,6 @@
 	</properties>
 
 	<dependencies>
-
 		<!-- Actor Mapping -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
@@ -329,14 +328,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Exception -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.exceptions</groupId>
-			<artifactId>bonita-exceptions-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -956,8 +947,14 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
+				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
+					<properties>
+						<property>
+							<name>listener</name>
+							<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
+						</property>
+					</properties>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
 						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
@@ -966,6 +963,15 @@
 						<include>org/bonitasoft/engine/bpm/test/AllBPMTestsWithJNDI.java</include>
 					</includes>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -980,4 +986,5 @@
 			</plugin>
 		</plugins>
 	</build>
+
 </project>

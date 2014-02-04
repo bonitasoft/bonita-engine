@@ -240,11 +240,7 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
-import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
-import org.bonitasoft.engine.core.operation.model.SOperatorType;
-import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
@@ -2799,7 +2795,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 // data instances and operation are in the same order
                 final SDataInstance dataInstance = dataInstances.get(i);
                 final Operation operation = operations.get(i);
-                final SOperation sOperation = toSOperation(operation);
+                final SOperation sOperation = ModelConvertor.toSOperation(operation);
                 final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
                         activityInstance.getLogicalGroup(processDefinitionIndex));
                 sExpressionContext.setSerializableInputValues(expressionContexts);
@@ -3160,93 +3156,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance startProcess(final long userId, final long processDefinitionId, final List<Operation> operations,
             final Map<String, Serializable> context) throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final long starterId;
-        final long userIdFromSession = getUserId();
-        if (userId == 0) {
-            starterId = userIdFromSession;
-        } else {
-            starterId = userId;
-        }
-        // Retrieval of the process definition:
-        final SProcessDefinition sProcessDefinition;
-        try {
-            final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
-            if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
-                throw new ProcessActivationException("Process disabled");
-            }
-            sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
-        final SProcessInstance startedInstance;
-        try {
-            final List<SOperation> sOperations = toSOperation(operations);
-            Map<String, Object> operationContext;
-            if (context != null) {
-                operationContext = new HashMap<String, Object>(context);
-            } else {
-                operationContext = Collections.emptyMap();
-            }
-            startedInstance = processExecutor.start(sProcessDefinition, starterId, userIdFromSession, sOperations, operationContext, null);
-        } catch (final SBonitaException e) {
-            throw new ProcessExecutionException(e);
-        }// FIXME in case process instance creation exception -> put it in failed
-
-        final ProcessInstance processInstance = ModelConvertor.toProcessInstance(sProcessDefinition, startedInstance);
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
-            final StringBuilder stb = new StringBuilder();
-            stb.append("The user <");
-            stb.append(SessionInfos.getUserNameFromSession());
-            if (starterId != userIdFromSession) {
-                stb.append(">acting as delegate of user with id <");
-                stb.append(starterId);
-            }
-            stb.append("> has started instance <");
-            stb.append(processInstance.getId());
-            stb.append("> of process <");
-            stb.append(sProcessDefinition.getName());
-            stb.append("> in version <");
-            stb.append(sProcessDefinition.getVersion());
-            stb.append("> and id <");
-            stb.append(sProcessDefinition.getId());
-            stb.append(">");
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());
-        }
-        return processInstance;
-    }
-
-    private List<SOperation> toSOperation(final List<Operation> operations) {
-        if (operations == null) {
-            return null;
-        }
-        if (operations.isEmpty()) {
-            return Collections.emptyList();
-        }
-        final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
-        for (final Operation operation : operations) {
-            final SOperation sOperation = toSOperation(operation);
-            sOperations.add(sOperation);
-        }
-        return sOperations;
-    }
-
-    private SOperation toSOperation(final Operation operation) {
-        final SExpression rightOperand = ModelConvertor.constructSExpression(operation.getRightOperand());
-        final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
-                .setType(operatorType).setLeftOperand(sLeftOperand).done();
-    }
-
-    private SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
+        ProcessStarter starter = new ProcessStarter(userId, processDefinitionId, operations, context);
+        return starter.start();
     }
 
     @Override
@@ -5594,8 +5505,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
+            // pagination of this method is based on order by username:
             final List<Long> userIds = activityInstanceService.getPossibleUserIdsOfPendingTasks(humanTaskInstanceId, startIndex, maxResults);
             final IdentityService identityService = getTenantAccessor().getIdentityService();
+            // This method below is also ordered by username, so the order is preserved:
             final List<SUser> sUsers = identityService.getUsers(userIds);
             return ModelConvertor.toUsers(sUsers);
         } catch (final SBonitaException sbe) {

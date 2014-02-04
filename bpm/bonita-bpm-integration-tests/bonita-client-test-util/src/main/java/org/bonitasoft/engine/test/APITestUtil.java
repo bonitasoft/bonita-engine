@@ -177,6 +177,7 @@ public class APITestUtil {
 
     public static final int DEFAULT_TIMEOUT = 7 * 60 * 1000;
 
+
     @After
     public void clearSynchroRepository() {
         try {
@@ -478,6 +479,17 @@ public class APITestUtil {
     protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final User user)
             throws BonitaException {
         return deployAndEnableWithActor(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user));
+    }
+
+    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final List<User> users)
+            throws BonitaException {
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+        for (final User user : users) {
+            addMappingOfActorsForUser(actorName, user.getId(), processDefinition);
+        }
+        getProcessAPI().enableProcess(processDefinition.getId());
+        return processDefinition;
     }
 
     protected ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final String actorName,
@@ -1646,7 +1658,7 @@ public class APITestUtil {
         return messages;
     }
 
-    protected ProcessAPI getProcessAPI() {
+    public ProcessAPI getProcessAPI() {
         return processAPI;
     }
 

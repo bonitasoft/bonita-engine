@@ -60,4 +60,8 @@ public class SSubProcessDefinitionImpl extends SActivityDefinitionImpl implement
         subProcessContainer = container;
     }
 
+    @Override
+    public boolean isStartable() {
+        return !isTriggeredByEvent() && super.isStartable();
+    }
 }

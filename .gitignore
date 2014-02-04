@@ -10,3 +10,4 @@ TemporaryLocalIntegrationTests.java
 bpm/bonita-bpm-integration-tests/bonita-integration-local-tests/src/test/java/org/bonitasoft/engine/DeployBarTest.java
 *.iml
 *.orig
+engine-it.exec

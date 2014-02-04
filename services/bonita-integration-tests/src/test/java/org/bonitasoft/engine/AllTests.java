@@ -9,7 +9,6 @@ import org.bonitasoft.engine.continuation.WorkServiceTest;
 import org.bonitasoft.engine.data.DataTest;
 import org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImplIT;
 import org.bonitasoft.engine.dependency.DependencyServiceTest;
-import org.bonitasoft.engine.exceptions.impl.ExceptionsManagerTests;
 import org.bonitasoft.engine.expression.ExpressionServiceTest;
 import org.bonitasoft.engine.identity.IdentityServiceTest;
 import org.bonitasoft.engine.persistence.PersistenceTests;
@@ -40,7 +39,6 @@ import org.junit.runners.Suite.SuiteClasses;
         ExpressionServiceTest.class,
         QueriableLoggerServiceTest.class,
         IdentityServiceTest.class,
-        ExceptionManagerIntegrationTests.class,
         AuthenticationServiceTest.class,
         PlatformAuthenticationServiceTest.class,
         SessionServiceTest.class,
@@ -60,7 +58,6 @@ import org.junit.runners.Suite.SuiteClasses;
         PlatformCommandServiceIntegrationTest.class,
         ProfileServiceTest.class,
         ParserTest.class,
-        ExceptionsManagerTests.class,
         TenantManagementTest.class
 })
 /**

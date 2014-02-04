@@ -15,6 +15,7 @@ package org.bonitasoft.engine.operation.impl;
 
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandType;
+import org.bonitasoft.engine.operation.Operation;
 
 /**
  * @author Zhang Bole
@@ -38,11 +39,17 @@ public class LeftOperandImpl implements LeftOperand {
         return name;
     }
 
+    /**
+     * @deprecated As of 6.0 replaced by {@link #setName(String)}
+     */
     @Deprecated
     public void setDataName(final String dataName) {
         name = dataName;
     }
 
+    /**
+     * @deprecated As of 6.0 replaced by {@link #getName()}
+     */
     @Deprecated
     @Override
     public String getDataName() {
@@ -92,6 +99,9 @@ public class LeftOperandImpl implements LeftOperand {
         return true;
     }
 
+    /**
+     * @deprecated As of 6.0 use {@link Operation#getType()} instead
+     */
     @Override
     @Deprecated
     public LeftOperandType getType() {

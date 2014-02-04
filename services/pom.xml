@@ -31,7 +31,6 @@
 		<module>bonita-data</module>
 		<module>bonita-dependency</module>
 		<module>bonita-platform</module>
-		<module>bonita-exceptions</module>
 		<module>bonita-test-util</module>
 		<module>bonita-archive</module>
 		<module>bonita-sql</module>
@@ -59,63 +58,25 @@
 	<profiles>
 		<profile>
 			<id>tests</id>
-			<properties>
-				<maven.javadoc.skip>true</maven.javadoc.skip>
-			</properties>
 			<modules>
 				<module>bonita-integration-tests</module>
 			</modules>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
+		
 		<profile>
 			<id>sonar</id>
-			<properties>
-				<maven.javadoc.skip>true</maven.javadoc.skip>
-			</properties>
 			<modules>
 				<module>bonita-integration-tests</module>
 			</modules>
 		</profile>
+		
 		<profile>
 			<id>all</id>
-			<properties>
-				<maven.javadoc.skip>true</maven.javadoc.skip>
-			</properties>
 			<modules>
 				<module>bonita-integration-tests</module>
 			</modules>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
+		
 		<profile>
 			<id>package-all</id>
 			<modules>

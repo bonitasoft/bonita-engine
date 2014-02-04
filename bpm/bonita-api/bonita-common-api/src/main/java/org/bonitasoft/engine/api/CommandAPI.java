@@ -39,6 +39,8 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * Manipulate tenant commands. A command can be registered, unregistered, and executed with parameters.
  * <p>
  * Commands are used to extend engine behavior, and are classes that are called from this API and executed on the server side. <br/>
+ * in the execute method of this class.
+ * </p>
  * <p>
  * A command is composed of a jar containing at least one class that implements org.bonitasoft.engine.command.TenantCommand.
  * org.bonitasoft.engine.command.system.CommandWithParameters can be used to handle parameter more easily. The behavior of the command must be defined in the

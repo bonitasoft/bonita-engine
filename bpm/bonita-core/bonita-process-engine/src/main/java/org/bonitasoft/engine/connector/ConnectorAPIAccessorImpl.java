@@ -59,7 +59,7 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
                 final SSession session = sessionService.createSession(tenantId, ConnectorAPIAccessorImpl.class.getSimpleName());// FIXME get the
                 sessionAccessor.setSessionInfo(session.getId(), tenantId);
                 return ModelConvertor.toAPISession(session, null);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new BonitaRuntimeException(e);
             }
         }
