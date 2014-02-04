@@ -174,6 +174,7 @@ public class APITestUtil {
 
     public static final int DEFAULT_TIMEOUT = 7 * 60 * 1000;
 
+
     @After
     public void clearSynchroRepository() {
         try {
@@ -1635,7 +1636,7 @@ public class APITestUtil {
         return messages;
     }
 
-    protected ProcessAPI getProcessAPI() {
+    public ProcessAPI getProcessAPI() {
         return processAPI;
     }
 
