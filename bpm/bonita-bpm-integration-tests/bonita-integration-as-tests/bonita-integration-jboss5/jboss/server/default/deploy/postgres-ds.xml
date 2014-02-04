@@ -12,11 +12,11 @@
 		<jndi-name>bonitaDS</jndi-name>
 		<use-java-context>false</use-java-context>
 		<xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
-		<xa-datasource-property name="ServerName">192.168.4.68</xa-datasource-property>
-		<xa-datasource-property name="portNumber">5432</xa-datasource-property>
-		<xa-datasource-property name="DatabaseName">bonita6_jbosspoll</xa-datasource-property>
-		<xa-datasource-property name="User">bonita6_jbosspoll</xa-datasource-property>
-		<xa-datasource-property name="Password">bonita6_jbosspoll</xa-datasource-property>
+		<xa-datasource-property name="ServerName">#database.ip#</xa-datasource-property>
+		<xa-datasource-property name="portNumber">#database.port#</xa-datasource-property>
+		<xa-datasource-property name="DatabaseName">#database.name#</xa-datasource-property>
+		<xa-datasource-property name="User">#database.user#</xa-datasource-property>
+		<xa-datasource-property name="Password">#database.password#</xa-datasource-property>
 		<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
 		<background-validation-millis>30000</background-validation-millis>
 		<track-connection-by-tx/>
@@ -24,11 +24,11 @@
 
 	<no-tx-datasource>
 		<jndi-name>bonitaSequenceManagerDS</jndi-name>
-		<connection-url>jdbc:postgresql://192.168.4.68:5432/bonita6_jbosspoll</connection-url>
+		<connection-url>jdbc:postgresql://#database.ip#:#database.port#/#database.name#</connection-url>
 		<driver-class>org.postgresql.Driver</driver-class>
 		<use-java-context>false</use-java-context>
-		<user-name>bonita6_jbosspoll</user-name>
-		<password>bonita6_jbosspoll</password>
+		<user-name>#database.user#</user-name>
+		<password>#database.password#</password>
 		<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
 		<background-validation-millis>30000</background-validation-millis>
 		<idle-timeout-minutes>0</idle-timeout-minutes>

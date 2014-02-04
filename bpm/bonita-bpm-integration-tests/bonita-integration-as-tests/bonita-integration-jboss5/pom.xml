@@ -112,6 +112,11 @@
 												<include name="*xml" />
 											</fileset>
 										</copy>
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.ip#" value="${database.ip}"/>
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.port#" value="${database.port}"/>
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.user#" value="${database.user}"/>
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.password#" value="${database.password}"/>
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.name#" value="${database.name}"/>
 										<copy todir="${jboss.lib.dir}">
 											<fileset dir="target/driver">
 												<include name="*jar" />
