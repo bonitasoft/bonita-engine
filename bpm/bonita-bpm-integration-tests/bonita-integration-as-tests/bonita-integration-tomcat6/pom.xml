@@ -57,6 +57,11 @@
 			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm-tomcat55-lifecycle</artifactId>
 			<version>${bitronix.version}</version>
@@ -121,6 +126,11 @@
 										<artifactItem>
 											<groupId>org.slf4j</groupId>
 											<artifactId>slf4j-api</artifactId>
+											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.slf4j</groupId>
+											<artifactId>slf4j-jdk14</artifactId>
 											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
 										</artifactItem>
 										<artifactItem>
