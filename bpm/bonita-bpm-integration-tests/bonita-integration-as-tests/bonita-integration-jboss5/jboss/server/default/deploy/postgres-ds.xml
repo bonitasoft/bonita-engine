@@ -24,7 +24,7 @@
 
 	<no-tx-datasource>
 		<jndi-name>bonitaSequenceManagerDS</jndi-name>
-		<connection-url>jdbc:postgresql://192.168.4.68:5432/bonita</connection-url>
+		<connection-url>jdbc:postgresql://192.168.4.68:5432/bonita6_jbosspoll</connection-url>
 		<driver-class>org.postgresql.Driver</driver-class>
 		<use-java-context>false</use-java-context>
 		<user-name>bonita6_jbosspoll</user-name>
