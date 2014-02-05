@@ -57,6 +57,12 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
@@ -109,6 +115,11 @@
 										<artifactItem>
 											<groupId>org.slf4j</groupId>
 											<artifactId>slf4j-api</artifactId>
+											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.slf4j</groupId>
+											<artifactId>slf4j-jdk14</artifactId>
 											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
 										</artifactItem>
 										<artifactItem>
@@ -186,7 +197,11 @@
 										<copy todir="${bonita.home}" verbose="true">
 											<fileset dir="${distrib.dir}/resources/home/" />
 										</copy>
-
+										
+										<copy todir="${bonita.home}/server/licenses" failonerror="true">
+											<fileset dir="${user.home}/lic" includes="*.lic" />
+										</copy>
+										
 										<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
 									</target>
 								</configuration>

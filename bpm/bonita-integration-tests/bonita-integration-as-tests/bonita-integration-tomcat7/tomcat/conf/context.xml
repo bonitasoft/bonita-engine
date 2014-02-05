@@ -21,6 +21,8 @@
     <!-- Default set of monitored resources -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
 
+    <Transaction factory="bitronix.tm.BitronixUserTransactionObjectFactory" />
+
     <!-- Uncomment this to disable session persistence across Tomcat restarts -->
     <!--
     <Manager pathname="" />
@@ -31,51 +33,5 @@
     <!--
     <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
     -->
-    
-    <!-- Configure Datasource -->
-    <Resource name="bonitaDS"  
-              auth="Container"  
-              type="javax.sql.DataSource" 
-              maxActive="100"  
-              minIdle="10"  
-              maxWait="10000"  
-              initialSize="1" 
-              maxPoolSize="15" 
-              minPoolSize="3"
-              maxConnectionAge="0"
-              maxIdleTime="1800"
-              maxIdleTimeExcessConnections="120"
-              idleConnectionTestPeriod="30"
-              acquireIncrement="3"
-              testConnectionOnCheckout="true"
-              removeAbandoned="true" 
-              logAbandoned="true" 
-              username="sa" 
-              password=""
-              driverClassName="org.h2.Driver" 
-              url="jdbc:h2:${bonita.home}/server/default/work/databases/bonita_journal.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;AUTO_SERVER_PORT=9090;AUTO_SERVER=TRUE;IGNORECASE=TRUE"/>
-   
-      
-      <Resource name="bonitaSequenceManagerDS"  
-              auth="Container"  
-              type="javax.sql.DataSource" 
-              maxActive="100"  
-              minIdle="10"  
-              maxWait="10000"  
-              initialSize="1" 
-              maxPoolSize="5" 
-              minPoolSize="1"
-              maxConnectionAge="0"
-              maxIdleTime="1800"
-              maxIdleTimeExcessConnections="120"
-              idleConnectionTestPeriod="30"
-              acquireIncrement="3"
-              testConnectionOnCheckout="true"
-              removeAbandoned="true" 
-              logAbandoned="true" 
-              username="sa" 
-              password=""
-              driverClassName="org.h2.Driver" 
-              url="jdbc:h2:${bonita.home}/server/default/work/databases/bonita_journal.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;AUTO_SERVER_PORT=9090;AUTO_SERVER=TRUE;IGNORECASE=TRUE"/>
 
 </Context>
