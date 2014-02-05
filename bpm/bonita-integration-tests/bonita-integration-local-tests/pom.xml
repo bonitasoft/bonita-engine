@@ -189,9 +189,8 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
+				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-					<argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
 					<properties>
 						<property>
 							<name>listener</name>
@@ -205,6 +204,15 @@
 						<include>com/bonitasoft/engine/LocalIntegrationTestsSP.java</include>
 					</includes>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>  
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -238,9 +246,8 @@
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
+						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<argLine>-Xmx512m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</argLine>
 							<properties>
 								<property>
 									<name>listener</name>
@@ -255,9 +262,19 @@
 								<include>com/bonitasoft/engine/SlowExecutionLocalIntegrationTestsSP.java</include>
 							</includes>
 						</configuration>
+						<executions>
+							<execution>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 	</profiles>
+
 </project>
