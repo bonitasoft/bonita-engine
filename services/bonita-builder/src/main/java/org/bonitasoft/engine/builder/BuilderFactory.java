@@ -77,7 +77,7 @@ public class BuilderFactory {
     @SuppressWarnings("unchecked")
     private <T extends Object> T getInternalBuilderFactory(final Class<T> clazz) {
         //System.err.println("Looking for class: " + clazz.getName());
-        if (!this.factoryCache.containsKey(clazz)) {
+        if (!this.factoryCache.containsKey(clazz.getName())) {
             cacheFactory(clazz.getName(), properties.getProperty(clazz.getName()));
         }
         return (T) this.factoryCache.get(clazz.getName());
