@@ -13,17 +13,21 @@
     <name>Bonita - Integration Tests on Tomcat 7</name>
 
     <properties>
-        <server.port>8383</server.port>
-        <provider.port>8123</provider.port>
+        <server.port>8384</server.port>
+        <provider.port>8124</provider.port>
         <tomcat.version>7.0.37</tomcat.version>
         <tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
         <tomcat.home>${project.build.directory}/${tomcat.name}</tomcat.home>
         <tomcat.conf.dir>${tomcat.home}/conf</tomcat.conf.dir>
         <tomcat.deploy.dir>${tomcat.home}/webapps</tomcat.deploy.dir>
-        <tomcat.url>http://apache.crihan.fr/dist/tomcat/tomcat-7/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
+        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
         <tomcat.zip.folder>${user.home}</tomcat.zip.folder>
         <bonita.home>${tomcat.home}/bonita</bonita.home>
         <if.task>net.sf.antcontrib.logic.IfTask</if.task>
+		<db.vendor>h2</db.vendor>
+		<cargo.jvmargs>-Xms128m -Xmx512m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+		<!-- -Xdebug -->
+		<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE -->
     </properties>
 
 	<profiles>
@@ -152,6 +156,7 @@
 		                        <home>${tomcat.home}</home>
 		                        <properties>
 		                            <cargo.servlet.port>${provider.port}</cargo.servlet.port>
+					    <cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
 		                        </properties>
 		                    </configuration>
 		                    <wait>false</wait>
