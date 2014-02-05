@@ -212,8 +212,6 @@
 									<sysprop.bonita.hibernate.transaction.manager_lookup_class>org.hibernate.transaction.JBossTransactionManagerLookup</sysprop.bonita.hibernate.transaction.manager_lookup_class>
 									<sysprop.bonita.db.vendor>postgres</sysprop.bonita.db.vendor><!--souillac DO NOT COMMIT THIS LINE -->
 									<jboss.server.log.threshold>WARN</jboss.server.log.threshold>
-									<java.naming.factory.initial>org.jnp.interfaces.NamingContextFactory</java.naming.factory.initial>
-									<java.naming.provider.url>jnp://localhost:1099</java.naming.provider.url>
 								</systemProperties>
 							</container>
 							<configuration>
