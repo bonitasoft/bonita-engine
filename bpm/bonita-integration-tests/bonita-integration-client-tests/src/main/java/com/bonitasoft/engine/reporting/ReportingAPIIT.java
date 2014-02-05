@@ -13,15 +13,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -492,13 +490,6 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
     @Test
     public void getAllArchivedProcessInstances() throws Exception {
-        for (int i = 0; i < 20; i++) {
-            System.out.println("iteration " + i);
-            getAllArchivedProcessInstances__();
-        }
-    }
-
-    public void getAllArchivedProcessInstances__() throws Exception {
         final StringBuilder builder = new StringBuilder("SELECT ");
         builder.append("CS.PROCESSDEFINITIONID AS CS_PROCESS_DEFINITION_ID, ");
         builder.append("CS.NAME AS CS_NAME, ");
@@ -535,9 +526,9 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("INNER JOIN process_definition APS ON CS.PROCESSDEFINITIONID = APS.PROCESSID ");
         builder.append("WHERE CS.TENANTID = $P{BONITA_TENANT_ID} ");
         builder.append("AND APS.TENANTID = $P{BONITA_TENANT_ID} ");
-        builder.append("AND CS.STARTEDBY = 0 ");
         builder.append("$P!{__p_state_name} ");
         builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to} ");
+        builder.append("AND CS.STARTEDBY = 0 ");
         builder.append("$P!{_p_apps_id} ");
         builder.append("UNION ");
         builder.append("SELECT ");
@@ -580,7 +571,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
         builder.append("AND APS.TENANTID = $P{BONITA_TENANT_ID} ");
         builder.append("AND CS.STARTEDBY = 0 ");
         builder.append("$P!{__p_state_name} ");
-        builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to}");
+        builder.append("AND CS.STARTDATE BETWEEN $P{_p_date_from} AND $P{_p_date_to} ");
 
         String query = builder.toString();
         query = query.replace("$P{BONITA_TENANT_ID}", "1");
@@ -598,9 +589,8 @@ public class ReportingAPIIT extends CommonAPISPTest {
         final BusinessArchive endSignalArchive = archiveBuilder.done();
 
         processBuilder = new ProcessDefinitionBuilder();
-        String targetUserTask = "getAllArchivedProcessInstances_Task2";
         processBuilder.createNewInstance("GetGO", "1.0").addActor(ACTOR_NAME).addStartEvent("StartOnSignal").addSignalEventTrigger("GO")
-                .addUserTask(targetUserTask, ACTOR_NAME).addTransition("StartOnSignal", targetUserTask);
+                .addUserTask("Task1", ACTOR_NAME).addTransition("StartOnSignal", "Task1");
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(processBuilder.done());
         final BusinessArchive startSignalArchive = archiveBuilder.done();
 
@@ -614,53 +604,29 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
         // Check that the process with trigger signal on start is not started, before send signal
         final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
-        HumanTaskInstance step1 = waitForUserTask("step1", processInstanceWithEndSignal);
+        waitForUserTask("step1", processInstanceWithEndSignal);
         checkNbOfProcessInstances(1);
 
+        List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        assertEquals(1, taskInstances.size());
+        assertEquals("step1", taskInstances.get(0).getName());
+
         // Send signal
-        assignAndExecuteStep(step1, john.getId());
-        waitProcessToFinishAndBeArchived(processInstanceWithEndSignal.getId());
+        assignAndExecuteStep(taskInstances.get(0), john.getId());
+        waitForProcessToFinish(processInstanceWithEndSignal.getId());
 
         // Check that the process with trigger signal on start is started, after send signal
-        HumanTaskInstance task2 = waitForUserTask(targetUserTask);
+        waitForUserTask("Task1");
 
         String selectList = getReportingAPI().selectList(query);
         String[] split = selectList.split("\n");
-        if (split.length == 1) {
-            List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(processInstanceWithEndSignal.getId(), 0, 5);
-            System.out.println("List<ArchivedProcessInstance> archivedProcessInstances.size: " + archivedProcessInstances.size());
-            if (archivedProcessInstances.size() > 0) {
-                System.err.println("########  Pourtant le archivedProcessInstance pour l'ID " + processInstanceWithEndSignal.getId()
-                        + " est bien trouvé en BDD #########");
-            }
-            System.out.println("problem. task1.getParentProcessInstanceId of process 2: " + task2.getParentProcessInstanceId());
-            System.out.println("problem. task1.getParentContainerId of process 2: " + task2.getParentContainerId());
-            System.err.println("=== AU MILIEU ===");
-            System.out.println("process 1: " + getReportingAPI().selectList("select * from process_instance where id=" + processInstanceWithEndSignal.getId()));
-            System.out.println("process 2: " + getReportingAPI().selectList("select * from process_instance where id=" + task2.getParentProcessInstanceId()));
-            System.out.println("archived process 1: "
-                    + getReportingAPI().selectList("select * from arch_process_instance where SOURCEOBJECTID=" + processInstanceWithEndSignal.getId()));
-            Thread.sleep(40000);
-            selectList = getReportingAPI().selectList(query);
-            split = selectList.split("\n");
-            if (split.length > 1) {
-                System.err.println("=== AU MILIEU ## après correction ===");
-                System.out.println("process 1: "
-                        + getReportingAPI().selectList("select * from process_instance where id=" + processInstanceWithEndSignal.getId()));
-                System.out.println("process 2: "
-                        + getReportingAPI().selectList("select * from process_instance where id=" + task2.getParentProcessInstanceId()));
-                System.out.println("archived process 1: "
-                        + getReportingAPI().selectList("select * from arch_process_instance where SOURCEOBJECTID=" + processInstanceWithEndSignal.getId()));
-                System.err.println("MILIEU: OK after waiting 1 minute, continuing...");
-            }
-        }
-        for (int i = 0; i < split.length; i++) {
-            System.err.println(split[i]);
-        }
         assertEquals(3, split.length);
 
-        assignAndExecuteStep(task2, john.getId());
-        waitProcessToFinishAndBeArchived(task2.getParentContainerId());
+        taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
+        assertEquals(1, taskInstances.size());
+        assertEquals("Task1", taskInstances.get(0).getName());
+        assignAndExecuteStep(taskInstances.get(0), john.getId());
+        waitForProcessToFinish(taskInstances.get(0).getParentContainerId());
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         final SearchResult<ArchivedProcessInstance> search = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done());
@@ -668,144 +634,11 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
         selectList = getReportingAPI().selectList(query);
         split = selectList.split("\n");
-        if (split.length == 1) {
-            List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(processInstanceWithEndSignal.getId(), 0, 5);
-            System.out.println("List<ArchivedProcessInstance> archivedProcessInstances.size: " + archivedProcessInstances.size());
-            if (archivedProcessInstances.size() > 0) {
-                System.err.println("########  Pourtant le archivedProcessInstance pour l'ID " + processInstanceWithEndSignal.getId()
-                        + " est bien trouvé en BDD #########");
-            }
-            System.out.println("problem. task1.getParentProcessInstanceId of process 2: " + task2.getParentProcessInstanceId());
-            System.out.println("problem. task1.getParentContainerId of process 2: " + task2.getParentContainerId());
-            System.err.println("=== A LA FIN ===");
-            System.out.println("process 1: " + getReportingAPI().selectList("select * from process_instance where id=" + processInstanceWithEndSignal.getId()));
-            System.out.println("process 2: " + getReportingAPI().selectList("select * from process_instance where id=" + task2.getParentProcessInstanceId()));
-            System.out.println("archived process 1: "
-                    + getReportingAPI().selectList("select * from arch_process_instance where SOURCEOBJECTID=" + processInstanceWithEndSignal.getId()));
-            System.out.println("archived process 2: "
-                    + getReportingAPI().selectList("select * from arch_process_instance where SOURCEOBJECTID=" + task2.getParentProcessInstanceId()));
-            Thread.sleep(40000);
-            selectList = getReportingAPI().selectList(query);
-            split = selectList.split("\n");
-            if (split.length > 1) {
-                System.err.println("=== A LA FIN ## après correction ===");
-                System.out.println("process 1: "
-                        + getReportingAPI().selectList("select * from process_instance where id=" + processInstanceWithEndSignal.getId()));
-                System.out.println("process 2: "
-                        + getReportingAPI().selectList("select * from process_instance where id=" + task2.getParentProcessInstanceId()));
-                System.out.println("archived process 1: "
-                        + getReportingAPI().selectList("select * from arch_process_instance where SOURCEOBJECTID=" + processInstanceWithEndSignal.getId()));
-                System.out.println("archived process 2: "
-                        + getReportingAPI().selectList("select * from arch_process_instance where SOURCEOBJECTID=" + task2.getParentProcessInstanceId()));
-                System.err.println("FIN: OK after waiting 1 minute, continuing...");
-            }
-        }
-        for (int i = 0; i < split.length; i++) {
-            System.err.println(split[i]);
-        }
         assertEquals(3, split.length);
 
         disableAndDeleteProcess(processDefinitionWithStartSignal);
         disableAndDeleteProcess(processDefinitionWithEndSignal);
         deleteUser(john);
-    }
-
-    @Test
-    public void testHibernateFlush() throws Exception {
-        int errors1 = 0;
-        int errors2 = 0;
-        int NB_ITERATIONS = 15;
-        for (int i = 0; i < NB_ITERATIONS; i++) {
-            System.out.println("iteration " + i);
-            Couple errors = testHibernateFlush__();
-            if (errors.error1)
-                errors1++;
-            if (errors.error2)
-                errors2++;
-        }
-        System.err.println("Errors Direct JDBC: " + errors1 + "/" + NB_ITERATIONS);
-        System.err.println("Errors ReportingAPI.selectList: " + errors2 + "/" + NB_ITERATIONS);
-    }
-
-    public Couple testHibernateFlush__() throws Exception {
-        final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
-
-        ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
-        processBuilder.createNewInstance("SayGO", "1.0").addActor(ACTOR_NAME).addStartEvent("Start").addAutomaticTask("autoTask").addEndEvent("End")
-                .addTransition("Start", "autoTask").addTransition("autoTask", "End");
-        archiveBuilder.createNewBusinessArchive().setProcessDefinition(processBuilder.done());
-        final BusinessArchive endSignalArchive = archiveBuilder.done();
-
-        final User john = createUser("john", "bpm");
-
-        final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableWithActor(endSignalArchive, ACTOR_NAME, john);
-
-        logout();
-        loginWith("john", "bpm");
-
-        // Check that the process with trigger signal on start is not started, before send signal
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
-
-        // Send signal
-        waitProcessToFinishAndBeArchived(processInstance.getId());
-
-        // ********************************************
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/bonita?useUnicode=true&characterEncoding=UTF-8", "root", "root");
-        // connection.setAutoCommit(false);
-        ResultSet rs = connection.createStatement().executeQuery("select * from arch_process_instance where SOURCEOBJECTID=" + processInstance.getId());
-        boolean error1 = false;
-        try {
-            int counter = 0;
-            while (rs.next()) {
-                counter++;
-                for (int i = 1; i < 20; i++) {
-                    System.out.print(rs.getObject(i));
-                }
-                System.out.print("\n");
-            }
-            if (counter != 3) {
-                System.out.println(" ========= JDBC =========== Should have 3 archives for pi but got:" + counter + " ====================== ");
-                error1 = true;
-                // System.exit(5);
-            }
-        } finally {
-            if (rs != null)
-                rs.close();
-            if (connection != null)
-                connection.close();
-        }
-        // ********************************************
-
-        String selectList = getReportingAPI().selectList("select * from arch_process_instance where SOURCEOBJECTID=" + processInstance.getId());
-        System.err.println("archived processes: " + selectList);
-        boolean error2 = false;
-        String[] lines = selectList.split("\n");
-        if (lines.length != 3) {
-            System.err.println("===========  through ReportingAPI ================ There Should be 3 archived pi but got:" + lines.length
-                    + " =================================");
-            error2 = true;
-            // for debug:
-            // selectList = getReportingAPI().selectList("select * from arch_process_instance where SOURCEOBJECTID=" + processInstance.getId());
-        }
-
-        // ********************************************
-
-        disableAndDeleteProcess(processDefinitionWithEndSignal);
-        deleteUser(john);
-        return new Couple(error1, error2);
-    }
-
-    class Couple {
-
-        boolean error1;
-
-        boolean error2;
-
-        public Couple(final boolean error1, final boolean error2) {
-            super();
-            this.error1 = error1;
-            this.error2 = error2;
-        }
     }
 
 }
