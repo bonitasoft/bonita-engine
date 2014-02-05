@@ -7,11 +7,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -459,6 +461,39 @@ public class UserTaskAssignationTest extends CommonAPITest {
         deleteGroups(group);
         deleteRoles(role);
         deleteUser(jaakko);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(jira = "BS-6798", classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "possible users", "pagination" })
+    @Test
+    public void getPossibleUsersOfTaskShouldReturnAllUsersInThePaginationRange() throws Exception {
+        final Group group = createGroup("group");
+        final Role role = createRole("role");
+        final int USER_LIST_SIZE = 21;
+        final List<User> users = new ArrayList<User>(USER_LIST_SIZE);
+        for (int i = 0; i < USER_LIST_SIZE; i++) {
+            User newUser = createUser("user_" + i, "pwd");
+            users.add(newUser);
+            createUserMembership(newUser.getUserName(), role.getName(), group.getName());
+        }
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("getPossible_pagination", "1.1");
+        String actorName = "major";
+        String activityName = "step1";
+        designProcessDefinition.addActor(actorName);
+        designProcessDefinition.addUserTask(activityName, actorName);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(designProcessDefinition.done(), actorName, users);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask(activityName, processInstance);
+
+        final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTask(userTask.getId(), 0, 30);
+        // make sure the list is not limited to 20:
+        assertEquals(21, possibleUsers.size());
+
+        // cleanup:
+        deleteGroups(group);
+        deleteRoles(role);
+        deleteUsers(users);
         disableAndDeleteProcess(processDefinition);
     }
 
