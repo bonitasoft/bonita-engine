@@ -441,11 +441,14 @@ public class XMLProcessDefinition {
             fillConnectorNode(connectorNode, connector);
             connectorsNode.addChild(connectorNode);
         }
-        final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
-        flowElements.addChild(businessDataDefinitionsNode);
-        for (final BusinessDataDefinition businessDataDefinition : containerDefinition.getBusinessDataDefinitions()) {
-            final XMLNode businessDataDefinitionNode = getBusinessDataDefinitionNode(businessDataDefinition);
-            businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
+        List<BusinessDataDefinition> businessDataDefinitions = containerDefinition.getBusinessDataDefinitions();
+        if (!businessDataDefinitions.isEmpty()) {
+            final XMLNode businessDataDefinitionsNode = new XMLNode(BUSINESS_DATA_DEFINITIONS_NODE);
+            flowElements.addChild(businessDataDefinitionsNode);
+            for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
+                final XMLNode businessDataDefinitionNode = getBusinessDataDefinitionNode(businessDataDefinition);
+                businessDataDefinitionsNode.addChild(businessDataDefinitionNode);
+            }
         }
         final XMLNode dataDefinitionsNode = new XMLNode(DATA_DEFINITIONS_NODE);
         flowElements.addChild(dataDefinitionsNode);
