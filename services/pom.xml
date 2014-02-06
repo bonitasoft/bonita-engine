@@ -33,7 +33,6 @@
 		<module>bonita-platform</module>
 		<module>bonita-test-util</module>
 		<module>bonita-archive</module>
-		<module>bonita-sql</module>
 		<module>bonita-authentication</module>
 		<module>bonita-session</module>
 		<module>bonita-platform-authentication</module>
