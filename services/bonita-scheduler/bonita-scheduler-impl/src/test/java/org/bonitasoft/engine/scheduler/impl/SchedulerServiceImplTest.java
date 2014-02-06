@@ -1,15 +1,10 @@
 package org.bonitasoft.engine.scheduler.impl;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -53,7 +48,7 @@ public class SchedulerServiceImplTest {
     @Before
     public void setUp() {
         PowerMockito.mockStatic(BuilderFactory.class);
-
+        
         schedulerExecutor = mock(SchedulerExecutor.class);
         jobService = mock(JobService.class);
 
@@ -65,7 +60,7 @@ public class SchedulerServiceImplTest {
         SEventBuilder sEventBuilder = mock(SEventBuilder.class);
         SEventBuilderFactory sEventBuilderFactory = mock(SEventBuilderFactory.class);
         Mockito.when(BuilderFactory.get(SEventBuilderFactory.class)).thenReturn(sEventBuilderFactory);
-
+        
         when(sEventBuilderFactory.createNewInstance(anyString())).thenReturn(sEventBuilder);
         when(sEventBuilderFactory.createInsertEvent(anyString())).thenReturn(sEventBuilder);
         when(sEventBuilder.setObject(any(Object.class))).thenReturn(sEventBuilder);
@@ -85,7 +80,7 @@ public class SchedulerServiceImplTest {
         when(sLogBuilder.actionStatus(any(int.class))).thenReturn(sLogBuilder);
         when(sLogBuilder.severity(any(SQueriableLogSeverity.class))).thenReturn(sLogBuilder);
         when(sLogBuilder.rawMessage(anyString())).thenReturn(sLogBuilder);
-
+        
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService,
                 transactionService, sessionAccessor);
     }
@@ -109,22 +104,4 @@ public class SchedulerServiceImplTest {
         schedulerService.schedule(null, trigger);
     }
 
-    @Test
-    public void should_pauseJobs_of_tenant_call_schedulerExecutor() throws Exception {
-        schedulerService.resumeJobs(123l);
-
-        verify(schedulerExecutor, times(1)).resumeJobs(123l);
-    }
-
-    @Test
-    public void should_pauseJobs_of_tenant_call_schedulerExecutor_rethrow_exception() throws Exception {
-        SSchedulerException theException = new SSchedulerException("My exception");
-        doThrow(theException).when(schedulerExecutor).resumeJobs(123l);
-        try {
-            schedulerService.resumeJobs(123l);
-            fail("should have rethrown the exception");
-        } catch (SSchedulerException e) {
-            assertEquals(theException, e);
-        }
-    }
 }

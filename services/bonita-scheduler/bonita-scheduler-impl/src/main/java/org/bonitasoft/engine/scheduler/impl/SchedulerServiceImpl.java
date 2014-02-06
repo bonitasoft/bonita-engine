@@ -253,16 +253,6 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void pauseJobs(final long tenantId) throws SSchedulerException {
-        schedulerExecutor.pauseJobs(tenantId);
-    }
-
-    @Override
-    public void resumeJobs(final long tenantId) throws SSchedulerException {
-        schedulerExecutor.resumeJobs(tenantId);
-    }
-
-    @Override
     public boolean delete(final String jobName) throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "delete");
         final boolean delete = schedulerExecutor.delete(jobName);

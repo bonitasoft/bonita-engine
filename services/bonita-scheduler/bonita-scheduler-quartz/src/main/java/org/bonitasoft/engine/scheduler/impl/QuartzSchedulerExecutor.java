@@ -39,7 +39,6 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 import org.quartz.core.QuartzScheduler;
@@ -284,6 +283,20 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
+    public void resumeJobs() throws SSchedulerException {
+        try {
+            checkSchedulerState();
+            final String tenantId = String.valueOf(getTenantIdFromSession());
+            final GroupMatcher<JobKey> jobGroupEquals = jobGroupEquals(tenantId);
+            scheduler.resumeJobs(jobGroupEquals);
+        } catch (final org.quartz.SchedulerException e) {
+            throw new SSchedulerException(e);
+        } catch (final TenantIdNotSetException e) {
+            throw new SSchedulerException(e);
+        }
+    }
+
+    @Override
     public void pause(final String jobName) throws SSchedulerException {
         try {
             checkSchedulerState();
@@ -398,26 +411,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             return stillScheduled;
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void pauseJobs(final long tenantId) throws SSchedulerException {
-        GroupMatcher<JobKey> groupEquals = GroupMatcher.groupEquals(String.valueOf(tenantId));
-        try {
-            scheduler.pauseJobs(groupEquals);
-        } catch (SchedulerException e) {
-            throw new SSchedulerException("Unable to put jobs of tenant " + tenantId + " in pause", e);
-        }
-    }
-
-    @Override
-    public void resumeJobs(final long tenantId) throws SSchedulerException {
-        GroupMatcher<JobKey> groupEquals = GroupMatcher.groupEquals(String.valueOf(tenantId));
-        try {
-            scheduler.resumeJobs(groupEquals);
-        } catch (SchedulerException e) {
-            throw new SSchedulerException("Unable to put jobs of tenant " + tenantId + " in pause", e);
         }
     }
 

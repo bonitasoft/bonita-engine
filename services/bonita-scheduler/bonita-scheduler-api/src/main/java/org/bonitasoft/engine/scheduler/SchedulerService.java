@@ -133,6 +133,7 @@ public interface SchedulerService extends ServiceWithLifecycle {
      */
     List<String> getJobs() throws SSchedulerException;
 
+
     /**
      * Get all jobs on all tenants
      * \/!\Must be replaced by a platform scheduler/!\
@@ -144,22 +145,5 @@ public interface SchedulerService extends ServiceWithLifecycle {
     List<String> getAllJobs() throws SSchedulerException;
 
     boolean isStillScheduled(SJobDescriptor jobDescriptor) throws SSchedulerException;
-
-    /**
-     * 
-     * Pause all jobs running on the tenant
-     * 
-     * @param tenantId
-     * @throws SSchedulerException
-     */
-    void pauseJobs(long tenantId) throws SSchedulerException;
-
-    /**
-     * Resume all jobs paused on the tenant
-     * 
-     * @param tenantId
-     * @throws SSchedulerException
-     */
-    void resumeJobs(long tenantId) throws SSchedulerException;
 
 }
