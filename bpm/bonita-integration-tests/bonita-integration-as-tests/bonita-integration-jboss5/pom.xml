@@ -17,6 +17,7 @@
 		<jboss5.version>jboss-5.1.0.GA-jdk6</jboss5.version>
 		<jboss.name>jboss-5.1.0.GA</jboss.name>
 		<jboss.web.port>7081</jboss.web.port>
+		<jboss.ajp.port>8010</jboss.ajp.port>
 		<provider.port>7100</provider.port>
 		<invokerLocatorPort>3874</invokerLocatorPort>
 		<jboss.url>http://sourceforge.net/projects/jboss/files/JBoss/JBoss-5.1.0.GA/jboss-5.1.0.GA-jdk6.zip/download</jboss.url>
@@ -102,6 +103,7 @@
 										<replace file="${jboss.deploy.dir}/ejb3-connectors-jboss-beans.xml" token="&lt;parameter&gt;3873&lt;/parameter&gt;" value="&lt;parameter&gt;${invokerLocatorPort}&lt;/parameter&gt;" />
 		
 										<replace file="${jboss.deploy.dir}/jbossweb.sar/server.xml" token="port=&quot;8080&quot;" value="port=&quot;${jboss.web.port}&quot;" />
+										<replace file="${jboss.deploy.dir}/jbossweb.sar/server.xml" token="port=&quot;8009&quot;" value="port=&quot;${jboss.ajp.port}&quot;" />
 		
 										<replace file="${jboss.home}/bin/run.conf" token="-XX:MaxPermSize=256m" value="-XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" />
 										
