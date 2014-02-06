@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -25,10 +25,10 @@ import javax.naming.NamingException;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.exception.ServerAPIException;
-import org.bonitasoft.engine.exception.StackTraceTransformer;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Aurelien Pupier
  */
 public class EJB3ServerAPI implements ServerAPI {
 
@@ -56,13 +56,8 @@ public class EJB3ServerAPI implements ServerAPI {
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
-        try {
-            return remoteServAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-        } catch (ServerWrappedException e) {
-            // merge stack trace of the server exception
-            return StackTraceTransformer.mergeStackTraces(e);
-        }
+    	final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+    	return remoteServAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
     }
 
 }
