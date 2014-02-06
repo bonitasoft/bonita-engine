@@ -314,15 +314,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    /**
-     * @param session
-     */
-    private void flushDirtySession(final Session session) {
-        if (session.isDirty()) {
-            session.flush();
-        }
-    }
-
     protected Class<? extends PersistentObject> getMappedClass(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
         if (classMapping.contains(entityClass)) {
             return entityClass;
@@ -385,7 +376,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
         query.setMaxResults(1);
         try {
-            flushDirtySession(session);
             return (T) query.uniqueResult();
         } catch (final AssertionFailure af) {
             throw new SRetryableException(af);
@@ -614,8 +604,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             query.setFirstResult(selectDescriptor.getStartIndex());
             query.setMaxResults(selectDescriptor.getPageSize());
 
-            // Hibernate does not detect that it needs to flush before executing the list (in FlushMode.AUTO)
-            flushDirtySession(session);
             @SuppressWarnings("unchecked")
             final List<T> list = query.list();
             if (list != null) {
