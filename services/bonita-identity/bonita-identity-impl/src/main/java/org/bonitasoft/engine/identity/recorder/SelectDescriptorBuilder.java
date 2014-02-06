@@ -82,7 +82,8 @@ public class SelectDescriptorBuilder {
     public static <T extends PersistentObject> SelectListDescriptor<T> getElementsByIds(final Class<T> clazz, final String elementName,
             final Collection<Long> ids) {
         final Map<String, Object> parameters = Collections.singletonMap("ids", (Object) ids);
-        return new SelectListDescriptor<T>("get" + elementName + "sByIds", parameters, clazz);
+        int maxResults = ids != null ? ids.size() : 0;
+        return new SelectListDescriptor<T>("get" + elementName + "sByIds", parameters, clazz, new QueryOptions(0, maxResults));
     }
 
     public static SelectListDescriptor<SGroup> getGroupsByName(final String groupName) {
