@@ -87,9 +87,8 @@ public class ReportingServiceImpl implements ReportingService {
         try {
             connection.setAutoCommit(false);
             final Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                statement.execute(selectQuery);
-                final ResultSet resultSet = statement.getResultSet();
-                    if (resultSet != null) {
+            final ResultSet resultSet = statement.executeQuery(selectQuery);
+            if (resultSet != null) {
                 final String newline = "\n";
                 final ResultSetMetaData metaData = resultSet.getMetaData();
                 final int columns = metaData.getColumnCount();
@@ -101,11 +100,11 @@ public class ReportingServiceImpl implements ReportingService {
                 // Special treatment of last record (to avoid having extra comma at the end):
                 final String columnName = metaData.getColumnLabel(columns);
                 builder.append(columnName.toUpperCase()).append(newline);
-                        while (resultSet.next()) {
+                while (resultSet.next()) {
                     for (int j = 1; j < columns; j++) {
-                                final Object value = resultSet.getObject(j);
-                            builder.append(protect(String.valueOf(value))).append(",");
-                            }
+                        final Object value = resultSet.getObject(j);
+                        builder.append(protect(String.valueOf(value))).append(",");
+                    }
                     final Object value = resultSet.getObject(columns);
                     // Special treatment of last record (to avoid having extra comma at the end):
                     builder.append(value).append(newline);
