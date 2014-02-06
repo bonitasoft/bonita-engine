@@ -87,35 +87,30 @@ public class ReportingServiceImpl implements ReportingService {
         try {
             connection.setAutoCommit(false);
             final Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            try {
-                final ResultSet resultSet = statement.executeQuery(selectQuery);
-                try {
-                    final String newline = "\n";
-
-                    // generate header with column names:
-                    final int columns = appendUpperCaseColumnNames(builder, resultSet.getMetaData(), newline);
-
-                    while (resultSet.next()) {
-                        for (int j = 1; j < columns; j++) {
-                            final Object value = resultSet.getObject(j);
-                            builder.append(protect(String.valueOf(value))).append(",");
-                        }
-                        final Object value = resultSet.getObject(columns);
-
-                        // Special treatment of last record (to avoid having extra comma at the end):
-                        builder.append(protect(String.valueOf(value))).append(newline);
-                    }
-                    return builder.toString();
-                } finally {
-                    if (resultSet != null) {
-                        resultSet.close();
-                    }
+            final ResultSet resultSet = statement.executeQuery(selectQuery);
+            if (resultSet != null) {
+                final String newline = "\n";
+                final ResultSetMetaData metaData = resultSet.getMetaData();
+                final int columns = metaData.getColumnCount();
+                for (int i = 1; i < columns; i++) {
+                    final String columnName = metaData.getColumnLabel(i);
+                    // in order to use the same case for all database
+                    builder.append(columnName.toUpperCase()).append(",");
                 }
-            } finally {
-                if (statement != null) {
-                    statement.close();
+                // Special treatment of last record (to avoid having extra comma at the end):
+                final String columnName = metaData.getColumnLabel(columns);
+                builder.append(columnName.toUpperCase()).append(newline);
+                while (resultSet.next()) {
+                    for (int j = 1; j < columns; j++) {
+                        final Object value = resultSet.getObject(j);
+                        builder.append(protect(String.valueOf(value))).append(",");
+                    }
+                    final Object value = resultSet.getObject(columns);
+                    // Special treatment of last record (to avoid having extra comma at the end):
+                    builder.append(value).append(newline);
                 }
             }
+            return builder.toString();
         } finally {
             connection.close();
         }
@@ -137,22 +132,6 @@ public class ReportingServiceImpl implements ReportingService {
             return value.replaceAll("\"", "\"\"");
         }
         return value;
-    }
-
-    protected int appendUpperCaseColumnNames(final StringBuilder builder, final ResultSetMetaData metaData, final String newline) throws SQLException {
-        final int columns = metaData.getColumnCount();
-        for (int i = 1; i <= columns; i++) {
-            final String columnName = metaData.getColumnLabel(i);
-            // in order to use the same case for all database
-            builder.append(columnName.toUpperCase());
-            if (i < columns) {
-                builder.append(",");
-            } else {
-                // Special treatment of last column (to avoid having extra comma at the end):
-                builder.append(newline);
-            }
-        }
-        return columns;
     }
 
     @Override
