@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -50,167 +50,171 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
  */
 public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 
-	private EntityManagerFactory entityManagerFactory;
+    private static final String DEFAULT_DATA_SOURCE_NAME = "java:comp/env/BusinessDataDS";
 
-	private DependencyService dependencyService;
+    private final String dataSourceName;
 
-	private List<String> classNameList;
+    private final DependencyService dependencyService;
 
+    private EntityManagerFactory entityManagerFactory;
 
-	public JPABusinessDataRepositoryImpl(DependencyService dependencyService) {
-		this.dependencyService = dependencyService;
-	}
+    private List<String> classNameList;
 
-	@Override
-	public void deploy(final byte[] bdrArchive,long tenantId) throws SBusinessDataRepositoryException {
-		byte[] transformedBdrArchive = null;
-		try {
-			transformedBdrArchive = transformBDRArchive(bdrArchive);
-		}  catch (IOException e) {
-			throw new SBusinessDataRepositoryDeploymentException(e);
-		} catch (TransformerException e) {
-			throw new SBusinessDataRepositoryDeploymentException(e);
-		}
+    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService) {
+        this(dependencyService, DEFAULT_DATA_SOURCE_NAME);
+    }
 
-		final SDependency sDependency = createSDependency(transformedBdrArchive);
-		try {
-			dependencyService.createDependency(sDependency);
-		} catch (SDependencyAlreadyExistsException e) {
-			throw new SBusinessDataRepositoryDeploymentException(e);
-		} catch (SDependencyCreationException e) {
-			throw new SBusinessDataRepositoryDeploymentException(e);
-		}
-		final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
-		try {
-			dependencyService.createDependencyMapping(sDependencyMapping);
-		} catch (SDependencyException e) {
-			throw new SBusinessDataRepositoryDeploymentException(e);
-		}
+    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final String dataSourceName) {
+        this.dependencyService = dependencyService;
+        this.dataSourceName = dataSourceName;
+    }
 
-	}
+    @Override
+    public void deploy(final byte[] bdrArchive, final long tenantId) throws SBusinessDataRepositoryException {
+        byte[] transformedBdrArchive = null;
+        try {
+            transformedBdrArchive = transformBDRArchive(bdrArchive);
+        } catch (final IOException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        } catch (final TransformerException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        }
 
-	protected SDependencyMapping createDependencyMapping(long tenantId,
-			final SDependency sDependency) {
-		return BuilderFactory.get(SDependencyMappingBuilderFactory.class)
-				.createNewInstance(sDependency.getId(),tenantId , "tenant").done();
-	}
+        final SDependency sDependency = createSDependency(transformedBdrArchive);
+        try {
+            dependencyService.createDependency(sDependency);
+            final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
+            dependencyService.createDependencyMapping(sDependencyMapping);
+        } catch (final SDependencyAlreadyExistsException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        } catch (final SDependencyCreationException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        } catch (final SDependencyException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        }
+    }
 
-	protected SDependency createSDependency(byte[] transformedBdrArchive) {
-		return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance("BDR", "1.0", "BDR.jar", transformedBdrArchive).done();
-	}
+    protected SDependencyMapping createDependencyMapping(final long tenantId, final SDependency sDependency) {
+        return BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), tenantId, "tenant").done();
+    }
 
-	protected byte[] transformBDRArchive(final byte[] bdrArchive) throws SBusinessDataRepositoryDeploymentException, IOException, TransformerException {
-		try {
-			classNameList = IOUtil.getClassNameList(bdrArchive);
-		} catch (IOException e) {
-			throw new SBonitaRuntimeException(e);
-		}
+    protected SDependency createSDependency(final byte[] transformedBdrArchive) {
+        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance("BDR", "1.0", "BDR.jar", transformedBdrArchive).done();
+    }
 
-		if (classNameList == null || classNameList.isEmpty()) {
-			throw new IllegalStateException("No entity found in bdr archive");
-		}
-		byte[] persistenceFileContent = getPersistenceFileContentFor(classNameList);
-		return IOUtil.addJarEntry(bdrArchive,"META-INF/persistence.xml",persistenceFileContent);
-	}
+    protected byte[] transformBDRArchive(final byte[] bdrArchive) throws SBusinessDataRepositoryDeploymentException, IOException, TransformerException {
+        try {
+            classNameList = IOUtil.getClassNameList(bdrArchive);
+        } catch (final IOException e) {
+            throw new SBonitaRuntimeException(e);
+        }
 
-	public List<String> getClassNameList() {
-		return classNameList;
-	}
+        if (classNameList == null || classNameList.isEmpty()) {
+            throw new IllegalStateException("No entity found in bdr archive");
+        }
+        final byte[] persistenceFileContent = getPersistenceFileContentFor(classNameList);
+        return IOUtil.addJarEntry(bdrArchive, "META-INF/persistence.xml", persistenceFileContent);
+    }
 
-	public void setClassNameList(List<String> classNameList) {
-		this.classNameList = classNameList;
-	}
+    public List<String> getClassNameList() {
+        return classNameList;
+    }
 
-	protected byte[] getPersistenceFileContentFor(final List<String> classNames) throws SBusinessDataRepositoryDeploymentException, IOException, TransformerException {
-		PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
-		for(String classname : classNames){
-			builder.addClass(classname);
-		}
-		return IOUtil.toByteArray(builder.done());
-	}
+    public void setClassNameList(final List<String> classNameList) {
+        this.classNameList = classNameList;
+    }
 
-	@Override
-	public void start() throws SBusinessDataRepositoryDeploymentException {
-		final Map<String, Object> configOverrides = new HashMap<String, Object>();
-		configOverrides.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
-		entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configOverrides);
-		Properties properties = toProperties(entityManagerFactory.getProperties());
-		Dialect dialect = Dialect.getDialect(properties);
-		try {
-			executeQueries(new SchemaGenerator(dialect,properties,getClassNameList()).generate());
-		} catch (SQLException e) {
-			throw new SBusinessDataRepositoryDeploymentException(e);
-		}
-	}
+    protected byte[] getPersistenceFileContentFor(final List<String> classNames) throws SBusinessDataRepositoryDeploymentException, IOException,
+            TransformerException {
+        final PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
+        for (final String classname : classNames) {
+            builder.addClass(classname);
+        }
+        return IOUtil.toByteArray(builder.done());
+    }
 
+    @Override
+    public void start() throws SBusinessDataRepositoryDeploymentException {
+        final Map<String, Object> configOverrides = new HashMap<String, Object>();
+        configOverrides.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
+        configOverrides.put("hibernate.connection.datasource", dataSourceName);
+        entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configOverrides);
+        final Properties properties = toProperties(entityManagerFactory.getProperties());
+        final Dialect dialect = Dialect.getDialect(properties);
+        try {
+            executeQueries(new SchemaGenerator(dialect, properties, getClassNameList()).generate());
+        } catch (final SQLException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        }
+    }
 
-	private void executeQueries(final String... sqlQuerys) {
-		final EntityManager entityManager = getEntityManager();
-		for (final String sqlQuery : sqlQuerys) {
-			final Query query = entityManager.createNativeQuery(sqlQuery);
-			query.executeUpdate();
-		}
-	}
+    private void executeQueries(final String... sqlQuerys) {
+        final EntityManager entityManager = getEntityManager();
+        for (final String sqlQuery : sqlQuerys) {
+            final Query query = entityManager.createNativeQuery(sqlQuery);
+            query.executeUpdate();
+        }
+    }
 
-	private Properties toProperties(Map<String, Object> propertiesAsMap) {
-		Properties properties = new Properties();
-		properties.putAll(propertiesAsMap);
-		return properties;
-	}
+    private Properties toProperties(final Map<String, Object> propertiesAsMap) {
+        final Properties properties = new Properties();
+        properties.putAll(propertiesAsMap);
+        return properties;
+    }
 
-	@Override
-	public void stop() {
-		if (entityManagerFactory != null) {
-			entityManagerFactory.close();
-			entityManagerFactory = null;
-		}
-	}
+    @Override
+    public void stop() {
+        if (entityManagerFactory != null) {
+            entityManagerFactory.close();
+            entityManagerFactory = null;
+        }
+    }
 
-	@Override
-	public <T> T find(final Class<T> entityClass, final Serializable primaryKey) throws BusinessDataNotFoundException {
-		final EntityManager em = getEntityManager();
-		final T entity = em.find(entityClass, primaryKey);
-		if (entity == null) {
-			throw new BusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
-		}
-		return entity;
-	}
+    @Override
+    public <T> T find(final Class<T> entityClass, final Serializable primaryKey) throws BusinessDataNotFoundException {
+        final EntityManager em = getEntityManager();
+        final T entity = em.find(entityClass, primaryKey);
+        if (entity == null) {
+            throw new BusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
+        }
+        return entity;
+    }
 
-	@Override
-	public <T> T find(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) throws BusinessDataNotFoundException,
-	NonUniqueResultException {
-		final EntityManager em = getEntityManager();
-		final TypedQuery<T> query = em.createQuery(qlString, resultClass);
-		if (parameters != null) {
-			for (final Entry<String, Object> parameter : parameters.entrySet()) {
-				query.setParameter(parameter.getKey(), parameter.getValue());
-			}
-		}
-		try {
-			return query.getSingleResult();
-		} catch (final javax.persistence.NonUniqueResultException nure) {
-			throw new NonUniqueResultException(nure);
-		} catch (final NoResultException nre) {
-			throw new BusinessDataNotFoundException("Impossible to get data using query: " + qlString + " and parameters: " + parameters, nre);
-		}
-	}
+    @Override
+    public <T> T find(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) throws BusinessDataNotFoundException,
+            NonUniqueResultException {
+        final EntityManager em = getEntityManager();
+        final TypedQuery<T> query = em.createQuery(qlString, resultClass);
+        if (parameters != null) {
+            for (final Entry<String, Object> parameter : parameters.entrySet()) {
+                query.setParameter(parameter.getKey(), parameter.getValue());
+            }
+        }
+        try {
+            return query.getSingleResult();
+        } catch (final javax.persistence.NonUniqueResultException nure) {
+            throw new NonUniqueResultException(nure);
+        } catch (final NoResultException nre) {
+            throw new BusinessDataNotFoundException("Impossible to get data using query: " + qlString + " and parameters: " + parameters, nre);
+        }
+    }
 
-	private EntityManager getEntityManager() {
-		if (entityManagerFactory == null) {
-			throw new IllegalStateException("The BDR is not started");
-		}
-		final EntityManager entityManager = entityManagerFactory.createEntityManager();
-		entityManager.joinTransaction();
-		return entityManager;
-	}
+    private EntityManager getEntityManager() {
+        if (entityManagerFactory == null) {
+            throw new IllegalStateException("The BDR is not started");
+        }
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.joinTransaction();
+        return entityManager;
+    }
 
-	@Override
-	public void persist(final Object entity) {
-		if (entity == null) {
-			return;
-		}
-		final EntityManager em = getEntityManager();
-		em.persist(entity);
-	}
+    @Override
+    public void persist(final Object entity) {
+        if (entity == null) {
+            return;
+        }
+        final EntityManager em = getEntityManager();
+        em.persist(entity);
+    }
 
 }

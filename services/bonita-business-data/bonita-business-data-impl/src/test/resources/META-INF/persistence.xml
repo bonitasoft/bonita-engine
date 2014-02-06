@@ -4,7 +4,6 @@
 
 	<persistence-unit name="BDR" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<jta-data-source>java:/comp/env/jdbc/PGDS1</jta-data-source>
 		<class>com.bonitasoft.pojo.Employee</class>
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
