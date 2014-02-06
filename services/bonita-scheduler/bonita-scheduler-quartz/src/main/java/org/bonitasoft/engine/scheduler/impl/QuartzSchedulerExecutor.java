@@ -39,8 +39,10 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 
@@ -270,59 +272,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void resume(final String jobName) throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final String tenantId = String.valueOf(getTenantIdFromSession());
-            scheduler.resumeJob(jobKey(jobName, tenantId));
-        } catch (final org.quartz.SchedulerException e) {
-            throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void resumeJobs() throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final String tenantId = String.valueOf(getTenantIdFromSession());
-            final GroupMatcher<JobKey> jobGroupEquals = jobGroupEquals(tenantId);
-            scheduler.resumeJobs(jobGroupEquals);
-        } catch (final org.quartz.SchedulerException e) {
-            throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void pause(final String jobName) throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final String tenantId = String.valueOf(getTenantIdFromSession());
-            scheduler.pauseJob(jobKey(jobName, tenantId));
-        } catch (final org.quartz.SchedulerException e) {
-            throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void pauseJobs() throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final String tenantId = String.valueOf(getTenantIdFromSession());
-            scheduler.pauseJobs(jobGroupEquals(tenantId));
-        } catch (final org.quartz.SchedulerException e) {
-            throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
     public boolean delete(final String jobName) throws SSchedulerException {
         try {
             checkSchedulerState();
@@ -411,6 +360,26 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             return stillScheduled;
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
+        }
+    }
+
+    @Override
+    public void pauseJobs(final long tenantId) throws SSchedulerException {
+        GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(tenantId));
+        try {
+            scheduler.pauseTriggers(groupEquals);
+        } catch (SchedulerException e) {
+            throw new SSchedulerException("Unable to put jobs of tenant " + tenantId + " in pause", e);
+        }
+    }
+
+    @Override
+    public void resumeJobs(final long tenantId) throws SSchedulerException {
+        GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(tenantId));
+        try {
+            scheduler.resumeTriggers(groupEquals);
+        } catch (SchedulerException e) {
+            throw new SSchedulerException("Unable to put jobs of tenant " + tenantId + " in pause", e);
         }
     }
 
