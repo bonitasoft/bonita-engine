@@ -103,7 +103,7 @@
           </profileEntry>
         </childrenEntries>
       </parentProfileEntry>
-      <parentProfileEntry name="Business Data Model">
+      <parentProfileEntry name="Business Data Models">
         <parentName>NULL</parentName>
         <index>6</index>
         <description>Manage business data model</description>
