@@ -4,14 +4,6 @@
 
 	<persistence-unit name="BDR" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<properties>
-			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
-			<property name="hibernate.show_sql" value="false" />
-			<property name="hibernate.format_sql" value="false" />
-			<property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.BTMTransactionManagerLookup" />
-			<property name="hibernate.validator.autoregister_listeners" value="false" />
-			<property name="hibernate.validator.apply_to_ddl" value="false" />
-			<property name="javax.persistence.validation.mode" value="NONE" />
-		</properties>
 	</persistence-unit>
+
 </persistence>

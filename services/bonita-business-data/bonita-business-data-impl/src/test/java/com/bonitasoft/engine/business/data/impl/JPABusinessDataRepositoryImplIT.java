@@ -10,6 +10,7 @@ import static org.mockito.Mockito.spy;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -29,8 +30,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
@@ -39,7 +38,6 @@ import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.pojo.Employee;
 
-@RunWith(MockitoJUnitRunner.class)
 public class JPABusinessDataRepositoryImplIT {
 
     private static final String DATA_SOURCE_NAME = "java:/comp/env/jdbc/PGDS1";
@@ -101,7 +99,12 @@ public class JPABusinessDataRepositoryImplIT {
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
         bdrArchive = IOUtil.getAllContentFrom(JPABusinessDataRepositoryImplIT.class.getResourceAsStream("/bdr-jar.bak"));
-        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, DATA_SOURCE_NAME));
+        final Map<String, Object> configuration = new HashMap<String, Object>();
+        configuration.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        configuration.put("hibernate.connection.datasource", DATA_SOURCE_NAME);
+        configuration.put("hibernate.transaction.manager_lookup_class", "org.hibernate.transaction.BTMTransactionManagerLookup");
+
+        businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, configuration));
         doReturn(Collections.singletonList("com.bonitasoft.pojo.Employee")).when(businessDataRepository).getClassNameList();
         doReturn(null).when(businessDataRepository).createSDependency(any(byte[].class));
         doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));

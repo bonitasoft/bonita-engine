@@ -36,7 +36,6 @@ import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
-import org.hibernate.dialect.Dialect;
 
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
@@ -50,9 +49,7 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
  */
 public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 
-    private static final String DEFAULT_DATA_SOURCE_NAME = "java:comp/env/BusinessDataDS";
-
-    private final String dataSourceName;
+    private final Map<String, Object> configuration;
 
     private final DependencyService dependencyService;
 
@@ -60,13 +57,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 
     private List<String> classNameList;
 
-    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService) {
-        this(dependencyService, DEFAULT_DATA_SOURCE_NAME);
-    }
-
-    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final String dataSourceName) {
+    public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final Map<String, Object> configuration) {
         this.dependencyService = dependencyService;
-        this.dataSourceName = dataSourceName;
+        this.configuration = new HashMap<String, Object>(configuration);
+        this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
     }
 
     @Override
@@ -135,14 +129,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 
     @Override
     public void start() throws SBusinessDataRepositoryDeploymentException {
-        final Map<String, Object> configOverrides = new HashMap<String, Object>();
-        configOverrides.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
-        configOverrides.put("hibernate.connection.datasource", dataSourceName);
-        entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configOverrides);
+        entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configuration);
         final Properties properties = toProperties(entityManagerFactory.getProperties());
-        final Dialect dialect = Dialect.getDialect(properties);
         try {
-            executeQueries(new SchemaGenerator(dialect, properties, getClassNameList()).generate());
+            executeQueries(new SchemaGenerator(properties, getClassNameList()).generate());
         } catch (final SQLException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }

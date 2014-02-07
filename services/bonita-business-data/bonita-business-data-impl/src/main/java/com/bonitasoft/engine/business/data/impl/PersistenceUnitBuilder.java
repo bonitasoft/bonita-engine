@@ -1,19 +1,11 @@
-/**
+/*******************************************************************************
  * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
 import java.io.IOException;
@@ -35,69 +27,69 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentExce
 
 /**
  * @author Romain Bioteau
- *
  */
 public class PersistenceUnitBuilder {
 
-	private Document document;
-	private Set<String> classes = new HashSet<String>();
+    private final Document document;
 
-	public PersistenceUnitBuilder() throws SBusinessDataRepositoryDeploymentException{
-		document = initializeDefaultPersistenceDocument();
-	}
+    private final Set<String> classes = new HashSet<String>();
 
-	protected Document initializeDefaultPersistenceDocument() throws SBusinessDataRepositoryDeploymentException {
-		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		documentBuilderFactory.setValidating(false);
-		DocumentBuilder documentBuilder = null;
-		try {
-			documentBuilder = documentBuilderFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			throw new SBusinessDataRepositoryDeploymentException(e);
-		}
-		InputStream is = null ;
-		try{
-			is = JPABusinessDataRepositoryImpl.class.getResourceAsStream("persistence.xml");
-			return documentBuilder.parse(is);
-		} catch (SAXException e) {
-			throw new SBusinessDataRepositoryDeploymentException(e);
-		} catch (IOException e) {
-			throw new SBusinessDataRepositoryDeploymentException(e);
-		}finally{
-			if(is != null){
-				try {
-					is.close();
-				} catch (IOException e) {
-					throw new SBusinessDataRepositoryDeploymentException(e);
-				}
-			}
-		}
-	}
+    public PersistenceUnitBuilder() throws SBusinessDataRepositoryDeploymentException {
+        document = initializeDefaultPersistenceDocument();
+    }
 
-	public Document done() {
-		insertClasses();
-		return document;
-	}
+    protected Document initializeDefaultPersistenceDocument() throws SBusinessDataRepositoryDeploymentException {
+        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setValidating(false);
+        DocumentBuilder documentBuilder = null;
+        try {
+            documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        } catch (final ParserConfigurationException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        }
+        InputStream is = null;
+        try {
+            is = JPABusinessDataRepositoryImpl.class.getResourceAsStream("persistence.xml");
+            return documentBuilder.parse(is);
+        } catch (final SAXException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        } catch (final IOException e) {
+            throw new SBusinessDataRepositoryDeploymentException(e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (final IOException e) {
+                    throw new SBusinessDataRepositoryDeploymentException(e);
+                }
+            }
+        }
+    }
 
-	protected void insertClasses() {
-		Node persistenceUnitNode = getPersistenceUnitNode();
-		Node refChild = ((Element)persistenceUnitNode).getElementsByTagName("properties").item(0);
-		for(String classname : classes){
-			Element classNode = document.createElement("class");
-			classNode.setTextContent(classname);
-			persistenceUnitNode.insertBefore(classNode, refChild);
-		}
+    public Document done() {
+        insertClasses();
+        return document;
+    }
 
-	}
+    protected void insertClasses() {
+        final Node persistenceUnitNode = getPersistenceUnitNode();
+        final Node refChild = ((Element) persistenceUnitNode).getElementsByTagName("properties").item(0);
+        for (final String classname : classes) {
+            final Element classNode = document.createElement("class");
+            classNode.setTextContent(classname);
+            persistenceUnitNode.insertBefore(classNode, refChild);
+        }
 
-	private Node getPersistenceUnitNode() {
-		NodeList parentElement = document.getElementsByTagName("persistence-unit");
-		return parentElement.item(0);
-	}
+    }
 
-	public PersistenceUnitBuilder addClass(String classname) {
-		classes.add(classname);
-		return this;
-	}
+    private Node getPersistenceUnitNode() {
+        final NodeList parentElement = document.getElementsByTagName("persistence-unit");
+        return parentElement.item(0);
+    }
+
+    public PersistenceUnitBuilder addClass(final String classname) {
+        classes.add(classname);
+        return this;
+    }
 
 }

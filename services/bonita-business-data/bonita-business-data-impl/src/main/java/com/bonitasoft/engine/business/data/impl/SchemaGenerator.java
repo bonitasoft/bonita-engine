@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
 import java.sql.Connection;
@@ -15,6 +23,7 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentExce
 
 /**
  * @author Romain Bioteau
+ * @author Matthieu Chaffotte
  */
 public class SchemaGenerator {
 
@@ -22,16 +31,14 @@ public class SchemaGenerator {
 
     private final Dialect dialect;
 
-    public SchemaGenerator(final Dialect dialect, final Properties properties, final List<String> classNameList)
-            throws SBusinessDataRepositoryDeploymentException {
+    public SchemaGenerator(final Properties properties, final List<String> classNameList) throws SBusinessDataRepositoryDeploymentException {
         cfg = new Configuration();
         cfg.setProperties(properties);
         cfg.setProperty("hibernate.hbm2ddl.auto", "update");
         cfg.setProperty("hibernate.current_session_context_class", "jta");
         cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.transaction.JTATransactionFactory");
         cfg.setProperty("hibernate.transaction.manager_lookup_class", "org.hibernate.transaction.BTMTransactionManagerLookup");
-        this.dialect = dialect;
-        cfg.setProperty("hibernate.dialect", dialect.getClass().getName());
+        dialect = Dialect.getDialect(properties);
         for (final String className : classNameList) {
             Class<?> annotatedClass;
             try {
@@ -40,9 +47,7 @@ public class SchemaGenerator {
             } catch (final ClassNotFoundException e) {
                 throw new SBusinessDataRepositoryDeploymentException(e);
             }
-
         }
-
     }
 
     /**
@@ -55,8 +60,12 @@ public class SchemaGenerator {
     public String[] generate() throws SQLException {
         final ConnectionProvider connectionProvider = ConnectionProviderFactory.newConnectionProvider(cfg.getProperties());
         final Connection connection = connectionProvider.getConnection();
-        final DatabaseMetadata databaseMetadata = new DatabaseMetadata(connection, dialect);
-        return cfg.generateSchemaUpdateScript(dialect, databaseMetadata);
+        try {
+            final DatabaseMetadata databaseMetadata = new DatabaseMetadata(connection, dialect);
+            return cfg.generateSchemaUpdateScript(dialect, databaseMetadata);
+        } finally {
+            connection.close();
+        }
     }
 
 }
