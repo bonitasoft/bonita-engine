@@ -15,18 +15,33 @@ package org.bonitasoft.engine.bpm.actor;
 
 import org.bonitasoft.engine.bpm.BonitaObject;
 
-
 /**
+ * It is used to map a actorInstance with the organisation.
+ * It's possible to map a actorInstance with a user, or a group, or a role, or a group and a role.
+ * 
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface ActorMember extends BonitaObject {
 
+    /**
+     * @return The identifier of the actor member
+     */
     long getId();
 
+    /**
+     * @return The identifier of the user
+     */
     long getUserId();
 
+    /**
+     * @return The identifier of the group
+     */
     long getGroupId();
 
+    /**
+     * @return The identifier of the role
+     */
     long getRoleId();
 
 }
