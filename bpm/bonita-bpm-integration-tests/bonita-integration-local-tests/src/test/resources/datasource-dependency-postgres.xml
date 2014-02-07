@@ -7,11 +7,11 @@
 	<bean id="driverProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
 			<props>
-				<prop key="user">${jdbc.user}</prop>
-				<prop key="password">${jdbc.password}</prop>
-				<prop key="serverName">${jdbc.serverName}</prop>
-				<prop key="portNumber">${jdbc.portNumber}</prop>
-				<prop key="databaseName">${jdbc.databaseName}</prop>
+				<prop key="user">${db.user}</prop>
+				<prop key="password">${db.password}</prop>
+				<prop key="serverName">${db.server.name}</prop>
+				<prop key="portNumber">${db.server.port}</prop>
+				<prop key="databaseName">${db.database.name}</prop>
 			</props>
 		</property>
 	</bean>
