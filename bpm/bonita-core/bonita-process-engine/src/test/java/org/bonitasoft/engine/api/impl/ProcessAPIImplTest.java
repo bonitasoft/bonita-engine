@@ -27,22 +27,21 @@ public class ProcessAPIImplTest {
         final long tenantId = 1;
         final long processInstanceId = 45;
         final long userId = 9;
-        final ProcessAPIImpl processAPI = new ProcessAPIImpl();
-        final ProcessAPIImpl spiAPI = spy(processAPI);
+        final ProcessAPIImpl processAPI = spy(new ProcessAPIImpl());
         final TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
         final LockService lockService = mock(LockService.class);
         final TransactionalProcessInstanceInterruptor interruptor = mock(TransactionalProcessInstanceInterruptor.class);
 
-        doReturn(tenantAccessor).when(spiAPI).getTenantAccessor();
+        doReturn(tenantAccessor).when(processAPI).getTenantAccessor();
         when(tenantAccessor.getTenantId()).thenReturn(tenantId);
         when(tenantAccessor.getLockService()).thenReturn(lockService);
-        doReturn(userId).when(spiAPI).getUserId();
-        doReturn(interruptor).when(spiAPI).buildProcessInstanceInterruptor(tenantAccessor);
+        doReturn(userId).when(processAPI).getUserId();
+        doReturn(interruptor).when(processAPI).buildProcessInstanceInterruptor(tenantAccessor);
         doThrow(new SProcessInstanceNotFoundException(processInstanceId)).when(interruptor).interruptProcessInstance(processInstanceId,
                 SStateCategory.CANCELLING, userId);
 
         try {
-            spiAPI.cancelProcessInstance(processInstanceId);
+            processAPI.cancelProcessInstance(processInstanceId);
             fail("The process instance does not exists");
         } catch (final ProcessInstanceNotFoundException pinfe) {
             verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), tenantId);
