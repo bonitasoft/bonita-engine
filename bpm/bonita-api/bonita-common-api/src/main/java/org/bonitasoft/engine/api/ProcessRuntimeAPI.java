@@ -740,6 +740,21 @@ public interface ProcessRuntimeAPI {
     void updateProcessDataInstance(String dataName, long processInstanceId, Serializable dataValue) throws UpdateException;
 
     /**
+     * Update the value of a named data item in a specified process instance.
+     * 
+     * @param processInstanceId
+     *            the identifier of the process instance.
+     * @param dataNameValues
+     *            the mapping between the data name and its value to update to.
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws UpdateException
+     *             if a problem occurs while updating the data value.
+     * @since 6.2.3
+     */
+    void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues) throws UpdateException;
+
+    /**
      * Get a list of the data instances from a specified activity instance.
      * 
      * @param activityInstanceId

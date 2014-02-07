@@ -2523,6 +2523,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues) throws UpdateException {
+        for (Map.Entry<String, Serializable> dataInstance : dataNameValues.entrySet()) {
+            updateProcessDataInstance(dataInstance.getKey(), processInstanceId, dataInstance.getValue());
+        }
+    }
+
+    @Override
     public List<DataInstance> getActivityDataInstances(final long activityInstanceId, final int startIndex, final int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
