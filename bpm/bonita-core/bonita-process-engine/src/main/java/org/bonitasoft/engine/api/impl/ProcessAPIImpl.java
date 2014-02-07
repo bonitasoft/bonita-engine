@@ -2501,20 +2501,24 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void updateProcessDataInstance(final String dataName, final long processInstanceId, final Serializable dataValue) throws UpdateException {
+        updateProcessDataInstances(processInstanceId, Collections.singletonMap(dataName, dataValue));
+    }
+
+    @Override
+    public void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
-        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final long processDefinitionId = processInstanceService.getProcessInstance(processInstanceId).getProcessDefinitionId();
-            final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final ClassLoader processClassLoader = getProcessInstanceClassloader(tenantAccessor, processInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString());
-            final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            entityUpdateDescriptor.addField("value", dataValue);
-            dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
+            final List<SDataInstance> sDataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(dataNameValues.keySet()), processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString());
+            for (SDataInstance sDataInstance : sDataInstances) {
+                final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+                entityUpdateDescriptor.addField("value", dataNameValues.get(sDataInstance.getName()));
+                dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
+            }
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
@@ -2522,11 +2526,21 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Override
-    public void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues) throws UpdateException {
-        for (Map.Entry<String, Serializable> dataInstance : dataNameValues.entrySet()) {
-            updateProcessDataInstance(dataInstance.getKey(), processInstanceId, dataInstance.getValue());
-        }
+    /**
+     * @param tenantAccessor
+     * @param processInstanceId
+     * @return
+     * @throws SProcessInstanceNotFoundException
+     * @throws SProcessInstanceReadException
+     * @throws ClassLoaderException
+     */
+    protected ClassLoader getProcessInstanceClassloader(final TenantServiceAccessor tenantAccessor, final long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
+    ClassLoaderException {
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final long processDefinitionId = processInstanceService.getProcessInstance(processInstanceId).getProcessDefinitionId();
+        final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+        return processClassLoader;
     }
 
     @Override
@@ -4212,7 +4226,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Document attachNewDocumentVersion(final long processInstanceId, final String documentName, final String contentFileName,
             final String contentMimeType, final byte[] documentContent) throws DocumentAttachmentException {
-        getTenantAccessor();
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDocumentService processDocumentService = tenantAccessor.getProcessDocumentService();
         final long authorId = getUserId();
