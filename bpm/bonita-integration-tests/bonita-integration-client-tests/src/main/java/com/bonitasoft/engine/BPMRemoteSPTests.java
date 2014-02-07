@@ -20,7 +20,6 @@ import com.bonitasoft.engine.log.LogTest;
 import com.bonitasoft.engine.monitoring.MonitoringAPITest;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
 import com.bonitasoft.engine.platform.NodeAPITest;
-import com.bonitasoft.engine.process.DataInstanceTest;
 import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.profile.ProfileTests;
 import com.bonitasoft.engine.reporting.ReportingAPIIT;
@@ -34,7 +33,6 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         LogTest.class,
         ExternalCommandsTestSP.class,
         MultiInstanceTest.class,
-        DataInstanceTest.class,
         ProcessTests.class,
         ProfileTests.class,
         RemoteConnectorExecutionTestSP.class,

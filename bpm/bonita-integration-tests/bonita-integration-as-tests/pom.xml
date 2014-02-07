@@ -42,6 +42,10 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -88,6 +92,11 @@
 									<artifactId>mysql-connector-java</artifactId>
 									<outputDirectory>${project.build.directory}/driver</outputDirectory>
 								</artifactItem>
+								<artifactItem>
+									<groupId>org.postgresql</groupId>
+									<artifactId>postgresql</artifactId>
+									<outputDirectory>${project.build.directory}/driver</outputDirectory>
+								</artifactItem>
 							</artifactItems>
 						</configuration>
 					</execution>
@@ -98,48 +107,12 @@
 
 	<profiles>
 		<profile>
-			<id>sp</id>
-			<properties>
-				<bonita.version>-sp</bonita.version>
-				<test.class>com.bonitasoft.engine.BPMSPTestsForServers</test.class>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>unpack</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>com.bonitasoft.engine</groupId>
-											<artifactId>bonita-engine-deploy</artifactId>
-											<version>${project.version}</version>
-											<classifier>hibernate</classifier>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${distrib.dir}</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>package-all</id>
 			<modules>
 				<module>bonita-integration-tomcat6</module>
 				<module>bonita-integration-tomcat6-cluster</module>
 				<module>bonita-integration-tomcat7</module>
+				<module>bonita-integration-jboss5</module>
 			</modules>
 		</profile>
 		<profile>
