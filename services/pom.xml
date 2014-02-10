@@ -31,10 +31,8 @@
 		<module>bonita-data</module>
 		<module>bonita-dependency</module>
 		<module>bonita-platform</module>
-		<module>bonita-exceptions</module>
 		<module>bonita-test-util</module>
 		<module>bonita-archive</module>
-		<!--<module>bonita-sql</module> -->
 		<module>bonita-authentication</module>
 		<module>bonita-session</module>
 		<module>bonita-platform-authentication</module>
@@ -57,31 +55,31 @@
 	</modules>
 	
 	<profiles>
-		<!--<profile>
+		<profile>
 			<id>tests</id>
 			<modules>
-				<module>bonita-integration-tests</module>
+				<module>bonita-services-integration-tests</module>
 			</modules>
-		</profile>-->
+		</profile>
 		
 		<profile>
 			<id>sonar</id>
 			<modules>
-				<module>bonita-integration-tests</module>
+				<module>bonita-services-integration-tests</module>
 			</modules>
 		</profile>
 		
 		<profile>
 			<id>all</id>
 			<modules>
-				<module>bonita-integration-tests</module>
+				<module>bonita-services-integration-tests</module>
 			</modules>
 		</profile>
 		
 		<profile>
 			<id>package-all</id>
 			<modules>
-				<module>bonita-integration-tests</module>
+				<module>bonita-services-integration-tests</module>
 			</modules>
 		</profile>
 	</profiles>

@@ -39,7 +39,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final String temporaryFolder;
 
-    private VirtualClassLoader virtualGlobalClassLoader;
+    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());;
 
     private final Map<String, VirtualClassLoader> localClassLoaders = new HashMap<String, VirtualClassLoader>();
 
@@ -52,6 +52,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     public static final long GLOBAL_ID = -1;
 
     private static final String LOCAL_FOLDER = "local";
+    
+    private Object mutex = new Object();
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
@@ -88,30 +90,35 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         return GLOBAL_TYPE;
     }
 
-    private synchronized VirtualClassLoader getVirtualGlobalClassLoader() {
-        if (this.virtualGlobalClassLoader == null) {
-            this.virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
-        }
+    private VirtualClassLoader getVirtualGlobalClassLoader() {
         return this.virtualGlobalClassLoader;
     }
 
     @Override
-    public synchronized ClassLoader getGlobalClassLoader() {
+    public ClassLoader getGlobalClassLoader() {
         return getVirtualGlobalClassLoader();
     }
 
     @Override
-    public synchronized ClassLoader getLocalClassLoader(final String type, final long id) {
+    public ClassLoader getLocalClassLoader(final String type, final long id) {
         if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             this.logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLocalClassLoader"));
         }
         NullCheckingUtil.checkArgsNotNull(id, type);
         final String key = getKey(type, id);
-        final VirtualClassLoader classLoader = this.localClassLoaders.get(key);
-        if (classLoader == null) {
-            final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, new ParentRedirectClassLoader(getGlobalClassLoader(),
-                    this.parentClassLoaderResolver, this, type, id));
-            this.localClassLoaders.put(key, virtualClassLoader);
+        //here we have to manage the case of the "first" get to avoid creating 2 classloaders
+        //we decided to do it in a "double" check manner
+        //as it happens almost "never" (concurrency maybe on 2 or more threads but only on time...
+        //we use the same mutex for all pair type/id
+        if (!this.localClassLoaders.containsKey(key)) {
+            synchronized (mutex) {
+                //here we have to check again the classloader is still not null as it can be not null if the thread executing now is the "second" one
+                if (!this.localClassLoaders.containsKey(key)) {
+                    final VirtualClassLoader virtualClassLoader = new VirtualClassLoader(type, id, new ParentRedirectClassLoader(getGlobalClassLoader(),
+                            this.parentClassLoaderResolver, this, type, id));
+                    this.localClassLoaders.put(key, virtualClassLoader);
+                }
+            }
         }
         if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             this.logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLocalClassLoader"));
@@ -156,7 +163,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public synchronized void removeAllLocalClassLoaders(final String application) {
+    public void removeAllLocalClassLoaders(final String application) {
         if (this.logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             this.logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeAllLocalClassLoaders"));
         }
@@ -181,7 +188,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public synchronized void refreshGlobalClassLoader(final Map<String, byte[]> resources) {
+    public void refreshGlobalClassLoader(final Map<String, byte[]> resources) {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
         virtualClassloader.release();
         virtualClassloader.setClassLoader(new BonitaClassLoader(resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), getGlobalTemporaryFolder(),
@@ -189,7 +196,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public synchronized void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) {
+    public void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getLocalClassLoader(type, id);
         virtualClassloader.release();
         virtualClassloader.setClassLoader(new BonitaClassLoader(resources, type, id, getLocalTemporaryFolder(type, id), new ParentRedirectClassLoader(
