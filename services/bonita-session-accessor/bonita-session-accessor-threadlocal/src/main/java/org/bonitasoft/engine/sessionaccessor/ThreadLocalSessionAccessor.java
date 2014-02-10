@@ -20,60 +20,44 @@ package org.bonitasoft.engine.sessionaccessor;
  */
 public class ThreadLocalSessionAccessor implements SessionAccessor {
 
-    private final Object mutex = new Object();
-
     private final ThreadLocal<Long> sessionData = new ThreadLocal<Long>();
     private final ThreadLocal <Long> tenantData = new ThreadLocal<Long>();
 
     @Override
     public long getSessionId() throws SessionIdNotSetException {
-        Long sessionId = null;
-        synchronized (mutex) {
-            sessionId = sessionData.get();
-            if (sessionId == null) {
-                throw new SessionIdNotSetException("No session set.");
-            }
+        Long sessionId = sessionData.get();
+        if (sessionId == null) {
+            throw new SessionIdNotSetException("No session set.");
         }
         return sessionId;
     }
 
     @Override
     public void setSessionInfo(final long sessionId, final long tenantId) {
-        synchronized (mutex) {
-            sessionData.set(sessionId);
-            tenantData.set(tenantId);
-        }
+        sessionData.set(sessionId);
+        tenantData.set(tenantId);
     }
-    
+
     @Override
     public void setTenantId(final long tenantId) {
-    	synchronized (mutex) {
-            tenantData.set(tenantId);
-        }
+        tenantData.set(tenantId);
     }
 
     @Override
     public void deleteSessionId() {
-        synchronized (mutex) {
-            sessionData.remove();
-        }
+        sessionData.remove();
     }
-    
+
     @Override
     public void deleteTenantId() {
-    	synchronized (mutex) {
-            tenantData.remove();
-        }   
+        tenantData.remove();
     }
 
     @Override
     public long getTenantId() throws TenantIdNotSetException {
-        Long tenantId = null;
-        synchronized (mutex) {
-        	tenantId = tenantData.get();
-            if (tenantId == null) {
-                throw new TenantIdNotSetException("No tenantId set.");
-            }
+        final Long tenantId = tenantData.get();
+        if (tenantId == null) {
+            throw new TenantIdNotSetException("No tenantId set.");
         }
         return tenantId;
     }

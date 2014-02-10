@@ -46,7 +46,7 @@ public class BuilderFactory {
 
                         INSTANCE = new BuilderFactory(allProperties);
 
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         throw new RuntimeException("Unable to load builder factories from: fileURL:" + defaultFileURL);
                     }
                 }
@@ -63,7 +63,7 @@ public class BuilderFactory {
             final Class<?> clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
             final Object factory = clazz.newInstance();
             factoryCache.put(interfaceName, factory);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -79,7 +79,7 @@ public class BuilderFactory {
     @SuppressWarnings("unchecked")
     private <T extends Object> T getInternalBuilderFactory(final Class<T> clazz) {
         // System.err.println("Looking for class: " + clazz.getName());
-        if (!factoryCache.containsKey(clazz)) {
+        if (!factoryCache.containsKey(clazz.getName())) {
             cacheFactory(clazz.getName(), properties.getProperty(clazz.getName()));
         }
         return (T) factoryCache.get(clazz.getName());

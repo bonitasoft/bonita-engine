@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.api.bean;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +21,14 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 
-import org.bonitasoft.engine.api.impl.ServerAPIFactory;
+import org.bonitasoft.engine.api.impl.ServerAPIImpl;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
+import org.bonitasoft.engine.exception.StackTraceTransformer;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Aurélien Pupier
  */
 public class ServerAPIBean implements SessionBean, ServerAPI {
 
@@ -37,9 +38,14 @@ public class ServerAPIBean implements SessionBean, ServerAPI {
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
-        final ServerAPI apiImpl = ServerAPIFactory.getServerAPI();
-        return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
+        final ServerAPIImpl apiImpl = new ServerAPIImpl();
+        try {
+            return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+        } catch (final ServerWrappedException e) {
+            // merge stack trace of the server exception
+            throw StackTraceTransformer.mergeStackTraces(e);
+        }
     }
 
     @Override
