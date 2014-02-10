@@ -11,7 +11,6 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.UpdateException;
 
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 
@@ -31,11 +30,8 @@ public interface TenantManagementAPI {
      *             if the jar content passed as parameter is in an invalid format.
      * @throws BusinessDataRepositoryDeploymentException
      *             if the deployment cannot be fulfilled completely.
-     * @throws BusinessDataRepositoryException
-     *             if a deployment exception occurs with the provided content.
      */
-    void deployBusinessDataRepository(final byte[] jar) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException,
-            BusinessDataRepositoryException;
+    void deployBusinessDataRepository(final byte[] jar) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
     /**
      * Allows to set the tenand mode.

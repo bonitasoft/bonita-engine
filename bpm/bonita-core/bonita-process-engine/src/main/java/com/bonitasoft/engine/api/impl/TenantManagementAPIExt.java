@@ -17,9 +17,7 @@ import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -41,8 +39,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     @Override
     @AvailableOnMaintenanceTenant
-    public void deployBusinessDataRepository(final byte[] jar) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException,
-            BusinessDataRepositoryException {
+    public void deployBusinessDataRepository(final byte[] jar) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             // TODO: should be in activate tenant
