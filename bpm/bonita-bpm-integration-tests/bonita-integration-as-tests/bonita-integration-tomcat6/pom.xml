@@ -177,19 +177,28 @@
 										<concat destfile="${tomcat.conf.dir}/bitronix-resources.properties" append="true">
 											<fileset file="tomcat/${db.vendor}/ds.properties" />
 										</concat>
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.datasource.classname#" value="${db.datasource.classname}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.servername#" value="${db.servername}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.port#" value="${db.port}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.databasename#" value="${db.databasename}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.datasource.class#" value="${db.datasource.class}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.server.name#" value="${db.server.name}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.server.port#" value="${db.server.port}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.database.name#" value="${db.database.name}" />
 										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.url#" value="${db.url}" />
-										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.username#" value="${db.username}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.user#" value="${db.user}" />
 										<replace file="${tomcat.conf.dir}/bitronix-resources.properties" token="#db.password#" value="${db.password}" />
-										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.driver.classname#" value="${db.driver.classname}" />
+										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.driver.class#" value="${db.driver.class}" />
 										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.url#" value="${db.url}" />
-										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.username#" value="${db.username}" />
+										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.user#" value="${db.user}" />
 										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.password#" value="${db.password}" />
 
-
+										<!-- Replace server.xml by specific file for H2 -->
+										<if>
+											<equals arg1="${db.vendor}" arg2="h2" />
+											<then>
+												<copy todir="${tomcat.conf.dir}">
+													<fileset dir="tomcat/${db.vendor}/server.xml" />
+												</copy>
+											</then>
+										</if>
+										
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;" value="&lt;Server port=&quot;${server.port}&quot;" />
 										<replace file="${tomcat.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;" value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />

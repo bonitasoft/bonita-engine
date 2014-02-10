@@ -84,18 +84,18 @@ public abstract class CommonAPITest extends APITestUtil {
         login();
 
         final List<String> messages = new ArrayList<String>();
-        messages.addAll(checkExistenceOfCommands());
-        messages.addAll(checkExistenceOfUsers());
-        messages.addAll(checkExistenceOfGroups());
-        messages.addAll(checkExistenceOfRoles());
-        messages.addAll(checkExistenceOfProcessDefinitions());
-        messages.addAll(checkExistenceOfProcessIntances());
-        messages.addAll(checkExistenceOfArchivedProcessIntances());
-        messages.addAll(checkExistenceOfFlowNodes());
-        messages.addAll(checkExistenceOfArchivedFlowNodes());
-        messages.addAll(checkExistenceOfCategories());
-        messages.addAll(checkExistenceOfComments());
-        messages.addAll(checkExistenceOfArchivedComments());
+        messages.addAll(checkNoCommands());
+        messages.addAll(checkNoUsers());
+        messages.addAll(checkNoGroups());
+        messages.addAll(checkNoRoles());
+        messages.addAll(checkNoProcessDefinitions());
+        messages.addAll(checkNoProcessIntances());
+        messages.addAll(checkNoArchivedProcessIntances());
+        messages.addAll(checkNoFlowNodes());
+        messages.addAll(checkNoArchivedFlowNodes());
+        messages.addAll(checkNoCategories());
+        messages.addAll(checkNoComments());
+        messages.addAll(checkNoArchivedComments());
 
         logout();
         return messages;
