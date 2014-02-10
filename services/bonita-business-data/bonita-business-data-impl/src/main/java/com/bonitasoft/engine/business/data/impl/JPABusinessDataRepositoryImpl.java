@@ -11,7 +11,6 @@ package com.bonitasoft.engine.business.data.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,8 +28,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.dependency.SDependencyAlreadyExistsException;
-import org.bonitasoft.engine.dependency.SDependencyCreationException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
@@ -41,7 +38,6 @@ import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
 /**
  * @author Matthieu Chaffotte
@@ -59,12 +55,11 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
 
     public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final Map<String, Object> configuration) {
         this.dependencyService = dependencyService;
-        this.configuration = new HashMap<String, Object>(configuration);
-        this.configuration.put("hibernate.ejb.resource_scanner", InactiveScanner.class.getName());
+        this.configuration = configuration;
     }
 
     @Override
-    public void deploy(final byte[] bdrArchive, final long tenantId) throws SBusinessDataRepositoryException {
+    public void deploy(final byte[] bdrArchive, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
         byte[] transformedBdrArchive = null;
         try {
             transformedBdrArchive = transformBDRArchive(bdrArchive);
@@ -79,10 +74,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
             dependencyService.createDependency(sDependency);
             final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);
             dependencyService.createDependencyMapping(sDependencyMapping);
-        } catch (final SDependencyAlreadyExistsException e) {
-            throw new SBusinessDataRepositoryDeploymentException(e);
-        } catch (final SDependencyCreationException e) {
-            throw new SBusinessDataRepositoryDeploymentException(e);
         } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }

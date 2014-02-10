@@ -54,7 +54,7 @@ import com.bonitasoft.engine.api.impl.ThemeAPIExt;
  */
 public class APIAccessResolverImpl implements APIAccessResolver {
 
-    private static final Map<String, Object> apis = new HashMap<String, Object>(12);
+    private static final Map<String, Object> apis = new HashMap<String, Object>(25);
 
     private static final List<String> NO_SESSION_APIS = Arrays.asList(PlatformLoginAPI.class.getName(), LoginAPI.class.getName(),
             com.bonitasoft.engine.api.LoginAPI.class.getName(), NodeAPI.class.getName());
