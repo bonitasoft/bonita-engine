@@ -408,9 +408,14 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final WorkService workService = tenantAccessor.getWorkService();
         final BonitaWork runnable = new FailureHandlingBonitaWork(new FailingWork());
         workService.executeWork(runnable);
-        Thread.sleep(100);
         final String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());
         final File file = new File(tenantFolder + File.separatorChar + "incidents.log");
+        int waitDuration = 0;
+        while(!file.exists() && waitDuration < 2000){
+        	Thread.sleep(100);
+        	waitDuration+=100;
+        	System.err.println("Incidents log still not created after waiting "+ waitDuration+" ms.");
+        }
         String content = org.bonitasoft.engine.io.IOUtil.read(file);
         assertTrue("File content is: " + content, content.contains("An incident occurred: MyJob"));
         assertTrue("File content is: " + content, content.contains("an unexpected exception"));
