@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -18,10 +18,16 @@ import java.util.Map;
  * If not set, defaultTenant property is pre-set to false.
  * 
  * @author Emmanuel Duchastenier
+ * @author Aurelien Pupier - This file need to be Serializable
  */
-public class TenantCreator {
+public class TenantCreator implements Serializable{
 
-    public enum TenantField {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6904933424057070693L;
+
+	public enum TenantField {
         NAME, DESCRIPTION, ICON_NAME, ICON_PATH, DEFAULT_TENANT,
 
         /**
