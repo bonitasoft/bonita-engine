@@ -10,6 +10,8 @@ package com.bonitasoft.engine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -229,7 +231,7 @@ public class APITestSPUtil extends APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfBreakpoints() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
+    public List<String> checkNoBreakpoints() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
         final List<String> messages = new ArrayList<String>();
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("startIndex", 0);
@@ -247,7 +249,7 @@ public class APITestSPUtil extends APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfReports() throws SearchException {
+    public List<String> checkNoReports() throws SearchException {
         final List<String> messages = new ArrayList<String>();
         // only for non-default tenants:
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000).filter(ReportSearchDescriptor.PROVIDED, false);
@@ -261,6 +263,18 @@ public class APITestSPUtil extends APITestUtil {
             messages.add(messageBuilder.toString());
         }
         return messages;
+    }
+
+    /**
+     * @return
+     * @throws BonitaException
+     */
+    public Collection<? extends String> checkNoDataMappings() throws BonitaException {
+        Integer count = new Integer(getReportingAPI().selectList("SELECT count(*) FROM data_mapping").split("\n")[1]);
+        if (count == 0) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList("There is some data mapping present: " + count);
     }
 
     public void assignAndExecuteStep(final ActivityInstance activityInstance, final User user) throws BonitaException {
