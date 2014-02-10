@@ -125,9 +125,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void createGroup(final SGroup group) throws SGroupCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createGroup"));
-        }
+        logBeforeMethod("createGroup");
 
         final long objectId = group.getId();
         final SGroupLogBuilder logBuilder = getGroupLog(ActionType.CREATED, "Adding a new group with name " + group.getName());
@@ -169,9 +167,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void createProfileMetadataDefinition(final SProfileMetadataDefinition metadata) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createProfileMetadataDefinition"));
-        }
+        logBeforeMethod("createProfileMetadataDefinition");
         final SProfileMetadataDefinitionLogBuilder logBuilder = getSProfileMetadataDefinitionLog(ActionType.CREATED, "Adding a profile metadata with name "
                 + metadata.getName());
         try {
@@ -193,9 +189,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void createProfileMetadataValue(final SProfileMetadataValue metadataValue) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createProfileMetadataValue"));
-        }
+        logBeforeMethod("createProfileMetadataValue");
         try {
             final InsertRecord insertRecord = new InsertRecord(metadataValue);
             final SInsertEvent insertEvent = getInsertEvent(metadataValue, METADATAVALUE);
@@ -213,9 +207,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void createRole(final SRole role) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createRole"));
-        }
+        logBeforeMethod("createRole");
         final SRoleLogBuilder logBuilder = getRoleLog(ActionType.CREATED, "Adding a new role with name " + role.getName());
         try {
             final InsertRecord insertRecord = new InsertRecord(role);
@@ -236,9 +228,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SUser createUser(final SUser user) throws SUserCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createUser"));
-        }
+        logBeforeMethod("createUser");
         final String message = "Adding a new user with user name " + user.getUserName() + ", first name " + user.getFirstName() + ", last name "
                 + user.getLastName();
         final SUserLogBuilder logBuilder = getUserLog(ActionType.CREATED, message);
@@ -265,9 +255,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SContactInfo createUserContactInfo(final SContactInfo contactInfo) throws SUserCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createUserContactInfo"));
-        }
+        logBeforeMethod("createUserContactInfo");
         final String message = "Adding a new user contact information for user with id " + contactInfo.getUserId();
         final SContactInfoLogBuilder logBuilder = getUserContactInfoLog(ActionType.CREATED, message, contactInfo);
         try {
@@ -290,9 +278,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void createUserMembership(final SUserMembership userMembership) throws SUserMembershipCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createUserMembership"));
-        }
+        logBeforeMethod("createUserMembership");
         final String message = "Adding a new user membership for user " + userMembership.getUsername() + " with role " + userMembership.getRoleName()
                 + " in group " + userMembership.getGroupName();
 
@@ -322,9 +308,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void deleteGroup(final SGroup group) throws SGroupDeletionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteGroup"));
-        }
+        logBeforeMethod("deleteGroup");
         final SGroupLogBuilder logBuilder = getGroupLog(ActionType.DELETED, "Deleting group " + group.getName());
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(group);
@@ -356,9 +340,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<Long> deleteChildrenGroup(final long groupId) throws SGroupDeletionException, SGroupNotFoundException {
         final ArrayList<Long> deletedGroups = new ArrayList<Long>();
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteChildrenGroup"));
-        }
+        logBeforeMethod("deleteChildrenGroup");
         try {
             List<SGroup> childrenGroup;
             final int nbGroup = 20;
@@ -444,9 +426,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void deleteProfileMetadataDefinition(final SProfileMetadataDefinition metadata) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteProfileMetadataDefinition"));
-        }
+        logBeforeMethod("deleteProfileMetadataDefinition");
         final SProfileMetadataDefinitionLogBuilder logBuilder = getSProfileMetadataDefinitionLog(ActionType.DELETED, "Deleting profile metadata with name "
                 + metadata.getName());
         try {
@@ -473,9 +453,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void deleteProfileMetadataValue(final SProfileMetadataValue metadataValue) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteProfileMetadataValue"));
-        }
+        logBeforeMethod("deleteProfileMetadataValue");
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(metadataValue);
             final SDeleteEvent deleteEvent = getDeleteEvent(metadataValue, METADATAVALUE);
@@ -499,9 +477,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void deleteRole(final SRole role) throws SRoleDeletionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteRole"));
-        }
+        logBeforeMethod("deleteRole");
         final SRoleLogBuilder logBuilder = getRoleLog(ActionType.DELETED, "Deleting role with name " + role.getName());
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(role);
@@ -543,9 +519,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void deleteUser(final SUser user) throws SUserDeletionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteUser"));
-        }
+        logBeforeMethod("deleteUser");
         final SUserLogBuilder logBuilder = getUserLog(ActionType.DELETED, "Deleting user with username " + user.getUserName());
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(user);
@@ -576,9 +550,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SUserMembership getLightUserMembership(final long userMembershipId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLightUserMembership"));
-        }
+        logBeforeMethod("getLightUserMembership");
         try {
             final SUserMembership selectOne = persistenceService.selectById(SelectDescriptorBuilder.getLightElementById(SUserMembership.class,
                     "SUserMembership", userMembershipId));
@@ -622,9 +594,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void deleteLightUserMembership(final SUserMembership userMembership) throws SMembershipDeletionException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteUserMembership"));
-        }
+        logBeforeMethod("deleteLightUserMembership");
         final String message = "Deleting user membership for user " + userMembership.getUsername() + " with role " + userMembership.getRoleName()
                 + " in group " + userMembership.getGroupName();
         final SUserMembershipLogBuilder logBuilder = getUserMembershipLog(ActionType.DELETED, message, userMembership);
@@ -657,9 +627,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SGroup getGroup(final long groupId) throws SGroupNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroup"));
-        }
+        logBeforeMethod("getGroup");
         try {
             final SGroup group = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SGroup.class, "Group", groupId));
             if (group == null) {
@@ -679,9 +647,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SGroup> getGroupChildren(final long groupId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroupChildren"));
-        }
+        logBeforeMethod("getGroupChildren");
         try {
             final SGroup group = getGroup(groupId);
             final List<SGroup> listGroups = persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group));
@@ -699,9 +665,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SGroup> getGroupChildren(final long groupId, final int fromIndex, final int numberOfGroups) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroupChildren"));
-        }
+        logBeforeMethod("getGroupChildren");
         try {
             final SGroup group = getGroup(groupId);
             final List<SGroup> listGroups = persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, fromIndex, numberOfGroups));
@@ -720,9 +684,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<SGroup> getGroupChildren(final long groupId, final int fromIndex, final int numberOfGroups, final String field, final OrderByType order)
             throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroupChildren"));
-        }
+        logBeforeMethod("getGroupChildren");
         try {
             final SGroup group = getGroup(groupId);
             final List<SGroup> listGroups = persistenceService.selectList(SelectDescriptorBuilder.getChildrenOfGroup(group, field, order, fromIndex,
@@ -741,9 +703,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SGroup> getGroups(final int fromIndex, final int numberOfGroups) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroups"));
-        }
+        logBeforeMethod("getGroups");
         try {
             final List<SGroup> listGroups = persistenceService
                     .selectList(SelectDescriptorBuilder.getElements(SGroup.class, "Group", fromIndex, numberOfGroups));
@@ -761,9 +721,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SGroup> getGroups(final int fromIndex, final int numberOfGroups, final String field, final OrderByType order) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroups"));
-        }
+        logBeforeMethod("getGroups");
         try {
             final List<SGroup> listGroups = persistenceService.selectList(SelectDescriptorBuilder.getElements(SGroup.class, "Group", field, order, fromIndex,
                     numberOfGroups));
@@ -781,9 +739,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SGroup> getGroups(final List<Long> groupIds) throws SGroupNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroups"));
-        }
+        logBeforeMethod("getGroups");
         if (groupIds == null || groupIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -803,9 +759,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public Set<SGroup> getGroupsByName(final String groupName) throws SGroupNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroupsByName"));
-        }
+        logBeforeMethod("getGroupsByName");
         try {
             final Set<SGroup> setGroups = CollectionUtil.buildHashSetFromList(SGroup.class,
                     persistenceService.selectList(SelectDescriptorBuilder.getGroupsByName(groupName)));
@@ -823,9 +777,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUserMembership> getUserMemberships(final int fromIndex, final int numberOfResult, final OrderByOption orderByOption) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMemberships"));
-        }
+        logBeforeMethod("getUserMemberships");
         try {
             List<SUserMembership> listSUserMembership;
             if (orderByOption.getClazz() == SRole.class) {
@@ -852,9 +804,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUserMembership> getUserMembershipsOfGroup(final long groupId, final int startIndex, final int maxResults) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembershipsOfGroup"));
-        }
+        logBeforeMethod("getUserMembershipsOfGroup");
         try {
             final List<SUserMembership> selectList = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByGroup(groupId, startIndex,
                     maxResults));
@@ -872,9 +822,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUserMembership> getUserMembershipsOfRole(final long roleId, final int startIndex, final int maxResults) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembershipsOfRole"));
-        }
+        logBeforeMethod("getUserMembershipsOfRole");
         try {
             final List<SUserMembership> memberships = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsByRole(roleId, startIndex,
                     maxResults));
@@ -892,9 +840,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfGroupChildren(final long parentGroupId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfGroupChildren"));
-        }
+        logBeforeMethod("getNumberOfGroupChildren");
         try {
             final SGroup parentGroup = getGroup(parentGroupId);
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfGroupChildren(parentGroup.getPath()));
@@ -912,9 +858,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfGroups() throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfGroups"));
-        }
+        logBeforeMethod("getNumberOfGroups");
         try {
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("SGroup", SGroup.class));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -931,9 +875,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfProfileMetadataDefinition() throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfProfileMetadataDefinition"));
-        }
+        logBeforeMethod("getNumberOfProfileMetadataDefinition");
         try {
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("ProfileMetadata", SProfileMetadataDefinition.class));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -951,9 +893,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfRoles() throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfRoles"));
-        }
+        logBeforeMethod("getNumberOfRoles");
         try {
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("SRole", SRole.class));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -970,9 +910,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfUsers() throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfUsers"));
-        }
+        logBeforeMethod("getNumberOfUsers");
         try {
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("SUser", SUser.class));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -989,9 +927,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfUserMembershipsOfUser(final long userId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfUserMembershipsOfUser"));
-        }
+        logBeforeMethod("getNumberOfUserMembershipsOfUser");
         try {
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUserMembershipsOfUser(userId));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1008,9 +944,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfUsersByGroup(final long groupId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfUsersByGroup"));
-        }
+        logBeforeMethod("getNumberOfUsersByGroup");
         try {
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByGroup(groupId));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1027,9 +961,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfUsersByRole(final long roleId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfUsersByRole"));
-        }
+        logBeforeMethod("getNumberOfUsersByRole");
         try {
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByRole(roleId));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1046,9 +978,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfUsersByMembership(final long groupId, final long roleId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfUsersByMembership"));
-        }
+        logBeforeMethod("getNumberOfUsersByMembership");
         try {
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfUsersByMembership(groupId, roleId));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1065,9 +995,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SProfileMetadataDefinition getProfileMetadataByName(final String metadataName) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileMetadataByName"));
-        }
+        logBeforeMethod("getProfileMetadataByName");
         try {
             final SProfileMetadataDefinition sProfileMetadataDefinition = persistenceService.selectOne(SelectDescriptorBuilder.getMetadataByName(metadataName));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1084,9 +1012,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SProfileMetadataDefinition> getProfileMetadataDefinition(final int fromIndex, final int numberOfMetadata) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileMetadataDefinition"));
-        }
+        logBeforeMethod("getProfileMetadataDefinition");
         try {
             final List<SProfileMetadataDefinition> listSProfileMetadataDefinition = persistenceService.selectList(SelectDescriptorBuilder.getElements(
                     SProfileMetadataDefinition.class, "ProfileMetadata", fromIndex, numberOfMetadata));
@@ -1104,9 +1030,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SProfileMetadataDefinition getProfileMetadataDefinition(final long profileMetadataId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileMetadataDefinition"));
-        }
+        logBeforeMethod("getProfileMetadataDefinition");
         try {
             final SProfileMetadataDefinition selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SProfileMetadataDefinition.class,
                     "ProfileMetadata", profileMetadataId));
@@ -1127,9 +1051,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SProfileMetadataDefinition> getProfileMetadataDefinitions(final List<Long> profileMetadataDefinitionIds) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileMetadataDefinitions"));
-        }
+        logBeforeMethod("getProfileMetadataDefinitions");
         if (profileMetadataDefinitionIds == null || profileMetadataDefinitionIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -1150,9 +1072,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SProfileMetadataValue getProfileMetadataValue(final long profileMetadataValueId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileMetadataValue"));
-        }
+        logBeforeMethod("getProfileMetadataValue");
         try {
             final SProfileMetadataValue selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SProfileMetadataValue.class,
                     "SProfileMetadataValue", profileMetadataValueId));
@@ -1173,9 +1093,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SProfileMetadataValue> getProfileMetadataValues(final List<Long> profileMetadataValueIds) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getProfileMetadataValues"));
-        }
+        logBeforeMethod("getProfileMetadataValues");
         if (profileMetadataValueIds == null || profileMetadataValueIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -1195,9 +1113,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SRole getRole(final long roleId) throws SRoleNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getRole"));
-        }
+        logBeforeMethod("getRole");
         try {
             final SRole selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SRole.class, "Role", roleId));
             if (selectOne == null) {
@@ -1217,9 +1133,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SRole getRoleByName(final String roleName) throws SRoleNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getRoleByName"));
-        }
+        logBeforeMethod("getRoleByName");
         try {
             final SRole role = persistenceService.selectOne(SelectDescriptorBuilder.getRoleByName(roleName));
             if (role == null) {
@@ -1239,9 +1153,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SGroup getGroupByPath(final String groupPath) throws SGroupNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getGroupByPath"));
-        }
+        logBeforeMethod("getGroupByPath");
         SelectOneDescriptor<SGroup> descriptor;
         final int lastIndexOf = groupPath.lastIndexOf('/');
         if (lastIndexOf > 0) {
@@ -1273,9 +1185,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SRole> getRoles(final int fromIndex, final int numberOfRoles) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getRoles"));
-        }
+        logBeforeMethod("getRoles");
         try {
             final List<SRole> listSRole = persistenceService.selectList(SelectDescriptorBuilder.getElements(SRole.class, "Role", fromIndex, numberOfRoles));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1292,9 +1202,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SRole> getRoles(final int fromIndex, final int numberOfRoles, final String field, final OrderByType order) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getRoles"));
-        }
+        logBeforeMethod("getRoles");
         try {
             final List<SRole> listSRole = persistenceService.selectList(SelectDescriptorBuilder.getElements(SRole.class, "Role", field, order, fromIndex,
                     numberOfRoles));
@@ -1312,9 +1220,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SRole> getRoles(final List<Long> roleIds) throws SRoleNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getRoles"));
-        }
+        logBeforeMethod("getRoles");
         if (roleIds == null || roleIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -1334,9 +1240,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SUser getUser(final long userId) throws SUserNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUser"));
-        }
+        logBeforeMethod("getUser");
         try {
             final SUser user = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SUser.class, "User", userId));
             if (user == null) {
@@ -1356,9 +1260,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SContactInfo getUserContactInfo(final long userId, final boolean isPersonal) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserContactInfo"));
-        }
+        logBeforeMethod("getUserContactInfo");
         try {
             final SContactInfo contactInfo = persistenceService.selectOne(SelectDescriptorBuilder.getUserContactInfo(userId, isPersonal));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1375,9 +1277,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SUser getUserByUserName(final String userName) throws SUserNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserByUserName"));
-        }
+        logBeforeMethod("getUserByUserName");
         try {
             final SUser user = persistenceService.selectOne(SelectDescriptorBuilder.getUserByUserName(userName));
             if (user == null) {
@@ -1397,9 +1297,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SUserMembership getUserMembership(final long userMembershipId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembership"));
-        }
+        logBeforeMethod("getUserMembership");
         try {
             final Map<String, Object> parameters = Collections.singletonMap("id", (Object) userMembershipId);
             final SelectOneDescriptor<SUserMembership> desc = new SelectOneDescriptor<SUserMembership>("getSUserMembershipById", parameters,
@@ -1422,9 +1320,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUserMembership> getUserMembershipsOfUser(final long userId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembershipsOfUser"));
-        }
+        logBeforeMethod("getUserMembershipsOfUser");
         try {
             final List<SUserMembership> listSUserMembership = persistenceService.selectList(SelectDescriptorBuilder.getUserMembershipsOfUser(userId));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1441,10 +1337,8 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUserMembership> getUserMemberships(final List<Long> userMembershipIds) throws SIdentityException {
+        logBeforeMethod("getUserMemberships");
         List<Long> localUserMembershipIds = userMembershipIds;
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMemberships"));
-        }
         if (localUserMembershipIds == null || localUserMembershipIds.isEmpty()) {
             localUserMembershipIds = Collections.emptyList();
         }
@@ -1465,9 +1359,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsers(final int fromIndex, final int numberOfUsers) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsers"));
-        }
+        logBeforeMethod("getUsers");
         try {
             final List<SUser> listSUsers = persistenceService.selectList(SelectDescriptorBuilder.getElements(SUser.class, "User", fromIndex, numberOfUsers));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1484,9 +1376,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsers(final int fromIndex, final int numberOfUsers, final String field, final OrderByType order) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsers"));
-        }
+        logBeforeMethod("getUsers");
         try {
             final List<SUser> listsUsers = persistenceService.selectList(SelectDescriptorBuilder.getElements(SUser.class, "User", field, order, fromIndex,
                     numberOfUsers));
@@ -1504,9 +1394,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsers(final List<Long> userIds) throws SUserNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsers"));
-        }
+        logBeforeMethod("getUsers");
         if (userIds == null || userIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -1526,9 +1414,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsersByUsername(final List<String> userNames) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByName"));
-        }
+        logBeforeMethod("getUsersByUsername");
         if (userNames == null || userNames.isEmpty()) {
             return Collections.emptyList();
         }
@@ -1549,9 +1435,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsersByDelegee(final long delegateId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByDelegee"));
-        }
+        logBeforeMethod("getUsersByDelegee");
         try {
             final SUser delegee = getUser(delegateId);
             final List<SUser> listsUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByDelegee(delegee.getUserName()));
@@ -1569,9 +1453,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsersByGroup(final long groupId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByGroup"));
-        }
+        logBeforeMethod("getUsersByGroup");
         try {
             final List<SUser> listsUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1588,9 +1470,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsersByGroup(final long groupId, final int fromIndex, final int numberOfUsers) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByGroup"));
-        }
+        logBeforeMethod("getUsersByGroup");
         try {
             final List<SUser> listsUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, fromIndex, numberOfUsers));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1608,9 +1488,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<SUser> getUsersByGroup(final long groupId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
             throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByGroup"));
-        }
+        logBeforeMethod("getUsersByGroup");
         try {
             final List<SUser> listsSUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByGroup(groupId, field, order, fromIndex,
                     numberOfUsers));
@@ -1628,9 +1506,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsersByManager(final long managerId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByManager"));
-        }
+        logBeforeMethod("getUsersByManager");
         try {
             final List<SUser> listsSUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByManager(managerId));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1647,9 +1523,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsersByRole(final long roleId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByRole"));
-        }
+        logBeforeMethod("getUsersByRole");
         try {
             final List<SUser> listsUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByRole(roleId));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1666,9 +1540,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> getUsersByRole(final long roleId, final int fromIndex, final int numberOfUsers) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByRole"));
-        }
+        logBeforeMethod("getUsersByRole");
         try {
             final List<SUser> listsSUsers = persistenceService.selectList(SelectDescriptorBuilder.getUsersByRole(roleId, fromIndex, numberOfUsers));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -1686,9 +1558,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<SUser> getUsersByRole(final long roleId, final int fromIndex, final int numberOfUsers, final String field, final OrderByType order)
             throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUsersByRole"));
-        }
+        logBeforeMethod("getUsersByRole");
         try {
             final List<SUser> listsUsers = persistenceService
                     .selectList(SelectDescriptorBuilder.getUsersByRole(roleId, field, order, fromIndex, numberOfUsers));
@@ -1706,9 +1576,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void updateGroup(final SGroup group, final EntityUpdateDescriptor descriptor) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateGroup"));
-        }
+        logBeforeMethod("updateGroup");
         final SGroupLogBuilder logBuilder = getGroupLog(ActionType.UPDATED, "Updating the group");
         try {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(group, descriptor);
@@ -1732,9 +1600,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void updateProfileMetadataDefinition(final SProfileMetadataDefinition metadata, final EntityUpdateDescriptor descriptor) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateProfileMetadataDefinition"));
-        }
+        logBeforeMethod("updateProfileMetadataDefinition");
         final SProfileMetadataDefinitionLogBuilder logBuilder = getSProfileMetadataDefinitionLog(ActionType.UPDATED,
                 "Updating the profile metadata definition with name " + metadata.getName());
         try {
@@ -1759,9 +1625,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void updateProfileMetadataValue(final SProfileMetadataValue metadataValue, final EntityUpdateDescriptor descriptor) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateProfileMetadataValue"));
-        }
+        logBeforeMethod("updateProfileMetadataValue");
         try {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(metadataValue, descriptor);
             SUpdateEvent updateEvent = null;
@@ -1782,9 +1646,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void updateRole(final SRole role, final EntityUpdateDescriptor descriptor) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateRole"));
-        }
+        logBeforeMethod("updateRole");
         final SRoleLogBuilder logBuilder = getRoleLog(ActionType.UPDATED, "Updating the role with name " + role.getName());
         try {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(role, descriptor);
@@ -1814,9 +1676,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Deprecated
     @Override
     public void updateUser(final SUser user, final EntityUpdateDescriptor descriptor, final boolean isPasswordEncrypted) throws SUserUpdateException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateUser"));
-        }
+        logBeforeMethod("updateUser");
         final StringBuilder sb = new StringBuilder();
         sb.append("Updating user with user name ");
         sb.append(user.getUserName());
@@ -1856,9 +1716,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void updateUserContactInfo(final SContactInfo contactInfo, final EntityUpdateDescriptor descriptor) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateUserContactInfo"));
-        }
+        logBeforeMethod("updateUserContactInfo");
         final StringBuilder sb = new StringBuilder();
         sb.append("Updating " + (contactInfo.isPersonal() ? "personal" : "professional") + " user contact Info for user with Id ");
         sb.append(contactInfo.getUserId());
@@ -1887,9 +1745,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void updateUserMembership(final SUserMembership userMembership, final EntityUpdateDescriptor descriptor) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateUserMembership"));
-        }
+        logBeforeMethod("updateUserMembership");
         final StringBuilder sb = new StringBuilder();
         sb.append("Updating user membership for user ");
         sb.append(userMembership.getUsername());
@@ -1920,9 +1776,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUserMembership> getUserMemberships(final int fromIndex, final int numberOfUserMemberships) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMemberships"));
-        }
+        logBeforeMethod("getUserMemberships");
         final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getElements(SUserMembership.class, "UserMembership", fromIndex,
                 numberOfUserMemberships);
         try {
@@ -1941,9 +1795,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUserMembership> getUserMembershipsOfUser(final long userId, final int fromIndex, final int numberOfUsers) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembershipsOfUser"));
-        }
+        logBeforeMethod("getUserMembershipsOfUser");
         try {
             final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembershipsOfUser(userId, fromIndex, numberOfUsers);
             final List<SUserMembership> listsSUserMemberships = persistenceService.selectList(descriptor);
@@ -1962,9 +1814,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<SUserMembership> getUserMembershipsOfUser(final long userId, final int fromIndex, final int numberOfMemberships, final String field,
             final OrderByType order) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembershipsOfUser"));
-        }
+        logBeforeMethod("getUserMembershipsOfUser");
         try {
             final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembershipsOfUser(userId, field, order, fromIndex,
                     numberOfMemberships);
@@ -1984,9 +1834,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public List<SUserMembership> getUserMembershipsOfUser(final long userId, final int fromIndex, final int numberPerPage, final OrderByOption orderByOption)
             throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembershipsOfUser"));
-        }
+        logBeforeMethod("getUserMembershipsOfUser");
         try {
             final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembershipsOfUser(userId, new QueryOptions(fromIndex,
                     numberPerPage, Collections.singletonList(orderByOption)));
@@ -2005,15 +1853,10 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SUserMembership getUserMembership(final long userId, final long groupId, final long roleId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getUserMembership"));
-        }
+        logBeforeMethod("getUserMembership");
         final SelectOneDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getUserMembership(userId, groupId, roleId);
         try {
-            final SUserMembership sUserMembership = persistenceService.selectOne(descriptor);
-            if (sUserMembership == null) {
-                throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId);
-            }
+            final SUserMembership sUserMembership = getUserMembership(userId, groupId, roleId, descriptor);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getUserMembership"));
             }
@@ -2028,15 +1871,10 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SUserMembership getLightUserMembership(final long userId, final long groupId, final long roleId) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLightUserMembership"));
-        }
+        logBeforeMethod("getLightUserMembership");
         final SelectOneDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getLightUserMembership(userId, groupId, roleId);
         try {
-            final SUserMembership sUserMembership = persistenceService.selectOne(descriptor);
-            if (sUserMembership == null) {
-                throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId);
-            }
+            final SUserMembership sUserMembership = getUserMembership(userId, groupId, roleId, descriptor);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLightUserMembership"));
             }
@@ -2049,11 +1887,18 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
+    private SUserMembership getUserMembership(final long userId, final long groupId, final long roleId, final SelectOneDescriptor<SUserMembership> descriptor)
+            throws SBonitaReadException, SIdentityException {
+        final SUserMembership sUserMembership = persistenceService.selectOne(descriptor);
+        if (sUserMembership == null) {
+            throw new SIdentityException("Can't get the userMembership with userId = " + userId + ", groupId = " + groupId + ", roleId = " + roleId);
+        }
+        return sUserMembership;
+    }
+
     @Override
     public long getNumberOfUserMemberships() throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfUserMemberships"));
-        }
+        logBeforeMethod("getNumberOfUserMemberships");
         try {
             final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("UserMembership", SUserMembership.class));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -2070,9 +1915,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUserMembership> getLightUserMemberships(final int startIndex, final int numberOfElements) throws SIdentityException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLightUserMemberships"));
-        }
+        logBeforeMethod("getLightUserMemberships");
         final SelectListDescriptor<SUserMembership> descriptor = SelectDescriptorBuilder.getElements(SUserMembership.class, "LightUserMembership", startIndex,
                 numberOfElements);
         try {
@@ -2091,9 +1934,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfUsers(final QueryOptions options) throws SBonitaSearchException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfUsers"));
-        }
+        logBeforeMethod("getNumberOfUsers");
         try {
             final long number = persistenceService.getNumberOfEntities(SUser.class, options, null);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -2110,9 +1951,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SUser> searchUsers(final QueryOptions options) throws SBonitaSearchException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "searchUsers"));
-        }
+        logBeforeMethod("searchUsers");
         try {
             final List<SUser> listsSUsers = persistenceService.searchEntity(SUser.class, options, null);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -2129,9 +1968,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfRoles(final QueryOptions options) throws SBonitaSearchException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfRoles"));
-        }
+        logBeforeMethod("getNumberOfRoles");
         try {
             final long number = persistenceService.getNumberOfEntities(SRole.class, options, null);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -2148,9 +1985,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SRole> searchRoles(final QueryOptions options) throws SBonitaSearchException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "searchRoles"));
-        }
+        logBeforeMethod("searchRoles");
         try {
             final List<SRole> listsRoles = persistenceService.searchEntity(SRole.class, options, null);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -2167,9 +2002,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public long getNumberOfGroups(final QueryOptions options) throws SBonitaSearchException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfGroups"));
-        }
+        logBeforeMethod("getNumberOfGroups");
         try {
             final long number = persistenceService.getNumberOfEntities(SGroup.class, options, null);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -2186,9 +2019,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SGroup> searchGroups(final QueryOptions options) throws SBonitaSearchException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "searchGroups"));
-        }
+        logBeforeMethod("searchGroups");
         try {
             final List<SGroup> listsGroups = persistenceService.searchEntity(SGroup.class, options, null);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -2222,9 +2053,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     @Deprecated
     public SUser createUserWithoutEncryptingPassword(final SUser user) throws SUserCreationException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createUser"));
-        }
+        logBeforeMethod("createUserWithoutEncryptingPassword");
         final String message = "Adding a new user with user name " + user.getUserName() + ", first name " + user.getFirstName() + ", last name "
                 + user.getLastName();
         final SUserLogBuilder logBuilder = getUserLog(ActionType.CREATED, message);
@@ -2234,18 +2063,28 @@ public class IdentityServiceImpl implements IdentityService {
             final InsertRecord insertRecord = new InsertRecord(hashedUser);
             final SInsertEvent insertEvent = getInsertEvent(hashedUser, USER);
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, "createUser");
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createUser"));
-            }
+            initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, "createUserWithoutEncryptingPassword");
+            logAfterMethod("createUserWithoutEncryptingPassword");
             return hashedUser;
         } catch (final SRecorderException re) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createUser", re));
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
+                        LogUtil.getLogOnExceptionMethod(this.getClass(), "createUserWithoutEncryptingPassword", re));
             }
-            initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createUser");
+            initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createUserWithoutEncryptingPassword");
             throw new SUserCreationException(re);
         }
     }
 
+    private void logBeforeMethod(final String methodName) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
+        }
+    }
+
+    private void logAfterMethod(String methodName) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
+        }
+    }
 }
