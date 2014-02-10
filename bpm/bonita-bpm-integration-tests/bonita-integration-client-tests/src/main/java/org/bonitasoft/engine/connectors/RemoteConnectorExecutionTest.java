@@ -106,11 +106,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Test
     public void executeConnectorWithJNDILookupAndAPICall() throws Exception {
         final Expression localDataExpression = new ExpressionBuilder().createConstantLongExpression(0L);
-        final Expression processNameExpression = new ExpressionBuilder().createConstantStringExpression("process");
+        final Expression processNameExpression = new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME);
         final Expression processVersionExpression = new ExpressionBuilder().createConstantStringExpression("1.0");
         final Expression outputExpression = new ExpressionBuilder().createInputExpression("processId", Long.class.getName());
 
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("process", "1.0");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addLongData("processId", localDataExpression);
         designProcessDefinition.addAutomaticTask("start");
         designProcessDefinition.addAutomaticTask("step1")
@@ -1447,12 +1447,12 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         script += "return apiAccessor.getIdentityAPI().getNumberOfUsers();";
 
         connector.addInput(
-                "input1",
+                CONNECTOR_INPUT_NAME,
                 new ExpressionBuilder().createGroovyScriptExpression("script", script,
                         Long.class.getName(), new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
                         new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID)));
         connector.addOutput(new OperationBuilder().createSetDataOperation("numberOfUser",
-                new ExpressionBuilder().createInputExpression("output1", Long.class.getName())));
+                new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, Long.class.getName())));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
 
