@@ -10,6 +10,7 @@
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.BTMTransactionManagerLookup" />
+			<property name="hibernate.ejb.resource_scanner" value="com.bonitasoft.engine.business.data.impl.InactiveScanner" />
 		</properties>
 	</persistence-unit>
 </persistence>

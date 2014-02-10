@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface BusinessDataRespository {
 
-    void start() throws SBusinessDataRepositoryException;
+    void start() throws SBusinessDataRepositoryDeploymentException;
 
     void stop();
 
@@ -26,6 +26,6 @@ public interface BusinessDataRespository {
 
     void persist(Object entity);
 
-    void deploy(byte[] bdrArchive,long tenantId) throws SBusinessDataRepositoryException;
+    void deploy(byte[] bdrArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
 
 }

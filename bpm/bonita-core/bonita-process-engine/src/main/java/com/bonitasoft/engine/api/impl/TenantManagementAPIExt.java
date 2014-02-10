@@ -4,7 +4,6 @@ import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -17,8 +16,9 @@ import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -39,16 +39,18 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     @Override
     @AvailableOnMaintenanceTenant
-    public void deployBusinessDataRepository(final byte[] jar) throws CreationException,BusinessDataRepositoryException {
+    public void deployBusinessDataRepository(final byte[] jar) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             // TODO: should be in activate tenant
-        	BusinessDataRespository bdr = tenantAccessor.getBusinessDataRepository();
-        	bdr.deploy(jar,tenantAccessor.getTenantId());
-        	bdr.start();
-        } catch (SBusinessDataRepositoryException e) {
-        	  throw new BusinessDataRepositoryException(e);
-		}
+            BusinessDataRespository bdr = tenantAccessor.getBusinessDataRepository();
+            bdr.deploy(jar, tenantAccessor.getTenantId());
+            bdr.start();
+        } catch (IllegalStateException e) {
+            throw new InvalidBusinessDataModelException(e);
+        } catch (SBusinessDataRepositoryDeploymentException e) {
+            throw new BusinessDataRepositoryDeploymentException(e);
+        }
     }
 
     @Override

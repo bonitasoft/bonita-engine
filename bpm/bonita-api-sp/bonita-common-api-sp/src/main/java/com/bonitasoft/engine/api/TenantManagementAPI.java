@@ -8,10 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
 
-import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 
 /**
@@ -21,7 +21,17 @@ import com.bonitasoft.engine.platform.TenantNotFoundException;
  */
 public interface TenantManagementAPI {
 
-    void deployBusinessDataRepository(final byte[] jar) throws CreationException,BusinessDataRepositoryException;
+    /**
+     * Deploys a new Business Data Repository on the current tenant.
+     * 
+     * @param jar
+     *            the binary content of the jar file to deploy.
+     * @throws InvalidBusinessDataModelException
+     *             if the jar content passed as parameter is in an invalid format.
+     * @throws BusinessDataRepositoryDeploymentException
+     *             if the deployment cannot be fulfilled completely.
+     */
+    void deployBusinessDataRepository(final byte[] jar) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
     /**
      * Allows to set the tenand mode.
@@ -32,10 +42,17 @@ public interface TenantManagementAPI {
      *            the mode to set: "in maintenance", "running"
      * @throws UpdateException
      *             if the update could not be performed.
-     * @see {@link TenantMode}
+     * @see TenantMode
      */
     void setTenantMaintenanceMode(long tenantId, TenantMode mode) throws UpdateException;
 
+    /**
+     * @param tenantId
+     *            the ID of the tenant
+     * @return true if the tenant is in "Maintenance" mode, false otherwise.
+     * @throws TenantNotFoundException
+     *             if the tenant cannot be found with this ID.
+     */
     boolean isTenantInMaintenance(long tenantId) throws TenantNotFoundException;
 
 }
