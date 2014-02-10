@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-<properties>
-  <entry key="org.bonitasoft.engine.api-type">HTTP</entry>
-  <entry key="org.bonitasoft.engine.api-type.parameters">server.url,application.name</entry>
-  <entry key="server.url">http://localhost:8123</entry>
-  <entry key="application.name">bonita</entry>
-</properties>

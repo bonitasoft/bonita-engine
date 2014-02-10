@@ -26,7 +26,10 @@
         <bonita.home>${tomcat.home}/bonita</bonita.home>
         <if.task>net.sf.antcontrib.logic.IfTask</if.task>
 		<db.vendor>h2</db.vendor>
-    </properties>
+		<cargo.jvmargs>-Xms128m -Xmx512m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+		<!-- -Xdebug -->
+		<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE -->
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -286,27 +289,21 @@
 		              <bonita.home>${bonita.home}</bonita.home>
 									<sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
 									<db.vendor>${db.vendor}</db.vendor>
-		
-		              <file.encoding>${project.build.sourceEncoding}</file.encoding>
-		              <javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
-		
-		              <!-- Bitronix properties -->
-		              <btm.root>${tomcat.home}</btm.root>
-		              <bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties</bitronix.tm.configuration>
-		            </systemProperties>
-		          </container>
-		                    <configuration>
-		                        <type>existing</type>
-		                        <home>${tomcat.home}</home>
-		                        <properties>
-		                            <cargo.servlet.port>${provider.port}</cargo.servlet.port>
-		                            <cargo.jvmargs>
-										<!-- -Xdebug -->
-										<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -->
-										<!-- -Xnoagent -->
-										<!-- -Djava.compiler=NONE -->
-									 -XX:+HeapDumpOnOutOfMemoryError
-									</cargo.jvmargs>
+
+									<file.encoding>${project.build.sourceEncoding}</file.encoding>
+									<javax.xml.parsers.DocumentBuilderFactory>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</javax.xml.parsers.DocumentBuilderFactory>
+
+									<!-- Bitronix properties -->
+									<btm.root>${tomcat.home}</btm.root>
+									<bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties</bitronix.tm.configuration>
+								</systemProperties>
+							</container>
+							<configuration>
+								<type>existing</type>
+								<home>${tomcat.home}</home>
+								<properties>
+									<cargo.servlet.port>${provider.port}</cargo.servlet.port>
+									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
 		                        </properties>
 		                    </configuration>
 		                    <wait>false</wait>
