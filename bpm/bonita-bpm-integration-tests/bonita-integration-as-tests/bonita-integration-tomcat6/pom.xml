@@ -192,6 +192,16 @@
 										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.user#" value="${db.user}" />
 										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml" token="#db.password#" value="${db.password}" />
 
+										<!-- Replace server.xml by specific file for H2 -->
+										<if>
+											<equals arg1="${db.vendor}" arg2="h2" />
+											<then>
+												<copy todir="${tomcat.conf.dir}">
+													<fileset dir="tomcat/${db.vendor}/server.xml" />
+												</copy>
+											</then>
+										</if>
+										
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Server port=&quot;8005&quot;" value="&lt;Server port=&quot;${server.port}&quot;" />
 										<replace file="${tomcat.conf.dir}/server.xml" token="redirectPort=&quot;8443&quot;" value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;" />
