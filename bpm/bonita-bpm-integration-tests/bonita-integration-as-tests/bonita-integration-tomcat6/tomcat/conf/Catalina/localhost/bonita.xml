@@ -39,9 +39,9 @@
 		testConnectionOnCheckout="true" 
 		removeAbandoned="true"
 		logAbandoned="true"
-		username="#db.username#"
+		username="#db.user#"
 		password="#db.password#" 
-		driverClassName="#db.driver.classname#" 
+		driverClassName="#db.driver.class#" 
 		url="#db.url#" />
 
 </Context>
