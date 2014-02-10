@@ -1,0 +1,79 @@
+package org.bonitasoft.engine.authentication;
+
+import static org.junit.Assert.assertFalse;
+
+import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
+import org.junit.Test;
+
+/**
+ * @author Elias Ricken de Medeiros
+ */
+public class AuthenticationServiceTest extends CommonServiceTest {
+
+    private static AuthenticationService authService;
+
+    private static IdentityService identityService;
+
+    static {
+        identityService = getServicesBuilder().buildIdentityService();
+        authService = getServicesBuilder().buildAuthenticationService();
+    }
+
+    @Test
+    public void testCheckValidUser() throws Exception {
+        final String username = "john";
+        final String password = "bpm";
+        final SUser user = createUser(username, password);
+
+        getTransactionService().begin();
+        authService.checkUserCredentials(username, password);
+        getTransactionService().complete();
+
+        deleteUser(user);
+    }
+
+    private SUser createUser(final String username, final String password) throws Exception {
+        getTransactionService().begin();
+        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance().setUserName(username).setPassword(password);
+        final SUser user = identityService.createUser(userBuilder.done());
+        getTransactionService().complete();
+
+        return user;
+    }
+
+    private void deleteUser(final SUser user) throws Exception {
+        getTransactionService().begin();
+        identityService.deleteUser(user);
+        getTransactionService().complete();
+    }
+
+    @Test
+    public void testCheckUserWithWrongPassword() throws Exception {
+        final String username = "james";
+        final String password = "bpm";
+        final SUser user = createUser(username, password);
+
+        getTransactionService().begin();
+        final boolean valid = authService.checkUserCredentials(username, "wrong");
+        getTransactionService().complete();
+        assertFalse(valid);
+
+        deleteUser(user);
+    }
+
+    @Test
+    public void testCheckNonExistentUser() throws Exception {
+        final String username = "anonyme";
+        final String password = "bpm";
+        getTransactionService().begin();
+        final boolean valid = authService.checkUserCredentials(username, password);
+        getTransactionService().complete();
+        assertFalse(valid);
+    }
+
+}

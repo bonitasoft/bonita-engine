@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<connectorImplementation implementationId = "Mockup" implementationVersion = "1.0" definitionId = "Mockup" definitionVersion = "1.0" implementationClassname = "org.bonitasoft.engine.connector.test.MockupConnector">
-		<jarDependencies>
-    		<jarDependency>target/lib/junit-4.10.jar</jarDependency>
-  		</jarDependencies>
-  		<jarDependencies>
-    		<jarDependency>target/lib/hamcrest-core-1.1.jar</jarDependency>
-  		</jarDependencies>
-</connectorImplementation>
