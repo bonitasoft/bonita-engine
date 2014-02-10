@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+	<comment>Bonita platform core database configuration</comment>
+
+	<!-- SQL Server configuration -->
+	<entry key="sql.delimiter">GO</entry>
+
+	<!-- Hibernate specific configuration -->
+	<entry key="hibernate.journal.dialect">org.hibernate.dialect.SQLServerDialect</entry>
+	<entry key="hibernate.journal.interceptor">org.bonitasoft.engine.persistence.SQLServerInterceptor</entry>
+
+	<!-- Quartz specific configuration -->
+	<entry key="quartz.connection.jobstoredriver">org.quartz.impl.jdbcjobstore.MSSQLDelegate</entry>
+
+</properties>
