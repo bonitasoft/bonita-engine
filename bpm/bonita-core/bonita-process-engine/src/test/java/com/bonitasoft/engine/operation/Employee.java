@@ -2,7 +2,7 @@ package com.bonitasoft.engine.operation;
 
 public class Employee {
 
-    private Long id;
+    private Long persistenceId;
 
     private String firstName;
 
@@ -14,13 +14,13 @@ public class Employee {
 
     public Employee(final Long id, final String firstName, final String lastName) {
         super();
-        this.id = id;
+        this.persistenceId = id;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    public Long getId() {
-        return id;
+    public Long getPersistenceId() {
+        return persistenceId;
     }
 
     public String getFirstName() {
@@ -44,7 +44,7 @@ public class Employee {
         final int prime = 31;
         int result = 1;
         result = prime * result + (firstName == null ? 0 : firstName.hashCode());
-        result = prime * result + (id == null ? 0 : id.hashCode());
+        result = prime * result + (persistenceId == null ? 0 : persistenceId.hashCode());
         result = prime * result + (lastName == null ? 0 : lastName.hashCode());
         return result;
     }
@@ -68,11 +68,11 @@ public class Employee {
         } else if (!firstName.equals(other.firstName)) {
             return false;
         }
-        if (id == null) {
-            if (other.id != null) {
+        if (persistenceId == null) {
+            if (other.persistenceId != null) {
                 return false;
             }
-        } else if (!id.equals(other.id)) {
+        } else if (!persistenceId.equals(other.persistenceId)) {
             return false;
         }
         if (lastName == null) {
@@ -87,7 +87,7 @@ public class Employee {
 
     @Override
     public String toString() {
-        return "Employee [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + "]";
+        return "Employee [id=" + persistenceId + ", firstName=" + firstName + ", lastName=" + lastName + "]";
     }
 
 }

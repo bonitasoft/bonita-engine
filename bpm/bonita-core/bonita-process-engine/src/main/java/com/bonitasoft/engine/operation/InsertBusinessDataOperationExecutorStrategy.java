@@ -28,6 +28,8 @@ import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstanc
  */
 public class InsertBusinessDataOperationExecutorStrategy implements OperationExecutorStrategy {
 
+	private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
+	
     private final BusinessDataRespository respository;
 
     private final RefBusinessDataService refBusinessDataService;
@@ -53,7 +55,7 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
         respository.persist(newValue);
         try {
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(), containerId);
-            final Long id = ClassReflector.invokeGetter(newValue, "getId");
+            final Long id = ClassReflector.invokeGetter(newValue, PERSISTENCE_ID_GETTER);
             refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
         } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
             throw new SOperationExecutionException(srbdinfe);

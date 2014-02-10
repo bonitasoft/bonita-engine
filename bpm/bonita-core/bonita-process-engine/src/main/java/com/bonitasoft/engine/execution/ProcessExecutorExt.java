@@ -78,7 +78,9 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SRefBusinessDat
  */
 public class ProcessExecutorExt extends ProcessExecutorImpl {
 
-    private final BusinessDataRespository businessDataRepository;
+    private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
+
+	private final BusinessDataRespository businessDataRepository;
 
     private final RefBusinessDataService refBusinessDataService;
 
@@ -122,7 +124,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                 if (expression != null) {
                     final Object businessData = expressionResolverService.evaluate(expression);
                     businessDataRepository.persist(businessData);
-                    primaryKey = ClassReflector.invokeGetter(businessData, "getId");
+                    primaryKey = ClassReflector.invokeGetter(businessData, PERSISTENCE_ID_GETTER);
                 }
                 final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
                 final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey, bdd.getClassName())
