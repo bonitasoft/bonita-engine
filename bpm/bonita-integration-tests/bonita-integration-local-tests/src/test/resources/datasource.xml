@@ -37,21 +37,11 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 	</bean>
 
 	<bean id="businessDataDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="dataSourceDependency">
-		<property name="className" value="org.h2.jdbcx.JdbcDataSource" />
+		<property name="className" value="${jdbc.xaDataSourceClass}" />
 		<property name="uniqueName" value="java:comp/env/BusinessDataDS" /> <!-- Is it really useful and/or used ? -->
 		<property name="maxPoolSize" value="10" />
 		<property name="allowLocalTransactions" value="true" /> <!-- For hibernate : see if we can set it to false -->
 		<property name="driverProperties" ref="driverPropertiesBD">
-		</property>
-	</bean>
-
-	<bean id="driverPropertiesBD" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-		<property name="properties">
-			<props>
-				<prop key="user">sa</prop>
-				<prop key="password"></prop>
-				<prop key="URL">jdbc:h2:tcp://localhost:${h2.port:1234}/${bonita.home}/server/platform/work/business_data_journal;LOCK_MODE=0;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE;</prop>
-			</props>
 		</property>
 	</bean>
 

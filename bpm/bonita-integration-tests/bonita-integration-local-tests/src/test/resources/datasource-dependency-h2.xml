@@ -19,4 +19,14 @@
 		</property>
 	</bean>
 
+	<bean id="driverPropertiesBD" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="user">${jdbc.user}</prop>
+				<prop key="password">${jdbc.password}</prop>
+				<prop key="URL">${jdbc.url}</prop>
+			</props>
+		</property>
+	</bean>
+
 </beans>
