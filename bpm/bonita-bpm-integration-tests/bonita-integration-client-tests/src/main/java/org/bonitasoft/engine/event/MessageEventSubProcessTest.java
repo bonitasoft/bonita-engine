@@ -220,8 +220,6 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
-        activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
-        assertEquals(2, activities.size());
         // the parent process instance is supposed to be aborted, so no more waiting events are expected
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 0);
 
