@@ -174,7 +174,6 @@ public class APITestUtil {
 
     public static final int DEFAULT_TIMEOUT = 7 * 60 * 1000;
 
-
     @After
     public void clearSynchroRepository() {
         try {
@@ -837,7 +836,9 @@ public class APITestUtil {
 
     @Deprecated
     private boolean waitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
-        return new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
+        final boolean waitUntil = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
+        assertTrue("process was not finished", waitUntil);
+        return waitUntil;
     }
 
     @Deprecated
