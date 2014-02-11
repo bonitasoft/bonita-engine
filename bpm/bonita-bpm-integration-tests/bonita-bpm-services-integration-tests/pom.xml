@@ -1,29 +1,90 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>services</artifactId>
+		<artifactId>bonita-bpm-integration-tests</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.3.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-services-integration-tests</artifactId>
+	<artifactId>bonita-bpm-services-integration-tests</artifactId>
+
+	<properties>
+		<bonita.home>${project.build.directory}/home</bonita.home>
+	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>com.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-process-engine</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-services-integration-tests</artifactId>
+			<artifactId>bonita-bpm-services-integration-tests</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.oracle</groupId>
+					<artifactId>ojdbc</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.microsoft.jdbc</groupId>
+					<artifactId>sqlserver</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Archive -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.archive</groupId>
 			<artifactId>bonita-archive-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-data-cached-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Parameter -->
+		<dependency>
+			<groupId>com.bonitasoft.engine.core.parameter</groupId>
+			<artifactId>bonita-parameter-propertyfile</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Sequence -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<artifactId>bonita-sequence-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<artifactId>bonita-sequence-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Actor Mapping -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
+			<artifactId>bonita-actor-mapping-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
+			<artifactId>bonita-actor-mapping-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -36,10 +97,38 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Business Data -->
+		<dependency>
+			<groupId>com.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-business-data-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Cache -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.cache</groupId>
 			<artifactId>bonita-cache-ehcache</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Category -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.category</groupId>
+			<artifactId>bonita-category-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.category</groupId>
+			<artifactId>bonita-category-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.category</groupId>
+			<artifactId>bonita-category-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -72,16 +161,50 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Comment -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.comment</groupId>
+			<artifactId>bonita-process-comment-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.comment</groupId>
+			<artifactId>bonita-process-comment-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.comment</groupId>
+			<artifactId>bonita-process-comment-model-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Connector -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.connector</groupId>
+			<artifactId>bonita-connector-service-api</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.connector</groupId>
+			<artifactId>bonita-connector-service-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.connector</groupId>
 			<artifactId>bonita-connector-executor-api-impl</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-connector-executor-timedout</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Data -->
@@ -98,8 +221,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-data-cached-impl</artifactId>
+			<groupId>org.bonitasoft.engine.data</groupId>
+			<artifactId>bonita-data-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -126,12 +249,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
 			<artifactId>bonita-data-instance-data-source-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.data</groupId>
-			<artifactId>bonita-data-instance-transient-data-source</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -163,15 +280,16 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-platform-model-impl-hibernate</artifactId>
+			<artifactId>bonita-dependency-platform-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-platform-model-impl</artifactId>
+			<artifactId>bonita-dependency-platform-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -195,28 +313,70 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>org.bonitasoft.engine.document</groupId> -->
+		<!-- <artifactId>bonita-document-opencmis</artifactId> -->
+		<!-- <version>${project.version}</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.document</groupId>
 			<artifactId>bonita-document-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- Event -->
 		<dependency>
-			<groupId>com.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api-impl</artifactId>
+			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
+			<artifactId>bonita-process-document-mapping-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
+			<artifactId>bonita-process-document-mapping-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
+			<artifactId>bonita-process-document-mapping-model-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.document</groupId>
+			<artifactId>bonita-process-document-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.document</groupId>
+			<artifactId>bonita-process-document-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.events</groupId>
+			<artifactId>bonita-events-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- Expression -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.expression</groupId>
+			<artifactId>bonita-expression-api</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
 			<artifactId>bonita-expression-api-impl</artifactId>
@@ -230,8 +390,15 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Expression Resolver -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-expression-resolver-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-		<!-- External identity mapping -->
+		<!-- Expression -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.external.identity.mapping</groupId>
 			<artifactId>bonita-external-identity-mapping-impl</artifactId>
@@ -248,13 +415,28 @@
 		<!-- Identity -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-impl</artifactId>
+			<artifactId>bonita-identity-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-model-impl-hibernate</artifactId>
+			<artifactId>bonita-identity-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Incident -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.incident</groupId>
+			<artifactId>bonita-incident-log</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Lock -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.lock</groupId>
+			<artifactId>bonita-lock-api-memory-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -268,24 +450,90 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-impl</artifactId>
+			<artifactId>bonita-log-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.log</groupId>
+			<artifactId>bonita-log-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Lock -->
+		<!-- Login -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.lock</groupId>
-			<artifactId>bonita-lock-api-memory-impl</artifactId>
+			<groupId>org.bonitasoft.engine.core.login</groupId>
+			<artifactId>bonita-login-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+
 		<!-- Monitoring -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.monitoring</groupId>
 			<artifactId>bonita-monitoring-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- Operation -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.operation</groupId>
+			<artifactId>bonita-operation-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.operation</groupId>
+			<artifactId>bonita-operation-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Platform -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform</groupId>
+			<artifactId>bonita-platform-model-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform</groupId>
+			<artifactId>bonita-platform-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.platform.login</groupId>
+			<artifactId>bonita-platform-login-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.session</groupId>
+			<artifactId>bonita-platform-session-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.session</groupId>
+			<artifactId>bonita-platform-session-api-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Platform command -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bonita-platform-command-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.platform.command</groupId>
+			<artifactId>bonita-platform-command-api-impl</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<!-- Persistence -->
@@ -301,85 +549,11 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-persistence-hibernate-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-test-util</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Platform -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Platform authentication -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform.authentication</groupId>
 			<artifactId>bonita-platform-authentication-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Platform login -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.platform.login</groupId>
-			<artifactId>bonita-platform-login-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- platform-command -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.command</groupId>
-			<artifactId>bonita-platform-command-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.command</groupId>
-			<artifactId>bonita-platform-command-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.command</groupId>
-			<artifactId>bonita-platform-command-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Platform Session -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.session</groupId>
-			<artifactId>bonita-platform-session-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform.session</groupId>
-			<artifactId>bonita-platform-session-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -398,6 +572,53 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Process -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+			<artifactId>bonita-process-definition-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+			<artifactId>bonita-process-definition-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+			<artifactId>bonita-process-definition-model-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
+			<artifactId>bonita-process-instance-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
+			<artifactId>bonita-process-instance-model-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
+			<artifactId>bonita-process-instance-model-impl-hibernate</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<!-- Process Migration -->
+		<dependency>
+			<groupId>com.bonitasoft.engine.core</groupId>
+			<artifactId>bonita-instance-migration-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Recorder -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>
@@ -407,12 +628,6 @@
 		</dependency>
 
 		<!-- Scheduler -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-api</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
 			<artifactId>bonita-scheduler-quartz</artifactId>
@@ -440,23 +655,24 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Sequence -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-sequence-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-sequence-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-
 		<!-- Session Accessor -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.sessionaccessor</groupId>
 			<artifactId>bonita-session-accessor-threadlocal</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Supervisor Mapping -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
+			<artifactId>bonita-supervisor-mapping-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
+			<artifactId>bonita-supervisor-mapping-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -468,7 +684,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
+		
 		<!-- Theme -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.theme</groupId>
@@ -490,11 +706,26 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>jta</artifactId>
 			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Transient Data -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.data</groupId>
+			<artifactId>bonita-data-instance-transient-data-source</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- User Filter -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.filter</groupId>
+			<artifactId>bonita-user-filter-impl</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -525,21 +756,33 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.bonitasoft.engine.xml</groupId>
+			<artifactId>bonita-xml-write-dom</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- Misc -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.test</groupId>
+			<artifactId>bonita-test-util</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons-test</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.easytesting</groupId>
-			<artifactId>fest-assert</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -555,13 +798,11 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.26</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.2-1003-jdbc4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -582,30 +823,39 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
 			<version>3.1.2.RELEASE</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.4</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-pool</groupId>
 			<artifactId>commons-pool</artifactId>
 			<version>1.5.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-commons-test</artifactId>
-			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.6.1</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Local JNDI implementation -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.jndi</groupId>
 			<artifactId>bonita-jndi-memory</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>com.jolbox</groupId>
 			<artifactId>bonecp</artifactId>
@@ -619,25 +869,66 @@
 			<version>2.1.3</version>
 			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
+
 	<build>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-antrun-plugin</artifactId>
+										<versionRange>[1.6,)</versionRange>
+										<goals>
+											<goal>run</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
-				<!-- don't execute tests in test phase -->
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skipTests>true</skipTests>
-				</configuration>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>process-test-resources</phase>
+						<configuration>
+							<target name="copy-bos-home">
+								<copy todir="${bonita.home}">
+									<fileset dir="${basedir}/home" />
+									<filterset>
+										<filter token="VERSION" value="${project.version}" />
+									</filterset>
+								</copy>
+								<copy todir="${bonita.home}/server/licenses" failonerror="true">
+									<fileset dir="${user.home}/lic" includes="*.lic" />
+								</copy>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
@@ -649,15 +940,16 @@
 						</property>
 					</properties>
 					<systemPropertyVariables>
+						<bonita.home>${bonita.home}</bonita.home>
 						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
-						<include>com/bonitasoft/services/AllTestsSPWithJNDI.java</include>
+						<include>com/bonitasoft/engine/bpm/test/AllBPMSPTestsWithJNDI.java</include>
 					</includes>
 				</configuration>
 				<executions>
 					<execution>
-						<phase>integration-test</phase>
+						<phase>integration-test</phase>  
 						<goals>
 							<goal>integration-test</goal>
 							<goal>verify</goal>
@@ -667,5 +959,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
