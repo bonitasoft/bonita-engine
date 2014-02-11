@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -32,49 +31,44 @@ import java.util.logging.SimpleFormatter;
  */
 public class FileLoggerIncidentHandler implements IncidentHandler {
 
-	private final String logFilePath;
+    private final String logFilePath;
 
-	private final Map<Long, Logger> loggers;
+    private final Map<Long, Logger> loggers;
 
-	public FileLoggerIncidentHandler(final String logFilePath) {
-		this.logFilePath = logFilePath;
-		loggers = new HashMap<Long, Logger>(2);
-	}
+    public FileLoggerIncidentHandler(final String logFilePath) {
+        this.logFilePath = logFilePath;
+        loggers = new HashMap<Long, Logger>(2);
+    }
 
-	@Override
-	public void handle(final long tenantId, final Incident incident) {
-		try {
-			final Logger logger = getLogger(tenantId);
-			logger.log(Level.SEVERE, "An incident occurred: " + incident.getDescription());
-			logger.log(Level.SEVERE, "Exception was", incident.getCause());
-			logger.log(Level.SEVERE, "We were unable to handle the failure on the elements because of", incident.getExceptionWhenHandlingFailure());
-			final String recoveryProcedure = incident.getRecoveryProcedure();
-			if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
-				logger.log(Level.SEVERE, "Procedure to recover: " + recoveryProcedure);
-			}
-		} catch (final SecurityException e) {
-			e.printStackTrace();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-	}
+    @Override
+    public void handle(final long tenantId, final Incident incident) {
+        try {
+            final Logger logger = getLogger(tenantId);
+            logger.log(Level.SEVERE, "An incident occurred: " + incident.getDescription());
+            logger.log(Level.SEVERE, "Exception was", incident.getCause());
+            logger.log(Level.SEVERE, "We were unable to handle the failure on the elements because of", incident.getExceptionWhenHandlingFailure());
+            final String recoveryProcedure = incident.getRecoveryProcedure();
+            if (recoveryProcedure != null && !recoveryProcedure.isEmpty()) {
+                logger.log(Level.SEVERE, "Procedure to recover: " + recoveryProcedure);
+            }
+        } catch (final SecurityException e) {
+            e.printStackTrace();
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	private Logger getLogger(final long tenantId) throws SecurityException, IOException {
-		Logger logger = loggers.get(tenantId);
-		if (logger == null) {
-			logger = Logger.getLogger("INCIDENT" + tenantId);
-			final FileHandler fh = new FileHandler(logFilePath + File.separatorChar + tenantId + File.separatorChar + "incidents.log"){
-				@Override
-				public synchronized void publish(LogRecord record) {
-					super.publish(record);
-					this.flush();
-				}};
-				logger.addHandler(fh);
-				final SimpleFormatter formatter = new SimpleFormatter();
-				fh.setFormatter(formatter);
-				loggers.put(tenantId, logger);
-		}
-		return logger;
-	}
+    private Logger getLogger(final long tenantId) throws SecurityException, IOException {
+        Logger logger = loggers.get(tenantId);
+        if (logger == null) {
+            logger = Logger.getLogger("INCIDENT" + tenantId);
+            final FileHandler fh = new FileHandler(logFilePath + File.separatorChar + tenantId + File.separatorChar + "incidents.log");
+            logger.addHandler(fh);
+            final SimpleFormatter formatter = new SimpleFormatter();
+            fh.setFormatter(formatter);
+            loggers.put(tenantId, logger);
+        }
+        return logger;
+    }
 
 }
