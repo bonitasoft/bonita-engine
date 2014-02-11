@@ -41,7 +41,7 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     private final boolean delayable;
 
     private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<BatchLogSynchronization>();
-    
+
     public BatchQueriableLoggerImpl(final PersistenceService persistenceService, final TransactionService transactionService,
             final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider,
             final TechnicalLoggerService logger, final PlatformService platformService, final Boolean delayable) {
@@ -74,7 +74,7 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
             this.logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found");
         }
     }
-    
+
     class BatchLogSynchronization implements BonitaTransactionSynchronization {
 
         private final List<SQueriableLog> logs = new ArrayList<SQueriableLog>();
@@ -85,8 +85,6 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
         public void afterCompletion(final TransactionState transactionState) {
             if (delayable && TransactionState.COMMITTED == transactionState) {
                 BatchLogBuffer.getInstance().addLogs(this.logs);
-                final InsertBatchLogsJobRegister register = InsertBatchLogsJobRegister.getInstance();
-                register.registerJobIfNotRegistered();
             }
             synchronizations.remove();
         }

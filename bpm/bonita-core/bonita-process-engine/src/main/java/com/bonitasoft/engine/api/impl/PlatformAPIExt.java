@@ -8,33 +8,28 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
-import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.impl.reports.DefaultReportList;
-import com.bonitasoft.engine.api.impl.reports.ReportDeployer;
-import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
-import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
-import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
-import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
-import com.bonitasoft.engine.core.reporting.ReportingService;
-import com.bonitasoft.engine.core.reporting.SReportBuilder;
-import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
-import com.bonitasoft.engine.platform.*;
-import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
-import com.bonitasoft.engine.search.SearchTenants;
-import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
-import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.SPModelConvertor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.LicenseChecker;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.manager.Features;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.concurrent.Callable;
+
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
-import org.bonitasoft.engine.api.impl.transaction.platform.*;
+import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
+import org.bonitasoft.engine.api.impl.transaction.platform.DeactivateTenant;
+import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
+import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
+import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
+import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -55,7 +50,12 @@ import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.platform.*;
+import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.SDeletingActivatedTenantException;
+import org.bonitasoft.engine.platform.STenantCreationException;
+import org.bonitasoft.engine.platform.STenantNotFoundException;
+import org.bonitasoft.engine.platform.StartNodeException;
+import org.bonitasoft.engine.platform.StopNodeException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -68,15 +68,32 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.concurrent.Callable;
+import com.bonitasoft.engine.api.PlatformAPI;
+import com.bonitasoft.engine.api.impl.reports.DefaultReportList;
+import com.bonitasoft.engine.api.impl.reports.ReportDeployer;
+import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
+import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
+import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
+import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
+import com.bonitasoft.engine.core.reporting.ReportingService;
+import com.bonitasoft.engine.core.reporting.SReportBuilder;
+import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
+import com.bonitasoft.engine.platform.Tenant;
+import com.bonitasoft.engine.platform.TenantActivationException;
+import com.bonitasoft.engine.platform.TenantCreator;
+import com.bonitasoft.engine.platform.TenantCriterion;
+import com.bonitasoft.engine.platform.TenantDeactivationException;
+import com.bonitasoft.engine.platform.TenantNotFoundException;
+import com.bonitasoft.engine.platform.TenantUpdater;
+import com.bonitasoft.engine.platform.TenantUpdater.TenantField;
+import com.bonitasoft.engine.search.SearchTenants;
+import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.SPModelConvertor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.LicenseChecker;
+import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import com.bonitasoft.manager.Features;
 
 /**
  * @author Matthieu Chaffotte
@@ -303,13 +320,14 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         reports.deploy(new ReportDeployer() {
 
             @Override
-            public void deploy(String name, String description, byte[] screenShot, byte[] content) throws SBonitaException {
-            final ReportingService reportingService = tenantAccessor.getReportingService();
-		final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true, description, screenShot);
-            final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-            // Here we are already in a transaction, so we can call execute() directly:
-            addReport.execute();
-        }
+            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
+                final ReportingService reportingService = tenantAccessor.getReportingService();
+                final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
+                        description, screenShot);
+                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
+                // Here we are already in a transaction, so we can call execute() directly:
+                addReport.execute();
+            }
         });
     }
 
@@ -377,7 +395,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final WorkService workService = platformAccessor.getWorkService();
-            final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
+            final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 
@@ -385,8 +403,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
-                    platformAccessor.getTechnicalLoggerService(), workService);
+            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+            final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
+                    platformAccessor.getTechnicalLoggerService(), workService, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
         } catch (final TenantNotFoundException e) {
@@ -433,7 +452,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
             sessionService.deleteSessionsOfTenant(tenantId);
