@@ -21,6 +21,7 @@ import com.bonitasoft.engine.theme.ThemeTest;
         BPMSPTests.class,
         BPMLocalSuiteTests.class,
         LocalLogTest.class,
+        JobSPTests.class,
         APIMethodSPTest.class,
         ConnectorExecutionTimeOutTest.class,
         ConnectorImplementationLocalSPTest.class,
