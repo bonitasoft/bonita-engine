@@ -92,6 +92,8 @@
 						<version>5</version>
 						<loader-repository>org.bonitasoft.engine:archive=${project.artifactId}-${project.version}.ear</loader-repository>
 					</jboss>
+					
+					<packagingExcludes>lib/xml-apis*.jar,lib/jboss-transaction-api*.jar,lib/jboss-logging-annotations*.jar</packagingExcludes>
 				</configuration>
 			</plugin>
 		</plugins>
