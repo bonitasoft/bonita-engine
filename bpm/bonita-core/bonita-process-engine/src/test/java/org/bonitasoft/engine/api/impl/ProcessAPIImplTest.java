@@ -10,13 +10,13 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,9 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
@@ -75,7 +77,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void should_updateProcessDataInstances_work_as_expected() throws Exception {
+    public void should_updateProcessDataInstances_call_DataInstanceService() throws Exception {
         final long processInstanceId = 42l;
         ProcessAPIImpl processAPI = spy(new ProcessAPIImpl());
 
@@ -91,7 +93,7 @@ public class ProcessAPIImplTest {
         doReturn("foo").when(sDataFoo).getName();
         SDataInstance sDataBar = mock(SDataInstance.class);
         doReturn("bar").when(sDataBar).getName();
-        doReturn(Arrays.asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
 
         // Then update the data instances
         Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -101,5 +103,38 @@ public class ProcessAPIImplTest {
 
         // Check that we called DataInstanceService for each pair data/value
         verify(dataInstanceService, times(2)).updateDataInstance(any(SDataInstance.class), any(EntityUpdateDescriptor.class));
+        verify(dataInstanceService).updateDataInstance(eq(sDataFoo), any(EntityUpdateDescriptor.class));
+        verify(dataInstanceService).updateDataInstance(eq(sDataBar), any(EntityUpdateDescriptor.class));
     }
+
+    @Test
+    public void should_updateProcessDataInstances_call_DataInstance_on_non_existing_data_throw_UpdateException() throws Exception {
+        final long processInstanceId = 42l;
+        ProcessAPIImpl processAPI = spy(new ProcessAPIImpl());
+
+        final TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
+        final DataInstanceService dataInstanceService = mock(DataInstanceService.class);
+
+        doReturn(null).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
+
+        doReturn(tenantAccessor).when(processAPI).getTenantAccessor();
+        doReturn(dataInstanceService).when(tenantAccessor).getDataInstanceService();
+
+        doThrow(new SDataInstanceException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+
+        // Then update the data instances
+        Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
+        dataNameValues.put("foo", "go");
+        dataNameValues.put("bar", "go");
+        try {
+            processAPI.updateProcessDataInstances(processInstanceId, dataNameValues);
+            fail("An exception should have been thrown.");
+        } catch (UpdateException e) {
+            // Ok
+        }
+
+        // Check that we called DataInstanceService for each pair data/value
+        verify(dataInstanceService, never()).updateDataInstance(any(SDataInstance.class), any(EntityUpdateDescriptor.class));
+    }
+
 }
