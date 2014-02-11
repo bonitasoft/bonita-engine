@@ -2,22 +2,20 @@ package org.bonitasoft.engine.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.test.CommonAPILocalTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JobExecutionTest extends CommonAPILocalTest {
+public class JobExecutionTest extends CommonAPITest {
 
     protected User matti;
 
@@ -88,17 +86,4 @@ public class JobExecutionTest extends CommonAPILocalTest {
         }
     }
 
-    @Test
-    public void check_DeleteBatchJob_is_registered() throws Exception {
-        Callable<Boolean> callable = new Callable<Boolean>() {
-
-            @Override
-            public Boolean call() throws Exception {
-                List<String> jobs = getTenantAccessor().getSchedulerService().getJobs();
-                System.out.println("registered jobs=" + jobs);
-                return jobs.contains("DeleteBatchJob");
-            }
-        };
-        assertTrue("delete batch job is not registered", getTenantAccessor().getTransactionService().executeInTransaction(callable));
-    }
 }
