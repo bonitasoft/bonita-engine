@@ -674,7 +674,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
         SchedulerService schedulerService = null;
-        final boolean schedulerStarted = false;
         long platformSessionId = -1;
         try {
             platformAccessor = getPlatformAccessor();
@@ -698,8 +697,9 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
-            final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
-                    platformAccessor.getTechnicalLoggerService(), workService);
+            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+            final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService,
+                    platformAccessor.getTechnicalLoggerService(), workService, plaformConfiguration, tenantServiceAccessor.getTenantConfiguration());
             activateTenant.execute();
             sessionService.deleteSession(sessionId);
         } catch (final STenantActivationException stae) {
@@ -712,15 +712,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             log(platformAccessor, e);
             throw new STenantActivationException(e);
         } finally {
-            if (schedulerStarted && schedulerService != null) {
-                try {
-                    // stop scheduler after scheduling global jobs
-                    schedulerService.stop();
-                } catch (final Exception e) {
-                    log(platformAccessor, e);
-                    throw new STenantActivationException(e);
-                }
-            }
             cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
@@ -757,7 +748,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
 
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
             sessionService.deleteSessionsOfTenant(tenantId);

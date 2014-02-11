@@ -25,6 +25,7 @@ import org.bonitasoft.engine.actor.xml.ActorMembershipBinding;
 import org.bonitasoft.engine.actor.xml.GroupPathsBinding;
 import org.bonitasoft.engine.actor.xml.RoleNamesBinding;
 import org.bonitasoft.engine.actor.xml.UserNamesBinding;
+import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -220,6 +221,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private JobService jobService;
 
     private ThemeService themeService;
+
+    private TenantConfiguration tenantConfiguration;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);
@@ -753,6 +756,19 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     @Override
     public void destroy() {
         beanAccessor.destroy();
+    }
+
+    @Override
+    public TenantConfiguration getTenantConfiguration() {
+        if (tenantConfiguration == null) {
+            tenantConfiguration = beanAccessor.getService(TenantConfiguration.class);
+        }
+        return tenantConfiguration;
+    }
+
+    @Override
+    public <T> T lookup(final String serviceName) {
+        return beanAccessor.getService(serviceName);
     }
 
 }

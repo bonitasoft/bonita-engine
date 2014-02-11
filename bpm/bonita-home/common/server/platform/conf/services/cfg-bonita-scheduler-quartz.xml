@@ -55,6 +55,10 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="servicesResolver" ref="servicesResolver" />
+	</bean>
+	
+	<bean id="servicesResolver" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver">
 	</bean>
 
 	<bean id="db-bonita-scheduler-quartz" class="org.bonitasoft.engine.persistence.DBConfiguration">

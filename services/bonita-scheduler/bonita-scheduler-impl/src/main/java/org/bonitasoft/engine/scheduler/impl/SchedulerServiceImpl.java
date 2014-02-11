@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,10 +38,12 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
+import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.ServicesResolver;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilderFactory;
@@ -80,16 +83,19 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     private final TransactionService transactionService;
 
+    private final ServicesResolver servicesResolver;
+
     /**
      * Create a new instance of scheduler service. Synchronous
      * QueriableLoggerService must be used to avoid an infinite loop.
      */
     public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService,
             final TechnicalLoggerService logger, final EventService eventService,
-            final TransactionService transactionService, final SessionAccessor sessionAccessor) {
+            final TransactionService transactionService, final SessionAccessor sessionAccessor, final ServicesResolver servicesResolver) {
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.logger = logger;
+        this.servicesResolver = servicesResolver;
         schedulStarted = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(SCHEDULER_STARTED).done();
         schedulStopped = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(SCHEDULER_STOPPED).done();
         jobFailed = BuilderFactory.get(SEventBuilderFactory.class).createNewInstance(JOB_FAILED).done();
@@ -361,11 +367,29 @@ public class SchedulerServiceImpl implements SchedulerService {
                     parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
                 }
                 statelessJob.setAttributes(parameterMap);
+                if (servicesResolver != null) {
+                    injectServices(statelessJob);
+                }
                 final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger,
                         jobIdentifier.getTenantId(), eventService, sessionAccessor, transactionService);
                 return jobWrapper;
             }
         };
+    }
+
+    /**
+     * @param statelessJob
+     */
+    protected void injectServices(final StatelessJob statelessJob) throws Exception {
+        Method[] methods = statelessJob.getClass().getMethods();
+        for (Method method : methods) {
+            if (method.getAnnotation(InjectedService.class) != null) {
+                String serviceName = method.getName().substring(3);
+                serviceName = serviceName.substring(0, 1).toLowerCase() + serviceName.substring(1);
+                Object lookup = servicesResolver.lookup(serviceName);
+                method.invoke(statelessJob, lookup);
+            }
+        }
     }
 
     @Override

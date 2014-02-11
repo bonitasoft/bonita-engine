@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.scheduler.JobRegister;
 
 /**
  * @author Baptiste Mesta
@@ -33,15 +32,9 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     private List<RestartHandler> restartHandlers;
 
-    private String eventHandlingJobCron = "*/5 * * * * ?";
-
-    private String cleanInvalidSessionsJobCron = "0 0 */2 * * ?";
-
     private boolean shouldStartEventHandlingJob = true;
 
     private List<TenantRestartHandler> tenantRestartHandlers;
-
-    private List<JobRegister> jobsToRegister;
 
     @Override
     public boolean shouldStartScheduler() {
@@ -55,7 +48,7 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     @Override
     public List<RestartHandler> getRestartHandlers() {
-        return emptyOrUnmodifiable(restartHandlers);
+        return CollectionUtil.emptyOrUnmodifiable(restartHandlers);
     }
 
     public void setRestartHandlers(final List<RestartHandler> restartHandlers) {
@@ -64,16 +57,11 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     @Override
     public List<TenantRestartHandler> getTenantRestartHandlers() {
-        return emptyOrUnmodifiable(tenantRestartHandlers);
+        return CollectionUtil.emptyOrUnmodifiable(tenantRestartHandlers);
     }
 
     public void setTenantRestartHandlers(final List<TenantRestartHandler> tenantRestartHandlers) {
         this.tenantRestartHandlers = tenantRestartHandlers;
-    }
-
-    @Override
-    public String getEventHandlingJobCron() {
-        return eventHandlingJobCron;
     }
 
     @Override
@@ -89,39 +77,13 @@ public class NodeConfigurationImpl implements NodeConfiguration {
         this.shouldRestartElements = shouldRestartElements;
     }
 
-    public void setEventHandlingJobCron(final String eventHandlingJobCron) {
-        this.eventHandlingJobCron = eventHandlingJobCron;
-    }
-
     public void setShouldStartEventHandlingJob(final boolean shouldStartEventHandlingJob) {
         this.shouldStartEventHandlingJob = shouldStartEventHandlingJob;
-    }
-
-    public void setJobsToRegister(final List<JobRegister> jobsToRegister) {
-        this.jobsToRegister = jobsToRegister;
-    }
-
-    @Override
-    public List<JobRegister> getJobsToRegister() {
-        return emptyOrUnmodifiable(jobsToRegister);
-    }
-
-    @Override
-    public String getCleanInvalidSessionsJobCron() {
-        return cleanInvalidSessionsJobCron;
-    }
-
-    public void setCleanInvalidSessionsJobCron(final String cleanInvalidSessionsJobCron) {
-        this.cleanInvalidSessionsJobCron = cleanInvalidSessionsJobCron;
     }
 
     @Override
     public boolean shouldClearSessions() {
         return true;
-    }
-
-    private <T> List<T> emptyOrUnmodifiable(final List<T> list) {
-        return list == null ?Collections.<T>emptyList() :Collections.unmodifiableList(list);
     }
 
 }

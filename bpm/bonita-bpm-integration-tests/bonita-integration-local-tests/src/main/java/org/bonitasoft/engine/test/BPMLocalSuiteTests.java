@@ -11,10 +11,10 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        BPMLocalTest.class,
-        ConnectorExecutionsTestsLocal.class,
-        ProcessWithExpressionTestLocal.class,
-        ProcessArchiveTest.class,
+        // BPMLocalTest.class,
+        // ConnectorExecutionsTestsLocal.class,
+        // ProcessWithExpressionTestLocal.class,
+        // ProcessArchiveTest.class,
         LocalTimerEventTest.class,
         DataInstanceIntegrationLocalTest.class,
         GatewayExecutionLocalTest.class,

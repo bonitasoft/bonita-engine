@@ -20,6 +20,7 @@ import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.ServicesResolver;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.session.SessionService;
@@ -47,7 +48,7 @@ import org.bonitasoft.engine.xml.Parser;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  */
-public class ServicesBuilder {
+public class ServicesBuilder implements ServicesResolver {
 
     ServicesAccessor accessor;
 
@@ -191,6 +192,11 @@ public class ServicesBuilder {
 
     public <T> T getInstanceOf(final Class<T> class1) {
         return getAccessor().getInstanceOf(class1);
+    }
+
+    @Override
+    public <T> T lookup(final String serviceName) {
+        return getAccessor().lookup(serviceName);
     }
 
 }

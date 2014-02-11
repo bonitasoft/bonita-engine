@@ -17,7 +17,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -34,15 +33,11 @@ public final class DeactivateTenant implements TransactionContent {
 
     private final WorkService workService;
 
-    private final SessionService sessionService;
-
-    public DeactivateTenant(final long tenantId, final PlatformService platformService, final SchedulerService schedulerService, final WorkService workService,
-            SessionService sessionService) {
+    public DeactivateTenant(final long tenantId, final PlatformService platformService, final SchedulerService schedulerService, final WorkService workService) {
         this.tenantId = tenantId;
         this.platformService = platformService;
         this.schedulerService = schedulerService;
         this.workService = workService;
-        this.sessionService = sessionService;
     }
 
     @Override
