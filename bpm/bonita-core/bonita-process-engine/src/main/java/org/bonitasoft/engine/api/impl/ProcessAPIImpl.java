@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import static java.util.Collections.singletonMap;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -2501,7 +2503,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void updateProcessDataInstance(final String dataName, final long processInstanceId, final Serializable dataValue) throws UpdateException {
-        updateProcessDataInstances(processInstanceId, Collections.singletonMap(dataName, dataValue));
+        updateProcessDataInstances(processInstanceId, singletonMap(dataName, dataValue));
     }
 
     @Override
