@@ -498,17 +498,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         parameters.put(OPERATIONS_INPUT_KEY, fieldValues);
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
-        assertTrue("no pending user task instances are found", new WaitUntil(50, 1000) {
-
-            @Override
-            protected boolean check() throws Exception {
-                return getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 10, null).size() >= 1;
-            }
-        }.waitUntil());
-        userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC).get(0);
-        final String activityName = userTaskInstance.getName();
-        assertNotNull(activityName);
-        assertEquals("step2", activityName);
+        waitForUserTask("step2", processInstanceId);
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstanceId);
         assertEquals("field_fieldId1_Ryan", dataInstance.getValue().toString());
         final DataInstance dataInstance2 = getProcessAPI().getProcessDataInstance(dataName2, processInstanceId);
