@@ -886,26 +886,6 @@ public class UserTest extends CommonAPITest {
     }
 
     @Test
-    public void searchTermIsInsensitive() throws BonitaException {
-        final User manu = getIdentityAPI().createUser("emmanuel", "ENCRYPTED", "manuel", "Duch");
-        final User marie = getIdentityAPI().createUser("Marie", "bpm", "Marie", "Gillain");
-        final User marcel = getIdentityAPI().createUser("marcel", "bpm", "marcel", "Desaillie");
-
-        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-        builder.searchTerm("Ma");
-        builder.sort(UserSearchDescriptor.FIRST_NAME, Order.ASC);
-        final SearchResult<User> searchUsers = getIdentityAPI().searchUsers(builder.done());
-        assertNotNull(searchUsers);
-        assertEquals(3, searchUsers.getCount());
-        final List<User> users = searchUsers.getResult();
-        assertEquals(manu, users.get(0));
-        assertEquals(marcel, users.get(1));
-        assertEquals(marie, users.get(2));
-
-        deleteUsers(marcel, manu, marie);
-    }
-
-    @Test
     public void searchUsersInGroup() throws BonitaException {
         final User john1 = createUser("john001", "bpm", "John", "Smith");
         final User jack = createUser("jack001", "bpm", "Jack", "Doe");

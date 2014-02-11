@@ -1476,7 +1476,7 @@ public class APITestUtil {
         return operationBuilder.done();
     }
 
-    public List<String> checkExistenceOfCategories() throws DeletionException {
+    public List<String> checkNoCategories() throws DeletionException {
         final List<String> messages = new ArrayList<String>();
         final long numberOfCategories = getProcessAPI().getNumberOfCategories();
         if (numberOfCategories > 0) {
@@ -1491,7 +1491,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfFlowNodes() throws SearchException {
+    public List<String> checkNoFlowNodes() throws SearchException {
         final List<String> messages = new ArrayList<String>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
         final SearchResult<FlowNodeInstance> searchResult = getProcessAPI().searchFlowNodeInstances(build.done());
@@ -1506,7 +1506,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfArchivedFlowNodes() throws SearchException {
+    public List<String> checkNoArchivedFlowNodes() throws SearchException {
         final List<String> messages = new ArrayList<String>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
         final SearchResult<ArchivedFlowNodeInstance> searchResult = getProcessAPI().searchArchivedFlowNodeInstances(build.done());
@@ -1521,7 +1521,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfComments() throws SearchException {
+    public List<String> checkNoComments() throws SearchException {
         final List<String> messages = new ArrayList<String>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
         final SearchResult<Comment> searchResult = getProcessAPI().searchComments(build.done());
@@ -1536,7 +1536,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfArchivedComments() throws SearchException {
+    public List<String> checkNoArchivedComments() throws SearchException {
         final List<String> messages = new ArrayList<String>();
         final SearchOptionsBuilder build = new SearchOptionsBuilder(0, 1000);
         final SearchResult<ArchivedComment> searchResult = getProcessAPI().searchArchivedComments(build.done());
@@ -1551,7 +1551,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfProcessDefinitions() throws DeletionException, ProcessDefinitionNotFoundException, ProcessActivationException {
+    public List<String> checkNoProcessDefinitions() throws DeletionException, ProcessDefinitionNotFoundException, ProcessActivationException {
         final List<String> messages = new ArrayList<String>();
         final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 200, ProcessDeploymentInfoCriterion.DEFAULT);
         if (processes.size() > 0) {
@@ -1568,7 +1568,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfProcessIntances() throws DeletionException {
+    public List<String> checkNoProcessIntances() throws DeletionException {
         final List<String> messages = new ArrayList<String>();
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
         if (!processInstances.isEmpty()) {
@@ -1582,7 +1582,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfArchivedProcessIntances() throws DeletionException {
+    public List<String> checkNoArchivedProcessIntances() throws DeletionException {
         final List<String> messages = new ArrayList<String>();
         final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().getArchivedProcessInstances(0, 1000, ProcessInstanceCriterion.DEFAULT);
         if (!archivedProcessInstances.isEmpty()) {
@@ -1596,7 +1596,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfGroups() throws DeletionException {
+    public List<String> checkNoGroups() throws DeletionException {
         final List<String> messages = new ArrayList<String>();
         final long numberOfGroups = getIdentityAPI().getNumberOfGroups();
         if (numberOfGroups > 0) {
@@ -1611,7 +1611,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfRoles() throws DeletionException {
+    public List<String> checkNoRoles() throws DeletionException {
         final List<String> messages = new ArrayList<String>();
         final long numberOfRoles = getIdentityAPI().getNumberOfRoles();
         if (numberOfRoles > 0) {
@@ -1626,7 +1626,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfUsers() throws DeletionException {
+    public List<String> checkNoUsers() throws DeletionException {
         final List<String> messages = new ArrayList<String>();
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         if (numberOfUsers > 0) {
@@ -1641,7 +1641,7 @@ public class APITestUtil {
         return messages;
     }
 
-    public List<String> checkExistenceOfCommands() throws SearchException, CommandNotFoundException, DeletionException {
+    public List<String> checkNoCommands() throws SearchException, CommandNotFoundException, DeletionException {
         final List<String> messages = new ArrayList<String>();
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 1000);
         searchOptionsBuilder.filter(CommandSearchDescriptor.SYSTEM, false);

@@ -261,12 +261,6 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         searchProcessDefinitions(PROCESS_NAME, "process'VERSION");
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks", "case" }, jira = "ENGINE-366")
-    @Test
-    public void searchProcessDefinitionsCaseSensitive() throws Exception {
-        searchProcessDefinitions(PROCESS_NAME, "PROCESS'VERSION");
-    }
-
     private void searchProcessDefinitions(final String processName, final String processVersion) throws Exception {
         // create user
         final User user = createUser(USERNAME, PASSWORD);
