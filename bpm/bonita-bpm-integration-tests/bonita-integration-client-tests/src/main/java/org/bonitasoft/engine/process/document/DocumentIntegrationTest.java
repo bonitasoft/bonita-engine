@@ -419,7 +419,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     @Test
-    public void getDocument_should_get_archived_document() throws Exception {
+    public void evaluateExpressionOnCompletedProcessInstance_should_be_able_to_retrieve_document_for_an_archived_process_instance() throws Exception {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MyProcessWithDocumentsInBar", "1.0");
         builder.addStartEvent("start");
         builder.addAutomaticTask("auto");
