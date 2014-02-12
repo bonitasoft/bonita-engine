@@ -18,11 +18,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -62,32 +64,42 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         try {
-            final Long containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
-            final String containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
-            if (containerId == null || containerType == null) {
-                throw new SExpressionDependencyMissingException("the context to retrieve the document is not set");
-            }
-            final long processInstanceId;
-            if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
-                processInstanceId = containerId;
-            } else {
-                SFlowNodeInstance flowNodeInstance;
-                flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
-                processInstanceId = flowNodeInstance.getParentProcessInstanceId();
-            }
+            Long containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
+            String containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
+            Long time = (Long) dependencyValues.get("time");
+            final long processInstanceId = getProcessInstance(containerId, containerType);
             final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
             for (final SExpression expression : expressions) {
-                try {
-
-                    final SProcessDocument document = processDocumentService.getDocument(processInstanceId, expression.getContent());
-                    results.add(ModelConvertor.toDocument(document));
-                } catch (final SDocumentNotFoundException e) {
-                    results.add(null);
-                }
+                results.add(getDocument(processInstanceId, expression, time));
             }
             return results;
         } catch (final SBonitaException e) {
             throw new SExpressionEvaluationException(e);
+        }
+    }
+
+    private Document getDocument(long processInstanceId, SExpression expression, Long time) {
+        try {
+            SProcessDocument document;
+            if(time != null) {
+                document = processDocumentService.getDocument(processInstanceId, expression.getContent(), time);
+            } else {
+                document = processDocumentService.getDocument(processInstanceId, expression.getContent());
+            }
+            return ModelConvertor.toDocument(document);
+        } catch (final SDocumentNotFoundException e) {
+            return null;
+        }
+    }
+
+    private long getProcessInstance(Long containerId, String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException, SExpressionDependencyMissingException {
+        if (containerId == null || containerType == null) {
+            throw new SExpressionDependencyMissingException("the context to retrieve the document is not set");
+        }
+        if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
+            return containerId;
+        } else {
+            return flowNodeInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
         }
     }
 
