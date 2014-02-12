@@ -999,7 +999,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         assertNotNull(result.getResult());
         assertEquals(0, result.getResult().size());
         // after supervisor
-        final ProcessSupervisor supervisor1 = createSupervisor(processDefinition.getId(), user1.getId());
+        final ProcessSupervisor supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user1.getId());
 
         searchOptions = buildSearchOptions(0, 10, HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
         // search and check result

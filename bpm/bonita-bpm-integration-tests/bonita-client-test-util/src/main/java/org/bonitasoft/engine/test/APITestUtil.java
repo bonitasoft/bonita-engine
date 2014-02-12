@@ -234,10 +234,6 @@ public class APITestUtil {
         getProcessAPI().addUserToActor(actorName, definition, userId);
     }
 
-    public void addMappingOfActorsForGroup(final String actorName, final long groupId, final ProcessDefinition definition) throws BonitaException {
-        getProcessAPI().addGroupToActor(actorName, groupId, definition);
-    }
-
     public void addMappingOfActorsForRole(final String actorName, final long roleId, final ProcessDefinition definition) throws BonitaException {
         getProcessAPI().addRoleToActor(actorName, definition, roleId);
     }
@@ -368,10 +364,6 @@ public class APITestUtil {
             actorList.add(actorName);
         }
         return actorList;
-    }
-
-    protected ProcessSupervisor createSupervisor(final long processDefID, final long userId) throws BonitaException {
-        return getProcessAPI().createProcessSupervisorForUser(processDefID, userId);
     }
 
     private ProcessSupervisor createSupervisorByRole(final long processDefID, final long roleId) throws BonitaException {
@@ -539,7 +531,7 @@ public class APITestUtil {
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
-        addMappingOfActorsForGroup(actorName, group.getId(), processDefinition);
+        getProcessAPI().addGroupToActor(actorName, group.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
     }
@@ -549,7 +541,7 @@ public class APITestUtil {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         for (final Group group : groups) {
-            addMappingOfActorsForGroup(actorName, group.getId(), processDefinition);
+            getProcessAPI().addGroupToActor(actorName, group.getId(), processDefinition);
         }
         getProcessAPI().enableProcess(processDefinition.getId());
         return processDefinition;
@@ -757,17 +749,6 @@ public class APITestUtil {
         getProcessAPI().deleteSupervisor(id);
     }
 
-    protected ProcessDefinition createProcessDefinition() throws Exception {
-        final String actorName = "Night coders";
-        final String actorDescription = "Coding all-night-long";
-
-        final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance("My_Process_with_branches", "1.0");
-        processBuilder1.addActor(actorName).addDescription(actorDescription);
-        final DesignProcessDefinition designProcessDefinition1 = processBuilder1.addUserTask("step2", actorName).getProcess();
-        final BusinessArchive businessArchive1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition1).done();
-        return getProcessAPI().deploy(businessArchive1);
-    }
-
     @Deprecated
     protected List<HumanTaskInstance> waitForPendingTasks(final long userId, final int nbPendingTasks) throws Exception {
         final WaitForPendingTasks waitUntil = new WaitForPendingTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbPendingTasks, userId, getProcessAPI());
@@ -788,7 +769,8 @@ public class APITestUtil {
 
     @Deprecated
     protected ArchivedActivityInstance waitForArchivedActivity(final long activityId, final String stateName) throws Exception {
-        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(100, 10000, activityId, stateName, getProcessAPI());
+        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityId, stateName,
+                getProcessAPI());
         waitForArchivedActivity.waitUntil();
         final ArchivedActivityInstance archivedActivityInstance = waitForArchivedActivity.getArchivedActivityInstance();
         assertNotNull(archivedActivityInstance);
@@ -1002,8 +984,8 @@ public class APITestUtil {
 
     @Deprecated
     public WaitForFinalArchivedActivity waitForFinalArchivedActivity(final String activityName, final ProcessInstance processInstance) throws Exception {
-        final WaitForFinalArchivedActivity waitForFinalArchivedActivity = new WaitForFinalArchivedActivity(200, 1000, activityName, processInstance.getId(),
-                getProcessAPI());
+        final WaitForFinalArchivedActivity waitForFinalArchivedActivity = new WaitForFinalArchivedActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityName,
+                processInstance.getId(), getProcessAPI());
         assertTrue(activityName + " should be finished and archived", waitForFinalArchivedActivity.waitUntil());
         return waitForFinalArchivedActivity;
     }
@@ -1020,12 +1002,12 @@ public class APITestUtil {
 
     @Deprecated
     public WaitForEvent waitForEvent(final long processInstanceId, final String eventName, final String state) throws Exception {
-        return waitForEvent(DEFAULT_REPEAT_EACH, 8000, processInstanceId, eventName, state);
+        return waitForEvent(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstanceId, eventName, state);
     }
 
     @Deprecated
     public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final String state) throws Exception {
-        return waitForEvent(DEFAULT_REPEAT_EACH, 8000, processInstance.getId(), eventName, state);
+        return waitForEvent(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance.getId(), eventName, state);
     }
 
     @Deprecated
@@ -1266,8 +1248,8 @@ public class APITestUtil {
 
     @Deprecated
     public void checkNbOfOpenTasks(final ProcessInstance processInstance, final String message, final int expectedNbOfOpenActivities) throws Exception {
-        final CheckNbOfOpenActivities checkNbOfOpenActivities = new CheckNbOfOpenActivities(40, 5000, true, processInstance, expectedNbOfOpenActivities,
-                getProcessAPI());
+        final CheckNbOfOpenActivities checkNbOfOpenActivities = new CheckNbOfOpenActivities(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, false, processInstance,
+                expectedNbOfOpenActivities, getProcessAPI());
         checkNbOfOpenActivities.waitUntil();
         assertEquals(message, expectedNbOfOpenActivities, checkNbOfOpenActivities.getNumberOfOpenActivities());
     }
@@ -1321,7 +1303,8 @@ public class APITestUtil {
     @Deprecated
     public CheckNbOfActivities checkNbOfActivitiesInInterruptingState(final ProcessInstance processInstance, final int nbActivities, final String state)
             throws Exception {
-        final CheckNbOfActivities checkNbOfActivities = new CheckNbOfActivities(getProcessAPI(), 50, 5000, true, processInstance, nbActivities, state);
+        final CheckNbOfActivities checkNbOfActivities = new CheckNbOfActivities(getProcessAPI(), DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, false, processInstance,
+                nbActivities, state);
         assertTrue("Expected " + nbActivities + " activities in " + state + " state", checkNbOfActivities.waitUntil());
         return checkNbOfActivities;
     }
