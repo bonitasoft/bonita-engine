@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -95,7 +94,7 @@ public class LocalLogTest extends CommonAPISPTest {
         designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         designProcessDefinition
                 .addAutomaticTask("step1")
-                .addConnector("myConnector", "org.bonitasoft.connector.APIAccessorConnector", "1.0", ConnectorEvent.ON_FINISH)
+                .addConnector("myConnector", "com.bonitasoft.connector.APIAccessorConnector", "1.0", ConnectorEvent.ON_FINISH)
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression("numberOfUsers", Long.class.getName()))
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(procInstIdData).done(), OperatorType.ASSIGNMENT, "=", null,
@@ -168,7 +167,7 @@ public class LocalLogTest extends CommonAPISPTest {
     }
 
     private void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream(path);
+        final InputStream stream = LocalLogTest.class.getResourceAsStream(path);
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
