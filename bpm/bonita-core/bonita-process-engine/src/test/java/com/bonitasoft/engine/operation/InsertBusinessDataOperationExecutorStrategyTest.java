@@ -56,6 +56,8 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
         final SRefBusinessDataInstance instance = mock(SRefBusinessDataInstance.class);
         when(leftOperand.getName()).thenReturn("unused");
         when(service.getRefBusinessDataInstance("unused", processInstanceId)).thenReturn(instance);
+        when(instance.getDataId()).thenReturn(null);
+        when(respository.merge(employee)).thenReturn(employee);
         doAnswer(new Answer<Void>() {
 
             @Override
@@ -67,8 +69,9 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
 
         strategy.update(leftOperand, employee, processInstanceId, "any");
 
-        verify(respository).persist(employee);
+        verify(respository).merge(employee);
         verify(service).getRefBusinessDataInstance("unused", processInstanceId);
         verify(service).updateRefBusinessDataInstance(instance, dataId);
     }
+
 }

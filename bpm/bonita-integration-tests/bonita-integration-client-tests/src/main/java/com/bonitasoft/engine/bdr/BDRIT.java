@@ -105,6 +105,7 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
+    @Ignore
     public void deployABDRAndCreateADefaultBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder()
                 .createGroovyScriptExpression("createNewEmployee",
@@ -115,6 +116,33 @@ public class BDRIT extends CommonAPISPTest {
         processDefinitionBuilder.addBusinessData("myEmployee", "org.bonita.pojo.Employee", employeeExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+
+        waitForUserTask("step1", instance.getId());
+        final Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
+        assertNotNull(businessDataInstance);
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
+    @Test
+    public void deployABDRAndCreateAndUdpateABusinessData() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder()
+                .createGroovyScriptExpression("createNewEmployee",
+                        "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;",
+                        "org.bonita.pojo.Employee");
+
+        final Expression getEmployeeExpression = new ExpressionBuilder().createBusinessDataExpression("myEmployee", "org.bonita.pojo.Employee");
+
+        final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("updateBizData", "myEmployee.lastName = 'BPM'; return 'BPM'",
+                String.class.getName(), getEmployeeExpression);
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addBusinessData("myEmployee", "org.bonita.pojo.Employee", employeeExpression);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addDisplayDescription(scriptExpression);
 
         final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());

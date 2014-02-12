@@ -80,7 +80,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
 
     private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
 
-	private final BusinessDataRespository businessDataRepository;
+    private final BusinessDataRespository businessDataRepository;
 
     private final RefBusinessDataService refBusinessDataService;
 
@@ -122,8 +122,8 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                 final SExpression expression = bdd.getDefaultValueExpression();
                 Long primaryKey = null;
                 if (expression != null) {
-                    final Object businessData = expressionResolverService.evaluate(expression);
-                    businessDataRepository.persist(businessData);
+                    Object businessData = expressionResolverService.evaluate(expression);
+                    businessData = businessDataRepository.merge(businessData);
                     primaryKey = ClassReflector.invokeGetter(businessData, PERSISTENCE_ID_GETTER);
                 }
                 final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);

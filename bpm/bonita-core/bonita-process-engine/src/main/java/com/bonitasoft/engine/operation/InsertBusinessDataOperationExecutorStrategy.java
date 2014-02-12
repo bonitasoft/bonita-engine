@@ -28,8 +28,8 @@ import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstanc
  */
 public class InsertBusinessDataOperationExecutorStrategy implements OperationExecutorStrategy {
 
-	private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
-	
+    private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
+
     private final BusinessDataRespository respository;
 
     private final RefBusinessDataService refBusinessDataService;
@@ -44,19 +44,22 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         if (value == null) {
-            throw new SOperationExecutionException("Unable to insert a null business data");
+            throw new SOperationExecutionException("Unable to insert/update a null business data");
         }
         return value;
     }
 
     @Override
-    public void update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public void update(final SLeftOperand sLeftOperand, Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        respository.persist(newValue);
         try {
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(), containerId);
-            final Long id = ClassReflector.invokeGetter(newValue, PERSISTENCE_ID_GETTER);
-            refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
+            final Long dataId = refBusinessDataInstance.getDataId();
+            if (dataId == null) {
+                newValue = respository.merge(newValue);
+                final Long id = ClassReflector.invokeGetter(newValue, PERSISTENCE_ID_GETTER);
+                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
+            }
         } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
             throw new SOperationExecutionException(srbdinfe);
         } catch (final SBonitaReadException sbre) {

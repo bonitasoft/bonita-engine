@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public interface BusinessDataRespository {
 
+    void deploy(byte[] bdrArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
+
     void start() throws SBusinessDataRepositoryDeploymentException;
 
     void stop();
@@ -24,8 +26,6 @@ public interface BusinessDataRespository {
 
     <T> T find(Class<T> resultClass, String qlString, Map<String, Object> parameters) throws BusinessDataNotFoundException, NonUniqueResultException;
 
-    void persist(Object entity);
-
-    void deploy(byte[] bdrArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
+    <T> T merge(T entity);
 
 }

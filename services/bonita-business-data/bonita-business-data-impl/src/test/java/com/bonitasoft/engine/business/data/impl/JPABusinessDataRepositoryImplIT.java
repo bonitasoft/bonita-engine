@@ -145,11 +145,11 @@ public class JPABusinessDataRepositoryImplIT {
     @Test
     public void persistNewEmployee() throws Exception {
         final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-        final Employee employee = new Employee("Marja", "Halonen");
+        final Employee employee;
         try {
             ut.begin();
             businessDataRepository.start();
-            businessDataRepository.persist(employee);
+            employee = businessDataRepository.merge(new Employee("Marja", "Halonen"));
         } finally {
             ut.commit();
         }
@@ -162,7 +162,7 @@ public class JPABusinessDataRepositoryImplIT {
         try {
             ut.begin();
             businessDataRepository.start();
-            businessDataRepository.persist(null);
+            businessDataRepository.merge(null);
             final Long count = businessDataRepository.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
             assertThat(count).isEqualTo(0);
         } finally {
@@ -225,6 +225,35 @@ public class JPABusinessDataRepositoryImplIT {
             final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Makkinen");
             businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
         } finally {
+            ut.commit();
+        }
+    }
+
+    @Test
+    public void updateAnEmployeeUsingParameterizedQuery() throws Exception {
+        UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.start();
+            setUpDatabase();
+            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
+            final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+            matti.setLastName("Hallonen");
+            businessDataRepository.merge(matti);
+            matti.setLastName("Halonen");
+            businessDataRepository.merge(matti);
+        } finally {
+            ut.commit();
+        }
+
+        ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
+            final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+            assertThat(matti.getLastName()).isEqualTo("Halonen");
+        } finally {
+            businessDataRepository.stop();
             ut.commit();
         }
     }

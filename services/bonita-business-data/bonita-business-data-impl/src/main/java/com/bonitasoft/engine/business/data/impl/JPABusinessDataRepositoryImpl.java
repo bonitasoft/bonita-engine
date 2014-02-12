@@ -158,6 +158,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
         if (entity == null) {
             throw new BusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
         }
+        em.detach(entity);
         return entity;
     }
 
@@ -172,7 +173,9 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
             }
         }
         try {
-            return query.getSingleResult();
+            final T entity = query.getSingleResult();
+            em.detach(entity);
+            return entity;
         } catch (final javax.persistence.NonUniqueResultException nure) {
             throw new NonUniqueResultException(nure);
         } catch (final NoResultException nre) {
@@ -190,12 +193,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
     }
 
     @Override
-    public void persist(final Object entity) {
-        if (entity == null) {
-            return;
+    public <T> T merge(final T entity) {
+        if (entity != null) {
+            final EntityManager em = getEntityManager();
+            return em.merge(entity);
         }
-        final EntityManager em = getEntityManager();
-        em.persist(entity);
+        return null;
     }
 
 }
