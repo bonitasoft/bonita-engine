@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api;
@@ -378,7 +378,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
-            ProcessActivationException, ProcessExecutionException;
+    ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
@@ -420,7 +420,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
-            ProcessActivationException, ProcessExecutionException;
+    ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
@@ -740,6 +740,21 @@ public interface ProcessRuntimeAPI {
     void updateProcessDataInstance(String dataName, long processInstanceId, Serializable dataValue) throws UpdateException;
 
     /**
+     * Update the value of a named data item in a specified process instance.
+     * 
+     * @param processInstanceId
+     *            the identifier of the process instance.
+     * @param dataNameValues
+     *            the mapping between the data name and its value to update to.
+     * @throws InvalidSessionException
+     *             if the session is invalid, e.g. the session has expired.
+     * @throws UpdateException
+     *             if a problem occurs while updating the data value.
+     * @since 6.2.3
+     */
+    void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues) throws UpdateException;
+
+    /**
      * Get a list of the data instances from a specified activity instance.
      * 
      * @param activityInstanceId
@@ -890,7 +905,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId) throws ProcessDefinitionNotFoundException,
-            UserNotFoundException;
+    UserNotFoundException;
 
     /**
      * Get the state of a specified activity instance.
@@ -1060,7 +1075,7 @@ public interface ProcessRuntimeAPI {
      */
     Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processDefinitionId)
-            throws ConnectorExecutionException, ConnectorNotFoundException;
+                    throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute a connector in a specified processDefinition with operations.
