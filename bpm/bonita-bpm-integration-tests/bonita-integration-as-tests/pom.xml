@@ -17,7 +17,7 @@
 		<bitronix.version>2.1.4</bitronix.version>
 		<distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
 		<bonita.home>${project.build.directory}/bonita</bonita.home>
-		<bonita.home.classifier>hibernate-teamwork</bonita.home.classifier>
+		<bonita.home.classifier>teamwork</bonita.home.classifier>
 		<bonita.version></bonita.version>
 		<!-- TESTS DIRS -->
 		<test.class>com.bonitasoft.engine.BPMSPTestsForServers</test.class>
@@ -65,11 +65,18 @@
 								<artifactItem>
 									<groupId>com.bonitasoft.engine</groupId>
 									<artifactId>bonita-engine-deploy</artifactId>
-									<classifier>${bonita.home.classifier}</classifier>
 									<version>${project.version}</version>
 									<type>zip</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${distrib.dir}</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.bonitasoft.engine</groupId>
+									<artifactId>bonita-home-sp</artifactId>
+									<version>${project.version}</version>
+									<classifier>${bonita.home.classifier}</classifier>
+									<type>zip</type>
+									<outputDirectory>${distrib.dir}/resources</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
