@@ -148,6 +148,20 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             throw handleNotFoundError("Can't get the document mappings", e);
         }
     }
+    
+    @Override
+    public List<SDocumentMapping> getDocumentMappingsForProcessInstanceOrderedById(final long processInstanceId, final int fromIndex, final int maxResults) throws SDocumentMappingException {
+        try {
+            List<SDocumentMapping> documentMappingList = persistenceService.selectList(SelectDescriptorBuilder.getDocumentMappingsforProcessInstance(
+                    processInstanceId, fromIndex, maxResults, null, null));
+            if (documentMappingList == null) {
+                documentMappingList = Collections.emptyList();
+            }
+            return documentMappingList;
+        } catch (final SBonitaReadException e) {
+            throw handleNotFoundError("Can't get the document mappings", e);
+        }
+    }
 
     private SDocumentMappingNotFoundException handleNotFoundError(final String message, final Exception e) {
         if (e != null && technicalLogger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
