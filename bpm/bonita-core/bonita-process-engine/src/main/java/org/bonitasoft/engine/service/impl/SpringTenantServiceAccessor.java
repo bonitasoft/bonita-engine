@@ -646,7 +646,9 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             throw new BonitaRuntimeException(ise);
         } finally {
             try {
-                resource.close();
+                if (resource != null) {
+                    resource.close();
+                }
             } catch (final IOException ioe) {
                 throw new BonitaRuntimeException(ioe);
             }
