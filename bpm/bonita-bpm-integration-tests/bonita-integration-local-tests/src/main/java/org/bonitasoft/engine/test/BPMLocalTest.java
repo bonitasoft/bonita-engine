@@ -426,8 +426,12 @@ public class BPMLocalTest extends CommonAPILocalTest {
             // fail something to flush the logs:
             new FailureHandlingBonitaWork(new FailingWork());
             workService.executeWork(runnable);
-            Thread.sleep(100);
-            content = org.bonitasoft.engine.io.IOUtil.read(file);
+            waitDuration = 0;
+            while(!content.contains("Procedure to recover: The recovery procedure") && waitDuration < 3000){
+            	Thread.sleep(100);
+            	waitDuration+=100;
+            	content = org.bonitasoft.engine.io.IOUtil.read(file);
+            }
             System.err.println("Reading again from file:" + file.getPath());
             assertTrue("File content is: " + content, content.contains("Procedure to recover: The recovery procedure"));
             System.err.println("Log flushing problem, please fix the test");
