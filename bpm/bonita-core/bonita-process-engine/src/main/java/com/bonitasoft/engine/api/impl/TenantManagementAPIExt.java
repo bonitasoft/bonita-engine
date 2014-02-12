@@ -16,7 +16,6 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -24,7 +23,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
-import com.bonitasoft.engine.platform.TenantNotFoundException;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -32,11 +30,15 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 public class TenantManagementAPIExt implements TenantManagementAPI {
 
-    private static TenantServiceAccessor getTenantAccessor() {
+    private TenantServiceAccessor getTenantAccessor() {
+        long tenantId = getTenantId();
+        return TenantServiceSingleton.getInstance(tenantId);
+    }
+
+    protected long getTenantId() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long tenantId = sessionAccessor.getTenantId();
-            return TenantServiceSingleton.getInstance(tenantId);
+            return sessionAccessor.getTenantId();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -64,21 +66,20 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     @Override
     @AvailableOnMaintenanceTenant
-    public boolean isTenantInMaintenance(final long tenantId) throws TenantNotFoundException {
+    public boolean isInMaintenance() {
+        long tenantId = getTenantId();
         final GetTenantInstance getTenant = new GetTenantInstance(tenantId, getPlatformService());
         try {
             getTenant.execute();
             return getTenant.getResult().isInMaintenance();
-        } catch (final STenantNotFoundException e) {
-            throw new TenantNotFoundException("No tenant exists with id: " + tenantId);
         } catch (final SBonitaException e) {
-            throw new RetrieveException("Unable to retrieve the tenant with id " + tenantId);
+            throw new RetrieveException("Unable to retrieve the tenant with id " + tenantId, e);
         }
     }
 
     @Override
     @AvailableOnMaintenanceTenant
-    public void setTenantMaintenanceMode(final long tenantId, final TenantMode mode) throws UpdateException {
+    public void setMaintenanceMode(final TenantMode mode) throws UpdateException {
         final PlatformService platformService = getPlatformService();
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -93,7 +94,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             default:
                 break;
         }
-        updateTenantFromId(tenantId, platformService, descriptor);
+        updateTenantFromId(getTenantId(), platformService, descriptor);
     }
 
     protected PlatformService getPlatformService() {

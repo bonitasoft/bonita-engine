@@ -28,8 +28,9 @@ public class TenantManagementAPIExtTest {
         PlatformService platformService = mock(PlatformService.class);
         doNothing().when(tenantManagementAPI).updateTenantFromId(eq(17), eq(platformService), any(EntityUpdateDescriptor.class));
         doReturn(platformService).when(tenantManagementAPI).getPlatformService();
+        doReturn(tenantId).when(tenantManagementAPI).getTenantId();
 
-        tenantManagementAPI.setTenantMaintenanceMode(tenantId, TenantMode.MAINTENANCE);
+        tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
 
         EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         String inMaintenanceKey = BuilderFactory.get(STenantBuilderFactory.class).getInMaintenanceKey();
@@ -51,7 +52,7 @@ public class TenantManagementAPIExtTest {
     @Test
     public void setTenantMaintenanceModeShouldHaveAnnotationAvailableOnMaintenanceTenant() throws Exception {
         // given:
-        Method method = TenantManagementAPIExt.class.getMethod("setTenantMaintenanceMode", long.class, TenantMode.class);
+        Method method = TenantManagementAPIExt.class.getMethod("setMaintenanceMode", TenantMode.class);
 
         // then:
         assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method TenantManagementAPIExt.setTenantMaintenanceMode()",
@@ -61,7 +62,7 @@ public class TenantManagementAPIExtTest {
     @Test
     public void isTenantInMaintenanceShouldHaveAnnotationAvailableOnMaintenanceTenant() throws Exception {
         // given:
-        Method method = TenantManagementAPIExt.class.getMethod("isTenantInMaintenance", long.class);
+        Method method = TenantManagementAPIExt.class.getMethod("isInMaintenance");
 
         // then:
         assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method TenantManagementAPIExt.isTenantInMaintenance()",

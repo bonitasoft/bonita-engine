@@ -19,7 +19,7 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.Session;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.TenantModeException;
+import com.bonitasoft.engine.api.TenantInMaintenanceException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -28,7 +28,7 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String IS_TENANT_IN_MAINTENANCE_METHOD_NAME = "isTenantInMaintenance";
+    private static final String IS_IN_MAINTENANCE_METHOD_NAME = "isInMaintenance";
 
     public ServerAPIExt() {
         super();
@@ -54,12 +54,14 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
     @Override
     protected void checkMethodAccessibility(final String apiInterfaceName, final Method method, final Session session) {
         super.checkMethodAccessibility(apiInterfaceName, method, session);
-        // Tenant-level method call:
+        // we don't check if tenant is in maintenance at platform level and when there is no session
+        // when there is no session means that we are trying to log in, in this case it is the LoginApiExt that check if the user is the technical user
+        // For tenant level method call:
         if (session instanceof APISession) {
             long tenantId = ((APISession) session).getTenantId();
             if (!isTenantInAValidModeFor(method, tenantId, session)) {
                 logTenantInMaintenanceMessage(apiInterfaceName, method.getName());
-                throw new TenantModeException("Tenant with ID " + tenantId + " in maintenance, no API call on this tenant can be made for now.");
+                throw new TenantInMaintenanceException("Tenant with ID " + tenantId + " is in maintenance, no API call on this tenant can be made for now.");
             }
         }
 
@@ -75,8 +77,8 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
         Object apiImpl;
         try {
             apiImpl = accessResolver.getAPIImplementation(TenantManagementAPI.class.getName());
-            final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_TENANT_IN_MAINTENANCE_METHOD_NAME, long.class);
-            Boolean inMaintenance = (Boolean) invokeAPIInTransaction(new Object[] { tenantId }, apiImpl, method, session);
+            final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_IN_MAINTENANCE_METHOD_NAME);
+            Boolean inMaintenance = (Boolean) invokeAPIInTransaction(new Object[0], apiImpl, method, session);
             return !inMaintenance;
         } catch (Throwable e) {
             throw new BonitaRuntimeException("Cannot determine if the tenant with ID " + tenantId + " is accessible", e);

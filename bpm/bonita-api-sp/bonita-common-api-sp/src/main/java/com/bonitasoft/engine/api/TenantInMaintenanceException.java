@@ -13,7 +13,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 /**
  * @author Emmanuel Duchastenier
  */
-public class TenantModeException extends BonitaRuntimeException {
+public class TenantInMaintenanceException extends BonitaRuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,7 +21,7 @@ public class TenantModeException extends BonitaRuntimeException {
      * @param message
      *            the exception message
      */
-    public TenantModeException(final String message) {
+    public TenantInMaintenanceException(final String message) {
         super(message);
     }
 

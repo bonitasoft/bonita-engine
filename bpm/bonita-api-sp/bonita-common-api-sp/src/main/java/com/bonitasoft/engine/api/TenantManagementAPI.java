@@ -11,8 +11,6 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
 
-import com.bonitasoft.engine.platform.TenantNotFoundException;
-
 /**
  * This API gives access to tenant management.
  * 
@@ -25,16 +23,15 @@ public interface TenantManagementAPI {
     /**
      * Allows to set the tenand mode.
      * 
-     * @param tenantId
-     *            the ID of the tenant to set the maintenance mode for.
      * @param mode
      *            the mode to set: "in maintenance", "running"
+     * 
      * @throws UpdateException
      *             if the update could not be performed.
      * @see {@link TenantMode}
      */
-    void setTenantMaintenanceMode(long tenantId, TenantMode mode) throws UpdateException;
+    void setMaintenanceMode(TenantMode mode) throws UpdateException;
 
-    boolean isTenantInMaintenance(long tenantId) throws TenantNotFoundException;
+    boolean isInMaintenance();
 
 }
