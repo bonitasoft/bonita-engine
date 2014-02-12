@@ -167,7 +167,7 @@ public class LocalLogTest extends CommonAPISPTest {
     }
 
     private void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
-        final InputStream stream = LocalLogTest.class.getResourceAsStream(path);
+        final InputStream stream = APIAccessorConnector.class.getResourceAsStream(path);
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
         stream.close();
