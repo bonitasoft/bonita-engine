@@ -9,12 +9,11 @@
 package com.bonitasoft.engine.session.impl;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import org.bonitasoft.engine.session.SSessionAlreadyExistsException;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
-import org.bonitasoft.engine.session.SessionProvider;
+import org.bonitasoft.engine.session.impl.AbstractSessionProvider;
 import org.bonitasoft.engine.session.model.SSession;
 
 import com.bonitasoft.manager.Features;
@@ -26,7 +25,7 @@ import com.hazelcast.core.IMap;
 /**
  * @author Baptiste Mesta
  */
-public final class SessionProviderClustered implements SessionProvider {
+public final class SessionProviderClustered extends AbstractSessionProvider {
 
     static final String SESSION_MAP = "SESSION_MAP";
 
@@ -48,67 +47,29 @@ public final class SessionProviderClustered implements SessionProvider {
     }
 
     @Override
-    public synchronized void addSession(final SSession session) throws SSessionAlreadyExistsException {
-        final long id = session.getId();
-        if (sessions.containsKey(id)) {
-            throw new SSessionAlreadyExistsException("A session wih id \"" + id + "\" already exists");
-        }
-        storeInMap(session, id);
-    }
-
-    /**
-     * @param session
-     * @param id
-     */
-    private void storeInMap(final SSession session, final long id) {
-        sessions.put(id, session, session.getDuration(), TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    public void removeSession(final long sessionId) throws SSessionNotFoundException {
-        final SSession session = sessions.remove(sessionId);
-        if (session == null) {
-            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
-        }
-    }
-
-    @Override
-    public SSession getSession(final long sessionId) throws SSessionNotFoundException {
-        final SSession session = sessions.get(sessionId);
-        if (session == null) {
-            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
-        }
-        return session;
-    }
-
-    @Override
-    public void updateSession(final SSession session) throws SSessionNotFoundException {
-        final long sessionId = session.getId();
-        if (!sessions.containsKey(sessionId)) {
-            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
-        }
-        storeInMap(session, sessionId);
-    }
-
-    @Override
     public synchronized void cleanInvalidSessions() {
         // do nothing since sessions are cleaned whith a TTL
     }
 
     @Override
-    public synchronized void removeSessions() {
-        sessions.clear();
+    protected Map<Long, SSession> getSessions() {
+        return sessions;
     }
 
     @Override
-    public synchronized void deleteSessionsOfTenant(final long tenantId) {
-        Iterator<Entry<Long, SSession>> iterator = sessions.entrySet().iterator();
+    protected SSession putSession(final SSession session, final long id) {
+        return sessions.put(id, session, session.getDuration(), TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public final synchronized void deleteSessionsOfTenant(final long tenantId) {
+        Iterator<Entry<Long, SSession>> iterator = getSessions().entrySet().iterator();
         while (iterator.hasNext()) {
-            Entry<Long, SSession> sSession = iterator.next();
-            if (tenantId == sSession.getValue().getTenantId()) {
-                sessions.remove(sSession.getKey());
+            Entry<Long, SSession> entry = iterator.next();
+            SSession session = entry.getValue();
+            if (tenantId == session.getTenantId() && !session.isTechnicalUser()) {
+                getSessions().remove(entry.getKey());
             }
         }
     }
-
 }

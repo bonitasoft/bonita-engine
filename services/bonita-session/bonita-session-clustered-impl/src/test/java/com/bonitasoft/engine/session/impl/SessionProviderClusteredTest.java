@@ -10,6 +10,7 @@ package com.bonitasoft.engine.session.impl;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -123,6 +124,24 @@ public class SessionProviderClusteredTest {
 
         // This call will throw an exception
         sessionProviderClustered.getSession(123l);
+    }
+
+    @Test
+    public void testDeleteSessionsOfTenant() throws Exception {
+        sessionProviderClustered.addSession(new SSessionImpl(54, 3, "john", "TEST", 12));
+        SSessionImpl technicalSession = new SSessionImpl(55, 3, "technicalUser", "TEST", 13);
+        technicalSession.setTechnicalUser(true);
+        sessionProviderClustered.addSession(technicalSession);
+        sessionProviderClustered.addSession(new SSessionImpl(56, 4, "john", "TEST", 14));
+        sessionProviderClustered.deleteSessionsOfTenant(3);
+        sessionProviderClustered.getSession(55);
+        sessionProviderClustered.getSession(56);
+        try {
+            sessionProviderClustered.getSession(54);
+            fail("session 54 should be deleted because it is on tenant 3");
+        } catch (SSessionNotFoundException e) {
+
+        }
     }
 
 }

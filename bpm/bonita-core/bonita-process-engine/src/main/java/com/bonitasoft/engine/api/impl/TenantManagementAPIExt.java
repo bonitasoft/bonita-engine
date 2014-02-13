@@ -12,6 +12,7 @@ import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
@@ -49,6 +50,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         PlatformServiceAccessor platformServiceAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+        SessionService sessionService = platformServiceAccessor.getSessionService();
 
         long tenantId = getTenantId();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -60,7 +62,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
                 break;
             case MAINTENANCE:
                 descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), STenantBuilderFactory.IN_MAINTENANCE);
-                pauseServicesForTenant(schedulerService, tenantId);
+                pauseServicesForTenant(schedulerService, sessionService, tenantId);
                 break;
             default:
                 break;
@@ -68,9 +70,11 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         updateTenantFromId(tenantId, platformService, descriptor);
     }
 
-    private void pauseServicesForTenant(final SchedulerService schedulerService, final long tenantId) throws UpdateException {
+    private void pauseServicesForTenant(final SchedulerService schedulerService, final SessionService sessionService, final long tenantId)
+            throws UpdateException {
         try {
             schedulerService.pauseJobs(tenantId);
+            sessionService.deleteSessionsOfTenant(tenantId);
         } catch (SSchedulerException e) {
             throw new UpdateException("Unable to pause the scheduler.", e);
         }
