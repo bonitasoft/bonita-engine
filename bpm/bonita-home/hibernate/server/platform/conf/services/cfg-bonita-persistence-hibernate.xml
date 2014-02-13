@@ -243,25 +243,11 @@
 				<entry key="getActorsOfScopes" value="true" />
 				<entry key="getActorsOfUser" value="true" />
 				<entry key="getActorsOfUserCanStartProcessDefinition" value="true" />
-				<entry key="getNumberOfActorMembersOfActor" value="true" />
-				<entry key="getDataInstanceByIds" value="true" />
-				<entry key="getDataInstanceIdFromMapping" value="true" />
-				<entry key="getDataInstanceIdsFromMapping" value="true" />
-				<entry key="getDataInstanceVisibilityMappings" value="true" />
-				<entry key="getDataInstancesByContainer" value="true" />
-				<entry key="getDataInstancesByNameAndContainer" value="true" />
+				<entry key="getNumberOfActorMembersOfActor" value="true" />                
 				<entry key="getDataSourceByNameAndVersion" value="true" />
 				<entry key="getDataSourceParameterByNameAndDataSourceId" value="true" />
 				<entry key="getDataSourceParametersByDataSourceId" value="true" />
 				<entry key="getDataSources" value="true" />
-				<entry key="getLastSADataInstanceByDataInstanceId" value="true" />
-				<entry key="getNumberOfDataInstancesForContainer" value="true" />
-				<entry key="getSADataInstanceByDataInstanceId" value="true" />
-				<entry key="getSADataInstanceByDataInstanceIdAndArchiveDate" value="true" />
-				<entry key="getSADataInstanceIdFromMapping" value="true" />
-				<entry key="getSADataInstanceIdsFromMapping" value="true" />
-				<entry key="getSADataInstanceVisibilityMappings" value="true" />
-				<entry key="getSADataInstancesByDataInstanceIdAndArchiveDate" value="true" />
 				<entry key="getPlatform" value="true" />
 				<entry key="getDeployInfoByProcessDefId" value="true" />
 				<entry key="getCommandByName" value="true" />
