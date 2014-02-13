@@ -44,6 +44,7 @@ public class ActorUpdater implements Serializable {
      * Set the new display name
      * 
      * @param name
+     *            The new display name
      */
     public void setDisplayName(final String name) {
         fields.put(ActorField.DISPLAY_NAME, name);
@@ -53,6 +54,7 @@ public class ActorUpdater implements Serializable {
      * Set the new description
      * 
      * @param description
+     *            The new description
      */
     public void setDescription(final String description) {
         fields.put(ActorField.DESCRIPTION, description);

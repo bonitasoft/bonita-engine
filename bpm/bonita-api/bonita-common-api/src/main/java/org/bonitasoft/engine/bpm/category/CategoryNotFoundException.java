@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,8 +16,11 @@ package org.bonitasoft.engine.bpm.category;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
+ * It's thrown when it's not possible to find a category.
+ * 
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class CategoryNotFoundException extends NotFoundException {
 
