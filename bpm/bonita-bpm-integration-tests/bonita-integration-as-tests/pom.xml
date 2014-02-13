@@ -51,11 +51,7 @@
 		<profile>
 			<id>package-all</id>
 			<modules>
-				<module>bonita-integration-jboss4-ejb2</module>
-				<module>bonita-integration-jboss4-ejb3</module>
 				<module>bonita-integration-jboss5</module>
-				<module>bonita-integration-jonas4</module>
-				<module>bonita-integration-jonas5</module>
 				<module>bonita-integration-tomcat6</module>
 				<module>bonita-integration-tomcat7</module>
 			</modules>

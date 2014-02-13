@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-<properties>
-  <entry key="org.bonitasoft.engine.api-type">EJB3</entry>
-  <entry key="org.bonitasoft.engine.api-type.parameters">java.naming.factory.initial, java.naming.provider.url</entry>
-  <entry key="java.naming.factory.initial">org.jnp.interfaces.NamingContextFactory</entry>
-  <entry key="java.naming.provider.url">jnp://localhost:7099</entry>
-</properties>
