@@ -34,7 +34,7 @@ public class MonitoringAPIImpl implements MonitoringAPI {
 
     @CustomTransactions
     @Override
-    public long getNumberOfActiveTransactions() throws MonitoringException {
+    public long getNumberOfActiveTransactions() {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.SERVICE_MONITORING);
 
         final TenantMonitoringService tenantMonitoringService = getTenantMonitoringService();
@@ -63,7 +63,7 @@ public class MonitoringAPIImpl implements MonitoringAPI {
     }
 
     @Override
-    public long getNumberOfExecutingProcesses() throws MonitoringException {
+    public long getNumberOfExecutingProcesses() {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.BPM_MONITORING);
         // FIXME
         return 0;

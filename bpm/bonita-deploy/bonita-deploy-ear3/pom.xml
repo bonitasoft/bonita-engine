@@ -98,6 +98,8 @@
 						<version>4.2</version>
 						<loader-repository>com.bonitasoft.engine:archive=${project.artifactId}-${project.version}.ear</loader-repository>
 					</jboss>
+					
+					<packagingExcludes>lib/jboss-transaction-api*.jar,lib/jboss-logging-annotations*.jar</packagingExcludes>
 				</configuration>
 			</plugin>
 		</plugins>
