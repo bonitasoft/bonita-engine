@@ -175,6 +175,7 @@ public class APITestSPUtil extends APITestUtil {
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
+        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
@@ -189,6 +190,7 @@ public class APITestSPUtil extends APITestUtil {
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
+        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
@@ -202,6 +204,7 @@ public class APITestSPUtil extends APITestUtil {
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
+        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
     }
 
     @Override

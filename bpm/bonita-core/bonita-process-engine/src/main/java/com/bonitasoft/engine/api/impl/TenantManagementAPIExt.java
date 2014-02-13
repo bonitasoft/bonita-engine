@@ -7,24 +7,19 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantMode;
-import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
 public class TenantManagementAPIExt implements TenantManagementAPI {
-
-    private TenantServiceAccessor getTenantAccessor() {
-        long tenantId = getTenantId();
-        return TenantServiceSingleton.getInstance(tenantId);
-    }
 
     protected long getTenantId() {
         try {
@@ -39,7 +34,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     @AvailableOnMaintenanceTenant
     public boolean isInMaintenance() {
         long tenantId = getTenantId();
-        final GetTenantInstance getTenant = new GetTenantInstance(tenantId, getPlatformService());
+        final GetTenantInstance getTenant = new GetTenantInstance(tenantId, getPlatformAccessorNoException().getPlatformService());
         try {
             getTenant.execute();
             return getTenant.getResult().isInMaintenance();
@@ -51,27 +46,42 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     @Override
     @AvailableOnMaintenanceTenant
     public void setMaintenanceMode(final TenantMode mode) throws UpdateException {
-        final PlatformService platformService = getPlatformService();
+        PlatformServiceAccessor platformServiceAccessor = getPlatformAccessorNoException();
+        final PlatformService platformService = platformServiceAccessor.getPlatformService();
+        SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
 
+        long tenantId = getTenantId();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
         switch (mode) {
             case AVAILABLE:
                 descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), STenantBuilderFactory.AVAILABLE);
+                resumeServicesForTenant(schedulerService, tenantId);
                 break;
             case MAINTENANCE:
                 descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), STenantBuilderFactory.IN_MAINTENANCE);
+                pauseServicesForTenant(schedulerService, tenantId);
                 break;
             default:
                 break;
         }
-        updateTenantFromId(getTenantId(), platformService, descriptor);
+        updateTenantFromId(tenantId, platformService, descriptor);
     }
 
-    protected PlatformService getPlatformService() {
-        PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        return platformService;
+    private void pauseServicesForTenant(final SchedulerService schedulerService, final long tenantId) throws UpdateException {
+        try {
+            schedulerService.pauseJobs(tenantId);
+        } catch (SSchedulerException e) {
+            throw new UpdateException("Unable to pause the scheduler.", e);
+        }
+    }
+
+    private void resumeServicesForTenant(final SchedulerService schedulerService, final long tenantId) throws UpdateException {
+        try {
+            schedulerService.resumeJobs(tenantId);
+        } catch (SSchedulerException e) {
+            throw new UpdateException("Unable to resume the scheduler.", e);
+        }
     }
 
     protected PlatformServiceAccessor getPlatformAccessorNoException() {
@@ -85,7 +95,8 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     protected void updateTenantFromId(final long tenantId, final PlatformService platformService, final EntityUpdateDescriptor descriptor)
             throws UpdateException {
         try {
-            new UpdateTenant(tenantId, descriptor, platformService).execute();
+            final STenant tenant = platformService.getTenant(tenantId);
+            platformService.updateTenant(tenant, descriptor);
         } catch (SBonitaException e) {
             throw new UpdateException("Could not update the tenant maintenance mode", e);
         }
