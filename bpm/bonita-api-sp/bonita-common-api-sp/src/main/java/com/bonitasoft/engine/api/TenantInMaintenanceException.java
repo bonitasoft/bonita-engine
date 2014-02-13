@@ -11,6 +11,9 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 
 /**
+ * 
+ * occurs when we try to login with an other user than the technical user on a tenant that is in maintenance
+ * 
  * @author Emmanuel Duchastenier
  */
 public class TenantInMaintenanceException extends BonitaRuntimeException {

@@ -86,14 +86,14 @@ public class TenantManagementAPIExtTest {
     public void should_setMaintenanceMode_to_MAINTENANCE_delete_sessions() throws Exception {
         tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
 
-        verify(sessionService).deleteSessionsOfTenant(tenantId);
+        verify(sessionService).deleteSessionsOfTenantExceptTechnicalUser(tenantId);
     }
 
     @Test
     public void should_setMaintenanceMode_to_AVAILABLE_delete_sessions() throws Exception {
         tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
 
-        verify(sessionService, times(0)).deleteSessionsOfTenant(tenantId);
+        verify(sessionService, times(0)).deleteSessionsOfTenantExceptTechnicalUser(tenantId);
     }
 
     @Test

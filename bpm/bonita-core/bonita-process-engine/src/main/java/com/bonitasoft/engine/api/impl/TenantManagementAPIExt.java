@@ -74,7 +74,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             throws UpdateException {
         try {
             schedulerService.pauseJobs(tenantId);
-            sessionService.deleteSessionsOfTenant(tenantId);
+            sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
         } catch (SSchedulerException e) {
             throw new UpdateException("Unable to pause the scheduler.", e);
         }

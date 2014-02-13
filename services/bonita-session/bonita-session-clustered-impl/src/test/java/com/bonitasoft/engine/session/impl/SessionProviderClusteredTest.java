@@ -127,15 +127,40 @@ public class SessionProviderClusteredTest {
     }
 
     @Test
-    public void testDeleteSessionsOfTenant() throws Exception {
+    public void testDeleteSessionsOfTenantKeepTechnical() throws Exception {
+        sessionProviderClustered.removeSessions();
         sessionProviderClustered.addSession(new SSessionImpl(54, 3, "john", "TEST", 12));
         SSessionImpl technicalSession = new SSessionImpl(55, 3, "technicalUser", "TEST", 13);
         technicalSession.setTechnicalUser(true);
         sessionProviderClustered.addSession(technicalSession);
         sessionProviderClustered.addSession(new SSessionImpl(56, 4, "john", "TEST", 14));
-        sessionProviderClustered.deleteSessionsOfTenant(3);
+        sessionProviderClustered.deleteSessionsOfTenant(3, true);
         sessionProviderClustered.getSession(55);
         sessionProviderClustered.getSession(56);
+        try {
+            sessionProviderClustered.getSession(54);
+            fail("session 54 should be deleted because it is on tenant 3");
+        } catch (SSessionNotFoundException e) {
+
+        }
+    }
+
+    @Test
+    public void testDeleteSessionsOfTenant() throws Exception {
+        sessionProviderClustered.removeSessions();
+        sessionProviderClustered.addSession(new SSessionImpl(54, 3, "john", "TEST", 12));
+        SSessionImpl technicalSession = new SSessionImpl(55, 3, "technicalUser", "TEST", 13);
+        technicalSession.setTechnicalUser(true);
+        sessionProviderClustered.addSession(technicalSession);
+        sessionProviderClustered.addSession(new SSessionImpl(56, 4, "john", "TEST", 14));
+        sessionProviderClustered.deleteSessionsOfTenant(3, false);
+        sessionProviderClustered.getSession(56);
+        try {
+            sessionProviderClustered.getSession(55);
+            fail("session 55 should be deleted because it is on tenant 3");
+        } catch (SSessionNotFoundException e) {
+
+        }
         try {
             sessionProviderClustered.getSession(54);
             fail("session 54 should be deleted because it is on tenant 3");

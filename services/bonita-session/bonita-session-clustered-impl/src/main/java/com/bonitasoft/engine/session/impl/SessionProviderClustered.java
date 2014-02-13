@@ -62,12 +62,12 @@ public final class SessionProviderClustered extends AbstractSessionProvider {
     }
 
     @Override
-    public final synchronized void deleteSessionsOfTenant(final long tenantId) {
+    public final synchronized void deleteSessionsOfTenant(final long tenantId, final boolean keepTechnicalSessions) {
         Iterator<Entry<Long, SSession>> iterator = getSessions().entrySet().iterator();
         while (iterator.hasNext()) {
             Entry<Long, SSession> entry = iterator.next();
             SSession session = entry.getValue();
-            if (tenantId == session.getTenantId() && !session.isTechnicalUser()) {
+            if (tenantId == session.getTenantId() && (!keepTechnicalSessions || !session.isTechnicalUser())) {
                 getSessions().remove(entry.getKey());
             }
         }
