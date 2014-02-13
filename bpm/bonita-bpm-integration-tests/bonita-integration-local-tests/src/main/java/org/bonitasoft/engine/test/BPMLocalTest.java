@@ -356,33 +356,6 @@ public class BPMLocalTest extends CommonAPILocalTest {
         assertEquals(0, actorMembers.size());
     }
 
-    @Test
-    public void incidentIsLogged() throws Exception {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final WorkService workService = tenantAccessor.getWorkService();
-        final BonitaWork runnable = new FailureHandlingBonitaWork(new FailingWork());
-        workService.executeWork(runnable);
-        Thread.sleep(100);
-        final String tenantFolder = BonitaHomeServer.getInstance().getTenantFolder(tenantAccessor.getSessionAccessor().getTenantId());
-        final File file = new File(tenantFolder + File.separatorChar + "incidents.log");
-        String content = org.bonitasoft.engine.io.IOUtil.read(file);
-        assertTrue("File content is: " + content, content.contains("An incident occurred: MyJob"));
-        assertTrue("File content is: " + content, content.contains("an unexpected exception"));
-        assertTrue("File content is: " + content, content.contains("unable to handle failure"));
-        try {
-            assertTrue("File content is: " + content, content.contains("Procedure to recover: The recovery procedure"));
-        } catch (final AssertionError ass) {
-            // fail something to flush the logs:
-            new FailureHandlingBonitaWork(new FailingWork());
-            workService.executeWork(runnable);
-            Thread.sleep(100);
-            content = org.bonitasoft.engine.io.IOUtil.read(file);
-            System.err.println("Reading again from file:" + file.getPath());
-            assertTrue("File content is: " + content, content.contains("Procedure to recover: The recovery procedure"));
-            System.err.println("Log flushing problem, please fix the test");
-        }
-    }
-
     private ProcessDefinition deployAndEnableProcessWithOneHumanTask(final String processName, final String actorName, final String userTaskName)
             throws BonitaException {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder();
