@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.UpdateException;
 
 /**
@@ -17,8 +16,6 @@ import org.bonitasoft.engine.exception.UpdateException;
  * @author Matthieu Chaffotte
  */
 public interface TenantManagementAPI {
-
-    void deployBusinessDataRepository(final byte[] jar) throws CreationException;
 
     /**
      * Allows to set the tenand mode.
