@@ -113,7 +113,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
             final long resolvedTenantId)
             throws LoginException, BonitaHomeNotSetException, IOException {
         if (!platformService.isTenantActivated(sTenant)) {
-            // FIXME launch an other type of exception
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated");
         }
     }
