@@ -589,7 +589,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     @Test
-    public void testSearchDocumentsSupervisedBy() throws Exception {
+    public void searchDocumentsSupervisedBy() throws Exception {
         // search document by supervisor before create supervisor.
         SearchOptionsBuilder searchOptionsBuilder;
         searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
@@ -601,7 +601,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         // create supervisor.
         final long processDefinitionId = getProcessAPI().getProcessDefinitionIdFromProcessInstanceId(pi.getId());
-        final ProcessSupervisor supervisor = createSupervisor(processDefinitionId, user.getId());
+        final ProcessSupervisor supervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitionId, user.getId());
 
         // search again.
         searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, pi.getId());
@@ -732,7 +732,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     @Test
-    public void testSearchArchivedDocumentsSupervisedBy() throws BonitaException {
+    public void searchArchivedDocumentsSupervisedBy() throws BonitaException {
         // add into archive, without supervisor.
         final ProcessInstance pi1 = ensureAProcessInstanceIsStartedWithDocumentAttached(user);
         final ProcessInstance pi2 = ensureAProcessInstanceIsStartedWithDocumentAttached(user);
@@ -753,7 +753,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         // create supervisor, add supervisor by role and group
         final long processDefinitionId = getProcessAPI().getProcessDefinitionIdFromProcessInstanceId(pi2.getId());
-        final ProcessSupervisor supervisor = createSupervisor(processDefinitionId, user.getId());
+        final ProcessSupervisor supervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitionId, user.getId());
         final Map<String, Object> map = createSupervisorByRoleAndGroup(pi2.getId(), user.getId());
 
         // search again. exist 1 document in archive table with supervisor.

@@ -153,7 +153,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         assertNotNull(result.getResult());
         assertEquals(0, result.getResult().size());
         // after supervisor
-        final ProcessSupervisor supervisor1 = createSupervisor(processDefinition.getId(), user1.getId());
+        final ProcessSupervisor supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user1.getId());
 
         // prepare search options
         searchOptions = buildSearchOptions(0, 10, ProcessInstanceSearchDescriptor.NAME, Order.ASC);
@@ -1151,7 +1151,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // add supervisor
-        final ProcessSupervisor supervisor1 = createSupervisor(processDefinition.getId(), user.getId());
+        final ProcessSupervisor supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition.getId(), user.getId());
 
         waitForStep("userTask1", processInstance);
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
@@ -1352,27 +1352,27 @@ public class SearchProcessInstanceTest extends CommonAPITest {
             disableAndDeleteProcess(info.getProcessId());
         }
     }
-    
+
     @Test
     public void search_process_instances_in_all_states_retrieves_all_process_states() throws Exception {
-        //deploy and start a process
+        // deploy and start a process
         final ProcessDefinition simpleProcess = deployProcessWithHumanTask(ACTOR_NAME, "step1");
         final ProcessInstance procInst = getProcessAPI().startProcess(simpleProcess.getId());
-        
-        //execute it until the end
+
+        // execute it until the end
         long processInstanceId = procInst.getId();
         waitForUserTaskAndExecuteIt("step1", processInstanceId, user.getId());
         waitForProcessToFinish(processInstanceId);
-        
-        //search archived process instances: all states must be retrieved
+
+        // search archived process instances: all states must be retrieved
         SearchResult<ArchivedProcessInstance> searchResult = searchAchivedProcessInstancesInAllStates(processInstanceId);
-        
+
         assertEquals(3, searchResult.getCount());
         List<ArchivedProcessInstance> archivedProcesses = searchResult.getResult();
         assertEquals(ProcessInstanceState.INITIALIZING.getId(), archivedProcesses.get(0).getStateId());
         assertEquals(ProcessInstanceState.STARTED.getId(), archivedProcesses.get(1).getStateId());
         assertEquals(ProcessInstanceState.COMPLETED.getId(), archivedProcesses.get(2).getStateId());
-        
+
         deleteProcessInstanceAndArchived(simpleProcess.getId());
         disableAndDeleteProcess(simpleProcess.getId());
     }
