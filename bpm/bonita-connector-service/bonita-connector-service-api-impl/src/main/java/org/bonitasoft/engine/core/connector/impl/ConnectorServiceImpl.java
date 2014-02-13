@@ -245,14 +245,20 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private String buildConnectorImplementationKey(final long rootDefinitionId, final String connectorId, final String version) {
-        return String.format("%d:%s-%s",  rootDefinitionId, connectorId, version);
+        return new StringBuilder()
+        .append(rootDefinitionId)
+        .append(":")
+        .append(connectorId)
+        .append("-")
+        .append(version)
+        .toString();
     }
 
     @Override
     public ConnectorResult executeMutipleEvaluation(final long processDefinitionId, final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, SExpression> connectorInputParameters,
             final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
-            throws SConnectorException {
+                    throws SConnectorException {
         String implementationClassName;
         final SConnectorImplementationDescriptor implementation;
         try {

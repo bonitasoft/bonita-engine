@@ -189,11 +189,11 @@ public interface ConnectorInstanceService {
     /**
      * @param containerId
      * @param containerType
-     * @throws SBonitaSearchException
+     * @throws SConnectorInstanceReadException
      * @throws SConnectorInstanceDeletionException
      * @since 6.1
      */
-    void deleteConnectors(long containerId, String containerType) throws SBonitaSearchException, SConnectorInstanceDeletionException;
+    void deleteConnectors(long containerId, String containerType) throws SConnectorInstanceReadException, SConnectorInstanceDeletionException;
 
     /**
      * @param containerId

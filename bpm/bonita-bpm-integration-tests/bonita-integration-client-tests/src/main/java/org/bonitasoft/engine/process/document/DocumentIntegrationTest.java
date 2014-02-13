@@ -14,6 +14,7 @@
  */
 package org.bonitasoft.engine.process.document;
 
+import static java.util.Collections.EMPTY_MAP;
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,6 +28,7 @@ import static org.junit.Assert.fail;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -414,6 +416,26 @@ public class DocumentIntegrationTest extends CommonAPITest {
         } finally {
             disableAndDeleteProcess(pi.getProcessDefinitionId());
         }
+    }
+
+    @Test
+    public void evaluateExpressionOnCompletedProcessInstance_should_be_able_to_retrieve_document_for_an_archived_process_instance() throws Exception {
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MyProcessWithDocumentsInBar", "1.0");
+        builder.addStartEvent("start");
+        builder.addAutomaticTask("auto");
+        builder.addEndEvent("end");
+
+        builder.addDocumentDefinition("document").addContentFileName("document.content").addFile("document.content");
+        BusinessArchiveBuilder archive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.getProcess());
+        archive.addDocumentResource(new BarResource("document.content", "content".getBytes()));
+        ProcessInstance processInstance = getProcessAPI().startProcess(deployAndEnableProcess(archive.done()).getId());
+        waitForProcessToFinish(processInstance.getId());
+
+        Map<Expression, Map<String, Serializable>> expressions = Collections.<Expression, Map<String, Serializable>> singletonMap(new ExpressionBuilder().createDocumentReferenceExpression("document"), EMPTY_MAP);
+        Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
+
+        assertEquals("document.content", ((Document) result.get("document")).getContentFileName());
+        disableAndDeleteProcess(processInstance.getProcessDefinitionId());
     }
 
     @Test
