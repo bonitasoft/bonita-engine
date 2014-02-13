@@ -180,81 +180,67 @@
 			</list>
 		</constructor-arg>
 		<!-- Query cache -->
-		<constructor-arg name="cacheQueries">
-			<map>
-				<entry key="getDirectProfileMembersOfGroup" value="true" />
-				<entry key="getDirectProfileMembersOfRole" value="true" />
-				<entry key="getDirectProfileMembersOfUser" value="true" />
-				<entry key="getEntriesOfProfile" value="true" />
-				<entry key="getEntriesOfProfileByParentId" value="true" />
-				<entry key="getNumberOfEntriesOfProfile" value="true" />
-				<entry key="getNumberOfProfile" value="true" />
-				<entry key="getNumberOfProfileMemberOfProfile" value="true" />
-				<entry key="getNumberOfSProfileMemberForGroup" value="true" />
-				<entry key="getNumberOfSProfileMemberForRole" value="true" />
-				<entry key="getNumberOfSProfileMemberForRoleAndGroup" value="true" />
-				<entry key="getNumberOfSProfileMemberForUser" value="true" />
-				<entry key="getNumberOfSProfileMemberwithSGroupForGroup" value="true" />
-				<entry key="getNumberOfSProfileMemberwithSGroupForRoleAndGroup" value="true" />
-				<entry key="getNumberOfSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true" />
-				<entry key="getNumberOfSProfileMemberwithSRoleForRole" value="true" />
-				<entry key="getNumberOfSProfileMemberwithSRoleForRoleAndGroup" value="true" />
-				<entry key="getNumberOfSProfileMemberwithSUserForUser" value="true" />
-				<entry key="getProfileByName" value="true" />
-				<entry key="getProfileMemberWithoutDisplayNameById" value="true" />
-				<entry key="getProfileMembersFromProfileIds" value="true" />
-				<entry key="getProfiles" value="true" />
-				<entry key="getProfilesOfUser" value="true" />
-				<entry key="getSProfileMembersWithoutDisplayName" value="true" />
-				<entry key="searchSProfileMemberForGroup" value="true" />
-				<entry key="searchSProfileMemberForRole" value="true" />
-				<entry key="searchSProfileMemberForRoleAndGroup" value="true" />
-				<entry key="searchSProfileMemberForUser" value="true" />
-				<entry key="searchSProfileMemberwithSGroupForGroup" value="true" />
-				<entry key="searchSProfileMemberwithSGroupForRoleAndGroup" value="true" />
-				<entry key="searchSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true" />
-				<entry key="searchSProfileMemberwithSRoleForRole" value="true" />
-				<entry key="searchSProfileMemberwithSRoleForRoleAndGroup" value="true" />
-				<entry key="searchSProfileMemberwithSUserForUser" value="true" />
-				<entry key="getCategories" value="true" />
-				<entry key="getCategoriesOfProcess" value="true" />
-				<entry key="getCategorizedProcessIds" value="true" />
-				<entry key="getCategoryByName" value="true" />
-				<entry key="getNumberOfCategoriesOfProcess" value="true" />
-				<entry key="getNumberOfCategorizedProcessIds" value="true" />
-				<entry key="getNumberOfCategory" value="true" />
-				<entry key="getProcessCategoryMappingsOfCategory" value="true" />
-				<entry key="getProcessCategoryMappingsOfProcess" value="true" />
-				<entry key="getProcessIdsOfCategory" value="true" />
-				<entry key="getActorFromNameAndScopeId" value="true" />
-				<entry key="getActorMembersOfActor" value="true" />
-				<entry key="getActorMembersOfGroup" value="true" />
-				<entry key="getActorMembersOfRole" value="true" />
-				<entry key="getActorMembersOfUser" value="true" />
-				<entry key="getActorsByIds" value="true" />
-				<entry key="getActorsOfScope" value="true" />
-				<entry key="getActorsOfScopes" value="true" />
-				<entry key="getActorsOfUser" value="true" />
-				<entry key="getActorsOfUserCanStartProcessDefinition" value="true" />
-				<entry key="getNumberOfActorMembersOfActor" value="true" />
-				<entry key="getDataInstanceByIds" value="true" />
-				<entry key="getDataInstanceIdFromMapping" value="true" />
-				<entry key="getDataInstanceIdsFromMapping" value="true" />
-				<entry key="getDataInstanceVisibilityMappings" value="true" />
-				<entry key="getDataInstancesByContainer" value="true" />
-				<entry key="getDataInstancesByNameAndContainer" value="true" />
-				<entry key="getDataSourceByNameAndVersion" value="true" />
-				<entry key="getDataSourceParameterByNameAndDataSourceId" value="true" />
-				<entry key="getDataSourceParametersByDataSourceId" value="true" />
-				<entry key="getDataSources" value="true" />
-				<entry key="getLastSADataInstanceByDataInstanceId" value="true" />
-				<entry key="getNumberOfDataInstancesForContainer" value="true" />
-				<entry key="getSADataInstanceByDataInstanceId" value="true" />
-				<entry key="getSADataInstanceByDataInstanceIdAndArchiveDate" value="true" />
-				<entry key="getSADataInstanceIdFromMapping" value="true" />
-				<entry key="getSADataInstanceIdsFromMapping" value="true" />
-				<entry key="getSADataInstanceVisibilityMappings" value="true" />
-				<entry key="getSADataInstancesByDataInstanceIdAndArchiveDate" value="true" />
+        <constructor-arg name="cacheQueries">
+            <map>
+                <entry key="getDirectProfileMembersOfGroup" value="true"/>
+                <entry key="getDirectProfileMembersOfRole" value="true"/>
+                <entry key="getDirectProfileMembersOfUser" value="true"/>
+                <entry key="getEntriesOfProfile" value="true"/>
+                <entry key="getEntriesOfProfileByParentId" value="true"/>
+                <entry key="getNumberOfEntriesOfProfile" value="true"/>
+                <entry key="getNumberOfProfile" value="true"/>
+                <entry key="getNumberOfProfileMemberOfProfile" value="true"/>
+                <entry key="getNumberOfSProfileMemberForGroup" value="true"/>
+                <entry key="getNumberOfSProfileMemberForRole" value="true"/>
+                <entry key="getNumberOfSProfileMemberForRoleAndGroup" value="true"/>
+                <entry key="getNumberOfSProfileMemberForUser" value="true"/>
+                <entry key="getNumberOfSProfileMemberwithSGroupForGroup" value="true"/>
+                <entry key="getNumberOfSProfileMemberwithSGroupForRoleAndGroup" value="true"/>
+                <entry key="getNumberOfSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true"/>
+                <entry key="getNumberOfSProfileMemberwithSRoleForRole" value="true"/>
+                <entry key="getNumberOfSProfileMemberwithSRoleForRoleAndGroup" value="true"/>
+                <entry key="getNumberOfSProfileMemberwithSUserForUser" value="true"/>
+                <entry key="getProfileByName" value="true"/>
+                <entry key="getProfileMemberWithoutDisplayNameById" value="true"/>
+                <entry key="getProfileMembersFromProfileIds" value="true"/>
+                <entry key="getProfiles" value="true"/>
+                <entry key="getProfilesOfUser" value="true"/>
+                <entry key="getSProfileMembersWithoutDisplayName" value="true"/>
+                <entry key="searchSProfileMemberForGroup" value="true"/>
+                <entry key="searchSProfileMemberForRole" value="true"/>
+                <entry key="searchSProfileMemberForRoleAndGroup" value="true"/>
+                <entry key="searchSProfileMemberForUser" value="true"/>
+                <entry key="searchSProfileMemberwithSGroupForGroup" value="true"/>
+                <entry key="searchSProfileMemberwithSGroupForRoleAndGroup" value="true"/>
+                <entry key="searchSProfileMemberwithSGroupwithSRoleForRoleAndGroup" value="true"/>
+                <entry key="searchSProfileMemberwithSRoleForRole" value="true"/>
+                <entry key="searchSProfileMemberwithSRoleForRoleAndGroup" value="true"/>
+                <entry key="searchSProfileMemberwithSUserForUser" value="true"/>
+                <entry key="getCategories" value="true"/>
+                <entry key="getCategoriesOfProcess" value="true"/>
+                <entry key="getCategorizedProcessIds" value="true"/>
+                <entry key="getCategoryByName" value="true"/>
+                <entry key="getNumberOfCategoriesOfProcess" value="true"/>
+                <entry key="getNumberOfCategorizedProcessIds" value="true"/>
+                <entry key="getNumberOfCategory" value="true"/>
+                <entry key="getProcessCategoryMappingsOfCategory" value="true"/>
+                <entry key="getProcessCategoryMappingsOfProcess" value="true"/>
+                <entry key="getProcessIdsOfCategory" value="true"/>
+                <entry key="getActorFromNameAndScopeId" value="true"/>
+                <entry key="getActorMembersOfActor" value="true"/>
+                <entry key="getActorMembersOfGroup" value="true"/>
+                <entry key="getActorMembersOfRole" value="true"/>
+                <entry key="getActorMembersOfUser" value="true"/>
+                <entry key="getActorsByIds" value="true"/>
+                <entry key="getActorsOfScope" value="true"/>
+                <entry key="getActorsOfScopes" value="true"/>
+                <entry key="getActorsOfUser" value="true"/>
+                <entry key="getActorsOfUserCanStartProcessDefinition" value="true"/>
+                <entry key="getNumberOfActorMembersOfActor" value="true"/>
+                <entry key="getDataSourceByNameAndVersion" value="true"/>
+                <entry key="getDataSourceParameterByNameAndDataSourceId" value="true"/>
+                <entry key="getDataSourceParametersByDataSourceId" value="true"/>
+                <entry key="getDataSources" value="true"/>
 				<entry key="getPlatform" value="true" />
 				<entry key="getDeployInfoByProcessDefId" value="true" />
 				<entry key="getCommandByName" value="true" />
