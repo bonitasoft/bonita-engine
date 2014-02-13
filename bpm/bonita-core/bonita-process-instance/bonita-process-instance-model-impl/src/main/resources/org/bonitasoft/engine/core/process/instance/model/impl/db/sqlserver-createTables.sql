@@ -210,7 +210,7 @@ CREATE TABLE breakpoint (
 )
 GO
 
-CREATE TABLE ref_business_data_inst (
+CREATE TABLE ref_biz_data_inst (
 	tenantid NUMERIC(19, 0) NOT NULL,
   	id NUMERIC(19, 0) NOT NULL,
   	name NVARCHAR(255) NOT NULL,

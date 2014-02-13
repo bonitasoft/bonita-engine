@@ -198,7 +198,7 @@ CREATE TABLE breakpoint (
   	PRIMARY KEY (tenantid, id)
 );
 
-CREATE TABLE ref_business_data_inst (
+CREATE TABLE ref_biz_data_inst (
 	tenantid BIGINT NOT NULL,
   	id BIGINT NOT NULL,
   	name VARCHAR(255) NOT NULL,

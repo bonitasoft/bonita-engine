@@ -28,5 +28,5 @@ GO
 DELETE FROM breakpoint
 GO
 
-DELETE FROM ref_business_data_inst
+DELETE FROM ref_biz_data_inst
 GO
