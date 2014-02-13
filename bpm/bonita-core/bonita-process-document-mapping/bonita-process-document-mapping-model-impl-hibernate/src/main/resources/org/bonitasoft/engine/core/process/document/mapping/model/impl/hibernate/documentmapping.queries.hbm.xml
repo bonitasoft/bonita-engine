@@ -20,6 +20,13 @@
 		FROM org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl AS docmapping
 		WHERE docmapping.processInstanceId = :processInstanceId
 	</query>
+    
+    <query name="getDocumentMappingsforProcessInstanceOrderedById">
+        SELECT docmapping
+        FROM org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl AS docmapping
+        WHERE docmapping.processInstanceId = :processInstanceId
+        ORDER BY docmapping.id
+    </query>
 	
 	<query name="getNumberOfDocumentMappingsforProcessInstance">
 		SELECT COUNT(docmapping)

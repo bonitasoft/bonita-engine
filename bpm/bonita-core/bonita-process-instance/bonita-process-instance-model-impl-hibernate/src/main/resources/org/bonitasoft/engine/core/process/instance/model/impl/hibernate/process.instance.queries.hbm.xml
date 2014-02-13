@@ -437,6 +437,13 @@
 		WHERE c.containerId = :containerId
 		AND c.containerType = :containerType
 	</query>
+    <query name="getConnectorInstancesOrderedById">
+        SELECT c
+        FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
+        WHERE c.containerId = :containerId
+        AND c.containerType = :containerType
+        ORDER BY  c.id
+    </query>
 	<query name="getNumberOfConnectorInstances">
 		SELECT count(c)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl AS c
