@@ -71,7 +71,7 @@ public class ProcessDocumentServiceImplTest {
 
         SProcessDocument document = processDocumentService.getDocument(1L);
 
-        assertEquals("url?name=document&contentStorageId=123", document.getURL());
+        assertEquals("url?fileName=document&contentStorageId=123", document.getURL());
     }
 
     @Test
@@ -90,7 +90,7 @@ public class ProcessDocumentServiceImplTest {
 
         SProcessDocument document = processDocumentService.getDocument(1L, "document");
 
-        assertEquals("url?name=document&contentStorageId=123", document.getURL());
+        assertEquals("url?fileName=document&contentStorageId=123", document.getURL());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class ProcessDocumentServiceImplTest {
 
         SProcessDocument document = processDocumentService.getDocument(1L, "document", 1L);
 
-        assertEquals("url?name=document&contentStorageId=123", document.getURL());
+        assertEquals("url?fileName=document&contentStorageId=123", document.getURL());
     }
 
     @Test
