@@ -23,7 +23,7 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl" table="ref_business_data_inst">
+	<class name="com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl" table="ref_biz_data_inst">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="id" type="long" />
