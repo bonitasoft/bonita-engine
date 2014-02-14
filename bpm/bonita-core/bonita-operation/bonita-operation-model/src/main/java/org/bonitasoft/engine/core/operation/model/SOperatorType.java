@@ -17,6 +17,7 @@ package org.bonitasoft.engine.core.operation.model;
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
 public enum SOperatorType {
 
@@ -30,6 +31,9 @@ public enum SOperatorType {
 
     STRING_INDEX,
 
-    CREATE_BUSINESS_DATA
+    CREATE_BUSINESS_DATA,
+
+    // Allows to set a Business Data attribute by calling a Java method on it:
+    BUSINESS_DATA_JAVA_SETTER
 
 }

@@ -19,6 +19,19 @@ package org.bonitasoft.engine.operation;
  */
 public enum OperatorType {
 
-    ASSIGNMENT, JAVA_METHOD, XPATH_UPDATE_QUERY, DOCUMENT_CREATE_UPDATE, STRING_INDEX, CREATE_BUSINESS_DATA;
+    // assign new value to process / task variable:
+    ASSIGNMENT,
 
+    JAVA_METHOD,
+
+    XPATH_UPDATE_QUERY,
+
+    DOCUMENT_CREATE_UPDATE,
+
+    STRING_INDEX,
+
+    CREATE_BUSINESS_DATA,
+
+    // update a Business Data attribute by calling setter method on it:
+    BUSINESS_DATA_JAVA_SETTER;
 }

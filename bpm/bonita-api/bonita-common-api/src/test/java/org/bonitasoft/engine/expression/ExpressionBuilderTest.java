@@ -63,4 +63,48 @@ public class ExpressionBuilderTest {
         new ExpressionBuilder().createLogicalComplementExpression("complement", intExpr);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void setReturnTypeShouldForbidPrimitiveCharType() throws Exception {
+        new ExpressionBuilder().setReturnType(char.class.getName());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setReturnTypeShouldForbidPrimitiveByteType() throws Exception {
+        new ExpressionBuilder().setReturnType(byte.class.getName());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setReturnTypeShouldForbidPrimitiveLongType() throws Exception {
+        new ExpressionBuilder().setReturnType(long.class.getName());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setReturnTypeShouldForbidPrimitiveIntType() throws Exception {
+        new ExpressionBuilder().setReturnType(int.class.getName());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setReturnTypeShouldForbidPrimitiveFloatType() throws Exception {
+        new ExpressionBuilder().setReturnType(float.class.getName());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setReturnTypeShouldForbidPrimitiveDoubleType() throws Exception {
+        new ExpressionBuilder().setReturnType(double.class.getName());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setReturnTypeShouldForbidPrimitiveShortType() throws Exception {
+        new ExpressionBuilder().setReturnType(short.class.getName());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setReturnTypeShouldForbidPrimitiveBooleanType() throws Exception {
+        new ExpressionBuilder().setReturnType(boolean.class.getName());
+    }
+
+    @Test
+    public void setReturnTypeShouldAllowNonPrimitiveBooleanType() throws Exception {
+        new ExpressionBuilder().createNewInstance("someName").setReturnType(Boolean.class.getName());
+    }
 }

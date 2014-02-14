@@ -258,7 +258,21 @@ public class ExpressionBuilder {
         return this;
     }
 
-    public ExpressionBuilder setReturnType(final String returnType) {
+    private static List<String> INVALID_PRIMITIVE_TYPES = Arrays.asList("char", "byte", "long", "int", "float", "double", "short", "boolean");
+
+    /**
+     * Sets the return type of the underlining expression.
+     * 
+     * @param returnType
+     *            the return type to set on the expression.
+     * @return this ExpressionBuilder itself.
+     * @throws IllegalArgumentException
+     *             if the return type is a primitive type
+     */
+    public ExpressionBuilder setReturnType(final String returnType) throws IllegalArgumentException {
+        if (INVALID_PRIMITIVE_TYPES.contains(returnType)) {
+            throw new IllegalArgumentException("Primitive type " + returnType + " is forbidden in Expression return type");
+        }
         expression.setReturnType(returnType);
         return this;
     }
