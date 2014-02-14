@@ -1050,6 +1050,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         return ModelConvertor.toConnectorInstanceWithFailureInfo(serverObject);
     }
 
+    // FIXME: the returned Business Data class is not visible on client side, so the retrieved object cannot be used:
     @Override
     public Serializable getBusinessDataInstance(final String dataName, final long processInstanceId) throws DataNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
