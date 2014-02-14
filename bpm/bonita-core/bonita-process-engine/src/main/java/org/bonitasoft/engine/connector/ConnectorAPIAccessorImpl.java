@@ -13,7 +13,14 @@
  **/
 package org.bonitasoft.engine.connector;
 
-import org.bonitasoft.engine.api.*;
+import java.lang.reflect.Proxy;
+
+import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.api.CommandAPI;
+import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProfileAPI;
+import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
 import org.bonitasoft.engine.api.impl.ServerAPIImpl;
 import org.bonitasoft.engine.api.internal.ServerAPI;
@@ -26,13 +33,9 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
-import java.lang.reflect.Proxy;
-
 /**
- * 
  * @author Baptiste Mesta
  * @author Celine Souchet
- * 
  */
 public class ConnectorAPIAccessorImpl implements APIAccessor {
 
@@ -56,7 +59,7 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
                 final SSession session = sessionService.createSession(tenantId, ConnectorAPIAccessorImpl.class.getSimpleName());// FIXME get the
                 sessionAccessor.setSessionInfo(session.getId(), tenantId);
                 return ModelConvertor.toAPISession(session, null);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new BonitaRuntimeException(e);
             }
         }

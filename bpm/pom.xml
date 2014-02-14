@@ -21,16 +21,17 @@
 				<module>bonita-common</module>
 				<module>bonita-client</module>
 				<module>bonita-server</module>
+				<module>bonita-home</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>all</id>
 			<modules>
-				<module>bonita-core</module>
-				<module>bonita-api</module>
 				<module>bonita-common</module>
 				<module>bonita-client</module>
 				<module>bonita-server</module>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
 				<module>bonita-home</module>
 				<module>bonita-deploy</module>
 				<module>bonita-connector-service</module>
@@ -44,11 +45,11 @@
 		<profile>
 			<id>fast</id>
 			<modules>
-				<module>bonita-core</module>
-				<module>bonita-api</module>
 				<module>bonita-common</module>
 				<module>bonita-client</module>
 				<module>bonita-server</module>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
 				<module>bonita-home</module>
 				<module>bonita-deploy</module>
 				<module>bonita-connector-service</module>
@@ -62,11 +63,11 @@
 		<profile>
 			<id>package</id>
 			<modules>
-				<module>bonita-core</module>
-				<module>bonita-api</module>
 				<module>bonita-common</module>
 				<module>bonita-client</module>
 				<module>bonita-server</module>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
 				<module>bonita-home</module>
 				<module>bonita-deploy</module>
 				<module>bonita-connector-service</module>
@@ -80,11 +81,11 @@
 		<profile>
 			<id>package-all</id>
 			<modules>
-				<module>bonita-core</module>
-				<module>bonita-api</module>
 				<module>bonita-common</module>
 				<module>bonita-client</module>
 				<module>bonita-server</module>
+				<module>bonita-core</module>
+				<module>bonita-api</module>
 				<module>bonita-home</module>
 				<module>bonita-deploy</module>
 				<module>bonita-connector-service</module>
@@ -97,36 +98,12 @@
 		</profile>
 		<profile>
 			<id>tests</id>
-			<properties>
-				<maven.javadoc.skip>true</maven.javadoc.skip>
-			</properties>
 			<modules>
-				<module>bonita-core</module>
-				<module>bonita-api</module>
 				<module>bonita-common</module>
 				<module>bonita-client</module>
 				<module>bonita-server</module>
-				<module>bonita-home</module>
-				<module>bonita-deploy</module>
-				<module>bonita-connector-service</module>
-				<module>bonita-expression-resolver</module>
-				<module>bonita-external</module>
-				<module>bonita-util</module>
-				<module>bonita-bpm-integration-tests</module>
-				<module>bonita-synchro-repository</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>sonar</id>
-			<properties>
-				<maven.javadoc.skip>true</maven.javadoc.skip>
-			</properties>
-			<modules>
 				<module>bonita-core</module>
 				<module>bonita-api</module>
-				<module>bonita-common</module>
-				<module>bonita-client</module>
-				<module>bonita-server</module>
 				<module>bonita-home</module>
 				<module>bonita-deploy</module>
 				<module>bonita-connector-service</module>

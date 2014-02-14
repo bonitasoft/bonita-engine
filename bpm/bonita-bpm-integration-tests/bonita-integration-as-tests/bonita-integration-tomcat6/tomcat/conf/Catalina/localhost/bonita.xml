@@ -16,8 +16,11 @@
 	<WatchedResource>WEB-INF/web.xml</WatchedResource>
 
 	<!-- Configure Datasource -->
-	<Resource name="bonitaDS" auth="Container" type="javax.sql.DataSource"
-		factory="bitronix.tm.resource.ResourceObjectFactory" uniqueName="jdbc/bonitaDSXA" />
+	<Resource name="bonitaDS" 
+	    auth="Container" 
+	    type="javax.sql.DataSource"
+		factory="bitronix.tm.resource.ResourceObjectFactory"
+		uniqueName="jdbc/bonitaDSXA" />
 
 	<Resource name="bonitaSequenceManagerDS"
 		auth="Container"
@@ -36,9 +39,9 @@
 		testConnectionOnCheckout="true" 
 		removeAbandoned="true"
 		logAbandoned="true"
-		username="#db.username#"
+		username="#db.user#"
 		password="#db.password#" 
-		driverClassName="#db.driver.classname#" 
+		driverClassName="#db.driver.class#" 
 		url="#db.url#" />
 
 </Context>

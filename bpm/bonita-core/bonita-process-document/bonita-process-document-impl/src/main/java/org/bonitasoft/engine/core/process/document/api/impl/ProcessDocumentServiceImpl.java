@@ -110,10 +110,9 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
 
     @Override
     public void deleteDocumentsFromProcessInstance(final Long processInstanceId) throws SDocumentException, SProcessDocumentDeletionException {
-        final SDocumentMappingBuilderFactory fact = BuilderFactory.get(SDocumentMappingBuilderFactory.class);
         List<SProcessDocument> sProcessDocuments;
         do {
-            sProcessDocuments = getDocumentsOfProcessInstance(processInstanceId, 0, 100, fact.getDocumentNameKey(), OrderByType.ASC);
+            sProcessDocuments = getDocumentsOfProcessInstanceOrderedById(processInstanceId, 0, 100);
             removeDocuments(sProcessDocuments);
         } while (!sProcessDocuments.isEmpty());
     }
@@ -280,6 +279,24 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         try {
             final List<SDocumentMapping> docMappings = documentMappingService.getDocumentMappingsForProcessInstance(processInstanceId, fromIndex,
                     numberPerPage, field, order);
+            if (docMappings != null && !docMappings.isEmpty()) {
+                final List<SProcessDocument> result = new ArrayList<SProcessDocument>(docMappings.size());
+                for (final SDocumentMapping docMapping : docMappings) {
+                    result.add(toProcessDocument(docMapping));
+                }
+                return result;
+            } else {
+                return Collections.emptyList();
+            }
+
+        } catch (final SBonitaException e) {
+            throw new SDocumentException("Unable to list documents of process instance: " + processInstanceId, e);
+        }
+    }
+    
+    private List<SProcessDocument> getDocumentsOfProcessInstanceOrderedById(final long processInstanceId, final int fromIndex, final int numberPerPage) throws SDocumentException {
+        try {
+            final List<SDocumentMapping> docMappings = documentMappingService.getDocumentMappingsForProcessInstanceOrderedById(processInstanceId, fromIndex, numberPerPage);
             if (docMappings != null && !docMappings.isEmpty()) {
                 final List<SProcessDocument> result = new ArrayList<SProcessDocument>(docMappings.size());
                 for (final SDocumentMapping docMapping : docMappings) {

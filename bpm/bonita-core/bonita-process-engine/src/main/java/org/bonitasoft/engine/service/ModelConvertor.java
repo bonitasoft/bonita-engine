@@ -1996,4 +1996,32 @@ public class ModelConvertor {
         final ThemeImpl themeImpl = new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
         return themeImpl;
     }
+    
+    public static List<SOperation> toSOperation(final List<Operation> operations) {
+        if (operations == null) {
+            return null;
+        }
+        if (operations.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
+        for (final Operation operation : operations) {
+            final SOperation sOperation = toSOperation(operation);
+            sOperations.add(sOperation);
+        }
+        return sOperations;
+    }
+
+    public static SOperation toSOperation(final Operation operation) {
+        final SExpression rightOperand = ModelConvertor.constructSExpression(operation.getRightOperand());
+        final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
+        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
+                .setType(operatorType).setLeftOperand(sLeftOperand).done();
+    }
+    
+
+    private static SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
+        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
+    }
 }
