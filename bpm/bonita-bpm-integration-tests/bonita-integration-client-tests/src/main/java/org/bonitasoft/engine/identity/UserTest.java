@@ -1033,30 +1033,30 @@ public class UserTest extends CommonAPITest {
     }
 
     @Test
-    public void getUsersFromIds() throws BonitaException {
-        final List<User> users = new ArrayList<User>();
-        users.add(getIdentityAPI().createUser("zhao", "engine"));
-        users.add(getIdentityAPI().createUser("qian", "engine"));
-        users.add(getIdentityAPI().createUser("sun", "engine"));
-        users.add(getIdentityAPI().createUser("li", "engine"));
-        users.add(getIdentityAPI().createUser("zhou", "engine"));
-        final List<Long> userIds = new ArrayList<Long>();
-        userIds.add(users.get(4).getId());
-        userIds.add(users.get(0).getId());
-        userIds.add(users.get(2).getId());
-        userIds.add(users.get(1).getId());
-        userIds.add(users.get(3).getId());
+    public void getUsersFromIdsShouldReturnUsersInTheRightOrder() throws BonitaException {
+        final List<User> expectedUsers = new ArrayList<User>();
+        expectedUsers.add(getIdentityAPI().createUser("zhao", "engine"));
+        expectedUsers.add(getIdentityAPI().createUser("qian", "engine"));
+        expectedUsers.add(getIdentityAPI().createUser("sun", "engine"));
+        expectedUsers.add(getIdentityAPI().createUser("li", "engine"));
+        expectedUsers.add(getIdentityAPI().createUser("zhou", "engine"));
+        final List<Long> userIds = new ArrayList<Long>(5);
+        userIds.add(expectedUsers.get(4).getId());
+        userIds.add(expectedUsers.get(0).getId());
+        userIds.add(expectedUsers.get(2).getId());
+        userIds.add(expectedUsers.get(1).getId());
+        userIds.add(expectedUsers.get(3).getId());
 
         final Map<Long, User> usersResult = getIdentityAPI().getUsers(userIds);
         assertNotNull(usersResult);
         assertEquals(5, usersResult.size());
-        assertEquals(users.get(0), usersResult.get(users.get(0).getId()));
-        assertEquals(users.get(1), usersResult.get(users.get(1).getId()));
-        assertEquals(users.get(2), usersResult.get(users.get(2).getId()));
-        assertEquals(users.get(3), usersResult.get(users.get(3).getId()));
-        assertEquals(users.get(4), usersResult.get(users.get(4).getId()));
+        assertEquals(expectedUsers.get(0), usersResult.get(expectedUsers.get(0).getId()));
+        assertEquals(expectedUsers.get(1), usersResult.get(expectedUsers.get(1).getId()));
+        assertEquals(expectedUsers.get(2), usersResult.get(expectedUsers.get(2).getId()));
+        assertEquals(expectedUsers.get(3), usersResult.get(expectedUsers.get(3).getId()));
+        assertEquals(expectedUsers.get(4), usersResult.get(expectedUsers.get(4).getId()));
 
-        deleteUsers(users);
+        deleteUsers(expectedUsers);
     }
 
     @Test

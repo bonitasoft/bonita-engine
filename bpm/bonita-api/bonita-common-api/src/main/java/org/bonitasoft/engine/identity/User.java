@@ -26,6 +26,7 @@ public interface User extends BonitaObject {
 
     long getId();
 
+    @Deprecated
     String getPassword();
 
     String getFirstName();

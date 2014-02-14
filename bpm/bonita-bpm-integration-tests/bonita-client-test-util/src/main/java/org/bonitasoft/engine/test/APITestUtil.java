@@ -485,6 +485,17 @@ public class APITestUtil {
         return deployAndEnableWithActor(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user));
     }
 
+    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final List<User> users)
+            throws BonitaException {
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+        for (final User user : users) {
+            addMappingOfActorsForUser(actorName, user.getId(), processDefinition);
+        }
+        getProcessAPI().enableProcess(processDefinition.getId());
+        return processDefinition;
+    }
+
     protected ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final User user, final Map<String, String> parameters) throws BonitaException {
         return deployAndEnableWithActorAndParameters(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user), parameters);
