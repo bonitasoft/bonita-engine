@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,6 +18,7 @@ import org.bonitasoft.engine.test.WaitUntil;
 
 /**
  * @author Sébastien Chevassu
+ * @author Celine Souchet
  */
 public class WaitForVariableValue extends WaitUntil {
 
@@ -30,7 +31,7 @@ public class WaitForVariableValue extends WaitUntil {
     private final String valueExpected;
 
     public WaitForVariableValue(final ProcessAPI processAPI, final long processInstanceId, final String variableName, final String valueExpected) {
-        super(40, 3000);
+        super(500, 7 * 60 * 1000, false);
         this.processAPI = processAPI;
         this.processInstanceId = processInstanceId;
         this.variableName = variableName;
