@@ -73,7 +73,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
             } else if (Date.class.getName().equals(returnType)) { // "2013-01-02T02:42:12.17+02:00"
                 result = parseDate(expressionContent);
             } else {
-                throw new SExpressionEvaluationException("unknown return type: " + returnType);
+                throw new SExpressionEvaluationException("unknown return type: " + returnType + " for expression " + expression.getName() + " : " + expressionContent);
             }
         } catch (final NumberFormatException e) {
             throw new SExpressionEvaluationException("The content of the expression \"" + expression.getName() + "\" is not a number :" + expressionContent);
