@@ -8,12 +8,19 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.io.IOException;
+
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.LoginException;
+import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.api.LoginAPI;
+import com.bonitasoft.engine.api.TenantInMaintenanceException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
@@ -40,16 +47,26 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
             throw new LoginException("The node is not started");
         }
         checkUsernameAndPassword(userName, password);
-        try {
-            return login(userName, password, tenantId);
-        } catch (Throwable e) {
-            throw new LoginException(e);
-        }
+        return login(userName, password, tenantId);
     }
 
     @Override
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) {
         return TenantServiceSingleton.getInstance(tenantId);
+    }
+
+    @Override
+    protected void checkThatWeCanLogin(final String userName, final Long tenantId, final PlatformService platformService, final STenant sTenant,
+            final long resolvedTenantId)
+            throws LoginException, BonitaHomeNotSetException, IOException {
+        super.checkThatWeCanLogin(userName, tenantId, platformService, sTenant, resolvedTenantId);
+        if (sTenant.isInMaintenance()) {
+            String technicalUserName = BonitaHomeServer.getInstance().getTenantProperties(resolvedTenantId).getProperty("userName");
+            if (!technicalUserName.equals(userName)) {
+                throw new TenantInMaintenanceException("Tenant with ID " + tenantId
+                        + " is in maintenance, unable to login with other user than the technical user.");
+            }
+        }
     }
 
 }

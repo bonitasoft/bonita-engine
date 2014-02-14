@@ -19,6 +19,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
@@ -26,10 +29,14 @@ import org.bonitasoft.engine.command.CommandExecutionException;
 import org.bonitasoft.engine.command.CommandNotFoundException;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +44,13 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.ProfileAPI;
 import com.bonitasoft.engine.api.ReportingAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.ThemeAPI;
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.BreakpointCriterion;
@@ -64,6 +73,23 @@ public class APITestSPUtil extends APITestUtil {
     private ReportingAPI reportingAPI;
 
     private ThemeAPI themeAPI;
+
+    private TenantManagementAPI tenantManagementAPI;
+
+    @Override
+    public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
+        return PlatformAPIAccessor.getPlatformLoginAPI();
+    }
+
+    @Override
+    protected PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return PlatformAPIAccessor.getPlatformAPI(session);
+    }
+
+    @Override
+    protected LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getLoginAPI();
+    }
 
     protected PlatformMonitoringAPI getPlatformMonitoringAPI() {
         return platformMonitoringAPI;
@@ -117,6 +143,14 @@ public class APITestSPUtil extends APITestUtil {
         return logAPI;
     }
 
+    public TenantManagementAPI getTenantManagementAPI() {
+        return tenantManagementAPI;
+    }
+
+    public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
+        this.tenantManagementAPI = tenantManagementAPI;
+    }
+
     protected void loginWith(final String userName, final String password, final long tenantId) throws BonitaException {
         setSession(SPBPMTestUtil.loginTenant(userName, password, tenantId));
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
@@ -127,6 +161,7 @@ public class APITestSPUtil extends APITestUtil {
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
+        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
     }
 
     @Override
@@ -140,6 +175,7 @@ public class APITestSPUtil extends APITestUtil {
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
+        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
@@ -154,6 +190,7 @@ public class APITestSPUtil extends APITestUtil {
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
+        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
     }
 
@@ -167,6 +204,7 @@ public class APITestSPUtil extends APITestUtil {
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
+        setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
     }
 
     @Override
@@ -237,6 +275,7 @@ public class APITestSPUtil extends APITestUtil {
         parameters.put("startIndex", 0);
         parameters.put("maxResults", 10000);
         parameters.put("sort", BreakpointCriterion.DEFINITION_ID_ASC);
+        @SuppressWarnings("unchecked")
         final List<Breakpoint> breakpoints = (List<Breakpoint>) getCommandAPI().execute("getBreakpoints", parameters);
         if (breakpoints.size() > 0) {
             final StringBuilder bpBuilder = new StringBuilder("Breakpoints are still present: ");

@@ -6,19 +6,29 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.services;
+package com.bonitasoft.engine.api.impl;
 
-import java.io.File;
-import java.io.FileFilter;
+import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
-public class MyBatisServicesFileFilter implements FileFilter {
+public class FakeTenantLevelAPI {
 
-    @Override
-    public boolean accept(final File pathname) {
-        return pathname.isFile() && pathname.getName().endsWith(".xml") && !pathname.getName().contains("hibernate");
+    @AvailableOnMaintenanceTenant
+    @AvailableOnStoppedNode
+    public void canAlsoBeCalledOnMaintenanceTenant() {
+
+    }
+
+    @AvailableOnStoppedNode
+    public void mustBeCalledOnRunningTenant() {
+
+    }
+
+    @AvailableOnStoppedNode
+    public void platformAPIMethod() {
+
     }
 
 }

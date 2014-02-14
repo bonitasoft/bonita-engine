@@ -10,8 +10,4 @@
 		<constructor-arg name="repeat" value="${delete.job.frequency:0 0 0/1 * * ?}" />
 	</bean>
 
-	<bean id="deleteService" class="com.bonitasoft.engine.persistence.DeleteServiceBatch">
-		<constructor-arg name="persistenceService" ref="persistenceService" />
-	</bean>
-
 </beans>

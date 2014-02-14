@@ -45,6 +45,7 @@ import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.ProcessAPIExt;
 import com.bonitasoft.engine.api.impl.ProfileAPIExt;
 import com.bonitasoft.engine.api.impl.ReportingAPIExt;
+import com.bonitasoft.engine.api.impl.TenantManagementAPIExt;
 import com.bonitasoft.engine.api.impl.ThemeAPIExt;
 
 /**
@@ -78,6 +79,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(com.bonitasoft.engine.api.ProfileAPI.class.getName(), new ProfileAPIExt());
         apis.put(ThemeAPI.class.getName(), new ThemeAPIImpl());
         apis.put(com.bonitasoft.engine.api.ThemeAPI.class.getName(), new ThemeAPIExt());
+        apis.put(com.bonitasoft.engine.api.TenantManagementAPI.class.getName(), new TenantManagementAPIExt());
     }
 
     @Override
