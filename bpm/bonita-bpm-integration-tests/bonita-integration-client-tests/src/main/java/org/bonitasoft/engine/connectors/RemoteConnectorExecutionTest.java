@@ -1114,7 +1114,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, johnUser);
-        final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
+        WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
         assertTrue(waitForConnector.waitUntil());
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();
@@ -1126,7 +1126,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertEquals("value1", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         waitForUserTask("step2", processInstance.getId());
         // connector restarted
-        assertEquals("value2", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
+        waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value2");
+        assertTrue(waitForConnector.waitUntil());
+
         disableAndDeleteProcess(processDefinition.getId());
     }
 
