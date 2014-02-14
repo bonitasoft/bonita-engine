@@ -29,11 +29,22 @@ public class CategoryUpdater implements Serializable {
      * The fields that can be updated.
      */
     public enum CategoryField {
-        NAME, DESCRIPTION;
+        /**
+         * The name of the field corresponding to the name of the category
+         */
+        NAME,
+
+        /**
+         * The name of the field corresponding to the description of the category
+         */
+        DESCRIPTION;
     }
 
     private final Map<CategoryField, Serializable> fields;
 
+    /**
+     * The default constructor
+     */
     public CategoryUpdater() {
         fields = new HashMap<CategoryField, Serializable>(5);
     }
@@ -43,6 +54,7 @@ public class CategoryUpdater implements Serializable {
      * 
      * @param name
      *            The new name
+     * @return The CategoryUpdater containing the new name
      */
     public CategoryUpdater setName(final String name) {
         fields.put(CategoryField.NAME, name);
@@ -54,6 +66,7 @@ public class CategoryUpdater implements Serializable {
      * 
      * @param description
      *            The new description
+     * @return The CategoryUpdater containing the new description
      */
     public CategoryUpdater setDescription(final String description) {
         fields.put(CategoryField.DESCRIPTION, description);

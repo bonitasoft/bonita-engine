@@ -31,11 +31,21 @@ public class ActorUpdater implements Serializable {
      * The fields that can be updated.
      */
     public enum ActorField {
-        DISPLAY_NAME, DESCRIPTION;
+        /**
+         * The name of the field corresponding to the display name of the actor
+         */
+        DISPLAY_NAME,
+        /**
+         * The name of the field corresponding to the description of the actor
+         */
+        DESCRIPTION;
     }
 
     private final Map<ActorField, Serializable> fields;
 
+    /**
+     * The default constructor
+     */
     public ActorUpdater() {
         fields = new HashMap<ActorField, Serializable>(ActorField.values().length);
     }
