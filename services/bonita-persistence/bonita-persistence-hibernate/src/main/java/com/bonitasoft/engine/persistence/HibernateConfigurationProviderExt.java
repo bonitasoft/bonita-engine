@@ -42,16 +42,12 @@ public class HibernateConfigurationProviderExt extends HibernateConfigurationPro
         this.cacheQueries = cacheQueries;
     }
 
-    /**
-     * @param properties
-     * @param cacheProperties
-     * @return
-     */
     private static Properties merge(final Properties normalProperties, final Properties cacheProperties) {
         final String cache1 = cacheProperties.getProperty("hibernate.cache.provider_class");
         final String cache2 = cacheProperties.getProperty("hibernate.cache.region.factory_class");
         if ((cache1 != null && cache1.contains("hazelcast") || cache2 != null && cache2.contains("hazelcast"))
                 && !Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
+            // Empty if ???
         }
         final Properties properties = new Properties();
         for (final Entry<Object, Object> entry : normalProperties.entrySet()) {

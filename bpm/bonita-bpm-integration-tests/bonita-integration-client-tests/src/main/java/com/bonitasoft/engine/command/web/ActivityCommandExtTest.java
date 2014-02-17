@@ -73,6 +73,14 @@ import com.bonitasoft.engine.api.ProcessAPI;
  */
 public class ActivityCommandExtTest extends CommonAPISPTest {
 
+    private static final String dataName = "var1";
+
+    private static final String dataName2 = "var2";
+
+    private static final String dataName3 = "var3";
+
+    private static final String intDataName = "intVar";
+
     /*
      * List<Operation>
      */
@@ -90,25 +98,13 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     private static final String ACTIVITY_INSTANCE_ID_KEY = "ACTIVITY_INSTANCE_ID_KEY";
 
-    private final String COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT = "executeActionsAndTerminateExt";
+    private static final String COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT = "executeActionsAndTerminateExt";
 
-    private final String COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT = "executeActionsAndStartInstanceExt";
-
-    protected static final String USERNAME = "dwight";
-
-    protected static final String PASSWORD = "Schrute";
+    private static final String COMMAND_EXECUTE_ACTIONS_AND_START_INSTANCE_EXT = "executeActionsAndStartInstanceExt";
 
     protected ProcessDefinition processDefinition;
 
     protected User businessUser;
-
-    private final String dataName = "var1";
-
-    private final String dataName2 = "var2";
-
-    private final String dataName3 = "var3";
-
-    private final String intDataName = "intVar";
 
     @Before
     public void beforeTest() throws Exception {
@@ -127,7 +123,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     private void createAndDeployProcess() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
@@ -141,7 +137,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         final Expression defaultExpression = new ExpressionBuilder().createConstantStringExpression("defaultString");
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("executeConnectorOnActivityInstance", "1.0");
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultExpression);
         designProcessDefinition.addBooleanData(dataName2, new ExpressionBuilder().createConstantBooleanExpression(false));
         designProcessDefinition.addShortTextData(dataName3, defaultExpression);
@@ -498,17 +494,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         parameters.put(OPERATIONS_INPUT_KEY, fieldValues);
         getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE_EXT, parameters);
 
-        assertTrue("no pending user task instances are found", new WaitUntil(50, 1000) {
-
-            @Override
-            protected boolean check() throws Exception {
-                return getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 10, null).size() >= 1;
-            }
-        }.waitUntil());
-        userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC).get(0);
-        final String activityName = userTaskInstance.getName();
-        assertNotNull(activityName);
-        assertEquals("step2", activityName);
+        waitForUserTask("step2", processInstanceId);
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstanceId);
         assertEquals("field_fieldId1_Ryan", dataInstance.getValue().toString());
         final DataInstance dataInstance2 = getProcessAPI().getProcessDataInstance(dataName2, processInstanceId);

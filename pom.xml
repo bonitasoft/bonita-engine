@@ -17,7 +17,7 @@
 		<hazelcast.version>3.0.3</hazelcast.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
+		
 		<!-- ************************ -->
 		<!-- Sonar/Reporting settings -->
 		<!-- ************************ -->
@@ -57,7 +57,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
-				<artifactId>hazelcast-hibernate3</artifactId>
+				<artifactId>hazelcast-hibernate4</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
@@ -106,7 +106,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
+							<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -133,7 +133,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
+							<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -167,7 +167,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
+							<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -232,8 +232,8 @@
 								<configuration>
 									<destFile>${sonar.jacoco.reportPath}</destFile>
 									<propertyName>jacoco.agent.ut.arg</propertyName>
-									<append>true</append>
-								</configuration>
+							<append>true</append>
+						</configuration>
 							</execution>
 							<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
 							<execution>

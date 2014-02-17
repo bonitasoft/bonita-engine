@@ -183,7 +183,7 @@
 											<equals arg1="${db.vendor}" arg2="h2" />
 											<then>
 												<copy todir="${tomcat.conf.dir}">
-													<fileset dir="tomcat/${db.vendor}/server.xml" />
+													<fileset file="tomcat/${db.vendor}/server.xml" />
 												</copy>
 											</then>
 										</if>
@@ -207,6 +207,7 @@
 											<fileset dir="${distrib.dir}/resources/home/" />
 										</copy>
 										
+
 										<copy todir="${bonita.home}/server/licenses" failonerror="true">
 											<fileset dir="${user.home}/lic" includes="*.lic" />
 										</copy>

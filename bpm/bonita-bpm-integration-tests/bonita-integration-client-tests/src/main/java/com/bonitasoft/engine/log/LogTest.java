@@ -10,28 +10,18 @@ package com.bonitasoft.engine.log;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
-import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
-import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -47,21 +37,16 @@ import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserUpdater;
-import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.operation.OperatorType;
-import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.connector.APIAccessorConnector;
 
 public class LogTest extends CommonAPISPTest {
 
@@ -126,9 +111,9 @@ public class LogTest extends CommonAPISPTest {
 
     @Test
     public void getPaginatedLogsByDefault() throws BonitaException {
-        final User user1 = getIdentityAPI().createUser("user1", "bpm");
+        final User user1 = getIdentityAPI().createUser("user1", PASSWORD);
         getIdentityAPI().deleteUser(user1.getId());
-        final User user2 = getIdentityAPI().createUser("user2", "bpm");
+        final User user2 = getIdentityAPI().createUser("user2", PASSWORD);
         getIdentityAPI().deleteUser(user2.getId());
 
         final List<Log> logs = getLogAPI().getLogs(0, 10, LogCriterion.CREATION_DATE_DESC);
@@ -144,13 +129,13 @@ public class LogTest extends CommonAPISPTest {
     }
 
     private void getPaginatedLogsByCreatedBy(final String orderByType) throws BonitaException {
-        final User user3 = createUser("loguser3", "bpm");
+        final User user3 = createUser("loguser3", PASSWORD);
         logout();
-        loginWith("loguser3", "bpm");
-        final User user2 = createUser("loguser2", "bpm");
+        loginWith("loguser3", PASSWORD);
+        final User user2 = createUser("loguser2", PASSWORD);
         logout();
-        loginWith("loguser2", "bpm");
-        final User user1 = createUser("loguser1", "bpm");
+        loginWith("loguser2", PASSWORD);
+        final User user1 = createUser("loguser1", PASSWORD);
         logout();
         login();
         getIdentityAPI().deleteUser(user1.getId());
@@ -187,9 +172,9 @@ public class LogTest extends CommonAPISPTest {
 
     @Test
     public void getPaginatedLogsByCreationDateAsc() throws BonitaException {
-        final User user1 = getIdentityAPI().createUser("user1", "bpm");
+        final User user1 = getIdentityAPI().createUser("user1", PASSWORD);
         getIdentityAPI().deleteUser(user1.getId());
-        final User user2 = getIdentityAPI().createUser("user2", "bpm");
+        final User user2 = getIdentityAPI().createUser("user2", PASSWORD);
         getIdentityAPI().deleteUser(user2.getId());
 
         final List<Log> logs = getLogAPI().getLogs(0, 10, LogCriterion.CREATION_DATE_ASC);
@@ -201,9 +186,9 @@ public class LogTest extends CommonAPISPTest {
 
     @Test
     public void getPaginatedLogsByCreationDateDesc() throws BonitaException {
-        final User user1 = getIdentityAPI().createUser("user1", "bpm");
+        final User user1 = getIdentityAPI().createUser("user1", PASSWORD);
         getIdentityAPI().deleteUser(user1.getId());
-        final User user2 = getIdentityAPI().createUser("user2", "bpm");
+        final User user2 = getIdentityAPI().createUser("user2", PASSWORD);
         getIdentityAPI().deleteUser(user2.getId());
 
         final List<Log> logs = getLogAPI().getLogs(0, 10, LogCriterion.CREATION_DATE_DESC);
@@ -233,9 +218,9 @@ public class LogTest extends CommonAPISPTest {
 
     @Test
     public void testSearchLogsWithAllAvailableFilters() throws Exception {
-        final User user1 = getIdentityAPI().createUser("user1WithAllAvailableFilters", "bpm");
+        final User user1 = getIdentityAPI().createUser("user1WithAllAvailableFilters", PASSWORD);
         getIdentityAPI().deleteUser(user1.getId());
-        final User user2 = getIdentityAPI().createUser("user2WithAllAvailableFilters", "bpm");
+        final User user2 = getIdentityAPI().createUser("user2WithAllAvailableFilters", PASSWORD);
         getIdentityAPI().deleteUser(user2.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 140);
@@ -260,9 +245,9 @@ public class LogTest extends CommonAPISPTest {
         SearchResult<Log> searchLogs = getLogAPI().searchLogs(builder.done());
         final long initialCount = searchLogs.getCount();
 
-        final User user1 = getIdentityAPI().createUser("user1SearchTerm", "bpm");
+        final User user1 = getIdentityAPI().createUser("user1SearchTerm", PASSWORD);
         getIdentityAPI().deleteUser(user1.getId());
-        final User user2 = getIdentityAPI().createUser("user2SearchTerm", "bpm");
+        final User user2 = getIdentityAPI().createUser("user2SearchTerm", PASSWORD);
         getIdentityAPI().deleteUser(user2.getId());
 
         searchLogs = getLogAPI().searchLogs(builder.done());
@@ -271,9 +256,9 @@ public class LogTest extends CommonAPISPTest {
 
     @Test(expected = SearchException.class)
     public void searchLogWithWrongSortKey() throws BonitaException {
-        final User user1 = getIdentityAPI().createUser("user1WrongSortKey", "bpm");
+        final User user1 = getIdentityAPI().createUser("user1WrongSortKey", PASSWORD);
         getIdentityAPI().deleteUser(user1.getId());
-        final User user2 = getIdentityAPI().createUser("user2WrongSortKey", "bpm");
+        final User user2 = getIdentityAPI().createUser("user2WrongSortKey", PASSWORD);
         getIdentityAPI().deleteUser(user2.getId());
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 140);
@@ -290,28 +275,21 @@ public class LogTest extends CommonAPISPTest {
     public void testDontLogJobExecutionEvent() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent("sendMessageProcess", "m1", "receiveMessageProcess",
                 "startEvent", null, null, null, null);
-        final User user = createUser("john", "bpm");
-        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "step1", "delivery", user, "m1",
+        final User user = createUser(USERNAME, PASSWORD);
+        final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent("receiveMessageProcess", "step1", "ACTOR_NAME", user, "m1",
                 null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 10000, true, 1, user);
-        assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("step1", taskInstance.getName());
+        waitForUserTask("step1");
 
         final List<Log> logs = getLogAPI().getLogs(0, getLogAPI().getNumberOfLogs(), LogCriterion.CREATED_BY_DESC);
         assertFalse(containsLogWithActionType(logs, "JOB_EXECUTED", 1));
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
-
-        deleteUser("john");
+        deleteUser(USERNAME);
     }
 
     private ProcessDefinition deployAndEnableProcessWithEndMessageEvent(final String processName, final String messageName, final String targetProcess,
@@ -408,110 +386,6 @@ public class LogTest extends CommonAPISPTest {
                 messageEventTrigger.addOperation(operation);
             }
         }
-    }
-
-    @Test
-    public void executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutputUsingAPIAccessor() throws Exception {
-        final String johnName = "john";
-        createUser(johnName, "bpm");
-        final String delivery = "Delivery men";
-        final Expression dataDefaultValue = new ExpressionBuilder().createConstantLongExpression(0);
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(
-                "executeConnectorOnFinishOfAnAutomaticActivityWithDataAsOutput", "1.0");
-        final String dataName = "myData1";
-        final String procInstIdData = "procInstId";
-        final String nbLogsData = "nbLogsData";
-        final String searchLogsData = "searchLogsData";
-        final String getLogsData = "getLogsData";
-        final String profileData = "profileData";
-        designProcessDefinition.addLongData(dataName, dataDefaultValue);
-        designProcessDefinition.addLongData(procInstIdData, dataDefaultValue);
-        designProcessDefinition.addIntegerData(nbLogsData, new ExpressionBuilder().createConstantIntegerExpression(0));
-        designProcessDefinition.addData(searchLogsData, SearchResult.class.getName(), null);
-        designProcessDefinition.addData(getLogsData, List.class.getName(), null);
-        designProcessDefinition.addData(profileData, Profile.class.getName(), null);
-        designProcessDefinition.addActor(delivery).addDescription("Delivery all day and night long");
-        designProcessDefinition.addUserTask("step0", delivery);
-        designProcessDefinition
-                .addAutomaticTask("step1")
-                .addConnector("myConnector", "org.bonitasoft.connector.APIAccessorConnector", "1.0", ConnectorEvent.ON_FINISH)
-                .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
-                        new ExpressionBuilder().createInputExpression("numberOfUsers", Long.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setName(procInstIdData).done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression("procInstId", Long.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setName(nbLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression("nbLogs", Integer.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setName(searchLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression("searchLogs", SearchResult.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setName(getLogsData).done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression("getLogs", List.class.getName()))
-                .addOutput(new LeftOperandBuilder().createNewInstance().setName(profileData).done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression("profile", Profile.class.getName()));
-        designProcessDefinition.addUserTask("step2", delivery);
-        designProcessDefinition.addTransition("step0", "step1");
-        designProcessDefinition.addTransition("step1", "step2");
-
-        final long userId = getIdentityAPI().getUserByUserName(johnName).getId();
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(delivery, userId, designProcessDefinition);
-        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        final long procInstanceId = startProcess.getId();
-        assertEquals(0l, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());
-        waitForUserTaskAndExecuteIt("step0", startProcess.getId(), userId);
-        waitForUserTask("step2", startProcess);
-
-        final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
-        assertEquals(numberOfUsers, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());
-        // check processInstanceId retrieved from injected context:
-        assertEquals(procInstanceId, getProcessAPI().getProcessDataInstance(procInstIdData, procInstanceId).getValue());
-        assertTrue("Number of Logs should be > 0", (Integer) getProcessAPI().getProcessDataInstance(nbLogsData, procInstanceId).getValue() > 0);
-        assertTrue("Number of SearchResult should be > 0",
-                ((SearchResult<?>) getProcessAPI().getProcessDataInstance(searchLogsData, procInstanceId).getValue()).getCount() > 0);
-        assertTrue("Number of getLogs should be > 0", ((List<?>) getProcessAPI().getProcessDataInstance(getLogsData, procInstanceId).getValue()).size() > 0);
-        final Profile profile = (Profile) getProcessAPI().getProcessDataInstance(profileData, procInstanceId).getValue();
-        assertEquals("addProfileCommandFromConnector", profile.getName());
-
-        deleteUser(johnName);
-        disableAndDeleteProcess(processDefinition);
-    }
-
-    private ProcessDefinition deployProcessWithDefaultTestConnector(final String delivery, final long userId,
-            final ProcessDefinitionBuilderExt designProcessDefinition) throws BonitaException, IOException {
-        final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                designProcessDefinition.done());
-        final List<BarResource> connectorImplementations = generateDefaultConnectorImplementations();
-        for (final BarResource barResource : connectorImplementations) {
-            businessArchiveBuilder.addConnectorImplementation(barResource);
-        }
-
-        final List<BarResource> generateConnectorDependencies = generateDefaultConnectorDependencies();
-        for (final BarResource barResource : generateConnectorDependencies) {
-            businessArchiveBuilder.addClasspathResource(barResource);
-        }
-
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
-        addMappingOfActorsForUser(delivery, userId, processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
-        return processDefinition;
-    }
-
-    private List<BarResource> generateDefaultConnectorImplementations() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
-        addResource(resources, "/com/bonitasoft/engine/connector/APIAccessorConnector.impl", "APIAccessorConnector.impl");
-        return resources;
-    }
-
-    private List<BarResource> generateDefaultConnectorDependencies() throws IOException {
-        final List<BarResource> resources = new ArrayList<BarResource>(1);
-        addResource(resources, APIAccessorConnector.class, "APIAccessorConnector.jar");
-        return resources;
-    }
-
-    private void addResource(final List<BarResource> resources, final String path, final String name) throws IOException {
-        final InputStream stream = BPMRemoteTests.class.getResourceAsStream(path);
-        assertNotNull(stream);
-        final byte[] byteArray = IOUtils.toByteArray(stream);
-        stream.close();
-        resources.add(new BarResource(name, byteArray));
     }
 
     @Test
