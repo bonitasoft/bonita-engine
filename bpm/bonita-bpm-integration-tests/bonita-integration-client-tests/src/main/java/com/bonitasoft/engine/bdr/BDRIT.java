@@ -167,8 +167,6 @@ public class BDRIT extends CommonAPISPTest {
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", "6.3-beta");
         String businessDataName = "newBornBaby";
         String newEmployeeFirstName = "Manon";
-        String firstName = "firstName";
-        processDefinitionBuilder.addData(firstName, String.class.getName(), null);
         processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addAutomaticTask("step1").addOperation(

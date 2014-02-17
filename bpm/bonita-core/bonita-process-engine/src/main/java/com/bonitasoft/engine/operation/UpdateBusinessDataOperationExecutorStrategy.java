@@ -123,7 +123,8 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     public void update(final SLeftOperand sLeftOperand, Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         try {
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(), containerId);
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
+                    getProcessInstanceId(containerId, containerType));
             newValue = businessDataRepository.merge(newValue);
             if (refBusinessDataInstance != null) {
                 final Long id = ClassReflector.invokeGetter(newValue, PERSISTENCE_ID_GETTER);
@@ -137,6 +138,10 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
             throw new SOperationExecutionException(re);
         } catch (final SRefBusinessDataInstanceModificationException srbsme) {
             throw new SOperationExecutionException(srbsme);
+        } catch (SFlowNodeNotFoundException e) {
+            throw new SOperationExecutionException(e);
+        } catch (SFlowNodeReadException e) {
+            throw new SOperationExecutionException(e);
         }
     }
 
