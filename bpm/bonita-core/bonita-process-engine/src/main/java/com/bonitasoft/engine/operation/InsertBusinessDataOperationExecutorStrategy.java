@@ -15,6 +15,11 @@ import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
@@ -34,10 +39,25 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
 
     private final RefBusinessDataService refBusinessDataService;
 
-    public InsertBusinessDataOperationExecutorStrategy(final BusinessDataRespository respository, final RefBusinessDataService refBusinessDataService) {
+    private final FlowNodeInstanceService flowNodeInstanceService;
+
+    public InsertBusinessDataOperationExecutorStrategy(final BusinessDataRespository respository, final RefBusinessDataService refBusinessDataService,
+            final FlowNodeInstanceService flowNodeInstanceService) {
         super();
         this.respository = respository;
         this.refBusinessDataService = refBusinessDataService;
+        this.flowNodeInstanceService = flowNodeInstanceService;
+    }
+
+    protected long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException {
+        if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
+            return containerId;
+        } else if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(containerType)) {
+            SFlowNodeInstance flowNodeInstance;
+            flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
+            return flowNodeInstance.getParentProcessInstanceId();
+        }
+        throw new IllegalArgumentException("Invalid container type: " + containerType);
     }
 
     @Override
@@ -53,7 +73,8 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
     public void update(final SLeftOperand sLeftOperand, Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         try {
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(), containerId);
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
+                    getProcessInstanceId(containerId, containerType));
             final Long dataId = refBusinessDataInstance.getDataId();
             if (dataId == null) {
                 newValue = respository.merge(newValue);
@@ -68,6 +89,10 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
             throw new SOperationExecutionException(re);
         } catch (final SRefBusinessDataInstanceModificationException srbsme) {
             throw new SOperationExecutionException(srbsme);
+        } catch (SFlowNodeNotFoundException e) {
+            throw new SOperationExecutionException(e);
+        } catch (SFlowNodeReadException e) {
+            throw new SOperationExecutionException(e);
         }
     }
 
