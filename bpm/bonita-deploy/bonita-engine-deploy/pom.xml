@@ -31,34 +31,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-home-sp</artifactId>
-			<version>${project.version}</version>
-			<classifier>teamwork</classifier>
-			<type>zip</type>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-home-sp</artifactId>
-			<version>${project.version}</version>
-			<classifier>efficiency</classifier>
-			<type>zip</type>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-home-sp</artifactId>
-			<version>${project.version}</version>
-			<classifier>performance</classifier>
-			<type>zip</type>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-home-sp</artifactId>
-			<version>${project.version}</version>
-			<classifier>performance-cluster</classifier>
-			<type>zip</type>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-deploy-ear2-sp</artifactId>
 			<version>${project.version}</version>
 			<type>ear</type>
@@ -91,10 +63,7 @@
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>assembly-hibernate-teamwork.xml</descriptor>
-								<descriptor>assembly-hibernate-efficiency.xml</descriptor>
-								<descriptor>assembly-hibernate-performance.xml</descriptor>
-								<descriptor>assembly-hibernate-performance-cluster.xml</descriptor>
+								<descriptor>assembly-hibernate.xml</descriptor>
 							</descriptors>
 						</configuration>
 					</execution>

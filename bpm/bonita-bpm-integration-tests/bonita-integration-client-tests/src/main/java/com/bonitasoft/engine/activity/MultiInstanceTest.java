@@ -24,7 +24,6 @@ import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivities;
-import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,9 +95,11 @@ public class MultiInstanceTest extends CommonAPISPTest {
         }
         Thread.sleep(200);
         checkNbPendingTaskOf(0, john);
+        waitProcessToFinishAndBeArchived(processInstance);
+
         final int nbAbortedActivities = (numberOfTask - numberOfTaskToCompleteMI) * 3 + numberOfTaskToCompleteMI * 2; // parent and 2 children for non completed
-                                                                                                                      // tasks + 2 children for completed one
-        assertTrue("process was not finished", new WaitProcessToFinishAndBeArchived(50, 7000, false, processInstance, getProcessAPI()).waitUntil());
+        // tasks + 2 children for completed one
+
         final CheckNbOfArchivedActivities checkNbOfActivities = new CheckNbOfArchivedActivities(getProcessAPI(), 100, 5000, true, processInstance,
                 nbAbortedActivities, TestStates.getAbortedState());
         final boolean waitUntilAborted = checkNbOfActivities.waitUntil();

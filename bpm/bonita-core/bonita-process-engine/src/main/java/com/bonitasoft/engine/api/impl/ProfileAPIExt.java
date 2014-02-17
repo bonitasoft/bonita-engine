@@ -184,9 +184,8 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
             }
             final String profileXml = exportProfiles.getResult();
             return profileXml.getBytes();
-        } else {
-            return null;
         }
+        return new byte[] {};
     }
 
     @Override

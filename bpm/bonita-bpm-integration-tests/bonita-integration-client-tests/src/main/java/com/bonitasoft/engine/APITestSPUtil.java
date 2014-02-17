@@ -238,7 +238,7 @@ public class APITestSPUtil extends APITestUtil {
         parameters.put("maxResults", 10000);
         parameters.put("sort", BreakpointCriterion.DEFINITION_ID_ASC);
         final List<Breakpoint> breakpoints = (List<Breakpoint>) getCommandAPI().execute("getBreakpoints", parameters);
-        if (breakpoints.size() > 0) {
+        if (!breakpoints.isEmpty()) {
             final StringBuilder bpBuilder = new StringBuilder("Breakpoints are still present: ");
             for (final Breakpoint breakpoint : breakpoints) {
                 bpBuilder.append(breakpoint.getElementName()).append(", ");

@@ -10,13 +10,14 @@ package com.bonitasoft.engine;
 
 import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.connectors.RemoteConnectorExecutionTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.bonitasoft.engine.process.TaskOnDemandTest;
+
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        RemoteConnectorExecutionTest.class
+        LocalLogTest.class, TaskOnDemandTest.class
 })
 @Initializer(TestsInitializerSP.class)
 public class TemporaryTestsSP extends LocalIntegrationTestsSP {
