@@ -19,22 +19,12 @@ package org.bonitasoft.engine.data.instance.api;
  */
 public enum DataInstanceContainer {
 
-    PROCESS_INSTANCE("process instance"),
+    PROCESS_INSTANCE,
 
-    ACTIVITY_INSTANCE("activity instance"),
+    ACTIVITY_INSTANCE,
 
-    MESSAGE_INSTANCE("message instance"),
+    MESSAGE_INSTANCE,
 
-    WAITING_MESSAGE("waiting message");
-
-    private final String value;
-
-    private DataInstanceContainer(final String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
+    WAITING_MESSAGE;
 
 }

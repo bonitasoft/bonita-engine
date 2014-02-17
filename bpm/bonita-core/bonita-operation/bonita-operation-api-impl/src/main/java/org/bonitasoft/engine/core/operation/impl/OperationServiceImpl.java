@@ -75,9 +75,9 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public void execute(final SOperation operation, final long dataContainerId, final String dataContainerType, final SExpressionContext expressionContext)
+    public void execute(final SOperation operation, final long containerId, final String containerType, final SExpressionContext expressionContext)
             throws SOperationExecutionException {
-        executeOperation(operation, dataContainerId, dataContainerType, expressionContext);
+        executeOperation(operation, containerId, containerType, expressionContext);
     }
 
     @Override
@@ -85,9 +85,9 @@ public class OperationServiceImpl implements OperationService {
         execute(operation, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);
     }
 
-    private void executeOperation(final SOperation operation, final long dataContainerId, final String dataContainerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
-        execute(Arrays.asList(operation), dataContainerId, dataContainerType, expressionContext);
+    private void executeOperation(final SOperation operation, final long containerId, final String containerType, final SExpressionContext expressionContext)
+            throws SOperationExecutionException {
+        execute(Arrays.asList(operation), containerId, containerType, expressionContext);
     }
 
     protected Object getOperationValue(final SOperation operation, final SExpressionContext expressionContext, final SExpression sExpression)
@@ -95,7 +95,8 @@ public class OperationServiceImpl implements OperationService {
         try {
             return expressionResolverService.evaluate(sExpression, expressionContext);
         } catch (final ClassCastException e) {
-            throw new SOperationExecutionException("Trying to set variable " + operation.getLeftOperand().getName() + " a value which is not Serializable", e);
+            throw new SOperationExecutionException("Unable to execute operation on " + operation.getLeftOperand().getName()
+                    + " with a new value which is not Serializable", e);
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
@@ -107,16 +108,16 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public void execute(final List<SOperation> operations, final long dataContainerId, final String dataContainerType,
-            final SExpressionContext expressionContext) throws SOperationExecutionException {
+    public void execute(final List<SOperation> operations, final long containerId, final String containerType, final SExpressionContext expressionContext)
+            throws SOperationExecutionException {
         retrieveDataInstancesToSetAndPutItInExpressionContextIfNotIn(operations, expressionContext);
         final Map<SLeftOperand, OperationExecutorStrategy> updates = new HashMap<SLeftOperand, OperationExecutorStrategy>();
         for (final SOperation operation : operations) {
             final Object operationValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
             final OperationExecutorStrategy operationExecutorStrategy = getOperationExecutorStrategy(operation);
-            final Object value = operationExecutorStrategy.getValue(operation, operationValue, dataContainerId, dataContainerType, expressionContext);
+            final Object value = operationExecutorStrategy.getValue(operation, operationValue, containerId, containerType, expressionContext);
             if (!operationExecutorStrategy.doUpdateData()) {
-                operationExecutorStrategy.update(operation.getLeftOperand(), value, dataContainerId, dataContainerType);
+                operationExecutorStrategy.update(operation.getLeftOperand(), value, containerId, containerType);
             } else {
                 expressionContext.getInputValues().put(operation.getLeftOperand().getName(), value);
                 updates.put(operation.getLeftOperand(), operationExecutorStrategy);
@@ -124,9 +125,9 @@ public class OperationServiceImpl implements OperationService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 StringBuilder stb = new StringBuilder();
                 stb.append("Executed operation on container [id: '");
-                stb.append(dataContainerId);
+                stb.append(containerId);
                 stb.append("', type: '");
-                stb.append(dataContainerType);
+                stb.append(containerType);
                 stb.append("']. Operation: [left operand: '");
                 stb.append(operation.getLeftOperand().getName());
                 stb.append("', operator: '");
@@ -138,7 +139,7 @@ public class OperationServiceImpl implements OperationService {
             }
         }
         for (final Entry<SLeftOperand, OperationExecutorStrategy> update : updates.entrySet()) {
-            update.getValue().update(update.getKey(), expressionContext.getInputValues().get(update.getKey().getName()), dataContainerId, dataContainerType);
+            update.getValue().update(update.getKey(), expressionContext.getInputValues().get(update.getKey().getName()), containerId, containerType);
         }
     }
 
