@@ -18,8 +18,8 @@ import org.bonitasoft.engine.exception.ExecutionException;
 /**
  * Thrown when it's not possible to execute correctly the connector.
  * 
- * The class ConnectorExecutionException are a form of Throwable that indicates conditions that a reasonable application might want to catch.
- * The class ConnectorExecutionException that are not also subclasses of {@link RuntimeException} are checked exceptions.
+ * The class ConnectorExecutionException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
+ * The class ConnectorExecutionException that is not also subclasses of {@link RuntimeException} are checked exceptions.
  * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
  * constructor and propagate outside the method or constructor boundary.
  * 

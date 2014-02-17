@@ -18,8 +18,8 @@ import org.bonitasoft.engine.exception.BonitaException;
 /**
  * Thrown when the connector implementation is invalid.
  * 
- * The class InvalidConnectorImplementationException are a form of Throwable that indicates conditions that a reasonable application might want to catch.
- * The class InvalidConnectorImplementationException that are not also subclasses of {@link RuntimeException} are checked exceptions.
+ * The class InvalidConnectorImplementationException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
+ * The class InvalidConnectorImplementationException that is not also subclasses of {@link RuntimeException} are checked exceptions.
  * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
  * constructor and propagate outside the method or constructor boundary.
  * 

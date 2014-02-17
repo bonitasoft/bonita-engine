@@ -18,8 +18,8 @@ import org.bonitasoft.engine.exception.BonitaException;
 /**
  * Thrown when the evaluation of the condition of the connector instance is invalid.
  * 
- * The class InvalidEvaluationConnectorConditionException are a form of Throwable that indicates conditions that a reasonable application might want to catch.
- * The class InvalidEvaluationConnectorConditionException that are not also subclasses of {@link RuntimeException} are checked exceptions.
+ * The class InvalidEvaluationConnectorConditionException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
+ * The class InvalidEvaluationConnectorConditionException that is not also subclasses of {@link RuntimeException} are checked exceptions.
  * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
  * constructor and propagate outside the method or constructor boundary.
  * 
