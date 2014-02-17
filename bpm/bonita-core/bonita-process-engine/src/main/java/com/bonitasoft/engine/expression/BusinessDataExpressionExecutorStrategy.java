@@ -14,8 +14,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -59,7 +57,7 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
             return context.get(bizDataName);
         }
         try {
-            long processInstanceId = getProcessInstanceId((Long) context.get(SExpressionContext.containerIdKey),
+            long processInstanceId = flowNodeInstanceService.getProcessInstanceId((Long) context.get(SExpressionContext.containerIdKey),
                     (String) context.get(SExpressionContext.containerTypeKey));
             SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
             Class<?> bizClass = Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
@@ -69,24 +67,6 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
         } catch (Exception e) {
             throw new SExpressionEvaluationException(e);
         }
-    }
-
-    /**
-     * protected for testing
-     */
-    protected long getProcessInstanceId(final long containerId, final String containerType) throws SExpressionEvaluationException {
-        if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
-            return containerId;
-        } else if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(containerType)) {
-            SFlowNodeInstance flowNodeInstance;
-            try {
-                flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
-                return flowNodeInstance.getParentProcessInstanceId();
-            } catch (Exception e) {
-                throw new SExpressionEvaluationException("Process instance id not found in context");
-            }
-        }
-        throw new SExpressionEvaluationException("Invalid container type");
     }
 
     @Override

@@ -21,8 +21,6 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
@@ -87,7 +85,7 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
         Map<String, Object> inputValues = expressionContext.getInputValues();
         Object objectToInvokeJavaMethodOn = inputValues.get(businessDataName);
         if (objectToInvokeJavaMethodOn == null) {
-            long processInstanceId = getProcessInstanceId(containerId, containerType);
+            long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
             objectToInvokeJavaMethodOn = getBusinessData(businessDataName, processInstanceId);
             // put it in context for further reuse:
             inputValues.put(businessDataName, objectToInvokeJavaMethodOn);
@@ -105,18 +103,6 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
         } catch (Exception e) {
             throw new SOperationExecutionException(e);
         }
-    }
-
-    // FIXME: put this method in FlowNodeInstanceService:
-    protected long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException {
-        if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
-            return containerId;
-        } else if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(containerType)) {
-            SFlowNodeInstance flowNodeInstance;
-            flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
-            return flowNodeInstance.getParentProcessInstanceId();
-        }
-        throw new IllegalArgumentException("Invalid container type: " + containerType);
     }
 
     @Override

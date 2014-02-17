@@ -72,7 +72,6 @@ public class UpdateBusinessDataOperationExecutorStrategyTest {
 
         UpdateBusinessDataOperationExecutorStrategy spy = spy(updateBizDataStrategy);
         doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong());
-        doReturn(4115L).when(spy).getProcessInstanceId(anyLong(), anyString());
         Map<String, Serializable> inputValues = new HashMap<String, Serializable>(1);
         SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", inputValues);
 

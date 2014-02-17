@@ -35,16 +35,16 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
 
     private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
 
-    private final BusinessDataRespository respository;
+    private final BusinessDataRespository repository;
 
     private final RefBusinessDataService refBusinessDataService;
 
     private final FlowNodeInstanceService flowNodeInstanceService;
 
-    public InsertBusinessDataOperationExecutorStrategy(final BusinessDataRespository respository, final RefBusinessDataService refBusinessDataService,
+    public InsertBusinessDataOperationExecutorStrategy(final BusinessDataRespository repository, final RefBusinessDataService refBusinessDataService,
             final FlowNodeInstanceService flowNodeInstanceService) {
         super();
-        this.respository = respository;
+        this.repository = repository;
         this.refBusinessDataService = refBusinessDataService;
         this.flowNodeInstanceService = flowNodeInstanceService;
     }
@@ -77,7 +77,7 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
                     getProcessInstanceId(containerId, containerType));
             final Long dataId = refBusinessDataInstance.getDataId();
             if (dataId == null) {
-                newValue = respository.merge(newValue);
+                newValue = repository.merge(newValue);
                 final Long id = ClassReflector.invokeGetter(newValue, PERSISTENCE_ID_GETTER);
                 refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
             }

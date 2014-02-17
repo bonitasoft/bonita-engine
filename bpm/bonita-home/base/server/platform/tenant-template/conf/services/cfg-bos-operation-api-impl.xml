@@ -47,7 +47,7 @@
 	</bean>
 
 	<bean id="createBusinessDataOperationExecutorStrategy" class="com.bonitasoft.engine.operation.InsertBusinessDataOperationExecutorStrategy">
-		<constructor-arg name="respository" ref="businessDataRepository" />
+		<constructor-arg name="repository" ref="businessDataRepository" />
 		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
 		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
 	</bean>

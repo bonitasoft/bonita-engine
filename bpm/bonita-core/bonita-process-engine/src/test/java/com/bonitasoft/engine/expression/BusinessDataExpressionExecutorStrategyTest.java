@@ -30,7 +30,6 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.ExpressionType;
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.junit.Test;
@@ -187,31 +186,6 @@ public class BusinessDataExpressionExecutorStrategyTest {
     @Test
     public void evaluation_result_should_be_pushed_in_context() throws Exception {
         assertThat(businessDataExpressionExecutorStrategy.mustPutEvaluatedExpressionInContext()).isEqualTo(true);
-    }
-
-    @Test
-    public void getProcessInstanceId_should_return_container_id_if_containerType_is_process() throws Exception {
-        final long expectedContainerId = 1L;
-
-        final long processInstanceId = businessDataExpressionExecutorStrategy.getProcessInstanceId(expectedContainerId,
-                DataInstanceContainer.PROCESS_INSTANCE.name());
-
-        assertThat(processInstanceId).isEqualTo(expectedContainerId);
-    }
-
-    @Test
-    public void getProcessInstanceId_should_return_taskInstance_processId_if_containerType_is_activity() throws Exception {
-        final SFlowNodeInstance flowNode = createAflowNodeInstanceInRepository();
-
-        final long processInstanceId = businessDataExpressionExecutorStrategy.getProcessInstanceId(flowNode.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name());
-
-        assertThat(processInstanceId).isEqualTo(flowNode.getParentProcessInstanceId());
-    }
-
-    @Test(expected = SExpressionEvaluationException.class)
-    public void getProcessInstanceId_should_throw_an_exception_for_a_not_supported_container_type() throws Exception {
-        businessDataExpressionExecutorStrategy.getProcessInstanceId(1L, DataInstanceContainer.MESSAGE_INSTANCE.name());
     }
 
 }
