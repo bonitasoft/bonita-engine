@@ -117,6 +117,7 @@ import org.bonitasoft.engine.test.check.CheckProcessInstanceIsArchived;
 import org.bonitasoft.engine.test.wait.WaitForActivity;
 import org.bonitasoft.engine.test.wait.WaitForArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForCompletedArchivedStep;
+import org.bonitasoft.engine.test.wait.WaitForDataValue;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForFlowNode;
@@ -988,6 +989,13 @@ public class APITestUtil {
                 processInstance.getId(), getProcessAPI());
         assertTrue(activityName + " should be finished and archived", waitForFinalArchivedActivity.waitUntil());
         return waitForFinalArchivedActivity;
+    }
+
+    @Deprecated
+    public void waitForDataValue(final ProcessInstance processInstance, final String dataName, final String expectedValue) throws Exception {
+        final WaitForDataValue waitForConnector = new WaitForDataValue(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance.getId(), dataName, expectedValue,
+                getProcessAPI());
+        assertTrue("Can't find data <" + dataName + "> with value <" + expectedValue + ">", waitForConnector.waitUntil());
     }
 
     @Deprecated
