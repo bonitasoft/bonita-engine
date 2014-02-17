@@ -14,9 +14,6 @@
  */
 package org.bonitasoft.engine.core.process.document.api.impl;
 
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
-import org.bonitasoft.engine.document.model.SDocument;
-
 /**
  * @author Nicolas Chabanoles
  */
@@ -29,10 +26,10 @@ public class SDocumentDownloadURLProviderImpl implements SDocumentDownloadURLPro
     }
 
     @Override
-    public String generateURL(final SProcessDocument document, final SDocument sDocument) {
+    public String generateURL(String documentName, String contentStorageId) {
         final StringBuffer buffer = new StringBuffer(servletUrl);
-        buffer.append("?contentStorageId=");
-        buffer.append(sDocument.getStorageId());
+        buffer.append("?fileName=").append(documentName);
+        buffer.append("&contentStorageId=").append(contentStorageId);
         return buffer.toString();
     }
 

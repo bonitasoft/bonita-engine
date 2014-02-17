@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,17 +21,32 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
+ * The archived comment associated to a process instance
+ * 
  * @author Zhang Bole
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface ArchivedComment extends NamedElement, BaseElement, ArchivedElement {
 
+    /**
+     * @return The identifier of the user that posted the comment
+     */
     Long getUserId();
 
+    /**
+     * @return The identifier of the process instance associated to the comment
+     */
     long getProcessInstanceId();
 
+    /**
+     * @return The date to which the comment was posted.
+     */
     Date getPostDate();
 
+    /**
+     * @return The content of the comment
+     */
     String getContent();
 
 }

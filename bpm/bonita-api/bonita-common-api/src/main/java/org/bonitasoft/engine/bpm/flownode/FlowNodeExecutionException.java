@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,25 +16,31 @@ package org.bonitasoft.engine.bpm.flownode;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
- * Thrown when a BPM Flow node fails to execute.
+ * Thrown when a BPM flow node fails to execute.
  * 
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class FlowNodeExecutionException extends ExecutionException {
 
     private static final long serialVersionUID = 1873896404277831296L;
 
     /**
+     * Constructs a new exception with the specified detail message.
+     * 
      * @param message
-     *            the error message describing why the Flow node failed to execute.
+     *            The detail message why the flow node failed to execute(which is saved for later retrieval by the {@link Throwable#getMessage()} method).
      */
     public FlowNodeExecutionException(final String message) {
         super(message);
     }
 
     /**
+     * Constructs a new exception with the specified detail cause.
+     * 
      * @param cause
-     *            the cause of the Flow node failure.
+     *            The cause of the flow node failure (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is
+     *            permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public FlowNodeExecutionException(final Throwable cause) {
         super(cause);
