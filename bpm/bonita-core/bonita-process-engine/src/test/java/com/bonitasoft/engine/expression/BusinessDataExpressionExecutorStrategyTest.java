@@ -61,7 +61,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
         final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
         when(flowNode.getParentProcessInstanceId()).thenReturn(1234L);
         when(flowNode.getId()).thenReturn(456L);
-        when(flowNodeInstanceService.getFlowNodeInstance(flowNode.getId())).thenReturn(flowNode);
+        when(flowNodeInstanceService.getProcessInstanceId(456L, DataInstanceContainer.ACTIVITY_INSTANCE.name())).thenReturn(1234L);
         return flowNode;
     }
 
@@ -117,6 +117,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
         final SRefBusinessDataInstance refBizData = createARefBizDataInRepository(expectedBizData, proccessInstanceId);
         final HashMap<String, Object> context = buildBusinessDataExpressionContext(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE);
         final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
+        when(flowNodeInstanceService.getProcessInstanceId(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(proccessInstanceId);
 
         final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null);
 
@@ -156,12 +157,13 @@ public class BusinessDataExpressionExecutorStrategyTest {
     public void evaluate_should_resolve_multiple_expressions() throws Exception {
         final SimpleBizData firstBizData = createAbizDataInRepository(1L);
         final SimpleBizData secondBizData = createAbizDataInRepository(2L);
-        final long aProcessInstanceId = 6L;
-        final SRefBusinessDataInstance firstRefBizData = createARefBizDataInRepository(firstBizData, "dataOne", aProcessInstanceId);
-        final SRefBusinessDataInstance secondRefBizData = createARefBizDataInRepository(secondBizData, "dataTwo", aProcessInstanceId);
-        final HashMap<String, Object> context = buildBusinessDataExpressionContext(aProcessInstanceId, DataInstanceContainer.PROCESS_INSTANCE);
+        final long processInstanceId = 6L;
+        final SRefBusinessDataInstance firstRefBizData = createARefBizDataInRepository(firstBizData, "dataOne", processInstanceId);
+        final SRefBusinessDataInstance secondRefBizData = createARefBizDataInRepository(secondBizData, "dataTwo", processInstanceId);
+        final HashMap<String, Object> context = buildBusinessDataExpressionContext(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE);
         final SExpression firstbuildBusinessDataExpression = buildBusinessDataExpression(firstRefBizData.getName());
         final SExpression secondbuildBusinessDataExpression = buildBusinessDataExpression(secondRefBizData.getName());
+        when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(processInstanceId);
 
         final List<Object> fetchedBizDatas = businessDataExpressionExecutorStrategy.evaluate(
                 Arrays.asList(firstbuildBusinessDataExpression, secondbuildBusinessDataExpression), context, null);
