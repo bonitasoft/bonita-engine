@@ -9,6 +9,8 @@ import static org.mockito.Mockito.when;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
+import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -25,10 +27,13 @@ import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstanc
 public class InsertBusinessDataOperationExecutorStrategyTest {
 
     @Mock
-    private BusinessDataRespository respository;
+    private BusinessDataRespository repository;
 
     @Mock
     private RefBusinessDataService service;
+
+    @Mock
+    private FlowNodeInstanceService flowNodeInstanceService;
 
     @InjectMocks
     private InsertBusinessDataOperationExecutorStrategy strategy;
@@ -53,11 +58,12 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
         final long processInstanceId = 76846321l;
 
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
-        final SRefBusinessDataInstance instance = mock(SRefBusinessDataInstance.class);
+        final SRefBusinessDataInstance refBizDataInstance = mock(SRefBusinessDataInstance.class);
         when(leftOperand.getName()).thenReturn("unused");
-        when(service.getRefBusinessDataInstance("unused", processInstanceId)).thenReturn(instance);
-        when(instance.getDataId()).thenReturn(null);
-        when(respository.merge(employee)).thenReturn(employee);
+        when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(processInstanceId);
+        when(service.getRefBusinessDataInstance("unused", processInstanceId)).thenReturn(refBizDataInstance);
+        when(refBizDataInstance.getDataId()).thenReturn(null);
+        when(repository.merge(employee)).thenReturn(employee);
         doAnswer(new Answer<Void>() {
 
             @Override
@@ -65,13 +71,13 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
                 return null;
             }
 
-        }).when(service).updateRefBusinessDataInstance(instance, dataId);
+        }).when(service).updateRefBusinessDataInstance(refBizDataInstance, dataId);
 
-        strategy.update(leftOperand, employee, processInstanceId, "any");
+        strategy.update(leftOperand, employee, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
 
-        verify(respository).merge(employee);
+        verify(repository).merge(employee);
         verify(service).getRefBusinessDataInstance("unused", processInstanceId);
-        verify(service).updateRefBusinessDataInstance(instance, dataId);
+        verify(service).updateRefBusinessDataInstance(refBizDataInstance, dataId);
     }
 
 }
