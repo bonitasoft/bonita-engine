@@ -75,8 +75,7 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     }
 
     protected String getOperator(final SOperation operation) {
-        final String operator = operation.getOperator().split(":", 2)[0];
-        return operator;
+        return operation.getOperator().split(":", 2)[0];
     }
 
     protected Object getBusinessDataObjectAndPutInContextIfNotAlready(final long containerId, final String containerType,
@@ -109,8 +108,9 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     public void update(final SLeftOperand sLeftOperand, Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         try {
+            long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
-                    getProcessInstanceId(containerId, containerType));
+                    processInstanceId);
             newValue = businessDataRepository.merge(newValue);
             if (refBusinessDataInstance != null) {
                 final Long id = ClassReflector.invokeGetter(newValue, PERSISTENCE_ID_GETTER);

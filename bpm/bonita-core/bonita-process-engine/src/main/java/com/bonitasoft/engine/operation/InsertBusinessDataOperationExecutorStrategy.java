@@ -18,8 +18,6 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.business.data.BusinessDataRespository;
@@ -49,17 +47,6 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
         this.flowNodeInstanceService = flowNodeInstanceService;
     }
 
-    protected long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException {
-        if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
-            return containerId;
-        } else if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(containerType)) {
-            SFlowNodeInstance flowNodeInstance;
-            flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
-            return flowNodeInstance.getParentProcessInstanceId();
-        }
-        throw new IllegalArgumentException("Invalid container type: " + containerType);
-    }
-
     @Override
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
@@ -74,7 +61,7 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
             throws SOperationExecutionException {
         try {
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
-                    getProcessInstanceId(containerId, containerType));
+                    flowNodeInstanceService.getProcessInstanceId(containerId, containerType));
             final Long dataId = refBusinessDataInstance.getDataId();
             if (dataId == null) {
                 newValue = repository.merge(newValue);
