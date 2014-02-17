@@ -39,14 +39,16 @@ public class SelectDescriptorBuilder {
     public static SelectListDescriptor<SDocumentMapping> getDocumentMappingsforProcessInstance(final long processInstanceId, final int fromIndex,
             final int maxResults, final String sortFieldOrder, final OrderByType orderBy) {
         QueryOptions queryOptions = null;
+        String queryName = "getDocumentMappingsforProcessInstance";
         if (sortFieldOrder == null) {
             queryOptions = new QueryOptions(fromIndex, maxResults);
+            queryName = "getDocumentMappingsforProcessInstanceOrderedById";
         } else {
             queryOptions = new QueryOptions(fromIndex, maxResults, SDocumentMapping.class, sortFieldOrder, orderBy);
         }
         final Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("processInstanceId", processInstanceId);
-        return new SelectListDescriptor<SDocumentMapping>("getDocumentMappingsforProcessInstance", parameters, SDocumentMapping.class, queryOptions);
+        return new SelectListDescriptor<SDocumentMapping>(queryName, parameters, SDocumentMapping.class, queryOptions);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfElement(final String elementName, final Class<? extends PersistentObject> clazz) {

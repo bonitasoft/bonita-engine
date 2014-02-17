@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.StringType;
 import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
@@ -53,23 +54,23 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
     public void setParameterValues(final Properties parameters) {
         final String enumClassName = parameters.getProperty("enumClass");
         try {
-            this.enumClass = Class.forName(enumClassName).asSubclass(Enum.class);
+            enumClass = Class.forName(enumClassName).asSubclass(Enum.class);
         } catch (final ClassNotFoundException cfne) {
             final String message = "Enum class not found";
             throw new HibernateException(message, cfne);
         }
         final String identifierMethodName = parameters.getProperty("identifierMethod", DEFAULT_IDENTIFIER_METHOD_NAME);
         try {
-            this.identifierMethod = this.enumClass.getMethod(identifierMethodName, new Class[0]);
-            this.identifierType = this.identifierMethod.getReturnType();
+            identifierMethod = enumClass.getMethod(identifierMethodName, new Class[0]);
+            identifierType = identifierMethod.getReturnType();
         } catch (final Exception e) {
             final String message = "Failed to obtain identifier method";
             throw new HibernateException(message, e);
         }
-        this.sqlTypes = new int[] { this.type.sqlType() };
+        sqlTypes = new int[] { type.sqlType() };
         final String valueOfMethodName = parameters.getProperty("valueOfMethod", DEFAULT_VALUE_OF_METHOD_NAME);
         try {
-            this.valueOfMethod = this.enumClass.getMethod(valueOfMethodName, new Class[] { this.identifierType });
+            valueOfMethod = enumClass.getMethod(valueOfMethodName, new Class[] { identifierType });
         } catch (final Exception e) {
             final String message = "Failed to obtain valueOf method";
             throw new HibernateException(message, e);
@@ -78,49 +79,52 @@ public class GenericEnumUserType implements UserType, ParameterizedType, Seriali
 
     @Override
     public Class<?> returnedClass() {
-        return this.enumClass;
+        return enumClass;
     }
 
     @Override
-    public Object nullSafeGet(final ResultSet rs, final String[] names, final Object owner) throws SQLException {
-        final Object identifier = this.type.get(rs, names[0]);
+    public Object nullSafeGet(final ResultSet rs, final String[] names, final SessionImplementor session, final Object owner) throws HibernateException,
+            SQLException {
+        final Object identifier = type.get(rs, names[0], session);
         if (identifier == null) {
             return null;
         }
         try {
-            return this.valueOfMethod.invoke(this.enumClass, new Object[] { identifier });
+            return valueOfMethod.invoke(enumClass, new Object[] { identifier });
         } catch (final Exception e) {
             final StringBuilder stb = new StringBuilder("Exception while invoking valueOf method '");
-            stb.append(this.valueOfMethod.getName());
+            stb.append(valueOfMethod.getName());
             stb.append("' of enumeration class '");
-            stb.append(this.enumClass);
+            stb.append(enumClass);
             stb.append('\'');
             throw new HibernateException(stb.toString(), e);
         }
     }
 
     @Override
-    public void nullSafeSet(final PreparedStatement st, final Object value, final int index) {
+    public void nullSafeSet(final PreparedStatement st, final Object value, final int index, final SessionImplementor session) throws HibernateException,
+            SQLException {
         try {
             if (value == null) {
-                st.setNull(index, this.type.sqlType());
+                st.setNull(index, type.sqlType());
             } else {
-                final String identifier = (String) this.identifierMethod.invoke(value, new Object[0]);
-                this.type.set(st, identifier, index);
+                final String identifier = (String) identifierMethod.invoke(value, new Object[0]);
+                type.set(st, identifier, index, session);
             }
         } catch (final Exception e) {
             final StringBuilder stb = new StringBuilder("Exception while invoking identifierMethod '");
-            stb.append(this.valueOfMethod.getName());
+            stb.append(valueOfMethod.getName());
             stb.append("' of enumeration class '");
-            stb.append(this.enumClass);
+            stb.append(enumClass);
             stb.append('\'');
             throw new HibernateException(stb.toString(), e);
         }
+
     }
 
     @Override
     public int[] sqlTypes() {
-        return this.sqlTypes;
+        return sqlTypes;
     }
 
     @Override

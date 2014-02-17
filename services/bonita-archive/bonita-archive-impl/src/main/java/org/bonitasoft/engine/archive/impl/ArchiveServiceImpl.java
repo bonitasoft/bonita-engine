@@ -114,7 +114,7 @@ public class ArchiveServiceImpl implements ArchiveService {
      * @return
      * @throws STransactionNotFoundException
      */
-    private synchronized BatchArchiveSynchronization getBatchArchiveSynchronization() throws STransactionNotFoundException {
+    private BatchArchiveSynchronization getBatchArchiveSynchronization() throws STransactionNotFoundException {
         BatchArchiveSynchronization synchro = synchronizations.get();
         if (synchro == null) {
             synchro = new BatchArchiveSynchronization(definitiveArchivePersistenceService);

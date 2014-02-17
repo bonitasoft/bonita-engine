@@ -20,7 +20,7 @@
     eternal="true"
     overflowToDisk="true"
   />
-  
+
   <cache
 	maxElementsInMemory="10000"
 	overflowToDisk="true"
@@ -29,7 +29,7 @@
 	copyOnRead="true"
 	copyOnWrite="true">
   </cache>
-	
+
   <cache
 	maxElementsInMemory="100000"
 	overflowToDisk="true"
