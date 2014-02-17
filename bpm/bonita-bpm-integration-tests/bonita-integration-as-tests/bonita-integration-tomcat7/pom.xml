@@ -173,7 +173,7 @@
 											<equals arg1="${db.vendor}" arg2="h2" />
 											<then>
 												<copy todir="${tomcat.conf.dir}">
-													<fileset dir="tomcat/${db.vendor}/server.xml" />
+													<fileset file="tomcat/${db.vendor}/server.xml" />
 												</copy>
 											</then>
 										</if>

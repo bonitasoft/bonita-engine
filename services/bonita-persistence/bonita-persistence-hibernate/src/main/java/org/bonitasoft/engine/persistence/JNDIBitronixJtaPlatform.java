@@ -11,12 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.transaction;
+package org.bonitasoft.engine.persistence;
 
 import javax.transaction.TransactionManager;
 
-public interface BonitaTransactionManagerLookup {
+import org.hibernate.engine.transaction.jta.platform.internal.BitronixJtaPlatform;
 
-    TransactionManager getTransactionManager();
+/**
+ * @author Laurent Vaills
+ */
+public class JNDIBitronixJtaPlatform extends BitronixJtaPlatform {
+
+    private static final long serialVersionUID = 4893085097625997082L;
+
+    @Override
+    protected TransactionManager locateTransactionManager() {
+        // Force the lookup to JNDI to find the TransactionManager : since we share it between
+        // Hibernate and Quartz, I prefer to force the JNDI lookup in order to be sure that
+        // they are using the same instance.
+        return (TransactionManager) jndiService().locate("java:comp/UserTransaction");
+    }
 
 }

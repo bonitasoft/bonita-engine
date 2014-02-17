@@ -97,7 +97,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     private static final String CONNECTOR_INPUT_NAME = "input1";
 
     private static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
-    
+
     private static final String FLOWNODE = "flowNode";
 
     private static final String PROCESS = "process";
@@ -544,7 +544,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
         assertEquals(ConnectorState.FAILED, instance.getState());
-        
+
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -799,7 +799,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
         assertEquals(ConnectorState.FAILED, instance.getState());
-        
+
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -1086,48 +1086,6 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(calledProcess);
     }
 
-    @Test
-    @Cover(classes = {}, concept = BPMNConcept.CONNECTOR, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode", "connector" }, story = "elements must be restarted when connectors were not completed when the node was shut down")
-    public void restartElementsWithConnector() throws Exception {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithTransition", "1.0");
-        builder.addActor(ACTOR_NAME);
-        builder.addShortTextData("data", new ExpressionBuilder().createConstantStringExpression("default"));
-        final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step1", ACTOR_NAME);
-        taskDefinitionBuilder
-                .addConnector("myConnector1", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
-                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"))
-                .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        taskDefinitionBuilder.addConnector("wait1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
-                new ExpressionBuilder().createConstantLongExpression(700));
-        taskDefinitionBuilder.addConnector("wait2", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
-                new ExpressionBuilder().createConstantLongExpression(500));
-        taskDefinitionBuilder
-                .addConnector("myConnector2", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
-                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value2"))
-                .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
-                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
-        builder.addUserTask("step2", ACTOR_NAME);
-        builder.addTransition("step1", "step2");
-        // start check value1,stop, check still value1, start, check value 2, check step2 is active
-        final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, johnUser);
-        final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
-        assertTrue(waitForConnector.waitUntil());
-        logout();
-        final PlatformSession loginPlatform = loginPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        platformAPI.stopNode();
-        platformAPI.startNode();
-        logoutPlatform(loginPlatform);
-        login();
-        assertEquals("value1", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
-        waitForUserTask("step2", processInstance.getId());
-        // connector restarted
-        assertEquals("value2", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
-        disableAndDeleteProcess(processDefinition.getId());
-    }
 
     @Test
     @Cover(classes = {}, concept = BPMNConcept.CONNECTOR, jira = "ENGINE-469", keywords = { "node", "restart", "transition", "flownode", "connector" }, story = "elements must be restarted when connectors were not completed when the node was shut down")

@@ -27,13 +27,12 @@
 	<bean id="journalConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateConfigurationProviderImpl">
 		<constructor-arg name="properties">
 			<props>
+				<prop key="hibernate.connection.datasource">${database.journal.datasource.name}</prop>
 				<prop key="hibernate.current_session_context_class">jta</prop>
-				<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</prop>
-				<prop key="hibernate.transaction.manager_lookup_class">${hibernate.transaction.manager_lookup_class}</prop>
+				<prop key="hibernate.transaction.factory_class">org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory</prop>
+				<prop key="hibernate.transaction.jta.platform">${hibernate.transaction.jta_platform}</prop>
 				<prop key="hibernate.dialect">${hibernate.journal.dialect}</prop>
 				<prop key="hibernate.interceptor">${hibernate.journal.interceptor}</prop>
-				<prop key="hibernate.connection.datasource">${database.journal.datasource.name}</prop>
-				<prop key="net.sf.ehcache.configurationResourceName">ehcache.xml</prop>
 				<prop key="hibernate.show_sql">${hibernate.journal.show_sql}</prop>
 				<prop key="hibernate.format_sql">${hibernate.journal.format_sql}</prop>
 				<prop key="hibernate.use_sql_comments">${hibernate.journal.use_sql_comments}</prop>
@@ -97,6 +96,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" />
+
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
 
@@ -118,7 +118,6 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActivityInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" />
-
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" value="org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl" />
@@ -152,6 +151,7 @@
 				<entry key="org.bonitasoft.engine.document.model.SDocumentContent" value="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SToken" value="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" />
+
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" />
@@ -185,22 +185,23 @@
 	<bean id="hbmResourcesConfigurationProvider" class="org.bonitasoft.engine.persistence.HibernateResourcesConfigurationProviderImpl">
 		<property name="hbmResources">
 			<list>
-				<ref bean="hbm-bonita-log-model" />
-				<ref bean="hbm-bonita-platform-model" />
 				<ref bean="hbm-bonita-data-model" />
 				<ref bean="hbm-bonita-dependency-model" />
 				<ref bean="hbm-bonita-dependency-platform-model" />
+				<ref bean="hbm-bonita-document-model" />
 				<ref bean="hbm-bonita-identity-model" />
+				<ref bean="hbm-bonita-log-model" />
+				<ref bean="hbm-bonita-platform-model" />
 				<ref bean="hbm-bonita-process-definition-model" />
 				<ref bean="hbm-bonita-process-instance-model" />
 				<ref bean="hbm-bonita-process-instance-model-arch" />
 				<ref bean="hbm-bonita-scheduler" />
-				<ref bean="hbm-bonita-document-model" />
 				<ref bean="hbm-bos-actor-mapping" />
 				<ref bean="hbm-bos-category-model" />
 				<ref bean="hbm-bos-command-model" />
 				<ref bean="hbm-bos-data-instance-model" />
 				<ref bean="hbm-bos-data-instance-model-arch" />
+				<ref bean="hbm-bos-external-identity-mapping" />
 				<ref bean="hbm-bos-platform-command-model" />
 				<ref bean="hbm-bos-process-comment-model" />
 				<ref bean="hbm-bos-process-comment-model-arch" />
@@ -209,10 +210,8 @@
 				<ref bean="hbm-bos-profile-model" />
 				<ref bean="hbm-bos-theme-model" />
 				<ref bean="hbm-bos-supervisor-mapping" />
-				<ref bean="hbm-bos-external-identity-mapping" />
 			</list>
 		</property>
 	</bean>
 
 </beans>
-

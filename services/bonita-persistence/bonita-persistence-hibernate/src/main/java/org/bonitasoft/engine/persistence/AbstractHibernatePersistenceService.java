@@ -51,8 +51,11 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StaleStateException;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.LockAcquisitionException;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.stat.Statistics;
 
 /**
@@ -118,10 +121,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
         }
 
-        sessionFactory = configuration.buildSessionFactory();
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+        sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         statistics = sessionFactory.getStatistics();
 
-        final Iterator<org.hibernate.mapping.PersistentClass> classMappingsIterator = configuration.getClassMappings();
+        final Iterator<PersistentClass> classMappingsIterator = configuration.getClassMappings();
         classMapping = new ArrayList<Class<? extends PersistentObject>>();
         while (classMappingsIterator.hasNext()) {
             classMapping.add(classMappingsIterator.next().getMappedClass());
@@ -166,8 +170,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     protected Session getSession(final boolean useTenant) throws SPersistenceException {
         logStats();
         try {
-            final org.hibernate.classic.Session currentSession = sessionFactory.getCurrentSession();
-            return currentSession;
+            return sessionFactory.getCurrentSession();
         } catch (final HibernateException e) {
             throw new SPersistenceException(e);
         }
@@ -580,7 +583,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             checkClassMapping(entityClass);
 
             final Session session = getSession(true);
-
             Query query = session.getNamedQuery(selectDescriptor.getQueryName());
             String builtQuery = query.getQueryString();
 
