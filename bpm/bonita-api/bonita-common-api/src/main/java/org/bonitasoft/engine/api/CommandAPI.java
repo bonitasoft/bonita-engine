@@ -45,8 +45,8 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * execute method of this class.<br/>
  * TenantCommand is a class available only in bonita-server.jar. In order to create the jar you will need to have a dependency on that jar.
  * <p>
- * The jar containing the command class must be added to the engine using the {@link addDependency} method with a name to identify the dependency so that it can
- * be removed later.<br/>
+ * The jar containing the command class must be added to the engine using the {@link CommandAPI#addDependency} method with a name to identify the dependency so
+ * that it can be removed later.<br/>
  * Then the command must be registered using {@link CommandAPI#register(String, String, String)} with a name to identify it and an implementation that is the
  * fully qualified name of the command class.<br/>
  * After registration, the command can be executed using {@link CommandAPI#execute(long, Map)} with the id returned by the register method or

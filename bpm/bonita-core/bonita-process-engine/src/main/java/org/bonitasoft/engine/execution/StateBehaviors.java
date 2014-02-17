@@ -77,7 +77,6 @@ import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
@@ -372,7 +371,7 @@ public class StateBehaviors {
      * @param processDefinition
      *            the process where the connectors are defined.
      * @param flowNodeInstance
-     *            the instance of the flownode to execute possible connectors on.
+     *            the instance of the flow node to execute possible connectors on.
      * @param executeConnectorsOnEnter
      *            do we want to consider the connectors ON_ENTER or ignore them?
      * @param executeConnectorsOnFinish

@@ -749,7 +749,7 @@ public class APITestUtil {
         try {
             return getProcessAPI().getFlowNodeInstance(id);
         } catch (final FlowNodeInstanceNotFoundException e) {
-            throw new RuntimeException("no id returned for flownode instance ");
+            throw new RuntimeException("no id returned for flow node instance ");
         }
     }
 

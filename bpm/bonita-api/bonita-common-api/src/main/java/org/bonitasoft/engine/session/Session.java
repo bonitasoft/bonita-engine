@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,50 +17,41 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * Informations concerning the connected user
+ * 
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface Session extends Serializable {
 
     /**
-     * Gets the session's identifier
-     * 
-     * @return
+     * @return The identifier of the session
      */
     long getId();
 
     /**
-     * Gets the session's creation date
-     * 
-     * @return
+     * @return The creation date of the session
      */
     Date getCreationDate();
 
     /**
-     * Gets the session's duration
-     * 
-     * @return
+     * @return The duration of the session
      */
     long getDuration();
 
     /**
-     * Gets the user name associated to this session
-     * 
-     * @return
+     * @return The user name associated to this session
      */
     String getUserName();
 
     /**
-     * Gets the user id associated to this session, if available (-1 if not)
-     * 
-     * @return the Id of the user
+     * @return The identifier of the user associated to this session, if available (-1 if not)
      */
     long getUserId();
 
     /**
-     * Is the logged in user, the special technical user?
-     * 
-     * @return true if the user is the technical one, false otherwise.
+     * @return True if the logged user is the technical one, False otherwise.
      */
     boolean isTechnicalUser();
 

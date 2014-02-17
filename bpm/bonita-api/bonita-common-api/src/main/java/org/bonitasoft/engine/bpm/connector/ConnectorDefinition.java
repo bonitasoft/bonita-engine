@@ -21,7 +21,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
- * The connector definition associated to a process definition or a flownode definition
+ * The connector definition associated to a process definition or a flow node definition
  * 
  * @author Baptiste Mesta
  * @author Celine Souchet
