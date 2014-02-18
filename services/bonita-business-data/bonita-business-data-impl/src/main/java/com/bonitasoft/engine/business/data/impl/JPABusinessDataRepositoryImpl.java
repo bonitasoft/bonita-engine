@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -24,6 +23,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -121,9 +121,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
     @Override
     public void start() throws SBusinessDataRepositoryDeploymentException {
         entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configuration);
-        final Properties properties = toProperties(entityManagerFactory.getProperties());
         try {
-            executeQueries(new SchemaGenerator(properties, getClassNameList()).generate());
+            executeQueries(new SchemaGenerator(entityManagerFactory.createEntityManager(), entityManagerFactory.getProperties(), getClassNameList()).generate());
         } catch (final SQLException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
@@ -135,12 +134,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
             final Query query = entityManager.createNativeQuery(sqlQuery);
             query.executeUpdate();
         }
-    }
-
-    private Properties toProperties(final Map<String, Object> propertiesAsMap) {
-        final Properties properties = new Properties();
-        properties.putAll(propertiesAsMap);
-        return properties;
     }
 
     @Override
@@ -174,7 +167,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
         }
         try {
             final T entity = query.getSingleResult();
-            em.detach(entity);
+            Class<? extends Object> entityClass = entity.getClass();
+            if (!entityClass.isPrimitive() && !ClassUtils.isPrimitiveOrWrapper(entityClass)) {
+                em.detach(entity);
+            }
             return entity;
         } catch (final javax.persistence.NonUniqueResultException nure) {
             throw new NonUniqueResultException(nure);

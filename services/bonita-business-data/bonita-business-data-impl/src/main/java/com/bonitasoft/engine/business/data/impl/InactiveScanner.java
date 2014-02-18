@@ -8,13 +8,16 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
-import java.lang.annotation.Annotation;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.ejb.packaging.NamedInputStream;
-import org.hibernate.ejb.packaging.Scanner;
+import org.hibernate.jpa.boot.scan.spi.ScanOptions;
+import org.hibernate.jpa.boot.scan.spi.ScanResult;
+import org.hibernate.jpa.boot.scan.spi.Scanner;
+import org.hibernate.jpa.boot.spi.ClassDescriptor;
+import org.hibernate.jpa.boot.spi.MappingFileDescriptor;
+import org.hibernate.jpa.boot.spi.PackageDescriptor;
+import org.hibernate.jpa.boot.spi.PersistenceUnitDescriptor;
 
 /**
  * @author Matthieu Chaffotte
@@ -22,28 +25,23 @@ import org.hibernate.ejb.packaging.Scanner;
 public class InactiveScanner implements Scanner {
 
     @Override
-    public Set<Package> getPackagesInJar(final URL jartoScan, final Set<Class<? extends Annotation>> annotationsToLookFor) {
-        return Collections.emptySet();
-    }
+    public ScanResult scan(final PersistenceUnitDescriptor persistenceUnit, final ScanOptions options) {
+        return new ScanResult() {
 
-    @Override
-    public Set<Class<?>> getClassesInJar(final URL jartoScan, final Set<Class<? extends Annotation>> annotationsToLookFor) {
-        return Collections.emptySet();
-    }
+            @Override
+            public Set<PackageDescriptor> getLocatedPackages() {
+                return Collections.EMPTY_SET;
+            }
 
-    @Override
-    public Set<NamedInputStream> getFilesInJar(final URL jartoScan, final Set<String> filePatterns) {
-        return Collections.emptySet();
-    }
+            @Override
+            public Set<MappingFileDescriptor> getLocatedMappingFiles() {
+                return Collections.EMPTY_SET;
+            }
 
-    @Override
-    public Set<NamedInputStream> getFilesInClasspath(final Set<String> filePatterns) {
-        return Collections.emptySet();
+            @Override
+            public Set<ClassDescriptor> getLocatedClasses() {
+                return Collections.EMPTY_SET;
+            }
+        };
     }
-
-    @Override
-    public String getUnqualifiedJarName(final URL jarUrl) {
-        return "";
-    }
-
 }

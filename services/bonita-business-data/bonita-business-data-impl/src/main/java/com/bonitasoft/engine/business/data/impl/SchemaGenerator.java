@@ -11,13 +11,17 @@ package com.bonitasoft.engine.business.data.impl;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import javax.persistence.EntityManager;
+
+import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.connection.ConnectionProviderFactory;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.jdbc.Work;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+import org.hibernate.tool.hbm2ddl.SchemaUpdateScript;
 
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 
@@ -27,18 +31,45 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentExce
  */
 public class SchemaGenerator {
 
+    /**
+     * @author Emmanuel Duchastenier
+     */
+    private final class ScriptGeneratorWork implements Work {
+
+        private String[] scripts;
+
+        @Override
+        public void execute(final Connection connection) throws SQLException {
+            final DatabaseMetadata databaseMetadata = new DatabaseMetadata(connection, dialect, cfg);
+            scripts = SchemaUpdateScript.toStringArray(cfg.generateSchemaUpdateScriptList(dialect, databaseMetadata));
+        }
+
+        /**
+         * @return the scripts
+         */
+        public String[] getScripts() {
+            return scripts;
+        }
+    }
+
     private final Configuration cfg;
 
     private final Dialect dialect;
 
-    public SchemaGenerator(final Properties properties, final List<String> classNameList) throws SBusinessDataRepositoryDeploymentException {
+    private final EntityManager entityManager;
+
+    public SchemaGenerator(final EntityManager entityManager, final Map<String, Object> properties, final List<String> classNameList)
+            throws SBusinessDataRepositoryDeploymentException {
+        this.entityManager = entityManager;
         cfg = new Configuration();
-        cfg.setProperties(properties);
+        Properties props = toProperties(properties);
+        cfg.setProperties(props);
         cfg.setProperty("hibernate.hbm2ddl.auto", "update");
         cfg.setProperty("hibernate.current_session_context_class", "jta");
         cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.transaction.JTATransactionFactory");
         cfg.setProperty("hibernate.transaction.manager_lookup_class", "org.hibernate.transaction.BTMTransactionManagerLookup");
-        dialect = Dialect.getDialect(properties);
+        dialect = Dialect.getDialect(props);
+
         for (final String className : classNameList) {
             Class<?> annotatedClass;
             try {
@@ -50,22 +81,21 @@ public class SchemaGenerator {
         }
     }
 
+    private Properties toProperties(final Map<String, Object> propertiesAsMap) {
+        final Properties properties = new Properties();
+        properties.putAll(propertiesAsMap);
+        return properties;
+    }
+
     /**
-     * Method that actually creates the file.
+     * Method that actually generates the SQL structure files.
      * 
-     * @param dbDialect
-     *            to use
      * @throws SQLException
      */
     public String[] generate() throws SQLException {
-        final ConnectionProvider connectionProvider = ConnectionProviderFactory.newConnectionProvider(cfg.getProperties());
-        final Connection connection = connectionProvider.getConnection();
-        try {
-            final DatabaseMetadata databaseMetadata = new DatabaseMetadata(connection, dialect);
-            return cfg.generateSchemaUpdateScript(dialect, databaseMetadata);
-        } finally {
-            connection.close();
-        }
+        ScriptGeneratorWork work = new ScriptGeneratorWork();
+        ((Session) entityManager.getDelegate()).doWork(work);
+        return work.getScripts();
     }
 
 }

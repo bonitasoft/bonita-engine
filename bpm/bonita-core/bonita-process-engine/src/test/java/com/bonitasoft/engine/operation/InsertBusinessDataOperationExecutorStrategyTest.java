@@ -30,7 +30,7 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
     private BusinessDataRespository repository;
 
     @Mock
-    private RefBusinessDataService service;
+    private RefBusinessDataService refBusinessDataService;
 
     @Mock
     private FlowNodeInstanceService flowNodeInstanceService;
@@ -61,7 +61,7 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
         final SRefBusinessDataInstance refBizDataInstance = mock(SRefBusinessDataInstance.class);
         when(leftOperand.getName()).thenReturn("unused");
         when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(processInstanceId);
-        when(service.getRefBusinessDataInstance("unused", processInstanceId)).thenReturn(refBizDataInstance);
+        when(refBusinessDataService.getRefBusinessDataInstance("unused", processInstanceId)).thenReturn(refBizDataInstance);
         when(refBizDataInstance.getDataId()).thenReturn(null);
         when(repository.merge(employee)).thenReturn(employee);
         doAnswer(new Answer<Void>() {
@@ -71,13 +71,13 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
                 return null;
             }
 
-        }).when(service).updateRefBusinessDataInstance(refBizDataInstance, dataId);
+        }).when(refBusinessDataService).updateRefBusinessDataInstance(refBizDataInstance, dataId);
 
         strategy.update(leftOperand, employee, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
 
         verify(repository).merge(employee);
-        verify(service).getRefBusinessDataInstance("unused", processInstanceId);
-        verify(service).updateRefBusinessDataInstance(refBizDataInstance, dataId);
+        verify(refBusinessDataService).getRefBusinessDataInstance("unused", processInstanceId);
+        verify(refBusinessDataService).updateRefBusinessDataInstance(refBizDataInstance, dataId);
     }
 
 }

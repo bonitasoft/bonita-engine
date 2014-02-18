@@ -102,7 +102,6 @@ public class JPABusinessDataRepositoryImplIT {
         final Map<String, Object> configuration = new HashMap<String, Object>();
         configuration.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         configuration.put("hibernate.connection.datasource", DATA_SOURCE_NAME);
-        configuration.put("hibernate.transaction.manager_lookup_class", "org.hibernate.transaction.BTMTransactionManagerLookup");
 
         businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, configuration));
         doReturn(Collections.singletonList("com.bonitasoft.pojo.Employee")).when(businessDataRepository).getClassNameList();
@@ -165,6 +164,8 @@ public class JPABusinessDataRepositoryImplIT {
             businessDataRepository.merge(null);
             final Long count = businessDataRepository.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
             assertThat(count).isEqualTo(0);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         } finally {
             businessDataRepository.stop();
             ut.commit();
