@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -46,8 +44,6 @@ public class ExecutorWorkService implements WorkService {
     private final TechnicalLoggerService loggerService;
 
     private final SessionAccessor sessionAccessor;
-
-    private final Set<Long> deactivated = new HashSet<Long>();
 
     private final BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
 
@@ -97,27 +93,17 @@ public class ExecutorWorkService implements WorkService {
         return synchro;
     }
 
-    @Override
-    public void stop(final Long tenantId) {
-        deactivated.add(tenantId);
-    }
-
-    @Override
-    public void start(final Long tenantId) {
-        deactivated.remove(tenantId);
-    }
-
-    public boolean isStopped(final long tenantId) {
-        return deactivated.contains(tenantId);
+    public boolean isStopped() {
+        return threadPoolExecutor == null || threadPoolExecutor.isShutdown();
     }
 
     @Override
     public void stop() {
-        if (threadPoolExecutor != null && !threadPoolExecutor.isShutdown()) {
+        if (!isStopped()) {
             threadPoolExecutor.shutdown();
             try {
                 if (!threadPoolExecutor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Waited termination of all work " + TIMEOUT + "s but all task were not finished");
+                    loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
                 }
             } catch (InterruptedException e) {
                 loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "error while waiting termination of all work ", e);
@@ -127,7 +113,7 @@ public class ExecutorWorkService implements WorkService {
 
     @Override
     public void start() {
-        if (threadPoolExecutor == null || threadPoolExecutor.isShutdown()) {
+        if (isStopped()) {
             threadPoolExecutor = bonitaExecutorServiceFactory.createExecutorService();
         }
     }

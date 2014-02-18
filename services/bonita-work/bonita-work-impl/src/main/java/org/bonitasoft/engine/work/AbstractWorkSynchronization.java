@@ -67,7 +67,7 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
             for (final BonitaWork work : works) {
                 work.setTenantId(tenantId);
             }
-            if (!threadPoolWorkService.isStopped(tenantId)) {
+            if (!threadPoolWorkService.isStopped()) {
                 executeRunnables(works);
             }
         }

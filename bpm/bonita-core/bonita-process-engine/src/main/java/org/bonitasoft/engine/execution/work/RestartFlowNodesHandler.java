@@ -38,7 +38,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
     @Override
     public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
-        final WorkService workService = platformServiceAccessor.getWorkService();
+        final WorkService workService = tenantServiceAccessor.getWorkService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         try {
             QueryOptions queryOptions = QueryOptions.defaultQueryOptions();

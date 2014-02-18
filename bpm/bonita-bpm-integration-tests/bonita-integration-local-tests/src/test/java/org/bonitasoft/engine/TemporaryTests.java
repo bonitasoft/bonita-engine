@@ -1,14 +1,14 @@
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.command.AdvancedStartProcessCommandIntegrationTest;
+import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.process.actor.ProcessActorTest;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
-@RunWith(Suite.class)
+@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        AdvancedStartProcessCommandIntegrationTest.class
-})
-public class TemporaryTests extends LocalIntegrationTests {
+        ProcessActorTest.class })
+
+@Initializer(TestsInitializer.class)
+public class TemporaryTests  {
 
 }

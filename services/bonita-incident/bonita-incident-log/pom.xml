@@ -14,10 +14,5 @@
 			<artifactId>bonita-incident-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-home-server</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 </project>

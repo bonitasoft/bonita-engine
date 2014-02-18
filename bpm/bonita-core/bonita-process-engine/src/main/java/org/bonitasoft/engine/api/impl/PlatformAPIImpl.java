@@ -247,7 +247,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        final WorkService workService = platformAccessor.getWorkService();
         final List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
         try {
             try {
@@ -261,9 +260,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                 for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
                     serviceWithLifecycle.start();
                 }
-                final RefreshPlatformClassLoader refreshPlatformClassLoader = new RefreshPlatformClassLoader(platformAccessor);
-                executor.execute(refreshPlatformClassLoader);
-                final List<Long> tenantIds = refreshPlatformClassLoader.getResult();
+                final List<Long> tenantIds = getPlatformTenantIds(platformAccessor, executor);
 
                 // set tenant classloader
                 final SessionService sessionService = platformAccessor.getSessionService();
@@ -275,6 +272,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                         sessionAccessor.deleteSessionId();
                         sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
                         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+                        tenantServiceAccessor.getWorkService().start();
                         final TransactionExecutor tenantExecutor = tenantServiceAccessor.getTransactionExecutor();
                         tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
                     } finally {
@@ -283,7 +281,6 @@ public class PlatformAPIImpl implements PlatformAPI {
                     }
                 }
                 // FIXME: shouldn't we also stop the workService?:
-                workService.start();
                 if (!isNodeStarted()) {
                     if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
                         schedulerService.start();
@@ -342,6 +339,14 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
+    private List<Long> getPlatformTenantIds(final PlatformServiceAccessor platformAccessor, final TransactionExecutor executor) throws SBonitaException {
+        final List<Long> tenantIds;
+        final RefreshPlatformClassLoader refreshPlatformClassLoader = new RefreshPlatformClassLoader(platformAccessor);
+        executor.execute(refreshPlatformClassLoader);
+        tenantIds = refreshPlatformClassLoader.getResult();
+        return tenantIds;
+    }
+
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
@@ -360,8 +365,14 @@ public class PlatformAPIImpl implements PlatformAPI {
                 // we shutdown the scheduler only if we are also responsible of starting it
                 shutdownScheduler(schedulerService);
             }
-            final WorkService workService = platformAccessor.getWorkService();
-            workService.stop();
+            final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
+            final RefreshPlatformClassLoader refreshPlatformClassLoader = new RefreshPlatformClassLoader(platformAccessor);
+            executor.execute(refreshPlatformClassLoader);
+            List<Long> tenantIds = getPlatformTenantIds(platformAccessor, executor);
+            for (Long tenantId : tenantIds) {
+                platformAccessor.getTenantServiceAccessor(tenantId).getWorkService().stop();
+            }
+
             if (plaformConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
@@ -684,7 +695,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
-            final WorkService workService = platformAccessor.getWorkService();
 
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
@@ -698,6 +708,10 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
             TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+
+            // final WorkService workService = platformAccessor.getWorkService();
+            final WorkService workService = tenantServiceAccessor.getWorkService();
+
             final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService,
                     platformAccessor.getTechnicalLoggerService(), workService, plaformConfiguration, tenantServiceAccessor.getTenantConfiguration());
             activateTenant.execute();
@@ -742,13 +756,13 @@ public class PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final WorkService workService = platformAccessor.getWorkService();
+            // final WorkService workService = platformAccessor.getWorkService();
             final long sessionId = createSession(tenantId, sessionService);
 
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
 
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
             sessionService.deleteSessionsOfTenant(tenantId);

@@ -84,7 +84,7 @@ public final class ActivateTenant implements TransactionContent {
         final boolean tenantWasActivated = platformService.activateTenant(tenantId);
         // we execute that only if the tenant was not already activated
         if (tenantWasActivated) {
-            workService.start(tenantId);
+            workService.start();
             startEventHandling();
             startCleanInvalidSessionsJob();
             final List<JobRegister> jobsToRegister = tenantConfiguration.getJobsToRegister();
