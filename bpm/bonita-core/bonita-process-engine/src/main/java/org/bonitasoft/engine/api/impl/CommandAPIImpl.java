@@ -183,6 +183,25 @@ public class CommandAPIImpl implements CommandAPI {
         return executeCommand(commandFetcher, parameters, false);
     }
 
+    @Override
+    @CustomTransactions
+    public Serializable executeWithUserTransactions(final String commandName, final Map<String, Serializable> parameters) throws CommandNotFoundException,
+    CommandParameterizationException, CommandExecutionException {
+        return executeWithUserTransactions(new SCommandFetcherByName(commandName), parameters);
+    }
+
+    @Override
+    @CustomTransactions
+    public Serializable executeWithUserTransactions(final long commandId, final Map<String, Serializable> parameters) throws CommandNotFoundException,
+    CommandParameterizationException, CommandExecutionException {
+        return executeWithUserTransactions(new SCommandFetcherById(commandId), parameters);
+    }
+
+    private Serializable executeWithUserTransactions(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters) throws CommandNotFoundException,
+    CommandParameterizationException, CommandExecutionException {
+        return executeCommand(commandFetcher, parameters, true);
+    }
+
     private Serializable executeCommand(final SCommandFetcher commandFetcher, final Map<String, Serializable> parameters, final boolean transactionManagedManually) throws CommandNotFoundException,
     CommandParameterizationException, CommandExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();

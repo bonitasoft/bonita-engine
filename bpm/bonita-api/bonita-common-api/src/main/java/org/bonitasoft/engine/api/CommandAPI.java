@@ -167,6 +167,28 @@ public interface CommandAPI {
     CommandExecutionException;
 
     /**
+     * Execute a command according to its name and a map of parameters. During the execution of this method, the command's implementation
+     * will have to manage itself its transactions.
+     * 
+     * @param name
+     *            the command name
+     * @param parameters
+     *            the parameters
+     * @return the result of the command execution.
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws CommandNotFoundException
+     *             occurs when the name does not refer to any existing command
+     * @throws CommandParameterizationException
+     *             when command parameters are not correct
+     * @throws CommandExecutionException
+     *             occurs when an exception is thrown during command execution
+     * @since 6.2
+     */
+    Serializable executeWithUserTransactions(String name, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
+    CommandExecutionException;
+
+    /**
      * Execute a command according to its id and a map of parameters.
      * 
      * @param commandId
@@ -186,6 +208,29 @@ public interface CommandAPI {
      */
     Serializable execute(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
     CommandExecutionException;
+
+    /**
+     * Execute a command according to its id and a map of parameters. During the execution of this method, the command's implementation
+     * will have to manage itself its transactions.
+     * 
+     * @param commandId
+     *            the command commandId
+     * @param parameters
+     *            the parameters
+     * @return the result of the command execution.
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws CommandNotFoundException
+     *             occurs when the name does not refer to any existing command
+     * @throws CommandParameterizationException
+     *             when command parameters are not correct
+     * @throws CommandExecutionException
+     *             occurs when an exception is thrown during command execution
+     * @since 6.2
+     */
+    Serializable executeWithUserTransactions(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
+    CommandExecutionException;
+
 
     /**
      * Delete a command through its name.
