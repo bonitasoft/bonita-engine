@@ -573,10 +573,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void setState(final SProcessInstance processInstance, final ProcessInstanceState state) throws SProcessInstanceModificationException {
         // Let's archive the process instance before changing the state (to keep a track of state change):
         archiveProcessInstance(processInstance);
+        int previousStateId = processInstance.getStateId();
         setProcessState(processInstance, state);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("[{0} with id {1}]{2}->{3}(new={4})", processInstance.getClass()
-                    .getSimpleName(), processInstance.getId(), processInstance.getStateId(), state.getId(), state.name()));
+                    .getSimpleName(), processInstance.getId(), previousStateId, state.getId(), state.name()));
         }
     }
 
