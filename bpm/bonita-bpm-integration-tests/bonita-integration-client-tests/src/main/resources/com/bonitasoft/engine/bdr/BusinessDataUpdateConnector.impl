@@ -1,0 +1,12 @@
+<connectorImplementation>
+
+	<definitionId>com.bonitasoft.connector.BusinessDataUpdateConnector</definitionId>
+	<definitionVersion>1.0</definitionVersion>
+	<implementationClassname>com.bonitasoft.engine.bdr.BusinessDataUpdateConnector</implementationClassname>
+	<implementationId>com.bonitasoft.connector.BusinessDataUpdateConnector</implementationId>
+	<implementationVersion>1.0</implementationVersion>
+
+	<jarDependencies>
+		<jarDependency>BusinessDataUpdateConnector.jar</jarDependency>
+	</jarDependencies>
+</connectorImplementation>
