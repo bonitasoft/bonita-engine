@@ -577,7 +577,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         setProcessState(processInstance, state);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("[{0} with id {1}]{2}->{3}(new={4})", processInstance.getClass()
-                    .getSimpleName(), processInstance.getId(), processInstance.getStateId(), state.getId(), state.getClass().getSimpleName()));
+                    .getSimpleName(), processInstance.getId(), processInstance.getStateId(), state.getId(), state.name()));
         }
     }
 
