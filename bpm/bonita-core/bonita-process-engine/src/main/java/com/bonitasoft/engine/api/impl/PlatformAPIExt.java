@@ -393,7 +393,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final WorkService workService = platformAccessor.getWorkService();
             final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
@@ -403,6 +402,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
             TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+
+            final WorkService workService = tenantServiceAccessor.getWorkService();
+
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
                     platformAccessor.getTechnicalLoggerService(), workService, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
             transactionContent.execute();
@@ -443,7 +445,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final WorkService workService = platformAccessor.getWorkService();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 
@@ -451,7 +452,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
             sessionService.deleteSessionsOfTenant(tenantId);
