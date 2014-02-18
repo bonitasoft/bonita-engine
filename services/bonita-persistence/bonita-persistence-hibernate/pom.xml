@@ -16,11 +16,16 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
+			<!-- Warning, Changing this version imply to check the related lib exclusion to avoid issue like BS-7291 -->
 			<version>4.3.1.Final</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jboss.spec.javax.transaction</groupId>
-					<artifactId>jboss-transaction-api_1.1_spec</artifactId>
+					<artifactId>jboss-transaction-api_1.2_spec</artifactId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jboss-logging-annotations</artifactId>
+					<groupId>org.jboss.logging</groupId>
 				</exclusion>
 				<exclusion>
 					<groupId>xml-apis</groupId>
