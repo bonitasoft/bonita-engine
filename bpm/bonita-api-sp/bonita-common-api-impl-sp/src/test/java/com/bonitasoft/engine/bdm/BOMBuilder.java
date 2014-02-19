@@ -26,7 +26,6 @@ public class BOMBuilder {
 
     public BusinessObjectModel buildDefaultBOM() {
         final BusinessObjectModel bom = new BusinessObjectModel();
-        bom.setPackageName("com.bonitasoft.bo");
         bom.addBusinessObject(buildMyBusinessObject());
         return bom;
     }
