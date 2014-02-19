@@ -80,6 +80,12 @@ public class SequenceManagerImpl implements SequenceManager {
         this.nextAvailableIds = new HashMap<Long, Map<Long, Long>>();
         this.lastIdInRanges = new HashMap<Long, Map<Long, Long>>();
         this.datasource = datasource;
+        
+        for (final Long sequenceId : sequencesMappings.values()) {
+            if (!sequenceMutexs.containsKey(sequenceId)) {
+                sequenceMutexs.put(sequenceId, new Object());
+            }
+        }
     }
 
     @Override
@@ -90,9 +96,6 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private long getNextAvailableId(final long sequenceId, final long tenantId) {
         final Map<Long, Long> nextAvailableIds = getNextAvailableIdsMapForTenant(tenantId);
-        if (!nextAvailableIds.containsKey(sequenceId)) {
-            nextAvailableIds.put(sequenceId, 0L);
-        }
         return nextAvailableIds.get(sequenceId);
     }
 
@@ -102,7 +105,13 @@ public class SequenceManagerImpl implements SequenceManager {
      */
     private Map<Long, Long> getNextAvailableIdsMapForTenant(final long tenantId) {
         if (!nextAvailableIds.containsKey(tenantId)) {
-            nextAvailableIds.put(tenantId, new HashMap<Long, Long>());
+            final Map<Long, Long> nextAvailableIdsForTenant = new HashMap<Long, Long>();
+            for (final Long sequenceId : sequencesMappings.values()) {
+                if (!nextAvailableIdsForTenant.containsKey(sequenceId)) {
+                    nextAvailableIdsForTenant.put(sequenceId, 0L);
+                }
+            }
+            nextAvailableIds.put(tenantId, nextAvailableIdsForTenant);
         }
         return nextAvailableIds.get(tenantId);
     }
@@ -113,9 +122,6 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private long getLastIdInRange(final long sequenceId, final long tenantId) {
         final Map<Long, Long> lastIdInRanges = getLastIdInRangeMapForTenant(tenantId);
-        if (!lastIdInRanges.containsKey(sequenceId)) {
-            lastIdInRanges.put(sequenceId, -1L);
-        }
         return lastIdInRanges.get(sequenceId);
     }
 
@@ -125,7 +131,13 @@ public class SequenceManagerImpl implements SequenceManager {
      */
     private Map<Long, Long> getLastIdInRangeMapForTenant(final long tenantId) {
         if (!lastIdInRanges.containsKey(tenantId)) {
-            lastIdInRanges.put(tenantId, new HashMap<Long, Long>());
+            final Map<Long, Long> lastIdInRangeForTenant = new HashMap<Long, Long>();
+            for (final Long sequenceId : sequencesMappings.values()) {
+                if (!lastIdInRangeForTenant.containsKey(sequenceId)) {
+                    lastIdInRangeForTenant.put(sequenceId, -1L);
+                }
+            }
+            lastIdInRanges.put(tenantId, lastIdInRangeForTenant);
         }
         return lastIdInRanges.get(tenantId);
     }
@@ -134,20 +146,13 @@ public class SequenceManagerImpl implements SequenceManager {
         getLastIdInRangeMapForTenant(tenantId).put(sequenceId, lastIdInRange);
     }
 
-    private static synchronized Object getSequenceMutex(final Long sequenceId) {
-        if (!sequenceMutexs.containsKey(sequenceId)) {
-            sequenceMutexs.put(sequenceId, new Object());
-        }
-        return sequenceMutexs.get(sequenceId);
-    }
-
     @Override
     public long getNextId(final String entityName, final long tenantId) throws SObjectNotFoundException, SObjectModificationException {
         final Long sequenceId = sequencesMappings.get(entityName);
         if (sequenceId == null) {
             throw new SObjectNotFoundException("No sequence id found for " + entityName);
         }
-        final Object sequenceMutex = getSequenceMutex(sequenceId);
+        final Object sequenceMutex = sequenceMutexs.get(sequenceId);
         synchronized (sequenceMutex) {
             final long nextAvailableId = getNextAvailableId(sequenceId, tenantId);
             final long lastIdInRange = getLastIdInRange(sequenceId, tenantId);
