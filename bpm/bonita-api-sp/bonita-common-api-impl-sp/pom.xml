@@ -6,7 +6,7 @@
 		<artifactId>bonita-api-sp</artifactId>
 		<version>6.3.0-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>bonita-common-api-impl-sp</artifactId>
 
 	<dependencies>
@@ -19,10 +19,15 @@
 			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-common-api-impl</artifactId>
 			<version>${project.version}</version>
-        </dependency>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -41,11 +46,41 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- Stored in internal artifact repository -->
-        <dependency>
-            <groupId>com.sap</groupId>
-            <artifactId>sapjco</artifactId>
-            <version>3.0.3</version><!-- Update version for local tests if needed -->
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.sap</groupId>
+			<artifactId>sapjco</artifactId>
+			<version>3.0.3</version><!-- Update version for local tests if needed -->
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>schemagen</goal>
+						</goals>
+						<phase>process-classes</phase>
+						<configuration>
+							<includes>
+								<include>com/bonitasoft/engine/bdm/BusinessObjectModel.java</include>
+							</includes>
+							<outputDirectory>${project.build.directory}/schemas</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
