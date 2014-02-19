@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -51,10 +51,7 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
         final Iterator<PersistentClass> it = configuration.getClassMappings();
 
         final StringBuilder sb = new StringBuilder();
-        sb.append("\n");
-        sb.append("\n");
-        sb.append("FOUND MAPPING FOR CLASS: ");
-        sb.append("\n");
+        sb.append("\n\nFOUND MAPPING FOR CLASS: \n");
         while (it.hasNext()) {
             sb.append(it.next().getEntityName());
             sb.append("\n");
@@ -127,4 +124,5 @@ public class HibernateConfigurationProviderImpl implements HibernateConfiguratio
     public Map<String, String> getCacheQueries() {
         return null;
     }
+
 }

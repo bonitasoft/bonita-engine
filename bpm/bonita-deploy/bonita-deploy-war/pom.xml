@@ -44,7 +44,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<packagingExcludes>.gwt-tmp/**,WEB-INF/deploy/**, %regex[WEB-INF/lib/bonita-[(?!server)|(?!common)]-*.jar]</packagingExcludes>
+					<packagingExcludes>.gwt-tmp/**,WEB-INF/deploy/**,%regex[WEB-INF/lib/bonita-[(?!server)|(?!common)]-*.jar]</packagingExcludes>
 				</configuration>
 			</plugin>
 			<plugin>
