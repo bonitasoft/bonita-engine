@@ -33,6 +33,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnMaintenanceTenant
     public APISession login(final String userName, final String password) throws LoginException {
         if (!LicenseChecker.getInstance().checkLicence()) {
             throw new LoginException("The node is not started: " + LicenseChecker.getInstance().getErrorMessage());
@@ -42,6 +43,7 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
 
     @Override
     @CustomTransactions
+    @AvailableOnMaintenanceTenant
     public APISession login(final long tenantId, final String userName, final String password) throws LoginException {
         if (!LicenseChecker.getInstance().checkLicence()) {
             throw new LoginException("The node is not started");

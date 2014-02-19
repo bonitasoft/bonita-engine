@@ -115,4 +115,24 @@ public class TenantManagementAPIExtTest {
         assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method TenantManagementAPIExt.isTenantInMaintenance()",
                 method.isAnnotationPresent(AvailableOnMaintenanceTenant.class));
     }
+
+    @Test
+    public void loginShouldHaveAnnotationAvailableOnMaintenanceTenant() throws Exception {
+        // given:
+        Method method = LoginAPIExt.class.getMethod("login", long.class, String.class, String.class);
+
+        // then:
+        assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method LoginAPIExt.login(long, String, String)",
+                method.isAnnotationPresent(AvailableOnMaintenanceTenant.class));
+    }
+
+    @Test
+    public void loginWithTenantIdShouldHaveAnnotationAvailableOnMaintenanceTenant() throws Exception {
+        // given:
+        Method method = LoginAPIExt.class.getMethod("login", String.class, String.class);
+
+        // then:
+        assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method LoginAPIExt.login(String, String)",
+                method.isAnnotationPresent(AvailableOnMaintenanceTenant.class));
+    }
 }
