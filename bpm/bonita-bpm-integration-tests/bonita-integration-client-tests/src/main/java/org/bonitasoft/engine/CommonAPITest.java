@@ -13,6 +13,7 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -21,7 +22,6 @@ import org.bonitasoft.engine.filter.user.TestFilter;
 import org.bonitasoft.engine.filter.user.TestFilterThatThrowException;
 import org.bonitasoft.engine.filter.user.TestFilterUsingActorName;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
-import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Rule;
@@ -60,16 +60,19 @@ public abstract class CommonAPITest extends APITestUtil {
 
         @Override
         public void succeeded(final Description d) {
-            List<String> clean = null;
             try {
-                clean = clean();
-            } catch (final BonitaException e) {
-                throw new BonitaRuntimeException(e);
-            }
-            LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-            LOGGER.info("-----------------------------------------------------------------------------------------------");
-            if (!clean.isEmpty()) {
-                throw new BonitaRuntimeException(clean.toString());
+                List<String> clean = null;
+                try {
+                    clean = clean();
+                } catch (final BonitaException e) {
+                    throw new BonitaRuntimeException(e);
+                }
+                LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
+                if (!clean.isEmpty()) {
+                    throw new BonitaRuntimeException(clean.toString());
+                }
+            } finally {
+                LOGGER.info("-----------------------------------------------------------------------------------------------");
             }
         }
     };
@@ -88,14 +91,14 @@ public abstract class CommonAPITest extends APITestUtil {
         messages.addAll(checkExistenceOfUsers());
         messages.addAll(checkExistenceOfGroups());
         messages.addAll(checkExistenceOfRoles());
-        messages.addAll(checkExistenceOfProcessDefinitions());
-        messages.addAll(checkExistenceOfProcessIntances());
-        messages.addAll(checkExistenceOfArchivedProcessIntances());
-        messages.addAll(checkExistenceOfFlowNodes());
-        messages.addAll(checkExistenceOfArchivedFlowNodes());
         messages.addAll(checkExistenceOfCategories());
-        messages.addAll(checkExistenceOfComments());
         messages.addAll(checkExistenceOfArchivedComments());
+        messages.addAll(checkExistenceOfComments());
+        messages.addAll(checkExistenceOfArchivedFlowNodes());
+        messages.addAll(checkExistenceOfFlowNodes());
+        messages.addAll(checkExistenceOfArchivedProcessIntances());
+        messages.addAll(checkExistenceOfProcessIntances());
+        messages.addAll(checkExistenceOfProcessDefinitions());
 
         logout();
         return messages;
@@ -119,7 +122,7 @@ public abstract class CommonAPITest extends APITestUtil {
         bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
         bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
     }
-    
+
     protected ProcessDefinition deployProcessWithTestFilter(final String actorName, final long userId, final ProcessDefinitionBuilder designProcessDefinition,
             final String filterName) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(

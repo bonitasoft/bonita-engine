@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -28,6 +28,7 @@ import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -146,7 +147,7 @@ public class DependencyServiceImplTest {
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencies);
 
         final QueryOptions options = new QueryOptions(0, 10);
-        Assert.assertEquals(sDependencies, dependencyServiceImpl.getDependencyIds(54156L, "artifactType", options));
+        Assert.assertEquals(sDependencies, dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, options));
     }
 
     @Test(expected = SDependencyException.class)
@@ -154,7 +155,7 @@ public class DependencyServiceImplTest {
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         final QueryOptions options = new QueryOptions(0, 10);
-        dependencyServiceImpl.getDependencyIds(54156L, "artifactType", options);
+        dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, options);
     }
 
     /**
@@ -193,7 +194,7 @@ public class DependencyServiceImplTest {
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencyMappings);
 
         final QueryOptions options = new QueryOptions(0, 10);
-        Assert.assertEquals(sDependencyMappings, dependencyServiceImpl.getDependencyMappings(54156L, "artifactType", options));
+        Assert.assertEquals(sDependencyMappings, dependencyServiceImpl.getDependencyMappings(54156L, ScopeType.PROCESS, options));
     }
 
     @Test(expected = SDependencyException.class)
@@ -201,7 +202,7 @@ public class DependencyServiceImplTest {
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
 
         final QueryOptions options = new QueryOptions(0, 10);
-        dependencyServiceImpl.getDependencyMappings(54156L, "artifactType", options);
+        dependencyServiceImpl.getDependencyMappings(54156L, ScopeType.PROCESS, options);
     }
 
     /**
@@ -254,7 +255,7 @@ public class DependencyServiceImplTest {
     @Test
     public final void getDisconnectedDependencyMappingsNothing() throws SBonitaReadException, SDependencyException {
         final ArtifactAccessor artifactAccessor = mock(ArtifactAccessor.class);
-        when(artifactAccessor.artifactExists(any(String.class), any(Long.class))).thenReturn(true);
+        when(artifactAccessor.artifactExists(any(ScopeType.class), any(Long.class))).thenReturn(true);
         final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
         sDependencyMappings.add(mock(SDependencyMapping.class));
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencyMappings);
@@ -266,7 +267,7 @@ public class DependencyServiceImplTest {
     @Test
     public final void getDisconnectedDependencyMappings() throws SBonitaReadException, SDependencyException {
         final ArtifactAccessor artifactAccessor = mock(ArtifactAccessor.class);
-        when(artifactAccessor.artifactExists(any(String.class), any(Long.class))).thenReturn(false);
+        when(artifactAccessor.artifactExists(any(ScopeType.class), any(Long.class))).thenReturn(false);
         final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
         sDependencyMappings.add(mock(SDependencyMapping.class));
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencyMappings);

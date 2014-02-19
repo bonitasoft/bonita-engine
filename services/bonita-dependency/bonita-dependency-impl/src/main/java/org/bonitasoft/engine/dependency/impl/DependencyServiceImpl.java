@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -35,6 +35,7 @@ import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilder;
@@ -69,6 +70,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class DependencyServiceImpl implements DependencyService {
 
@@ -98,8 +100,8 @@ public class DependencyServiceImpl implements DependencyService {
         this.classLoaderService = classLoaderService;
     }
 
-    private String getKey(final String artifactType, final long artifactId) {
-        final StringBuilder sb = new StringBuilder(artifactType);
+    private String getKey(final ScopeType artifactType, final long artifactId) {
+        final StringBuilder sb = new StringBuilder(artifactType.name());
         sb.append("________");
         sb.append(artifactId);
         return sb.toString();
@@ -168,7 +170,8 @@ public class DependencyServiceImpl implements DependencyService {
 
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(DEPENDENCYMAPPING, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DEPENDENCYMAPPING).setObject(dependencyMapping).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DEPENDENCYMAPPING).setObject(dependencyMapping)
+                        .done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "createDependencyMapping");
@@ -308,7 +311,8 @@ public class DependencyServiceImpl implements DependencyService {
         final SDependencyMappingLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a dependency mapping", dependencyMapping);
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(DEPENDENCYMAPPING, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DEPENDENCYMAPPING).setObject(dependencyMapping).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DEPENDENCYMAPPING).setObject(dependencyMapping)
+                    .done();
         }
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(dependencyMapping);
@@ -397,7 +401,7 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public List<Long> getDependencyIds(final long artifactId, final String artifactType, final QueryOptions queryOptions) throws SDependencyException {
+    public List<Long> getDependencyIds(final long artifactId, final ScopeType artifactType, final QueryOptions queryOptions) throws SDependencyException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencyIds"));
         }
@@ -467,7 +471,7 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public List<SDependencyMapping> getDependencyMappings(final long artifactId, final String artifactType, final QueryOptions queryOptions)
+    public List<SDependencyMapping> getDependencyMappings(final long artifactId, final ScopeType artifactType, final QueryOptions queryOptions)
             throws SDependencyException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getDependencyMappings"));
@@ -517,7 +521,7 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public long getLastUpdatedTimestamp(final String artifactType, final long artifactId) {
+    public long getLastUpdatedTimestamp(final ScopeType artifactType, final long artifactId) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getLastUpdatedTimestamp"));
         }
@@ -582,7 +586,8 @@ public class DependencyServiceImpl implements DependencyService {
         final SDependencyMappingLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating a dependency mapping", dependencyMapping);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(DEPENDENCYMAPPING, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DEPENDENCYMAPPING).setObject(dependencyMapping).done();
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DEPENDENCYMAPPING).setObject(dependencyMapping)
+                    .done();
         }
         try {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dependencyMapping, descriptor);
@@ -674,7 +679,7 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public void deleteDependencies(final long id, final String type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException {
+    public void deleteDependencies(final long id, final ScopeType type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException {
         QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
         final ArrayList<Long> allDependencyIds = new ArrayList<Long>();
         List<Long> dependencyIds;
@@ -698,7 +703,7 @@ public class DependencyServiceImpl implements DependencyService {
         refreshClassLoader(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId());
     }
 
-    private Map<String, byte[]> getDependenciesResources(final String type, final long id) throws SDependencyException {
+    private Map<String, byte[]> getDependenciesResources(final ScopeType type, final long id) throws SDependencyException {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
         int fromIndex = 0;
         final int pageSize = QueryOptions.DEFAULT_NUMBER_OF_RESULTS;
@@ -719,10 +724,10 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public void refreshClassLoader(final String type, final long id) throws SDependencyException {
+    public void refreshClassLoader(final ScopeType type, final long id) throws SDependencyException {
         final Map<String, byte[]> resources = getDependenciesResources(type, id);
         try {
-            classLoaderService.refreshLocalClassLoader(type, id, resources);
+            classLoaderService.refreshLocalClassLoader(type.name(), id, resources);
         } catch (final ClassLoaderException e) {
             throw new SDependencyException("Cannot refresh classLoader with type'" + type + "' and id " + id, e);
         }

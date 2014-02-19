@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -92,6 +92,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstan
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -908,7 +909,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", sProcessDefinition.getId());
+            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS, sProcessDefinition.getId());
             Thread.currentThread().setContextClassLoader(localClassLoader);
             // initialize the process classloader by getting it one time
             try {

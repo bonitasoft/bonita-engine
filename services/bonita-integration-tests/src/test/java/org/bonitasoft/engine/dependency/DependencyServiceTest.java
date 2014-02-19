@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -33,7 +34,8 @@ public class DependencyServiceTest extends CommonServiceTest {
     private final byte[] defaultValue = new byte[] { 12, 33 };
 
     private SDependency buildDefaultDependency() {
-        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(defaultName, defaultVersion, defaultFileName, defaultValue).done();
+        return BuilderFactory.get(SDependencyBuilderFactory.class)
+                .createNewInstance(defaultName, 2L, ScopeType.PROCESS, defaultVersion, defaultFileName, defaultValue).done();
     }
 
     @Test
