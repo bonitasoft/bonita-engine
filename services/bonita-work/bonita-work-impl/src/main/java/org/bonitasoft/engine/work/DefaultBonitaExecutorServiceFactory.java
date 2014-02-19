@@ -42,7 +42,10 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
 
     private final long keepAliveTimeSeconds;
 
-    public DefaultBonitaExecutorServiceFactory(final int corePoolSize, final int queueCapacity, final int maximumPoolSize, final long keepAliveTimeSeconds) {
+    private final long tenantId;
+
+    public DefaultBonitaExecutorServiceFactory(final long tenantId, final int corePoolSize, final int queueCapacity, final int maximumPoolSize, final long keepAliveTimeSeconds) {
+        this.tenantId = tenantId;
         this.corePoolSize = corePoolSize;
         this.queueCapacity = queueCapacity;
         this.maximumPoolSize = maximumPoolSize;
@@ -53,7 +56,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
     public ThreadPoolExecutor createExecutorService() {
         final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
-        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", maximumPoolSize);
+        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
         return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
     }
 
