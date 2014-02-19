@@ -129,7 +129,7 @@ import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
@@ -1057,7 +1057,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
         try {
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(dataName, processInstanceId);
-            final BusinessDataRespository businessDataRepository = tenantAccessor.getBusinessDataRepository();
+            final BusinessDataRepository businessDataRepository = tenantAccessor.getBusinessDataRepository();
             if (refBusinessDataInstance.getDataId() == null) {
                 return null;
             }

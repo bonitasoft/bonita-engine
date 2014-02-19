@@ -15,7 +15,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
@@ -43,7 +43,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             // TODO: should be in activate tenant
-            BusinessDataRespository bdr = tenantAccessor.getBusinessDataRepository();
+            BusinessDataRepository bdr = tenantAccessor.getBusinessDataRepository();
             bdr.deploy(jar, tenantAccessor.getTenantId());
             bdr.start();
         } catch (IllegalStateException e) {

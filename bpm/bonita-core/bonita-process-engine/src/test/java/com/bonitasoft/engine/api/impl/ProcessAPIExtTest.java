@@ -14,7 +14,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
 
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
@@ -29,7 +29,7 @@ public class ProcessAPIExtTest {
         final ProcessAPIExt spiAPI = spy(processAPI);
         final TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
         final RefBusinessDataService refBusinessDataService = mock(RefBusinessDataService.class);
-        final BusinessDataRespository businessDataRespository = mock(BusinessDataRespository.class);
+        final BusinessDataRepository businessDataRespository = mock(BusinessDataRepository.class);
         final SRefBusinessDataInstance refBusinessDataInstance = mock(SRefBusinessDataInstance.class);
         final String myLeaveRequest = "leaveRequest #45";
         doReturn(tenantAccessor).when(spiAPI).getTenantAccessor();
@@ -81,7 +81,7 @@ public class ProcessAPIExtTest {
         final ProcessAPIExt spiAPI = spy(processAPI);
         final TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
         final RefBusinessDataService refBusinessDataService = mock(RefBusinessDataService.class);
-        final BusinessDataRespository businessDataRespository = mock(BusinessDataRespository.class);
+        final BusinessDataRepository businessDataRespository = mock(BusinessDataRepository.class);
         final SRefBusinessDataInstance refBusinessDataInstance = mock(SRefBusinessDataInstance.class);
         doReturn(tenantAccessor).when(spiAPI).getTenantAccessor();
         when(tenantAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);
@@ -101,7 +101,7 @@ public class ProcessAPIExtTest {
         final ProcessAPIExt spiAPI = spy(processAPI);
         final TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
         final RefBusinessDataService refBusinessDataService = mock(RefBusinessDataService.class);
-        final BusinessDataRespository businessDataRespository = mock(BusinessDataRespository.class);
+        final BusinessDataRepository businessDataRespository = mock(BusinessDataRepository.class);
         final SRefBusinessDataInstance refBusinessDataInstance = mock(SRefBusinessDataInstance.class);
         doReturn(tenantAccessor).when(spiAPI).getTenantAccessor();
         when(tenantAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);
@@ -120,7 +120,7 @@ public class ProcessAPIExtTest {
         final ProcessAPIExt spiAPI = spy(processAPI);
         final TenantServiceAccessor tenantAccessor = mock(TenantServiceAccessor.class);
         final RefBusinessDataService refBusinessDataService = mock(RefBusinessDataService.class);
-        final BusinessDataRespository businessDataRespository = mock(BusinessDataRespository.class);
+        final BusinessDataRepository businessDataRespository = mock(BusinessDataRepository.class);
         final SRefBusinessDataInstance refBusinessDataInstance = mock(SRefBusinessDataInstance.class);
         doReturn(tenantAccessor).when(spiAPI).getTenantAccessor();
         when(tenantAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);

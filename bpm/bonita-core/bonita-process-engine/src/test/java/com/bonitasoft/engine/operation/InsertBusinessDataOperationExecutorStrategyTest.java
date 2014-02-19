@@ -19,7 +19,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
@@ -27,7 +27,7 @@ import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstanc
 public class InsertBusinessDataOperationExecutorStrategyTest {
 
     @Mock
-    private BusinessDataRespository repository;
+    private BusinessDataRepository repository;
 
     @Mock
     private RefBusinessDataService refBusinessDataService;

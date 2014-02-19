@@ -35,7 +35,7 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 
@@ -43,7 +43,7 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentExce
  * @author Matthieu Chaffotte
  * @author Romain Bioteau
  */
-public class JPABusinessDataRepositoryImpl implements BusinessDataRespository {
+public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     private final Map<String, Object> configuration;
 
