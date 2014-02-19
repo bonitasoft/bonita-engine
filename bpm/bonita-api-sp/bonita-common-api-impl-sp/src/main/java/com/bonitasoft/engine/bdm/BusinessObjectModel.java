@@ -11,6 +11,7 @@ package com.bonitasoft.engine.bdm;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -20,6 +21,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class BusinessObjectModel {
+
+    private String packageName;
 
     private List<BusinessObject> businessObjects;
 
@@ -69,6 +72,15 @@ public class BusinessObjectModel {
             return false;
         }
         return true;
+    }
+
+    @XmlAttribute(required = true)
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(final String packageName) {
+        this.packageName = packageName;
     }
 
 }
