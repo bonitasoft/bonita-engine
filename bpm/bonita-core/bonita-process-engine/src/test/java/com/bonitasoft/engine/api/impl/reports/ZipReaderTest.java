@@ -18,15 +18,14 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 /**
- * Created by Vincent Elcrin
- * Date: 03/12/13
- * Time: 13:52
+ * @author Vincent Elcrin
+ *
  */
 public class ZipReaderTest {
 
     @Test
     public void should_extract_a_zip_and_expose_content() throws Exception {
-        ZipReader zip = new ZipReader("src/test/resources", "myreport-content.zip");
+        ZipReader zip = new ZipReader("src/test/resources/reports", "myreport-content.zip");
 
         zip.read(new Reader() {
             @Override
@@ -40,7 +39,7 @@ public class ZipReaderTest {
 
     @Test
     public void should_remove_temporary_files_once_finish() throws Exception {
-        ZipReader zip = new ZipReader("src/test/resources", "myreport-content.zip");
+        ZipReader zip = new ZipReader("src/test/resources/reports", "myreport-content.zip");
         final File[] files = {null};
 
         zip.read(new Reader() {
