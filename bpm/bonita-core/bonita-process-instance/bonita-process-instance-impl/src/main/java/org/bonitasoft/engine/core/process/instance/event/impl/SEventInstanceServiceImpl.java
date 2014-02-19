@@ -101,8 +101,23 @@ public class SEventInstanceServiceImpl extends FlowNodeInstanceServiceImpl imple
             throw new SEventInstanceCreationException(e);
         }
         if (getLogger().isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            StringBuilder stb = new StringBuilder();
+            stb.append("Created ");
+            stb.append(eventInstance.getType().getValue());
+            stb.append(" <");
+            stb.append(eventInstance.getName());
+            stb.append("> with id <");
+            stb.append(eventInstance.getId());
+            stb.append(">, parent process instance: <");
+            stb.append(eventInstance.getParentProcessInstanceId());
+            stb.append(">, root process instance: <");
+            stb.append(eventInstance.getRootProcessInstanceId());
+            stb.append(">, process definition: <");
+            stb.append(eventInstance.getProcessDefinitionId());
+            stb.append(">");
+            String message = stb.toString();
             getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                    "Created " + eventInstance.getType().getValue() + " <" + eventInstance.getName() + "> with id <" + eventInstance.getId() + ">");
+                    message);
         }
     }
 
