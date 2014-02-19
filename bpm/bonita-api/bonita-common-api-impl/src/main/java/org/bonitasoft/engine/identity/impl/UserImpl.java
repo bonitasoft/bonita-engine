@@ -90,6 +90,7 @@ public class UserImpl implements User {
     }
 
     @Override
+    @Deprecated
     public String getPassword() {
         return password;
     }
