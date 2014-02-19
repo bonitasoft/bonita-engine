@@ -23,6 +23,7 @@ import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -84,8 +85,8 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         pair = userTransactionService.executeInTransaction(new Callable<Pair<List<Long>, List<SDependencyMapping>>>() {
             @Override
             public Pair<List<Long>, List<SDependencyMapping>> call() throws Exception {
-                List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
-                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
+                List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
+                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
                 return new Pair<List<Long>, List<SDependencyMapping>>(dependencyIds, dependencyMappings);
             };
         });
@@ -102,8 +103,8 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         pair = userTransactionService.executeInTransaction(new Callable<Pair<List<Long>, List<SDependencyMapping>>>() {
             @Override
             public Pair<List<Long>, List<SDependencyMapping>> call() throws Exception {
-                List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
-                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
+                List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
+                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
                 return new Pair<List<Long>, List<SDependencyMapping>>(dependencyIds, dependencyMappings);
             };
         });

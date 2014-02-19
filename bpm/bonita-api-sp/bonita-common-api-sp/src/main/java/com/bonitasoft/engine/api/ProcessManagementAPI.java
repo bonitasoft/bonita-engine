@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -32,6 +32,7 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
  * 
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessManagementAPI {
 
@@ -39,8 +40,8 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * Gets how many parameters the process definition contains.
      * 
      * @param processDefinitionId
-     *            Identifier of the processDefinition
-     * @return the number of parameters of a process definition
+     *            The identifier of the processDefinition
+     * @return The number of parameters of a process definition
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
@@ -51,10 +52,10 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * Get a parameter instance by process definition UUID
      * 
      * @param processDefinitionId
-     *            Identifier of the processDefinition
+     *            The identifier of the processDefinition
      * @param parameterName
      *            The parameter name for get ParameterInstance
-     * @return the ParameterInstance of the process with processDefinitionUUID and name parameterName
+     * @return The ParameterInstance of the process with processDefinitionUUID and name parameterName
      * @throws ParameterNotFoundException
      *             Error thrown if the given parameter is not found.
      * @throws InvalidSessionException
@@ -67,11 +68,11 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * Returns the parameters of a process definition or an empty map if the process does not contain any parameter.
      * 
      * @param processDefinitionId
-     *            Identifier of the processDefinition
+     *            The identifier of the processDefinition
      * @param startIndex
-     *            Index of the page to be returned. First page has index 0.
+     *            The index of the page to be returned. First page has index 0.
      * @param maxResults
-     *            Number of result per page. Maximum number of result returned.
+     *            The number of result per page. Maximum number of result returned.
      * @param sort
      *            The criterion to sort the result
      * @return The ordered list of parameter instances
@@ -85,15 +86,15 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * Update an existing parameter of a process definition.
      * 
      * @param processDefinitionId
-     *            Identifier of the processDefinition
+     *            The identifier of the processDefinition
      * @param parameterName
-     *            the parameter name
+     *            The parameter name
      * @param parameterValue
-     *            the new value of the parameter
+     *            The new value of the parameter
      * @throws ParameterNotFoundException
      *             Error thrown if the given parameter is not found.
      * @throws UpdateException
-     *             if the update cannot be fullfilled.
+     *             If the update cannot be fullfilled.
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
@@ -105,7 +106,7 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * The parameters are stored in a properties file.
      * 
      * @param processDefinitionId
-     *            the identifier of the process definition
+     *            The identifier of the process definition
      * @param parameters
      *            The content of the properties file as a byte array. If null or empty byte[], nothing is done, and the process does not reset to unresolved but
      *            stays the same.
@@ -121,15 +122,14 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * Retrieve the list of connector instances on an activity instance
      * 
      * @param activityInstanceId
-     *            the id of the element on which we want the connector instances
+     *            The identifier of the element on which we want the connector instances
      * @param startIndex
-     *            Index of the page to be returned. First page has index 0.
+     *            The index of the page to be returned. First page has index 0.
      * @param maxResults
-     *            Number of result per page. Maximum number of result returned.
+     *            The number of result per page. Maximum number of result returned.
      * @param sortingCriterion
      *            The criterion to sort the result
-     * @return
-     *         the list of connector instance on this element
+     * @return The list of connector instance on this element
      * @since 6.0
      */
     List<ConnectorInstance> getConnectorInstancesOfActivity(long activityInstanceId, int startIndex, int maxResults, ConnectorInstanceCriterion sortingCriterion);
@@ -138,15 +138,14 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * Retrieve the list of connector instances on a process instance
      * 
      * @param processInstanceId
-     *            the id of the element on which we want the connector instances
+     *            The identifier of the element on which we want the connector instances
      * @param startIndex
-     *            Index of the page to be returned. First page has index 0.
+     *            The index of the page to be returned. First page has index 0.
      * @param maxResults
-     *            Number of result per page. Maximum number of result returned.
+     *            The number of result per page. Maximum number of result returned.
      * @param sortingCriterion
      *            The criterion to sort the result
-     * @return
-     *         the list of connector instance on this element
+     * @return The list of connector instance on this element
      * @since 6.0
      */
     List<ConnectorInstance> getConnectorInstancesOfProcess(long processInstanceId, int startIndex, int maxResults, ConnectorInstanceCriterion sortingCriterion);
@@ -155,15 +154,15 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * Allows to reset the state of an instance of connector
      * 
      * @param connectorInstanceId
-     *            the id of the connector to change
+     *            The identifier of the connector to change
      * @param state
-     *            the state to set on the connector
+     *            The state to set on the connector
      * @throws UpdateException
-     *             if the set operation cannot be fullfilled.
+     *             If the set operation cannot be fullfilled.
      * @throws ConnectorInstanceNotFoundException
-     *             if the connector instance cannot be found with the provided connectorInstanceId
+     *             If the connector instance cannot be found with the provided connectorInstanceId
      * @throws InvalidSessionException
-     *             if no current valid engine session is found
+     *             If no current valid engine session is found
      * @since 6.0
      */
     void setConnectorInstanceState(long connectorInstanceId, ConnectorStateReset state) throws UpdateException, ConnectorInstanceNotFoundException;
@@ -172,14 +171,14 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * Allows to reset connector instance states for a Collection of connector instances at once.
      * 
      * @param connectorsToReset
-     *            a Map containing, as key, the connector instance id, and as value, the <code>ConnectorStateReset</code> value to reset the connector instance
+     *            A Map containing, as key, the connector instance id, and as value, the <code>ConnectorStateReset</code> value to reset the connector instance
      *            to.
      * @throws ConnectorInstanceNotFoundException
-     *             if the connector instance cannot be found with the provided connectorInstanceId
+     *             If the connector instance cannot be found with the provided connectorInstanceId
      * @throws UpdateException
-     *             if the set operation cannot be fullfilled.
+     *             If the set operation cannot be fullfilled.
      * @throws InvalidSessionException
-     *             if no current valid engine session is found
+     *             If no current valid engine session is found
      * @since 6.0
      */
     void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorInstanceNotFoundException, UpdateException;
@@ -187,38 +186,39 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
     /**
      * Updates the implementation version of the connector of the process definition.
      * Removes the old the old .impl file, puts the new .impl file in the connector directory and reloads the cache.
+     * Warning filesystem operation are not rolledback
      * 
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *            The identifier of the process definition.
      * @param connectorName
-     *            the name of the connector.
+     *            The name of the connector.
      * @param connectorVersion
-     *            the version of the connector.
+     *            The version of the connector.
      * @param connectorImplementationArchive
-     *            the zipped .impl file contented as a byte array.
+     *            The zipped .impl file contented as a byte array. The file is exported from studio.
      * @throws InvalidConnectorImplementationException
-     *             if the implementation is not valid. (e.g. wrong format)
+     *             If the implementation is not valid. (e.g. wrong format)
      * @throws UpdateException
-     *             if the set operation cannot be fullfilled.
+     *             If the set operation cannot be fullfilled.
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *             If the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     void setConnectorImplementation(long processDefinitionId, String connectorName, String connectorVersion, byte[] connectorImplementationArchive)
             throws InvalidConnectorImplementationException, UpdateException;
 
     /**
-     * set state of activity to its previous state and then execute.
+     * Set state of activity to its previous state and then execute.
      * precondition: the activity is in state FAILED
      * 
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *            The identifier of the activity instance
      * @param connectorsToReset
-     *            Map of connectors to reset before retrying the task
+     *            The map of connectors to reset before retrying the task
      * @throws ActivityInstanceNotFoundException
-     *             if no activity instance can be found with the provided activityInstanceId
+     *             If no activity instance can be found with the provided activityInstanceId
      * @throws ActivityExecutionException
-     *             if the activity failed to replay.
+     *             If the activity failed to replay.
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
@@ -232,11 +232,11 @@ public interface ProcessManagementAPI extends org.bonitasoft.engine.api.ProcessM
      * If that is the case change state of failed connectors first to SKIPPED of TO_BE_EXECUTED
      * 
      * @param activityInstanceId
-     *            the activity to replay
+     *            The activity to replay
      * @throws ActivityInstanceNotFoundException
-     *             if no activity instance can be found with the provided activityInstanceId
+     *             If no activity instance can be found with the provided activityInstanceId
      * @throws ActivityExecutionException
-     *             if the activity failed to replay.
+     *             If the activity failed to replay.
      * @throws InvalidSessionException
      *             When the activity can't be modified
      * @since 6.0
