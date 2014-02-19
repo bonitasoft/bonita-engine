@@ -16,7 +16,12 @@ package org.bonitasoft.engine.bpm.category;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
- * It's thrown when it's not possible to find a category.
+ * Thrown when it's not possible to find a category.
+ * 
+ * The class CategoryNotFoundException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
+ * The class CategoryNotFoundException that is not also subclasses of {@link RuntimeException} are checked exceptions.
+ * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
+ * constructor and propagate outside the method or constructor boundary.
  * 
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
@@ -26,6 +31,13 @@ public class CategoryNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = 7030553624142851456L;
 
+    /**
+     * Constructs a new exception with the specified detail cause.
+     * 
+     * @param cause
+     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *            cause is nonexistent or unknown.)
+     */
     public CategoryNotFoundException(final Throwable cause) {
         super(cause);
     }

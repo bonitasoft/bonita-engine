@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,25 +17,26 @@ import org.bonitasoft.engine.bpm.NamedElement;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
+ * Component of a process definition. It connects 2 {@link FlowNodeDefinition} between them.
+ * 
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 public interface TransitionDefinition extends NamedElement {
 
     /**
-     * Retrieves the the transition's source
-     * 
-     * @return
+     * @return The source of the transition
      */
     long getSource();
 
     /**
-     * Retrieves the the transition's target
-     * 
-     * @return
+     * @return The target of the transition
      */
     long getTarget();
 
+    /**
+     * @return The condition of the transition
+     */
     Expression getCondition();
 
 }

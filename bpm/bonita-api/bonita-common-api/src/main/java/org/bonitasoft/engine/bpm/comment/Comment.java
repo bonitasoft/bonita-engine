@@ -26,6 +26,7 @@ import org.bonitasoft.engine.session.APISession;
 public interface Comment extends BonitaObject {
 
     /**
+     * @return The identifier of the tenant
      * @deprecated As of 6.1 use {@link APISession#getTenantId()} instead
      */
     @Deprecated

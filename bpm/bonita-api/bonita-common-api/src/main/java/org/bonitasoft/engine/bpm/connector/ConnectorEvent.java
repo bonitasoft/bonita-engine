@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,10 +14,21 @@
 package org.bonitasoft.engine.bpm.connector;
 
 /**
+ * Events type to activate a connector
+ * 
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public enum ConnectorEvent {
 
-    ON_ENTER, ON_FINISH
+    /**
+     * On enter of the container
+     */
+    ON_ENTER,
+
+    /**
+     * On finish of the container
+     */
+    ON_FINISH
 
 }

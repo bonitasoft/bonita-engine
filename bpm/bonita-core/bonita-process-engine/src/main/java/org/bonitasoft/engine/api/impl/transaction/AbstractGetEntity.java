@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -28,10 +28,12 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 /**
  * Abstract class to allow to search server object and convert them to client object
- * first generic C is the client object
- * second generic S is the server object
  * 
  * @author Celine Souchet
+ * @param <C>
+ *            The client object
+ * @param <S>
+ *            The server object
  */
 public abstract class AbstractGetEntity<C extends Serializable, S extends PersistentObject> implements TransactionContentWithResult<List<C>> {
 
@@ -45,6 +47,16 @@ public abstract class AbstractGetEntity<C extends Serializable, S extends Persis
 
     private List<C> clientObjects;
 
+    /**
+     * @param searchDescriptor
+     *            The descriptor corresponding to the searched object
+     * @param fromIndex
+     *            The specified position to begin the search
+     * @param numberOfResults
+     *            The number of elements to return
+     * @param sort
+     *            How to sort the result
+     */
     public AbstractGetEntity(final SearchEntityDescriptor searchDescriptor, final int fromIndex, final int numberOfResults, final Sort sort) {
         this.searchDescriptor = searchDescriptor;
         this.numberOfResults = numberOfResults;
@@ -65,12 +77,11 @@ public abstract class AbstractGetEntity<C extends Serializable, S extends Persis
     }
 
     /**
-     * execute the search here
+     * Execute the search here
      * 
      * @param queryOptions
-     *            query options to execute the search with
-     * @return
-     *         the search result
+     *            The query options to execute the search with
+     * @return The searched result
      * @throws SBonitaException
      */
     public abstract List<S> executeGet(final QueryOptions queryOptions) throws SBonitaException;
@@ -79,8 +90,8 @@ public abstract class AbstractGetEntity<C extends Serializable, S extends Persis
      * Must convert server objects in client objects here
      * 
      * @param serverObjects
-     *            server object to convert
-     * @return
+     *            The server object to convert
+     * @return The list of the client objects
      */
     public abstract List<C> convertToClientObjects(final List<S> serverObjects);
 
