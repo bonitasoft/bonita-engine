@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
+import javax.lang.model.SourceVersion;
+
 /**
  * @author Matthieu Chaffotte
  */
@@ -22,6 +24,9 @@ public class Field {
     }
 
     public void setName(final String name) {
+        if (!SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name)) {
+            throw new IllegalArgumentException(name + " is not a valid field identifier");
+        }
         this.name = name;
     }
 

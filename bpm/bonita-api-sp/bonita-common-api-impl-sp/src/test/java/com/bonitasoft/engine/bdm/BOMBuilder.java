@@ -19,7 +19,7 @@ public class BOMBuilder {
         final Field integerField = buildField("integerField", FieldType.INTEGER);
 
         final BusinessObject employee = new BusinessObject();
-        employee.setClassName("BusinessObject");
+        employee.setQualifiedName("BusinessObject");
         employee.setFields(Arrays.asList(stringField, booleanField, dateField, doubleField, integerField));
         return employee;
     }
