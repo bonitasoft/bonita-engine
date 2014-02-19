@@ -82,4 +82,5 @@ public interface SFlowNodeDefinition extends SNamedElement {
 
     int getTransitionIndex(String transitionName);
 
+    boolean isStartable();
 }
