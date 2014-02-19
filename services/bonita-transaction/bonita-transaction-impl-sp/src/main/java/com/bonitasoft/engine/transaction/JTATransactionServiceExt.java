@@ -15,26 +15,22 @@ import javax.transaction.TransactionManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SRetryableException;
-import org.bonitasoft.engine.transaction.BonitaTransactionManagerLookup;
 import org.bonitasoft.engine.transaction.JTATransactionServiceImpl;
 
+/**
+ * @author Laurent Vaills
+ * @author Matthieu Chaffotte
+ */
 public class JTATransactionServiceExt extends JTATransactionServiceImpl {
 
     private final int retries;
+
     private final long delay;
+
     private final double delayFactor;
 
-    public JTATransactionServiceExt(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup, final int retries,
-            final long delay, final double delayFactor) {
-        super(logger, txManagerLookup);
-        this.retries = retries;
-        this.delay = delay;
-        this.delayFactor = delayFactor;
-
-    }
-
-    public JTATransactionServiceExt(final TechnicalLoggerService logger, final TransactionManager txManager, final int retries,
-            final long delay, final double delayFactor) {
+    public JTATransactionServiceExt(final TechnicalLoggerService logger, final TransactionManager txManager, final int retries, final long delay,
+            final double delayFactor) {
         super(logger, txManager);
         this.retries = retries;
         this.delay = delay;
@@ -62,9 +58,10 @@ public class JTATransactionServiceExt extends JTATransactionServiceImpl {
                 setRollbackOnly();
                 if (logger.isLoggable(JTATransactionServiceExt.class, TechnicalLogSeverity.INFO)) {
                     logger.log(JTATransactionServiceExt.class, TechnicalLogSeverity.INFO, "Transaction failed", sre);
-                    logger.log(JTATransactionServiceExt.class, TechnicalLogSeverity.INFO, "Retrying (# " + attempt + "/" + retries +") in " + sleepTime + " ms");
+                    logger.log(JTATransactionServiceExt.class, TechnicalLogSeverity.INFO, "Retrying (# " + attempt + "/" + retries + ") in " + sleepTime
+                            + " ms");
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 setRollbackOnly();
                 throw e;
             } finally {
@@ -76,9 +73,6 @@ public class JTATransactionServiceExt extends JTATransactionServiceImpl {
         return result;
     }
 
-    /**
-     * @param sleepTime
-     */
     private void sleep(final long sleepTime) {
         try {
             Thread.sleep(sleepTime);
@@ -88,4 +82,5 @@ public class JTATransactionServiceExt extends JTATransactionServiceImpl {
             }
         }
     }
+
 }

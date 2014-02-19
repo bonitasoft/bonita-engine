@@ -63,7 +63,6 @@ public class ReportingAPIExt implements ReportingAPI {
         } catch (SBonitaException e) {
             // ignore it
         }
-
     }
 
     @Override

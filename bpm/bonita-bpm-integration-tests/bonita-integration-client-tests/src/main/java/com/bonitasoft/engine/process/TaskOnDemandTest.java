@@ -47,8 +47,8 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     @Before
     public void setUp() throws Exception {
         login();
-        john = createUser("john", "secretPassword");
-        jack = createUser("jack", "bpm");
+        john = createUser("john", PASSWORD);
+        jack = createUser("jack", PASSWORD);
     }
 
     @After
@@ -60,15 +60,12 @@ public class TaskOnDemandTest extends CommonAPISPTest {
 
     @Test
     public void createManualTaskOnManualTask() throws Exception {
-        final String password = "secretPassword";
-        final String delivery = "Delivery men";
-
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemand", "1.0");
-        processBuilder.addActor(delivery).addDescription("kikoo lol").addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", delivery);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
 
         logout();
-        loginWith(john.getUserName(), password);
+        loginWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 30, 3000, true, 1, john);
@@ -100,15 +97,12 @@ public class TaskOnDemandTest extends CommonAPISPTest {
 
     @Test
     public void executeManualTaskWithChildManualTask() throws Exception {
-        final String password = "secretPassword";
-        final String delivery = "Delivery men";
-
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemandAndChildTask", "1.0");
-        processBuilder.addActor(delivery).addDescription("kikoo lol").addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", delivery);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
 
         logout();
-        loginWith(john.getUserName(), password);
+        loginWith(john.getUserName(), PASSWORD);
 
         final ProcessInstance pInstance = getProcessAPI().startProcess(processDefinition.getId());
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 30, 3000, true, 1, john);
@@ -148,13 +142,10 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, keywords = { "add subtask" }, jira = "")
     @Test
     public void createUserTaskOnParent() throws Exception {
-        final String password = "secretPassword";
-        final String delivery = "Delivery men";
-
-        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess(delivery);
+        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess();
 
         logout();
-        loginWith(john.getUserName(), password);
+        loginWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
         final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
@@ -203,13 +194,10 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, jira = "ENGINE-650", keywords = { "delete subtask" })
     @Test
     public void deleteManualTask() throws Exception {
-        final String password = "secretPassword";
-        final String delivery = "Delivery men";
-
-        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess(delivery);
+        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess();
 
         logout();
-        loginWith(john.getUserName(), password);
+        loginWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
         final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
@@ -235,11 +223,9 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     @Cover(classes = { ManualTaskInstance.class }, concept = BPMNConcept.SUB_TASK, jira = "ENGINE-650", keywords = { "delete subtask" })
     @Test(expected = DeletionException.class)
     public void deleteNotManualTask() throws Exception {
-        final String password = "secretPassword";
-        final String delivery = "Delivery men";
-        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess(delivery);
+        final ProcessDefinition processDefinition = deployAndEnableSimpleProcess();
         logout();
-        loginWith(john.getUserName(), password);
+        loginWith(john.getUserName(), PASSWORD);
         getProcessAPI().startProcess(processDefinition.getId());
         final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
         final HumanTaskInstance parentTask = pendingTasks.get(0);
@@ -259,24 +245,21 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         getProcessAPI().deleteManualUserTask(123);
     }
 
-    private ProcessDefinition deployAndEnableSimpleProcess(final String actorName) throws BonitaException, InvalidProcessDefinitionException {
+    private ProcessDefinition deployAndEnableSimpleProcess() throws BonitaException, InvalidProcessDefinitionException {
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemand", "1.0");
-        processBuilder.addActor(actorName).addDescription("kikoo lol").addUserTask("userTask1", actorName);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), actorName, john);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
         return processDefinition;
     }
 
     @Test
     public void checkAssignedDateOfASubTask() throws Exception {
-        final String password = "secretPassword";
-        final String delivery = "Delivery men";
-
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("ProcessWithTaskOnDemand", "1.0");
-        processBuilder.addActor(delivery).addDescription("kikoo lol").addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", delivery);
-        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), delivery, john);
+        processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, john);
 
         logout();
-        loginWith(john.getUserName(), password);
+        loginWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
         final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, true, 1, john);

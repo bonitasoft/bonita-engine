@@ -76,7 +76,6 @@ public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
     }
 
     private void validateSetCustomThemeInput(final byte[] content, final byte[] cssContent, final ThemeType type) throws SetThemeException {
-
         if (type == null) {
             throw new SetThemeException("Type is required.");
         }

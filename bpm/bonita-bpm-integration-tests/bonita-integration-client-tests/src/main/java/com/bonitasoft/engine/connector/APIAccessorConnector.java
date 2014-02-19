@@ -19,6 +19,7 @@ import com.bonitasoft.engine.log.LogCriterion;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class APIAccessorConnector extends AbstractConnector {
 
@@ -36,10 +37,9 @@ public class APIAccessorConnector extends AbstractConnector {
             setOutputParameter("procInstId", getExecutionContext().getProcessInstanceId());
 
             final LogAPI logAPI = getAPIAccessor().getLogAPI();
-            final int numberOfLogs = logAPI.getNumberOfLogs();
-            setOutputParameter("nbLogs", numberOfLogs);
-            setOutputParameter("searchLogs", logAPI.searchLogs(new SearchOptionsBuilder(0, numberOfLogs).done()));
-            setOutputParameter("getLogs", logAPI.getLogs(0, numberOfLogs, LogCriterion.SEVERITY_LEVEL_DESC));
+            setOutputParameter("nbLogs", logAPI.getNumberOfLogs());
+            setOutputParameter("searchLogs", logAPI.searchLogs(new SearchOptionsBuilder(0, 10).done()));
+            setOutputParameter("getLogs", logAPI.getLogs(0, 10, LogCriterion.SEVERITY_LEVEL_DESC));
 
             final Profile profile = getAPIAccessor().getProfileAPI().createProfile("addProfileCommandFromConnector",
                     "test of call to a command through getAPIAccessor from a Connector implementation", "");
