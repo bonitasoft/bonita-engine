@@ -49,7 +49,6 @@ public class BusinessObjectModel {
         final int prime = 31;
         int result = 1;
         result = prime * result + (businessObjects == null ? 0 : businessObjects.hashCode());
-        result = prime * result + (packageName == null ? 0 : packageName.hashCode());
         return result;
     }
 
@@ -70,13 +69,6 @@ public class BusinessObjectModel {
                 return false;
             }
         } else if (!businessObjects.equals(other.businessObjects)) {
-            return false;
-        }
-        if (packageName == null) {
-            if (other.packageName != null) {
-                return false;
-            }
-        } else if (!packageName.equals(other.packageName)) {
             return false;
         }
         return true;
