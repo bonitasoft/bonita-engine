@@ -47,7 +47,7 @@ public class SequenceManagerImpl implements SequenceManager {
 
     private final Map<Long, TenantSequenceManagerImpl> sequenceManagers = new HashMap<Long, TenantSequenceManagerImpl>();
 
-    private final Object mutex = new Object();
+    private final Object mutex = new SequenceManagerImplMutex();
 
     public SequenceManagerImpl(final LockService lockService, final Map<Long, Integer> rangeSizes, final int defaultRangeSize,
             final Map<String, Long> sequencesMappings,
@@ -60,6 +60,10 @@ public class SequenceManagerImpl implements SequenceManager {
         this.delay = delay;
         this.delayFactor = delayFactor;
         this.datasource = datasource;
+    }
+    
+    private static final class SequenceManagerImplMutex {
+        
     }
 
     @Override

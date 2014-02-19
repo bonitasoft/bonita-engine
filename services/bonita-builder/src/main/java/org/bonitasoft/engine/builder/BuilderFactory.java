@@ -16,13 +16,17 @@ public class BuilderFactory {
     private final Map<String, Object> factoryCache;
     private final Properties properties;
 
-    private static final Object mutex = new Object();
+    private static final Object mutex = new BuilderFactoryMutex();
 
     private static BuilderFactory INSTANCE = null;
 
     private BuilderFactory(final Properties properties) {
         this.properties = properties;
         this.factoryCache = new HashMap<String, Object>();
+    }
+    
+    private static final class BuilderFactoryMutex {
+        
     }
 
     public static BuilderFactory getInstance() {

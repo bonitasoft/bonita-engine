@@ -84,12 +84,16 @@ public class TenantSequenceManagerImpl {
         this.datasource = datasource;
         
         for (final Long sequenceId : sequencesMappings.values()) {
-            sequenceMutexs.put(sequenceId, new Object());
+            sequenceMutexs.put(sequenceId, new TenantSequenceManagerImplMutex());
             nextAvailableIds.put(sequenceId, 0L);
             lastIdInRanges.put(sequenceId, -1L);
         }
     }
 
+    private static final class TenantSequenceManagerImplMutex {
+        
+    }
+    
     public long getNextId(final String entityName) throws SObjectNotFoundException, SObjectModificationException {
         final Long sequenceId = sequencesMappings.get(entityName);
         if (sequenceId == null) {

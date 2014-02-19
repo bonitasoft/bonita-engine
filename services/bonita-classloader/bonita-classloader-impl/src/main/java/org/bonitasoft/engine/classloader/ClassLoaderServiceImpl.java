@@ -53,7 +53,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private static final String LOCAL_FOLDER = "local";
     
-    private Object mutex = new Object();
+    private Object mutex = new ClassLoaderServiceMutex();
 
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
@@ -72,6 +72,10 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
     }
 
+    private static final class ClassLoaderServiceMutex {
+        
+    }
+    
     private String getKey(final String type, final long id) {
         final StringBuffer stb = new StringBuffer();
         stb.append(type);
