@@ -22,6 +22,7 @@ import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JType;
 
 public class BDMCodeGeneratorTest {
 
@@ -62,6 +63,9 @@ public class BDMCodeGeneratorTest {
 		JAnnotationUse entityAnnotation = definedClass.annotations().iterator().next();
 		assertThat(entityAnnotation.getAnnotationClass().fullName()).isEqualTo(Entity.class.getName());
 		assertThat(entityAnnotation.getAnnotationMembers()).hasSize(1);
+		
+		assertThat(definedClass.getMethod("equals", new JType[]{definedClass.owner().ref(Object.class)})).isNotNull();
+		assertThat(definedClass.getMethod("hashCode", new JType[]{})).isNotNull();
 	}
 	
 	@Test
