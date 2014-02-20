@@ -15,9 +15,9 @@ import javax.lang.model.SourceVersion;
  */
 public class Field {
 
-    private static final String PERSISTENCE_ID = "persistenceId";
+    public static final String PERSISTENCE_ID = "persistenceId";
 
-    private static final String PERSISTENCE_VERSION = "persistenceVersion";
+    public static final String PERSISTENCE_VERSION = "persistenceVersion";
 
     private String name;
 
