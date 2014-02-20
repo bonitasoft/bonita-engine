@@ -27,15 +27,13 @@ public class DependencyServiceTest extends CommonServiceTest {
 
     private final String defaultName = "abc";
 
-    private final String defaultVersion = "ddd";
-
     private final String defaultFileName = "dfv.cu";
 
     private final byte[] defaultValue = new byte[] { 12, 33 };
 
     private SDependency buildDefaultDependency() {
         return BuilderFactory.get(SDependencyBuilderFactory.class)
-                .createNewInstance(defaultName, 2L, ScopeType.PROCESS, defaultVersion, defaultFileName, defaultValue).done();
+                .createNewInstance(defaultName, 2L, ScopeType.PROCESS, defaultFileName, defaultValue).done();
     }
 
     @Test

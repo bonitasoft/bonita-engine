@@ -5,7 +5,6 @@
 	<class name="SPlatformDependency" table="pdependency">
 		<id name="id" column="id" type="long" />
 		<property name="name" type="java.lang.String" column="name" />
-		<property name="version" type="java.lang.String" column="version" />
 		<property name="description" type="java.lang.String" column="description" />
 		<property name="fileName" type="java.lang.String" column="fileName" />
 		<property name="value_" type="binary" column="value_" />

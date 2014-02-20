@@ -25,15 +25,15 @@ import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
 public class SDependencyBuilderFactoryImpl implements SDependencyBuilderFactory {
 
     @Override
-    public SDependencyBuilder createNewInstance(final String name, final long artifactId, final ScopeType artifactType, final String version,
-            final String fileName, final byte[] value) {
+    public SDependencyBuilder createNewInstance(final String name, final long artifactId, final ScopeType artifactType, final String fileName,
+            final byte[] value) {
         final SDependencyImpl object;
         switch (artifactType) {
             case PROCESS:
-                object = new SDependencyImpl(artifactId + "_" + name, version, artifactId + "_" + fileName, value);
+                object = new SDependencyImpl(artifactId + "_" + name, artifactId + "_" + fileName, value);
                 break;
             default:
-                object = new SDependencyImpl(name, version, fileName, value);
+                object = new SDependencyImpl(name, fileName, value);
                 break;
         }
         return new SDependencyBuilderImpl(object);
@@ -62,11 +62,6 @@ public class SDependencyBuilderFactoryImpl implements SDependencyBuilderFactory 
     @Override
     public String getValueKey() {
         return "value_";
-    }
-
-    @Override
-    public String getVersionKey() {
-        return "version";
     }
 
 }

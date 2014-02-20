@@ -413,7 +413,7 @@ public class ConnectorServiceImpl implements ConnectorService {
                 final String name = jarFile.getName();
                 final byte[] jarContent = IOUtil.getAllContentFrom(jarFile);
                 final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class)
-                        .createNewInstance(name, processDefinitionId, ScopeType.PROCESS, "1.0", name + ".jar", jarContent).done();
+                        .createNewInstance(name, processDefinitionId, ScopeType.PROCESS, name + ".jar", jarContent).done();
                 dependencyService.createDependency(sDependency);
                 final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
                         .createNewInstance(sDependency.getId(), processDefinitionId, ScopeType.PROCESS).done();

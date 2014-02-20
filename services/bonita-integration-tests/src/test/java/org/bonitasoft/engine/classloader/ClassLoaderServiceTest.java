@@ -80,15 +80,15 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
 
     private void initializeClassLoaderService() throws Exception {
         getTransactionService().begin();
-        final long globalResourceId = createPlatformDependency("globalResource", "1.0", "globalResource.jar",
+        final long globalResourceId = createPlatformDependency("globalResource", "globalResource.jar",
                 IOUtil.generateJar(GlobalClass1.class, GlobalClass2.class, SharedClass1.class));
 
         createPlatformDependencyMapping(globalResourceId, classLoaderService.getGlobalClassLoaderType(),
                 classLoaderService.getGlobalClassLoaderId());
 
-        final long localResource1Id = createDependency(2L, TYPE1, "LocalResource1", "1.0", "LocalResource1.jar",
+        final long localResource1Id = createDependency(2L, TYPE1, "LocalResource1", "LocalResource1.jar",
                 IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
-        final long localResource2Id = createDependency(2L, TYPE1, "LocalResource2", "1.0", "LocalResource2.jar",
+        final long localResource2Id = createDependency(2L, TYPE1, "LocalResource2", "LocalResource2.jar",
                 IOUtil.generateJar(LocalClass3.class, LocalClass4.class, SharedClass1.class));
 
         createDependencyMapping(localResource1Id, TYPE1, ID1);
@@ -102,15 +102,15 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         getTransactionService().begin();
         final URL globalFile = ClassLoaderServiceTest.class.getResource("NotInPathGlobal.jar");
         final byte[] globalFileContent = IOUtil.getAllContentFrom(globalFile);
-        final long globalFileId = createPlatformDependency("NotInPathGlobal", "1.0", "NotInPathGlobal.jar", globalFileContent);
+        final long globalFileId = createPlatformDependency("NotInPathGlobal", "NotInPathGlobal.jar", globalFileContent);
 
         final URL sharedFile = ClassLoaderServiceTest.class.getResource("NotInPathShared.jar");
         final byte[] sharedFileContent = IOUtil.getAllContentFrom(sharedFile);
-        final long sharedFileId = createPlatformDependency("NotInPathShared", "1.0", "NotInPathShared.jar", sharedFileContent);
+        final long sharedFileId = createPlatformDependency("NotInPathShared", "NotInPathShared.jar", sharedFileContent);
 
         final URL localFile = ClassLoaderServiceTest.class.getResource("NotInPathLocal.jar");
         final byte[] localFileContent = IOUtil.getAllContentFrom(localFile);
-        final long localFileId = createDependency(2L, TYPE1, "NotInPathLocal", "1.0", "NotInPathLocal.jar", localFileContent);
+        final long localFileId = createDependency(2L, TYPE1, "NotInPathLocal", "NotInPathLocal.jar", localFileContent);
 
         createPlatformDependencyMapping(globalFileId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
         createPlatformDependencyMapping(sharedFileId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
@@ -120,18 +120,18 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         getTransactionService().complete();
     }
 
-    private long createDependency(final long artifactId, final ScopeType artifactType, final String name, final String version, final String fileName,
+    private long createDependency(final long artifactId, final ScopeType artifactType, final String name, final String fileName,
             final byte[] value) throws SDependencyException {
         final SDependencyBuilder builder = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, artifactId,
-                artifactType, version, fileName, value);
+                artifactType, fileName, value);
         final SDependency dependency = builder.done();
         dependencyService.createDependency(dependency);
         return dependency.getId();
     }
 
-    private long createPlatformDependency(final String name, final String version, final String fileName, final byte[] value) throws SDependencyException {
+    private long createPlatformDependency(final String name, final String fileName, final byte[] value) throws SDependencyException {
         final SPlatformDependencyBuilder builder = BuilderFactory.get(SPlatformDependencyBuilderFactory.class)
-                .createNewInstance(name, version, fileName, value);
+                .createNewInstance(name, fileName, value);
         final SDependency dependency = builder.done();
         platformDependencyService.createDependency(dependency);
         return dependency.getId();
@@ -139,20 +139,20 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
 
     private void initializeClassLoaderServiceWithTwoApplications() throws Exception {
         getTransactionService().begin();
-        final long globalResourceId = createPlatformDependency("globalResource", "1.0", "globalResource.jar",
+        final long globalResourceId = createPlatformDependency("globalResource", "globalResource.jar",
                 IOUtil.generateJar(GlobalClass1.class, SharedClass1.class));
         createPlatformDependencyMapping(globalResourceId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
 
-        final long localResource1Id = createDependency(2L, TYPE1, "LocalResource11", "1.0", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class));
-        final long localResource2Id = createDependency(2L, TYPE1, "LocalResource12", "1.0", "LocalResource2.jar", IOUtil.generateJar(LocalClass3.class));
+        final long localResource1Id = createDependency(2L, TYPE1, "LocalResource11", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class));
+        final long localResource2Id = createDependency(2L, TYPE1, "LocalResource12", "LocalResource2.jar", IOUtil.generateJar(LocalClass3.class));
 
         createDependencyMapping(localResource1Id, TYPE1, ID1);
         createDependencyMapping(localResource2Id, TYPE1, ID1);
 
         createDependencyMapping(localResource1Id, TYPE1, ID2);
 
-        final long localResource1Id2 = createDependency(2L, TYPE2, "LocalResource21", "1.0", "LocalResource1.jar", IOUtil.generateJar(LocalClass2.class));
-        final long localResource2Id2 = createDependency(2L, TYPE2, "LocalResource22", "1.0", "LocalResource2.jar", IOUtil.generateJar(LocalClass4.class));
+        final long localResource1Id2 = createDependency(2L, TYPE2, "LocalResource21", "LocalResource1.jar", IOUtil.generateJar(LocalClass2.class));
+        final long localResource2Id2 = createDependency(2L, TYPE2, "LocalResource22", "LocalResource2.jar", IOUtil.generateJar(LocalClass4.class));
 
         createDependencyMapping(localResource1Id2, TYPE2, ID1);
         createDependencyMapping(localResource2Id2, TYPE2, ID1);
@@ -358,7 +358,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
         assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
 
-        final long dependencyId = createPlatformDependency("newlib", "1.0", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
+        final long dependencyId = createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
         createPlatformDependencyMapping(dependencyId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
         Thread.sleep(10); // to be sure classlaoder refresh does NOT occur.
         clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
@@ -376,7 +376,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         assertTrue(isClassLoaderGlobal(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader()));
 
-        final long dependencyId = createDependency(2L, TYPE1, "newlib", "1.0", "newlib.jar", IOUtil.generateJar(GlobalClass2.class));
+        final long dependencyId = createDependency(2L, TYPE1, "newlib", "newlib.jar", IOUtil.generateJar(GlobalClass2.class));
         createDependencyMapping(dependencyId, TYPE1, ID1);
 
         // check the refresh has been done using the service
@@ -396,7 +396,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         initializeClassLoaderService();
 
         getTransactionService().begin();
-        final long dependencyId = createPlatformDependency("newlib", "1.0", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
+        final long dependencyId = createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
         final long mappingId = createPlatformDependencyMapping(dependencyId, classLoaderService.getGlobalClassLoaderType(),
                 classLoaderService.getGlobalClassLoaderId());
 
@@ -506,7 +506,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final URL resourceFile = ClassLoaderServiceTest.class.getResource("resource.txt");
         final byte[] resourceFileContent = IOUtil.getAllContentFrom(resourceFile);
 
-        final long resourceId = createPlatformDependency("resource", "1.0", "resource.txt", resourceFileContent);
+        final long resourceId = createPlatformDependency("resource", "resource.txt", resourceFileContent);
         createPlatformDependencyMapping(resourceId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
         getTransactionService().complete();
 

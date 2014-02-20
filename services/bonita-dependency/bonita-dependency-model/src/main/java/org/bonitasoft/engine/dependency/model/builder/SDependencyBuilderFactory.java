@@ -38,13 +38,11 @@ public interface SDependencyBuilderFactory {
      * @return The server dependency builder
      * @since 6.2
      */
-    SDependencyBuilder createNewInstance(String name, long artifactId, ScopeType artifactType, String version, String fileName, byte[] value);
+    SDependencyBuilder createNewInstance(String name, long artifactId, ScopeType artifactType, String fileName, byte[] value);
 
     String getIdKey();
 
     String getNameKey();
-
-    String getVersionKey();
 
     String getDescriptionKey();
 

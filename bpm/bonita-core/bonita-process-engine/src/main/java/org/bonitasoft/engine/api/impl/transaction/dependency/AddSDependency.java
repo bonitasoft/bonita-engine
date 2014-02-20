@@ -52,7 +52,7 @@ public class AddSDependency implements TransactionContent {
         final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class)
                 // add a .jar here because we need to add a new method in command API to have name and filename
                 // see BS-7393
-                .createNewInstance(name, artifactId, artifactType, "1.0", name + ".jar", jar)
+                .createNewInstance(name, artifactId, artifactType, name + ".jar", jar)
                 .done();
         dependencyService.createDependency(sDependency);
         final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)

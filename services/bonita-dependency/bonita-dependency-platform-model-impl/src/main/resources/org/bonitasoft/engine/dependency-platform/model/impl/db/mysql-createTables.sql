@@ -1,14 +1,12 @@
 CREATE TABLE pdependency (
   id BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL UNIQUE,
-  version VARCHAR(50) NOT NULL,
   description TEXT,
   filename VARCHAR(255) NOT NULL,
   value_ MEDIUMBLOB NOT NULL,
   PRIMARY KEY (id)
 ) ENGINE = INNODB;
 CREATE INDEX idx_pdependency_name ON pdependency (name);
-CREATE INDEX idx_pdependency_version ON pdependency (version);
 
 CREATE TABLE pdependencymapping (
   id BIGINT NOT NULL,
