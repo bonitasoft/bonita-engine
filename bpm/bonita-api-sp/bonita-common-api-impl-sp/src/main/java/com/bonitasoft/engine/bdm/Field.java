@@ -15,6 +15,10 @@ import javax.lang.model.SourceVersion;
  */
 public class Field {
 
+    private static final String PERSISTENCE_ID = "persistenceId";
+
+    private static final String PERSISTENCE_VERSION = "persistenceVersion";
+
     private String name;
 
     private FieldType type;
@@ -24,10 +28,14 @@ public class Field {
     }
 
     public void setName(final String name) {
-        if (!SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name)) {
+        if (!SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name) || isForbiddenIdentifier(name)) {
             throw new IllegalArgumentException(name + " is not a valid field identifier");
         }
         this.name = name;
+    }
+
+    private boolean isForbiddenIdentifier(final String name) {
+        return PERSISTENCE_ID.equalsIgnoreCase(name) || PERSISTENCE_VERSION.equalsIgnoreCase(name);
     }
 
     public FieldType getType() {
