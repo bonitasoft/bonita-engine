@@ -1,18 +1,12 @@
-package org.bonitasoft.engine.command.helper.design;
+package org.bonitasoft.engine.command.helper.designer;
 
-import static junit.framework.Assert.assertEquals;
 import static org.bonitasoft.engine.command.helper.designer.Transition.fails;
 import static org.bonitasoft.engine.command.helper.designer.Transition.meet;
+import static org.junit.Assert.assertEquals;
 
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.command.helper.designer.Branch;
-import org.bonitasoft.engine.command.helper.designer.EndEvent;
-import org.bonitasoft.engine.command.helper.designer.Gateway;
-import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
-import org.bonitasoft.engine.command.helper.designer.StartEvent;
-import org.bonitasoft.engine.command.helper.designer.UserTask;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.junit.Test;
