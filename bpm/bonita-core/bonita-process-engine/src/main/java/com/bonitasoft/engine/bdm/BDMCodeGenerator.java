@@ -16,59 +16,42 @@
  */
 package com.bonitasoft.engine.bdm;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Entity;
 
-import org.bonitasoft.engine.commons.StringUtil;
-
-import com.sun.codemodel.JAnnotatable;
 import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JBlock;
-import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
-import com.sun.codemodel.JType;
 
 
 /**
  * @author Romain Bioteau
  *
  */
-public class BDMCodeGenerator {
+public class BDMCodeGenerator extends CodeGenerator{
 
-	private JCodeModel model ;
 	private BusinessObjectModel bom;
 
 	public BDMCodeGenerator(BusinessObjectModel bom){
+		super();
 		if(bom == null){
 			throw new IllegalArgumentException("bom is null");
 		}
 		this.bom = bom;
-		this.model = new JCodeModel();
 	}
 
 	protected JCodeModel buildASTFromBom() throws JClassAlreadyExistsException{
 		for(BusinessObject bo : bom.getEntities()){
 			addEntity(bo);
 		}
-		return model;
+		return getModel();
 	}
 
 	protected void addEntity(BusinessObject bo) throws JClassAlreadyExistsException {
-		JDefinedClass entityClass = addClass(bo.getClassName());
+		JDefinedClass entityClass = addClass(bo.getQualifiedName());
 		JAnnotationUse entityAnnotation = addAnnotation(entityClass, Entity.class);
 		entityAnnotation.param("name", entityClass.name());
 		if(bo.getFields() != null){
@@ -86,92 +69,15 @@ public class BDMCodeGenerator {
 
 	private Class<?> toJavaType(FieldType type) {
 		switch (type) {
+		case STRING:return String.class;
 		case INTEGER:return Integer.class;
+		case FLOAT:return Integer.class;
+		case LONG:return Integer.class;
+		case DOUBLE:return Double.class;
 		case BOOLEAN:return Boolean.class;
 		case DATE:return Date.class;
-		case DOUBLE:return Double.class;
-		default:return String.class;
+		default:throw new IllegalStateException(type.name() + " is not mapped to a java type");
 		}
-	}
-
-	public void generate(File destDir) throws IOException, JClassAlreadyExistsException{
-		buildASTFromBom().build(destDir);
-	}
-
-	protected JDefinedClass addClass(String fullyqualifiedName) throws JClassAlreadyExistsException{
-		return model._class(fullyqualifiedName);
-	}
-
-	protected JFieldVar addField(JDefinedClass definedClass,String fieldName,Class<?> type) throws JClassAlreadyExistsException{
-		return definedClass.field(JMod.PRIVATE,type,fieldName);
-	}
-
-	protected JFieldVar addField(JDefinedClass definedClass, String fieldName,JType type) {
-		return definedClass.field(JMod.PRIVATE,type,fieldName);
-	}
-
-	protected JMethod addSetter(JDefinedClass definedClass,JFieldVar field) {
-		JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
-		method.param(field.type(), field.name());
-		method.body().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
-		return method;
-	}
-
-	protected JMethod addGetter(JDefinedClass definedClass,JFieldVar field) {
-		JMethod method = definedClass.method(JMod.PUBLIC, field.type(), getGetterName(field));
-		JBlock block = method.body();
-		block._return(field);
-		return method;
-	}
-
-	protected String getGetterName(JFieldVar field) {
-		return "get"+StringUtil.firstCharToUpperCase(field.name());
-	}
-
-	protected String getSetterName(JFieldVar field) {
-		return "set"+StringUtil.firstCharToUpperCase(field.name());
-	}
-
-
-
-
-	protected JCodeModel getModel() {
-		return model;
-	}
-
-	protected JAnnotationUse addAnnotation(JAnnotatable annotable, Class<? extends Annotation> annotationType) {
-		Set<ElementType> supportedElementTypes = getSupportedElementTypes(annotationType);
-		checkAnnotationTarget(annotable, annotationType, supportedElementTypes);
-		return annotable.annotate(annotationType);
-	}
-
-	protected void checkAnnotationTarget(JAnnotatable annotable,
-			Class<? extends Annotation> annotationType,
-			Set<ElementType> supportedElementTypes) {
-		if(annotable instanceof JClass && !supportedElementTypes.isEmpty() && !supportedElementTypes.contains(ElementType.TYPE)){
-			throw new IllegalArgumentException(annotationType.getName() + " is not supported for "+annotable);
-		}
-		if(annotable instanceof JFieldVar && !supportedElementTypes.isEmpty() && !supportedElementTypes.contains(ElementType.FIELD)){
-			throw new IllegalArgumentException(annotationType.getName() + " is not supported for "+annotable);
-		}
-		if(annotable instanceof JMethod && !supportedElementTypes.isEmpty() && !supportedElementTypes.contains(ElementType.METHOD)){
-			throw new IllegalArgumentException(annotationType.getName() + " is not supported for "+annotable);
-		}
-	}
-
-	protected Set<ElementType> getSupportedElementTypes(
-			Class<? extends Annotation> annotationType) {
-		Set<ElementType> elementTypes = new HashSet<ElementType>();
-		Target targetAnnotation = annotationType.getAnnotation(Target.class);
-		if(targetAnnotation != null){
-			ElementType[] value = targetAnnotation.value();
-			if(value != null){
-				for(ElementType et : value){
-					elementTypes.add(et);
-				}
-			}
-		}
-		return elementTypes;
 	}
 
 }
