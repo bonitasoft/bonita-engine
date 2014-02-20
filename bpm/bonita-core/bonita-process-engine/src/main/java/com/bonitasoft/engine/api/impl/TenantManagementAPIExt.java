@@ -1,9 +1,27 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.io.File;
+import java.util.Collection;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
+
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -15,10 +33,14 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
+import com.bonitasoft.engine.bdm.BDMCodeGenerator;
+import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
+import com.bonitasoft.engine.io.IOUtils;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -39,16 +61,42 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     @Override
     @AvailableOnMaintenanceTenant
-    public void deployBusinessDataRepository(final byte[] jar) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
+    public void deployBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             // TODO: should be in activate tenant
-            BusinessDataRepository bdr = tenantAccessor.getBusinessDataRepository();
-            bdr.deploy(jar, tenantAccessor.getTenantId());
+            final BusinessDataRepository bdr = tenantAccessor.getBusinessDataRepository();
+            bdr.deploy(buildBDMJAR(zip), tenantAccessor.getTenantId());
             bdr.start();
-        } catch (IllegalStateException e) {
+        } catch (final IllegalStateException e) {
             throw new InvalidBusinessDataModelException(e);
-        } catch (SBusinessDataRepositoryDeploymentException e) {
+        } catch (final SBusinessDataRepositoryDeploymentException e) {
+            throw new BusinessDataRepositoryDeploymentException(e);
+        }
+    }
+
+    private byte[] buildBDMJAR(final byte[] zip) throws BusinessDataRepositoryDeploymentException {
+        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        try {
+            final BusinessObjectModel bom = converter.unzip(zip);
+            final BDMCodeGenerator codeGenerator = new BDMCodeGenerator(bom);
+            final File TmpBDMDirectory = File.createTempFile("bdm", null);
+            TmpBDMDirectory.delete();
+            TmpBDMDirectory.mkdir();
+
+            codeGenerator.generate(TmpBDMDirectory);
+            final Collection<File> files = FileUtils.listFiles(TmpBDMDirectory, new String[] { "java" }, true);
+            final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+            final Iterable<? extends JavaFileObject> compUnits = fileManager.getJavaFileObjectsFromFiles(files);
+            final Boolean compiled = compiler.getTask(null, fileManager, null, null, null, compUnits).call();
+            if (!compiled) {
+                throw new CreationException("The compilation process fails");
+            }
+            final byte[] jar = IOUtils.toJar(TmpBDMDirectory.getAbsolutePath());
+            FileUtils.deleteDirectory(TmpBDMDirectory);
+            return jar;
+        } catch (final Exception e) {
             throw new BusinessDataRepositoryDeploymentException(e);
         }
     }
@@ -88,7 +136,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     protected PlatformService getPlatformService() {
-        PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
+        final PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformAccessor.getPlatformService();
         return platformService;
     }
@@ -105,7 +153,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             throws UpdateException {
         try {
             new UpdateTenant(tenantId, descriptor, platformService).execute();
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new UpdateException("Could not update the tenant maintenance mode", e);
         }
     }

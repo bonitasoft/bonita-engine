@@ -10,9 +10,14 @@ package com.bonitasoft.engine.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -23,6 +28,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
+
+import org.apache.commons.io.FileUtils;
 
 /**
  * @author Matthieu Chaffotte
@@ -97,6 +104,47 @@ public class IOUtils {
             return jaxbElement.getValue();
         } finally {
             bais.close();
+        }
+    }
+
+    public static byte[] toJar(final String dirPath) throws IOException {
+        final Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final JarOutputStream jos = new JarOutputStream(baos, manifest);
+        try {
+            addFileHierarchy(new File(dirPath), jos, new File(dirPath));
+            return baos.toByteArray();
+        } finally {
+            jos.closeEntry();
+            jos.close();
+        }
+    }
+
+    private static void addFileHierarchy(final File source, final JarOutputStream jos, final File base) throws IOException {
+        final String relativeName = base.toURI().relativize(source.toURI()).getPath();
+        if (source.isDirectory()) {
+            String name = relativeName.replace(File.separator, "/");
+            if (!name.isEmpty()) {
+                if (!name.endsWith("/")) {
+                    name += "/";
+                }
+                final JarEntry entry = new JarEntry(name);
+                entry.setTime(source.lastModified());
+                entry.setCrc(0);
+                jos.putNextEntry(entry);
+                jos.closeEntry();
+            }
+            for (final File f : source.listFiles()) {
+                addFileHierarchy(f, jos, base);
+            }
+        } else {
+            final JarEntry entry = new JarEntry(relativeName.replace(File.separator, "/"));
+            entry.setTime(source.lastModified());
+            entry.setCrc(FileUtils.checksumCRC32(source));
+            jos.putNextEntry(entry);
+            jos.write(FileUtils.readFileToByteArray(source));
+            jos.closeEntry();
         }
     }
 

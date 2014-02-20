@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,6 +38,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.bdm.BusinessObject;
+import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
+import com.bonitasoft.engine.bdm.Field;
+import com.bonitasoft.engine.bdm.FieldType;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 public class BDRIT extends CommonAPISPTest {
@@ -45,15 +51,32 @@ public class BDRIT extends CommonAPISPTest {
 
     private User matti;
 
+    private BusinessObjectModel buildBOM() {
+        final Field firstName = new Field();
+        firstName.setName("firstName");
+        firstName.setType(FieldType.STRING);
+
+        final Field lastName = new Field();
+        lastName.setName("lastName");
+        lastName.setType(FieldType.STRING);
+
+        final BusinessObject employee = new BusinessObject();
+        employee.setQualifiedName(EMPLOYEE_QUALIF_CLASSNAME);
+        employee.setFields(Arrays.asList(firstName, lastName));
+
+        final BusinessObjectModel model = new BusinessObjectModel();
+        model.addBusinessObject(employee);
+        return model;
+    }
+
     @Before
     public void setUp() throws Exception {
         login();
         matti = createUser("matti", "bpm");
 
-        final InputStream stream = BDRIT.class.getResourceAsStream("/bdr-jar.bak");
-        assertNotNull(stream);
-        final byte[] jar = IOUtils.toByteArray(stream);
-        getTenantManagementAPI().deployBusinessDataRepository(jar);
+        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
+        final byte[] zip = converter.zip(buildBOM());
+        getTenantManagementAPI().deployBusinessDataRepository(zip);
     }
 
     @After
