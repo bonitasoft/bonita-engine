@@ -15,8 +15,13 @@ public enum FieldType {
 
     STRING,
     INTEGER,
-    DATE,
     DOUBLE,
-    BOOLEAN;
+    LONG,
+    FLOAT,
+    DATE,
+    BOOLEAN,
+    BYTE,
+    SHORT,
+    CHAR;
 
 }
