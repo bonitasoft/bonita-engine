@@ -10,6 +10,7 @@ package com.bonitasoft.engine.bdm;
 
 import java.util.List;
 
+import javax.lang.model.SourceVersion;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -19,17 +20,20 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  */
 public class BusinessObject {
 
-    private String className;
+    private String qualifiedName;
 
     private List<Field> fields;
 
     @XmlAttribute
-    public String getClassName() {
-        return className;
+    public String getQualifiedName() {
+        return qualifiedName;
     }
 
-    public void setClassName(final String className) {
-        this.className = className;
+    public void setQualifiedName(final String qualifiedName) {
+        if (!SourceVersion.isName(qualifiedName)) {
+            throw new IllegalArgumentException(qualifiedName + " is not a valid Java qualified name");
+        }
+        this.qualifiedName = qualifiedName;
     }
 
     @XmlElementWrapper(name = "fields")
@@ -46,7 +50,7 @@ public class BusinessObject {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (className == null ? 0 : className.hashCode());
+        result = prime * result + (qualifiedName == null ? 0 : qualifiedName.hashCode());
         result = prime * result + (fields == null ? 0 : fields.hashCode());
         return result;
     }
@@ -63,11 +67,11 @@ public class BusinessObject {
             return false;
         }
         final BusinessObject other = (BusinessObject) obj;
-        if (className == null) {
-            if (other.className != null) {
+        if (qualifiedName == null) {
+            if (other.qualifiedName != null) {
                 return false;
             }
-        } else if (!className.equals(other.className)) {
+        } else if (!qualifiedName.equals(other.qualifiedName)) {
             return false;
         }
         if (fields == null) {

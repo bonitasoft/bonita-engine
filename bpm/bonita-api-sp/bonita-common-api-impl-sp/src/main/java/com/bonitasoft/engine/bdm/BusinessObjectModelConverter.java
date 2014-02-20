@@ -20,7 +20,7 @@ import com.bonitasoft.engine.io.IOUtils;
 /**
  * @author Matthieu Chaffotte
  */
-public class BusinessObjectModelConvertor {
+public class BusinessObjectModelConverter {
 
     private static final String BOM_XML = "bom.xml";
 

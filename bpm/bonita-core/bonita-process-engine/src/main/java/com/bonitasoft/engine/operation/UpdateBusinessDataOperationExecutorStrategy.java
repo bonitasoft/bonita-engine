@@ -23,7 +23,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFo
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
@@ -37,13 +37,13 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
 
     private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
 
-    private final BusinessDataRespository businessDataRepository;
+    private final BusinessDataRepository businessDataRepository;
 
     private final RefBusinessDataService refBusinessDataService;
 
     private final FlowNodeInstanceService flowNodeInstanceService;
 
-    public UpdateBusinessDataOperationExecutorStrategy(final BusinessDataRespository businessDataRepository,
+    public UpdateBusinessDataOperationExecutorStrategy(final BusinessDataRepository businessDataRepository,
             final RefBusinessDataService refBusinessDataService, final FlowNodeInstanceService flowNodeInstanceService) {
         super();
         this.businessDataRepository = businessDataRepository;

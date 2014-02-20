@@ -61,7 +61,7 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
@@ -80,7 +80,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
 
     private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
 
-    private final BusinessDataRespository businessDataRepository;
+    private final BusinessDataRepository businessDataRepository;
 
     private final RefBusinessDataService refBusinessDataService;
 
@@ -93,7 +93,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final TokenService tokenService, final EventsHandler eventsHandler, final TransactionService transactionService,
-            final FlowNodeStateManager flowNodeStateManager, final BusinessDataRespository businessDataRepository,
+            final FlowNodeStateManager flowNodeStateManager, final BusinessDataRepository businessDataRepository,
             final RefBusinessDataService refBusinessDataService) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,

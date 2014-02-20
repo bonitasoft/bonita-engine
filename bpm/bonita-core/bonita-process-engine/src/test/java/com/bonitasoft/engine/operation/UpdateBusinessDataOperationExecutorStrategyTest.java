@@ -23,14 +23,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateBusinessDataOperationExecutorStrategyTest {
 
     @Mock
-    private BusinessDataRespository businessDataRepository;
+    private BusinessDataRepository businessDataRepository;
 
     @Mock
     private FlowNodeInstanceService flowNodeInstanceService;

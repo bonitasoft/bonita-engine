@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service.impl;
 
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
@@ -33,7 +33,7 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
 
     private SearchEntitiesDescriptor searchEntitiesDescriptor;
 
-    private BusinessDataRespository businessDataRespository;
+    private BusinessDataRepository businessDataRespository;
 
     private RefBusinessDataService refBusinessDataService;
 
@@ -86,9 +86,9 @@ public class SpringTenantServiceAccessor extends org.bonitasoft.engine.service.i
     }
 
     @Override
-    public BusinessDataRespository getBusinessDataRepository() {
+    public BusinessDataRepository getBusinessDataRepository() {
         if (businessDataRespository == null) {
-            businessDataRespository = lookupService(BusinessDataRespository.class);
+            businessDataRespository = lookupService(BusinessDataRepository.class);
         }
         return businessDataRespository;
     }

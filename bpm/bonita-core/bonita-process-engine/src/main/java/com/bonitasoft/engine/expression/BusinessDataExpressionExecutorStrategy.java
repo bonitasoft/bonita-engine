@@ -21,7 +21,7 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
@@ -33,11 +33,11 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
 
     private final RefBusinessDataService refBusinessDataService;
 
-    private final BusinessDataRespository businessDataRepository;
+    private final BusinessDataRepository businessDataRepository;
 
     private final FlowNodeInstanceService flowNodeInstanceService;
 
-    public BusinessDataExpressionExecutorStrategy(final RefBusinessDataService refBusinessDataService, final BusinessDataRespository businessDataRepository,
+    public BusinessDataExpressionExecutorStrategy(final RefBusinessDataService refBusinessDataService, final BusinessDataRepository businessDataRepository,
             final FlowNodeInstanceService flowNodeInstanceService) {
         this.refBusinessDataService = refBusinessDataService;
         this.businessDataRepository = businessDataRepository;

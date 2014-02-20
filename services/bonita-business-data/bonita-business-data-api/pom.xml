@@ -9,7 +9,7 @@
  
   <artifactId>bonita-business-data-api</artifactId>
   
-  <name>Bonita Business Data: Respository</name>
+  <name>Bonita Business Data: Repository</name>
 
   <dependencies>
   	<dependency>

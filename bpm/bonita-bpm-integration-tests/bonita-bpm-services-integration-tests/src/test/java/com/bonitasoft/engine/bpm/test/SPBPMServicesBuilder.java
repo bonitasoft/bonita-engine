@@ -10,7 +10,7 @@ package com.bonitasoft.engine.bpm.test;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 
-import com.bonitasoft.engine.business.data.BusinessDataRespository;
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
@@ -97,8 +97,8 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     }
 
     @Override
-    public BusinessDataRespository getBusinessDataRepository() {
-        return getInstanceOf(BusinessDataRespository.class);
+    public BusinessDataRepository getBusinessDataRepository() {
+        return getInstanceOf(BusinessDataRepository.class);
     }
 
     @Override
