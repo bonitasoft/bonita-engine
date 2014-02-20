@@ -8,20 +8,35 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
+import java.util.Date;
+
 /**
  * @author Matthieu Chaffotte
  */
 public enum FieldType {
 
-    STRING,
-    INTEGER,
-    DOUBLE,
-    LONG,
-    FLOAT,
-    DATE,
-    BOOLEAN,
-    BYTE,
-    SHORT,
-    CHAR;
+	
+    STRING(String.class),
+    INTEGER(Integer.class),
+    DOUBLE(Double.class),
+    LONG(Long.class),
+    FLOAT(Float.class),
+    DATE(Date.class),
+    BOOLEAN(Boolean.class),
+    BYTE(Byte.class),
+    SHORT(Short.class),
+    CHAR(Character.class);
+    
+
+	private Class<?> clazz;
+
+	FieldType(Class<?> clazz){
+		this.clazz = clazz;
+	}
+
+	public Class<?> getClazz() {
+		return clazz;
+	}
+
 
 }
