@@ -23,7 +23,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformLoginException;
 import org.bonitasoft.engine.platform.PlatformLogoutException;
-import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.session.SSessionNotFoundException;
 import org.bonitasoft.engine.platform.session.model.SPlatformSession;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -50,10 +49,10 @@ public class PlatformLoginAPIImpl extends AbstractLoginApiImpl implements Platfo
             throw new PlatformLoginException(e.getMessage());
         }
         final PlatformLoginService platformLoginService = platformAccessor.getPlatformLoginService();
-        PlatformService platformService = platformAccessor.getPlatformService();
+//        PlatformService platformService = platformAccessor.getPlatformService(); // TO UNCOMMENT lvaills
 
         // first call before create session: put the platform in cache if necessary
-        putPlatformInCacheIfNecessary(platformAccessor, platformService);
+//        putPlatformInCacheIfNecessary(platformAccessor, platformService); // TO UNCOMMENT lvaills
 
         try {
             final SPlatformSession platformSession = platformLoginService.login(userName, password);

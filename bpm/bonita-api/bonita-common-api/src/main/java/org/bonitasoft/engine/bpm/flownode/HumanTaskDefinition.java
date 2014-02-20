@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,26 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api.impl.transaction.command;
+package org.bonitasoft.engine.bpm.flownode;
 
-import org.bonitasoft.engine.command.CommandService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
 
 /**
- * @author Yanyan Liu
+ * A Human task is a task having an actor and that can be assigned.
+ * 
+ * @author Baptiste Mesta
+ * @author Celine Souchet
  */
-public class DeleteAllCommands implements TransactionContent {
+public interface HumanTaskDefinition extends TaskDefinition {
 
-    private final CommandService commandService;
+    String getActorName();
 
-    public DeleteAllCommands(final CommandService commandService) {
-        this.commandService = commandService;
-    }
+    void setUserFilter(UserFilterDefinition userFilterDefinition);
 
-    @Override
-    public void execute() throws SBonitaException {
-        commandService.deleteAll();
-    }
+    UserFilterDefinition getUserFilter();
 
+    Long getExpectedDuration();
+
+    String getPriority();
 }

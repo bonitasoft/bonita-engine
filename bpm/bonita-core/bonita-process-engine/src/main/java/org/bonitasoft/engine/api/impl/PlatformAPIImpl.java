@@ -215,7 +215,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }
 
@@ -311,7 +311,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                                     return null;
                                 }
                             };
-                            tenantServiceAccessor.getTransactionService().executeInTransaction(callable);
+                            tenantServiceAccessor.getUserTransactionService().executeInTransaction(callable);
                         }
                         sessionService.deleteSession(sessionId);
                     }
@@ -343,7 +343,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
-            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
     }
 

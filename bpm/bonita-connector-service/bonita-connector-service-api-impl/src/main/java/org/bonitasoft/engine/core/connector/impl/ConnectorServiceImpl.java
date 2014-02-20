@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -240,7 +241,8 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private void storeImplementation(final long processDefinitionId, final SConnectorImplementationDescriptor connectorImplementation) throws CacheException {
-        String key = buildConnectorImplementationKey(processDefinitionId, connectorImplementation.getDefinitionId(), connectorImplementation.getDefinitionVersion());
+        String key = buildConnectorImplementationKey(processDefinitionId, connectorImplementation.getDefinitionId(),
+                connectorImplementation.getDefinitionVersion());
         cacheService.store(CONNECTOR_CACHE_NAME, key, connectorImplementation);
     }
 
@@ -258,7 +260,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     public ConnectorResult executeMutipleEvaluation(final long processDefinitionId, final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, SExpression> connectorInputParameters,
             final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
-                    throws SConnectorException {
+            throws SConnectorException {
         String implementationClassName;
         final SConnectorImplementationDescriptor implementation;
         try {
@@ -407,7 +409,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     private void deployNewDependencies(final long processDefinitionId, final long tenantId) throws SDependencyException, IOException, BonitaHomeNotSetException {
         // delete existing ones:
-        dependencyService.deleteDependencies(processDefinitionId, "process");
+        dependencyService.deleteDependencies(processDefinitionId, ScopeType.PROCESS);
         // deploy new ones from the filesystem (bonita-home):
         final File processFolder = new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId)), String.valueOf(processDefinitionId));
         final File file = new File(processFolder, CLASSPATH_FOLDER);
@@ -416,15 +418,14 @@ public class ConnectorServiceImpl implements ConnectorService {
             for (final File jarFile : listFiles) {
                 final String name = jarFile.getName();
                 final byte[] jarContent = IOUtil.getAllContentFrom(jarFile);
-                final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, "1.0", name + ".jar", jarContent)
-                        .done();
+                final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class)
+                        .createNewInstance(name, processDefinitionId, ScopeType.PROCESS, name + ".jar", jarContent).done();
                 dependencyService.createDependency(sDependency);
                 final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
-                        .createNewInstance(sDependency.getId(), processDefinitionId, "process").done();
+                        .createNewInstance(sDependency.getId(), processDefinitionId, ScopeType.PROCESS).done();
                 dependencyService.createDependencyMapping(sDependencyMapping);
             }
         }
-
     }
 
     protected void checkConnectorImplementationIsValid(final byte[] connectorImplementationArchive, final String connectorId, final String connectorVersion)

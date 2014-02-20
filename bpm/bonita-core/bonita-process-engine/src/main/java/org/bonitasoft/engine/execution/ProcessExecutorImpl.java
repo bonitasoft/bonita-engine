@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -92,6 +92,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstan
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -413,7 +414,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return false;
     }
 
-    private List<SFlowNodeInstance> initializeFirstExecutableElements(final SProcessInstance sProcessInstance, FlowNodeSelector selector) {
+    private List<SFlowNodeInstance> initializeFirstExecutableElements(final SProcessInstance sProcessInstance, final FlowNodeSelector selector) {
         try {
             List<SFlowNodeDefinition> flownNodeDefinitions = selector.getFilteredElements();;
             long rootProcessInstanceId = sProcessInstance.getRootProcessInstanceId();
@@ -749,7 +750,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         FlowNodeTransitionsWrapper transitionsDescriptor = buildTransitionsWrapper(flowNode, sProcessDefinition, child);
         TokenProvider tokenProvider = new TokenProvider(child, sProcessInstance, flowNodeWrapper, transitionsDescriptor, tokenService);
         FlowMerger merger = new FlowMerger(flowNodeWrapper, transitionsDescriptor, tokenProvider);
-        
+
         archiveInvalidTransitions(child, transitionsDescriptor);
 
         final List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<STransitionDefinition>(transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
@@ -784,7 +785,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
         }
-    }
+        }
 
     private int updateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
             final int numberOfTokenToMerge, FlowNodeTransitionsWrapper transitionsDescriptor, FlowMerger merger)
@@ -894,7 +895,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private Filter<SFlowNodeDefinition> getFilter(final long targetSFlowNodeDefinitionId) {
-        if(targetSFlowNodeDefinitionId == -1) {
+        if (targetSFlowNodeDefinitionId == -1) {
             return new StartFlowNodeFilter();
         }
         return new FlowNodeIdFilter(targetSFlowNodeDefinitionId);
@@ -903,12 +904,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     @Override
     public SProcessInstance start(final long starterId,
             final long starterDelegateId, final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
-            final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, FlowNodeSelector selector)
+            final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, final FlowNodeSelector selector)
             throws SProcessInstanceCreationException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", sProcessDefinition.getId());
+            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), sProcessDefinition.getId());
             Thread.currentThread().setContextClassLoader(localClassLoader);
             // initialize the process classloader by getting it one time
             try {
@@ -982,7 +983,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public SProcessInstance startElements(final SProcessInstance sProcessInstance, FlowNodeSelector selector) throws SProcessInstanceCreationException, SFlowNodeExecutionException {
+    public SProcessInstance startElements(final SProcessInstance sProcessInstance, final FlowNodeSelector selector) throws SProcessInstanceCreationException,
+            SFlowNodeExecutionException {
         List<SFlowNodeInstance> flowNodeInstances = initializeFirstExecutableElements(sProcessInstance, selector);
         // process is initialized and now the engine trigger jobs to execute other activities, give the hand back
         ProcessInstanceState state;

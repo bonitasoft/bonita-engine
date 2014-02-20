@@ -72,7 +72,7 @@ public interface FlowNodeExecutor extends ContainerExecutor {
     void childReachedState(SProcessInstance childProcInst, ProcessInstanceState childState, boolean hasActionsToExecute) throws SBonitaException;
 
     /**
-     * Archive the flownode instance given as parameter. Also archive all related object that needs to be archived as well.
+     * Archive the flow node instance given as parameter. Also archive all related object that needs to be archived as well.
      * 
      * @param flowNodeInstance
      *            The flow node instance to be archived.

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,6 +20,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -27,6 +28,7 @@ import org.bonitasoft.engine.service.PlatformServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class RefreshPlatformClassLoader implements TransactionContentWithResult<List<Long>> {
 
@@ -42,7 +44,8 @@ public class RefreshPlatformClassLoader implements TransactionContentWithResult<
     public void execute() throws SBonitaException {
         final DependencyService platformDependencyService = platformAccessor.getDependencyService();
         final ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
-        platformDependencyService.refreshClassLoader(classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
+        platformDependencyService.refreshClassLoader(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+                classLoaderService.getGlobalClassLoaderId());
         final PlatformService platformService = platformAccessor.getPlatformService();
         List<STenant> tenants;
         final int maxResults = 100;

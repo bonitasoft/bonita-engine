@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,14 +25,14 @@ public class TxBonitaWorkTest {
 
     private TenantServiceAccessor tenantAccessor;
 
-    private TransactionService transactionService;
+    private UserTransactionService userTransactionService;
 
     @Before
     public void before() {
         txBonitawork = new TxBonitaWork(wrappedWork);
         tenantAccessor = mock(TenantServiceAccessor.class);
-        transactionService = mock(TransactionService.class);
-        when(tenantAccessor.getTransactionService()).thenReturn(transactionService);
+        userTransactionService = mock(UserTransactionService.class);
+        when(tenantAccessor.getUserTransactionService()).thenReturn(userTransactionService);
     }
 
     @SuppressWarnings("unchecked")
@@ -40,7 +40,7 @@ public class TxBonitaWorkTest {
     public void testWork() throws Exception {
         Map<String, Object> singletonMap = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         txBonitawork.work(singletonMap);
-        verify(transactionService, times(1)).executeInTransaction(any(Callable.class));
+        verify(userTransactionService, times(1)).executeInTransaction(any(Callable.class));
     }
 
     @Test

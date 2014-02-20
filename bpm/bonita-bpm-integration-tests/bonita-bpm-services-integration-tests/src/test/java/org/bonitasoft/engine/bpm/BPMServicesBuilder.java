@@ -104,6 +104,7 @@ import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.test.util.ServicesAccessor;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
@@ -151,9 +152,13 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(Recorder.class);
     }
 
-    @Override
     public TransactionService getTransactionService() {
         return getInstanceOf(TransactionService.class);
+    }
+
+    @Override
+    public UserTransactionService getUserTransactionService() {
+        return getTransactionService();
     }
 
     @Override

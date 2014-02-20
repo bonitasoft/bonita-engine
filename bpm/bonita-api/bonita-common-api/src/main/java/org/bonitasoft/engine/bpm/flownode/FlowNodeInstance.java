@@ -73,21 +73,21 @@ public interface FlowNodeInstance extends DescriptionElement, BaseElement {
     String getDisplayName();
 
     /**
-     * @return id of the user who originally executed the flownode
+     * @return id of the user who originally executed the flow node
      * @since 6.0.1
      */
     long getExecutedBy();
 
     /**
-     * @return id of the user (delegate) who executed the flownode for the original executer
+     * @return id of the user (delegate) who executed the flow node for the original executer
      * @since 6.0.1
      */
     long getExecutedByDelegate();
 
     /**
-     * Returns the ID of the flownode definition of this instance.
+     * Returns the ID of the flow node definition of this instance.
      * 
-     * @return the ID of the flownode definition that this <code>FlowNodeInstance</code> is an instance of.
+     * @return the ID of the flow node definition that this <code>FlowNodeInstance</code> is an instance of.
      */
     long getFlownodeDefinitionId();
 }

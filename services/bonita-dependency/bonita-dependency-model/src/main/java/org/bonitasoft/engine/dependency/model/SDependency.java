@@ -22,8 +22,6 @@ public interface SDependency extends PersistentObject {
 
     String getName();
 
-    String getVersion();
-
     String getDescription();
 
     String getFileName();
