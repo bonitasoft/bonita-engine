@@ -150,6 +150,7 @@ public class JPABusinessDataRepositoryImplIT {
             businessDataRepository.start();
             employee = businessDataRepository.merge(new Employee("Marja", "Halonen"));
         } finally {
+            businessDataRepository.stop();
             ut.commit();
         }
         assertThat(employee.getId()).isNotNull();
@@ -164,8 +165,6 @@ public class JPABusinessDataRepositoryImplIT {
             businessDataRepository.merge(null);
             final Long count = businessDataRepository.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
             assertThat(count).isEqualTo(0);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
         } finally {
             businessDataRepository.stop();
             ut.commit();
