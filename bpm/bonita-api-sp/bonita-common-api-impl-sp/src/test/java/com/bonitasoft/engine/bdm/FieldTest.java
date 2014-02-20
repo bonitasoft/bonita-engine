@@ -28,4 +28,28 @@ public class FieldTest {
         field.setName("9firstName");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void setNameShouldThrowAnExceptionWhenNameIsPersistenceId() {
+        final Field field = new Field();
+        field.setName("persistenceId");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setNameShouldThrowAnExceptionWhenNameIsPersistenceIdInAnyCase() {
+        final Field field = new Field();
+        field.setName("PersIstenceId");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setNameShouldThrowAnExceptionWhenNameIsPersistenceVersion() {
+        final Field field = new Field();
+        field.setName("persistenceVersion");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void setNameShouldThrowAnExceptionWhenNameIsPersistenceVersionInAnyCase() {
+        final Field field = new Field();
+        field.setName("PersIstenCeVersiOn");
+    }
+
 }
