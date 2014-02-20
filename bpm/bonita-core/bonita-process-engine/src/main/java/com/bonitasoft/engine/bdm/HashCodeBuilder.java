@@ -16,10 +16,17 @@
  */
 package com.bonitasoft.engine.bdm;
 
+import java.util.Map.Entry;
+
+import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
+import com.sun.codemodel.JType;
+import com.sun.codemodel.JVar;
 
 /**
  * @author Romain Bioteau
@@ -29,34 +36,38 @@ public class HashCodeBuilder {
 
 	public JMethod generate(JDefinedClass definedClass) {
 		JMethod hashCodeMethod = definedClass.method(JMod.PUBLIC, int.class, "hashCode");
-		hashCodeMethod.body()._return(JExpr.direct("0"));
+		JBlock body = hashCodeMethod.body();
+		JVar prime = body.decl(JMod.FINAL,JType.parse(definedClass.owner(), int.class.getName()), "prime", JExpr.lit(31));
+		JVar result = body.decl(JType.parse(definedClass.owner(), int.class.getName()), "result", JExpr.lit(1));
+		for(Entry<String, JFieldVar> field : definedClass.fields().entrySet()){
+			JFieldVar fieldVar = field.getValue();
+			JType type = fieldVar.type();
+			JType unboxifyType = type.unboxify();
+			if(!unboxifyType.isPrimitive()){
+				JVar refHashCode = body.decl(JType.parse(definedClass.owner(), int.class.getName()), "refHashCode",JExpr.lit(0));
+				body._if(fieldVar.ne(JExpr._null()))._then().assign(refHashCode, fieldVar.invoke("hashCode"));
+				body.assign(result, prime.mul(result).plus(refHashCode));
+			}else{
+				if(unboxifyType.name().equals(boolean.class.getSimpleName())){
+					JVar refHashCode = body.decl(JType.parse(definedClass.owner(), int.class.getName()), "refHashCode",JExpr.lit(1237));
+					body._if(fieldVar)._then().assign(refHashCode, JExpr.lit(1231));
+					body.assign(result, prime.mul(result).plus(refHashCode));
+				}else if(unboxifyType.name().equals(long.class.getSimpleName())){
+					body.assign(result, prime.mul(result).plus(JExpr.cast(JType.parse(definedClass.owner(), int.class.getName()), JExpr.direct(fieldVar.name()+" ^ ("+fieldVar.name()+" >>> 32)"))));
+				}else if(unboxifyType.name().equals(double.class.getSimpleName())){
+					JClass doubleType = definedClass.owner().ref(Double.class.getName());
+					JVar temp = body.decl(JType.parse(definedClass.owner(), long.class.getName()), "temp",doubleType.staticInvoke("doubleToLongBits").arg(fieldVar));
+					body.assign(result, prime.mul(result).plus(JExpr.cast(JType.parse(definedClass.owner(), int.class.getName()), JExpr.direct(temp.name()+" ^ ("+temp.name()+" >>> 32)"))));
+				}else if(unboxifyType.name().equals(float.class.getSimpleName())){
+					JClass floatType = definedClass.owner().ref(Float.class.getName());
+					body.assign(result, prime.mul(result).plus(floatType.staticInvoke("floatToIntBits").arg(fieldVar)));
+				}
+			}
+		}
+
+		body._return(result);
 		return hashCodeMethod;
 	}
 
-//	@Override
-//	public int hashCode() {
-//		final int prime = 31;
-//		int result = 1;
-//		«FOREACH this.EStructuralFeatureModelGenAnnotations AS featureAnnotation-»
-//			«IF featureAnnotation.reference || !featureAnnotation.primitive »
-//				result = prime * result
-//						+ ((«featureAnnotation.name» == null) ? 0 : «featureAnnotation.name».hashCode());
-//			«ELSEIF !featureAnnotation.reference && featureAnnotation.primitive -»
-//				«IF featureAnnotation.type == "boolean" »
-//				result = prime * result + («featureAnnotation.name» ? 1231 : 1237) ;
-//				«ELSEIF featureAnnotation.type == "long"-»
-//				result = prime * result + (int) («featureAnnotation.name» ^ («featureAnnotation.name» >>> 32));
-//				«ELSEIF featureAnnotation.type == "double"-»
-//				long temp;
-//				temp = Double.doubleToLongBits(«featureAnnotation.name»);
-//				result = prime * result + (int) (temp ^ (temp >>> 32));
-//				«ELSEIF featureAnnotation.type == "float"-»
-//				result = prime * result + Float.floatToIntBits(«featureAnnotation.name»);
-//				«ENDIF-»
-//			«ENDIF-»
-//	 	«ENDFOREACH-»
-//		return result;
-//	}
-//}
 	
 }

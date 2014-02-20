@@ -33,10 +33,10 @@ import com.sun.codemodel.JType;
  * @author Romain Bioteau
  *
  */
-public class EqualsBuilderTest {
+public class HashCodeBuilderTest {
 
-	private EqualsBuilder equalsBuilder;
 	private CodeGenerator codeGenerator;
+	private HashCodeBuilder hashCodeBuilder;
 
 	/**
 	 * @throws java.lang.Exception
@@ -44,7 +44,7 @@ public class EqualsBuilderTest {
 	@Before
 	public void setUp() throws Exception {
 		codeGenerator = new CodeGenerator();
-		equalsBuilder = new EqualsBuilder();
+		hashCodeBuilder = new HashCodeBuilder();
 	}
 
 	/**
@@ -53,20 +53,24 @@ public class EqualsBuilderTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	
 	@Test
-	public void shouldGenerate_AddEqualsJMethodInDefinedClass() throws Exception {
+	public void shouldGenerate_AddHashCodeJMethodInDefinedClass() throws Exception {
 		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
 		codeGenerator.addField(definedClass, "name", String.class);
 		codeGenerator.addField(definedClass, "age", Integer.class);
+		codeGenerator.addField(definedClass, "height", Float.class);
+		codeGenerator.addField(definedClass, "isMarried", Boolean.class);
+		codeGenerator.addField(definedClass, "timestamp", Long.class);
+		codeGenerator.addField(definedClass, "weight", Double.class);
 		codeGenerator.addField(definedClass, "returnDate",  codeGenerator.getModel().ref(Date.class));
-		JMethod equalsMethod = equalsBuilder.generate(definedClass);
-		assertThat(equalsMethod).isNotNull();
-		assertThat(equalsMethod.name()).isEqualTo("equals");
-		assertThat(equalsMethod.hasSignature(new JType[]{codeGenerator.getModel().ref(Object.class.getName())})).isTrue();
-		assertThat(equalsMethod.type().fullName()).isEqualTo(boolean.class.getName());
+		JMethod hashcodeMethod = hashCodeBuilder.generate(definedClass);
+		assertThat(hashcodeMethod).isNotNull();
+		assertThat(hashcodeMethod.name()).isEqualTo("hashCode");
+		assertThat(hashcodeMethod.hasSignature(new JType[]{})).isTrue();
+		assertThat(hashcodeMethod.type().fullName()).isEqualTo(int.class.getName());
 		
-		JBlock body = equalsMethod.body();
+		JBlock body = hashcodeMethod.body();
 		assertThat(body).isNotNull();
 		assertThat(body.getContents()).isNotEmpty();
 	}

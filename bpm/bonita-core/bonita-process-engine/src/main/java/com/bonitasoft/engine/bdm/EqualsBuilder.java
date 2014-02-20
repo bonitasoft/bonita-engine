@@ -38,8 +38,8 @@ public class EqualsBuilder {
 	public JMethod generate(JDefinedClass definedClass){
 		JMethod equalsMethod = definedClass.method(JMod.PUBLIC, boolean.class, "equals");
 		JVar param = equalsMethod.param(definedClass.owner().ref(Object.class), "obj");
-		JBlock body = equalsMethod.body();
 		
+		JBlock body = equalsMethod.body();
 		body._if(JExpr._this().eq(param))._then()._return(JExpr.TRUE);
 		body._if(param.eq(JExpr._null()))._then()._return(JExpr.FALSE);
 		body._if(JExpr.invoke("getClass").ne(param.invoke("getClass")))._then()._return(JExpr.FALSE);
@@ -60,33 +60,5 @@ public class EqualsBuilder {
 		body._return(JExpr.TRUE);
 		return equalsMethod;
 	}
-
-//	 /**
-//		 * A equals method which compare object fields.
-//	 	 * @generated
-//		 */
-//		@Override
-//		public boolean equals(Object obj) {
-//			if (this == obj)
-//				return true;
-//			if (obj == null)
-//				return false;
-//			if (getClass() != obj.getClass())
-//				return false;
-//			«this.name» other = («this.name») obj;
-//			«FOREACH this.EStructuralFeatureModelGenAnnotations AS featureAnnotation-»
-//				«IF !featureAnnotation.reference && featureAnnotation.primitive »
-//					if («featureAnnotation.name» != other.«featureAnnotation.name»)
-//						return false; 
-//				«ELSE-»
-//					if («featureAnnotation.name» == null) {
-//						if (other.«featureAnnotation.name» != null) 
-//							return false;
-//					} else if (!«featureAnnotation.name».equals(other.«featureAnnotation.name»))
-//							return false;
-//				«ENDIF-»
-//		 	«ENDFOREACH-»
-//			return true;
-//		}
 	
 }
