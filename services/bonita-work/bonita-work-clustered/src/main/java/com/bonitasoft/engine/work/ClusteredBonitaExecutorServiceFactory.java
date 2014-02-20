@@ -21,9 +21,9 @@ import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- *
+ * 
  * Factory that use a hazelcast executor
- *
+ * 
  * @author Baptiste Mesta
  */
 public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
@@ -36,7 +36,11 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
 
     private final long keepAliveTimeSeconds;
 
-    public ClusteredBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
+    private final long tenantId;
+
+    public ClusteredBonitaExecutorServiceFactory(final long tenantId, final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds,
+            final HazelcastInstance hazelcastInstance) {
+        this.tenantId = tenantId;
         this.hazelcastInstance = hazelcastInstance;
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
@@ -49,7 +53,7 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
     @Override
     public ClusteredThreadPoolExecutor createExecutorService() {
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
-        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", maximumPoolSize);
+        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
         return new ClusteredThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance);
     }
 
