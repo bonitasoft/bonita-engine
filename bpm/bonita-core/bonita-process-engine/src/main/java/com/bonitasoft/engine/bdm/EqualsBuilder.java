@@ -18,7 +18,6 @@ package com.bonitasoft.engine.bdm;
 
 import java.util.Map.Entry;
 
-import com.sun.codemodel.JAssignmentTarget;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;

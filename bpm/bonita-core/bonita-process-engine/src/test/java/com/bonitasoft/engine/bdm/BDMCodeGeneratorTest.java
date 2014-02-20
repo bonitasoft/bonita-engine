@@ -1,7 +1,6 @@
 package com.bonitasoft.engine.bdm;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.Matchers.isNotNull;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,20 +11,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.fest.assertions.MapAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JMethod;
 
 public class BDMCodeGeneratorTest {

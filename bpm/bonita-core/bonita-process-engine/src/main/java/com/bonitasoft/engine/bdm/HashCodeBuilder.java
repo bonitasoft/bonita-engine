@@ -17,7 +17,9 @@
 package com.bonitasoft.engine.bdm;
 
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JMod;
 
 /**
  * @author Romain Bioteau
@@ -26,8 +28,9 @@ import com.sun.codemodel.JMethod;
 public class HashCodeBuilder {
 
 	public JMethod generate(JDefinedClass definedClass) {
-		// TODO Auto-generated method stub
-		return null;
+		JMethod hashCodeMethod = definedClass.method(JMod.PUBLIC, int.class, "hashCode");
+		hashCodeMethod.body()._return(JExpr.direct("0"));
+		return hashCodeMethod;
 	}
 
 //	@Override
