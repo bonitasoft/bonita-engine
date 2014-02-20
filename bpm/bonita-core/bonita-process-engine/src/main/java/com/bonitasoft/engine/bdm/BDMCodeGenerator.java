@@ -16,15 +16,23 @@
  */
 package com.bonitasoft.engine.bdm;
 
-import java.util.Date;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JType;
 
 
 /**
@@ -43,41 +51,72 @@ public class BDMCodeGenerator extends CodeGenerator{
 		this.bom = bom;
 	}
 
-	protected JCodeModel buildASTFromBom() throws JClassAlreadyExistsException{
+	protected void buildASTFromBom() throws JClassAlreadyExistsException{
 		for(BusinessObject bo : bom.getEntities()){
 			addEntity(bo);
 		}
-		return getModel();
 	}
 
 	protected void addEntity(BusinessObject bo) throws JClassAlreadyExistsException {
 		JDefinedClass entityClass = addClass(bo.getQualifiedName());
+		entityClass = addInterface(entityClass, Serializable.class.getName());
+	
 		JAnnotationUse entityAnnotation = addAnnotation(entityClass, Entity.class);
 		entityAnnotation.param("name", entityClass.name());
+		
+		addPersistenceIdFieldAndAccessors(entityClass);
+		addPersistenceVersionFieldAndAccessors(entityClass);
+		
 		if(bo.getFields() != null){
 			for(Field field : bo.getFields()){
-				addFieldAndAccessors(entityClass,field);
+				JFieldVar basicField = addBasicField(entityClass, field);
+				addAccessors(entityClass,basicField);
 			}
 		}
+		
+		addEqualsMethod(entityClass);
+		addHashCodeMethod(entityClass);
 	}
 
-	protected void addFieldAndAccessors(JDefinedClass entityClass, Field field) throws JClassAlreadyExistsException {
+	protected void addPersistenceIdFieldAndAccessors(JDefinedClass entityClass)
+			throws JClassAlreadyExistsException {
+		JFieldVar idFieldVar = addField(entityClass, Field.PERSISTENCE_ID, toJavaType(FieldType.LONG));
+		addAnnotation(idFieldVar, Id.class);
+		addAnnotation(idFieldVar, GeneratedValue.class);
+		addAccessors(entityClass,idFieldVar);
+	}
+	
+	protected void addPersistenceVersionFieldAndAccessors(JDefinedClass entityClass)
+			throws JClassAlreadyExistsException {
+		JFieldVar versionField = addField(entityClass, Field.PERSISTENCE_VERSION, toJavaType(FieldType.LONG));
+		addAnnotation(versionField, Version.class);
+		addAccessors(entityClass,versionField);
+	}
+
+	protected JFieldVar addBasicField(JDefinedClass entityClass, Field field) throws JClassAlreadyExistsException {
 		JFieldVar fieldVar = addField(entityClass, field.getName(), toJavaType(field.getType()));
+		addAnnotation(fieldVar, Basic.class);
+		if(field.getType() == FieldType.DATE){
+			JAnnotationUse temporalAnnotation = addAnnotation(fieldVar,Temporal.class);
+			temporalAnnotation.param("value", TemporalType.TIMESTAMP);
+		}
+		return fieldVar;
+	}
+	
+	protected void addAccessors(JDefinedClass entityClass, JFieldVar fieldVar) throws JClassAlreadyExistsException {
 		addSetter(entityClass, fieldVar);
 		addGetter(entityClass, fieldVar);
 	}
 
-	private Class<?> toJavaType(FieldType type) {
-		switch (type) {
-		case STRING:return String.class;
-		case INTEGER:return Integer.class;
-		case FLOAT:return Integer.class;
-		case LONG:return Integer.class;
-		case DOUBLE:return Double.class;
-		case BOOLEAN:return Boolean.class;
-		case DATE:return Date.class;
-		default:throw new IllegalStateException(type.name() + " is not mapped to a java type");
-		}
+	protected JType toJavaType(FieldType type) {
+		return getModel().ref(type.getClazz());
+	}
+	
+	@Override
+	public void generate(File destDir) throws IOException,
+			JClassAlreadyExistsException {
+		buildASTFromBom();
+		super.generate(destDir);
 	}
 
 }

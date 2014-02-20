@@ -47,9 +47,13 @@ import com.sun.codemodel.JType;
 public class CodeGenerator {
 
 	private JCodeModel model ;
-
+	private EqualsBuilder equalsBuilder ;
+	private HashCodeBuilder hashCodeBuilder ;
+	
 	public CodeGenerator(){
 		this.model = new JCodeModel();
+		this.equalsBuilder = new EqualsBuilder();
+		this.hashCodeBuilder = new HashCodeBuilder();
 	}
 	
 	public void generate(File destDir) throws IOException, JClassAlreadyExistsException{
@@ -59,8 +63,12 @@ public class CodeGenerator {
 	public JDefinedClass addClass(String fullyqualifiedName) throws JClassAlreadyExistsException{
 		return model._class(fullyqualifiedName);
 	}
+	
+	public JDefinedClass addInterface(JDefinedClass definedClass,String fullyqualifiedName) {
+		return definedClass._implements(model.ref(fullyqualifiedName));
+	}
 
-	public JFieldVar addField(JDefinedClass definedClass,String fieldName,Class<?> type) throws JClassAlreadyExistsException{
+	public JFieldVar addField(JDefinedClass definedClass,String fieldName,Class<?> type) {
 		return definedClass.field(JMod.PRIVATE,type,fieldName);
 	}
 
@@ -81,6 +89,19 @@ public class CodeGenerator {
 		block._return(field);
 		return method;
 	}
+	
+	public JMethod addEqualsMethod(JDefinedClass definedClass) {
+		JMethod equalsMethod = equalsBuilder.generate(definedClass);
+		addAnnotation(equalsMethod, Override.class);
+		return equalsMethod;
+	}
+	
+	public JMethod addHashCodeMethod(JDefinedClass definedClass) {
+		JMethod hashCodeMethod = hashCodeBuilder.generate(definedClass);
+		addAnnotation(hashCodeMethod, Override.class);
+		return hashCodeMethod;
+	}
+
 
 	public String getGetterName(JFieldVar field) {
 		return "get"+StringUtil.firstCharToUpperCase(field.name());
@@ -95,10 +116,10 @@ public class CodeGenerator {
 		return model;
 	}
 
-	public JAnnotationUse addAnnotation(JAnnotatable annotable, Class<? extends Annotation> annotationType) {
+	protected JAnnotationUse addAnnotation(JAnnotatable annotable, Class<? extends Annotation> annotationType) {
 		Set<ElementType> supportedElementTypes = getSupportedElementTypes(annotationType);
 		checkAnnotationTarget(annotable, annotationType, supportedElementTypes);
-		return annotable.annotate(annotationType);
+		return annotable.annotate(model.ref(annotationType));
 	}
 
 	protected void checkAnnotationTarget(JAnnotatable annotable,

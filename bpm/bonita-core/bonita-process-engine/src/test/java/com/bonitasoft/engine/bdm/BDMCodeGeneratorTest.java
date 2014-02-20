@@ -1,16 +1,31 @@
 package com.bonitasoft.engine.bdm;
 
-import static org.assertj.core.api.Assertions.fail;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Matchers.isNotNull;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Iterator;
+
+import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
+import org.fest.assertions.MapAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JAnnotationValue;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JMethod;
 
 public class BDMCodeGeneratorTest {
@@ -45,6 +60,9 @@ public class BDMCodeGeneratorTest {
 		JDefinedClass definedClass = bdmCodeGenerator.getModel()._getClass(employeeBO.getQualifiedName());
 		assertThat(definedClass).isNotNull();
 		assertThat(definedClass._package().name()).isEqualTo("org.bonitasoft.hr");
+		assertThat(definedClass._implements()).hasSize(1);
+		JClass jClass = definedClass._implements().next();
+		assertThat(jClass.fullName()).isEqualTo(Serializable.class.getName());
 		assertThat(definedClass.annotations()).hasSize(1);
 		JAnnotationUse entityAnnotation = definedClass.annotations().iterator().next();
 		assertThat(entityAnnotation.getAnnotationClass().fullName()).isEqualTo(Entity.class.getName());
@@ -52,17 +70,57 @@ public class BDMCodeGeneratorTest {
 	}
 	
 	@Test
-	public void shouldAddFieldAndAccessors_CreatePrimitiveAttribute_AndAccessorMethods_InDefinedClass() throws Exception {
+	public void shouldAddBasicField_CreatePrimitiveAttribute_InDefinedClass() throws Exception {
 		BusinessObject employeeBO = new BusinessObject();
 		employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
 		Field nameField = new Field();
 		nameField.setName("name");
 		nameField.setType(FieldType.STRING);
 		JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
-		bdmCodeGenerator.addFieldAndAccessors(definedClass, nameField);
+		bdmCodeGenerator.addBasicField(definedClass, nameField);
 	
-		assertThat(definedClass.fields().get("name")).isNotNull();
-		assertThat(definedClass.fields().get("name").type()).isEqualTo(bdmCodeGenerator.getModel().ref(String.class.getName()));
+		JFieldVar nameFieldVar = definedClass.fields().get("name");
+		assertThat(nameFieldVar).isNotNull();
+		assertThat(nameFieldVar.type()).isEqualTo(bdmCodeGenerator.getModel().ref(String.class.getName()));
+		assertThat(nameFieldVar.annotations()).hasSize(1);
+		JAnnotationUse annotationUse = nameFieldVar.annotations().iterator().next();
+		assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Basic.class.getName());
+	}
+	
+	@Test
+	public void shouldAddBasicField_AddAFieldWithTemporalAnnotation_InDefinedClass() throws Exception {
+		BusinessObject employeeBO = new BusinessObject();
+		employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
+		Field nameField = new Field();
+		nameField.setName("name");
+		nameField.setType(FieldType.DATE);
+		JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
+		bdmCodeGenerator.addBasicField(definedClass, nameField);
+	
+		JFieldVar nameFieldVar = definedClass.fields().get("name");
+		assertThat(nameFieldVar).isNotNull();
+		assertThat(nameFieldVar.type()).isEqualTo(bdmCodeGenerator.getModel().ref(Date.class.getName()));
+		assertThat(nameFieldVar.annotations()).hasSize(2);
+		Iterator<JAnnotationUse> iterator = nameFieldVar.annotations().iterator();
+		JAnnotationUse annotationUse = iterator.next();
+		assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Basic.class.getName());
+		annotationUse = iterator.next();
+		assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Temporal.class.getName());
+		assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
+		assertThat(annotationUse.getAnnotationMembers().get("value")).isNotNull();
+	}
+	
+	@Test
+	public void shouldAddAccessors_AddAccessorMethods_InDefinedClass() throws Exception {
+		BusinessObject employeeBO = new BusinessObject();
+		employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
+		Field nameField = new Field();
+		nameField.setName("name");
+		nameField.setType(FieldType.STRING);
+		JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
+		JFieldVar basicField = bdmCodeGenerator.addBasicField(definedClass, nameField);
+	
+		bdmCodeGenerator.addAccessors(definedClass, basicField);
 		
 		assertThat(definedClass.methods()).hasSize(2);
 		JMethod setter = (JMethod) definedClass.methods().toArray()[0];
@@ -70,8 +128,76 @@ public class BDMCodeGeneratorTest {
 		
 		JMethod getter = (JMethod) definedClass.methods().toArray()[1];
 		assertThat(getter.name()).isEqualTo("getName");
-		
-		fail("check field annotation");
 	}
+	
+	@Test
+	public void shouldToJavaType_ReturnIntegerClass() throws Exception {
+		assertThat(bdmCodeGenerator.toJavaType(FieldType.INTEGER).name()).isEqualTo(Integer.class.getSimpleName());
+	}
+	
+	@Test
+	public void shouldToJavaType_ReturnStringClass() throws Exception {
+		assertThat(bdmCodeGenerator.toJavaType(FieldType.STRING).name()).isEqualTo(String.class.getSimpleName());
+	}
+	
+	@Test
+	public void shouldToJavaType_ReturnLongClass() throws Exception {
+		assertThat(bdmCodeGenerator.toJavaType(FieldType.LONG).name()).isEqualTo(Long.class.getSimpleName());
+	}
+	
+	@Test
+	public void shouldToJavaType_ReturnDoubleClass() throws Exception {
+		assertThat(bdmCodeGenerator.toJavaType(FieldType.DOUBLE).name()).isEqualTo(Double.class.getSimpleName());
+	}
+	
+	@Test
+	public void shouldToJavaType_ReturnFloatClass() throws Exception {
+		assertThat(bdmCodeGenerator.toJavaType(FieldType.FLOAT).name()).isEqualTo(Float.class.getSimpleName());
+	}
+	
+	@Test
+	public void shouldToJavaType_ReturnBooleanClass() throws Exception {
+		assertThat(bdmCodeGenerator.toJavaType(FieldType.BOOLEAN).name()).isEqualTo(Boolean.class.getSimpleName());
+	}
+	
+	@Test
+	public void shouldToJavaType_ReturnDateClass() throws Exception {
+		assertThat(bdmCodeGenerator.toJavaType(FieldType.DATE).name()).isEqualTo(Date.class.getSimpleName());
+	}
+	
+	@Test
+	public void shouldAddPersistenceIdFieldAndAccessors_AddPersistenceId() throws Exception {
+		BusinessObject employeeBO = new BusinessObject();
+		employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
+		JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
+		bdmCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass);
+		
+		JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
+		assertThat(idFieldVar).isNotNull();
+		assertThat(idFieldVar.type()).isEqualTo(bdmCodeGenerator.getModel().ref(Long.class.getName()));
+		assertThat(idFieldVar.annotations()).hasSize(2);
+		Iterator<JAnnotationUse> iterator = idFieldVar.annotations().iterator();
+		JAnnotationUse annotationUse = iterator.next();
+		assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Id.class.getName());
+		annotationUse = iterator.next();
+		assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(GeneratedValue.class.getName());
+	}
+	
+	@Test
+	public void shouldAddPersistenceVersionFieldAndAccessors_AddPersistenceVersion() throws Exception {
+		BusinessObject employeeBO = new BusinessObject();
+		employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
+		JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
+		bdmCodeGenerator.addPersistenceVersionFieldAndAccessors(definedClass);
+		
+		JFieldVar versionFieldVar = definedClass.fields().get(Field.PERSISTENCE_VERSION);
+		assertThat(versionFieldVar).isNotNull();
+		assertThat(versionFieldVar.type()).isEqualTo(bdmCodeGenerator.getModel().ref(Long.class.getName()));
+		assertThat(versionFieldVar.annotations()).hasSize(1);
+		Iterator<JAnnotationUse> iterator = versionFieldVar.annotations().iterator();
+		JAnnotationUse annotationUse = iterator.next();
+		assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Version.class.getName());
+	}
+
 
 }

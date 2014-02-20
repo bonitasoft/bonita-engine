@@ -19,10 +19,14 @@ package com.bonitasoft.engine.bdm;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.File;
+import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.fest.assertions.MapAssert;
 import org.junit.After;
@@ -153,6 +157,14 @@ public class CodeGeneratorTest {
 		codeGenerator.addAnnotation(privateField,Entity.class);
 	}
 	
+	
+	@Test
+	public void shoulAddInterface_AddInterface_ToADefinedClass() throws Exception {
+		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
+		definedClass = codeGenerator.addInterface(definedClass, Serializable.class.getName());
+		assertThat(definedClass._implements()).isNotEmpty().contains(codeGenerator.getModel().ref( Serializable.class.getName()));
+	}
+	
 	@Test
 	public void shouldGenerate_CreatePojoFile() throws Exception {
 		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
@@ -160,6 +172,10 @@ public class CodeGeneratorTest {
 		
 		JClass stringList = codeGenerator.getModel().ref(List.class).narrow(String.class);
 		JFieldVar skillField = codeGenerator.addField(definedClass, "skills", stringList);
+		JFieldVar dateField = codeGenerator.addField(definedClass, "returnDate",  codeGenerator.getModel().ref(Date.class));
+		JAnnotationUse tAnnotation = codeGenerator.addAnnotation(dateField, Temporal.class);
+		tAnnotation.param("value", TemporalType.TIMESTAMP);
+		
 		codeGenerator.addGetter(definedClass, nameField);
 		codeGenerator.addSetter(definedClass, nameField);
 		codeGenerator.addAnnotation(definedClass, Entity.class);
@@ -169,12 +185,16 @@ public class CodeGeneratorTest {
 		
 		File destDir = new File(System.getProperty("java.io.tmpdir"),"generatedPojo");
 		destDir.mkdirs();
-		destDir.deleteOnExit();
+	//	destDir.deleteOnExit();
 		codeGenerator.generate(destDir);
 		File rootFolder = new File(destDir,"org"+File.separatorChar+"bonitasoft");
 		assertThat(rootFolder.listFiles()).isNotEmpty().contains(new File(rootFolder,"Entity.java"));
 	}
 	
+	@Test
+	public void shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() throws Exception {
+		
+	}
 
 	
 }
