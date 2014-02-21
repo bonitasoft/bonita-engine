@@ -1,13 +1,13 @@
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.command.AdvancedStartProcessCommandIntegrationTest;
+import org.bonitasoft.engine.connectors.RemoteConnectorExecutionTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        AdvancedStartProcessCommandIntegrationTest.class
+        RemoteConnectorExecutionTest.class
 })
 public class TemporaryTests extends LocalIntegrationTests {
 

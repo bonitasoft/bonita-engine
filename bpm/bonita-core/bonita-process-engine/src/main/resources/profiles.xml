@@ -60,7 +60,7 @@
           </profileEntry>
         </childrenEntries>
       </parentProfileEntry>
-      <parentProfileEntry name="Directory">
+      <parentProfileEntry name="Organization">
         <parentName>NULL</parentName>
         <index>2</index>
         <description>Organization</description>
@@ -102,7 +102,7 @@
           <description>Portal</description>
           <type>folder</type>
           <childrenEntries>
-            <profileEntry name="User rights">
+            <profileEntry name="Profiles">
               <parentName>Portal</parentName>
               <index>0</index>
               <description>All profiles</description>

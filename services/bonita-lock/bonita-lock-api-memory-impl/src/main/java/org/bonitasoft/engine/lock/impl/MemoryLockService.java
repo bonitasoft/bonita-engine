@@ -67,11 +67,19 @@ public class MemoryLockService implements LockService {
         // this a sharding approach
         final Map<Integer, Object> tmpMutexs = new HashMap<Integer, Object>();
         for (int i = 0; i < lockPoolSize; i++) {
-            tmpMutexs.put(i, new Object());
+            tmpMutexs.put(i, new MemoryLockServiceMutex());
         }
         mutexs = Collections.unmodifiableMap(tmpMutexs);
     }
 
+    private static final class MemoryLockServiceMutex {
+        
+    }
+    
+    private static final class MemoryLockServiceReentrantLock extends ReentrantLock {
+        
+    }
+    
     private Object getMutex(final long objectToLockId) {
         final int poolKeyForThisObjectId = Long.valueOf(objectToLockId % lockPoolSize).intValue();
         if (!mutexs.containsKey(poolKeyForThisObjectId)) {
@@ -83,7 +91,7 @@ public class MemoryLockService implements LockService {
     protected ReentrantLock getLock(final String key) {
         if (!locks.containsKey(key)) {
             // use fair mode?
-            locks.put(key, new ReentrantLock());
+            locks.put(key, new MemoryLockServiceReentrantLock());
         }
         return locks.get(key);
     }

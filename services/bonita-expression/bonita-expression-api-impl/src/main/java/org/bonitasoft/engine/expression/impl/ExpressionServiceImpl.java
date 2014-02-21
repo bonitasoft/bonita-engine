@@ -150,16 +150,18 @@ public class ExpressionServiceImpl implements ExpressionService {
      */
     private void checkReturnType(final SExpression expression, final Object result) throws SInvalidExpressionException {
         if (mustCheckExpressionReturnType() && result != null) {
-            try {
-                final Class<?> declaredReturnedType = Thread.currentThread().getContextClassLoader().loadClass(expression.getReturnType());
-                final Class<?> evaluatedReturnedType = result.getClass();
-                if (!(declaredReturnedType.isAssignableFrom(evaluatedReturnedType) || declaredReturnedType.getName().equals(evaluatedReturnedType.getName()))) {
-                    throw new SInvalidExpressionException("Declared return type " + declaredReturnedType + " is not compatible with evaluated type "
-                            + evaluatedReturnedType + " for expression " + expression.getName());
+            if (!result.getClass().getName().equals(expression.getReturnType())) {
+                try {
+                    final Class<?> declaredReturnedType = Thread.currentThread().getContextClassLoader().loadClass(expression.getReturnType());
+                    final Class<?> evaluatedReturnedType = result.getClass();
+                    if (!(declaredReturnedType.isAssignableFrom(evaluatedReturnedType))) {
+                        throw new SInvalidExpressionException("Declared return type " + declaredReturnedType + " is not compatible with evaluated type "
+                                + evaluatedReturnedType + " for expression " + expression.getName());
+                    }
+                } catch (final ClassNotFoundException e) {
+                    throw new SInvalidExpressionException(
+                            "Declared return type unknown: " + expression.getReturnType() + " for expression " + expression.getName(), e);
                 }
-            } catch (final ClassNotFoundException e) {
-                throw new SInvalidExpressionException(
-                        "Declared return type unknown: " + expression.getReturnType() + " for expression " + expression.getName(), e);
             }
         }
     }
