@@ -36,8 +36,10 @@ import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilderFactory;
+import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilderFactory;
 import org.bonitasoft.engine.events.EventActionType;
@@ -719,6 +721,63 @@ public class DependencyServiceImpl implements DependencyService {
         } catch (final ClassLoaderException e) {
             throw new SDependencyException("Cannot refresh classLoader with type'" + type + "' and id " + id, e);
         }
+    }
+
+    @Override
+    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final ArrayList<SDependency> dependencies) throws SDependencyException {
+        Map<String, SDependency> newDependenciesByName = getMapOfNames(dependencies);
+        List<Long> dependencyIds = getDependencyIds(id, type, QueryOptions.allResultsQueryOptions());
+        if (!dependencyIds.isEmpty()) {
+            List<SDependency> currentDependencies = getDependencies(dependencyIds);
+            for (SDependency currentDependency : currentDependencies) {
+                if (!newDependenciesByName.containsKey(currentDependency.getName())) {
+                    delete(currentDependency);
+                } else {
+                    SDependency newDependency = newDependenciesByName.get(currentDependency.getName());
+                    update(currentDependency, newDependency);
+                }
+                // remove from list
+                newDependenciesByName.remove(currentDependency.getName());
+            }
+        }
+        // all artifact that are still here must be created
+        for (SDependency sDependency : newDependenciesByName.values()) {
+            createForArtifact(id, type, sDependency);
+        }
+    }
+
+    private void createForArtifact(final long id, final ScopeType type, final SDependency sDependency) throws SDependencyCreationException,
+            SDependencyException {
+        createDependency(sDependency);
+        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
+                .createNewInstance(sDependency.getId(), id, type).done();
+        createDependencyMapping(sDependencyMapping);
+    }
+
+    private void update(final SDependency currentDependency, final SDependency newDependency) throws SDependencyException {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(BuilderFactory.get(SDependencyBuilderFactory.class).getDescriptionKey(), newDependency.getDescription());
+        descriptor.addField(BuilderFactory.get(SDependencyBuilderFactory.class).getFileNameKey(), newDependency.getFileName());
+        descriptor.addField(BuilderFactory.get(SDependencyBuilderFactory.class).getValueKey(), newDependency.getValue());
+        updateDependency(currentDependency, descriptor);
+    }
+
+    private void delete(final SDependency dependency) throws SDependencyException, SDependencyDeletionException {
+        SDependencyMapping sDependencyMapping = getDependencyMappings(dependency.getId(), QueryOptions.defaultQueryOptions()).get(0);
+        deleteDependencyMapping(sDependencyMapping);
+        deleteDependency(dependency);
+    }
+
+    /**
+     * @param dependencies
+     * @return
+     */
+    private Map<String, SDependency> getMapOfNames(final ArrayList<SDependency> dependencies) {
+        HashMap<String, SDependency> hashMap = new HashMap<String, SDependency>(dependencies.size());
+        for (SDependency sDependency : dependencies) {
+            hashMap.put(sDependency.getName(), sDependency);
+        }
+        return hashMap;
     }
 
 }
