@@ -477,11 +477,11 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
     @Override
     public FlowNodeState getNextNormalState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, final int currentStateId)
             throws SActivityExecutionException {
-        FlowNodeState flowNodeStateToExecute = getCurrentNonInterruptingState(flowNodeInstance, currentStateId);
+        FlowNodeState currentState = getCurrentNonInterruptingState(flowNodeInstance, currentStateId);
         do {
-            flowNodeStateToExecute = getNextStateToHandle(flowNodeInstance, flowNodeStateToExecute);
-        } while (!flowNodeStateToExecute.shouldExecuteState(processDefinition, flowNodeInstance));
-        return flowNodeStateToExecute;
+            currentState = getNextStateToHandle(flowNodeInstance, currentState);
+        } while (!currentState.shouldExecuteState(processDefinition, flowNodeInstance));
+        return currentState;
     }
 
     private FlowNodeState getCurrentNonInterruptingState(final SFlowNodeInstance flowNodeInstance, final int currentStateId) {
