@@ -75,8 +75,10 @@ public class BDMCodeGeneratorTest extends CompilableCode{
 		assertThat(definedClass.getMethod("equals", new JType[]{definedClass.owner().ref(Object.class)})).isNotNull();
 		assertThat(definedClass.getMethod("hashCode", new JType[]{})).isNotNull();
 		
+		File sourceFileToCompile = new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"hr"+File.separatorChar+"Employee.java");
+		sourceFileToCompile.delete();
 		bdmCodeGenerator.getModel().build(destDir);
-		assertCompilationSuccessful(new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"Entity.java"));
+		assertCompilationSuccessful(sourceFileToCompile);
 	}
 
 	@Test
@@ -96,8 +98,10 @@ public class BDMCodeGeneratorTest extends CompilableCode{
 		JAnnotationUse annotationUse = nameFieldVar.annotations().iterator().next();
 		assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Basic.class.getName());
 		
+		File sourceFileToCompile = new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"hr"+File.separatorChar+"Employee.java");
+		sourceFileToCompile.delete();
 		bdmCodeGenerator.getModel().build(destDir);
-		assertCompilationSuccessful(new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"Entity.java"));
+		assertCompilationSuccessful(sourceFileToCompile);
 	}
 
 	@Test
@@ -122,8 +126,10 @@ public class BDMCodeGeneratorTest extends CompilableCode{
 		assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
 		assertThat(annotationUse.getAnnotationMembers().get("value")).isNotNull();
 		
+		File sourceFileToCompile = new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"hr"+File.separatorChar+"Employee.java");
+		sourceFileToCompile.delete();
 		bdmCodeGenerator.getModel().build(destDir);
-		assertCompilationSuccessful(new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"Entity.java"));
+		assertCompilationSuccessful(sourceFileToCompile);
 	}
 
 	@Test
@@ -145,8 +151,10 @@ public class BDMCodeGeneratorTest extends CompilableCode{
 		JMethod getter = (JMethod) definedClass.methods().toArray()[1];
 		assertThat(getter.name()).isEqualTo("getName");
 		
+		File sourceFileToCompile = new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"hr"+File.separatorChar+"Employee.java");
+		sourceFileToCompile.delete();
 		bdmCodeGenerator.getModel().build(destDir);
-		assertCompilationSuccessful(new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"Entity.java"));
+		assertCompilationSuccessful(sourceFileToCompile);
 	}
 
 	@Test
@@ -201,8 +209,10 @@ public class BDMCodeGeneratorTest extends CompilableCode{
 		annotationUse = iterator.next();
 		assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(GeneratedValue.class.getName());
 		
+		File sourceFileToCompile = new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"hr"+File.separatorChar+"Employee.java");
+		sourceFileToCompile.delete();
 		bdmCodeGenerator.getModel().build(destDir);
-		assertCompilationSuccessful(new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"Entity.java"));
+		assertCompilationSuccessful(sourceFileToCompile);
 	}
 
 	@Test
@@ -220,8 +230,10 @@ public class BDMCodeGeneratorTest extends CompilableCode{
 		JAnnotationUse annotationUse = iterator.next();
 		assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Version.class.getName());
 		
+		File sourceFileToCompile = new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"hr"+File.separatorChar+"Employee.java");
+		sourceFileToCompile.delete();
 		bdmCodeGenerator.getModel().build(destDir);
-		assertCompilationSuccessful(new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"Entity.java"));
+		assertCompilationSuccessful(sourceFileToCompile);
 	}
 
 
