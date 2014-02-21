@@ -93,11 +93,11 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
         }
     }
 
-    private long getStartedBy(Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    private Long getStartedBy(Map<String, Serializable> parameters) throws SCommandParameterizationException {
         return getMandatory(STARTED_BY, parameters);
     }
 
-    private long getProcessDefinitionId(Map<String, Serializable> parameters) throws SCommandParameterizationException {
+    private Long getProcessDefinitionId(Map<String, Serializable> parameters) throws SCommandParameterizationException {
         return getMandatory(PROCESS_DEFINITION_ID, parameters);
     }
 
