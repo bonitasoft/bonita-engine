@@ -9,11 +9,7 @@
 package com.bonitasoft.engine.api.impl;
 
 import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -40,7 +36,6 @@ import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.bdm.BDMCodeGenerator;
 import com.bonitasoft.engine.bdm.BusinessObjectModel;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
-import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
@@ -80,7 +75,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 		}
 	}
 
-	private byte[] buildBDMJAR(final byte[] zip) throws BusinessDataRepositoryDeploymentException {
+	protected byte[] buildBDMJAR(final byte[] zip) throws BusinessDataRepositoryDeploymentException {
 		final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
 		try {
 			final BusinessObjectModel bom = converter.unzip(zip);
@@ -95,17 +90,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 			final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
 			final Iterable<? extends JavaFileObject> compUnits = fileManager.getJavaFileObjectsFromFiles(files);
 
-			List<String> options = new ArrayList<String>();
-			options.add("-classpath");
-			StringBuilder sb = new StringBuilder();
-			URLClassLoader urlClassLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
-			URL resource = urlClassLoader.getResource(Entity.class.getName());
-			if(resource == null){
-				throw new CreationException(Entity.class.getName() +" not found in classloader for bdm compilation");
-			}
-			sb.append(resource.getFile()).append(File.pathSeparator);
-			options.add(sb.toString());
-			final Boolean compiled = compiler.getTask(null, fileManager, null, options, null, compUnits).call();
+			final Boolean compiled = compiler.getTask(null, fileManager, null, null, null, compUnits).call();
 			if (!compiled) {
 				throw new CreationException("The compilation process fails");
 			}

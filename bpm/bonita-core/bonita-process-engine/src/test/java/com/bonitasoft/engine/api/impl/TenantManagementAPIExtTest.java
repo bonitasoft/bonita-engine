@@ -1,5 +1,6 @@
 package com.bonitasoft.engine.api.impl;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -18,6 +20,11 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.TenantMode;
+import com.bonitasoft.engine.bdm.BusinessObject;
+import com.bonitasoft.engine.bdm.BusinessObjectModel;
+import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
+import com.bonitasoft.engine.bdm.Field;
+import com.bonitasoft.engine.bdm.FieldType;
 
 public class TenantManagementAPIExtTest {
 
@@ -67,4 +74,17 @@ public class TenantManagementAPIExtTest {
         assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method TenantManagementAPIExt.isTenantInMaintenance()",
                 method.isAnnotationPresent(AvailableOnMaintenanceTenant.class));
     }
+    
+    @Test
+	public void shouldBuildBDMJAR_ReturnAByteArray() throws Exception {
+    	BusinessObjectModel bom = new BusinessObjectModel();
+    	BusinessObject businessObject = new BusinessObject();
+    	businessObject.setQualifiedName("org.bonitasoft.pojo.Employee");
+    	Field name = new Field();
+    	name.setName("name");
+    	name.setType(FieldType.STRING);
+    	businessObject.setFields(Arrays.asList(name));
+		bom.addBusinessObject(businessObject );
+		assertThat(new TenantManagementAPIExt().buildBDMJAR(new BusinessObjectModelConverter().zip(bom))).isNotEmpty();
+	}
 }
