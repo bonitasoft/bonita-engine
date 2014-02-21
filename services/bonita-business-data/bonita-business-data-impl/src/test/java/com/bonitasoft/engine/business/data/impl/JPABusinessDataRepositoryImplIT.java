@@ -111,110 +111,124 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void findAnEmployeeByPrimaryKey() throws Exception {
-        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-        try {
-            ut.begin();
-            businessDataRepository.deploy(bdrArchive, 1);
-            businessDataRepository.start();
-            setUpDatabase();
-            final Employee employee = businessDataRepository.find(Employee.class, 45l);
-            assertThat(employee).isNotNull();
-            assertThat(employee.getId()).isEqualTo(45l);
-            assertThat(employee.getFirstName()).isEqualTo("Hannu");
-            assertThat(employee.getLastName()).isEqualTo("Hakkinen");
-        } finally {
-            ut.commit();
-            businessDataRepository.stop();
-        }
+        executeInTransaction(new RunnableInTransaction(true) {
+
+            @Override
+            public void run() {
+                try {
+                    businessDataRepository.deploy(bdrArchive, 1);
+                    final Employee employee = businessDataRepository.find(Employee.class, 45l);
+                    assertThat(employee).isNotNull();
+                    assertThat(employee.getId()).isEqualTo(45l);
+                    assertThat(employee.getFirstName()).isEqualTo("Hannu");
+                    assertThat(employee.getLastName()).isEqualTo("Hakkinen");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        });
     }
 
     @Test(expected = BusinessDataNotFoundException.class)
     public void throwExceptionWhenEmployeeNotFound() throws Exception {
-        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-        try {
-            ut.begin();
-            businessDataRepository.start();
-            businessDataRepository.find(Employee.class, -145l);
-        } finally {
-            ut.commit();
-            businessDataRepository.stop();
-        }
+        executeInTransaction(new RunnableInTransaction(false) {
+
+            @Override
+            public void run() {
+                try {
+                    businessDataRepository.find(Employee.class, -145l);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        });
     }
 
     @Test
     public void persistNewEmployee() throws Exception {
-        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-        final Employee employee;
-        try {
-            ut.begin();
-            businessDataRepository.start();
-            employee = businessDataRepository.merge(new Employee("Marja", "Halonen"));
-        } finally {
-            ut.commit();
-            businessDataRepository.stop();
-        }
-        assertThat(employee.getId()).isNotNull();
+        executeInTransaction(new RunnableInTransaction(false) {
+
+            @Override
+            public void run() {
+                try {
+                    final Employee employee = businessDataRepository.merge(new Employee("Marja", "Halonen"));
+                    assertThat(employee.getId()).isNotNull();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        });
     }
 
     @Test
     public void persistANullEmployee() throws Exception {
-        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-        try {
-            ut.begin();
-            businessDataRepository.start();
-            businessDataRepository.merge(null);
-            final Long count = businessDataRepository.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
-            assertThat(count).isEqualTo(0);
-        } finally {
-            ut.commit();
-            businessDataRepository.stop();
-        }
+        executeInTransaction(new RunnableInTransaction(false) {
+
+            @Override
+            public void run() {
+                try {
+                    businessDataRepository.merge(null);
+                    final Long count = businessDataRepository.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
+                    assertThat(count).isEqualTo(0);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        });
     }
 
     @Test
     public void findAnEmployeeUsingParameterizedQuery() throws Exception {
-        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-        try {
-            ut.begin();
-            businessDataRepository.start();
-            setUpDatabase();
-            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
-            final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
-            assertThat(matti.getFirstName()).isEqualTo("Matti");
-        } finally {
-            ut.commit();
-            businessDataRepository.stop();
-        }
+        executeInTransaction(new RunnableInTransaction(true) {
+
+            @Override
+            public void run() {
+                final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
+                try {
+                    final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+                    assertThat(matti.getFirstName()).isEqualTo("Matti");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        });
     }
 
     @Test(expected = NonUniqueResultException.class)
     public void throwExceptionWhenFindingAnEmployeeButGettingSeveral() throws Exception {
-        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-        try {
-            ut.begin();
-            businessDataRepository.start();
-            setUpDatabase();
-            final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Hakkinen");
-            businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
-        } finally {
-            ut.commit();
-            businessDataRepository.stop();
-        }
+        executeInTransaction(new RunnableInTransaction(true) {
+
+            @Override
+            public void run() {
+                final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Hakkinen");
+                try {
+                    businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     @Test(expected = BusinessDataNotFoundException.class)
     public void throwExceptionWhenFindingAnUnknownEmployee() throws Exception {
-        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
-        try {
-            ut.begin();
-            businessDataRepository.start();
-            setUpDatabase();
-            final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Makkinen");
-            businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
-        } finally {
-            ut.commit();
-            businessDataRepository.stop();
-        }
+        executeInTransaction(new RunnableInTransaction(true) {
+
+            @Override
+            public void run() {
+                final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Unknown_lastName");
+                try {
+                    businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     @Test(expected = IllegalStateException.class)
@@ -255,6 +269,44 @@ public class JPABusinessDataRepositoryImplIT {
         } finally {
             ut.commit();
             businessDataRepository.stop();
+        }
+    }
+
+    /**
+     * Sets up the database (if specified), the businessDataRepository, and runs a piece of business logics inside a transaction.
+     * 
+     * @param runnable
+     *            the logics to run.
+     */
+    private void executeInTransaction(final RunnableInTransaction runnable) throws Exception {
+        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.start();
+            if (runnable.isSetupDatabase()) {
+                setUpDatabase();
+            }
+
+            runnable.run();
+        } catch (RuntimeException e) {
+            throw (Exception) e.getCause();
+        } finally {
+            ut.commit();
+            businessDataRepository.stop();
+        }
+
+    }
+
+    private static abstract class RunnableInTransaction implements Runnable {
+
+        private final boolean setupDatabase;
+
+        public RunnableInTransaction(final boolean setupDatabase) {
+            this.setupDatabase = setupDatabase;
+        }
+
+        public boolean isSetupDatabase() {
+            return setupDatabase;
         }
     }
 
