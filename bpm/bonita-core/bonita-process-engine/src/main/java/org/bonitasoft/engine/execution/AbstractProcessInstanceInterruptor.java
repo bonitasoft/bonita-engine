@@ -110,8 +110,8 @@ public abstract class AbstractProcessInstanceInterruptor {
 			children = getChildrenExcept(processInstanceId, exceptionChildId);
 			count = getNumberOfChildrenExcept(processInstanceId, exceptionChildId);
 
-			final List<Long> childreToBeExecutedIds = interruptFlowNodeInstances(children, stateCategory);
-			stableChildrenIds.addAll(childreToBeExecutedIds);
+			final List<Long> childrenToBeExecutedIds = interruptFlowNodeInstances(children, stateCategory);
+			stableChildrenIds.addAll(childrenToBeExecutedIds);
 		} while (count > children.size());
 
 		return stableChildrenIds;
