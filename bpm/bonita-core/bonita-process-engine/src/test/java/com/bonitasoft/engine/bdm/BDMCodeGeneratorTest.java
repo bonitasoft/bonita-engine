@@ -80,6 +80,13 @@ public class BDMCodeGeneratorTest extends CompilableCode{
 		bdmCodeGenerator.getModel().build(destDir);
 		assertCompilationSuccessful(sourceFileToCompile);
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddEntity_ThrowAnIllegalArgumentException() throws Exception {
+		BusinessObject employeeBO = new BusinessObject();
+		employeeBO.setQualifiedName("java.lang.String");
+		bdmCodeGenerator.addEntity(employeeBO);
+	}
 
 	@Test
 	public void shouldAddBasicField_CreatePrimitiveAttribute_InDefinedClass() throws Exception {

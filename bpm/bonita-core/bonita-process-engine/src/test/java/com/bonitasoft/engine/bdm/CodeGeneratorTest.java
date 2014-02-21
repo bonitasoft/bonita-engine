@@ -38,6 +38,7 @@ import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JType;
 
 /**
  * @author Romain Bioteau
@@ -70,7 +71,53 @@ public class CodeGeneratorTest {
 		assertThat(definedClass.fullName()).isEqualTo("org.bonitasoft.Entity");
 		assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity")).isNotNull().isSameAs(definedClass);
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddClass_ThrowAnIllegalArgumentExcpetionForEmptyName() throws Exception {
+		codeGenerator.addClass("");
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddClass_ThrowAnIllegalArgumentExcpetionForNullName() throws Exception {
+		codeGenerator.addClass(null);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddClass_ThrowAnIllegalArgumentExcpetionForInvalidName() throws Exception {
+		codeGenerator.addClass("org.bonitasoft*.Entity");
+	}
 
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddField_ThrowAnIllegalArgumentExcpetionForEmptyName() throws Exception {
+		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
+		codeGenerator.addField(definedClass, "",String.class);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddField_ThrowAnIllegalArgumentExcpetionForNullName() throws Exception {
+		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
+		codeGenerator.addField(definedClass, null,String.class);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddField_ThrowAnIllegalArgumentExcpetionForInvalidName() throws Exception {
+		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
+		codeGenerator.addField(definedClass, "enum",String.class);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddField_ThrowAnIllegalArgumentExcpetionForNullClassType() throws Exception {
+		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
+		codeGenerator.addField(definedClass, "name",(Class<?>)null);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void shouldAddField_ThrowAnIllegalArgumentExcpetionForNullJType() throws Exception {
+		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
+		codeGenerator.addField(definedClass, "name",(JType)null);
+	}
+	
 	@Test
 	public void shouldAddPrivateField_FromClass_AddAJVarFieldInDefinedClass_AndReturnIt() throws Exception {
 		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
@@ -79,8 +126,6 @@ public class CodeGeneratorTest {
 		assertThat(privateField.name()).isEqualTo("name");
 		assertThat(privateField.type().name()).isEqualTo(String.class.getSimpleName());
 		assertThat(codeGenerator.getModel()._getClass("org.bonitasoft.Entity").fields()).includes(MapAssert.entry("name", privateField));
-		
-	
 	}
 	
 	@Test

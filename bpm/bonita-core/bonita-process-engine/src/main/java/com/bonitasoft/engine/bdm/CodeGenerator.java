@@ -24,6 +24,8 @@ import java.lang.annotation.Target;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.lang.model.SourceVersion;
+
 import org.bonitasoft.engine.commons.StringUtil;
 
 import com.sun.codemodel.JAnnotatable;
@@ -61,6 +63,12 @@ public class CodeGenerator {
 	}
 
 	public JDefinedClass addClass(String fullyqualifiedName) throws JClassAlreadyExistsException{
+		if(fullyqualifiedName == null || fullyqualifiedName.isEmpty()){
+			throw new IllegalArgumentException("Classname cannot cannot be null or empty");
+		}
+		if(!SourceVersion.isName(fullyqualifiedName)){
+			throw new IllegalArgumentException("Classname "+fullyqualifiedName+" is not a valid qualified name");
+		}
 		return model._class(fullyqualifiedName);
 	}
 	
@@ -69,13 +77,33 @@ public class CodeGenerator {
 	}
 
 	public JFieldVar addField(JDefinedClass definedClass,String fieldName,Class<?> type) {
+		validateFieldName(fieldName);
+		if(type == null){
+			throw new IllegalArgumentException("Field type cannot be null");
+		}
 		return definedClass.field(JMod.PRIVATE,type,fieldName);
 	}
 
 	public JFieldVar addField(JDefinedClass definedClass, String fieldName,JType type) {
+		validateFieldName(fieldName);
+		if(type == null){
+			throw new IllegalArgumentException("Field type cannot be null");
+		}
 		return definedClass.field(JMod.PRIVATE,type,fieldName);
 	}
 
+	private void validateFieldName(String fieldName) {
+		if(fieldName == null || fieldName.isEmpty()){
+			throw new IllegalArgumentException("Field name cannot be null or empty");
+		}
+		if(SourceVersion.isKeyword(fieldName)){
+			throw new IllegalArgumentException("Field "+fieldName+" is a resered keyword");
+		}
+		if(!SourceVersion.isIdentifier(fieldName)){
+			throw new IllegalArgumentException("Field "+fieldName+" is not a valid Java identifier");
+		}
+	}
+	
 	public JMethod addSetter(JDefinedClass definedClass,JFieldVar field) {
 		JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
 		method.param(field.type(), field.name());

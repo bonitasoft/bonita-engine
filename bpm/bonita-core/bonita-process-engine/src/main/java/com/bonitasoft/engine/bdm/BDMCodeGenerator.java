@@ -58,7 +58,10 @@ public class BDMCodeGenerator extends CodeGenerator{
 	}
 
 	protected void addEntity(BusinessObject bo) throws JClassAlreadyExistsException {
-		JDefinedClass entityClass = addClass(bo.getQualifiedName());
+		String qualifiedName = bo.getQualifiedName();
+		validateClassNotExistsInRuntime(qualifiedName);
+		
+		JDefinedClass entityClass = addClass(qualifiedName);
 		entityClass = addInterface(entityClass, Serializable.class.getName());
 		entityClass = addInterface(entityClass, com.bonitasoft.engine.bdm.Entity.class.getName());
 		
@@ -77,6 +80,19 @@ public class BDMCodeGenerator extends CodeGenerator{
 		
 		addEqualsMethod(entityClass);
 		addHashCodeMethod(entityClass);
+	}
+
+	private void validateClassNotExistsInRuntime(String qualifiedName) {
+		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		boolean alreadyInRuntime = true;
+		try {
+			contextClassLoader.loadClass(qualifiedName);
+		} catch (ClassNotFoundException e) {
+			alreadyInRuntime = false;
+		}
+		if(alreadyInRuntime){
+			throw new IllegalArgumentException("Class "+qualifiedName+" already exists in target runtime environment.");
+		}
 	}
 
 	protected void addPersistenceIdFieldAndAccessors(JDefinedClass entityClass)
