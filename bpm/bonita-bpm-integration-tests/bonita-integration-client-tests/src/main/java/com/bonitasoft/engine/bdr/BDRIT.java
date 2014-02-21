@@ -62,7 +62,7 @@ public class BDRIT extends CommonAPISPTest {
         logout();
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException, IOException {
 
@@ -86,7 +86,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateABusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
@@ -113,7 +113,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateADefaultBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
@@ -134,7 +134,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateAndUdpateABusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder()
@@ -242,7 +242,7 @@ public class BDRIT extends CommonAPISPTest {
         }
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void updateBusinessDataOutsideATransaction() throws Exception {
         final String taskName = "step";
