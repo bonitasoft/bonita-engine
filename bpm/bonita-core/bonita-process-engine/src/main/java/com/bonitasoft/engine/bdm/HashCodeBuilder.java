@@ -44,19 +44,19 @@ public class HashCodeBuilder {
 			JType type = fieldVar.type();
 			JType unboxifyType = type.unboxify();
 			if(!unboxifyType.isPrimitive()){
-				JVar refHashCode = body.decl(JType.parse(definedClass.owner(), int.class.getName()), "refHashCode",JExpr.lit(0));
+				JVar refHashCode = body.decl(JType.parse(definedClass.owner(), int.class.getName()), type.name()+"Code",JExpr.lit(0));
 				body._if(fieldVar.ne(JExpr._null()))._then().assign(refHashCode, fieldVar.invoke("hashCode"));
 				body.assign(result, prime.mul(result).plus(refHashCode));
 			}else{
 				if(unboxifyType.name().equals(boolean.class.getSimpleName())){
-					JVar refHashCode = body.decl(JType.parse(definedClass.owner(), int.class.getName()), "refHashCode",JExpr.lit(1237));
+					JVar refHashCode = body.decl(JType.parse(definedClass.owner(), int.class.getName()),  type.name()+"Code",JExpr.lit(1237));
 					body._if(fieldVar)._then().assign(refHashCode, JExpr.lit(1231));
 					body.assign(result, prime.mul(result).plus(refHashCode));
 				}else if(unboxifyType.name().equals(long.class.getSimpleName())){
 					body.assign(result, prime.mul(result).plus(JExpr.cast(JType.parse(definedClass.owner(), int.class.getName()), JExpr.direct(fieldVar.name()+" ^ ("+fieldVar.name()+" >>> 32)"))));
 				}else if(unboxifyType.name().equals(double.class.getSimpleName())){
 					JClass doubleType = definedClass.owner().ref(Double.class.getName());
-					JVar temp = body.decl(JType.parse(definedClass.owner(), long.class.getName()), "temp",doubleType.staticInvoke("doubleToLongBits").arg(fieldVar));
+					JVar temp = body.decl(JType.parse(definedClass.owner(), long.class.getName()),  type.name()+"temp",doubleType.staticInvoke("doubleToLongBits").arg(fieldVar));
 					body.assign(result, prime.mul(result).plus(JExpr.cast(JType.parse(definedClass.owner(), int.class.getName()), JExpr.direct(temp.name()+" ^ ("+temp.name()+" >>> 32)"))));
 				}else if(unboxifyType.name().equals(float.class.getSimpleName())){
 					JClass floatType = definedClass.owner().ref(Float.class.getName());

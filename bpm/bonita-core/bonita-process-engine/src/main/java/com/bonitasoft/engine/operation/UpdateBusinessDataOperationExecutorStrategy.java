@@ -10,9 +10,7 @@ package com.bonitasoft.engine.operation;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
-import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -21,8 +19,10 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
+import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
@@ -34,8 +34,6 @@ import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstanc
  * @author Emmanuel Duchastenier
  */
 public class UpdateBusinessDataOperationExecutorStrategy implements OperationExecutorStrategy {
-
-    private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
 
     private final BusinessDataRepository businessDataRepository;
 
@@ -112,17 +110,18 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
                     processInstanceId);
             newValue = businessDataRepository.merge(newValue);
+            if(!(newValue instanceof Entity)){
+            	  throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() +" must implements "+Entity.class.getName()));
+            }
             if (refBusinessDataInstance != null) {
-                final Long id = ClassReflector.invokeGetter(newValue, PERSISTENCE_ID_GETTER);
+                final Long id = ((Entity)newValue).getPersistenceId();
                 refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
             }
         } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
             throw new SOperationExecutionException(srbdinfe);
         } catch (final SBonitaReadException sbre) {
             throw new SOperationExecutionException(sbre);
-        } catch (final ReflectException re) {
-            throw new SOperationExecutionException(re);
-        } catch (final SRefBusinessDataInstanceModificationException srbsme) {
+        }  catch (final SRefBusinessDataInstanceModificationException srbsme) {
             throw new SOperationExecutionException(srbsme);
         } catch (SFlowNodeNotFoundException e) {
             throw new SOperationExecutionException(e);
@@ -133,7 +132,7 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
 
     @Override
     public String getOperationType() {
-        return "BUSINESS_DATA_JAVA_SETTER";
+        return OperatorType.BUSINESS_DATA_JAVA_SETTER.name();
     }
 
     @Override

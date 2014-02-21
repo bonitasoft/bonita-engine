@@ -11,6 +11,7 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -79,5 +80,10 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
         verify(refBusinessDataService).getRefBusinessDataInstance("unused", processInstanceId);
         verify(refBusinessDataService).updateRefBusinessDataInstance(refBizDataInstance, dataId);
     }
+    
+    @Test
+	public void shouldGetOperatorType_Return_CREATE_BUSINESS_DATA() throws Exception {
+    	assertThat(strategy.getOperationType()).isEqualTo(OperatorType.CREATE_BUSINESS_DATA.name());
+	}
 
 }

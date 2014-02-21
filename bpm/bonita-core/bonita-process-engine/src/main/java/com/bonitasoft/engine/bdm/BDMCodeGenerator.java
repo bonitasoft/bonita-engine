@@ -60,7 +60,8 @@ public class BDMCodeGenerator extends CodeGenerator{
 	protected void addEntity(BusinessObject bo) throws JClassAlreadyExistsException {
 		JDefinedClass entityClass = addClass(bo.getQualifiedName());
 		entityClass = addInterface(entityClass, Serializable.class.getName());
-	
+		entityClass = addInterface(entityClass, com.bonitasoft.engine.bdm.Entity.class.getName());
+		
 		JAnnotationUse entityAnnotation = addAnnotation(entityClass, Entity.class);
 		entityAnnotation.param("name", entityClass.name());
 		

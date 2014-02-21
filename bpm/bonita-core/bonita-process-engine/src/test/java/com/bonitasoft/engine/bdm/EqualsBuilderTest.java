@@ -18,6 +18,7 @@ package com.bonitasoft.engine.bdm;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.io.File;
 import java.util.Date;
 
 import org.junit.After;
@@ -33,10 +34,11 @@ import com.sun.codemodel.JType;
  * @author Romain Bioteau
  *
  */
-public class EqualsBuilderTest {
+public class EqualsBuilderTest extends CompilableCode{
 
 	private EqualsBuilder equalsBuilder;
 	private CodeGenerator codeGenerator;
+	private File destDir;
 
 	/**
 	 * @throws java.lang.Exception
@@ -45,6 +47,8 @@ public class EqualsBuilderTest {
 	public void setUp() throws Exception {
 		codeGenerator = new CodeGenerator();
 		equalsBuilder = new EqualsBuilder();
+		destDir = new File(System.getProperty("java.io.tmpdir"),"generationDir");
+		destDir.mkdirs();
 	}
 
 	/**
@@ -52,6 +56,7 @@ public class EqualsBuilderTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		destDir.delete();
 	}
 
 	@Test
@@ -69,6 +74,9 @@ public class EqualsBuilderTest {
 		JBlock body = equalsMethod.body();
 		assertThat(body).isNotNull();
 		assertThat(body.getContents()).isNotEmpty();
+		
+		codeGenerator.getModel().build(destDir);
+		assertCompilationSuccessful(new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"Entity.java"));
 	}
 
 }
