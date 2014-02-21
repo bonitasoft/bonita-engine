@@ -10,7 +10,10 @@ package com.bonitasoft.engine.api.impl;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Locale;
 
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
@@ -89,10 +92,15 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 			final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 			final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
 			final Iterable<? extends JavaFileObject> compUnits = fileManager.getJavaFileObjectsFromFiles(files);
-
-			final Boolean compiled = compiler.getTask(null, fileManager, null, null, null, compUnits).call();
+			DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+			final Boolean compiled = compiler.getTask(null, fileManager, diagnostics, null, null, compUnits).call();
 			if (!compiled) {
-				throw new CreationException("The compilation process fails");
+				StringBuilder sb = new StringBuilder();
+				for(Diagnostic<? extends JavaFileObject> diagnostic :diagnostics.getDiagnostics()){
+					sb.append(diagnostic.getMessage(Locale.getDefault()));
+					sb.append("\n");
+				}
+				throw new CreationException("bdm compilation process fails:"+sb.toString());
 			}
 			final byte[] jar = IOUtils.toJar(TmpBDMDirectory.getAbsolutePath());
 			FileUtils.deleteDirectory(TmpBDMDirectory);
