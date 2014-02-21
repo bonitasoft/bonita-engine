@@ -8,11 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.reports;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-
-import static junit.framework.Assert.assertEquals;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
@@ -51,6 +47,6 @@ public class DefaultReportListTest {
             }
         });
 
-        assertEquals("[case_avg_time, case_list, task_list, case_history]", reports.toString());
+        assertThat(reports.toString()).isEqualTo("[case_avg_time, case_list, task_list, case_history]");
     }
 }

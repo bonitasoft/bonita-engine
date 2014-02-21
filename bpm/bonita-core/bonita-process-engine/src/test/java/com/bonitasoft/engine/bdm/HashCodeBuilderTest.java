@@ -18,6 +18,7 @@ package com.bonitasoft.engine.bdm;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.io.File;
 import java.util.Date;
 
 import org.junit.After;
@@ -33,10 +34,11 @@ import com.sun.codemodel.JType;
  * @author Romain Bioteau
  *
  */
-public class HashCodeBuilderTest {
+public class HashCodeBuilderTest extends CompilableCode{
 
 	private CodeGenerator codeGenerator;
 	private HashCodeBuilder hashCodeBuilder;
+	private File destDir;
 
 	/**
 	 * @throws java.lang.Exception
@@ -45,6 +47,8 @@ public class HashCodeBuilderTest {
 	public void setUp() throws Exception {
 		codeGenerator = new CodeGenerator();
 		hashCodeBuilder = new HashCodeBuilder();
+		destDir = new File(System.getProperty("java.io.tmpdir"),"generationDir");
+		destDir.mkdirs();
 	}
 
 	/**
@@ -52,8 +56,9 @@ public class HashCodeBuilderTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		destDir.delete();
 	}
-	
+
 	@Test
 	public void shouldGenerate_AddHashCodeJMethodInDefinedClass() throws Exception {
 		JDefinedClass definedClass = codeGenerator.addClass("org.bonitasoft.Entity");
@@ -69,10 +74,15 @@ public class HashCodeBuilderTest {
 		assertThat(hashcodeMethod.name()).isEqualTo("hashCode");
 		assertThat(hashcodeMethod.hasSignature(new JType[]{})).isTrue();
 		assertThat(hashcodeMethod.type().fullName()).isEqualTo(int.class.getName());
-		
+
 		JBlock body = hashcodeMethod.body();
 		assertThat(body).isNotNull();
 		assertThat(body.getContents()).isNotEmpty();
+
+		codeGenerator.getModel().build(destDir);
+		assertCompilationSuccessful(new File(destDir,"org"+File.separatorChar+"bonitasoft"+File.separatorChar+"Entity.java"));
 	}
+
+	
 
 }

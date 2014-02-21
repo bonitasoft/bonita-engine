@@ -18,6 +18,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
@@ -85,7 +86,7 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
 
     @Override
     public String getOperationType() {
-        return "CREATE_BUSINESS_DATA";
+        return OperatorType.CREATE_BUSINESS_DATA.name();
     }
 
     @Override

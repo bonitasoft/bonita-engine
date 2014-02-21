@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.api.impl.reports;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by Vincent Elcrin

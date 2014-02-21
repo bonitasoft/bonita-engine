@@ -26,20 +26,20 @@ public class InactiveScanner implements Scanner {
         return Collections.emptySet();
     }
 
-    @Override
+            @Override
     public Set<Class<?>> getClassesInJar(final URL jartoScan, final Set<Class<? extends Annotation>> annotationsToLookFor) {
         return Collections.emptySet();
-    }
+            }
 
-    @Override
+            @Override
     public Set<NamedInputStream> getFilesInJar(final URL jartoScan, final Set<String> filePatterns) {
         return Collections.emptySet();
-    }
+            }
 
-    @Override
+            @Override
     public Set<NamedInputStream> getFilesInClasspath(final Set<String> filePatterns) {
         return Collections.emptySet();
-    }
+            }
 
     @Override
     public String getUnqualifiedJarName(final URL jarUrl) {

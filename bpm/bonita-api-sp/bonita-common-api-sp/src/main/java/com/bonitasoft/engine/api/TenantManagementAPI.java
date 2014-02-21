@@ -24,14 +24,14 @@ public interface TenantManagementAPI {
     /**
      * Deploys a new Business Data Repository on the current tenant.
      * 
-     * @param jar
-     *            the binary content of the jar file to deploy.
+     * @param zip
+     *            the binary content of the business object model.
      * @throws InvalidBusinessDataModelException
      *             if the jar content passed as parameter is in an invalid format.
      * @throws BusinessDataRepositoryDeploymentException
      *             if the deployment cannot be fulfilled completely.
      */
-    void deployBusinessDataRepository(final byte[] jar) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
+    void deployBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
     /**
      * Allows to set the tenand mode.

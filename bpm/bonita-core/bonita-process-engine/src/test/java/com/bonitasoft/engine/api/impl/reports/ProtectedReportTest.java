@@ -9,14 +9,15 @@
 package com.bonitasoft.engine.api.impl.reports;
 
 
-import static junit.framework.Assert.assertEquals;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import com.bonitasoft.engine.service.impl.LicenseChecker;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+
+import com.bonitasoft.engine.service.impl.LicenseChecker;
 
 /**
  * @author Vincent Elcrin
@@ -48,7 +49,7 @@ public class ProtectedReportTest {
 
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) throws Exception {
-                assertEquals("myreport", name);
+                assertThat(name).isEqualTo("myreport");
             }
         });
     }
