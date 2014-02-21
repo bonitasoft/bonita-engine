@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -122,10 +123,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     public void start() throws SBusinessDataRepositoryDeploymentException {
         entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configuration);
         try {
-            executeQueries(new SchemaGenerator(entityManagerFactory.createEntityManager(), entityManagerFactory.getProperties(), getClassNameList()).generate());
+            executeQueries(new SchemaGenerator(entityManagerFactory.createEntityManager(), toProperties(entityManagerFactory.getProperties()),
+                    getClassNameList()).generate());
         } catch (final SQLException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
+    }
+
+    private Properties toProperties(final Map<String, Object> propertiesAsMap) {
+        final Properties properties = new Properties();
+        properties.putAll(propertiesAsMap);
+        return properties;
     }
 
     private void executeQueries(final String... sqlQuerys) {
