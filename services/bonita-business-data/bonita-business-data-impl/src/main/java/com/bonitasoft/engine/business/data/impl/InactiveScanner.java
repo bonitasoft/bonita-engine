@@ -30,17 +30,17 @@ public class InactiveScanner implements Scanner {
 
             @Override
             public Set<PackageDescriptor> getLocatedPackages() {
-                return Collections.EMPTY_SET;
+                return Collections.emptySet();
             }
 
             @Override
             public Set<MappingFileDescriptor> getLocatedMappingFiles() {
-                return Collections.EMPTY_SET;
+                return Collections.emptySet();
             }
 
             @Override
             public Set<ClassDescriptor> getLocatedClasses() {
-                return Collections.EMPTY_SET;
+                return Collections.emptySet();
             }
         };
     }
