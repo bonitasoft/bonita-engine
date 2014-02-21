@@ -10,7 +10,6 @@
 				<entry key="hibernate.connection.datasource" value="java:comp/env/BusinessDataDS" />
 				<entry key="hibernate.show_sql" value="false" />
 				<entry key="hibernate.format_sql" value="false" />
-				<entry key="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.BTMTransactionManagerLookup" />
 				<entry key="hibernate.validator.autoregister_listeners" value="false" />
 				<entry key="hibernate.validator.apply_to_ddl" value="false" />
 				<entry key="javax.persistence.validation.mode" value="NONE" />

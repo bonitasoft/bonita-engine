@@ -63,8 +63,8 @@ public class SchemaGenerator {
         cfg.setProperties(properties);
         cfg.setProperty("hibernate.hbm2ddl.auto", "update");
         cfg.setProperty("hibernate.current_session_context_class", "jta");
-        cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.transaction.JTATransactionFactory");
-        cfg.setProperty("hibernate.transaction.manager_lookup_class", "org.hibernate.transaction.BTMTransactionManagerLookup");
+        cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory");
+        cfg.setProperty("hibernate.transaction.jta.platform", "org.bonitasoft.engine.persistence.JNDIBitronixJtaPlatform");
         dialect = Dialect.getDialect(properties);
         for (final String className : classNameList) {
             Class<?> annotatedClass;

@@ -123,8 +123,8 @@ public class JPABusinessDataRepositoryImplIT {
             assertThat(employee.getFirstName()).isEqualTo("Hannu");
             assertThat(employee.getLastName()).isEqualTo("Hakkinen");
         } finally {
-            businessDataRepository.stop();
             ut.commit();
+            businessDataRepository.stop();
         }
     }
 
@@ -136,8 +136,8 @@ public class JPABusinessDataRepositoryImplIT {
             businessDataRepository.start();
             businessDataRepository.find(Employee.class, -145l);
         } finally {
-            businessDataRepository.stop();
             ut.commit();
+            businessDataRepository.stop();
         }
     }
 
@@ -150,8 +150,8 @@ public class JPABusinessDataRepositoryImplIT {
             businessDataRepository.start();
             employee = businessDataRepository.merge(new Employee("Marja", "Halonen"));
         } finally {
-            businessDataRepository.stop();
             ut.commit();
+            businessDataRepository.stop();
         }
         assertThat(employee.getId()).isNotNull();
     }
@@ -166,8 +166,8 @@ public class JPABusinessDataRepositoryImplIT {
             final Long count = businessDataRepository.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
             assertThat(count).isEqualTo(0);
         } finally {
-            businessDataRepository.stop();
             ut.commit();
+            businessDataRepository.stop();
         }
     }
 
@@ -182,8 +182,8 @@ public class JPABusinessDataRepositoryImplIT {
             final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
             assertThat(matti.getFirstName()).isEqualTo("Matti");
         } finally {
-            businessDataRepository.stop();
             ut.commit();
+            businessDataRepository.stop();
         }
     }
 
@@ -197,8 +197,8 @@ public class JPABusinessDataRepositoryImplIT {
             final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Hakkinen");
             businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
         } finally {
-            businessDataRepository.stop();
             ut.commit();
+            businessDataRepository.stop();
         }
     }
 
@@ -212,8 +212,8 @@ public class JPABusinessDataRepositoryImplIT {
             final Map<String, Object> parameters = Collections.singletonMap("lastName", (Object) "Makkinen");
             businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
         } finally {
-            businessDataRepository.stop();
             ut.commit();
+            businessDataRepository.stop();
         }
     }
 
@@ -253,8 +253,8 @@ public class JPABusinessDataRepositoryImplIT {
             final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
             assertThat(matti.getLastName()).isEqualTo("Halonen");
         } finally {
-            businessDataRepository.stop();
             ut.commit();
+            businessDataRepository.stop();
         }
     }
 
