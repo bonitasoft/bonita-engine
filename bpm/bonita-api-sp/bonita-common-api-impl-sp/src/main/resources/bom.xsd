@@ -5,10 +5,10 @@
 
   <xs:complexType name="businessObjectModel">
     <xs:sequence>
-      <xs:element name="entities">
+      <xs:element name="businessObjects">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="entity" type="businessObject" maxOccurs="unbounded"/>
+            <xs:element name="businessObject" type="businessObject" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

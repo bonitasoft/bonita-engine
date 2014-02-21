@@ -24,8 +24,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BusinessObjectModel {
 
-    @XmlElementWrapper(name = "entities", required = true)
-    @XmlElement(name = "entity", required = true)
+    @XmlElementWrapper(name = "businessObjects", required = true)
+    @XmlElement(name = "businessObject", required = true)
     private final List<BusinessObject> businessObjects;
 
     public BusinessObjectModel() {
