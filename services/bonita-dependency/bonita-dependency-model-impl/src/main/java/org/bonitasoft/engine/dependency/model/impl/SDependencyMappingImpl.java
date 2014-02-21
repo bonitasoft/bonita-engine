@@ -94,7 +94,8 @@ public class SDependencyMappingImpl implements SDependencyMapping {
 
     @Override
     public String toString() {
-        return "SDependencyMappingImpl [artifactId=" + artifactId + ", artifactType=" + artifactType + ", dependencyId=" + dependencyId + ", id=" + id + "]";
+        return "SDependencyMappingImpl [id=" + id + ", artifactId=" + artifactId + ", artifactType=" + artifactType + ", dependencyId=" + dependencyId
+                + ", tenantId=" + tenantId + "]";
     }
 
     @Override
