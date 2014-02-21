@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.transaction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -39,6 +41,8 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final TransactionServiceContextThreadLocal txContextThreadLocal;
 
+    private final ThreadLocal<List<Callable<Void>>> beforeCommitCallables = new ThreadLocal<List<Callable<Void>>>();
+
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager) {
         this.logger = logger;
         if (txManager == null) {
@@ -58,6 +62,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             txContext.incrementReentrantCounter();
 
             if (!txContext.isAlreadyManaged()) {
+                beforeCommitCallables.remove();
                 boolean transactionStarted = false;
                 try {
                     txManager.begin();
@@ -140,6 +145,17 @@ public class JTATransactionServiceImpl implements TransactionService {
                 }
             } else {
                 try {
+                    final List<Callable<Void>> callables = beforeCommitCallables.get();
+                    if (callables != null) {
+                        for (final Callable<Void> callable : callables) {
+                            try {
+                                callable.call();
+                            } catch (Exception e) {
+                                throw new STransactionCommitException("Exception while executing callable in beforeBeforeCommit phase", e);
+                            }
+                        }
+                        beforeCommitCallables.remove();
+                    }
                     txManager.commit();
                 } catch (final SecurityException e) {
                     throw new STransactionCommitException("", e);
@@ -229,6 +245,27 @@ public class JTATransactionServiceImpl implements TransactionService {
             throw new STransactionNotFoundException(e.getMessage());
         }
     }
+    
+    @Override
+    public void registerBeforeCommitCallable(final Callable<Void> callable) throws STransactionNotFoundException {
+        try {
+            final Transaction transaction = txManager.getTransaction();
+            if (transaction == null) {
+                throw new STransactionNotFoundException("No active transaction");
+            }
+            List<Callable<Void>> callables = beforeCommitCallables.get();
+            if (callables == null) {
+                callables = new ArrayList<Callable<Void>>();
+                beforeCommitCallables.set(callables);
+            }
+            callables.add(callable);
+        } catch (final IllegalStateException e) {
+            throw new STransactionNotFoundException(e.getMessage());
+        } catch (final SystemException e) {
+            throw new STransactionNotFoundException(e.getMessage());
+        }
+    }
+
 
     @Override
     public <T> T executeInTransaction(final Callable<T> callable) throws Exception {

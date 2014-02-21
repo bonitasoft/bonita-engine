@@ -34,5 +34,6 @@ public interface UserTransactionService {
      */
     void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException;
 
+    void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException;
 
 }
