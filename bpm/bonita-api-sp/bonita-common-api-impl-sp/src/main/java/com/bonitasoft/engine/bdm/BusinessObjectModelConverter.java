@@ -9,11 +9,13 @@
 package com.bonitasoft.engine.bdm;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.exception.CreationException;
+import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.io.IOUtils;
 
@@ -26,10 +28,13 @@ public class BusinessObjectModelConverter {
 
     public byte[] zip(final BusinessObjectModel bom) throws IOException, CreationException {
         try {
-            final byte[] bomXML = IOUtils.marshallObjectToXML(bom);
+            final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
+            final byte[] bomXML = IOUtils.marshallObjectToXML(bom, resource);
             return IOUtils.zip(BOM_XML, bomXML);
         } catch (final JAXBException jaxbe) {
             throw new CreationException(jaxbe);
+        } catch (final SAXException saxe) {
+            throw new CreationException(saxe);
         }
     }
 
@@ -37,9 +42,15 @@ public class BusinessObjectModelConverter {
         try {
             final Map<String, byte[]> files = IOUtils.unzip(zippedBOM);
             final byte[] bomXML = files.get(BOM_XML);
-            return IOUtils.unmarshallXMLtoObject(bomXML, BusinessObjectModel.class);
+            if (bomXML == null) {
+                throw new CreationException("the file" + BOM_XML + " is missing in the zip");
+            }
+            final URL resource = BusinessObjectModel.class.getResource("/bom.xsd");
+            return IOUtils.unmarshallXMLtoObject(bomXML, BusinessObjectModel.class, resource);
         } catch (final JAXBException jaxbe) {
             throw new CreationException(jaxbe);
+        } catch (final SAXException saxe) {
+            throw new CreationException(saxe);
         }
     }
 
