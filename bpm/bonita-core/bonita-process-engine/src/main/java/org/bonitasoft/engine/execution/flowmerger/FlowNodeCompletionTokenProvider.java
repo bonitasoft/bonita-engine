@@ -20,11 +20,12 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
+import org.bonitasoft.engine.execution.TokenProvider;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class TokenProvider {
+public class FlowNodeCompletionTokenProvider implements TokenProvider {
 
     private SFlowNodeWrapper flowNodeWrapper;
 
@@ -38,7 +39,7 @@ public class TokenProvider {
     
     private TokenInfo tokenInfo = null;
 
-    public TokenProvider(final SFlowNodeInstance child, final SProcessInstance sProcessInstance, final SFlowNodeWrapper flowNodeWrapper,
+    public FlowNodeCompletionTokenProvider(final SFlowNodeInstance child, final SProcessInstance sProcessInstance, final SFlowNodeWrapper flowNodeWrapper,
             final FlowNodeTransitionsWrapper transitionsDescriptor, TokenService tokenService) {
         this.child = child;
         this.processInstance = sProcessInstance;
@@ -47,6 +48,7 @@ public class TokenProvider {
         this.tokenService = tokenService;
     }
 
+    @Override
     public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException {
         if(tokenInfo != null) {
             return tokenInfo;
@@ -61,13 +63,13 @@ public class TokenProvider {
             return new TokenInfo();
         }
 
-        if (flowNodeWrapper.isBoundaryEvent()) {
-            return getOutputTokenRefIdFromBoundaryEvent();
+        if (flowNodeWrapper.isBoundaryEvent() && flowNodeWrapper.isInterrupting()) {
+                return tansmitAllTokenInfo();
         }
 
-        if (flowNodeWrapper.isExclusive() || transitionsDescriptor.isSimpleMerge()) {
+        if (flowNodeWrapper.isExclusive() || transitionsDescriptor.isSimpleMerge() || isNonInterruptingBoundaryEvent()) {
             // always transmit token
-            return transmitToken();
+            return transmitOnlyTokenRefId();
         }
         
         if (transitionsDescriptor.isSimpleToMany()) {
@@ -94,6 +96,10 @@ public class TokenProvider {
         
         return new TokenInfo();
     }
+
+    private boolean isNonInterruptingBoundaryEvent() {
+        return flowNodeWrapper.isBoundaryEvent() && !flowNodeWrapper.isInterrupting();
+    }
     
 
     private Long getParentTokenRefId() throws SObjectReadException, SObjectNotFoundException {
@@ -101,23 +107,13 @@ public class TokenProvider {
         return token.getParentRefId();
     }
 
-    private TokenInfo transmitToken() {
+    private TokenInfo transmitOnlyTokenRefId() {
         return new TokenInfo(child.getTokenRefId());
     }
 
-    private TokenInfo getOutputTokenRefIdFromBoundaryEvent() throws SObjectReadException, SObjectNotFoundException {
-        // the creation of tokens for the boundaries are done inside the ExecutingBoundaryEventStateImpl
-        // we don't change tokens
-        // still need to get the refId to put on the next element
-        if (flowNodeWrapper.isInterrupting()) {
-            // we create the same token that activated the activity
-            // the activity is canceled so a token will be consumed by the aborted activity
-            SToken token = tokenService.getToken(child.getParentProcessInstanceId(), child.getTokenRefId());
-            return new TokenInfo(token.getRefId(), token.getParentRefId());
-        } else {
-            // a token with no parent is produced -> not the same "execution" than activity
-            return new TokenInfo(child.getId());
-        }
+    private TokenInfo tansmitAllTokenInfo() throws SObjectReadException, SObjectNotFoundException {
+        SToken token = tokenService.getToken(child.getParentProcessInstanceId(), child.getTokenRefId());
+        return new TokenInfo(token.getRefId(), token.getParentRefId());
     }
 
 }
