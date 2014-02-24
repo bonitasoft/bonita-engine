@@ -10,13 +10,14 @@ package com.bonitasoft.engine;
 
 import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.connectors.RemoteConnectorExecutionTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.bonitasoft.engine.process.ProcessResolutionTest;
+
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        RemoteConnectorExecutionTest.class
+    ProcessResolutionTest.class
 })
 @Initializer(TestsInitializerSP.class)
 public class TemporaryTestsSP extends LocalIntegrationTestsSP {
