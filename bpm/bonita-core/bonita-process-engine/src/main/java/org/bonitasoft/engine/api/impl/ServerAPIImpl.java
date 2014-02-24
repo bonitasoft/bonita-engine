@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -33,6 +33,7 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -59,6 +60,7 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
 /**
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ServerAPIImpl implements ServerAPI {
 
@@ -335,7 +337,7 @@ public class ServerAPIImpl implements ServerAPI {
         final APISession apiSession = (APISession) session;
         final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(apiSession.getTenantId());
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        return classLoaderService.getLocalClassLoader("tenant", apiSession.getTenantId());
+        return classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), apiSession.getTenantId());
     }
 
     private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor) throws ClassLoaderException {

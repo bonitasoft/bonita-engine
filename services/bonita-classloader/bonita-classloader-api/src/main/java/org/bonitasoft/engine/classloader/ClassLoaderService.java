@@ -15,7 +15,6 @@ package org.bonitasoft.engine.classloader;
 
 import java.util.Map;
 
-
 /**
  * @author Elias Ricken de Medeiros
  * @since 6.0
@@ -78,6 +77,6 @@ public interface ClassLoaderService {
     void removeAllLocalClassLoaders(final String type);
 
     void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws ClassLoaderException;
-    
+
     void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) throws ClassLoaderException;
 }

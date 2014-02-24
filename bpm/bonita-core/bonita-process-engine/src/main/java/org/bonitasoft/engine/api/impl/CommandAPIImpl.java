@@ -50,6 +50,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyAlreadyExistsException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -93,7 +94,7 @@ public class CommandAPIImpl implements CommandAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final AddSDependency addSDependency = new AddSDependency(dependencyService, name, jar, tenantAccessor.getTenantId(),
-                "tenant");
+                ScopeType.TENANT);
         try {
             addSDependency.execute();
         } catch (final SDependencyAlreadyExistsException e) {

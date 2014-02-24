@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -38,6 +38,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyCreationException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -54,6 +55,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * 
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class DependencyResolver {
 
@@ -143,8 +145,7 @@ public class DependencyResolver {
      * @throws SBonitaException
      */
     public void resolveAndCreateDependencies(final File processFolder, final ProcessDefinitionService processDefinitionService,
-            final DependencyService dependencyService, final long processDefinitionId)
-            throws SBonitaException {
+            final DependencyService dependencyService, final long processDefinitionId) throws SBonitaException {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>();
 
         final File file = new File(processFolder, "classpath");
@@ -154,7 +155,7 @@ public class DependencyResolver {
                 final String name = jarFile.getName();
                 try {
                     final byte[] jarContent = FileUtils.readFileToByteArray(jarFile);
-                    resources.put(getDependencyName(processDefinitionId, name), jarContent);
+                    resources.put(name, jarContent);
                 } catch (final IOException e) {
                     throw new SDependencyCreationException(e);
                 }
@@ -176,7 +177,7 @@ public class DependencyResolver {
         final Iterator<Entry<String, byte[]>> iterator = resources.entrySet().iterator();
         while (iterator.hasNext()) {
             final Map.Entry<java.lang.String, byte[]> entry = iterator.next();
-            if (!dependencies.contains(entry.getKey())) {
+            if (!dependencies.contains(getDependencyName(processDefinitionId, entry.getKey()))) {
                 addDependency(entry.getKey(), entry.getValue(), dependencyService, processDefinitionId);
             }
         }
@@ -200,7 +201,7 @@ public class DependencyResolver {
         QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
         List<Long> currentPage;
         do {
-            currentPage = dependencyService.getDependencyIds(processDefinitionId, "process", queryOptions);
+            currentPage = dependencyService.getDependencyIds(processDefinitionId, ScopeType.PROCESS, queryOptions);
             dependencyIds.addAll(currentPage);
             queryOptions = QueryOptions.getNextPage(queryOptions);
         } while (currentPage.size() == QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
@@ -218,8 +219,7 @@ public class DependencyResolver {
      * @throws SBonitaException
      */
     public void resolveAndCreateDependencies(final BusinessArchive businessArchive, final ProcessDefinitionService processDefinitionService,
-            final DependencyService dependencyService, final SProcessDefinition sDefinition)
-            throws SBonitaException {
+            final DependencyService dependencyService, final SProcessDefinition sDefinition) throws SBonitaException {
         final Long processDefinitionId = sDefinition.getId();
         if (businessArchive != null) {
             final Map<String, byte[]> resources = businessArchive.getResources("^classpath/.*$");
@@ -229,7 +229,7 @@ public class DependencyResolver {
             for (final Entry<String, byte[]> resource : resources.entrySet()) {
                 final String name = resource.getKey().substring(10);
                 final byte[] jarContent = resource.getValue();
-                resourcesWithRealName.put(getDependencyName(processDefinitionId, name), jarContent);
+                resourcesWithRealName.put(name, jarContent);
             }
             addDependencies(resourcesWithRealName, dependencyService, sDefinition.getId());
         }
@@ -238,12 +238,11 @@ public class DependencyResolver {
 
     private void addDependency(final String name, final byte[] jarContent, final DependencyService dependencyService,
             final long processdefinitionId) throws SDependencyException {
-        final AddSDependency addSDependency = new AddSDependency(dependencyService, name, jarContent, processdefinitionId, "process");
+        final AddSDependency addSDependency = new AddSDependency(dependencyService, name, jarContent, processdefinitionId, ScopeType.PROCESS);
         addSDependency.execute();
     }
 
     public List<ProcessDependencyResolver> getResolvers() {
         return dependencyResolvers;
     }
-
 }

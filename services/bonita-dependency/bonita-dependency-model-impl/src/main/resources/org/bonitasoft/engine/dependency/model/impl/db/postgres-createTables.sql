@@ -2,7 +2,6 @@ CREATE TABLE dependency (
   tenantid INT8 NOT NULL,
   id INT8 NOT NULL,
   name VARCHAR(150) NOT NULL,
-  version VARCHAR(50) NOT NULL,
   description TEXT,
   filename VARCHAR(255) NOT NULL,
   value_ BYTEA NOT NULL,
@@ -10,7 +9,6 @@ CREATE TABLE dependency (
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_dependency_name ON dependency (name);
-CREATE INDEX idx_dependency_version ON dependency (version);
 
 CREATE TABLE dependencymapping (
   tenantid INT8 NOT NULL,
