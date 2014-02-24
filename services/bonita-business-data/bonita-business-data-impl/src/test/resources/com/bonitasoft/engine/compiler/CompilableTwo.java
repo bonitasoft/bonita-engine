@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.compiler;
+package com.bonitasoft;
 
 public class CompilableTwo {
 

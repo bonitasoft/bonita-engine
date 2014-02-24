@@ -49,8 +49,8 @@ public class JDTCompilerTest {
 
         jdtCompiler.compile(asList(compilableOne, compilableTwo), outputdirectory);
 
-        assertThat(new File(outputdirectory, "com/bonitasoft/engine/bdm/compiler/CompilableOne.class")).exists();
-        assertThat(new File(outputdirectory, "com/bonitasoft/engine/bdm/compiler/CompilableTwo.class")).exists();
+        assertThat(new File(outputdirectory, "com/bonitasoft/CompilableOne.class")).exists();
+        assertThat(new File(outputdirectory, "com/bonitasoft/CompilableTwo.class")).exists();
     }
 
     @Test(expected = CompilationException.class)
