@@ -29,51 +29,52 @@ public class JDTCompiler {
 
     private static final String COMPILER_COMPLIANCE_LEVEL = "-1.6";
 
-    public void compile(Collection<File> filesToBeCompiled, File outputdirectory) throws CompilationException {
-        String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory);
+    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory) throws CompilationException {
+        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory);
         launchCompiler(commandLine);
     }
 
-    private String[] buildCommandLineArguments(Collection<File> files, File outputdirectory) {
-        List<String> arguments = new ArrayList<String>();
+    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory) {
+        final List<String> arguments = new ArrayList<String>();
         arguments.add(COMPILER_COMPLIANCE_LEVEL);
         arguments.addAll(outputDirectoryArguments(outputdirectory));
         arguments.addAll(filesToBeCompiledArguments(files));
         return arguments.toArray(new String[arguments.size()]);
     }
 
-    private List<String> filesToBeCompiledArguments(Collection<File> files) {
-        List<String> arguments = new ArrayList<String>(files.size());
-        for (File file : files) {
+    private List<String> filesToBeCompiledArguments(final Collection<File> files) {
+        final List<String> arguments = new ArrayList<String>(files.size());
+        for (final File file : files) {
             arguments.add(file.getAbsolutePath());
         }
         return arguments;
     }
 
-    private List<String> outputDirectoryArguments(File outputdirectory) {
+    private List<String> outputDirectoryArguments(final File outputdirectory) {
         if (outputdirectory == null) {
             return emptyList();
         }
         return asList("-d", outputdirectory.getAbsolutePath());
     }
 
-    private void launchCompiler(String[] commandLine) throws CompilationException {
-        PrintWriter outWriter = new PrintWriter(new ByteArrayOutputStream());
+    private void launchCompiler(final String[] commandLine) throws CompilationException {
+        final PrintWriter outWriter = new PrintWriter(new ByteArrayOutputStream());
         // closing outwriter since we don't want to see compilation out stream
         outWriter.close();
-        
-        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-        PrintWriter errorWriter = new PrintWriter(errorStream);
+
+        final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+        final PrintWriter errorWriter = new PrintWriter(errorStream);
         try {
             doCompilation(commandLine, outWriter, errorStream, errorWriter);
         } finally {
             // no need to close OutputStream, printWriter is doing it for us
-            errorWriter.close(); 
+            errorWriter.close();
         }
     }
 
-    private void doCompilation(String[] commandLine, PrintWriter outWriter, ByteArrayOutputStream errorStream, PrintWriter errorWriter) throws CompilationException {
-        boolean succeeded = BatchCompiler.compile(commandLine, outWriter, errorWriter, new DummyCompilationProgress());
+    private void doCompilation(final String[] commandLine, final PrintWriter outWriter, final ByteArrayOutputStream errorStream, final PrintWriter errorWriter)
+            throws CompilationException {
+        final boolean succeeded = BatchCompiler.compile(commandLine, outWriter, errorWriter, new DummyCompilationProgress());
         if (!succeeded) {
             throw new CompilationException(new String(errorStream.toByteArray()));
         }

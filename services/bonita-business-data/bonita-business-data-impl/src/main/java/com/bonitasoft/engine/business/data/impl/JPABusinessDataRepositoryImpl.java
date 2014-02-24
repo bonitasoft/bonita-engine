@@ -34,7 +34,6 @@ import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-import com.bonitasoft.engine.compiler.JDTCompiler;
 
 /**
  * @author Matthieu Chaffotte
@@ -71,7 +70,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     protected byte[] generateBDMJar(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
-        final BDMJarBuilder builder = new BDMJarBuilder(new JDTCompiler());
+        final BDMJarBuilder builder = new BDMJarBuilder();
         return builder.build(bdmZip);
     }
 

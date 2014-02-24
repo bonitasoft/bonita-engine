@@ -160,4 +160,11 @@ public class IOUtils {
         }
     }
 
+    public static File createTempDirectory(final String prefix) throws IOException {
+        final File tmpDirectory = File.createTempFile(prefix, null);
+        tmpDirectory.delete();
+        tmpDirectory.mkdir();
+        return tmpDirectory;
+    }
+
 }
