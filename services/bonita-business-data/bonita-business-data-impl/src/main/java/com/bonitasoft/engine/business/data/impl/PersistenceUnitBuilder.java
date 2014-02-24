@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -23,10 +23,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-
 /**
  * @author Romain Bioteau
+ * @author Matthieu Chaffotte
  */
 public class PersistenceUnitBuilder {
 
@@ -34,35 +33,19 @@ public class PersistenceUnitBuilder {
 
     private final Set<String> classes = new HashSet<String>();
 
-    public PersistenceUnitBuilder() throws SBusinessDataRepositoryDeploymentException {
+    public PersistenceUnitBuilder() throws ParserConfigurationException, SAXException, IOException {
         document = initializeDefaultPersistenceDocument();
     }
 
-    protected Document initializeDefaultPersistenceDocument() throws SBusinessDataRepositoryDeploymentException {
+    protected Document initializeDefaultPersistenceDocument() throws ParserConfigurationException, SAXException, IOException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setValidating(false);
-        DocumentBuilder documentBuilder = null;
+        final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        final InputStream is = JPABusinessDataRepositoryImpl.class.getResourceAsStream("persistence.xml");
         try {
-            documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        } catch (final ParserConfigurationException e) {
-            throw new SBusinessDataRepositoryDeploymentException(e);
-        }
-        InputStream is = null;
-        try {
-            is = JPABusinessDataRepositoryImpl.class.getResourceAsStream("persistence.xml");
             return documentBuilder.parse(is);
-        } catch (final SAXException e) {
-            throw new SBusinessDataRepositoryDeploymentException(e);
-        } catch (final IOException e) {
-            throw new SBusinessDataRepositoryDeploymentException(e);
         } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (final IOException e) {
-                    throw new SBusinessDataRepositoryDeploymentException(e);
-                }
-            }
+            is.close();
         }
     }
 
