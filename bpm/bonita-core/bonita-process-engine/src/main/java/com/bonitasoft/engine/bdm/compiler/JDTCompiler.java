@@ -22,19 +22,14 @@ public class JDTCompiler {
     private static final String COMPILER_COMPLIANCE_LEVEL = "-1.6";
 
     public void compile(Collection<File> filesToBeCompiled, File outputdirectory) throws CompilationException {
-        compile(filesToBeCompiled, outputdirectory, null);
-    }
-
-    public void compile(Collection<File> filesToBeCompiled, File outputdirectory, String classpath) throws CompilationException {
-        String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory, classpath);
+        String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory);
         launchCompiler(commandLine);
     }
 
-    private String[] buildCommandLineArguments(Collection<File> files, File outputdirectory, String classpath) {
+    private String[] buildCommandLineArguments(Collection<File> files, File outputdirectory) {
         List<String> arguments = new ArrayList<String>();
         arguments.add(COMPILER_COMPLIANCE_LEVEL);
         arguments.addAll(outputDirectoryArguments(outputdirectory));
-        arguments.addAll(classpathArguments(classpath));
         arguments.addAll(filesToBeCompiledArguments(files));
         return arguments.toArray(new String[arguments.size()]);
     }
@@ -45,13 +40,6 @@ public class JDTCompiler {
             arguments.add(file.getAbsolutePath());
         }
         return arguments;
-    }
-
-    private List<String> classpathArguments(String classpath) {
-        if (classpath == null || classpath.isEmpty()) {
-            return emptyList();
-        }
-        return asList("-cp", classpath);
     }
 
     private List<String> outputDirectoryArguments(File outputdirectory) {
@@ -72,7 +60,7 @@ public class JDTCompiler {
             doCompilation(commandLine, outWriter, errorStream, errorWriter);
         } finally {
             // no need to close OutputStream, printWriter is doing it for us
-            if (errorWriter != null) errorWriter.close(); 
+            errorWriter.close(); 
         }
     }
 
