@@ -33,7 +33,7 @@ import com.sun.codemodel.JClassAlreadyExistsException;
  */
 public class BDMJarBuilder {
 
-    private JDTCompiler compiler;
+    private final JDTCompiler compiler;
 
     public BDMJarBuilder(final JDTCompiler compiler) {
         this.compiler = compiler;
@@ -76,7 +76,6 @@ public class BDMJarBuilder {
 
     protected void compileJavaClasses(final File srcDirectory) throws CompilationException {
         final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[] { "java" }, true);
-        compiler = new JDTCompiler();
         compiler.compile(files, srcDirectory);
     }
 
