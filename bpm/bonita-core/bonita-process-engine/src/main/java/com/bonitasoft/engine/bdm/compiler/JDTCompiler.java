@@ -12,9 +12,12 @@ import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
 public class JDTCompiler {
 
-    public void compile(Collection<File> filesToBeCompiled, File outputdirectory) {
+    public void compile(Collection<File> filesToBeCompiled, File outputdirectory) throws CompilationException {
         String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory);
-        BatchCompiler.compile(commandLine, new PrintWriter(System.out), new PrintWriter(System.err), new DummyCompilationProgress());
+        boolean succeeded = BatchCompiler.compile(commandLine, new PrintWriter(System.out), new PrintWriter(System.err), new DummyCompilationProgress());
+        if (!succeeded) {
+            throw new CompilationException("Compilation failed");
+        }
     }
 
     private String[] buildCommandLineArguments(Collection<File> files, File outputdirectory) {

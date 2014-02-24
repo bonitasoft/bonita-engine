@@ -12,28 +12,59 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
 public class JDTCompilerTest {
 
+    private JDTCompiler jdtCompiler;
+
+    @Before
+    public void instanciateCompiler() {
+        jdtCompiler = new JDTCompiler();
+    }
+    
     @Test
     public void should_compile_files_in_output_directory() throws Exception {
         File compilableOne = getResourceAsFile("CompilableOne.java");
         File compilableTwo = getResourceAsFile("CompilableTwo.java");
         File outputdirectory = createTempDirectory();
         
-        JDTCompiler jdtCompiler = new JDTCompiler();
         jdtCompiler.compile(asList(compilableOne, compilableTwo), outputdirectory);
         
         assertThat(new File(outputdirectory, "com/bonitasoft/engine/bdm/compiler/CompilableOne.class")).exists();
         assertThat(new File(outputdirectory, "com/bonitasoft/engine/bdm/compiler/CompilableTwo.class")).exists();
     }
     
+    @Test(expected = CompilationException.class)
+    public void should_throw_exception_if_compilation_errors_occurs() throws Exception {
+        File uncompilable = getResourceAsFile("UnCompilable.java");
+        File outputdirectory = createTempDirectory();
+        
+        jdtCompiler.compile(asList(uncompilable), outputdirectory);
+    }
+    
+    @Test
+    public void if_compilation_exception_occurs_exception_message_must_list_compilation_errors() throws Exception {
+        File uncompilable = getResourceAsFile("UnCompilable.java");
+        File outputdirectory = createTempDirectory();
+        
+        try {
+            jdtCompiler.compile(asList(uncompilable), outputdirectory);
+        } catch (CompilationException e) {
+            assertThat(e.getMessage()).contains("cannot be resolved to a type");
+        }
+        
+    }
 
     private File getResourceAsFile(String fileName) throws URISyntaxException {
-        return new File(JDTCompilerTest.class.getResource(fileName).toURI());
+        URL resource = JDTCompilerTest.class.getResource(fileName);
+        if (resource == null) {
+            throw new RuntimeException("Test resource " + fileName + " not found");
+        }
+        return new File(resource.toURI());
     }
 
     private File createTempDirectory() throws IOException {
