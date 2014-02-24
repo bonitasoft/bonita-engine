@@ -10,6 +10,7 @@ package com.bonitasoft.engine.business.data.impl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -54,8 +55,9 @@ public class SchemaGenerator {
 
     private final EntityManager entityManager;
 
-    public SchemaGenerator(final EntityManager entityManager, final Properties properties) throws SBusinessDataRepositoryDeploymentException {
+    public SchemaGenerator(final EntityManager entityManager) throws SBusinessDataRepositoryDeploymentException {
         this.entityManager = entityManager;
+        final Properties properties = toProperties(entityManager.getEntityManagerFactory().getProperties());
         dialect = Dialect.getDialect(properties);
 
         cfg = new Configuration();
@@ -69,6 +71,12 @@ public class SchemaGenerator {
         for (final EntityType<?> entity : entities) {
             cfg.addAnnotatedClass(entity.getJavaType());
         }
+    }
+
+    private Properties toProperties(final Map<String, Object> propertiesAsMap) {
+        final Properties properties = new Properties();
+        properties.putAll(propertiesAsMap);
+        return properties;
     }
 
     /**

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -54,6 +53,7 @@ import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import com.sun.codemodel.JClassAlreadyExistsException;
 
 /**
  * @author Matthieu Chaffotte
@@ -74,7 +74,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     @Override
     public void deploy(final byte[] bdmArchive, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
-        final byte[] bdmJar = buildBDMJAR(bdmArchive);
+        final byte[] bdmJar = buildBDMJar(bdmArchive);
         final SDependency sDependency = createSDependency(bdmJar);
         try {
             dependencyService.createDependency(sDependency);
@@ -106,16 +106,10 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     public void start() throws SBusinessDataRepositoryDeploymentException {
         entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configuration);
         try {
-            executeQueries(new SchemaGenerator(entityManagerFactory.createEntityManager(), toProperties(entityManagerFactory.getProperties())).generate());
+            executeQueries(new SchemaGenerator(entityManagerFactory.createEntityManager()).generate());
         } catch (final SQLException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
-    }
-
-    private Properties toProperties(final Map<String, Object> propertiesAsMap) {
-        final Properties properties = new Properties();
-        properties.putAll(propertiesAsMap);
-        return properties;
     }
 
     private void executeQueries(final String... sqlQuerys) {
@@ -187,46 +181,60 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return null;
     }
 
-    protected byte[] buildBDMJAR(final byte[] zip) throws SBusinessDataRepositoryDeploymentException {
+    protected byte[] buildBDMJar(final byte[] zip) throws SBusinessDataRepositoryDeploymentException {
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         try {
             final BusinessObjectModel bom = converter.unzip(zip);
-            final BDMCodeGenerator codeGenerator = new BDMCodeGenerator(bom);
-            final File tmpBDMDirectory = File.createTempFile("bdm", null);
-            tmpBDMDirectory.delete();
-            tmpBDMDirectory.mkdir();
-
-            codeGenerator.generate(tmpBDMDirectory);
-            final Collection<File> files = FileUtils.listFiles(tmpBDMDirectory, new String[] { "java" }, true);
-            final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-            final Iterable<? extends JavaFileObject> compUnits = fileManager.getJavaFileObjectsFromFiles(files);
-            final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-            final List<String> optionList = new ArrayList<String>();
-            // set compiler's classpath to be same as the runtime's
-            optionList.addAll(Arrays.asList("-classpath", System.getProperty("java.class.path")));
-            final Boolean compiled = compiler.getTask(null, fileManager, diagnostics, optionList, null, compUnits).call();
-            if (!compiled) {
-                final StringBuilder sb = new StringBuilder();
-                for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                    sb.append(diagnostic.getMessage(Locale.getDefault()));
-                    sb.append("\n");
-                }
-                throw new SBusinessDataRepositoryDeploymentException("bdm compilation process fails:" + sb.toString());
-            }
+            final File tmpBDMDirectory = generateJavaClasses(bom);
+            compileJavaClasses(tmpBDMDirectory);
             final byte[] jar = com.bonitasoft.engine.io.IOUtils.toJar(tmpBDMDirectory.getAbsolutePath());
             FileUtils.deleteDirectory(tmpBDMDirectory);
-
-            final List<BusinessObject> entities = bom.getEntities();
-            final List<String> classNames = new ArrayList<String>();
-            for (final BusinessObject businessObject : entities) {
-                classNames.add(businessObject.getQualifiedName());
-            }
-            final byte[] persistenceFileContent = getPersistenceFileContentFor(classNames);
-            return IOUtil.addJarEntry(jar, "META-INF/persistence.xml", persistenceFileContent);
+            return addPersistenceFile(jar, bom);
+        } catch (final SBusinessDataRepositoryDeploymentException sbdrde) {
+            throw sbdrde;
         } catch (final Exception e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
         }
+    }
+
+    protected File generateJavaClasses(final BusinessObjectModel bom) throws IOException, JClassAlreadyExistsException {
+        final BDMCodeGenerator codeGenerator = new BDMCodeGenerator(bom);
+        final File tmpBDMDirectory = File.createTempFile("bdm", null);
+        tmpBDMDirectory.delete();
+        tmpBDMDirectory.mkdir();
+        codeGenerator.generate(tmpBDMDirectory);
+        return tmpBDMDirectory;
+    }
+
+    protected void compileJavaClasses(final File srcDirectory) throws SBusinessDataRepositoryDeploymentException {
+        final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[] { "java" }, true);
+        final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+        final Iterable<? extends JavaFileObject> compUnits = fileManager.getJavaFileObjectsFromFiles(files);
+        final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+        final List<String> optionList = new ArrayList<String>();
+        // set compiler's classpath to be same as the runtime's
+        optionList.addAll(Arrays.asList("-classpath", System.getProperty("java.class.path")));
+        final Boolean compiled = compiler.getTask(null, fileManager, diagnostics, optionList, null, compUnits).call();
+        if (!compiled) {
+            final StringBuilder sb = new StringBuilder();
+            for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
+                sb.append(diagnostic.getMessage(Locale.getDefault()));
+                sb.append("\n");
+            }
+            throw new SBusinessDataRepositoryDeploymentException("bdm compilation process fails:" + sb.toString());
+        }
+    }
+
+    protected byte[] addPersistenceFile(final byte[] jar, final BusinessObjectModel bom) throws SBusinessDataRepositoryDeploymentException, IOException,
+            TransformerException {
+        final List<BusinessObject> entities = bom.getEntities();
+        final List<String> classNames = new ArrayList<String>();
+        for (final BusinessObject businessObject : entities) {
+            classNames.add(businessObject.getQualifiedName());
+        }
+        final byte[] persistenceFileContent = getPersistenceFileContentFor(classNames);
+        return IOUtil.addJarEntry(jar, "META-INF/persistence.xml", persistenceFileContent);
     }
 
 }
