@@ -23,5 +23,12 @@
 			<artifactId>bonita-log-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- test -->
+		 <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 </project>

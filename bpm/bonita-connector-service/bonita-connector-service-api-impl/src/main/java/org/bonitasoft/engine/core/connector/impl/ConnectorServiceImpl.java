@@ -54,10 +54,8 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
-import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
@@ -184,7 +182,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         return stb.toString();
     }
 
-    private static String buildConnectorInputMessage(Map<String, Object> inputParameters) {
+    private static String buildConnectorInputMessage(final Map<String, Object> inputParameters) {
         StringBuilder stb = new StringBuilder();
         if (inputParameters != null && !inputParameters.isEmpty()) {
             stb.append(LINE_SEPARATOR);
@@ -408,11 +406,10 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private void deployNewDependencies(final long processDefinitionId, final long tenantId) throws SDependencyException, IOException, BonitaHomeNotSetException {
-        // delete existing ones:
-        dependencyService.deleteDependencies(processDefinitionId, ScopeType.PROCESS);
         // deploy new ones from the filesystem (bonita-home):
         final File processFolder = new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId)), String.valueOf(processDefinitionId));
         final File file = new File(processFolder, CLASSPATH_FOLDER);
+        ArrayList<SDependency> dependencies = new ArrayList<SDependency>();
         if (file.exists() && file.isDirectory()) {
             final File[] listFiles = file.listFiles();
             for (final File jarFile : listFiles) {
@@ -420,11 +417,9 @@ public class ConnectorServiceImpl implements ConnectorService {
                 final byte[] jarContent = IOUtil.getAllContentFrom(jarFile);
                 final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class)
                         .createNewInstance(name, processDefinitionId, ScopeType.PROCESS, name + ".jar", jarContent).done();
-                dependencyService.createDependency(sDependency);
-                final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
-                        .createNewInstance(sDependency.getId(), processDefinitionId, ScopeType.PROCESS).done();
-                dependencyService.createDependencyMapping(sDependencyMapping);
+                dependencies.add(sDependency);
             }
+            dependencyService.updateDependenciesOfArtifact(processDefinitionId, ScopeType.PROCESS, dependencies);
         }
     }
 

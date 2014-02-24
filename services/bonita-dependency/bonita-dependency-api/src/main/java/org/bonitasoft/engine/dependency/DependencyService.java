@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.dependency;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -283,5 +284,20 @@ public interface DependencyService {
     void deleteDependencies(long id, ScopeType type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException;
 
     void refreshClassLoader(ScopeType type, long id) throws SDependencyException;
+
+    /**
+     * 
+     * Update dependencies of this artifact with the given list of dependencies.
+     * 
+     * If a dependency with the same name exists it will update it.
+     * If it does not it will create a new one.
+     * If the list does not contains a existing dependency of the element it will delete it.
+     * 
+     * @param id
+     * @param type
+     * @param dependencies
+     * @throws SDependencyException
+     */
+    void updateDependenciesOfArtifact(long id, ScopeType type, ArrayList<SDependency> dependencies) throws SDependencyException;
 
 }

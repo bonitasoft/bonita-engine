@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
+import org.bonitasoft.engine.execution.TokenProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,9 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TokenProviderTest {
-
-    private static final long TOKEN_REF_ID = 20L;
+public class FlowNodeCompletionTokenProviderTest {
 
     private static final long PARENT_TOKEN_REF_ID = 21L;
 
@@ -74,8 +73,8 @@ public class TokenProviderTest {
     
     @Before
     public void setUp() throws Exception {
-        boundaryTokenProvider = new TokenProvider(boundary, processInstance, flowNodeWrapper, flowNodeTransitionsWrapper, tokenService);
-        gateWayTokenProvider = new TokenProvider(gateway, processInstance, flowNodeWrapper, flowNodeTransitionsWrapper, tokenService);
+        boundaryTokenProvider = new FlowNodeCompletionTokenProvider(boundary, processInstance, flowNodeWrapper, flowNodeTransitionsWrapper, tokenService);
+        gateWayTokenProvider = new FlowNodeCompletionTokenProvider(gateway, processInstance, flowNodeWrapper, flowNodeTransitionsWrapper, tokenService);
         doReturn(PROCESS_INSTANCE_ID).when(processInstance).getId();
         
         doReturn(FLOW_NODE_TOKEN_REF_ID).when(gateway).getTokenRefId();
@@ -85,7 +84,7 @@ public class TokenProviderTest {
         doReturn(FLOW_NODE_INSTANCE_ID).when(boundary).getId();
 
         doReturn(token).when(tokenService).getToken(PROCESS_INSTANCE_ID, FLOW_NODE_TOKEN_REF_ID);
-        doReturn(TOKEN_REF_ID).when(token).getRefId();
+        doReturn(FLOW_NODE_TOKEN_REF_ID).when(token).getRefId();
         doReturn(PARENT_TOKEN_REF_ID).when(token).getParentRefId();
     }
     
@@ -106,20 +105,20 @@ public class TokenProviderTest {
     }
     
     @Test
-    public void get_outputTokenRefId_non_interrupting_boundary_event() throws Exception {
+    public void getOutputTokenInfo_returns_current_token_info_for_non_interrupting_boundary_event() throws Exception {
         doReturn(true).when(flowNodeWrapper).isBoundaryEvent();
         doReturn(false).when(flowNodeWrapper).isInterrupting();
         
-        assertEquals(Long.valueOf(FLOW_NODE_INSTANCE_ID), boundaryTokenProvider.getOutputTokenInfo().outputTokenRefId);
+        assertEquals(Long.valueOf(FLOW_NODE_TOKEN_REF_ID), boundaryTokenProvider.getOutputTokenInfo().outputTokenRefId);
         assertNull(boundaryTokenProvider.getOutputTokenInfo().outputParentTokenRefId);
     }
 
     @Test
-    public void get_outputTokenRefId_interrupting_boundary_event() throws Exception {
+    public void getOutputTokenInfo_returns_current_token_info_for_interrupting_boundary_event() throws Exception {
         doReturn(true).when(flowNodeWrapper).isBoundaryEvent();
         doReturn(true).when(flowNodeWrapper).isInterrupting();
         
-        assertEquals(Long.valueOf(TOKEN_REF_ID), boundaryTokenProvider.getOutputTokenInfo().outputTokenRefId);
+        assertEquals(Long.valueOf(FLOW_NODE_TOKEN_REF_ID), boundaryTokenProvider.getOutputTokenInfo().outputTokenRefId);
         assertEquals(Long.valueOf(PARENT_TOKEN_REF_ID), boundaryTokenProvider.getOutputTokenInfo().outputParentTokenRefId);
     }
 

@@ -420,4 +420,9 @@ public class PlatformDependencyServiceImpl implements DependencyService {
         return resources;
     }
 
+    @Override
+    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final ArrayList<SDependency> dependencies) throws SDependencyException {
+        throw new UnsupportedOperationException("only one artifact at platform level, no need to update in batch all dependencies");
+    }
+
 }

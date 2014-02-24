@@ -99,10 +99,10 @@ import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.flowmerger.FlowMerger;
+import org.bonitasoft.engine.execution.flowmerger.FlowNodeCompletionTokenProvider;
 import org.bonitasoft.engine.execution.flowmerger.FlowNodeTransitionsWrapper;
 import org.bonitasoft.engine.execution.flowmerger.SFlowNodeWrapper;
 import org.bonitasoft.engine.execution.flowmerger.TokenInfo;
-import org.bonitasoft.engine.execution.flowmerger.TokenProvider;
 import org.bonitasoft.engine.execution.handler.SProcessInstanceHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.WorkFactory;
@@ -748,7 +748,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SFlowNodeDefinition flowNode = sProcessDefinition.getProcessContainer().getFlowNode(child.getFlowNodeDefinitionId());
         SFlowNodeWrapper flowNodeWrapper = new SFlowNodeWrapper(flowNode);
         FlowNodeTransitionsWrapper transitionsDescriptor = buildTransitionsWrapper(flowNode, sProcessDefinition, child);
-        TokenProvider tokenProvider = new TokenProvider(child, sProcessInstance, flowNodeWrapper, transitionsDescriptor, tokenService);
+        TokenProvider tokenProvider = new FlowNodeCompletionTokenProvider(child, sProcessInstance, flowNodeWrapper, transitionsDescriptor, tokenService);
         FlowMerger merger = new FlowMerger(flowNodeWrapper, transitionsDescriptor, tokenProvider);
 
         archiveInvalidTransitions(child, transitionsDescriptor);
@@ -792,10 +792,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
             WorkRegisterException, SBonitaException {
         // handle token creation/deletion
-        if (merger.mustConsumeInputToken()) {
+        if (merger.mustConsumeInputTokenOnTakingTransition()) {
             tokenService.deleteTokens(sProcessInstance.getId(), child.getTokenRefId(), numberOfTokenToMerge);
         }
-        if (merger.mustCreateToken()) {
+        if (merger.mustCreateTokenOnFinish()) {
             TokenInfo outputTokenInfo = merger.getOutputTokenInfo();
             tokenService.createTokens(sProcessInstance.getId(), outputTokenInfo.outputTokenRefId, outputTokenInfo.outputParentTokenRefId, transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
         }

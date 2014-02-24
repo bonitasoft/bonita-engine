@@ -114,8 +114,7 @@ public class SDependencyImpl implements SDependency {
 
     @Override
     public String toString() {
-        return "SDependencyImpl [description=" + description + ", fileName=" + fileName + ", id=" + id + ", name=" + name + ", value="
-                + Arrays.toString(value_) + "]";
+        return "SDependencyImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", fileName=" + fileName + ", description=" + description + "]";
     }
 
     @Override
