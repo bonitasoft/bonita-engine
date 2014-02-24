@@ -13,6 +13,8 @@ import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
 public class JDTCompiler {
 
+    private static final String COMPILER_COMPLIANCE_LEVEL = "-1.6";
+
     public void compile(Collection<File> filesToBeCompiled, File outputdirectory) throws CompilationException {
         String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory);
         launchCompiler(commandLine);
@@ -21,6 +23,7 @@ public class JDTCompiler {
     private String[] buildCommandLineArguments(Collection<File> files, File outputdirectory) {
         List<String> arguments = new ArrayList<String>();
         arguments.addAll(outputDirectoryArguments(outputdirectory));
+        arguments.add(COMPILER_COMPLIANCE_LEVEL);
         for (File file : files) {
             arguments.add(file.getAbsolutePath());
         }
