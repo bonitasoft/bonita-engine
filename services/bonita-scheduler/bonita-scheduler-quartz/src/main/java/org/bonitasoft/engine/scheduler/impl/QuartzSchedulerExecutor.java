@@ -30,7 +30,7 @@ import org.bonitasoft.engine.scheduler.trigger.CronTrigger;
 import org.bonitasoft.engine.scheduler.trigger.RepeatTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
@@ -277,7 +277,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             scheduler.resumeJob(jobKey(jobName, tenantId));
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -291,7 +291,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             scheduler.resumeJobs(jobGroupEquals);
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -304,7 +304,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             scheduler.pauseJob(jobKey(jobName, tenantId));
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -317,7 +317,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             scheduler.pauseJobs(jobGroupEquals(tenantId));
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -330,7 +330,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             return scheduler.deleteJob(jobKey(jobName, tenantId));
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -346,7 +346,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             }
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -364,7 +364,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             return jobsNames;
         } catch (final org.quartz.SchedulerException e) {
             throw new SSchedulerException(e);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -392,7 +392,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    private long getTenantIdFromSession() throws TenantIdNotSetException {
+    private long getTenantIdFromSession() throws STenantIdNotSetException {
         return sessionAccessor.getTenantId();
     }
 

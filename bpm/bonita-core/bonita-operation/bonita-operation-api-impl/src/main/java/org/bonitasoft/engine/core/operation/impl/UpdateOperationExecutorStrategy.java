@@ -18,7 +18,7 @@ import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -34,7 +34,7 @@ public abstract class UpdateOperationExecutorStrategy implements OperationExecut
         this.dataInstanceService = dataInstanceService;
     }
 
-    protected void update(final SDataInstance sDataInstance, final Object content) throws SDataInstanceException {
+    protected void update(final SDataInstance sDataInstance, final Object content) throws SDataInstanceReadException {
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
         updateDescriptor.addField(fact.getValueKey(), content);
@@ -42,7 +42,7 @@ public abstract class UpdateOperationExecutorStrategy implements OperationExecut
         dataInstanceService.updateDataInstance(sDataInstance, updateDescriptor);
     }
 
-    protected SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws SDataInstanceException {
+    protected SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws SDataInstanceReadException {
         return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType);
     }
 
@@ -67,7 +67,7 @@ public abstract class UpdateOperationExecutorStrategy implements OperationExecut
         try {
             sDataInstance = getDataInstance(dataInstanceName, containerId, containerType);
             update(sDataInstance, expressionResult);
-        } catch (final SDataInstanceException e) {
+        } catch (final SDataInstanceReadException e) {
             throw new SOperationExecutionException(e);
         }
     }

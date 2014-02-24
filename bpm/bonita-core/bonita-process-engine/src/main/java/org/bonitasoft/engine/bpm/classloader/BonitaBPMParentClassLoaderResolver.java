@@ -5,7 +5,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.ParentClassLoaderResolver;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 public class BonitaBPMParentClassLoaderResolver implements ParentClassLoaderResolver {
 
@@ -21,7 +21,7 @@ public class BonitaBPMParentClassLoaderResolver implements ParentClassLoaderReso
 			try {
 			final Long tenantId = this.sessionAccessor.getTenantId();
 				return classLoaderService.getLocalClassLoader("tenant", tenantId);
-			} catch (TenantIdNotSetException e) {
+			} catch (STenantIdNotSetException e) {
 				return classLoaderService.getGlobalClassLoader();
 			}
 		} else if ("tenant".equals(childClassLoaderType)) {

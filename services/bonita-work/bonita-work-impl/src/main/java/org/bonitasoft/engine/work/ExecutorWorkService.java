@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
@@ -72,7 +72,7 @@ public class ExecutorWorkService implements WorkService {
     public void executeWork(final BonitaWork work) throws WorkRegisterException {
         try {
             work.setTenantId(sessionAccessor.getTenantId());
-        } catch (TenantIdNotSetException e) {
+        } catch (STenantIdNotSetException e) {
             throw new WorkRegisterException("Unable to read tenant id from session", e);
         }
         this.threadPoolExecutor.submit(work);

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.impl.VariableStorage;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -28,7 +28,7 @@ public class IncrementVariableJobWithMultiTenancy extends GroupJob {
             VariableStorage storage;
             try {
                 storage = VariableStorage.getInstance(readSessionAccessor.getTenantId());
-            } catch (final TenantIdNotSetException e) {
+            } catch (final STenantIdNotSetException e) {
                 throw new SJobExecutionException(e);
             }
             final Integer value = (Integer) storage.getVariableValue(variableName);

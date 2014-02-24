@@ -49,7 +49,7 @@ import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -207,7 +207,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         final long tenantId;
         try {
             tenantId = sessionAccessor.getTenantId();
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getTenantId", e);
             throw new SSchedulerException(e);
         }

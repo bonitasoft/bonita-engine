@@ -15,7 +15,7 @@ package org.bonitasoft.engine.data.instance.api;
 
 import java.util.List;
 
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping;
@@ -39,9 +39,9 @@ public interface DataInstanceService {
      * 
      * @param dataInstance
      *            SDataInstance object
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException;
+    void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException;
 
     /**
      * Update the specific dataInstance according to the given descriptor
@@ -50,18 +50,18 @@ public interface DataInstanceService {
      *            SDataInstance object will be updated
      * @param descriptor
      *            Update description
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException;
+    void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceReadException;
 
     /**
      * Delete the specific dataInstance
      * 
      * @param dataInstance
      *            SDataInstance object will be deleted
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException;
+    void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException;
 
     /**
      * Get dataInstance by its id
@@ -69,9 +69,9 @@ public interface DataInstanceService {
      * @param dataInstanceId
      *            Identifier of dataInstance
      * @return a SDataInstance object
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceException;
+    SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceReadException;
 
     /**
      * Get dataInstance visible in the specific container
@@ -83,9 +83,9 @@ public interface DataInstanceService {
      * @param containerType
      *            Type of container, e.g process instance, activity instance and so on.
      * @return a SDataInstance object
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException;
+    SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceReadException;
 
     /**
      * Get dataInstances visible in the specific container for given names
@@ -97,9 +97,9 @@ public interface DataInstanceService {
      * @param containerType
      *            Type of container, e.g process instance, activity instance and so on.
      * @return a list of SDataInstance objects
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId, final String containerType) throws SDataInstanceException;
+    List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId, final String containerType) throws SDataInstanceReadException;
 
     /**
      * Get all dataInstances visible in the specific container
@@ -109,10 +109,10 @@ public interface DataInstanceService {
      * @param containerType
      *            Type of container, e.g process instance, activity instance and so on.
      * @return
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
     List<SDataInstance> getDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
-            throws SDataInstanceException;
+            throws SDataInstanceReadException;
 
     /**
      * Add the dataInstances visible in parent container to current container
@@ -125,10 +125,10 @@ public interface DataInstanceService {
      *            Identifier of current container
      * @param containerType
      *            Type of current container, e.g process instance, activity instance and so on.
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
     void addChildContainer(final long parentContainerId, final String parentContainerType, final long containerId, final String containerType)
-            throws SDataInstanceException;
+            throws SDataInstanceReadException;
 
     /**
      * Get the local dataInstance by name in a certain container, the dataInstance is existed in this container
@@ -140,9 +140,9 @@ public interface DataInstanceService {
      * @param containerType
      *            Type of container, e.g process instance, activity instance and so on.
      * @return an SDataInstance object
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    SDataInstance getLocalDataInstance(String dataName, long containerId, String containerType) throws SDataInstanceException;
+    SDataInstance getLocalDataInstance(String dataName, long containerId, String containerType) throws SDataInstanceReadException;
 
     /**
      * Get a list of local dataInstances for the specific container, those dataInstances must belong to the specified container. This method is paginated.
@@ -152,10 +152,10 @@ public interface DataInstanceService {
      * @param containerType
      *            Type of container, e.g process instance, activity instance and so on.
      * @return a list of SDataInstance objects
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      * @see {@link #getLocalDataInstances(long, String)}
      */
-    List<SDataInstance> getLocalDataInstances(long containerId, String containerType, int fromIndex, int numberOfResults) throws SDataInstanceException;
+    List<SDataInstance> getLocalDataInstances(long containerId, String containerType, int fromIndex, int numberOfResults) throws SDataInstanceReadException;
 
     /**
      * Create relationship mapping between the container and dataInstances in it.
@@ -165,9 +165,9 @@ public interface DataInstanceService {
      * @param containerType
      *            Type of container, e.g process instance, activity instance and so on.
      * @return a list of SDataInstanceVisibilityMapping objects
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    List<SDataInstanceVisibilityMapping> createDataContainer(long containerId, String containerType) throws SDataInstanceException;
+    List<SDataInstanceVisibilityMapping> createDataContainer(long containerId, String containerType) throws SDataInstanceReadException;
 
     /**
      * Get SADataInstance object for specific dataInstance at the specific time
@@ -177,9 +177,9 @@ public interface DataInstanceService {
      * @param time
      *            The archive time
      * @return an SADataInstance object
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    SADataInstance getSADataInstance(long sourceObjectId, long time) throws SDataInstanceException;
+    SADataInstance getSADataInstance(long sourceObjectId, long time) throws SDataInstanceReadException;
 
     /**
      * Get SADataInstance object archived in the specific time for name specified dataInstance in a container
@@ -193,9 +193,9 @@ public interface DataInstanceService {
      * @param time
      *            The archive time
      * @return an SADataInstance object
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    SADataInstance getSADataInstance(long containerId, String containerType, String dataName, long time) throws SDataInstanceException;
+    SADataInstance getSADataInstance(long containerId, String containerType, String dataName, long time) throws SDataInstanceReadException;
 
     /**
      * Get all SADataInstance objects archived after specific time for specific dataInstance in a container
@@ -209,9 +209,9 @@ public interface DataInstanceService {
      * @param time
      *            The archive time
      * @return a list of SADataInstance objects
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    List<SADataInstance> getSADataInstances(long containerId, String containerType, List<String> dataNames, long time) throws SDataInstanceException;
+    List<SADataInstance> getSADataInstances(long containerId, String containerType, List<String> dataNames, long time) throws SDataInstanceReadException;
 
     /**
      * Get number of dataInstance for specified container
@@ -221,9 +221,9 @@ public interface DataInstanceService {
      * @param containerType
      *            Type of container, e.g process instance, activity instance and so on.
      * @return the number of dataInstances
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    long getNumberOfDataInstances(long containerId, DataInstanceContainer containerType) throws SDataInstanceException;
+    long getNumberOfDataInstances(long containerId, DataInstanceContainer containerType) throws SDataInstanceReadException;
 
     /**
      * Get all SADataInstance objects for the specific dataInstance
@@ -231,9 +231,9 @@ public interface DataInstanceService {
      * @param dataInstanceId
      *            Identifier of dataInstance
      * @return a list of SADataInstance objects
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    List<SADataInstance> getSADataInstances(long dataInstanceId) throws SDataInstanceException;
+    List<SADataInstance> getSADataInstances(long dataInstanceId) throws SDataInstanceReadException;
 
     /**
      * Get the last SADataInstance object for the specific dataInstance
@@ -241,9 +241,9 @@ public interface DataInstanceService {
      * @param dataInstanceId
      *            Identifier of dataInstance
      * @return a SADataInstance object
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    SADataInstance getLastSADataInstance(long dataInstanceId) throws SDataInstanceException;
+    SADataInstance getLastSADataInstance(long dataInstanceId) throws SDataInstanceReadException;
 
     /**
      * Gets the last archived SADataInstance object for the named data in the container.
@@ -255,9 +255,9 @@ public interface DataInstanceService {
      * @param containerType
      *            the type of the container
      * @return the last archived SADataInstance
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    SADataInstance getLastSADataInstance(String dataName, long containerId, String containerType) throws SDataInstanceException;
+    SADataInstance getLastSADataInstance(String dataName, long containerId, String containerType) throws SDataInstanceReadException;
 
     /**
      * Gets the last archived SADataInstance objects of the container.
@@ -269,16 +269,16 @@ public interface DataInstanceService {
      * @param startIndex
      * @param maxResults
      * @return the last archived SADataInstance
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    List<SADataInstance> getLastLocalSADataInstances(long containerId, String containerType, int startIndex, int maxResults) throws SDataInstanceException;
+    List<SADataInstance> getLastLocalSADataInstances(long containerId, String containerType, int startIndex, int maxResults) throws SDataInstanceReadException;
 
     /**
      * @param containerId
      * @param containerType
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    void removeContainer(long containerId, String containerType) throws SDataInstanceException;
+    void removeContainer(long containerId, String containerType) throws SDataInstanceReadException;
 
     /**
      * Get the local SADataInstances for this element
@@ -288,9 +288,9 @@ public interface DataInstanceService {
      * @param fromIndex
      * @param maxResults
      * @return
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    List<SADataInstance> getLocalSADataInstances(long containerId, String containerType, int fromIndex, int maxResults) throws SDataInstanceException;
+    List<SADataInstance> getLocalSADataInstances(long containerId, String containerType, int fromIndex, int maxResults) throws SDataInstanceReadException;
 
     /**
      * @param sDataInstance
@@ -303,10 +303,10 @@ public interface DataInstanceService {
      * 
      * @param containerId
      * @param dataInstanceContainerType
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      * @since 6.1
      */
-    void deleteLocalArchivedDataInstances(long containerId, String dataInstanceContainerType) throws SDataInstanceException;
+    void deleteLocalArchivedDataInstances(long containerId, String dataInstanceContainerType) throws SDataInstanceReadException;
 
     /**
      * Delete all local active data instances for a specified container
@@ -314,10 +314,10 @@ public interface DataInstanceService {
      * @param containerId
      * @param dataInstanceContainerType
      * @param dataPresent
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      * @since 6.1
      */
-    void deleteLocalDataInstances(long containerId, String dataInstanceContainerType, boolean dataPresent) throws SDataInstanceException;
+    void deleteLocalDataInstances(long containerId, String dataInstanceContainerType, boolean dataPresent) throws SDataInstanceReadException;
 
     /**
      * Archive all data instances in database, for a specific process instance, at a specific date
@@ -326,9 +326,9 @@ public interface DataInstanceService {
      *            Identifier of process instance
      * @param archiveDate
      *            Date to archive
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      * @since 6.1
      */
-    void archiveLocalDataInstancesFromProcessInstance(long processInstanceId, long archiveDate) throws SDataInstanceException;
+    void archiveLocalDataInstancesFromProcessInstance(long processInstanceId, long archiveDate) throws SDataInstanceReadException;
 
 }

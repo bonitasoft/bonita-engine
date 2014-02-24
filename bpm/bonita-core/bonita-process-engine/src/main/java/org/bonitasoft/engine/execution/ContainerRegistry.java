@@ -51,7 +51,7 @@ public class ContainerRegistry {
             throws SBonitaException {
         final ContainerExecutor containerExecutor = executors.get(parentType);
         if (containerExecutor != null) {
-            containerExecutor.childFinished(processDefinitionId, flowNodeInstanceId, stateId, parentId);
+            containerExecutor.childFinished(processDefinitionId, flowNodeInstanceId, parentId);
         } else {
             throw new SActivityExecutionException("There is no container executor for the container " + parentId + " having the type " + parentType);
         }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,6 +34,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  * @author Zhao na
  * @author Emmanuel Duchastenier
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ExpressionServiceImpl implements ExpressionService {
 
@@ -126,7 +127,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate", exceptionMessage));
             }
-            throw new SExpressionEvaluationException(exceptionMessage);
+            throw new SExpressionEvaluationException(exceptionMessage, null);
         }
         for (int i = 0; i < list.size(); i++) {
             checkReturnType(expressions.get(i), list.get(i));

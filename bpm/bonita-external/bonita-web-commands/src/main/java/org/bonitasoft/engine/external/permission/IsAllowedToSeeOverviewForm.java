@@ -22,7 +22,6 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.impl.transaction.actor.GetActorsOfUserCanStartProcessDefinitions;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.SCommandExecutionException;
@@ -31,9 +30,9 @@ import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
 import org.bonitasoft.engine.search.impl.SearchOptionsImpl;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesInvolvingUser;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUser;
@@ -75,12 +74,12 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
         final ProcessInstanceService processInstanceService = this.tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
-        final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = searchEntitiesDescriptor.getSearchProcessInstanceDescriptor();
 
-        final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService, searchProcessInstanceDescriptor,
-                processInstanceId);
         try {
-            getProcessInstance.execute();
+            final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+            if (sProcessInstance != null) {
+                processDefinitionId = sProcessInstance.getProcessDefinitionId();
+            }
         } catch (final SBonitaException e) {
             final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
                     searchEntitiesDescriptor, processInstanceId, 0, 5);
@@ -94,10 +93,6 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
             if (archivedPInstances.size() > 0) {
                 processDefinitionId = archivedPInstances.get(0).getProcessDefinitionId();
             }
-        }
-        final ProcessInstance processInstance = getProcessInstance.getResult();
-        if (processInstance != null) {
-            processDefinitionId = processInstance.getProcessDefinitionId();
         }
 
         if (processDefinitionId != 0) {

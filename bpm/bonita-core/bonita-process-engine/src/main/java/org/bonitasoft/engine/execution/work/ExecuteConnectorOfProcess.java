@@ -88,7 +88,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
 
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SProcessInstance intTxProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
-        final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance, activationEvent, connectorService);
+        final boolean connectorTriggered = processExecutor.executeConnectors(sProcessDefinition, intTxProcessInstance, activationEvent);
         if (!connectorTriggered) {
             if (activationEvent == ConnectorEvent.ON_ENTER) {
                 FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, new StartFlowNodeFilter());

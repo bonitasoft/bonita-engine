@@ -104,7 +104,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
@@ -197,7 +197,7 @@ public class BPMInstancesCreator {
         try {
             dataInstanceService.addChildContainer(flowNodeInstance.getParentContainerId(), parentContainerType, flowNodeInstance.getId(),
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-        } catch (final SDataInstanceException e) {
+        } catch (final SDataInstanceReadException e) {
             throw new SActivityStateExecutionException(e);
         }
     }
@@ -612,7 +612,7 @@ public class BPMInstancesCreator {
     private void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
             final SExpressionContext expressionContext, final ExpressionResolverService expressionResolverService,
             final DataInstanceService dataInstanceService, final String loopDataInputRef, final int index,
-            final String dataInputRef, final long parentContainerId) throws SDataInstanceException, SExpressionException {
+            final String dataInputRef, final long parentContainerId) throws SDataInstanceReadException, SExpressionException {
         for (final SDataDefinition dataDefinition : dataDefinitions) {
             Serializable dataValue = null;
             if (dataDefinition.getName().equals(dataInputRef)) {
@@ -622,11 +622,11 @@ public class BPMInstancesCreator {
                     try {
                         dataValue = (Serializable) ((List<?>) dataInstance.getValue()).get(index);
                     } catch (final ClassCastException e) {
-                        throw new SDataInstanceException("loopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
+                        throw new SDataInstanceReadException("loopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
                                 + " is not a list or the value is not serializable");
                     }
                 } else {
-                    throw new SDataInstanceException("loopDataInput ref named " + loopDataInputRef + " is not visible for " + containerId + " " + containerType);
+                    throw new SDataInstanceReadException("loopDataInput ref named " + loopDataInputRef + " is not visible for " + containerId + " " + containerType);
                 }
             } else {
                 final SExpression defaultValueExpression = dataDefinition.getDefaultValueExpression();
@@ -643,7 +643,7 @@ public class BPMInstancesCreator {
             try {
                 dataInstance = buildDataInstance(dataDefinition, containerId, containerType, dataValue);
             } catch (final SDataInstanceNotWellFormedException e) {
-                throw new SDataInstanceException(e);
+                throw new SDataInstanceReadException(e);
             }
             dataInstanceService.createDataInstance(dataInstance);
         }
@@ -652,7 +652,7 @@ public class BPMInstancesCreator {
 
     public void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
             final SExpressionContext expressionContext, final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService) throws SDataInstanceException,
+            final DataInstanceService dataInstanceService) throws SDataInstanceReadException,
             SExpressionException {
         createDataInstances(dataDefinitions, containerId, containerType, expressionContext, expressionResolverService, dataInstanceService,
                 null, -1, null, -1);

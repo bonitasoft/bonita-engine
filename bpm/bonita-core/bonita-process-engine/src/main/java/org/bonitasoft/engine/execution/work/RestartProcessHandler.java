@@ -66,7 +66,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                     if (info) {
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "executing on enter connectors of process " + processInstance);
                     }
-                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_ENTER, connectorService);
+                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_ENTER);
                 }
             } while (processInstances.size() == queryOptions.getNumberOfResults());
             do {
@@ -77,7 +77,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                     if (info) {
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "executing on finish connectors of process " + processInstance);
                     }
-                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_FINISH, connectorService);
+                    processExecutor.executeConnectors(processDefinition, processInstance, ConnectorEvent.ON_FINISH);
                 }
             } while (processInstances.size() == queryOptions.getNumberOfResults());
         } catch (final SProcessInstanceReadException e) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -42,6 +40,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.expression.Expression;
@@ -52,16 +51,17 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
+import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Ruiheng Fan
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
 
@@ -101,7 +101,7 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         }
         try {
             return sessionAccessor.getTenantId();
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new BonitaRuntimeException(e);
         }
     }
@@ -149,33 +149,27 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         return sOperations;
     }
 
-    protected SActivityInstance getActivityInstance(final TenantServiceAccessor tenantAccessor, final long activityInstanceId)
+    protected SActivityInstance getSActivityInstance(final TenantServiceAccessor tenantAccessor, final long activityInstanceId)
             throws ActivityInstanceNotFoundException {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final GetActivityInstance getActivityInstance = new GetActivityInstance(activityInstanceService, activityInstanceId);
         try {
-            getActivityInstance.execute();
+            return activityInstanceService.getActivityInstance(activityInstanceId);
         } catch (final SBonitaException e) {
             throw new ActivityInstanceNotFoundException(activityInstanceId);
         }
-        return getActivityInstance.getResult();
     }
 
     protected ProcessInstance getProcessInstance(final TenantServiceAccessor tenantAccessor, final long processInstanceId)
             throws ProcessInstanceNotFoundException {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
-                .getSearchProcessInstanceDescriptor();
-
-        final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService, searchProcessInstanceDescriptor,
-                processInstanceId);
         try {
-            getProcessInstance.execute();
+            final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+            return ModelConvertor.toProcessInstances(Collections.singletonList(sProcessInstance),
+                    processDefinitionService).get(0);
         } catch (final SBonitaException e) {
             throw new ProcessInstanceNotFoundException(processInstanceId);
         }
-        return getProcessInstance.getResult();
     }
 
     protected ClassLoader getLocalClassLoader(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) throws ClassLoaderException {

@@ -59,7 +59,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SBPMEventType;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
@@ -233,7 +233,7 @@ public class EventsHandler {
     }
 
     public void handleThrowMessage(final SProcessDefinition processDefinition, final SSendTaskDefinition sendTaskDefinition,
-            final SSendTaskInstance sendTaskInstance) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException, SDataInstanceException,
+            final SSendTaskInstance sendTaskInstance) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException, SDataInstanceReadException,
             SExpressionException {
         final SThrowMessageEventTriggerDefinition eventTrigger = sendTaskDefinition.getMessageTrigger();
         final MessageEventHandlerStrategy messageEventHandlerStrategy = (MessageEventHandlerStrategy) handlers.get(SEventTriggerType.MESSAGE);

@@ -69,7 +69,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -146,7 +146,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
         } catch (final CacheException e) {
             throw new SConnectorException(e);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SConnectorException(e);
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -271,7 +271,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             implementationClassName = implementation.getImplementationClassName();
         } catch (final CacheException e) {
             throw new SConnectorException(e);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SConnectorException(e);
         }
 

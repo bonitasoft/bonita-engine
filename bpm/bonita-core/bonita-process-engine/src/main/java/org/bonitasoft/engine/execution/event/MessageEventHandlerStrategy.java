@@ -59,7 +59,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
@@ -167,7 +167,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     public void handleThrowEvent(final SProcessDefinition processDefinition, final SSendTaskInstance sendTaskInstance,
             final SThrowMessageEventTriggerDefinition messageTrigger) throws SEventTriggerInstanceCreationException, SMessageInstanceCreationException,
-            SDataInstanceException, SExpressionException {
+            SDataInstanceReadException, SExpressionException {
         final long eventInstanceId = sendTaskInstance.getId();
         final String eventInstanceName = sendTaskInstance.getName();
         final long parentContainerId = sendTaskInstance.getParentContainerId();
@@ -179,7 +179,7 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
 
     private void handleThrowMessage(final SEventTriggerDefinition sEventTriggerDefinition, final long eventInstanceId, final String eventInstanceName,
             final Long processDefinitionId, final SExpressionContext expressionContext) throws SEventTriggerInstanceCreationException,
-            SMessageInstanceCreationException, SDataInstanceException, SExpressionException {
+            SMessageInstanceCreationException, SDataInstanceReadException, SExpressionException {
         final SThrowMessageEventTriggerDefinition messageTrigger = (SThrowMessageEventTriggerDefinition) sEventTriggerDefinition;
         final String messageName = messageTrigger.getMessageName();
         final SExpression targetProcess = messageTrigger.getTargetProcess();

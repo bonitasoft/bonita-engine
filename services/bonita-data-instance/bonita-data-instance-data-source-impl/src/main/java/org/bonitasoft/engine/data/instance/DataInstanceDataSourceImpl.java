@@ -22,7 +22,7 @@ import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.data.DataSourceConfiguration;
 import org.bonitasoft.engine.data.instance.exception.SCreateDataInstanceException;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceException;
@@ -74,7 +74,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     }
 
     @Override
-    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
+    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException {
         try {
             final InsertRecord insertRecord = new InsertRecord(dataInstance);
             final SInsertEvent insertEvent = getInsertEvent(dataInstance);
@@ -85,7 +85,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     }
 
     @Override
-    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
+    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dataInstance, descriptor);
         final SUpdateEvent updateEvent = getUpdateEvent(dataInstance);
@@ -97,7 +97,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     }
 
     @Override
-    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
+    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
         final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
         final SDeleteEvent deleteEvent = getDeleteEvent(dataInstance);
@@ -109,7 +109,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     }
 
     @Override
-    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceException {
+    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(dataInstanceId);
         try {
             final SelectByIdDescriptor<SDataInstance> selectDescriptor = new SelectByIdDescriptor<SDataInstance>("getDataInstanceById", SDataInstance.class,
@@ -120,7 +120,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
             }
             return dataInstance;
         } catch (final SBonitaReadException e) {
-            throw new SDataInstanceException("Cannot get the data instance with id " + dataInstanceId, e);
+            throw new SDataInstanceReadException("Cannot get the data instance with id " + dataInstanceId, e);
         }
     }
 
@@ -149,7 +149,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     }
 
     @Override
-    public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
+    public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(dataName, containerType);
         final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
         final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getNameKey(), dataName);
@@ -160,17 +160,17 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
             final SDataInstance dataInstance = persistenceRead.selectOne(new SelectOneDescriptor<SDataInstance>("getDataInstancesByNameAndContainer", paraMap,
                     SDataInstance.class, SDataInstance.class)); // conditions :and not or
             if (dataInstance == null) {
-                throw new SDataInstanceException("No data instance found");
+                throw new SDataInstanceReadException("No data instance found");
             }
             return dataInstance;
         } catch (final SBonitaReadException e) {
-            throw new SDataInstanceException("Unable to check if a data instance already exists: " + e.getMessage(), e);
+            throw new SDataInstanceReadException("Unable to check if a data instance already exists: " + e.getMessage(), e);
         }
     }
 
     @Override
     public List<SDataInstance> getDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
-            throws SDataInstanceException {
+            throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(containerType);
         final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
         final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getContainerIdKey(), containerId);
@@ -180,13 +180,13 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
             return persistenceRead.selectList(new SelectListDescriptor<SDataInstance>("getDataInstancesByContainer", paraMap, SDataInstance.class,
                     SDataInstance.class, new QueryOptions(fromIndex, numberOfResults)));
         } catch (final SBonitaReadException e) {
-            throw new SDataInstanceException("Unable to check if a data instance already exists for the data container of type " + containerType + " with id "
+            throw new SDataInstanceReadException("Unable to check if a data instance already exists for the data container of type " + containerType + " with id "
                     + containerId + " for reason: " + e.getMessage(), e);
         }
     }
 
     @Override
-    public List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) throws SDataInstanceException {
+    public List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(dataInstanceIds);
         if (dataInstanceIds.isEmpty()) {
             return Collections.emptyList();
@@ -201,7 +201,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
             }
             return dataInstances;
         } catch (final SBonitaReadException e) {
-            throw new SDataInstanceException("Cannot get the data instance with id " + dataInstanceIds, e);
+            throw new SDataInstanceReadException("Cannot get the data instance with id " + dataInstanceIds, e);
         }
     }
 

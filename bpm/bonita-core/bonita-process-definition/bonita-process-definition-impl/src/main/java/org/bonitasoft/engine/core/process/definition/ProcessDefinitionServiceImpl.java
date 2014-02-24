@@ -31,7 +31,7 @@ import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.ReflectException;
+import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
@@ -327,7 +327,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
     }
 
-    private long setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition) throws ReflectException {
+    private long setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition) throws SReflectException {
         final long id = generateId();
         ClassReflector.invokeSetter(sProcessDefinition, "setId", Long.class, id);
         return id;

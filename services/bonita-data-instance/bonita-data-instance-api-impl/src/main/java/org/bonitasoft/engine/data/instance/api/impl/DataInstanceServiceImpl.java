@@ -30,7 +30,7 @@ import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -102,7 +102,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     // FIXME this should be done BEFORE insertChildContainer... should we add a check mappings and add it here too
     @Override
-    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
+    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "createDataInstance");
         final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(dataInstance.isTransientData());
         dataInstanceDataSource.createDataInstance(dataInstance);
@@ -110,7 +110,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         logAfterMethod(TechnicalLogSeverity.TRACE, "createDataInstance");
     }
 
-    private DataInstanceDataSource getDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion) throws SDataInstanceException {
+    private DataInstanceDataSource getDataInstanceDataSource(final String dataSourceName, final String dataSourceVersion) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource");
         try {
             final SDataSource dataSource = dataSourceService.getDataSource(dataSourceName, dataSourceVersion);
@@ -120,11 +120,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return dataInstanceDataSource;
         } catch (final SBonitaException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource", e);
-            throw new SDataInstanceException("Unable to get data instance data source", e);
+            throw new SDataInstanceReadException("Unable to get data instance data source", e);
         }
     }
 
-    private DataInstanceDataSource getDataInstanceDataSource(final boolean isTransient) throws SDataInstanceException {
+    private DataInstanceDataSource getDataInstanceDataSource(final boolean isTransient) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstanceDataSource");
         final DataInstanceDataSource dataInstanceDataSource;
         if (isTransient) {
@@ -137,7 +137,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
+    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "updateDataInstance");
         NullCheckingUtil.checkArgsNotNull(dataInstance, descriptor);
         if (dataInstance.isTransientData()) {
@@ -151,11 +151,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         archiveDataInstance(dataInstance);
     }
 
-    private void archiveDataInstance(final SDataInstance sDataInstance) throws SDataInstanceException {
+    private void archiveDataInstance(final SDataInstance sDataInstance) throws SDataInstanceReadException {
         archiveDataInstance(sDataInstance, System.currentTimeMillis());
     }
 
-    private void archiveDataInstance(final SDataInstance sDataInstance, final long archiveDate) throws SDataInstanceException {
+    private void archiveDataInstance(final SDataInstance sDataInstance, final long archiveDate) throws SDataInstanceReadException {
         if (!sDataInstance.isTransientData()) {
             try {
                 final SADataInstance saDataInstance = BuilderFactory.get(SADataInstanceBuilderFactory.class).createNewInstance(sDataInstance).done();
@@ -163,16 +163,16 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 archiveService.recordInsert(archiveDate, archiveInsertRecord);
             } catch (final SDefinitiveArchiveNotFound e) {
                 logOnExceptionMethod(TechnicalLogSeverity.TRACE, "updateDataInstance", e);
-                throw new SDataInstanceException("Unable to create SADataInstance", e);
+                throw new SDataInstanceReadException("Unable to create SADataInstance", e);
             } catch (final SRecorderException e) {
                 logOnExceptionMethod(TechnicalLogSeverity.TRACE, "updateDataInstance", e);
-                throw new SDataInstanceException("Unable to create SADataInstance", e);
+                throw new SDataInstanceReadException("Unable to create SADataInstance", e);
             }
         }
     }
 
     @Override
-    public void archiveLocalDataInstancesFromProcessInstance(final long processInstanceId, final long archiveDate) throws SDataInstanceException {
+    public void archiveLocalDataInstancesFromProcessInstance(final long processInstanceId, final long archiveDate) throws SDataInstanceReadException {
         final int archiveBatchSize = 50;
         int currentIndex = 0;
         List<SDataInstance> sDataInstances = getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
@@ -188,7 +188,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
+    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "deleteDataInstance");
         NullCheckingUtil.checkArgsNotNull(dataInstance);
         final DataInstanceDataSource dataInstanceDataSource = getDataInstanceDataSource(dataInstance.isTransientData());
@@ -197,7 +197,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceException {
+    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceReadException {
         // FIXME: update the service interface to take data source information as parameters instead of look for data in both datasources
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstance");
         try {
@@ -208,7 +208,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
+    public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceReadException {
         // FIXME: update the service interface to take data source information as parameters instead of look for data in both datasources
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstance");
 
@@ -218,18 +218,18 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return getDataInstanceById(dataInstanceId);
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstance", e);
-            throw new SDataInstanceException("No data found with name " + dataName + "  neither on container " + containerId + " with type " + containerType
+            throw new SDataInstanceReadException("No data found with name " + dataName + "  neither on container " + containerId + " with type " + containerType
                     + " nor in its parents", e);
         } finally {
             logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstance");
         }
     }
 
-    private SDataInstance getDataInstanceById(final long dataInstanceId) throws SDataInstanceException {
+    private SDataInstance getDataInstanceById(final long dataInstanceId) throws SDataInstanceReadException {
         final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
         try {
             return transientDataInstanceDataSource.getDataInstance(dataInstanceId);
-        } catch (final SDataInstanceException e) {
+        } catch (final SDataInstanceReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstance", e);
             final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
             return defaultDataInstanceDataSource.getDataInstance(dataInstanceId);
@@ -294,7 +294,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     @Override
     public List<SDataInstance> getDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
-            throws SDataInstanceException {
+            throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
         NullCheckingUtil.checkArgsNotNull(containerType);
         try {
@@ -307,7 +307,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return dataInstances;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
-            throw new SDataInstanceException("Unable to read data mappings of the container with type " + containerType + " and id " + containerId, e);
+            throw new SDataInstanceReadException("Unable to read data mappings of the container with type " + containerType + " and id " + containerId, e);
         }
     }
 
@@ -322,7 +322,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public SDataInstance getLocalDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
+    public SDataInstance getLocalDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstance");
         NullCheckingUtil.checkArgsNotNull(dataName);
         NullCheckingUtil.checkArgsNotNull(containerType);
@@ -331,7 +331,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
         try {
             return transientDataInstanceDataSource.getDataInstance(dataName, containerId, containerType);
-        } catch (final SDataInstanceException e) {
+        } catch (final SDataInstanceReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstance", e);
             final DataInstanceDataSource defaultDataInstanceDataSource = getDataInstanceDataSource(DEFAULT_DATA_SOURCE, DATA_SOURCE_VERSION);
             return defaultDataInstanceDataSource.getDataInstance(dataName, containerId, containerType);
@@ -342,7 +342,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     @Override
     public List<SDataInstance> getLocalDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
-            throws SDataInstanceException {
+            throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstances");
         NullCheckingUtil.checkArgsNotNull(containerType);
         final DataInstanceDataSource transientDataInstanceDataSource = getDataInstanceDataSource(TRANSIENT_DATA_SOURCE, TRANSIENT_DATA_SOURCE_VERSION);
@@ -353,7 +353,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             final List<SDataInstance> dataInstances = defaultDataInstanceDataSource.getDataInstances(containerId, containerType, fromIndex, numberOfResults);
             dataInstances.addAll(transientDataInstances);
             return dataInstances;
-        } catch (final SDataInstanceException e) {
+        } catch (final SDataInstanceReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLocalDataInstances", e);
             throw e;
         } finally {
@@ -363,7 +363,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     @Override
     public void addChildContainer(final long parentContainerId, final String parentContainerType, final long containerId, final String containerType)
-            throws SDataInstanceException {
+            throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "addChildContainer");
         try {
             // insert mappings from parent element
@@ -388,15 +388,15 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             logAfterMethod(TechnicalLogSeverity.TRACE, "addChildContainer");
         } catch (final SRecorderException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "addChildContainer", e);
-            throw new SDataInstanceException(e);
+            throw new SDataInstanceReadException(e);
         } catch (final SDefinitiveArchiveNotFound e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "addChildContainer", e);
-            throw new SDataInstanceException(e);
+            throw new SDataInstanceReadException(e);
         }
     }
 
     @Override
-    public void removeContainer(final long containerId, final String containerType) throws SDataInstanceException {
+    public void removeContainer(final long containerId, final String containerType) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "removeContainer");
         try {
             List<SDataInstanceVisibilityMapping> visibilityMappings;
@@ -409,28 +409,28 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             logAfterMethod(TechnicalLogSeverity.TRACE, "removeContainer");
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "removeContainer", e);
-            throw new SDataInstanceException(e);
+            throw new SDataInstanceReadException(e);
         }
 
     }
 
     /**
      * @param sDataInstanceVisibilityMapping
-     * @throws SDataInstanceException
+     * @throws SDataInstanceReadException
      */
-    private void deleteDataInstanceVisibilityMapping(final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping) throws SDataInstanceException {
+    private void deleteDataInstanceVisibilityMapping(final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping) throws SDataInstanceReadException {
         final DeleteRecord record = new DeleteRecord(sDataInstanceVisibilityMapping);
         final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_VISIBILITY_MAPPING).done();
         try {
             recorder.recordDelete(record, deleteEvent);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "deleteDataInstanceVisibilityMapping", e);
-            throw new SDataInstanceException(e);
+            throw new SDataInstanceReadException(e);
         }
     }
 
     @Override
-    public List<SDataInstanceVisibilityMapping> createDataContainer(final long containerId, final String containerType) throws SDataInstanceException {
+    public List<SDataInstanceVisibilityMapping> createDataContainer(final long containerId, final String containerType) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "createDataContainer");
         try {
             final List<SDataInstanceVisibilityMapping> listSDataInstanceVisibilityMapping = insertMappingForLocalElement(containerId, containerType);
@@ -438,15 +438,15 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return listSDataInstanceVisibilityMapping;
         } catch (final SRecorderException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "createDataContainer", e);
-            throw new SDataInstanceException(e);
+            throw new SDataInstanceReadException(e);
         } catch (final SDefinitiveArchiveNotFound e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "createDataContainer", e);
-            throw new SDataInstanceException(e);
+            throw new SDataInstanceReadException(e);
         }
     }
 
     protected List<SDataInstanceVisibilityMapping> insertMappingForLocalElement(final long containerId, final String containerType) throws SRecorderException,
-            SDataInstanceException, SDefinitiveArchiveNotFound {
+            SDataInstanceReadException, SDefinitiveArchiveNotFound {
         final int batchSize = 50;
         int currentIndex = 0;
         final long archiveDate = System.currentTimeMillis();
@@ -495,7 +495,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     @Override
     public SADataInstance getSADataInstance(final long containerId, final String containerType, final String dataName, final long time)
-            throws SDataInstanceException {
+            throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
         try {
             final long dataInstanceId = getSADataInstanceDataVisibilityMapping(dataName, containerId, containerType);
@@ -509,12 +509,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return saDataInstance;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstance", e);
-            throw new SDataInstanceException("Unable to read SADataInstance", e);
+            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
         }
     }
 
     @Override
-    public SADataInstance getSADataInstance(final long sourceObjectId, final long time) throws SDataInstanceException {
+    public SADataInstance getSADataInstance(final long sourceObjectId, final long time) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
         try {
             final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
@@ -527,12 +527,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return saDataInstance;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstance", e);
-            throw new SDataInstanceException("Unable to read SADataInstance", e);
+            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
         }
     }
 
     @Override
-    public List<SADataInstance> getSADataInstances(final long dataInstanceId) throws SDataInstanceException {
+    public List<SADataInstance> getSADataInstances(final long dataInstanceId) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
         try {
             final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
@@ -545,12 +545,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return listSADataInstance;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstances", e);
-            throw new SDataInstanceException("Unable to read SADataInstance", e);
+            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
         }
     }
 
     @Override
-    public SADataInstance getLastSADataInstance(final long dataInstanceId) throws SDataInstanceException {
+    public SADataInstance getLastSADataInstance(final long dataInstanceId) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
         try {
             final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
@@ -562,12 +562,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return saDataInstance;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance", e);
-            throw new SDataInstanceException("Unable to read SADataInstance", e);
+            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
         }
     }
 
     @Override
-    public SADataInstance getLastSADataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
+    public SADataInstance getLastSADataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
         final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final Map<String, Object> parameters = new HashMap<String, Object>(1);
@@ -587,13 +587,13 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return saDataInstance;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance", e);
-            throw new SDataInstanceException("Unable to read SADataInstance", e);
+            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
         }
     }
 
     @Override
     public List<SADataInstance> getLastLocalSADataInstances(final long containerId, final String containerType, final int startIndex, final int maxResults)
-            throws SDataInstanceException {
+            throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastLocalSADataInstances");
         try {
             final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
@@ -606,12 +606,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return saDataInstances;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLastLocalSADataInstances", e);
-            throw new SDataInstanceException("Unable to read SADataInstance", e);
+            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
         }
     }
 
     @Override
-    public long getNumberOfDataInstances(final long containerId, final DataInstanceContainer containerType) throws SDataInstanceException {
+    public long getNumberOfDataInstances(final long containerId, final DataInstanceContainer containerType) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getNumberOfDataInstances");
         final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("containerId", containerId);
@@ -623,14 +623,14 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             dataInstanceId = persistenceService.selectOne(selectOneDescriptor);
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getNumberOfDataInstances", e);
-            throw new SDataInstanceException(e);
+            throw new SDataInstanceReadException(e);
         }
         logAfterMethod(TechnicalLogSeverity.TRACE, "getNumberOfDataInstances");
         return dataInstanceId;
     }
 
     @Override
-    public List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId, final String containerType) throws SDataInstanceException {
+    public List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId, final String containerType) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
         NullCheckingUtil.checkArgsNotNull(dataNames, containerType);
         // FIXME: update the service interface to take data source information as parameters instead of look for data in both datasources
@@ -643,7 +643,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             List<SDataInstance> result = null;
             try {
                 result = transientDataInstanceDataSource.getDataInstances(dataInstanceIds);
-            } catch (final SDataInstanceException e) {
+            } catch (final SDataInstanceReadException e) {
                 logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
             }
             if (result == null || result.size() < dataNames.size()) {
@@ -659,14 +659,14 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return result;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
-            throw new SDataInstanceException("Unable to find the data in the data mapping with name = " + dataNames + ", containerId = " + containerId
+            throw new SDataInstanceReadException("Unable to find the data in the data mapping with name = " + dataNames + ", containerId = " + containerId
                     + ", containerType = " + containerType, e);
         }
     }
 
     @Override
     public List<SADataInstance> getSADataInstances(final long containerId, final String containerType, final List<String> dataNames, final long time)
-            throws SDataInstanceException {
+            throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
         if (dataNames.isEmpty()) {
             return Collections.emptyList();
@@ -683,13 +683,13 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return listSADataInstance;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstances", e);
-            throw new SDataInstanceException("Unable to read SADataInstance", e);
+            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
         }
     }
 
     @Override
     public List<SADataInstance> getLocalSADataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
-            throws SDataInstanceException {
+            throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLocalSADataInstances");
         try {
             final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
@@ -702,7 +702,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return saDataInstances;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLocalSADataInstances", e);
-            throw new SDataInstanceException("Unable to read SADataInstance", e);
+            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
         }
     }
 
@@ -721,7 +721,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public void deleteLocalArchivedDataInstances(final long containerId, final String dataInstanceContainerType) throws SDataInstanceException {
+    public void deleteLocalArchivedDataInstances(final long containerId, final String dataInstanceContainerType) throws SDataInstanceReadException {
         List<SADataInstance> sDataInstances;
         do {
             sDataInstances = getLocalSADataInstances(containerId, dataInstanceContainerType, 0, 100);
@@ -733,7 +733,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     @Override
     public void deleteLocalDataInstances(final long containerId, final String dataInstanceContainerType, final boolean dataPresent)
-            throws SDataInstanceException {
+            throws SDataInstanceReadException {
         if (dataPresent) {
             final int deleteBatchSize = 80;
             List<SDataInstance> sDataInstances = getLocalDataInstances(containerId, dataInstanceContainerType, 0, deleteBatchSize);
