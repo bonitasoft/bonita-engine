@@ -64,6 +64,12 @@
 			<version>2.2.7</version>
 		</dependency>
 		<dependency>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>org.eclipse.jdt.core</artifactId>
+            <version>3.9.1.v20130905-0837</version>
+        </dependency>
+		
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
@@ -101,6 +107,13 @@
 			<version>1.7.5</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- used by jdt compiler tests -->
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.1.Final</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>

@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.bdm.compiler;
+package com.bonitasoft.engine.compiler;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
