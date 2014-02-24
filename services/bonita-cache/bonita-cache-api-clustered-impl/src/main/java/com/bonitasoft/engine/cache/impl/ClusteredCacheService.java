@@ -16,7 +16,7 @@ import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.DistributedObject;
@@ -46,7 +46,7 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
     protected String getKeyFromCacheName(final String cacheName) throws CacheException {
         try {
             return String.valueOf(sessionAccessor.getTenantId()) + '_' + cacheName;
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new CacheException(e);
         }
     }
@@ -64,7 +64,7 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
                 }
             }
 
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new RuntimeException(e);
         }
 

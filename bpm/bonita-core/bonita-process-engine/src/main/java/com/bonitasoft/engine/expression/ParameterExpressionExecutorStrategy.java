@@ -46,29 +46,32 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
         long processDefinitionId;
         final String expressionContent = expression.getContent();
         try {
-            Object result = null;
             if (dependencyValues != null && !dependencyValues.isEmpty()) {
                 if (dependencyValues.containsKey(PROCESS_DEFINITION_ID)) {
                     processDefinitionId = (Long) dependencyValues.get(PROCESS_DEFINITION_ID);
                     final SParameter para = parameterService.get(processDefinitionId, expressionContent);
-                    final String returnType = expression.getReturnType();
-                    if (Boolean.class.getName().equals(returnType)) {
-                        result = Boolean.parseBoolean(para.getValue());
-                    } else if (Double.class.getName().equals(returnType)) {
-                        result = Double.parseDouble(para.getValue());
-                    } else if (Integer.class.getName().equals(returnType)) {
-                        result = Integer.parseInt(para.getValue());
-                    } else if (String.class.getName().equals(returnType)) {
-                        result = para.getValue();
+                    try {
+                        final String returnType = expression.getReturnType();
+                        if (Boolean.class.getName().equals(returnType)) {
+                            return Boolean.parseBoolean(para.getValue());
+                        } else if (Double.class.getName().equals(returnType)) {
+                            return Double.parseDouble(para.getValue());
+                        } else if (Integer.class.getName().equals(returnType)) {
+                            return Integer.parseInt(para.getValue());
+                        } else if (String.class.getName().equals(returnType)) {
+                            return para.getValue();
+                        }
+                    } catch (final NumberFormatException e) {
+                        throw new SExpressionEvaluationException("Can't convert value = " + para.getValue() + " in type = returnType", e, expression.getName());
                     }
                 } else {
                     throw new SExpressionDependencyMissingException("Mandatory dependency processDefinitionId is missing.");
                 }
             }
-            return result;
         } catch (final SParameterProcessNotFoundException e) {
-            throw new SExpressionEvaluationException("Referenced parameter '" + expressionContent + "' does not exist", e);
+            throw new SExpressionEvaluationException("Referenced parameter '" + expressionContent + "' does not exist", e, expression.getName());
         }
+        return null;
     }
 
     @Override
