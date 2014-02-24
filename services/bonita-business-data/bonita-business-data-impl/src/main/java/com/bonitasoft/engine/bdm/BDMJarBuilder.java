@@ -33,6 +33,12 @@ import com.sun.codemodel.JClassAlreadyExistsException;
  */
 public class BDMJarBuilder {
 
+    private JDTCompiler compiler;
+
+    public BDMJarBuilder(final JDTCompiler compiler) {
+        this.compiler = compiler;
+    }
+
     public byte[] build(final byte[] bomZip) throws SBusinessDataRepositoryDeploymentException {
         try {
             final BusinessObjectModel bom = getBOM(bomZip);
@@ -70,8 +76,8 @@ public class BDMJarBuilder {
 
     protected void compileJavaClasses(final File srcDirectory) throws CompilationException {
         final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[] { "java" }, true);
-        final JDTCompiler jdtCompiler = new JDTCompiler();
-        jdtCompiler.compile(files, srcDirectory);
+        compiler = new JDTCompiler();
+        compiler.compile(files, srcDirectory);
     }
 
     protected byte[] addPersistenceFile(final byte[] jar, final BusinessObjectModel bom) throws IOException, TransformerException,
