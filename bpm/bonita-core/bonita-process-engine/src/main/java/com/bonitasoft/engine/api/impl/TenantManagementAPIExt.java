@@ -9,7 +9,10 @@
 package com.bonitasoft.engine.api.impl;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import javax.tools.Diagnostic;
@@ -93,7 +96,10 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 			final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
 			final Iterable<? extends JavaFileObject> compUnits = fileManager.getJavaFileObjectsFromFiles(files);
 			DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-			final Boolean compiled = compiler.getTask(null, fileManager, diagnostics, null, null, compUnits).call();
+			List<String> optionList = new ArrayList<String>();
+			// set compiler's classpath to be same as the runtime's
+			optionList.addAll(Arrays.asList("-classpath",System.getProperty("java.class.path")));
+			final Boolean compiled = compiler.getTask(null, fileManager, diagnostics, optionList, null, compUnits).call();
 			if (!compiled) {
 				StringBuilder sb = new StringBuilder();
 				for(Diagnostic<? extends JavaFileObject> diagnostic :diagnostics.getDiagnostics()){
