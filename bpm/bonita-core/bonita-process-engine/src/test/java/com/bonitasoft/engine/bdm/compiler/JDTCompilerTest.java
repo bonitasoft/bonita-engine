@@ -75,6 +75,6 @@ public class JDTCompilerTest {
     public void should_compile_class_with_external_dependencies() throws Exception {
         File compilableWithDependency = getTestResourceAsFile("JpaDependencyNeeded.java");
 
-        jdtCompiler.compile(asList(compilableWithDependency), outputdirectory);
+        jdtCompiler.compile(asList(compilableWithDependency), outputdirectory, System.getProperty("java.class.path"));
     }
 }

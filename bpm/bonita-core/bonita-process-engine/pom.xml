@@ -102,6 +102,13 @@
 			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- used by jdt compiler tests -->
+		<dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.1.Final</version>
+            <scope>test</scope>
+        </dependency>
 
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
