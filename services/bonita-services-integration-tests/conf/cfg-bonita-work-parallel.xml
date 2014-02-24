@@ -12,7 +12,7 @@
 	</bean>
 
 	<bean id="bonitaExecutorServiceFactory" class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
-		<constructor-arg name="tenantId" value="222" />
+		<constructor-arg name="tenantId" value="1" />
 		<constructor-arg name="corePoolSize" value="20" />
 		<constructor-arg name="maximumPoolSize" value="20" />
 		<constructor-arg name="keepAliveTimeSeconds" value="60" />
