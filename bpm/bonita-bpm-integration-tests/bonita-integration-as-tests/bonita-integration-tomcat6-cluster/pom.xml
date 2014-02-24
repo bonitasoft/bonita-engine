@@ -13,7 +13,7 @@
 
 
 	<properties>
-		<bonita.home.classifier>hibernate-performance-cluster</bonita.home.classifier>
+		<bonita.home.classifier>performance-cluster</bonita.home.classifier>
 		<tomcat.version>6.0.37</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
 		<tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
