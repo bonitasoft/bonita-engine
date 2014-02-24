@@ -10,10 +10,11 @@ package com.bonitasoft.engine.business.data.impl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.metamodel.EntityType;
 
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
@@ -38,13 +39,10 @@ public class SchemaGenerator {
 
         @Override
         public void execute(final Connection connection) throws SQLException {
-            final DatabaseMetadata databaseMetadata = new DatabaseMetadata(connection, dialect);
+            final DatabaseMetadata databaseMetadata = new DatabaseMetadata(connection, dialect, cfg);
             scripts = cfg.generateSchemaUpdateScript(dialect, databaseMetadata);
         }
 
-        /**
-         * @return the scripts
-         */
         public String[] getScripts() {
             return scripts;
         }
@@ -56,24 +54,20 @@ public class SchemaGenerator {
 
     private final EntityManager entityManager;
 
-    public SchemaGenerator(final EntityManager entityManager, final Properties properties, final List<String> classNameList)
-            throws SBusinessDataRepositoryDeploymentException {
+    public SchemaGenerator(final EntityManager entityManager, final Properties properties) throws SBusinessDataRepositoryDeploymentException {
         this.entityManager = entityManager;
+        dialect = Dialect.getDialect(properties);
+
         cfg = new Configuration();
         cfg.setProperties(properties);
         cfg.setProperty("hibernate.hbm2ddl.auto", "update");
         cfg.setProperty("hibernate.current_session_context_class", "jta");
         cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory");
         cfg.setProperty("hibernate.transaction.jta.platform", "org.bonitasoft.engine.persistence.JNDIBitronixJtaPlatform");
-        dialect = Dialect.getDialect(properties);
-        for (final String className : classNameList) {
-            Class<?> annotatedClass;
-            try {
-                annotatedClass = Thread.currentThread().getContextClassLoader().loadClass(className);
-                cfg.addAnnotatedClass(annotatedClass);
-            } catch (final ClassNotFoundException e) {
-                throw new SBusinessDataRepositoryDeploymentException(e);
-            }
+
+        final Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
+        for (final EntityType<?> entity : entities) {
+            cfg.addAnnotatedClass(entity.getJavaType());
         }
     }
 
@@ -85,7 +79,7 @@ public class SchemaGenerator {
      * @throws SQLException
      */
     public String[] generate() throws SQLException {
-        ScriptGeneratorWork work = new ScriptGeneratorWork();
+        final ScriptGeneratorWork work = new ScriptGeneratorWork();
         ((Session) entityManager.getDelegate()).doWork(work);
         return work.getScripts();
     }

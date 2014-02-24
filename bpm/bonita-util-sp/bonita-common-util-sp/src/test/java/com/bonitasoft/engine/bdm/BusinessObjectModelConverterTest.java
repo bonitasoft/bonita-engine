@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
-import org.bonitasoft.engine.exception.CreationException;
+import javax.xml.bind.JAXBException;
+
 import org.junit.Test;
 
 import com.bonitasoft.engine.io.IOUtils;
@@ -12,7 +13,7 @@ import com.bonitasoft.engine.io.IOUtils;
 public class BusinessObjectModelConverterTest {
 
     @Test
-    public void zipThenUnzipBOMShouldReturnTheOriginalBOM() throws IOException, CreationException {
+    public void zipThenUnzipBOMShouldReturnTheOriginalBOM() throws Exception {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final BusinessObjectModel bom = new BOMBuilder().buildDefaultBOM();
         final byte[] zip = convertor.zip(bom);
@@ -21,29 +22,29 @@ public class BusinessObjectModelConverterTest {
         assertThat(actual).isEqualTo(bom);
     }
 
-    @Test(expected = CreationException.class)
-    public void zipAnEmptyBOMShouldThrowAnException() throws IOException, CreationException {
+    @Test(expected = JAXBException.class)
+    public void zipAnEmptyBOMShouldThrowAnException() throws Exception {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final BusinessObjectModel bom = new BOMBuilder().buildEmptyBOM();
         convertor.zip(bom);
     }
 
-    @Test(expected = CreationException.class)
-    public void zipAnBOMWithAnEmptyShouldThrowAnException() throws IOException, CreationException {
+    @Test(expected = JAXBException.class)
+    public void zipAnBOMWithAnEmptyShouldThrowAnException() throws Exception {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final BusinessObjectModel bom = new BOMBuilder().buildBOMWithAnEmptyEntity();
         convertor.zip(bom);
     }
 
-    @Test(expected = CreationException.class)
-    public void zipAnBOMWithAnEmptyFieldShouldThrowAnException() throws IOException, CreationException {
+    @Test(expected = JAXBException.class)
+    public void zipAnBOMWithAnEmptyFieldShouldThrowAnException() throws Exception {
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         final BusinessObjectModel bom = new BOMBuilder().buildBOMWithAnEmptyField();
         convertor.zip(bom);
     }
 
-    @Test(expected = CreationException.class)
-    public void unzipADifferentZipThrowAnException() throws IOException, CreationException {
+    @Test(expected = IOException.class)
+    public void unzipADifferentZipThrowAnException() throws Exception {
         final byte[] zip = IOUtils.zip("bonita", "bpm".getBytes());
         final BusinessObjectModelConverter convertor = new BusinessObjectModelConverter();
         convertor.unzip(zip);

@@ -52,35 +52,7 @@
 			<version>3.0.3</version><!-- Update version for local tests if needed -->
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>schemagen</goal>
-						</goals>
-						<phase>process-classes</phase>
-						<configuration>
-							<includes>
-								<include>com/bonitasoft/engine/bdm/BusinessObjectModel.java</include>
-							</includes>
-							<outputDirectory>${project.build.directory}/schemas</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+	
 </project>

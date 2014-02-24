@@ -23,14 +23,14 @@ public interface BusinessDataRepository {
     /**
      * Deploys a Business Data Model / repository on the specified tenant.
      * 
-     * @param bdrArchive
+     * @param bdmArchive
      *            the Business Data Model, as a jar containing the Business Object classes to deploy.
      * @param tenantId
      *            the ID of the tenant to deploy the Business Data Model to.
      * @throws SBusinessDataRepositoryDeploymentException
      *             if a deployment exception occurs.
      */
-    void deploy(byte[] bdrArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
+    void deploy(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
 
     void start() throws SBusinessDataRepositoryDeploymentException;
 
