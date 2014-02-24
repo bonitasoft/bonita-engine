@@ -11,6 +11,8 @@ package com.bonitasoft.engine.bdm;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -19,22 +21,19 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Matthieu Chaffotte
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class BusinessObjectModel {
 
-    private List<BusinessObject> businessObjects;
+    @XmlElementWrapper(name = "entities", required = true)
+    @XmlElement(name = "entity", required = true)
+    private final List<BusinessObject> businessObjects;
 
     public BusinessObjectModel() {
         businessObjects = new ArrayList<BusinessObject>();
     }
 
-    @XmlElementWrapper(name = "entities")
-    @XmlElement(name = "entity")
     public List<BusinessObject> getEntities() {
         return businessObjects;
-    }
-
-    public void setEntities(final List<BusinessObject> businessObjects) {
-        this.businessObjects = businessObjects;
     }
 
     public void addBusinessObject(final BusinessObject businessObject) {

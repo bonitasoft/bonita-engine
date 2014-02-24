@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="businessObjectModel" type="businessObjectModel"/>
+
+  <xs:complexType name="businessObjectModel">
+    <xs:sequence>
+      <xs:element name="entities">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entity" type="businessObject" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="businessObject">
+    <xs:sequence>
+      <xs:element name="fields">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="field" type="field" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="qualifiedName" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="field">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="type" type="fieldType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="fieldType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="STRING"/>
+      <xs:enumeration value="INTEGER"/>
+      <xs:enumeration value="DOUBLE"/>
+      <xs:enumeration value="LONG"/>
+      <xs:enumeration value="FLOAT"/>
+      <xs:enumeration value="DATE"/>
+      <xs:enumeration value="BOOLEAN"/>
+      <xs:enumeration value="BYTE"/>
+      <xs:enumeration value="SHORT"/>
+      <xs:enumeration value="CHAR"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

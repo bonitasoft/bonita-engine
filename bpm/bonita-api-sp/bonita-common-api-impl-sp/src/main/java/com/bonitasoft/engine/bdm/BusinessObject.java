@@ -8,9 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.SourceVersion;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -18,13 +21,20 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 /**
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class BusinessObject {
 
+    @XmlAttribute(required = true)
     private String qualifiedName;
 
-    private List<Field> fields;
+    @XmlElementWrapper(name = "fields", required = true)
+    @XmlElement(name = "field", required = true)
+    private final List<Field> fields;
 
-    @XmlAttribute
+    public BusinessObject() {
+        fields = new ArrayList<Field>();
+    }
+
     public String getQualifiedName() {
         return qualifiedName;
     }
@@ -36,14 +46,12 @@ public class BusinessObject {
         this.qualifiedName = qualifiedName;
     }
 
-    @XmlElementWrapper(name = "fields")
-    @XmlElement(name = "field")
     public List<Field> getFields() {
         return fields;
     }
 
-    public void setFields(final List<Field> fields) {
-        this.fields = fields;
+    public void addField(final Field field) {
+        fields.add(field);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.bonitasoft.engine.bdm;
 
-import java.util.Arrays;
-
 public class BOMBuilder {
 
     private Field buildField(final String name, final FieldType type) {
@@ -20,13 +18,37 @@ public class BOMBuilder {
 
         final BusinessObject employee = new BusinessObject();
         employee.setQualifiedName("BusinessObject");
-        employee.setFields(Arrays.asList(stringField, booleanField, dateField, doubleField, integerField));
+        employee.addField(stringField);
+        employee.addField(booleanField);
+        employee.addField(dateField);
+        employee.addField(doubleField);
+        employee.addField(integerField);
+
         return employee;
     }
 
     public BusinessObjectModel buildDefaultBOM() {
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(buildMyBusinessObject());
+        return bom;
+    }
+
+    public BusinessObjectModel buildEmptyBOM() {
+        return new BusinessObjectModel();
+    }
+
+    public BusinessObjectModel buildBOMWithAnEmptyEntity() {
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(new BusinessObject());
+        return bom;
+    }
+
+    public BusinessObjectModel buildBOMWithAnEmptyField() {
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        final BusinessObject businessObject = new BusinessObject();
+        businessObject.setQualifiedName("BusinessObject");
+        businessObject.addField(new Field());
+        bom.addBusinessObject(businessObject);
         return bom;
     }
 

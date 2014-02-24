@@ -9,18 +9,26 @@
 package com.bonitasoft.engine.bdm;
 
 import javax.lang.model.SourceVersion;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Matthieu Chaffotte
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = { "name", "type" })
 public class Field {
 
     public static final String PERSISTENCE_ID = "persistenceId";
 
     public static final String PERSISTENCE_VERSION = "persistenceVersion";
 
+    @XmlElement(required = true)
     private String name;
 
+    @XmlElement(required = true)
     private FieldType type;
 
     public String getName() {

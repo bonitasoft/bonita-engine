@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -62,7 +61,8 @@ public class BDRIT extends CommonAPISPTest {
 
         final BusinessObject employee = new BusinessObject();
         employee.setQualifiedName(EMPLOYEE_QUALIF_CLASSNAME);
-        employee.setFields(Arrays.asList(firstName, lastName));
+        employee.addField(firstName);
+        employee.addField(lastName);
 
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
