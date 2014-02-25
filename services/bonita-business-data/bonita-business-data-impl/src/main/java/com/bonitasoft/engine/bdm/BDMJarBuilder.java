@@ -11,7 +11,9 @@ package com.bonitasoft.engine.bdm;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,6 +21,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
@@ -46,8 +49,8 @@ public class BDMJarBuilder {
             try {
                 generateJavaFiles(bom, tmpBDMDirectory);
                 compileJavaClasses(tmpBDMDirectory);
-                final byte[] jar = generateJar(tmpBDMDirectory);
-                return addPersistenceFile(jar, bom);
+                addPersistenceFile(tmpBDMDirectory, bom);
+                return generateJar(tmpBDMDirectory);
             } finally {
                 FileUtils.deleteDirectory(tmpBDMDirectory);
             }
@@ -66,7 +69,14 @@ public class BDMJarBuilder {
     }
 
     protected byte[] generateJar(final File directory) throws IOException {
-        return com.bonitasoft.engine.io.IOUtils.toJar(directory.getAbsolutePath());
+        final Collection<File> files = FileUtils.listFiles(directory, new String[] { "class", "xml" }, true);
+        final Map<String, byte[]> resources = new HashMap<String, byte[]>();
+        for (final File file : files) {
+            final String relativeName = directory.toURI().relativize(file.toURI()).getPath();
+            final byte[] content = FileUtils.readFileToByteArray(file);
+            resources.put(relativeName, content);
+        }
+        return IOUtil.generateJar(resources);
     }
 
     protected void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException {
@@ -74,20 +84,21 @@ public class BDMJarBuilder {
         codeGenerator.generate(directory);
     }
 
-    protected void compileJavaClasses(final File srcDirectory) throws CompilationException {
-        final Collection<File> files = FileUtils.listFiles(srcDirectory, new String[] { "java" }, true);
-        compiler.compile(files, srcDirectory);
+    private void compileJavaClasses(final File directory) throws CompilationException {
+        final Collection<File> files = FileUtils.listFiles(directory, new String[] { "java" }, true);
+        compiler.compile(files, directory);
     }
 
-    protected byte[] addPersistenceFile(final byte[] jar, final BusinessObjectModel bom) throws IOException, TransformerException,
+    protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,
             ParserConfigurationException, SAXException {
         final List<BusinessObject> entities = bom.getEntities();
         final PersistenceUnitBuilder builder = new PersistenceUnitBuilder();
         for (final BusinessObject businessObject : entities) {
             builder.addClass(businessObject.getQualifiedName());
         }
-        final byte[] persistenceFileContent = IOUtil.toByteArray(builder.done());
-        return IOUtil.addJarEntry(jar, "META-INF/persistence.xml", persistenceFileContent);
+        final Document document = builder.done();
+        final File metaInf = IOUtils.createSubDirectory(directory, "META-INF");
+        IOUtils.saveDocument(document, new File(metaInf, "persistence.xml"));
     }
 
 }

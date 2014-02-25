@@ -32,7 +32,6 @@ public class BDMJarBuilderTest {
         doAnswer(new VoidAnswer()).when(spyBuilder).generateJavaFiles(model, tmpDir);
         doAnswer(new VoidAnswer()).when(compiler).compile(anyCollectionOf(File.class), eq(tmpDir));
         doReturn(jar).when(spyBuilder).generateJar(tmpDir);
-        doReturn(jar).when(spyBuilder).addPersistenceFile(jar, model);
 
         // when
         spyBuilder.build(bomZip);
@@ -41,9 +40,7 @@ public class BDMJarBuilderTest {
         verify(spyBuilder).getBOM(bomZip);
         verify(spyBuilder).createBDMTmpDir();
         verify(spyBuilder).generateJavaFiles(model, tmpDir);
-        verify(spyBuilder).compileJavaClasses(tmpDir);
         verify(spyBuilder).generateJar(tmpDir);
-        verify(spyBuilder).addPersistenceFile(jar, model);
     }
 
 }

@@ -11,14 +11,11 @@ package com.bonitasoft.engine.io;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -29,11 +26,17 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.commons.io.FileUtils;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 /**
@@ -119,52 +122,36 @@ public class IOUtils {
         return resources;
     }
 
-    public static byte[] toJar(final String dirPath) throws IOException {
-        final Manifest manifest = new Manifest();
-        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final JarOutputStream jos = new JarOutputStream(baos, manifest);
-        try {
-            addFileHierarchy(new File(dirPath), jos, new File(dirPath));
-            return baos.toByteArray();
-        } finally {
-            jos.closeEntry();
-            jos.close();
-        }
-    }
-
-    private static void addFileHierarchy(final File source, final JarOutputStream jos, final File base) throws IOException {
-        final String relativeName = base.toURI().relativize(source.toURI()).getPath();
-        if (source.isDirectory()) {
-            String name = relativeName.replace(File.separator, "/");
-            if (!name.isEmpty()) {
-                if (!name.endsWith("/")) {
-                    name += "/";
-                }
-                final JarEntry entry = new JarEntry(name);
-                entry.setTime(source.lastModified());
-                entry.setCrc(0);
-                jos.putNextEntry(entry);
-                jos.closeEntry();
-            }
-            for (final File f : source.listFiles()) {
-                addFileHierarchy(f, jos, base);
-            }
-        } else {
-            final JarEntry entry = new JarEntry(relativeName.replace(File.separator, "/"));
-            entry.setTime(source.lastModified());
-            entry.setCrc(FileUtils.checksumCRC32(source));
-            jos.putNextEntry(entry);
-            jos.write(FileUtils.readFileToByteArray(source));
-            jos.closeEntry();
-        }
-    }
-
     public static File createTempDirectory(final String prefix) throws IOException {
         final File tmpDirectory = File.createTempFile(prefix, null);
-        tmpDirectory.delete();
-        tmpDirectory.mkdir();
-        return tmpDirectory;
+        return createDirectory(tmpDirectory);
+    }
+
+    public static File createSubDirectory(final File directory, final String child) throws IOException {
+        final File subDir = new File(directory, child);
+        return createDirectory(subDir);
+    }
+
+    private static File createDirectory(final File dir) {
+        dir.delete();
+        dir.mkdir();
+        return dir;
+    }
+
+    public static void saveDocument(final Document document, final File destination) throws IOException, TransformerException {
+        if (document == null) {
+            throw new IllegalArgumentException("Document should not be null.");
+        }
+        final Transformer tf = TransformerFactory.newInstance().newTransformer();
+        tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        tf.setOutputProperty(OutputKeys.INDENT, "yes");
+        final FileOutputStream fos = new FileOutputStream(destination);
+        try {
+            final StreamResult outputTarget = new StreamResult(fos);
+            tf.transform(new DOMSource(document), outputTarget);
+        } finally {
+            fos.close();
+        }
     }
 
 }
