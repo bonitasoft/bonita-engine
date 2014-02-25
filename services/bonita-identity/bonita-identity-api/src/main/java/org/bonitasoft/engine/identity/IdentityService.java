@@ -750,7 +750,7 @@ public interface IdentityService {
      *            SProfileMetadataDefinition object
      * @throws SIdentityException
      */
-    void createProfileMetadataDefinition(SProfileMetadataDefinition metadata) throws SIdentityException;
+    SProfileMetadataDefinition createProfileMetadataDefinition(SProfileMetadataDefinition metadata) throws SIdentityException;
 
     /**
      * Update profileMetadataDefinition according to the descriptor
@@ -1140,7 +1140,6 @@ public interface IdentityService {
      * 
      * @param user
      *            The user object
-     * @param passwordEncrypted
      * @throws SUserCreationException
      */
     @Deprecated

@@ -164,7 +164,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void createProfileMetadataDefinition(final SProfileMetadataDefinition metadata) throws SIdentityException {
+    public SProfileMetadataDefinition createProfileMetadataDefinition(final SProfileMetadataDefinition metadata) throws SIdentityException {
         final String methodName = "createProfileMetadataDefinition";
         logBeforeMethod(methodName);
         final SProfileMetadataDefinitionLogBuilder logBuilder = getSProfileMetadataDefinitionLog(ActionType.CREATED, "Adding a profile metadata with name "
@@ -175,6 +175,7 @@ public class IdentityServiceImpl implements IdentityService {
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
+            return metadata;
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
             initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);

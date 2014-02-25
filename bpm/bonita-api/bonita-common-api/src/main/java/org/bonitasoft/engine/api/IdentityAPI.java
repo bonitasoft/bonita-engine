@@ -22,6 +22,6 @@ package org.bonitasoft.engine.api;
  * @author Bole Zhang
  * @author Yanyan Liu
  */
-public interface IdentityAPI extends UserAPI, RoleAPI, GroupAPI, MembershipAPI, OrganizationAPI {
+public interface IdentityAPI extends UserAPI, RoleAPI, GroupAPI, MembershipAPI, OrganizationAPI, CustomUserDetailsAPI {
 
 }

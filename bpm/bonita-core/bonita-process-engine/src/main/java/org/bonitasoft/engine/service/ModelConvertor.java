@@ -209,6 +209,7 @@ import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 import org.bonitasoft.engine.expression.model.builder.SExpressionBuilderFactory;
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
+import org.bonitasoft.engine.identity.CustomUserDetailsDefinition;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.ExportedUserBuilder;
 import org.bonitasoft.engine.identity.ExportedUserBuilderFactory;
@@ -223,12 +224,14 @@ import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCreator.UserField;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.impl.ContactDataImpl;
+import org.bonitasoft.engine.identity.impl.CustomUserDetailsDefinitionImpl;
 import org.bonitasoft.engine.identity.impl.GroupImpl;
 import org.bonitasoft.engine.identity.impl.RoleImpl;
 import org.bonitasoft.engine.identity.impl.UserImpl;
 import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SGroup;
+import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -2023,5 +2026,13 @@ public class ModelConvertor {
 
     private static SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
         return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();
+    }
+
+    public static CustomUserDetailsDefinition toCustomUserDetailsDefinition(SProfileMetadataDefinition sDefinition) {
+        CustomUserDetailsDefinitionImpl definition = new CustomUserDetailsDefinitionImpl();
+        definition.setName(sDefinition.getName());
+        definition.setDisplayName(sDefinition.getDisplayName());
+        definition.setDescription(sDefinition.getDescription());
+        return definition;
     }
 }
