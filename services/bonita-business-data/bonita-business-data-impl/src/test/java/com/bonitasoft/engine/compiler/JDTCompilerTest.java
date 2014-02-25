@@ -17,7 +17,6 @@ import org.junit.Test;
 public class JDTCompilerTest {
 
     private static final String EMPTY_CLASSPATH = "";
-    private static final String CURRENT_CLASSPATH = null;
     
     private JDTCompiler jdtCompiler;
     private File outputdirectory;
@@ -76,8 +75,10 @@ public class JDTCompilerTest {
     
     @Test
     public void should_compile_class_with_external_dependencies() throws Exception {
-        File compilableWithDependency = getTestResourceAsFile("JpaDependencyNeeded.java");
+        File compilableWithDependency = getTestResourceAsFile("DependenciesNeeded.java");
+        File externalLib = getTestResourceAsFile("external-lib.jar");
+        String classPath = System.getProperty("java.class.path") + ":" + externalLib.getAbsolutePath();
 
-        jdtCompiler.compile(asList(compilableWithDependency), outputdirectory, CURRENT_CLASSPATH);
+        jdtCompiler.compile(asList(compilableWithDependency), outputdirectory, classPath);
     }
 }
