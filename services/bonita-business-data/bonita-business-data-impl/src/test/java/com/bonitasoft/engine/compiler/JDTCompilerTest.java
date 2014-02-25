@@ -16,6 +16,9 @@ import org.junit.Test;
  */
 public class JDTCompilerTest {
 
+    private static final String EMPTY_CLASSPATH = "";
+    private static final String CURRENT_CLASSPATH = null;
+    
     private JDTCompiler jdtCompiler;
     private File outputdirectory;
 
@@ -28,7 +31,7 @@ public class JDTCompilerTest {
     }
 
     private File createTempDirectory() throws IOException {
-        File outputdirectory = File.createTempFile("testFolder", "");
+        File outputdirectory = File.createTempFile("testFolder", EMPTY_CLASSPATH);
         // in order to create a directory, we have to delete it first ... !!
         outputdirectory.delete();
         outputdirectory.mkdir();
@@ -47,7 +50,7 @@ public class JDTCompilerTest {
         File compilableOne = getTestResourceAsFile("CompilableOne.java");
         File compilableTwo = getTestResourceAsFile("CompilableTwo.java");
 
-        jdtCompiler.compile(asList(compilableOne, compilableTwo), outputdirectory);
+        jdtCompiler.compile(asList(compilableOne, compilableTwo), outputdirectory, EMPTY_CLASSPATH);
 
         assertThat(new File(outputdirectory, "com/bonitasoft/CompilableOne.class")).exists();
         assertThat(new File(outputdirectory, "com/bonitasoft/CompilableTwo.class")).exists();
@@ -57,7 +60,7 @@ public class JDTCompilerTest {
     public void should_throw_exception_if_compilation_errors_occurs() throws Exception {
         File uncompilable = getTestResourceAsFile("CannotBeResolvedToATypeError.java");
 
-        jdtCompiler.compile(asList(uncompilable), outputdirectory);
+        jdtCompiler.compile(asList(uncompilable), outputdirectory, EMPTY_CLASSPATH);
     }
 
     @Test
@@ -65,7 +68,7 @@ public class JDTCompilerTest {
         File uncompilable = getTestResourceAsFile("CannotBeResolvedToATypeError.java");
 
         try {
-            jdtCompiler.compile(asList(uncompilable), outputdirectory);
+            jdtCompiler.compile(asList(uncompilable), outputdirectory, EMPTY_CLASSPATH);
         } catch (CompilationException e) {
             assertThat(e.getMessage()).contains("cannot be resolved to a type");
         }
@@ -75,6 +78,6 @@ public class JDTCompilerTest {
     public void should_compile_class_with_external_dependencies() throws Exception {
         File compilableWithDependency = getTestResourceAsFile("JpaDependencyNeeded.java");
 
-        jdtCompiler.compile(asList(compilableWithDependency), outputdirectory);
+        jdtCompiler.compile(asList(compilableWithDependency), outputdirectory, CURRENT_CLASSPATH);
     }
 }

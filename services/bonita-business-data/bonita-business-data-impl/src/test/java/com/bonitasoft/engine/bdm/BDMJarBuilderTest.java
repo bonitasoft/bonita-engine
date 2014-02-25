@@ -1,6 +1,7 @@
 package com.bonitasoft.engine.bdm;
 
 import static org.mockito.Matchers.anyCollectionOf;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -30,7 +31,7 @@ public class BDMJarBuilderTest {
         doReturn(model).when(spyBuilder).getBOM(bomZip);
         doReturn(tmpDir).when(spyBuilder).createBDMTmpDir();
         doAnswer(new VoidAnswer()).when(spyBuilder).generateJavaFiles(model, tmpDir);
-        doAnswer(new VoidAnswer()).when(compiler).compile(anyCollectionOf(File.class), eq(tmpDir));
+        doAnswer(new VoidAnswer()).when(compiler).compile(anyCollectionOf(File.class), eq(tmpDir), anyString());
         doReturn(jar).when(spyBuilder).generateJar(tmpDir);
 
         // when

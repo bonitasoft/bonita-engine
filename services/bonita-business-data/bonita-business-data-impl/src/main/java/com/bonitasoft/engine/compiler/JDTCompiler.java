@@ -29,17 +29,31 @@ public class JDTCompiler {
 
     private static final String COMPILER_COMPLIANCE_LEVEL = "-1.6";
 
-    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory) throws CompilationException {
-        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory);
+    /**
+     * Compile files in output directory using provided classpath
+     * Put null for classpath argument to take current classpath
+     * 
+     * @throws CompilationException if compilation errors occurs
+     */
+    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory, String classpath) throws CompilationException {
+        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory, classpath);
         launchCompiler(commandLine);
     }
 
-    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory) {
+    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory, String classpath) {
         final List<String> arguments = new ArrayList<String>();
         arguments.add(COMPILER_COMPLIANCE_LEVEL);
         arguments.addAll(outputDirectoryArguments(outputdirectory));
         arguments.addAll(filesToBeCompiledArguments(files));
+        arguments.addAll(classpathArguments(classpath));
         return arguments.toArray(new String[arguments.size()]);
+    }
+
+    private List<String> classpathArguments(String classpath) {
+        if (classpath == null) {
+            return emptyList();
+        }
+        return asList("-cp", classpath);
     }
 
     private List<String> filesToBeCompiledArguments(final Collection<File> files) {
