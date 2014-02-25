@@ -7,7 +7,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -17,7 +16,6 @@ import java.util.Map;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.UserTransaction;
-import javax.xml.bind.JAXBException;
 
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
@@ -31,16 +29,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 
-import com.bonitasoft.engine.bdm.BusinessObject;
-import com.bonitasoft.engine.bdm.BusinessObjectModel;
-import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
-import com.bonitasoft.engine.bdm.Field;
-import com.bonitasoft.engine.bdm.FieldType;
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.pojo.Employee;
@@ -52,8 +44,6 @@ public class JPABusinessDataRepositoryImplIT {
     private IDatabaseTester databaseTester;
 
     private DependencyService dependencyService;
-
-    private byte[] bdrArchive;
 
     private JPABusinessDataRepositoryImpl businessDataRepository;
 
@@ -110,7 +100,6 @@ public class JPABusinessDataRepositoryImplIT {
     @Before
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
-        bdrArchive = buildZippedBOM();
         final Map<String, Object> configuration = new HashMap<String, Object>();
         configuration.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         configuration.put("hibernate.connection.datasource", DATA_SOURCE_NAME);
@@ -120,22 +109,6 @@ public class JPABusinessDataRepositoryImplIT {
         doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
     }
 
-    private byte[] buildZippedBOM() throws IOException, JAXBException, SAXException {
-        final Field firstName = new Field();
-        firstName.setName("firstName");
-        firstName.setType(FieldType.STRING);
-        final Field lastName = new Field();
-        lastName.setName("lastName");
-        lastName.setType(FieldType.STRING);
-        final BusinessObject employee = new BusinessObject();
-        employee.setQualifiedName("com.bonitasoft.pojo.Employee");
-        employee.addField(firstName);
-        employee.addField(lastName);
-        final BusinessObjectModel bom = new BusinessObjectModel();
-        bom.addBusinessObject(employee);
-        final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
-        return converter.zip(bom);
-    }
 
     @Test
     public void findAnEmployeeByPrimaryKey() throws Exception {
@@ -144,8 +117,6 @@ public class JPABusinessDataRepositoryImplIT {
             @Override
             public void run() {
                 try {
-                    // FIXME return the byte[] and add it in the classpath
-                    // businessDataRepository.deploy(bdrArchive, 1);
                     final Employee employee = businessDataRepository.find(Employee.class, 45l);
                     assertThat(employee).isNotNull();
                     assertThat(employee.getId()).isEqualTo(45l);

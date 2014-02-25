@@ -1,8 +1,7 @@
 package com.bonitasoft.engine.bdm;
 
-import java.io.InputStream;
+import static com.bonitasoft.engine.BOMBuilder.aBOM;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class BDMJarBuilderIT {
@@ -11,7 +10,6 @@ public class BDMJarBuilderIT {
     @Test
     public void jar_builder_should_goes_well_without_errors() throws Exception {
         BDMJarBuilder bdmJarBuilder = new BDMJarBuilder(BDMCompiler.create());
-        InputStream bdm = BDMJarBuilderIT.class.getResourceAsStream("BDM.zip");
-        bdmJarBuilder.build(IOUtils.toByteArray(bdm));
+        bdmJarBuilder.build(aBOM().buildZip());
     }
 }
