@@ -11,7 +11,9 @@ package com.bonitasoft.engine.bdm;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,12 +21,11 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.io.IOUtil;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.business.data.impl.PersistenceUnitBuilder;
-import com.bonitasoft.engine.compiler.CompilationException;
-import com.bonitasoft.engine.compiler.JDTCompiler;
 import com.bonitasoft.engine.io.IOUtils;
 import com.sun.codemodel.JClassAlreadyExistsException;
 
