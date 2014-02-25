@@ -17,11 +17,14 @@ import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 public class TenantManagementAPIExtTest {
 
@@ -39,6 +42,10 @@ public class TenantManagementAPIExtTest {
 
     private SessionService sessionService;
 
+    private WorkService workService;
+
+    private TenantServiceAccessor tenantServiceAccessor;
+
     @Before
     public void before() throws Exception {
         tenantManagementAPI = spy(new TenantManagementAPIExt());
@@ -46,14 +53,39 @@ public class TenantManagementAPIExtTest {
         schedulerService = mock(SchedulerService.class);
         sessionService = mock(SessionService.class);
         platformServiceAccessor = mock(PlatformServiceAccessor.class);
+        tenantServiceAccessor = mock(TenantServiceAccessor.class);
+        workService = mock(WorkService.class);
         doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
         doReturn(sessionService).when(platformServiceAccessor).getSessionService();
+        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(Mockito.anyLong());
+
         tenantId = 17;
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
+        doReturn(workService).when(tenantServiceAccessor).getWorkService();
         sTenant = new STenantImpl("myTenant", "john", 123456789, "MAINTENANCE", false, false);
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
+    }
+
+    @Test
+    public void setMaintenanceModeToMAINTENANCEShouldPauseWorkService() throws Exception {
+
+        // given a tenant moved to maintenance mode
+        tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
+
+        // then his work service should be pause
+        verify(workService).pause();
+    }
+
+    @Test
+    public void setMaintenanceModeToAVAILLABLEShouldResumeWorkService() throws Exception {
+
+        // given a tenant moved to available mode
+        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+
+        // then his work service should be resumed
+        verify(workService).resume();
     }
 
     @Test

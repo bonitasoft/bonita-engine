@@ -14,6 +14,7 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantMode;
@@ -53,16 +54,18 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         SessionService sessionService = platformServiceAccessor.getSessionService();
 
         long tenantId = getTenantId();
+        WorkService workService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getWorkService();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
         switch (mode) {
             case AVAILABLE:
                 descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), STenantBuilderFactory.AVAILABLE);
-                resumeServicesForTenant(schedulerService, tenantId);
+                resumeServicesForTenant(workService, schedulerService, tenantId);
                 break;
             case MAINTENANCE:
                 descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), STenantBuilderFactory.IN_MAINTENANCE);
-                pauseServicesForTenant(schedulerService, sessionService, tenantId);
+                pauseServicesForTenant(workService, schedulerService, sessionService, tenantId);
+
                 break;
             default:
                 break;
@@ -70,18 +73,21 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         updateTenantFromId(tenantId, platformService, descriptor);
     }
 
-    private void pauseServicesForTenant(final SchedulerService schedulerService, final SessionService sessionService, final long tenantId)
+    private void pauseServicesForTenant(final WorkService workService, final SchedulerService schedulerService, final SessionService sessionService,
+            final long tenantId)
             throws UpdateException {
         try {
             schedulerService.pauseJobs(tenantId);
             sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
+            workService.pause();
         } catch (SSchedulerException e) {
             throw new UpdateException("Unable to pause the scheduler.", e);
         }
     }
 
-    private void resumeServicesForTenant(final SchedulerService schedulerService, final long tenantId) throws UpdateException {
+    private void resumeServicesForTenant(final WorkService workService, final SchedulerService schedulerService, final long tenantId) throws UpdateException {
         try {
+            workService.resume();
             schedulerService.resumeJobs(tenantId);
         } catch (SSchedulerException e) {
             throw new UpdateException("Unable to resume the scheduler.", e);
