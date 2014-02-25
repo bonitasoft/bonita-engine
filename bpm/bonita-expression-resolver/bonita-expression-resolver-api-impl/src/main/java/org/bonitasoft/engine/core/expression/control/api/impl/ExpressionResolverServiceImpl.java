@@ -96,7 +96,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
 
             for (final SExpression sExpression : expressions) {
                 // Then evaluate recursively all remaining expressions:
-                resolvedExpressions.putAll(evaluateExpressionWithResolvedDependencies(sExpression, dependencyValues, dataReplacement));
+                resolvedExpressions.putAll(evaluateExpressionWithResolvedDependencies(sExpression, dependencyValues, dataReplacement, resolvedExpressions));
             }
             final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
             for (final SExpression sExpression : expressions) {
@@ -145,12 +145,13 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
     }
 
     private Map<? extends Integer, ? extends Object> evaluateExpressionWithResolvedDependencies(final SExpression sExpression,
-            final Map<String, Object> dependencyValues, final Map<SExpression, SExpression> dataReplacement) throws SExpressionTypeUnknownException,
+            final Map<String, Object> dependencyValues, final Map<SExpression, SExpression> dataReplacement,
+            final Map<Integer, Object> alreadyResolvedExpressions) throws SExpressionTypeUnknownException,
             SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
-        final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
+        final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>(alreadyResolvedExpressions);
         // Evaluate the dependencies first:
         for (final SExpression dep : sExpression.getDependencies()) {
-            resolvedExpressions.putAll(evaluateExpressionWithResolvedDependencies(dep, dependencyValues, dataReplacement));
+            resolvedExpressions.putAll(evaluateExpressionWithResolvedDependencies(dep, dependencyValues, dataReplacement, resolvedExpressions));
         }
         // Then evaluate the expression itself:
         if (!resolvedExpressions.containsKey(sExpression.getDiscriminant())) {
