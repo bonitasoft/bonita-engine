@@ -1,26 +1,31 @@
 package com.bonitasoft.engine.compiler;
 
-import java.net.URL;
-import java.util.HashSet;
+import java.io.File;
+import java.security.CodeSource;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
-
+/**
+ * Find jar in resources given class
+ * 
+ * @author Colin PUY
+ */
 public class ClassPathResolver {
 
     public String[] getJarsPath(Class<?>... classes) {
-        Set<String> list = new HashSet<String>();
-       for (Class<?> clas : classes) {
-           list.add(findJarPath(clas));
-       }
+        Set<String> list = new LinkedHashSet<String>();
+        for (Class<?> clazz : classes) {
+            list.add(findJarPath(clazz));
+        }
         return list.toArray(new String[list.size()]);
     }
 
     private String findJarPath(Class<?> clazzToFind) {
-        URL jarUrl = clazzToFind.getResource(clazzToFind.getSimpleName()+".class");
-        String jarPath = jarUrl.getFile();
-        if(jarPath.indexOf("!") != -1){
-            jarPath = jarPath.split("!")[0];
+        try {
+            CodeSource codeSource = clazzToFind.getProtectionDomain().getCodeSource();
+            return new File(codeSource.getLocation().getPath()).getAbsolutePath();
+        } catch (NullPointerException e) {
+            throw new RuntimeException("Unable to find jar for class " + clazzToFind + " source code not in classpath or not in protection domain");
         }
-        return jarPath;
     }
 }

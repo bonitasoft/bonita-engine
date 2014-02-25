@@ -6,6 +6,7 @@ import org.assertj.core.api.AssertionInfo;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runners.model.TestClass;
 
 
 public class ClassPathResolverTest {
@@ -28,9 +29,9 @@ public class ClassPathResolverTest {
     @Test
     public void should_find_multiple_jar_for_multiple_given_classes() throws Exception {
         
-        String[] jars = classPathResolver.getJarsPath(String.class, Assertions.class);
+        String[] jars = classPathResolver.getJarsPath(TestClass.class, Assertions.class);
         
-        assertThat(jars[0]).endsWith("rt.jar");
+        assertThat(jars[0]).contains("junit").endsWith(".jar");
         assertThat(jars[1]).contains("assertj-core").endsWith(".jar");
     }
     
@@ -42,4 +43,8 @@ public class ClassPathResolverTest {
         assertThat(jars).hasSize(1);
     }
 
+    @Test(expected = RuntimeException.class)
+    public void should_throw_runtime_exception_if_jar_not_found() throws Exception {
+        classPathResolver.getJarsPath(new Class[] { null });
+    }
 }
