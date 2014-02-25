@@ -15,8 +15,13 @@ package org.bonitasoft.engine.core.login;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -53,19 +58,29 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
 
     @Override
-    public SSession login(final long tenantId, final String userName, final String password) throws SLoginException {
+    public SSession login(Map<String, Serializable> credentials) throws SLoginException {
+        if (credentials == null) {
+            throw new SLoginException("invalid credentials, map is null");
+        }
+        Long tenantId = NumberUtils.toLong(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)), -1);
         sessionAccessor.setSessionInfo(-1, tenantId); // necessary to check user credentials
         long userId;
         boolean isTechnicalUser = false;
+        String userName = null;
+        if (!credentials.containsKey(AuthenticationConstants.BASIC_USERNAME) || credentials.get(AuthenticationConstants.BASIC_USERNAME) == null
+                || StringUtils.isBlank((userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME))))) {
+            throw new SLoginException("invalid credentials, username is blank");
+        }
         try {
-            final boolean valid = authenticationService.checkUserCredentials(userName, password);
+            final boolean valid = authenticationService.checkUserCredentials(credentials);
             if (valid) {
                 final SUser user = identityService.getUserByUserName(userName);
                 userId = user.getId();
             } else {
                 // if authentication fails it can be due to the technical user
                 final TechnicalUser technicalUser = getTechnicalUser(tenantId);
-                if (technicalUser.getUserName().equals(userName) && technicalUser.getPassword().equals(password)) {
+                if (technicalUser.getUserName().equals(userName)
+                        && technicalUser.getPassword().equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)))) {
                     isTechnicalUser = true;
                     userId = -1;
                 } else {

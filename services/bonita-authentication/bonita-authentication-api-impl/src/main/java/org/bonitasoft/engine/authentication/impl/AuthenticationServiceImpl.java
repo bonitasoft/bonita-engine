@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.authentication.impl;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -38,13 +42,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public boolean checkUserCredentials(final String userName, final String password) {
+    public boolean checkUserCredentials(Map<String, Serializable> credentials) {
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "checkUserCredentials"));
             }
-            final SUser user = identityService.getUserByUserName(userName);
-            final boolean valid = identityService.chechCredentials(user, password);
+            final SUser user = identityService.getUserByUserName(String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME)));
+            final boolean valid = identityService.chechCredentials(user, String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME)));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "checkUserCredentials"));
             }

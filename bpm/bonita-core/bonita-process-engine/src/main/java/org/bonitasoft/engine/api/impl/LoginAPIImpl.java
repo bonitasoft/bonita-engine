@@ -13,12 +13,18 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateUser;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.Logout;
+import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
@@ -44,6 +50,7 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Matthieu Chaffotte
@@ -57,7 +64,21 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         checkUsernameAndPassword(userName, password);
 
         try {
-            return login(userName, password, null);
+            Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+            credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
+            credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+            return loginInternal(credentials);
+        } catch (final Throwable e) {
+            throw new LoginException(e);
+        }
+    }
+
+    @Override
+    @CustomTransactions
+    public APISession login(final Map<String, Serializable> credentials) throws LoginException {
+        checkCredentials(credentials);
+        try {
+            return loginInternal(credentials);
         } catch (final Throwable e) {
             throw new LoginException(e);
         }
@@ -72,7 +93,16 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         }
     }
 
-    protected APISession login(final String userName, final String password, final Long tenantId) throws Throwable {
+    protected void checkCredentials(final Map<String, Serializable> credentials) throws LoginException {
+        if (CollectionUtils.isEmpty(credentials)) {
+            throw new LoginException("credentials are null or empty");
+        }
+    }
+
+    protected APISession loginInternal(final Map<String, Serializable> credentials) throws Throwable {
+        Long tenantId = (NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))) ? NumberUtils.toLong(String
+                .valueOf(credentials.get(
+                        AuthenticationConstants.BASIC_TENANT_ID))) : null;
         final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
@@ -91,12 +121,13 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         }
 
         final long localTenantId = sTenant.getId();
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, localTenantId);
         final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(localTenantId);
         final LoginService loginService = serviceAccessor.getLoginService();
         final IdentityService identityService = serviceAccessor.getIdentityService();
         final TransactionExecutor tenantTransactionExecutor = serviceAccessor.getTransactionExecutor();
 
-        final LoginAndRetrieveUser txContent = new LoginAndRetrieveUser(loginService, identityService, localTenantId, userName, password);
+        final LoginAndRetrieveUser txContent = new LoginAndRetrieveUser(loginService, identityService, credentials);
         try {
             tenantTransactionExecutor.execute(txContent);
         } catch (final BonitaRuntimeException e) {
@@ -112,22 +143,15 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
         private final IdentityService identityService;
 
-        private final long tenantId;
-
-        private final String userName;
-
-        private final String password;
+        private final Map<String, Serializable> credentials;
 
         private SSession session;
 
         public LoginAndRetrieveUser(final LoginService loginService, final IdentityService identityService,
-                final long tenantId, final String userName, final String password) {
+                final Map<String, Serializable> credentials) {
             this.loginService = loginService;
             this.identityService = identityService;
-            this.tenantId = tenantId;
-            this.userName = userName;
-            this.password = password;
-
+            this.credentials = credentials;
         }
 
         @Override
@@ -139,11 +163,14 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         public void execute() {
             SessionAccessor sessionAccessor = null;
             try {
-                session = loginService.login(tenantId, userName, password);
+                session = loginService.login(credentials);
                 if (!session.isTechnicalUser()) {
+                    Long tenantId = NumberUtils.toLong(String.valueOf(credentials.get(
+                            AuthenticationConstants.BASIC_TENANT_ID)), 0L);
                     sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
                     sessionAccessor.setSessionInfo(session.getId(), tenantId);
-                    final SUser sUser = identityService.getUserByUserName(userName);
+                    final SUser sUser = identityService.getUserByUserName(String.valueOf(credentials.get(
+                            AuthenticationConstants.BASIC_USERNAME)));
                     if (!sUser.isEnabled()) {
                         throw new LoginException("Unable to login: the user is disable");
                     }

@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.login;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.model.SSession;
 
@@ -21,7 +24,16 @@ import org.bonitasoft.engine.session.model.SSession;
  */
 public interface LoginService {
 
-    SSession login(final long tenantId, final String userName, final String password) throws SLoginException;
+    /**
+     * generic login approach to handle outer authentication service like CAS or OAuth or whatever...
+     * 
+     * @param credentials
+     *            the parameters to use to login
+     * @return the session created if login succeeds
+     * @throws SLoginException
+     *             if login fails
+     */
+    public SSession login(Map<String, Serializable> credentials) throws SLoginException;
 
     boolean isValid(final long sessionId);
 
