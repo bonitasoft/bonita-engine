@@ -22,8 +22,8 @@ public class BDMJarBuilderTest {
     public void testGetPersistenceFileContentFor() throws Exception {
         // given
         final byte[] bomZip = "bomZip".getBytes();
-        final JDTCompiler compiler = mock(JDTCompiler.class);
-        final BDMJarBuilder builder = new BDMJarBuilder(new JDTCompiler());
+        final BDMCompiler compiler = mock(BDMCompiler.class);
+        final BDMJarBuilder builder = new BDMJarBuilder(compiler);
         final BDMJarBuilder spyBuilder = spy(builder);
         final BusinessObjectModel model = new BusinessObjectModel();
         final File tmpDir = IOUtils.createTempDirectory("bdm");
@@ -33,6 +33,7 @@ public class BDMJarBuilderTest {
         doAnswer(new VoidAnswer()).when(spyBuilder).generateJavaFiles(model, tmpDir);
         doAnswer(new VoidAnswer()).when(compiler).compile(anyCollectionOf(File.class), eq(tmpDir), anyString());
         doReturn(jar).when(spyBuilder).generateJar(tmpDir);
+        doReturn(jar).when(spyBuilder).addPersistenceFile(jar, model);
 
         // when
         spyBuilder.build(bomZip);
@@ -41,7 +42,9 @@ public class BDMJarBuilderTest {
         verify(spyBuilder).getBOM(bomZip);
         verify(spyBuilder).createBDMTmpDir();
         verify(spyBuilder).generateJavaFiles(model, tmpDir);
+        verify(compiler).compile(tmpDir);
         verify(spyBuilder).generateJar(tmpDir);
+        verify(spyBuilder).addPersistenceFile(jar, model);
     }
 
 }

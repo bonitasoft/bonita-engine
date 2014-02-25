@@ -11,9 +11,7 @@ package com.bonitasoft.engine.bdm;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,7 +19,6 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.io.IOUtil;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
@@ -36,9 +33,9 @@ import com.sun.codemodel.JClassAlreadyExistsException;
  */
 public class BDMJarBuilder {
 
-    private final JDTCompiler compiler;
+    private final BDMCompiler compiler;
 
-    public BDMJarBuilder(final JDTCompiler compiler) {
+    public BDMJarBuilder(final BDMCompiler compiler) {
         this.compiler = compiler;
     }
 
@@ -48,7 +45,7 @@ public class BDMJarBuilder {
             final File tmpBDMDirectory = createBDMTmpDir();
             try {
                 generateJavaFiles(bom, tmpBDMDirectory);
-                compileJavaClasses(tmpBDMDirectory);
+                compiler.compile(tmpBDMDirectory);
                 addPersistenceFile(tmpBDMDirectory, bom);
                 return generateJar(tmpBDMDirectory);
             } finally {
@@ -82,11 +79,6 @@ public class BDMJarBuilder {
     protected void generateJavaFiles(final BusinessObjectModel bom, final File directory) throws IOException, JClassAlreadyExistsException {
         final BDMCodeGenerator codeGenerator = new BDMCodeGenerator(bom);
         codeGenerator.generate(directory);
-    }
-
-    private void compileJavaClasses(final File directory) throws CompilationException {
-        final Collection<File> files = FileUtils.listFiles(directory, new String[] { "java" }, true);
-        compiler.compile(files, directory);
     }
 
     protected void addPersistenceFile(final File directory, final BusinessObjectModel bom) throws IOException, TransformerException,

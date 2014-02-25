@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import org.junit.Test;
  */
 public class JDTCompilerTest {
 
-    private static final String EMPTY_CLASSPATH = "";
+    private static final List<String> EMPTY_CLASSPATH = null;
     
     private JDTCompiler jdtCompiler;
     private File outputdirectory;
@@ -30,7 +31,7 @@ public class JDTCompilerTest {
     }
 
     private File createTempDirectory() throws IOException {
-        File outputdirectory = File.createTempFile("testFolder", EMPTY_CLASSPATH);
+        File outputdirectory = File.createTempFile("testFolder", "");
         // in order to create a directory, we have to delete it first ... !!
         outputdirectory.delete();
         outputdirectory.mkdir();
@@ -77,8 +78,8 @@ public class JDTCompilerTest {
     public void should_compile_class_with_external_dependencies() throws Exception {
         File compilableWithDependency = getTestResourceAsFile("DependenciesNeeded.java");
         File externalLib = getTestResourceAsFile("external-lib.jar");
-        String classPath = System.getProperty("java.class.path") + ":" + externalLib.getAbsolutePath();
+        List<String> classPathEntries = asList(System.getProperty("java.class.path"), externalLib.getAbsolutePath());
 
-        jdtCompiler.compile(asList(compilableWithDependency), outputdirectory, classPath);
+        jdtCompiler.compile(asList(compilableWithDependency), outputdirectory, classPathEntries);
     }
 }

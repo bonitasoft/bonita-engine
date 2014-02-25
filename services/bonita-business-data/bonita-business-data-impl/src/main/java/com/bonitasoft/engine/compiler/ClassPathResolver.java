@@ -2,6 +2,7 @@ package com.bonitasoft.engine.compiler;
 
 import java.io.File;
 import java.security.CodeSource;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -12,12 +13,12 @@ import java.util.Set;
  */
 public class ClassPathResolver {
 
-    public String[] getJarsPath(Class<?>... classes) {
-        Set<String> list = new LinkedHashSet<String>();
+    public Collection<String> getJarsPath(Class<?>... classes) {
+        Set<String> paths = new LinkedHashSet<String>();
         for (Class<?> clazz : classes) {
-            list.add(findJarPath(clazz));
+            paths.add(findJarPath(clazz));
         }
-        return list.toArray(new String[list.size()]);
+        return paths;
     }
 
     private String findJarPath(Class<?> clazzToFind) {

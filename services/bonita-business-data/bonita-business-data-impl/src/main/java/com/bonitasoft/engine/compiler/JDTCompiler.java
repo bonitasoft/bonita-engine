@@ -10,6 +10,7 @@ package com.bonitasoft.engine.compiler;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static org.apache.commons.lang3.StringUtils.join;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -35,25 +36,25 @@ public class JDTCompiler {
      * 
      * @throws CompilationException if compilation errors occurs
      */
-    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory, String classpath) throws CompilationException {
-        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory, classpath);
+    public void compile(final Collection<File> filesToBeCompiled, final File outputdirectory, Collection<String> classpathEntries) throws CompilationException {
+        final String[] commandLine = buildCommandLineArguments(filesToBeCompiled, outputdirectory, classpathEntries);
         launchCompiler(commandLine);
     }
 
-    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory, String classpath) {
+    private String[] buildCommandLineArguments(final Collection<File> files, final File outputdirectory, Collection<String> classpathEntries) {
         final List<String> arguments = new ArrayList<String>();
         arguments.add(COMPILER_COMPLIANCE_LEVEL);
         arguments.addAll(outputDirectoryArguments(outputdirectory));
         arguments.addAll(filesToBeCompiledArguments(files));
-        arguments.addAll(classpathArguments(classpath));
+        arguments.addAll(classpathArguments(classpathEntries));
         return arguments.toArray(new String[arguments.size()]);
     }
 
-    private List<String> classpathArguments(String classpath) {
-        if (classpath == null) {
+    private List<String> classpathArguments(Collection<String> classpathEntries) {
+        if (classpathEntries == null || classpathEntries.isEmpty()) {
             return emptyList();
         }
-        return asList("-cp", classpath);
+        return asList("-cp", join(classpathEntries, ":"));
     }
 
     private List<String> filesToBeCompiledArguments(final Collection<File> files) {
