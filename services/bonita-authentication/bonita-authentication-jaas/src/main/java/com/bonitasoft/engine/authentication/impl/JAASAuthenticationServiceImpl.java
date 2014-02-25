@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
@@ -35,10 +38,10 @@ public class JAASAuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public boolean checkUserCredentials(final String username, final String password) throws AuthenticationException {
+    public boolean checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException {
         LoginContext loginContext = null;
         try {
-            loginContext = new LoginContext(getLoginContext(), new AuthenticationCallbackHandler(username, password));
+            loginContext = new LoginContext(getLoginContext(), new AuthenticationCallbackHandler(credentials));
         } catch (final Exception e) {
             throw new AuthenticationException(e);
         }
@@ -60,5 +63,24 @@ public class JAASAuthenticationServiceImpl implements AuthenticationService {
 
     private String getLoginContext() throws TenantIdNotSetException {
         return LOGIN_CONTEXT_PREFIX + "-" + sessionAccessor.getTenantId();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.authentication.AuthenticationService#logout(java.util.Map)
+     */
+    @Override
+    public void logout(Map<String, Serializable> credentials) throws AuthenticationException {
+        LoginContext loginContext = null;
+        try {
+            loginContext = new LoginContext(getLoginContext(), new AuthenticationCallbackHandler(credentials));
+        } catch (final Exception e) {
+            throw new AuthenticationException(e);
+        }
+        try {
+            loginContext.logout();
+        } catch (final LoginException e) {
+            throw new AuthenticationException(e);
+        }
     }
 }
