@@ -19,14 +19,14 @@
 		<tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
 		<tomcat.zip.folder>${user.home}</tomcat.zip.folder>
 
-		<server1.port>7185</server1.port>
-		<provider1.port>7180</provider1.port>
+		<server1.port>8386</server1.port>
+		<provider1.port>8186</provider1.port>
 		<tomcat1.home>${project.build.directory}/node1</tomcat1.home>
 		<tomcat1.conf.dir>${tomcat1.home}/conf</tomcat1.conf.dir>
 		<tomcat1.deploy.dir>${tomcat1.home}/webapps</tomcat1.deploy.dir>
 
-		<server2.port>7285</server2.port>
-		<provider2.port>7280</provider2.port>
+		<server2.port>8387</server2.port>
+		<provider2.port>8187</provider2.port>
 		<tomcat2.home>${project.build.directory}/node2</tomcat2.home>
 		<tomcat2.conf.dir>${tomcat2.home}/conf</tomcat2.conf.dir>
 
