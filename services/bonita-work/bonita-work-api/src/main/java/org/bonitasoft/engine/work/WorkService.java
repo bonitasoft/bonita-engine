@@ -58,4 +58,19 @@ public interface WorkService extends ServiceWithLifecycle {
      */
     void start();
 
+    /**
+     * 
+     * pause the execution of work for this local work service
+     * 
+     */
+    void pause();
+
+    /**
+     * 
+     * resume the execution of work for this local work service
+     * 
+     */
+
+    void resume();
+
 }

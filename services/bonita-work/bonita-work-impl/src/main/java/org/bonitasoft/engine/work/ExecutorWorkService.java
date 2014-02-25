@@ -47,6 +47,8 @@ public class ExecutorWorkService implements WorkService {
 
     private final BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
 
+    private boolean deactivated = true;
+
     public ExecutorWorkService(final TransactionService transactionService, final WorkSynchronizationFactory workSynchronizationFactory,
             final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final BonitaExecutorServiceFactory bonitaExecutorServiceFactory) {
         this.transactionService = transactionService;
@@ -58,6 +60,11 @@ public class ExecutorWorkService implements WorkService {
 
     @Override
     public void registerWork(final BonitaWork work) throws WorkRegisterException {
+        if (isDeactivated()) {
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
+                    + " but the work service is paused");
+            return;
+        }
         final AbstractWorkSynchronization synchro = getContinuationSynchronization(work);
         if (synchro != null) {
             synchro.addWork(work);
@@ -66,6 +73,12 @@ public class ExecutorWorkService implements WorkService {
 
     @Override
     public void executeWork(final BonitaWork work) throws WorkRegisterException {
+        if (isDeactivated()) {
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
+                    + " but the work service is paused");
+            return;
+        }
+
         try {
             work.setTenantId(sessionAccessor.getTenantId());
         } catch (TenantIdNotSetException e) {
@@ -75,7 +88,6 @@ public class ExecutorWorkService implements WorkService {
     }
 
     private AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws WorkRegisterException {
-        if (threadPoolExecutor == null || threadPoolExecutor.isShutdown()) {
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
                     + " but the work service is shutdown. work will be restarted with the node");
             return null;
@@ -94,20 +106,14 @@ public class ExecutorWorkService implements WorkService {
     }
 
     public boolean isStopped() {
-        return threadPoolExecutor == null || threadPoolExecutor.isShutdown();
+        return threadPoolExecutor == null || threadPoolExecutor.isShutdown() || isDeactivated();
     }
 
     @Override
     public void stop() {
         if (!isStopped()) {
             threadPoolExecutor.shutdown();
-            try {
-                if (!threadPoolExecutor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
-                }
-            } catch (InterruptedException e) {
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "error while waiting termination of all work ", e);
-            }
+            pause();
         }
     }
 
@@ -115,7 +121,34 @@ public class ExecutorWorkService implements WorkService {
     public void start() {
         if (isStopped()) {
             threadPoolExecutor = bonitaExecutorServiceFactory.createExecutorService();
+            deactivated = false;
         }
+    }
+
+    @Override
+    public void pause() {
+        if (!isStopped()) {
+            try {
+                if (!threadPoolExecutor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
+                    loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
+                }
+            } catch (InterruptedException e) {
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "error while waiting termination of all work ", e);
+            }
+
+        }
+        deactivated = true;
+
+    }
+
+    @Override
+    public void resume() {
+        start();
+
+    }
+
+    public boolean isDeactivated() {
+        return deactivated;
     }
 
 }
