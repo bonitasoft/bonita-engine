@@ -56,6 +56,7 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.expression.ExpressionInterpreter;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
@@ -97,7 +98,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression).addUserTask("step2", ACTOR_NAME);
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         addUserTask.addConnector("myConnector1", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput("kind",
@@ -166,7 +167,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addConnector("myConnector1", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput(
@@ -199,7 +200,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition
                 .addAutomaticTask("step1")
@@ -236,7 +237,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         final AutomaticTaskDefinitionBuilder autoTask = designProcessDefinition.addAutomaticTask("step1");
         autoTask.addConnector("myConnector", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
@@ -285,7 +286,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition.addAutomaticTask("step1")
                 .addConnector("myConnector", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput("kind", normal);
@@ -320,7 +321,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition.addAutomaticTask("step1")
                 .addConnector("myConnector", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput("kind", normal);
@@ -355,7 +356,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step1");
         addAutomaticTask.addConnector("myConnector1", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
@@ -395,7 +396,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step1");
         addAutomaticTask.addConnector("myConnector1", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
@@ -434,7 +435,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition
                 .addAutomaticTask("step1")
@@ -489,7 +490,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition
                 .addAutomaticTask("step1")
@@ -515,13 +516,13 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression("Mett");
         final Expression input3Expression = new ExpressionBuilder().createDataExpression("valueOfInput3", String.class.getName());
         final Expression mainExp = new ExpressionBuilder().createExpression("param1", "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3",
-                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), "GROOVY",
+                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), ExpressionInterpreter.GROOVY.toString(),
                 Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         // process with data "Mett"
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME).addShortTextData("valueOfInput3", input3DefaultExpression);
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -561,13 +562,13 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression("Mett");
         final Expression input3Expression = new ExpressionBuilder().createDataExpression("valueOfInput3", String.class.getName());
         final Expression mainExp = new ExpressionBuilder().createExpression("param1", "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3",
-                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), "GROOVY",
+                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), ExpressionInterpreter.GROOVY.toString(),
                 Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         // process with data "Mett"
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME).addShortTextData("valueOfInput3", input3DefaultExpression);
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -605,13 +606,13 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression("Mett");
         final Expression input3Expression = new ExpressionBuilder().createDataExpression("valueOfInput3", String.class.getName());
         final Expression mainExp = new ExpressionBuilder().createExpression("param1", "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3",
-                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), "GROOVY",
+                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), ExpressionInterpreter.GROOVY.toString(),
                 Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         // process with data "Mett"
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("valueOfInput3", input3DefaultExpression);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
@@ -658,13 +659,13 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression("Mett");
         final Expression input3Expression = new ExpressionBuilder().createDataExpression("valueOfInput3", String.class.getName());
         final Expression mainExp = new ExpressionBuilder().createExpression("param1", "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3",
-                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), "GROOVY",
+                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), ExpressionInterpreter.GROOVY.toString(),
                 Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         // process with data "Mett"
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData("valueOfInput3", input3DefaultExpression);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
@@ -721,11 +722,11 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step0", ACTOR_NAME).addOperation(
                 new OperationBuilder().createSetDataOperation(inputName3, new ExpressionBuilder().createConstantStringExpression("not Mett")));
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
@@ -782,7 +783,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
@@ -827,7 +828,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
 
@@ -874,11 +875,11 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(inputName3, input3DefaultExpression);
 
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
@@ -888,7 +889,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 5);
         final ActivityInstance activity = activities.get(0);
 
-        waitForStep("step0", processInstance);
+        waitForUserTask("step0", processInstance);
 
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
@@ -926,11 +927,11 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(inputName3, input3DefaultExpression);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addTransition("step0", "step1");
@@ -978,11 +979,11 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(inputName3, input3DefaultExpression);
 
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
@@ -1036,11 +1037,11 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         designProcessDefinition.addShortTextData(inputName3, input3DefaultExpression);
 
@@ -1082,11 +1083,11 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         designProcessDefinition.addShortTextData(inputName3, input3DefaultExpression);
 
@@ -1141,7 +1142,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addUserTask("step0", ACTOR_NAME);
@@ -1186,10 +1187,9 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         // Main Expression
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression, input2Expression, input3Expression));
+                String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
-                PROCESS_VERSION);
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addUserTask("step0", ACTOR_NAME);
         designProcessDefinition.addShortTextData(inputName3, input3DefaultExpression);
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
@@ -1332,7 +1332,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // create process
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
 
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", TEST_CONNECTOR_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
                 .addInput(CONNECOTR_INPUT_NAME, input1Expression);
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
@@ -1376,7 +1376,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             final Expression defaultValueExpression, final String connectorId, final String CONNECTOR_VERSION, final String dataName)
             throws InvalidExpressionException {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(actor).addDescription("Delivery all day and night long");
+        designProcessDefinition.addActor(actor).addDescription(DESCRIPTION);
         designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
         designProcessDefinition
                 .addAutomaticTask("step1")

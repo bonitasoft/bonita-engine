@@ -13,11 +13,11 @@ import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.process.ProcessResolutionTest;
+import com.bonitasoft.engine.process.TaskOnDemandTest;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-    ProcessResolutionTest.class
+        LocalLogTest.class, TaskOnDemandTest.class
 })
 @Initializer(TestsInitializerSP.class)
 public class TemporaryTestsSP extends LocalIntegrationTestsSP {

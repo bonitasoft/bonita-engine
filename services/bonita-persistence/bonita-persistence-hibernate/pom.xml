@@ -21,6 +21,11 @@
 			<artifactId>ehcache-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-ehcache</artifactId>
+			<version>4.3.1.Final</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-hibernate</artifactId>
 			<version>${project.version}</version>
@@ -30,7 +35,6 @@
 			<artifactId>bonita-delete-batch</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 	</dependencies>
 </project>
 	
