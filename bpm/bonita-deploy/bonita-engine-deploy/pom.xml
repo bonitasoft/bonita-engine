@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-deploy</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.2.3-SNAPSHOT</version>
+		<version>6.2.3-dummy-001</version>
 	</parent>
 
 	<artifactId>bonita-engine-deploy</artifactId>
