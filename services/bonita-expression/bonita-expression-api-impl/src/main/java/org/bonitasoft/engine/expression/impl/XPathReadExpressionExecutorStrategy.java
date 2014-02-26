@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.expression.impl;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +22,11 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
@@ -37,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Supported return types are:
@@ -86,7 +90,19 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
             final XPath xpath = xpFactory.newXPath();
             final XPathExpression exp = xpath.compile(expression.getContent());
             return transType(exp.evaluate(document, qname), returnType);
-        } catch (final Exception e) {
+        } catch (final XPathExpressionException e) {
+            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
+                    expressionName);
+        } catch (final ParserConfigurationException e) {
+            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
+                    expressionName);
+        } catch (final SAXException e) {
+            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
+                    expressionName);
+        } catch (final IOException e) {
+            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
+                    expressionName);
+        } catch (final SBonitaRuntimeException e) {
             throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
                     expressionName);
         }
