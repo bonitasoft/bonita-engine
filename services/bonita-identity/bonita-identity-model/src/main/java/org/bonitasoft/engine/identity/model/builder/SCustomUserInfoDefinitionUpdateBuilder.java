@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 BonitaSoft S.A.
+ * Copyright (C) 2011 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,12 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.identity.model;
+package org.bonitasoft.engine.identity.model.builder;
 
 /**
- * @author Anthony Birembaut
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
-public interface SProfileMetadataDefinition extends SNamedElement {
+public interface SCustomUserInfoDefinitionUpdateBuilder extends SIdentityUpdateBuilder {
+
+    SCustomUserInfoDefinitionUpdateBuilder updateName(final String name);
+
+    SCustomUserInfoDefinitionUpdateBuilder updateDisplayName(final String displayName);
+
+    SCustomUserInfoDefinitionUpdateBuilder updateDescription(final String description);
 
 }

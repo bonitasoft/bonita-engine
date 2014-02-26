@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.identity.model.SContactInfo;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
 import org.bonitasoft.engine.identity.model.SProfileMetadataValue;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -39,7 +39,7 @@ public interface IdentityService {
 
     String GROUP = "GROUP";
 
-    String METADATA = "METADATA";
+    String CUSTOM_USER_INFO = "CUSTOM_USER_INFO";
 
     String METADATAVALUE = "METADATAVALUE";
 
@@ -563,14 +563,14 @@ public interface IdentityService {
     List<SUserMembership> getUserMemberships(int fromIndex, int numberOfUserMemberships, OrderByOption orderByOption) throws SIdentityException;
 
     /**
-     * Get profileMetadataDefinition by its id
+     * Get customUserInfoDefinition by its id
      * 
-     * @param profileMetadataDefinitionId
-     *            The identifier of profileMetadataDefinition
-     * @return the profileMetadataDefinition
+     * @param customUserInfoDefinitionId
+     *            The identifier of customUserInfoDefinition
+     * @return the customUserInfoDefinition
      * @throws SIdentityException
      */
-    SProfileMetadataDefinition getProfileMetadataDefinition(long profileMetadataDefinitionId) throws SIdentityException;
+    SCustomUserInfoDefinition getCustomUserInfoDefinition(long customUserInfoDefinitionId) throws SIdentityException;
 
     /**
      * Get profileMetadataValue by its id
@@ -590,25 +590,25 @@ public interface IdentityService {
      * @return the profileMetadataValue
      * @throws SIdentityException
      */
-    SProfileMetadataDefinition getProfileMetadataByName(String metadataName) throws SIdentityException;
+    SCustomUserInfoDefinition getProfileMetadataByName(String metadataName) throws SIdentityException;
 
     /**
-     * Get total number of profileMetadataDefinition
+     * Get total number of custom user info
      * 
-     * @return the total number of profileMetadataDefinition
+     * @return the total number of custom user info
      * @throws SIdentityException
      */
-    long getNumberOfProfileMetadataDefinition() throws SIdentityException;
+    long getNumberOfCustomUserInfoDefinition() throws SIdentityException;
 
     /**
-     * Get profileMetadataDefinitions by their ids
+     * Get customUserInfoDefinition by their ids
      * 
-     * @param profileMetadataDefinitionIds
-     *            A list of identifiers of profileMetadataDefinition
-     * @return a list of SProfileMetadataDefinition objects corresponding to parameters
+     * @param customUserInfoDefinitionIds
+     *            A list of identifiers of customUserInfoDefinition
+     * @return a list of SCustomUserInfoDefinition objects corresponding to parameters
      * @throws SIdentityException
      */
-    List<SProfileMetadataDefinition> getProfileMetadataDefinitions(List<Long> profileMetadataDefinitionIds) throws SIdentityException;
+    List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(List<Long> customUserInfoDefinitionIds) throws SIdentityException;
 
     /**
      * Get profileMetadataValues by their ids
@@ -621,16 +621,16 @@ public interface IdentityService {
     List<SProfileMetadataValue> getProfileMetadataValues(List<Long> profileMetadataValueIds) throws SIdentityException;
 
     /**
-     * Get profileMetadataDefinition in a specific interval, this is used for pagination
+     * Get custom user info in a specific interval, this is used for pagination
      * 
      * @param fromIndex
      *            Index of the record to be retrieved from. First record has index 0
      * @param numberOfMetadata
      *            Number of result we want to get. Maximum number of result returned
-     * @return a list of SProfileMetadataDefinition object
+     * @return a list of SCustomUserInfo object
      * @throws SIdentityException
      */
-    List<SProfileMetadataDefinition> getProfileMetadataDefinition(int fromIndex, int numberOfMetadata) throws SIdentityException;
+    List<SCustomUserInfoDefinition> getCustomUserInfoDefinition(int fromIndex, int numberOfMetadata) throws SIdentityException;
 
     /**
      * Get userMemberships in a specific interval for a user, this is used for pagination
@@ -744,24 +744,24 @@ public interface IdentityService {
     void updateUser(SUser user, EntityUpdateDescriptor descriptor, boolean isPasswordEncrypted) throws SUserUpdateException;
 
     /**
-     * Create profileMetadataDefinition in DB for give profileMetadataDefinition
+     * Create custom user info definition in DB for a server given custom user info definition
      * 
      * @param metadata
-     *            SProfileMetadataDefinition object
+     *            SCustomUserInfoDefinition object
      * @throws SIdentityException
      */
-    SProfileMetadataDefinition createProfileMetadataDefinition(SProfileMetadataDefinition metadata) throws SIdentityException;
+    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition metadata) throws SIdentityException;
 
     /**
-     * Update profileMetadataDefinition according to the descriptor
+     * Update customUserInfoDefinition according to the descriptor
      * 
      * @param metadata
-     *            The profileMetadataDefinition will be updated
+     *            The customUserInfoDefinition will be updated
      * @param descriptor
      *            The update description
      * @throws SIdentityException
      */
-    void updateProfileMetadataDefinition(SProfileMetadataDefinition metadata, EntityUpdateDescriptor descriptor) throws SIdentityException;
+    void updateCustomUserInfoDefinition(SCustomUserInfoDefinition metadata, EntityUpdateDescriptor descriptor) throws SIdentityException;
 
     /**
      * Create profileMetadataValue in DB for give profileMetadataValue object
@@ -870,22 +870,22 @@ public interface IdentityService {
     void deleteAllUsers() throws SUserDeletionException;
 
     /**
-     * Delete the specific profileMetadataDefinition
+     * Delete the specific custom user info
      * 
      * @param metadataDefinition
-     *            The profileMetadataDefinition object will be deleted
+     *            The custom user info object will be deleted
      * @throws SIdentityException
      */
-    void deleteProfileMetadataDefinition(SProfileMetadataDefinition metadataDefinition) throws SIdentityException;
+    void deleteCustomUserInfoDefinition(SCustomUserInfoDefinition metadataDefinition) throws SIdentityException;
 
     /**
-     * Delete the id specified profileMetadataDefinition
+     * Delete the id specified custom user info
      * 
      * @param metadataDefinitionId
-     *            The identifier of profileMetadataDefinition
+     *            The identifier of custom user info
      * @throws SIdentityException
      */
-    void deleteProfileMetadataDefinition(long metadataDefinitionId) throws SIdentityException;
+    void deleteCustomUserInfoDefinition(long metadataDefinitionId) throws SIdentityException;
 
     /**
      * Delete the specific profileMetadataValue

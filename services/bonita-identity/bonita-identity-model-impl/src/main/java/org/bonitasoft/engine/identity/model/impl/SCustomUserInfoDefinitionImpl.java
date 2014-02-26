@@ -13,27 +13,27 @@
  **/
 package org.bonitasoft.engine.identity.model.impl;
 
-import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 
 /**
  * @author Anthony Birembaut
  * @author Matthieu Chaffotte
  */
-public class SProfileMetadataDefinitionImpl extends SNamedElementImpl implements SProfileMetadataDefinition {
+public class SCustomUserInfoDefinitionImpl extends SNamedElementImpl implements SCustomUserInfoDefinition {
 
     private static final long serialVersionUID = 1L;
 
-    public SProfileMetadataDefinitionImpl() {
+    public SCustomUserInfoDefinitionImpl() {
     }
 
     @Override
     public String getDiscriminator() {
-        return SProfileMetadataDefinition.class.getName();
+        return SCustomUserInfoDefinition.class.getName();
     }
 
     @Override
     public String toString() {
-        return "SProfileMetadataDefinitionImpl [getDescription()=" + this.getDescription() + ", getLabel()=" + this.getDisplayName() + ", getName()="
+        return "SCustomUserInfoDefinitionImpl [getDescription()=" + this.getDescription() + ", getLabel()=" + this.getDisplayName() + ", getName()="
                 + this.getName() + ", getId()=" + this.getId() + "]";
     }
 

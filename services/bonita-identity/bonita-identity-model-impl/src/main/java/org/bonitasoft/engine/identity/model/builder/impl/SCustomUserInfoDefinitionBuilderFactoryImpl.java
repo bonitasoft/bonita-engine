@@ -13,15 +13,15 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilder;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilderFactory;
-import org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
+import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class SProfileMetadataDefinitionBuilderFactoryImpl implements SProfileMetadataDefinitionBuilderFactory {
+public class SCustomUserInfoDefinitionBuilderFactoryImpl implements SCustomUserInfoDefinitionBuilderFactory {
 
     static final String ID = "id";
 
@@ -33,9 +33,9 @@ public class SProfileMetadataDefinitionBuilderFactoryImpl implements SProfileMet
 
     
     @Override
-    public SProfileMetadataDefinitionBuilder createNewInstance() {
-        final SProfileMetadataDefinitionImpl entity = new SProfileMetadataDefinitionImpl();
-        return new SProfileMetadataDefinitionBuilderImpl(entity);
+    public SCustomUserInfoDefinitionBuilder createNewInstance() {
+        final SCustomUserInfoDefinitionImpl entity = new SCustomUserInfoDefinitionImpl();
+        return new SCustomUserInfoDefinitionBuilderImpl(entity);
     }
 
     @Override

@@ -17,12 +17,8 @@ package org.bonitasoft.engine.identity.model.builder;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public interface SProfileMetadataDefinitionUpdateBuilder extends SIdentityUpdateBuilder {
+public interface SCustomUserInfoDefinitionUpdateBuilderFactory extends SIdentityUpdateBuilderFactory {
 
-    SProfileMetadataDefinitionUpdateBuilder updateName(final String name);
-
-    SProfileMetadataDefinitionUpdateBuilder updateDisplayName(final String displayName);
-
-    SProfileMetadataDefinitionUpdateBuilder updateDescription(final String description);
-
+    SCustomUserInfoDefinitionUpdateBuilder createNewInstance();
+    
 }

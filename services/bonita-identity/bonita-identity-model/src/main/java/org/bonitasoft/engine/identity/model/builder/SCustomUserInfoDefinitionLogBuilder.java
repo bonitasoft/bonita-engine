@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.identity.model.builder;
 
-/**
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
- */
-public interface SProfileMetadataDefinitionUpdateBuilderFactory extends SIdentityUpdateBuilderFactory {
+import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
+import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 
-    SProfileMetadataDefinitionUpdateBuilder createNewInstance();
-    
+/**
+ * @author Yanyan Liu
+ */
+public interface SCustomUserInfoDefinitionLogBuilder extends HasCRUDEAction, SPersistenceLogBuilder {
+
 }

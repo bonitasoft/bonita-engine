@@ -77,10 +77,10 @@
 	</query>
 
 	<query name="getMetadataByName">
-		SELECT metadata
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS metadata
-		WHERE metadata.name = :name
-	</query>
+        SELECT metadata
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS metadata
+        WHERE metadata.name = :name
+    </query>
 
 <!--	Users -->
 
@@ -274,15 +274,15 @@
 
 <!--	 profile metadata -->
 	<query name="getProfileMetadataById">
-		SELECT p_metadata_def
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS p_metadata_def
-		WHERE p_metadata_def.id = :id
-	</query>
+        SELECT p_metadata_def
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS p_metadata_def
+        WHERE p_metadata_def.id = :id
+    </query>
 
 	<query name="getProfileMetadatas">
-		SELECT p_metadata_def
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS p_metadata_def
-	</query>
+        SELECT p_metadata_def
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS p_metadata_def
+    </query>
 
 <!--	get number of -->
 	<query name="getNumberOfSUser">
@@ -337,9 +337,9 @@
 	</query>
 
 	<query name="getNumberOfProfileMetadata">
-		SELECT COUNT(p_metadata_def)
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS p_metadata_def
-	</query>
+        SELECT COUNT(p_metadata_def)
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS p_metadata_def
+    </query>
 	
 	<query name="searchSUser">
 		SELECT user
@@ -365,10 +365,10 @@
 		FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
 	</query>
 
-	<query name="searchProfileMetadataDefinition">
-		SELECT p_metadata_def
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl AS p_metadata_def
-	</query>
+	<query name="searchCustomUserInfoDefinition">
+        SELECT p_metadata_def
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS p_metadata_def
+    </query>
 
 	<query name="searchProfileMetadataValue">
 		SELECT p_metadata_val

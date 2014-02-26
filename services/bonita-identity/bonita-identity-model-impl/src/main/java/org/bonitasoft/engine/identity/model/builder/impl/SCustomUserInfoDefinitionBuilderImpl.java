@@ -13,49 +13,49 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
-import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilder;
-import org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
+import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class SProfileMetadataDefinitionBuilderImpl implements SProfileMetadataDefinitionBuilder {
+public class SCustomUserInfoDefinitionBuilderImpl implements SCustomUserInfoDefinitionBuilder {
 
-    private final SProfileMetadataDefinitionImpl entity;
+    private final SCustomUserInfoDefinitionImpl entity;
     
-    public SProfileMetadataDefinitionBuilderImpl(final SProfileMetadataDefinitionImpl entity) {
+    public SCustomUserInfoDefinitionBuilderImpl(final SCustomUserInfoDefinitionImpl entity) {
         super();
         this.entity = entity;
     }
 
     @Override
-    public SProfileMetadataDefinitionBuilder setName(final String name) {
+    public SCustomUserInfoDefinitionBuilder setName(final String name) {
         entity.setName(name);
         return this;
     }
 
     @Override
-    public SProfileMetadataDefinitionBuilder setDisplayName(final String displayName) {
+    public SCustomUserInfoDefinitionBuilder setDisplayName(final String displayName) {
         entity.setDisplayName(displayName);
         return this;
     }
 
     @Override
-    public SProfileMetadataDefinitionBuilder setDescription(final String description) {
+    public SCustomUserInfoDefinitionBuilder setDescription(final String description) {
         entity.setDescription(description);
         return this;
     }
 
     @Override
-    public SProfileMetadataDefinitionBuilder setId(final long id) {
+    public SCustomUserInfoDefinitionBuilder setId(final long id) {
         entity.setId(id);
         return this;
     }
 
     @Override
-    public SProfileMetadataDefinition done() {
+    public SCustomUserInfoDefinition done() {
         return entity;
     }
 

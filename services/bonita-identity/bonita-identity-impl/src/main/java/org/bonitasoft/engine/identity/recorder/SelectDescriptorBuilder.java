@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -104,9 +104,9 @@ public class SelectDescriptorBuilder {
                 new QueryOptions(startIndex, maxResults));
     }
 
-    public static SelectOneDescriptor<SProfileMetadataDefinition> getMetadataByName(final String metadataName) {
+    public static SelectOneDescriptor<SCustomUserInfoDefinition> getMetadataByName(final String metadataName) {
         final Map<String, Object> parameters = Collections.singletonMap("name", (Object) metadataName);
-        return new SelectOneDescriptor<SProfileMetadataDefinition>("getMetadataByName", parameters, SProfileMetadataDefinition.class);
+        return new SelectOneDescriptor<SCustomUserInfoDefinition>("getMetadataByName", parameters, SCustomUserInfoDefinition.class);
     }
 
     public static SelectOneDescriptor<Long> getNumberOfElement(final String elementName, final Class<? extends PersistentObject> clazz) {

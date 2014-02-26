@@ -13,18 +13,18 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class SProfileMetadataDefinitionUpdateBuilderImpl implements SProfileMetadataDefinitionUpdateBuilder {
+public class SCustomUserInfoDefinitionUpdateBuilderImpl implements SCustomUserInfoDefinitionUpdateBuilder {
 
     private final EntityUpdateDescriptor descriptor;
 
-    public SProfileMetadataDefinitionUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
+    public SCustomUserInfoDefinitionUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
         super();
         this.descriptor = descriptor;
     }
@@ -35,20 +35,20 @@ public class SProfileMetadataDefinitionUpdateBuilderImpl implements SProfileMeta
     }
 
     @Override
-    public SProfileMetadataDefinitionUpdateBuilder updateName(final String name) {
-        this.descriptor.addField(SProfileMetadataDefinitionBuilderFactoryImpl.NAME, name);
+    public SCustomUserInfoDefinitionUpdateBuilder updateName(final String name) {
+        this.descriptor.addField(SCustomUserInfoDefinitionBuilderFactoryImpl.NAME, name);
         return this;
     }
 
     @Override
-    public SProfileMetadataDefinitionUpdateBuilder updateDisplayName(final String displayName) {
-        this.descriptor.addField(SProfileMetadataDefinitionBuilderFactoryImpl.DISPLAY_NAME, displayName);
+    public SCustomUserInfoDefinitionUpdateBuilder updateDisplayName(final String displayName) {
+        this.descriptor.addField(SCustomUserInfoDefinitionBuilderFactoryImpl.DISPLAY_NAME, displayName);
         return this;
     }
 
     @Override
-    public SProfileMetadataDefinitionUpdateBuilder updateDescription(final String description) {
-        this.descriptor.addField(SProfileMetadataDefinitionBuilderFactoryImpl.DESCRIPTION, description);
+    public SCustomUserInfoDefinitionUpdateBuilder updateDescription(final String description) {
+        this.descriptor.addField(SCustomUserInfoDefinitionBuilderFactoryImpl.DESCRIPTION, description);
         return this;
     }
 

@@ -13,20 +13,14 @@
  **/
 package org.bonitasoft.engine.identity.model.builder;
 
+import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEActionFactory;
+import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilderFactory;
 
 /**
- * @author Baptiste Mesta
+ * @author Yanyan Liu
  */
-public interface SProfileMetadataDefinitionBuilderFactory {
+public interface SCustomUserInfoDefinitionLogBuilderFactory extends HasCRUDEActionFactory, SPersistenceLogBuilderFactory {
 
-    SProfileMetadataDefinitionBuilder createNewInstance();
-
-    String getIdKey();
-
-    String getNameKey();
-
-    String getDisplayNameKey();
-
-    String getDescriptionKey();
-
+    SCustomUserInfoDefinitionLogBuilder createNewInstance();
+    
 }

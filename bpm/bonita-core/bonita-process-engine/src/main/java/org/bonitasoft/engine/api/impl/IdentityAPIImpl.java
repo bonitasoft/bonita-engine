@@ -117,10 +117,10 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilderFactory;
@@ -1478,6 +1478,6 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     private CustomUserInfoAPIImpl createCustomUserDetailsAPI() {
-        return new CustomUserInfoAPIImpl(getTenantAccessor().getIdentityService(), BuilderFactory.get(SProfileMetadataDefinitionBuilderFactory.class));
+        return new CustomUserInfoAPIImpl(getTenantAccessor().getIdentityService(), BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class));
     }
 }

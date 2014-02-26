@@ -16,9 +16,9 @@ package org.bonitasoft.engine.api.impl;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilder;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilderFactory;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,13 +39,13 @@ public class CustomUserDetailsAPIImplTest {
     private IdentityService service;
 
     @Mock
-    private SProfileMetadataDefinitionBuilderFactory factory;
+    private SCustomUserInfoDefinitionBuilderFactory factory;
 
     @Mock
-    private SProfileMetadataDefinitionBuilder builder;
+    private SCustomUserInfoDefinitionBuilder builder;
 
     @Mock
-    private SProfileMetadataDefinition sDefinition;
+    private SCustomUserInfoDefinition sDefinition;
 
     private CustomUserInfoAPIImpl api;
 
@@ -63,7 +63,7 @@ public class CustomUserDetailsAPIImplTest {
         given(sDefinition.getName()).willReturn("name");
         given(sDefinition.getDisplayName()).willReturn("display name");
         given(sDefinition.getDescription()).willReturn("description");
-        given(service.createProfileMetadataDefinition(any(SProfileMetadataDefinition.class))).willReturn(sDefinition);
+        given(service.createCustomUserInfoDefinition(any(SCustomUserInfoDefinition.class))).willReturn(sDefinition);
 
         CustomUserInfoDefinition definition = api.createCustomUserInfoDefinition(creator);
 

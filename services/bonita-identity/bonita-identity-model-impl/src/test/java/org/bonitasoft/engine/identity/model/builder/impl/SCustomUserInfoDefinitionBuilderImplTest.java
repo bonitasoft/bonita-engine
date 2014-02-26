@@ -13,8 +13,8 @@
  */
 package org.bonitasoft.engine.identity.model.builder.impl;
 
-import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
-import org.bonitasoft.engine.identity.model.impl.SProfileMetadataDefinitionImpl;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,20 +23,20 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Vincent Elcrin
  */
-public class SProfileMetadataDefinitionBuilderImplTest {
+public class SCustomUserInfoDefinitionBuilderImplTest {
 
-    private SProfileMetadataDefinitionBuilderImpl builder;
+    private SCustomUserInfoDefinitionBuilderImpl builder;
 
     @Before
     public void setUp() throws Exception {
-        builder = new SProfileMetadataDefinitionBuilderImpl(new SProfileMetadataDefinitionImpl());
+        builder = new SCustomUserInfoDefinitionBuilderImpl(new SCustomUserInfoDefinitionImpl());
     }
 
     @Test
     public void should_build_an_entity_with_the_right_id() throws Exception {
         builder.setId(1L);
 
-        SProfileMetadataDefinition entity = builder.done();
+        SCustomUserInfoDefinition entity = builder.done();
 
         assertEquals(1L, entity.getId());
     }
@@ -45,7 +45,7 @@ public class SProfileMetadataDefinitionBuilderImplTest {
     public void should_build_an_entity_with_the_right_name() throws Exception {
         builder.setName("name");
 
-        SProfileMetadataDefinition entity = builder.done();
+        SCustomUserInfoDefinition entity = builder.done();
 
         assertEquals("name", entity.getName());
     }
@@ -54,7 +54,7 @@ public class SProfileMetadataDefinitionBuilderImplTest {
     public void should_build_an_entity_with_the_right_display_name() throws Exception {
         builder.setDisplayName("display name");
 
-        SProfileMetadataDefinition entity = builder.done();
+        SCustomUserInfoDefinition entity = builder.done();
 
         assertEquals("display name", entity.getDisplayName());
     }
@@ -63,7 +63,7 @@ public class SProfileMetadataDefinitionBuilderImplTest {
     public void should_build_an_entity_with_the_right_description() throws Exception {
         builder.setDescription("description");
 
-        SProfileMetadataDefinition entity = builder.done();
+        SCustomUserInfoDefinition entity = builder.done();
 
         assertEquals("description", entity.getDescription());
     }

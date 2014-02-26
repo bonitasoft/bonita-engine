@@ -20,9 +20,9 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
-import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilder;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilderFactory;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 
 /**
  * @author Vincent Elcrin
@@ -31,9 +31,9 @@ public class CustomUserInfoAPIImpl implements CustomUserInfoAPI {
 
     private IdentityService service;
 
-    private SProfileMetadataDefinitionBuilderFactory factory;
+    private SCustomUserInfoDefinitionBuilderFactory factory;
 
-    public CustomUserInfoAPIImpl(IdentityService service, SProfileMetadataDefinitionBuilderFactory factory) {
+    public CustomUserInfoAPIImpl(IdentityService service, SCustomUserInfoDefinitionBuilderFactory factory) {
         this.service = service;
         this.factory = factory;
     }
@@ -44,18 +44,18 @@ public class CustomUserInfoAPIImpl implements CustomUserInfoAPI {
             throw new CreationException("Can not create null custom user details.");
         }
 
-        final SProfileMetadataDefinitionBuilder builder = factory.createNewInstance();
+        final SCustomUserInfoDefinitionBuilder builder = factory.createNewInstance();
         builder.setName(creator.getName());
         builder.setDisplayName(creator.getDisplayName());
         builder.setDescription(creator.getDescription());
         try {
-            return toCustomUserInfoDefinition(service.createProfileMetadataDefinition(builder.done()));
+            return toCustomUserInfoDefinition(service.createCustomUserInfoDefinition(builder.done()));
         } catch (SIdentityException e) {
             throw new CreationException(e);
         }
     }
 
-    private CustomUserInfoDefinition toCustomUserInfoDefinition(SProfileMetadataDefinition sDefinition) {
+    private CustomUserInfoDefinition toCustomUserInfoDefinition(SCustomUserInfoDefinition sDefinition) {
         CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
         definition.setName(sDefinition.getName());
         definition.setDisplayName(sDefinition.getDisplayName());

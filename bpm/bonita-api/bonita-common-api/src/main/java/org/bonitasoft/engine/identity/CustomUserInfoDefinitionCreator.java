@@ -13,10 +13,12 @@
  */
 package org.bonitasoft.engine.identity;
 
+import java.io.Serializable;
+
 /**
  * @author Vincent Elcrin
  */
-public class CustomUserInfoDefinitionCreator {
+public class CustomUserInfoDefinitionCreator implements Serializable {
 
     private String name;
 

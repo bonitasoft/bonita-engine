@@ -88,7 +88,7 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SProfileMetadataDefinitionImpl" table="p_metadata_def">
+	<class name="SCustomUserInfoDefinitionImpl" table="p_metadata_def">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="ID" type="long" />

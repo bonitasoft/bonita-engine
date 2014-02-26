@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2010 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,19 +10,13 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- */
-package org.bonitasoft.engine.identity;
-
-import org.bonitasoft.engine.bpm.BonitaObject;
+ **/
+package org.bonitasoft.engine.identity.model;
 
 /**
- * @author Vincent Elcrin
+ * @author Anthony Birembaut
+ * @author Baptiste Mesta
  */
-public interface CustomUserInfoDefinition extends BonitaObject {
+public interface SCustomUserInfoDefinition extends SNamedElement {
 
-    String getName();
-
-    String getDisplayName();
-
-    String getDescription();
 }
