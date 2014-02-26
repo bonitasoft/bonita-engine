@@ -53,6 +53,11 @@ public class ExpressionServiceTest extends AbstractExpressionServiceTest {
         expressionService = getServicesBuilder().buildExpressionService();
         dataInstanceService = getServicesBuilder().buildDataInstanceService();
         cacheService = getServicesBuilder().buildCacheService();
+        try {
+            cacheService.start();
+        } catch (SBonitaException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

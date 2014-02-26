@@ -26,6 +26,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -43,11 +44,21 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  */
 public class ConnectorExecutorImpl implements ConnectorExecutor {
 
-    private final ThreadPoolExecutor threadPoolExecutor;
+    private ThreadPoolExecutor threadPoolExecutor;
 
     private final SessionAccessor sessionAccessor;
 
     private final SessionService sessionService;
+
+    private final int queueCapacity;
+
+    private final int corePoolSize;
+
+    private final int maximumPoolSize;
+
+    private final long keepAliveTimeSeconds;
+
+    private final TechnicalLoggerService loggerService;
 
     /**
      * The handling of threads relies on the JVM
@@ -75,16 +86,21 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
      */
     public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
             final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService) {
-        final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
-        final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
-        final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
-        threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
+
+        this.queueCapacity = queueCapacity;
+        this.corePoolSize = corePoolSize;
+        this.loggerService = loggerService;
+        this.maximumPoolSize = maximumPoolSize;
+        this.keepAliveTimeSeconds = keepAliveTimeSeconds;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
     }
 
     @Override
     public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters) throws SConnectorException {
+        if (threadPoolExecutor == null) {
+            throw new SConnectorException("Unable to execute a connector if the node is node started. Start it first");
+        }
         final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
         final Future<Map<String, Object>> submit = threadPoolExecutor.submit(callable);
         try {
@@ -102,7 +118,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }
     }
 
-    @SuppressWarnings("unused")
     protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
         return submit.get();
     }
@@ -176,4 +191,25 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
 
     }
 
+    @Override
+    public void start() throws SBonitaException {
+        final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
+        final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
+        final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
+        threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, workQueue, threadFactory, handler);
+    }
+
+    @Override
+    public void stop() {
+        if (threadPoolExecutor != null) {
+            threadPoolExecutor.shutdown();
+            try {
+                if (!threadPoolExecutor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
+                    loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Timeout  (5s) trying to stop the connector executor thread pool");
+                }
+            } catch (InterruptedException e) {
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while stopping the connector executor thread pool", e);
+            }
+        }
+    }
 }
