@@ -36,10 +36,6 @@ public class JTATransactionServiceImpl implements TransactionService {
 
     private final AtomicLong numberOfActiveTransactions = new AtomicLong(0);
 
-    public JTATransactionServiceImpl(final TechnicalLoggerService logger, final BonitaTransactionManagerLookup txManagerLookup) {
-        this(logger, txManagerLookup.getTransactionManager());
-    }
-
     public JTATransactionServiceImpl(final TechnicalLoggerService logger, final TransactionManager txManager) {
         this.logger = logger;
         if (txManager == null) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,28 +18,30 @@ import org.bonitasoft.engine.test.WaitUntil;
 
 /**
  * @author Sébastien Chevassu
+ * @author Celine Souchet
  */
-public class WaitForVariableValue extends WaitUntil {
+public class WaitForDataValue extends WaitUntil {
 
     private final ProcessAPI processAPI;
 
     private final long processInstanceId;
 
-    private final String variableName;
+    private final String dataName;
 
     private final String valueExpected;
 
-    public WaitForVariableValue(final ProcessAPI processAPI, final long processInstanceId, final String variableName, final String valueExpected) {
-        super(40, 3000);
+    public WaitForDataValue(final int repeatEach, final int timeout, final long processInstanceId, final String dataName,
+            final String valueExpected, final ProcessAPI processAPI) {
+        super(repeatEach, timeout, false);
         this.processAPI = processAPI;
         this.processInstanceId = processInstanceId;
-        this.variableName = variableName;
+        this.dataName = dataName;
         this.valueExpected = valueExpected;
     }
 
     @Override
     protected boolean check() throws Exception {
-        final String value = (String) processAPI.getProcessDataInstance(variableName, processInstanceId).getValue();
+        final String value = (String) processAPI.getProcessDataInstance(dataName, processInstanceId).getValue();
         return value.equals(valueExpected);
     }
 

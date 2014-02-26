@@ -975,30 +975,6 @@ public class OrganizationTest extends CommonAPITest {
         assertNotNull(persistedGroup1);
     }
 
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "Password", "Encryption" }, jira = "ENGINE-661")
-    @Test
-    public void importACMEOrganizationAndCheckEncryptedPassword() throws Exception {
-        importOrganization("ACME.xml");
-        final User norio = getIdentityAPI().getUserByUserName("norio.yamazaki");
-        assertFalse(norio.getPassword().trim().isEmpty());
-        assertNotSame("bpm", norio.getPassword());
-
-        getIdentityAPI().deleteOrganization();
-    }
-
-    @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Organization", "Password", "Encryption" }, jira = "ENGINE-661")
-    @Test
-    public void importOrganizationWithSomeEncryptedPassword() throws Exception {
-        importOrganization("mixOrganization.xml");
-        final User matti = getIdentityAPI().getUserByUserName("matti");
-        final User petteri = getIdentityAPI().getUserByUserName("petteri");
-        assertFalse(matti.getPassword().trim().isEmpty());
-        assertEquals("bpm", matti.getPassword());
-        assertFalse(petteri.getPassword().trim().isEmpty());
-        assertNotSame("bpm", petteri.getPassword());
-
-        getIdentityAPI().deleteOrganization();
-    }
 
     @Test
     public void exportOrganization() throws Exception {

@@ -874,7 +874,7 @@ public class ModelConvertor {
     }
 
     public static User toUser(final SUser sUser, final Map<Long, SUser> userIdToUser) {
-        final UserImpl user = new UserImpl(sUser.getId(), sUser.getUserName(), sUser.getPassword());
+        final UserImpl user = new UserImpl(sUser.getId(), sUser.getUserName(), "");
         user.setFirstName(sUser.getFirstName());
         user.setLastName(sUser.getLastName());
         user.setTitle(sUser.getTitle());

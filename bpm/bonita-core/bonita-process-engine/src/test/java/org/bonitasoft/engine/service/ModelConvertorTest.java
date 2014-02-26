@@ -4,9 +4,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.fest.assertions.Assertions.assertThat;
+
 
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.junit.Test;
 
 public class ModelConvertorTest {
@@ -39,6 +43,14 @@ public class ModelConvertorTest {
     @Test(expected = IllegalArgumentException.class)
     public void getProcessInstanceState_conversionOnNullStateShouldThrowException() throws Exception {
         ModelConvertor.getProcessInstanceState(null);
+    }
+    
+    @Test
+    public void convertSUserToUserDoesntShowPassword() {
+        SUser sUser = mock(SUser.class);
+        User testUser = ModelConvertor.toUser(sUser);
+
+        assertThat(testUser.getPassword()).isEqualTo("");
     }
 
 }

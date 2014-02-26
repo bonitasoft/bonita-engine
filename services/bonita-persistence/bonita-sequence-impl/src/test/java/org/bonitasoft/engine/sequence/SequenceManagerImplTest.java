@@ -81,8 +81,8 @@ public class SequenceManagerImplTest {
                 1);
         when(datasource.getConnection()).thenReturn(connection);
         preparedStatement = mock(PreparedStatement.class);
-        when(connection.prepareStatement(SequenceManagerImpl.SELECT_BY_ID)).thenReturn(preparedStatement);
-        when(connection.prepareStatement(SequenceManagerImpl.UPDATE_SEQUENCE)).thenReturn(preparedStatement);
+        when(connection.prepareStatement(TenantSequenceManagerImpl.SELECT_BY_ID)).thenReturn(preparedStatement);
+        when(connection.prepareStatement(TenantSequenceManagerImpl.UPDATE_SEQUENCE)).thenReturn(preparedStatement);
         resultSet = mock(ResultSet.class);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
@@ -90,7 +90,7 @@ public class SequenceManagerImplTest {
     @Test
     public void testGetNextId() throws Exception {
         when(resultSet.next()).thenAnswer(new TrueThenFalse());
-        when(resultSet.getLong(SequenceManagerImpl.NEXTID)).thenReturn(110L, 310L);
+        when(resultSet.getLong(TenantSequenceManagerImpl.NEXTID)).thenReturn(110L, 310L);
         // first call to DB, return what is in DB
         // before we hit range size the sequence manager do +1 on next id
         for (int i = 0; i < RANGE_SIZE; i++) {
@@ -103,10 +103,10 @@ public class SequenceManagerImplTest {
     @Test
     public void testGetNextIdDatabaseAccessIsInsideLock() throws Exception {
         when(resultSet.next()).thenAnswer(new TrueThenFalse());
-        when(resultSet.getLong(SequenceManagerImpl.NEXTID)).thenReturn(110L);
+        when(resultSet.getLong(TenantSequenceManagerImpl.NEXTID)).thenReturn(110L);
         InOrder inOrder = inOrder(lockService, connection);
         assertEquals(110, sequenceManager.getNextId("myClass", 1));
-        inOrder.verify(lockService).lock(SEQUENCE_ID, SequenceManagerImpl.SEQUENCE, TENANTID);
+        inOrder.verify(lockService).lock(SEQUENCE_ID, TenantSequenceManagerImpl.SEQUENCE, TENANTID);
         inOrder.verify(connection).commit();;
         inOrder.verify(lockService).unlock(lock, TENANTID);
     }
@@ -114,9 +114,9 @@ public class SequenceManagerImplTest {
     @Test
     public void testGetNextIdRetry() throws Exception {
         when(resultSet.next()).thenReturn(true, true, false);
-        when(resultSet.getLong(SequenceManagerImpl.NEXTID)).thenThrow(new SQLException("Haha")).thenReturn(110L);
+        when(resultSet.getLong(TenantSequenceManagerImpl.NEXTID)).thenThrow(new SQLException("Haha")).thenReturn(110L);
         assertEquals(110, sequenceManager.getNextId("myClass", 1));
-        verify(resultSet, times(2)).getLong(SequenceManagerImpl.NEXTID);
+        verify(resultSet, times(2)).getLong(TenantSequenceManagerImpl.NEXTID);
         verify(lockService, times(1)).lock(anyLong(), anyString(), eq(TENANTID));
         verify(lockService, times(1)).unlock(lock, TENANTID);
     }
@@ -124,7 +124,7 @@ public class SequenceManagerImplTest {
     @Test(expected = SObjectNotFoundException.class)
     public void testGetNextIdRetryFail() throws Exception {
         when(resultSet.next()).thenReturn(true, true, false);
-        when(resultSet.getLong(SequenceManagerImpl.NEXTID)).thenThrow(new SQLException("e1"), new SQLException("e2"));
+        when(resultSet.getLong(TenantSequenceManagerImpl.NEXTID)).thenThrow(new SQLException("e1"), new SQLException("e2"));
         assertEquals(110, sequenceManager.getNextId("myClass", 1));
     }
 

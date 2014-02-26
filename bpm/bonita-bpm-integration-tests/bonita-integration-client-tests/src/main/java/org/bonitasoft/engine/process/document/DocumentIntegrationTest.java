@@ -14,6 +14,7 @@
  */
 package org.bonitasoft.engine.process.document;
 
+import static java.util.Collections.EMPTY_MAP;
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,6 +28,7 @@ import static org.junit.Assert.fail;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -417,6 +419,26 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     @Test
+    public void evaluateExpressionOnCompletedProcessInstance_should_be_able_to_retrieve_document_for_an_archived_process_instance() throws Exception {
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MyProcessWithDocumentsInBar", "1.0");
+        builder.addStartEvent("start");
+        builder.addAutomaticTask("auto");
+        builder.addEndEvent("end");
+
+        builder.addDocumentDefinition("document").addContentFileName("document.content").addFile("document.content");
+        BusinessArchiveBuilder archive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.getProcess());
+        archive.addDocumentResource(new BarResource("document.content", "content".getBytes()));
+        ProcessInstance processInstance = getProcessAPI().startProcess(deployAndEnableProcess(archive.done()).getId());
+        waitForProcessToFinish(processInstance.getId());
+
+        Map<Expression, Map<String, Serializable>> expressions = Collections.<Expression, Map<String, Serializable>> singletonMap(new ExpressionBuilder().createDocumentReferenceExpression("document"), EMPTY_MAP);
+        Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
+
+        assertEquals("document.content", ((Document) result.get("document")).getContentFileName());
+        disableAndDeleteProcess(processInstance.getProcessDefinitionId());
+    }
+
+    @Test
     public void getDocumentOnProcessWithDocumentInDefinitionUsingUrl() throws Exception {
         final String url = "http://plop.org/file.pdf";
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("MyProcessWithExternalDocuments", "1.0");
@@ -567,7 +589,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     @Test
-    public void testSearchDocumentsSupervisedBy() throws Exception {
+    public void searchDocumentsSupervisedBy() throws Exception {
         // search document by supervisor before create supervisor.
         SearchOptionsBuilder searchOptionsBuilder;
         searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
@@ -579,7 +601,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         // create supervisor.
         final long processDefinitionId = getProcessAPI().getProcessDefinitionIdFromProcessInstanceId(pi.getId());
-        final ProcessSupervisor supervisor = createSupervisor(processDefinitionId, user.getId());
+        final ProcessSupervisor supervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitionId, user.getId());
 
         // search again.
         searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, pi.getId());
@@ -710,7 +732,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     }
 
     @Test
-    public void testSearchArchivedDocumentsSupervisedBy() throws BonitaException {
+    public void searchArchivedDocumentsSupervisedBy() throws BonitaException {
         // add into archive, without supervisor.
         final ProcessInstance pi1 = ensureAProcessInstanceIsStartedWithDocumentAttached(user);
         final ProcessInstance pi2 = ensureAProcessInstanceIsStartedWithDocumentAttached(user);
@@ -731,7 +753,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         // create supervisor, add supervisor by role and group
         final long processDefinitionId = getProcessAPI().getProcessDefinitionIdFromProcessInstanceId(pi2.getId());
-        final ProcessSupervisor supervisor = createSupervisor(processDefinitionId, user.getId());
+        final ProcessSupervisor supervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitionId, user.getId());
         final Map<String, Object> map = createSupervisorByRoleAndGroup(pi2.getId(), user.getId());
 
         // search again. exist 1 document in archive table with supervisor.

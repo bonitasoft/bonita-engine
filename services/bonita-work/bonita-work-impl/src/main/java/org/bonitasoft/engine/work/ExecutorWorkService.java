@@ -74,7 +74,7 @@ public class ExecutorWorkService implements WorkService {
         this.threadPoolExecutor.submit(work);
     }
 
-    private synchronized AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws WorkRegisterException {
+    private AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws WorkRegisterException {
         if (threadPoolExecutor == null || threadPoolExecutor.isShutdown()) {
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
                     + " but the work service is shutdown. work will be restarted with the node");

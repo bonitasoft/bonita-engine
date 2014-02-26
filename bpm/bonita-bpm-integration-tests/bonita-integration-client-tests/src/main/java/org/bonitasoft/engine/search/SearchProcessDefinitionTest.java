@@ -571,8 +571,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, ACTOR_NAME, bole);
 
         // create supervisor
-        final ProcessSupervisor supervisor1 = createSupervisor(processDefinition1.getId(), bole.getId());
-        final ProcessSupervisor supervisor2 = createSupervisor(processDefinition2.getId(), bole.getId());
+        final ProcessSupervisor supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), bole.getId());
+        final ProcessSupervisor supervisor2 = getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), bole.getId());
 
         // add categories to processDefinition1
         final ArrayList<Long> categoryIds = new ArrayList<Long>();

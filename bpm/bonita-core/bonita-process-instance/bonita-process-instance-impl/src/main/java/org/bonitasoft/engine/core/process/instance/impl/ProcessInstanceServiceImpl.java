@@ -32,6 +32,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletionException;
+import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -442,14 +443,14 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteConnectorInstancesIfNecessary(final SProcessInstance processInstance, final SProcessDefinition processDefinition)
-            throws SBonitaSearchException, SConnectorInstanceDeletionException {
+            throws SConnectorInstanceReadException, SConnectorInstanceDeletionException {
         if (processDefinition != null && processDefinition.hasConnectors()) {
             connectorInstanceService.deleteConnectors(processInstance.getId(), SConnectorInstance.PROCESS_TYPE);
         }
     }
 
     private void deleteConnectorInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
-            throws SBonitaSearchException, SConnectorInstanceDeletionException {
+            throws SConnectorInstanceReadException, SConnectorInstanceDeletionException {
         if (hasConnectors(flowNodeInstance, processDefinition)) {
             connectorInstanceService.deleteConnectors(flowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
         }
@@ -573,10 +574,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void setState(final SProcessInstance processInstance, final ProcessInstanceState state) throws SProcessInstanceModificationException {
         // Let's archive the process instance before changing the state (to keep a track of state change):
         archiveProcessInstance(processInstance);
+        int previousStateId = processInstance.getStateId();
         setProcessState(processInstance, state);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("[{0} with id {1}]{2}->{3}(new={4})", processInstance.getClass()
-                    .getSimpleName(), processInstance.getId(), processInstance.getStateId(), state.getId(), state.getClass().getSimpleName()));
+                    .getSimpleName(), processInstance.getId(), previousStateId, state.getId(), state.name()));
         }
     }
 

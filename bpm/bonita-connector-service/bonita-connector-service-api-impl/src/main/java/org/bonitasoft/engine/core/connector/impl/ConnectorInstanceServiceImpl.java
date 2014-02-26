@@ -219,6 +219,19 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             throw new SConnectorInstanceReadException(e);
         }
     }
+    
+    private List<SConnectorInstance> getConnectorInstancesOrderedById(final long containerId, final String containerType, final int from, final int numberOfResult) throws SConnectorInstanceReadException {
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
+        inputParameters.put("containerId", containerId);
+        inputParameters.put("containerType", containerType);
+        final SelectListDescriptor<SConnectorInstance> selectListDescriptor = new SelectListDescriptor<SConnectorInstance>("getConnectorInstancesOrderedById",
+                inputParameters, SConnectorInstance.class, new QueryOptions(from, numberOfResult));
+        try {
+            return persistenceService.selectList(selectListDescriptor);
+        } catch (final SBonitaReadException e) {
+            throw new SConnectorInstanceReadException(e);
+        }
+    }
 
     @Override
     public SConnectorInstance getNextExecutableConnectorInstance(final long containerId, final String containerType, final ConnectorEvent activationEvent)
@@ -319,6 +332,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         }
     }
 
+    //charles
     @Override
     public List<SConnectorInstance> searchConnetorInstances(final QueryOptions searchOptions) throws SBonitaSearchException {
         try {
@@ -406,14 +420,11 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public void deleteConnectors(final long containerId, final String containerType) throws SBonitaSearchException, SConnectorInstanceDeletionException {
-        final List<FilterOption> filters = buildFiltersForConnectors(containerId, containerType, false);
-        final OrderByOption orderBy = new OrderByOption(SConnectorInstance.class, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
-        final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy), filters, null);
+    public void deleteConnectors(final long containerId, final String containerType) throws SConnectorInstanceReadException, SConnectorInstanceDeletionException {
         List<SConnectorInstance> connetorInstances;
         do {
             // the QueryOptions always will use 0 as start index because the retrieved results will be deleted
-            connetorInstances = searchConnetorInstances(queryOptions);
+            connetorInstances = getConnectorInstancesOrderedById(containerId, containerType, 0, 100);
             for (final SConnectorInstance sConnectorInstance : connetorInstances) {
                 deleteConnectorInstance(sConnectorInstance);
             }

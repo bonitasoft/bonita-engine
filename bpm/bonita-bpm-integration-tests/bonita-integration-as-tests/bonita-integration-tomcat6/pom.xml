@@ -26,6 +26,9 @@
 		<bonita.home>${tomcat.home}/bonita</bonita.home>
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
 		<db.vendor>h2</db.vendor>
+		<cargo.jvmargs>-Xms128m -Xmx512m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+		<!-- -Xdebug -->
+		<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE -->
 	</properties>
 
 	<dependencies>
@@ -54,7 +57,6 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -194,7 +196,7 @@
 											<equals arg1="${db.vendor}" arg2="h2" />
 											<then>
 												<copy todir="${tomcat.conf.dir}">
-													<fileset dir="tomcat/${db.vendor}/server.xml" />
+													<fileset file="tomcat/${db.vendor}/server.xml" />
 												</copy>
 											</then>
 										</if>
@@ -240,13 +242,12 @@
 											<pathelement path="${test_classpath}" />
 										</path>
 
-
 										<waitfor maxwait="1" maxwaitunit="minute">
 											<socket server="localhost" port="${provider.port}" />
 										</waitfor>
 
 										<mkdir dir="${report.xml}" />
-										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="512m">
+										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="1024m">
 											<!-- <jvmarg line="-Xdebug -Xmx512m -Xms128m -XX:MaxPermSize=256m -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8500"/> -->
 											<jvmarg line="-Xmx512m -Xms128m -XX:MaxPermSize=256m" />
 											<classpath refid="test.path" />
@@ -308,13 +309,7 @@
 								<home>${tomcat.home}</home>
 								<properties>
 									<cargo.servlet.port>${provider.port}</cargo.servlet.port>
-									<cargo.jvmargs>
-									<!-- -Xdebug -->
-									<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -->
-									<!-- -Xnoagent -->
-									<!-- -Djava.compiler=NONE -->
-									 -XX:+HeapDumpOnOutOfMemoryError
-									</cargo.jvmargs>
+									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
 								</properties>
 							</configuration>
 							<wait>false</wait>

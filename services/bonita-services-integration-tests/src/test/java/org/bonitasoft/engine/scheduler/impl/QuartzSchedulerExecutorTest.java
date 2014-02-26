@@ -390,27 +390,6 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         getTransactionService().complete();
     }
 
-    @Test
-    public void testExecuteSeveralTimesAJob() throws Exception {
-        final String jobName = "IncrementVariableJob1";
-        final Date now = new Date();
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(IncrementItselfJob.class.getName(), jobName).done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
-        final Trigger trigger = new RepeatXTimesTrigger("events", now, 10, 3, 100);
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, trigger);
-        getTransactionService().complete();
-
-        IncrementItselfJob.reset();
-        final WaitForIncrementJobToHaveValue wf = new WaitForIncrementJobToHaveValue(1000, IncrementItselfJob.getValue() + 1);
-        assertTrue(wf.waitFor());
-        Thread.sleep(500);
-        assertFalse(wf.waitFor());
-    }
-
     @Test(expected = SSchedulerException.class)
     public void testCannotUseRepeatTriggerDueToNegativeCount() throws Throwable {
         final Date now = new Date();

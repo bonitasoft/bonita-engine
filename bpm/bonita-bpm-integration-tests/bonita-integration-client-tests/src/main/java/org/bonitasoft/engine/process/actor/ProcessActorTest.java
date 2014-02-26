@@ -499,17 +499,12 @@ public class ProcessActorTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addUserTask("groupTask1", ACTOR_NAME);
-        final ProcessDefinition definition = getProcessAPI().deploy(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder.done()).done());
-        addMappingOfActorsForGroup(ACTOR_NAME, group1.getId(), definition);
-        addMappingOfActorsForGroup(ACTOR_NAME, group2.getId(), definition);
-        getProcessAPI().enableProcess(definition.getId());
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-
+        final ProcessDefinition processDefinition = deployAndEnableWithActor(processBuilder.done(), ACTOR_NAME, group1, group2);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // Retrieve actor
-        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 1, ActorCriterion.NAME_ASC);
+        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC);
         assertEquals(1, actors.size());
         final ActorInstance actor = actors.get(0);
         assertEquals(ACTOR_NAME, actor.getName());
@@ -522,7 +517,7 @@ public class ProcessActorTest extends CommonAPITest {
         final List<ActorMember> actorMembers = getProcessAPI().getActorMembers(actor.getId(), 0, 10);
         getProcessAPI().removeActorMember(actorMembers.get(0).getId());
         getProcessAPI().removeActorMember(actorMembers.get(1).getId());
-        disableAndDeleteProcess(definition);
+        disableAndDeleteProcess(processDefinition);
         deleteGroups(group1, group2, group3);
     }
 

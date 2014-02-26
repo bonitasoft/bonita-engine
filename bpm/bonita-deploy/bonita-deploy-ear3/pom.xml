@@ -92,6 +92,7 @@
 						<version>5</version>
 						<loader-repository>org.bonitasoft.engine:archive=${project.artifactId}-${project.version}.ear</loader-repository>
 					</jboss>
+
 				</configuration>
 			</plugin>
 		</plugins>
