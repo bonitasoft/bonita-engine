@@ -127,8 +127,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             clazz = ConcurrentQuartzJob.class;
         }
         final JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobName, String.valueOf(tenantId)).build();
-        jobDetail.getJobDataMap().put("tenantId", tenantId);
-        jobDetail.getJobDataMap().put("jobId", jobId);
+        jobDetail.getJobDataMap().put("tenantId", String.valueOf(tenantId));
+        jobDetail.getJobDataMap().put("jobId", String.valueOf(jobId));
         jobDetail.getJobDataMap().put("jobName", jobName);
         return jobDetail;
     }
