@@ -33,7 +33,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class QuartzSchedulerExecutorTest extends CommonServiceTest {
+public class QuartzSchedulerExecutorITest extends CommonServiceTest {
 
     public final String DEFAULT_TENANT_STATUS = "DEACTIVATED";
 
