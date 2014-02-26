@@ -11,45 +11,16 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  */
-package org.bonitasoft.engine.identity.impl;
-
-import org.bonitasoft.engine.identity.CustomUserDetailsDefinition;
+package org.bonitasoft.engine.identity;
 
 /**
  * @author Vincent Elcrin
  */
-public class CustomUserDetailsDefinitionImpl implements CustomUserDetailsDefinition {
+public interface CustomUserInfoDefinition {
 
-    private String name;
+    String getName();
 
-    private String displayName;
+    String getDisplayName();
 
-    private String description;
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    String getDescription();
 }

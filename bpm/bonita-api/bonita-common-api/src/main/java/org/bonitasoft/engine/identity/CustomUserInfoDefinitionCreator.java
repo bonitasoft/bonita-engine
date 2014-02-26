@@ -16,7 +16,7 @@ package org.bonitasoft.engine.identity;
 /**
  * @author Vincent Elcrin
  */
-public class CustomUserDetailsDefinitionCreator {
+public class CustomUserInfoDefinitionCreator {
 
     private String name;
 

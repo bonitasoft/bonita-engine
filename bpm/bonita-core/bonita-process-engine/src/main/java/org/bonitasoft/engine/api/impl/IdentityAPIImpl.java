@@ -77,8 +77,8 @@ import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingSe
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataUpdater;
 import org.bonitasoft.engine.identity.ContactDataUpdater.ContactDataField;
-import org.bonitasoft.engine.identity.CustomUserDetailsDefinition;
-import org.bonitasoft.engine.identity.CustomUserDetailsDefinitionCreator;
+import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCriterion;
@@ -112,7 +112,6 @@ import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.identity.impl.UserWithContactDataImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SProfileMetadataDefinition;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -121,7 +120,6 @@ import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFac
 import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilder;
 import org.bonitasoft.engine.identity.model.builder.SProfileMetadataDefinitionBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilder;
@@ -1475,23 +1473,11 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public CustomUserDetailsDefinition createCustomUserDetailsDefinition(CustomUserDetailsDefinitionCreator creator) throws CreationException {
-        if (creator == null) {
-            throw new CreationException("Can not create null custom user details.");
-        }
-
-        final SProfileMetadataDefinitionBuilder buidler = BuilderFactory.get(SProfileMetadataDefinitionBuilderFactory.class).createNewInstance();
-        buidler.setName(creator.getName());
-        buidler.setDisplayName(creator.getDisplayName());
-        buidler.setDescription(creator.getDescription());
-        return createCustomUserDetailsDefinition(getTenantAccessor(), buidler.done());
+    public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException {
+        return createCustomUserDetailsAPI().createCustomUserInfoDefinition(creator);
     }
 
-    private CustomUserDetailsDefinition createCustomUserDetailsDefinition(final TenantServiceAccessor tenantAccessor, final SProfileMetadataDefinition definition) throws AlreadyExistsException, CreationException {
-        try {
-            return ModelConvertor.toCustomUserDetailsDefinition(tenantAccessor.getIdentityService().createProfileMetadataDefinition(definition));
-        } catch (SIdentityException e) {
-            throw new CreationException(e);
-        }
+    private CustomUserInfoAPIImpl createCustomUserDetailsAPI() {
+        return new CustomUserInfoAPIImpl(getTenantAccessor().getIdentityService(), BuilderFactory.get(SProfileMetadataDefinitionBuilderFactory.class));
     }
 }

@@ -10,19 +10,46 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.api;
+ */
+package org.bonitasoft.engine.identity.impl;
 
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.identity.CustomUserDetailsDefinition;
-import org.bonitasoft.engine.identity.CustomUserDetailsDefinitionCreator;
+import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 
 /**
- * Allow custom user details administration.
- *
  * @author Vincent Elcrin
  */
-public interface CustomUserDetailsAPI {
+public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
 
-    public CustomUserDetailsDefinition createCustomUserDetailsDefinition(CustomUserDetailsDefinitionCreator creator) throws CreationException;
+    private String name;
+
+    private String displayName;
+
+    private String description;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
