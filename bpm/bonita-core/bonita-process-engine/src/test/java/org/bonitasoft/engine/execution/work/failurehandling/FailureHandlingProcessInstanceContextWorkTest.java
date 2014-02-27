@@ -11,6 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
+
 package org.bonitasoft.engine.execution.work.failurehandling;
 
 import static org.junit.Assert.assertEquals;
@@ -30,11 +31,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -55,13 +56,11 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
-public class FailureHandlingProcessDefinitionContextWorkTest {
+public class FailureHandlingProcessInstanceContextWorkTest {
 
-    private static final long PROCESS_DEFINITION_ID = 2;
+    private static final long PROCESS_INSTANCE_ID = 2;
 
-    private static final String VERSION = "version";
-
-    private static final String NAME = "name";
+    private static final long ROOT_PROCESS_INSTANCE_ID = 3;
 
     @Mock
     private BonitaWork wrappedWork;
@@ -82,27 +81,26 @@ public class FailureHandlingProcessDefinitionContextWorkTest {
     private SessionAccessor sessionAccessor;
 
     @Mock
-    private ProcessDefinitionService processDefinitionService;
+    private ProcessInstanceService processInstanceService;
 
     @Mock
-    private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
+    private SProcessInstance sProcessInstance;
 
-    private FailureHandlingProcessDefinitionContextWork txBonitawork;
+    private FailureHandlingProcessInstanceContextWork txBonitawork;
 
     @Before
     public void before() throws Exception {
-        doReturn(NAME).when(sProcessDefinitionDeployInfo).getName();
-        doReturn(VERSION).when(sProcessDefinitionDeployInfo).getVersion();
+        doReturn(ROOT_PROCESS_INSTANCE_ID).when(sProcessInstance).getRootProcessInstanceId();
 
-        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(PROCESS_DEFINITION_ID);
+        doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
 
-        doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
+        doReturn(processInstanceService).when(tenantAccessor).getProcessInstanceService();
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
         when(tenantAccessor.getSessionService()).thenReturn(sessionService);
         when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
 
-        txBonitawork = spy(new FailureHandlingProcessDefinitionContextWork(wrappedWork, PROCESS_DEFINITION_ID));
+        txBonitawork = spy(new FailureHandlingProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID));
         doReturn("The description").when(txBonitawork).getDescription();
         doReturn(tenantAccessor).when(txBonitawork).getTenantAccessor();
 
@@ -159,7 +157,7 @@ public class FailureHandlingProcessDefinitionContextWorkTest {
     }
 
     @Test
-    public void handleFailure() throws Throwable {
+    public void handleFailureProcessInstanceId() throws Throwable {
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         final SBonitaException e = new SBonitaException() {
 
@@ -167,9 +165,22 @@ public class FailureHandlingProcessDefinitionContextWorkTest {
         };
         txBonitawork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
-        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
-        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
-        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+    }
+
+    @Test
+    public void handleFailureWithProcessInstanceAndRootProcessInstanceIds() throws Throwable {
+        txBonitawork = spy(new FailureHandlingProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID, 5));
+        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final SBonitaException e = new SBonitaException() {
+
+            private static final long serialVersionUID = -6748168976371554636L;
+        };
+        txBonitawork.handleFailure(e, context);
+        verify(wrappedWork).handleFailure(e, context);
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + 5));
     }
 
     @Test
