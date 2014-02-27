@@ -77,7 +77,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -551,8 +550,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
 
-        final String containerType;
-
         try {
             // Reset connectors first:
             if (connectorsToReset != null) {
@@ -578,13 +575,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setState(activityInstance, flowNodeStateManager.getState(activityInstance.getPreviousStateId()));
             activityInstanceService.setExecuting(activityInstance);
 
-            if (activityInstance.getLogicalGroup(2) > 0) {
-                containerType = SFlowElementsContainerType.FLOWNODE.name();
-            } else {
-                containerType = SFlowElementsContainerType.PROCESS.name();
-            }
-
-            containerRegistry.executeFlowNode(activityInstanceId, null, null, containerType, activityInstance.getParentProcessInstanceId());
+            containerRegistry.executeFlowNode(activityInstanceId, null, null, activityInstance.getParentProcessInstanceId());
         } catch (final SActivityInstanceNotFoundException e) {
             throw new ActivityInstanceNotFoundException(e);
         } catch (final SBonitaException e) {

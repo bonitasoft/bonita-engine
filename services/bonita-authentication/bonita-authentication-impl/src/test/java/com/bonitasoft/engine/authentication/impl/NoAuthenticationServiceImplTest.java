@@ -49,7 +49,7 @@ public class NoAuthenticationServiceImplTest {
 
     @Test
     public void authKOWithAnUnknownUser() throws Exception {
-        when(identityService.getUserByUserName("hannu")).thenThrow(SUserNotFoundException.class);
+        when(identityService.getUserByUserName("hannu")).thenThrow(new SUserNotFoundException("plop"));
         assertFalse(authenticationService.checkUserCredentials("hannu", "bpm"));
     }
 

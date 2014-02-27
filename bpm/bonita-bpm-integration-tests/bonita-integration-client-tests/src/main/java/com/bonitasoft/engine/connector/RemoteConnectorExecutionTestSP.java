@@ -479,7 +479,8 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertTrue(stackTrace.contains("at org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl.executeConnector(ConnectorServiceImpl.java:"));
         assertTrue(stackTrace.contains("at org.bonitasoft.engine.connector.ConnectorServiceDecorator.executeConnector(ConnectorServiceDecorator.java:"));
         assertTrue(stackTrace.contains("at org.bonitasoft.engine.execution.work.ExecuteConnectorWork.work(ExecuteConnectorWork.java:"));
-        assertTrue(stackTrace.contains("at org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork.work(FailureHandlingBonitaWork.java:"));
+        assertTrue(stackTrace
+                .contains("at org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingBonitaWork.work(FailureHandlingBonitaWork.java:"));
 
         disableAndDeleteProcess(processDefinition);
     }

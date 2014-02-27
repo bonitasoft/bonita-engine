@@ -82,26 +82,20 @@ public class ImportProfileMember implements TransactionContentWithResult<List<St
             profileService.addGroupToProfile(profileId, group.getId(), group.getName(), group.getParentPath());
         }
 
-        boolean hasGroup = false;
-        boolean hasRole = false;
         for (final BEntry<String, String> membership : exportedProfileMapping.getMemberships()) {
             SGroup group = null;
             try {
                 group = identityService.getGroupByPath(membership.getKey());
             } catch (final SGroupNotFoundException e) {
                 warnings.add("Group with path " + membership.getKey() + " not found in profile memberShip.");
-                hasGroup = true;
             }
             SRole role = null;
             try {
                 role = identityService.getRoleByName(membership.getValue());
             } catch (final SRoleNotFoundException e) {
                 warnings.add("Role with name " + membership.getValue() + " not found in profile memberShip.");
-                hasRole = true;
             }
-            if (hasGroup || hasRole) {
-                hasGroup = false;
-                hasRole = false;
+            if (group == null || role == null) {
                 continue;
             }
             profileService.addRoleAndGroupToProfile(profileId, role.getId(), group.getId(), role.getName(), group.getName(), group.getParentPath());

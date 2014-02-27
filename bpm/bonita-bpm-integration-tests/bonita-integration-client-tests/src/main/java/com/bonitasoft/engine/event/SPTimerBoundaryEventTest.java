@@ -118,7 +118,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
             // assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
 
             ArchivedActivityInstance archActivityInst = waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
-            if (addChild) {
+            if (manualUserTask != null) {
                 archActivityInst = getProcessAPI().getArchivedActivityInstance(manualUserTask.getId());
                 assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
             }
