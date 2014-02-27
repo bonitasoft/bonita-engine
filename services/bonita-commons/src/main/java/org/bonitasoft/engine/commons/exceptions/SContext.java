@@ -39,6 +39,18 @@ public enum SContext {
     /**
      * Corresponding to the identifier of the root process instance
      */
-    ROOT_PROCESS_INSTANCE_ID;
+    ROOT_PROCESS_INSTANCE_ID,
+    /**
+     * Corresponding to the identifier of the flow node definition
+     */
+    FLOW_NODE_DEFINITION_ID,
+    /**
+     * Corresponding to the identifier of the flow node instance
+     */
+    FLOW_NODE_INSTANCE_ID,
+    /**
+     * Corresponding to the name of the flow node
+     */
+    FLOW_NODE_NAME;
 
 }

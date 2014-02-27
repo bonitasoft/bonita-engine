@@ -158,24 +158,58 @@ public abstract class SBonitaException extends Exception {
         context.put(SContext.ROOT_PROCESS_INSTANCE_ID, rootProcessInstanceId);
     }
 
+    /**
+     * @param flowNodeDefinitionId
+     * 				The identifier of the flow node definition id
+     * @since 6.3
+     */
+    public void setFlowNodeDefinitionId(long flowNodeDefinitionId) {
+    	context.put(SContext.FLOW_NODE_DEFINITION_ID, flowNodeDefinitionId);
+    }
+    
+    /**
+     * @param flowNodeInstanceId
+     * 				The identifier of the flow node instance to set
+     * @since 6.3
+     */
+    public void setFlowNodeInstanceId(long flowNodeInstanceId) {
+    	context.put(SContext.FLOW_NODE_INSTANCE_ID, flowNodeInstanceId); 	
+    }
+    
+    /**
+     * @param flowNodeName
+     * 				The name of the flow node to set
+     * @since 6.3
+     */
+    public void setFlowNodeName(String flowNodeName) {
+    	context.put(SContext.FLOW_NODE_NAME, flowNodeName);
+    }
+    
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder();
+        appendContextMessage(stringBuilder);
+        appendCauseMessage(stringBuilder);
+        return stringBuilder.toString();
+    }
 
-        if (!context.isEmpty()) {
-            for (final Entry<SContext, Serializable> entry : context.entrySet()) {
-                stringBuilder.append(entry.getKey() + " = " + entry.getValue() + " | ");
-            }
-        }
-
-        String message = super.getMessage();
+	private void appendCauseMessage(final StringBuilder stringBuilder) {
+		String message = super.getMessage();
         if (message != null && message.isEmpty() && getCause() != null) {
             message = getCause().getMessage();
         }
         if (message != null && !message.trim().equals("")) {
             stringBuilder.append(message);
         }
-        return stringBuilder.toString();
-    }
+	}
+
+	private void appendContextMessage(final StringBuilder stringBuilder) {
+		if (!context.isEmpty()) {
+            for (final Entry<SContext, Serializable> entry : context.entrySet()) {
+                stringBuilder.append(entry.getKey() + " = " + entry.getValue() + " | ");
+            }
+        }
+	}
+
 
 }
