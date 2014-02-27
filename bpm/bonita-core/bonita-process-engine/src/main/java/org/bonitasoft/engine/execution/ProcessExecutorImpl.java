@@ -658,7 +658,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return documentBuilder;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final long parentId) throws SBonitaException {
         final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
