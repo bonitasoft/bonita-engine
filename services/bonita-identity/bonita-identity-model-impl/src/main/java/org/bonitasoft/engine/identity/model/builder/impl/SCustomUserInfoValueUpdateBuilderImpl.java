@@ -13,18 +13,18 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataValueUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilder;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class SProfileMetadataValueUpdateBuilderImpl implements SProfileMetadataValueUpdateBuilder {
+public class SCustomUserInfoValueUpdateBuilderImpl implements SCustomUserInfoValueUpdateBuilder {
 
     private final EntityUpdateDescriptor descriptor;
     
-    public SProfileMetadataValueUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
+    public SCustomUserInfoValueUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
         super();
         this.descriptor = descriptor;
     }
@@ -35,19 +35,19 @@ public class SProfileMetadataValueUpdateBuilderImpl implements SProfileMetadataV
     }
 
     @Override
-    public SProfileMetadataValueUpdateBuilder updateMetadaName(final String metadataName) {
-        this.descriptor.addField(SProfileMetadataValueBuilderFactoryImpl.METADATA_NAME, metadataName);
+    public SCustomUserInfoValueUpdateBuilder updateMetadaName(final String metadataName) {
+        this.descriptor.addField(SCustomUserInfoValueBuilderFactoryImpl.METADATA_NAME, metadataName);
         return this;
     }
 
-    public SProfileMetadataValueUpdateBuilder updateUserId(final long userName) {
-        this.descriptor.addField(SProfileMetadataValueBuilderFactoryImpl.USER_NAME, userName);
+    public SCustomUserInfoValueUpdateBuilder updateUserId(final long userName) {
+        this.descriptor.addField(SCustomUserInfoValueBuilderFactoryImpl.USER_NAME, userName);
         return this;
     }
 
     @Override
-    public SProfileMetadataValueUpdateBuilder updateValue(final String value) {
-        this.descriptor.addField(SProfileMetadataValueBuilderFactoryImpl.VALUE, value);
+    public SCustomUserInfoValueUpdateBuilder updateValue(final String value) {
+        this.descriptor.addField(SCustomUserInfoValueBuilderFactoryImpl.VALUE, value);
         return this;
     }
 

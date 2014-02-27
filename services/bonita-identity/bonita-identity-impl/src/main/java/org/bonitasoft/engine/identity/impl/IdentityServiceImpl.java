@@ -46,7 +46,7 @@ import org.bonitasoft.engine.identity.SUserUpdateException;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SProfileMetadataValue;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -184,7 +184,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void createProfileMetadataValue(final SProfileMetadataValue metadataValue) throws SIdentityException {
+    public void createProfileMetadataValue(final SCustomUserInfoValue metadataValue) throws SIdentityException {
         final String methodName = "createProfileMetadataValue";
         logBeforeMethod(methodName);
         try {
@@ -424,7 +424,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void deleteProfileMetadataValue(final SProfileMetadataValue metadataValue) throws SIdentityException {
+    public void deleteProfileMetadataValue(final SCustomUserInfoValue metadataValue) throws SIdentityException {
         final String methodName = "deleteProfileMetadataValue";
         logBeforeMethod(methodName);
         try {
@@ -955,12 +955,12 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SProfileMetadataValue getProfileMetadataValue(final long profileMetadataValueId) throws SIdentityException {
+    public SCustomUserInfoValue getProfileMetadataValue(final long profileMetadataValueId) throws SIdentityException {
         final String methodName = "getProfileMetadataValue";
         logBeforeMethod(methodName);
         try {
-            final SProfileMetadataValue selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SProfileMetadataValue.class,
-                    "SProfileMetadataValue", profileMetadataValueId));
+            final SCustomUserInfoValue selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class,
+                    "SCustomUserInfoValue", profileMetadataValueId));
             if (selectOne == null) {
                 throw new SIdentityException("Can't get the profile metadata value with id " + profileMetadataValueId, null);
             }
@@ -973,7 +973,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SProfileMetadataValue> getProfileMetadataValues(final List<Long> profileMetadataValueIds) throws SIdentityException {
+    public List<SCustomUserInfoValue> getProfileMetadataValues(final List<Long> profileMetadataValueIds) throws SIdentityException {
         final String methodName = "getProfileMetadataValues";
         logBeforeMethod(methodName);
         if (profileMetadataValueIds == null || profileMetadataValueIds.isEmpty()) {
@@ -981,7 +981,7 @@ public class IdentityServiceImpl implements IdentityService {
         }
         try {
             logAfterMethod(methodName);
-            return persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SProfileMetadataValue.class, "SProfileMetadataValue",
+            return persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SCustomUserInfoValue.class, "SCustomUserInfoValue",
                     profileMetadataValueIds));
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
@@ -1424,7 +1424,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateProfileMetadataValue(final SProfileMetadataValue metadataValue, final EntityUpdateDescriptor descriptor) throws SIdentityException {
+    public void updateProfileMetadataValue(final SCustomUserInfoValue metadataValue, final EntityUpdateDescriptor descriptor) throws SIdentityException {
         final String methodName = "updateProfileMetadataValue";
         logBeforeMethod(methodName);
         try {

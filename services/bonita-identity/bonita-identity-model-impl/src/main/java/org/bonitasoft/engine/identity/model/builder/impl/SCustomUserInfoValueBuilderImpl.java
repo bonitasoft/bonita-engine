@@ -13,47 +13,47 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
-import org.bonitasoft.engine.identity.model.SProfileMetadataValue;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataValueBuilder;
-import org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilder;
+import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class SProfileMetadataValueBuilderImpl implements SProfileMetadataValueBuilder {
+public class SCustomUserInfoValueBuilderImpl implements SCustomUserInfoValueBuilder {
 
-    private final SProfileMetadataValueImpl entity;
+    private final SCustomUserInfoValueImpl entity;
     
-    public SProfileMetadataValueBuilderImpl(final SProfileMetadataValueImpl entity) {
+    public SCustomUserInfoValueBuilderImpl(final SCustomUserInfoValueImpl entity) {
         super();
         this.entity = entity;
     }
 
-    public SProfileMetadataValueBuilderImpl setId(final long id) {
+    public SCustomUserInfoValueBuilderImpl setId(final long id) {
         entity.setId(id);
         return this;
     }
 
     @Override
-    public SProfileMetadataValue done() {
+    public SCustomUserInfoValue done() {
         return entity;
     }
 
     @Override
-    public SProfileMetadataValueBuilder setMetadataName(final String metadataName) {
-        entity.setMetadataId(metadataName);
+    public SCustomUserInfoValueBuilder setMetadataName(final String metadataName) {
+        entity.setName(metadataName);
         return this;
     }
 
     @Override
-    public SProfileMetadataValueBuilder setUserName(final String userName) {
-        entity.setUserId(userName);
+    public SCustomUserInfoValueBuilder setUserId(final long userId) {
+        entity.setUserId(userId);
         return this;
     }
 
     @Override
-    public SProfileMetadataValueBuilder setValue(final String value) {
+    public SCustomUserInfoValueBuilder setValue(final String value) {
         entity.setValue(value);
         return this;
     }

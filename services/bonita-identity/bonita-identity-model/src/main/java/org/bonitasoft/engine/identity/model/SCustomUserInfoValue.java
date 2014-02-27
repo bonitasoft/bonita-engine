@@ -18,12 +18,13 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 /**
  * @author Anthony Birembaut
  * @author Baptiste Mesta
+ * @author Elias Ricken de Medeiros
  */
-public interface SProfileMetadataValue extends PersistentObject {
+public interface SCustomUserInfoValue extends PersistentObject {
 
-    String getUserName();
+    long getUserId();
 
-    String getMetadataName();
+    String getName();
 
     String getValue();
 

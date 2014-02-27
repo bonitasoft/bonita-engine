@@ -13,13 +13,20 @@
  **/
 package org.bonitasoft.engine.identity.model.builder;
 
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
+
 /**
  * @author Baptiste Mesta
+ * @aythor Matthieu Chaffotte
  */
-public interface SProfileMetadataValueUpdateBuilder extends SIdentityUpdateBuilder {
+public interface SCustomUserInfoValueBuilder {
 
-    SProfileMetadataValueUpdateBuilder updateMetadaName(final String metadataName);
+    SCustomUserInfoValueBuilder setUserId(final long userId);
 
-    SProfileMetadataValueUpdateBuilder updateValue(final String value);
+    SCustomUserInfoValueBuilder setMetadataName(final String metadataName);
+
+    SCustomUserInfoValueBuilder setValue(final String value);
+
+    SCustomUserInfoValue done();
 
 }

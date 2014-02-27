@@ -19,7 +19,7 @@ import java.util.Set;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
-import org.bonitasoft.engine.identity.model.SProfileMetadataValue;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -580,7 +580,7 @@ public interface IdentityService {
      * @return the profileMetadataValue
      * @throws SIdentityException
      */
-    SProfileMetadataValue getProfileMetadataValue(long profileMetadataValueId) throws SIdentityException;
+    SCustomUserInfoValue getProfileMetadataValue(long profileMetadataValueId) throws SIdentityException;
 
     /**
      * Get profileMetadataValue by its name
@@ -615,10 +615,10 @@ public interface IdentityService {
      * 
      * @param profileMetadataValueIds
      *            A list of identifiers of profileMetadataValue
-     * @return a list of SProfileMetadataValue objects corresponding to parameters
+     * @return a list of SCustomUserInfoValue objects corresponding to parameters
      * @throws SIdentityException
      */
-    List<SProfileMetadataValue> getProfileMetadataValues(List<Long> profileMetadataValueIds) throws SIdentityException;
+    List<SCustomUserInfoValue> getProfileMetadataValues(List<Long> profileMetadataValueIds) throws SIdentityException;
 
     /**
      * Get custom user info in a specific interval, this is used for pagination
@@ -770,7 +770,7 @@ public interface IdentityService {
      *            A profileMetadataValue object
      * @throws SIdentityException
      */
-    void createProfileMetadataValue(SProfileMetadataValue metadataValue) throws SIdentityException;
+    void createProfileMetadataValue(SCustomUserInfoValue metadataValue) throws SIdentityException;
 
     /**
      * Update profileMetadataValue according to the descriptor
@@ -781,7 +781,7 @@ public interface IdentityService {
      *            The update description
      * @throws SIdentityException
      */
-    void updateProfileMetadataValue(SProfileMetadataValue metadataValue, EntityUpdateDescriptor descriptor) throws SIdentityException;
+    void updateProfileMetadataValue(SCustomUserInfoValue metadataValue, EntityUpdateDescriptor descriptor) throws SIdentityException;
 
     /**
      * Create role in DB for the given role
@@ -894,7 +894,7 @@ public interface IdentityService {
      *            The profileMetadataValue object will be deleted
      * @throws SIdentityException
      */
-    void deleteProfileMetadataValue(SProfileMetadataValue metadataValue) throws SIdentityException;
+    void deleteProfileMetadataValue(SCustomUserInfoValue metadataValue) throws SIdentityException;
 
     /**
      * Delete the id specified profileMetadataValue

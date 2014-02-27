@@ -13,21 +13,13 @@
  **/
 package org.bonitasoft.engine.identity.model.builder;
 
-
 /**
  * @author Baptiste Mesta
- * @aythor Matthieu Chaffotte
  */
-public interface SProfileMetadataValueBuilderFactory {
+public interface SCustomUserInfoValueUpdateBuilder extends SIdentityUpdateBuilder {
 
-    SProfileMetadataValueBuilder createNewInstance();
+    SCustomUserInfoValueUpdateBuilder updateMetadaName(final String metadataName);
 
-    String getIdKey();
-
-    String getUserNameKey();
-
-    String getMetadataNameKey();
-
-    String getValueKey();
+    SCustomUserInfoValueUpdateBuilder updateValue(final String value);
 
 }

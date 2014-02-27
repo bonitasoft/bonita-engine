@@ -371,8 +371,8 @@
     </query>
 
 	<query name="searchProfileMetadataValue">
-		SELECT p_metadata_val
-		FROM org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl AS p_metadata_val
+		SELECT custom_usr_inf_val
+		FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS custom_usr_inf_val
 	</query>
 
 	<query name="searchSRole">

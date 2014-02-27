@@ -99,13 +99,13 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SProfileMetadataValueImpl" table="p_metadata_val">
+	<class name="SCustomUserInfoValueImpl" table="c_user_info_val">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="ID" type="long" />
 		</composite-id>
-		<property name="metadataName" type="java.lang.String" column="metadataName" />
-		<property name="userName" type="java.lang.String" column="userName" />
+		<property name="name" type="java.lang.String" column="name" />
+		<property name="userId" type="long" column="userId" />
 		<property name="value" type="java.lang.String" column="value" />
 		<filter name="tenantFilter" />
 	</class>

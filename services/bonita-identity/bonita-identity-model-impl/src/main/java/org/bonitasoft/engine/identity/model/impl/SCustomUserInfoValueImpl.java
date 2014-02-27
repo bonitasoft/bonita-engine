@@ -13,47 +13,48 @@
  **/
 package org.bonitasoft.engine.identity.model.impl;
 
-import org.bonitasoft.engine.identity.model.SProfileMetadataValue;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 
 /**
  * @author Anthony Birembaut
  * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
-public class SProfileMetadataValueImpl extends SPersistentObjectImpl implements SProfileMetadataValue {
+public class SCustomUserInfoValueImpl extends SPersistentObjectImpl implements SCustomUserInfoValue {
 
     private static final long serialVersionUID = 1L;
 
-    protected String userName;
+    protected long userId;
 
-    protected String metadataName;
+    protected String name;
 
     protected String value;
 
-    public SProfileMetadataValueImpl() {
+    public SCustomUserInfoValueImpl() {
         super();
     }
 
     @Override
     public String getDiscriminator() {
-        return SProfileMetadataValue.class.getName();
+        return SCustomUserInfoValue.class.getName();
     }
 
     @Override
-    public String getUserName() {
-        return this.userName;
+    public long getUserId() {
+        return this.userId;
     }
 
-    public void setUserId(final String userName) {
-        this.userName = userName;
+    public void setUserId(final long userId) {
+        this.userId = userId;
     }
 
     @Override
-    public String getMetadataName() {
-        return this.metadataName;
+    public String getName() {
+        return this.name;
     }
 
-    public void setMetadataId(final String metadataName) {
-        this.metadataName = metadataName;
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override
@@ -65,55 +66,44 @@ public class SProfileMetadataValueImpl extends SPersistentObjectImpl implements 
         this.value = value;
     }
 
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((metadataName == null) ? 0 : metadataName.hashCode());
-        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + (int) (userId ^ (userId >>> 32));
         result = prime * result + ((value == null) ? 0 : value.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-        }
-        if (!super.equals(obj)) {
+        if (!super.equals(obj))
             return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (getClass() != obj.getClass())
             return false;
-        }
-        final SProfileMetadataValueImpl other = (SProfileMetadataValueImpl) obj;
-        if (metadataName == null) {
-            if (other.metadataName != null) {
+        SCustomUserInfoValueImpl other = (SCustomUserInfoValueImpl) obj;
+        if (name == null) {
+            if (other.name != null)
                 return false;
-            }
-        } else if (!metadataName.equals(other.metadataName)) {
+        } else if (!name.equals(other.name))
             return false;
-        }
-        if (userName == null) {
-            if (other.userName != null) {
-                return false;
-            }
-        } else if (!userName.equals(other.userName)) {
+        if (userId != other.userId)
             return false;
-        }
         if (value == null) {
-            if (other.value != null) {
+            if (other.value != null)
                 return false;
-            }
-        } else if (!value.equals(other.value)) {
+        } else if (!value.equals(other.value))
             return false;
-        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "SProfileMetadataValueImpl [metadataId=" + this.metadataName + ", userId=" + this.userName + ", value=" + this.value + ", getId()="
+        return "SCustomUserInfoValueImpl [name=" + this.name + ", userId=" + this.userId + ", value=" + this.value + ", getId()="
                 + this.getId() + "]";
     }
 

@@ -13,15 +13,15 @@
  **/
 package org.bonitasoft.engine.identity.model.builder.impl;
 
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataValueBuilder;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataValueBuilderFactory;
-import org.bonitasoft.engine.identity.model.impl.SProfileMetadataValueImpl;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilder;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
+import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class SProfileMetadataValueBuilderFactoryImpl implements SProfileMetadataValueBuilderFactory {
+public class SCustomUserInfoValueBuilderFactoryImpl implements SCustomUserInfoValueBuilderFactory {
 
     static final String ID = "id";
 
@@ -32,9 +32,9 @@ public class SProfileMetadataValueBuilderFactoryImpl implements SProfileMetadata
     static final String VALUE = "value";
 
     @Override
-    public SProfileMetadataValueBuilder createNewInstance() {
-        final SProfileMetadataValueImpl entity = new SProfileMetadataValueImpl();
-        return new SProfileMetadataValueBuilderImpl(entity);
+    public SCustomUserInfoValueBuilder createNewInstance() {
+        final SCustomUserInfoValueImpl entity = new SCustomUserInfoValueImpl();
+        return new SCustomUserInfoValueBuilderImpl(entity);
     }
 
     public String getIdKey() {

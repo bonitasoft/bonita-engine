@@ -11,21 +11,11 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.identity.model.builder.impl;
-
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataValueUpdateBuilder;
-import org.bonitasoft.engine.identity.model.builder.SProfileMetadataValueUpdateBuilderFactory;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+package org.bonitasoft.engine.identity.model.builder;
 
 /**
  * @author Baptiste Mesta
- * @author Matthieu Chaffotte
  */
-public class SProfileMetadataValueUpdateBuilderFactoryImpl implements SProfileMetadataValueUpdateBuilderFactory {
-
-    public SProfileMetadataValueUpdateBuilder createNewInstance() {
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        return new SProfileMetadataValueUpdateBuilderImpl(descriptor);
-    }
+public interface SCustomUserInfoValueUpdateBuilderFactory extends SIdentityUpdateBuilderFactory {
 
 }
