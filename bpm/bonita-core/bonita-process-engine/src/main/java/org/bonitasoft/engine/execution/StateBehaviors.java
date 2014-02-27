@@ -854,8 +854,8 @@ public class StateBehaviors {
             final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), catchEventDef, catchEventInstance);
             final boolean delete = schedulerService.delete(jobName);
             if (!delete) {
-                if (logger.isLoggable(EndingIntermediateCatchEventExceptionStateImpl.class, TechnicalLogSeverity.WARNING)) {
-                    logger.log(EndingIntermediateCatchEventExceptionStateImpl.class, TechnicalLogSeverity.WARNING, "No job found with name '" + jobName
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "No job found with name '" + jobName
                             + "' when interrupting timer catch event named '" + catchEventDef.getName() + "' and id '" + catchEventInstance.getId()
                             + "'. It was probably already triggered.");
                 }

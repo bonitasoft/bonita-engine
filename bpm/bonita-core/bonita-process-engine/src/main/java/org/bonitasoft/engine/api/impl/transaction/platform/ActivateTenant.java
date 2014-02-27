@@ -96,7 +96,7 @@ public final class ActivateTenant implements TransactionContent {
                 final String cron = plaformConfiguration.getEventHandlingJobCron(); //
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(ProcessAPI.class, TechnicalLogSeverity.INFO, "Starting event handling job with frequency: " + cron);
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting event handling job with frequency: " + cron);
                 }
                 schedulerService.schedule(jobDescriptor, jobParameters, trigger);
             }
@@ -117,7 +117,7 @@ public final class ActivateTenant implements TransactionContent {
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(ProcessAPI.class, TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency: " + cron);
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency: " + cron);
                 }
                 schedulerService.schedule(jobDescriptor, jobParameters, trigger);
             }

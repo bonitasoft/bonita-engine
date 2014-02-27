@@ -164,7 +164,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(ThreadPoolExecutor.class, TechnicalLogSeverity.WARNING, "The work was rejected, requeue work: " + task.toString());
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "The work was rejected, requeue work: " + task.toString());
             }
             try {
                 executor.getQueue().put(task);
