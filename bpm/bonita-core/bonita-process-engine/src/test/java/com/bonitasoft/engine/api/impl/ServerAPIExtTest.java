@@ -43,8 +43,23 @@ public class ServerAPIExtTest {
         doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
 
         // When:
-        serverAPIExtSpy.checkMethodAccessibility(FakeTenantLevelAPI.class.getName(),
+        serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
                 FakeTenantLevelAPI.class.getMethod("canAlsoBeCalledOnMaintenanceTenant", new Class[0]), session);
+
+        // no TenantModeException must be thrown. If so, test would fail.
+    }
+
+    @Test
+    public void checkMethodAccessibilityOnTenantAPIShouldBePossibleOnAnnotatedAPI() throws Exception {
+        // Given:
+        long tenantId = 54L;
+        APISessionImpl session = new APISessionImpl(1L, new Date(), 120L, "userName", 5487L, "mon_tenant", tenantId);
+        ServerAPIExt serverAPIExtSpy = spy(serverAPIExt);
+        doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
+
+        // When:
+        serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelFullyAccessibleAPI(), FakeTenantLevelFullyAccessibleAPI.class.getName(),
+                FakeTenantLevelFullyAccessibleAPI.class.getMethod("aMethod", new Class[0]), session);
 
         // no TenantModeException must be thrown. If so, test would fail.
     }
@@ -58,7 +73,7 @@ public class ServerAPIExtTest {
         doReturn(true).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
 
         // When:
-        serverAPIExtSpy.checkMethodAccessibility(FakeTenantLevelAPI.class.getName(),
+        serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
                 FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session);
 
         // no TenantModeException must be thrown. If so, test would fail.
@@ -73,7 +88,7 @@ public class ServerAPIExtTest {
         doReturn(false).when(serverAPIExtSpy).isTenantAvailable(tenantId, session);
 
         // When:
-        serverAPIExtSpy.checkMethodAccessibility(FakeTenantLevelAPI.class.getName(),
+        serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
                 FakeTenantLevelAPI.class.getMethod("mustBeCalledOnRunningTenant", new Class[0]), session);
 
     }
@@ -85,7 +100,8 @@ public class ServerAPIExtTest {
         ServerAPIExt serverAPIExtSpy = spy(serverAPIExt);
 
         // When:
-        serverAPIExtSpy.checkMethodAccessibility(FakeTenantLevelAPI.class.getName(), FakeTenantLevelAPI.class.getMethod("platformAPIMethod", new Class[0]),
+        serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
+                FakeTenantLevelAPI.class.getMethod("platformAPIMethod", new Class[0]),
                 session);
 
         // Then:

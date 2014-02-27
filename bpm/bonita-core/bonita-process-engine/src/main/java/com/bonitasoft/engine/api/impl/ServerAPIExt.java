@@ -18,8 +18,8 @@ import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.Session;
 
-import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantInMaintenanceException;
+import com.bonitasoft.engine.api.TenantManagementAPI;
 
 /**
  * @author Emmanuel Duchastenier
@@ -47,19 +47,20 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
                 + "' cannot be called until the tenant mode is RUNNING again (TenantAPI.setTenantMode())");
     }
 
-    private boolean isTenantInAValidModeFor(final Method method, final long tenantId, final Session session) {
-        return method.isAnnotationPresent(AvailableOnMaintenanceTenant.class) || isTenantAvailable(tenantId, session);
+    private boolean isTenantInAValidModeFor(final Object apiImpl, final Method method, final long tenantId, final Session session) {
+        return apiImpl.getClass().isAnnotationPresent(AvailableOnMaintenanceTenant.class)
+                || method.isAnnotationPresent(AvailableOnMaintenanceTenant.class) || isTenantAvailable(tenantId, session);
     }
 
     @Override
-    protected void checkMethodAccessibility(final String apiInterfaceName, final Method method, final Session session) {
-        super.checkMethodAccessibility(apiInterfaceName, method, session);
+    protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session) {
+        super.checkMethodAccessibility(apiImpl, apiInterfaceName, method, session);
         // we don't check if tenant is in maintenance at platform level and when there is no session
         // when there is no session means that we are trying to log in, in this case it is the LoginApiExt that check if the user is the technical user
         // For tenant level method call:
         if (session instanceof APISession) {
             long tenantId = ((APISession) session).getTenantId();
-            if (!isTenantInAValidModeFor(method, tenantId, session)) {
+            if (!isTenantInAValidModeFor(apiImpl, method, tenantId, session)) {
                 logTenantInMaintenanceMessage(apiInterfaceName, method.getName());
                 throw new TenantInMaintenanceException("Tenant with ID " + tenantId + " is in maintenance, no API call on this tenant can be made for now.");
             }

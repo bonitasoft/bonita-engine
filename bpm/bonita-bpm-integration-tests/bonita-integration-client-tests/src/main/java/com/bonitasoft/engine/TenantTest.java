@@ -41,6 +41,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.theme.ThemeType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -155,7 +156,7 @@ public class TenantTest {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         apiSession = loginAPI.login(tenantId, userName, password);
         try {
-            apiTestSPUtil.getIdentityAPI().getNumberOfGroups();
+            apiTestSPUtil.getProcessAPI().getNumberOfProcessInstances();
         } finally {
             tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
             loginAPI.logout(apiSession);
@@ -204,6 +205,9 @@ public class TenantTest {
         tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
         try {
             tenantManagementAPI.isInMaintenance();
+            apiTestSPUtil.getThemeAPI().getLastUpdateDate(ThemeType.PORTAL);
+            apiTestSPUtil.getIdentityAPI().getNumberOfUsers();
+            apiTestSPUtil.getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).done());
         } finally {
             tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
             apiTestSPUtil.logoutTenant(apiTestSPUtil.getSession());
