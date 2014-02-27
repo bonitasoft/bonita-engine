@@ -217,7 +217,7 @@ public class ServerAPIImpl implements ServerAPI {
 
         final Object apiImpl = accessResolver.getAPIImplementation(apiInterfaceName);
         final Method method = ClassReflector.getMethod(apiImpl.getClass(), methodName, parameterTypes);
-        checkMethodAccessibility(apiInterfaceName, method, session);
+        checkMethodAccessibility(apiImpl, apiInterfaceName, method, session);
         // No session required means that there is no transaction
         if (method.isAnnotationPresent(CustomTransactions.class) || method.isAnnotationPresent(NoSessionRequired.class)) {
             return invokeAPI(parametersValues, apiImpl, method);
@@ -226,7 +226,7 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    protected void checkMethodAccessibility(final String apiInterfaceName, final Method method, final Session session) {
+    protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session) {
         if (!isNodeInAValidStateFor(method)) {
             logNodeNotStartedMessage(apiInterfaceName, method.getName());
             throw new NodeNotStartedException();
