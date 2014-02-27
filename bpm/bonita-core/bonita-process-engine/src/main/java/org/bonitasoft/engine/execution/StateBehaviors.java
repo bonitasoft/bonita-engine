@@ -97,7 +97,6 @@ import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
-import org.bonitasoft.engine.execution.state.EndingIntermediateCatchEventExceptionStateImpl;
 import org.bonitasoft.engine.execution.work.WorkFactory;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
