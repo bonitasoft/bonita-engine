@@ -55,7 +55,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -187,15 +187,15 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                         // we notify in a work: transitions and so on will be executed
                         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(processDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
                                 sFlowNodeInstance.getId(), sFlowNodeInstance
-                                        .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), state.getId()));
-                    } catch (final WorkRegisterException e) {
+                                        .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
+                    } catch (final SWorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
                 } else if (!state.isStable() && !state.isInterrupting()) {
                     try {
                         // reschedule this work but without the operations
                         workService.registerWork(WorkFactory.createExecuteFlowNodeWork(flowNodeInstanceId, null, null, processInstanceId));
-                    } catch (final WorkRegisterException e) {
+                    } catch (final SWorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
                 }
@@ -233,8 +233,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     // reschedule this work but without the operations
                     workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
                             sFlowNodeInstance.getId(), sFlowNodeInstance
-                                    .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
-                } catch (final WorkRegisterException e) {
+                                    .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
+                } catch (final SWorkRegisterException e) {
                     throw new SFlowNodeExecutionException(e);
                 }
             }
@@ -272,7 +272,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final int tokenCount = activityInstance.getTokenCount() - 1;
             activityInstanceService.setTokenCount(activityInstance, tokenCount);
             if (!hasActionsToExecute) {
-                containerRegistry.executeFlowNode(activityInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
+                containerRegistry.executeFlowNode(activityInstance.getId(), null, null,
                         activityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
             }
         }

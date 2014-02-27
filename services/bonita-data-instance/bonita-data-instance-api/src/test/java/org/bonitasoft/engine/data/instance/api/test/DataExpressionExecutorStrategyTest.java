@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.data.instance.api.DataExpressionExecutorStrategy;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -58,7 +59,7 @@ public class DataExpressionExecutorStrategyTest {
 
     @Test
     public void evaluateListOfEmptyDataExpressionDoesNotThrowException() throws SExpressionDependencyMissingException, SExpressionEvaluationException,
-            SDataInstanceReadException {
+            SDataInstanceException {
         when(expressionList.size()).thenReturn(1);
         when(expressionList.iterator()).thenReturn(exprIterator);
         when(exprIterator.hasNext()).thenReturn(false);

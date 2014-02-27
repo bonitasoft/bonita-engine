@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2011 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,26 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.work;
+package org.bonitasoft.engine.data.instance.exception;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Charles Souillard
- * @author Baptiste Mesta
+ * @author Elias Ricken de Medeiros
  */
-public class WorkRegisterException extends SBonitaException {
+public class SDataInstanceException extends SBonitaException {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -4274958205096504600L;
 
-    public WorkRegisterException(final String message, final Throwable t) {
-        super(message, t);
+    public SDataInstanceException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
-    /**
-     * @param string
-     */
-    public WorkRegisterException(final String message) {
+    public SDataInstanceException(final String message) {
         super(message);
     }
+
+    public SDataInstanceException(final Throwable cause) {
+        super(cause);
+    }
+
 }

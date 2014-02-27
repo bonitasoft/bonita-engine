@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -65,13 +64,7 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
         final SFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(childId);
         final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
-        String containerType = SFlowElementsContainerType.PROCESS.name();
-        final long parentActivity = flowNodeInstance.getLogicalGroup(flowNodeKeyProvider.getParentActivityInstanceIndex());
-        if (parentActivity > 0) {
-            containerType = SFlowElementsContainerType.FLOWNODE.name();
-        }
-
-        containerRegistry.executeFlowNode(flowNodeInstance.getId(), null, null, containerType,
+        containerRegistry.executeFlowNode(flowNodeInstance.getId(), null, null,
                 flowNodeInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()));
     }
 

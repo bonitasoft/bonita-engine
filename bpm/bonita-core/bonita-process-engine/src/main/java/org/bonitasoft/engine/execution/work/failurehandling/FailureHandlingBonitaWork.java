@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,13 +11,15 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.execution.work.failurehandling;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -30,11 +32,8 @@ import org.bonitasoft.engine.work.BonitaWork;
 /**
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
- * @deprecated since 6.3
- * @see {@link org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingBonitaWork}
  */
-@Deprecated
-public class FailureHandlingBonitaWork extends WrappingBonitaWork {
+public abstract class FailureHandlingBonitaWork extends WrappingBonitaWork {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,7 +51,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         incidentService.report(getTenantId(), incident);
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    TenantServiceAccessor getTenantAccessor() {
         try {
             return TenantServiceSingleton.getInstance(getTenantId());
         } catch (final Exception e) {
@@ -73,7 +72,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
                 loggerService.log(getClass(), TechnicalLogSeverity.TRACE, "Starting work: " + getDescription());
             }
             getWrappedWork().work(context);
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             final Throwable cause = e.getCause();
             if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
                     || cause instanceof SProcessDefinitionNotFoundException) {
@@ -98,4 +97,15 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             sessionAccessor.deleteTenantId();
         }
     }
+
+    @Override
+    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
+        if (e instanceof SBonitaException) {
+            setExceptionContext(((SBonitaException) e), context);
+        }
+
+        getWrappedWork().handleFailure(e, context);
+    }
+
+    protected abstract void setExceptionContext(SBonitaException sBonitaException, Map<String, Object> context) throws SBonitaException;
 }

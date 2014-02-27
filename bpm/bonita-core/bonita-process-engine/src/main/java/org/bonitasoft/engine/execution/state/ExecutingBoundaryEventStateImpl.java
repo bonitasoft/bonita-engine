@@ -22,7 +22,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
@@ -106,12 +105,7 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
                 activityInstanceService.setStateCategory(relatedActivityInst, SStateCategory.ABORTING);
                 activityInstanceService.setAbortedByBoundaryEvent(relatedActivityInst, boundaryEventInstance.getId());
                 if (relatedActivityInst.isStable() || relatedActivityInst.isStateExecuting()) {
-                    String containerType = SFlowElementsContainerType.PROCESS.name();
-                    final long parentActivityInstanceId = relatedActivityInst.getParentActivityInstanceId();
-                    if (parentActivityInstanceId > 0) {
-                        containerType = SFlowElementsContainerType.FLOWNODE.name();
-                    }
-                    containerRegistry.executeFlowNode(relatedActivityInst.getId(), null, null, containerType,
+                    containerRegistry.executeFlowNode(relatedActivityInst.getId(), null, null,
                             boundaryEventInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()));
                 }
             } catch (final SBonitaException e) {

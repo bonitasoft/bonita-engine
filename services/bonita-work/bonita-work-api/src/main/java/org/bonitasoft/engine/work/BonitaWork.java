@@ -54,7 +54,7 @@ public abstract class BonitaWork implements Runnable, Serializable {
     public void run() {
         try {
             work(new HashMap<String, Object>());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new IllegalStateException("Exception should be handled by works", e);
         }
     }

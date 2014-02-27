@@ -118,7 +118,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -793,7 +793,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private int updateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
             final int numberOfTokenToMerge, FlowNodeTransitionsWrapper transitionsDescriptor, FlowMerger merger)
             throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
-            WorkRegisterException, SBonitaException {
+            SWorkRegisterException, SBonitaException {
         // handle token creation/deletion
         if (merger.mustConsumeInputToken()) {
             tokenService.deleteTokens(sProcessInstance.getId(), child.getTokenRefId(), numberOfTokenToMerge);
@@ -850,11 +850,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * @param processInstanceId
      * @param processDefinition
      * @throws SBonitaException
-     * @throws WorkRegisterException
+     * @throws SWorkRegisterException
      * @throws SGatewayModificationException
      */
     private void implicitEnd(final SProcessDefinition processDefinition, final long processInstanceId, final int numberOfTokenToMerge, final Long tokenRefId)
-            throws SGatewayModificationException, WorkRegisterException, SBonitaException {
+            throws SGatewayModificationException, SWorkRegisterException, SBonitaException {
         final SToken token = tokenService.getToken(processInstanceId, tokenRefId);
         tokenService.deleteTokens(processInstanceId, tokenRefId, numberOfTokenToMerge);
         /*
@@ -1009,7 +1009,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         for (final SFlowNodeInstance flowNode : flowNodeInstances) {
             try {
                 workService.registerWork(WorkFactory.createExecuteFlowNodeWork(flowNode.getId(), null, null, sProcessInstance.getId()));
-            } catch (final WorkRegisterException e) {
+            } catch (final SWorkRegisterException e) {
                 throw new SFlowNodeExecutionException("unable to trigger execution of flow node " + flowNode, e);
             }
         }

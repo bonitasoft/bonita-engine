@@ -77,7 +77,6 @@ import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
@@ -118,7 +117,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -668,7 +667,7 @@ public class StateBehaviors {
             do {
                 childrenOfAnActivity = activityInstanceService.getChildrenOfAnActivity(flowNodeInstance.getId(), i, BATCH_SIZE);
                 for (final SActivityInstance sActivityInstance : childrenOfAnActivity) {
-                    containerRegistry.executeFlowNode(sActivityInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
+                    containerRegistry.executeFlowNode(sActivityInstance.getId(), null, null,
                             sActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
                 }
                 i += BATCH_SIZE;
@@ -693,7 +692,7 @@ public class StateBehaviors {
             for (final SActivityInstance child : childrenToEnd) {
                 activityInstanceService.setStateCategory(child, stateCategory);
                 if (child.isStable()) {
-                    containerRegistry.executeFlowNode(child.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
+                    containerRegistry.executeFlowNode(child.getId(), null, null,
                             child.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
                 }
             }
@@ -712,7 +711,7 @@ public class StateBehaviors {
                     connectorInstanceId, connectorDefinitionName));
         } catch (SConnectorInstanceModificationException e) {
             throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING", e);
-        } catch (final WorkRegisterException e) {
+        } catch (final SWorkRegisterException e) {
             throw new SActivityStateExecutionException("Unable to register the work that execute the connector " + connector + " on " + flowNodeInstanceId, e);
         }
     }
@@ -775,12 +774,7 @@ public class StateBehaviors {
                     interrupWaitinEvents(processDefinition, boundaryEventInstance, catchEventDef);
                     activityInstanceService.setStateCategory(boundaryEventInstance, categoryState);
                     if (stable) {
-                        String containerType = SFlowElementsContainerType.PROCESS.name();
-                        final long parentActivityInstanceId = boundaryEventInstance.getLogicalGroup(keyProvider.getParentActivityInstanceIndex());
-                        if (parentActivityInstanceId > 0) {
-                            containerType = SFlowElementsContainerType.FLOWNODE.name();
-                        }
-                        containerRegistry.executeFlowNode(boundaryEventInstance.getId(), null, null, containerType,
+                        containerRegistry.executeFlowNode(boundaryEventInstance.getId(), null, null,
                                 boundaryEventInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()));
                     }
                 }

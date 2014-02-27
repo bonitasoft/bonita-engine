@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,25 +20,31 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
+import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingProcessDefinitionContextWork;
+import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingProcessInstanceContextWork;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * Factory to construct works
  * 
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class WorkFactory {
 
     public static BonitaWork createExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
             final long connectorInstanceId, final String connectorDefinitionName) {
-        return new FailureHandlingBonitaWork(new ExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId,
-                connectorDefinitionName));
+        final ExecuteConnectorOfActivity wrappedWork = new ExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId,
+                connectorInstanceId, connectorDefinitionName);
+        return new FailureHandlingProcessDefinitionContextWork(wrappedWork, processDefinitionId);
     }
 
     public static BonitaWork createExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId,
             final String connectorDefinitionName, final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent) {
-        return new FailureHandlingBonitaWork(new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName,
-                processInstanceId, rootProcessInstanceId, activationEvent));
+        BonitaWork wrappedWork = new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, processInstanceId,
+                rootProcessInstanceId, activationEvent);
+        wrappedWork = new FailureHandlingProcessInstanceContextWork(wrappedWork, processInstanceId, rootProcessInstanceId);
+        return new FailureHandlingProcessDefinitionContextWork(wrappedWork, processDefinitionId);
     }
 
     public static BonitaWork createExecuteFlowNodeWork(final long flowNodeInstanceId, final List<SOperation> operations,
@@ -46,8 +52,9 @@ public class WorkFactory {
         if (processInstanceId <= 0) {
             throw new RuntimeException("It is forbidden to create a ExecuteFlowNodeWork with a processInstanceId equals to " + processInstanceId);
         }
-        return new FailureHandlingBonitaWork(new LockProcessInstanceWork(new TxBonitaWork(new ExecuteFlowNodeWork(flowNodeInstanceId, operations,
-                contextDependency, processInstanceId)), processInstanceId));
+        BonitaWork wrappedWork = new ExecuteFlowNodeWork(flowNodeInstanceId, operations, contextDependency, processInstanceId);
+        wrappedWork = new LockProcessInstanceWork(new TxBonitaWork(wrappedWork), processInstanceId);
+        return new FailureHandlingProcessInstanceContextWork(wrappedWork, processInstanceId);
     }
 
     public static BonitaWork createExecuteMessageCoupleWork(final SMessageInstance messageInstance, final SWaitingMessageEvent waitingMessage) {
@@ -56,12 +63,13 @@ public class WorkFactory {
         if (waitingMessage.getParentProcessInstanceId() > 0) {
             work = new LockProcessInstanceWork(work, waitingMessage.getParentProcessInstanceId());
         }
-        return new FailureHandlingBonitaWork(work);
+        return new FailureHandlingProcessDefinitionContextWork(work, waitingMessage.getProcessDefinitionId());
     }
 
     public static BonitaWork createNotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
-            final long parentId, final String parentType, final int stateId) {
-        return new FailureHandlingBonitaWork(new LockProcessInstanceWork(new TxBonitaWork(new NotifyChildFinishedWork(processDefinitionId, processInstanceId,
-                flowNodeInstanceId, parentId, parentType, stateId)), processInstanceId));
+            final long parentId, final String parentType) {
+        BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId, parentId, parentType);
+        wrappedWork = new LockProcessInstanceWork(new TxBonitaWork(wrappedWork), processInstanceId);
+        return new FailureHandlingProcessDefinitionContextWork(wrappedWork, processDefinitionId);
     }
 }

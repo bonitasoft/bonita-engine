@@ -35,14 +35,13 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.StateBehaviors;
@@ -161,8 +160,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                     createInnerInstances = InitializingMultiInstanceActivityStateImpl.createInnerInstances(bpmInstancesCreator, activityInstanceService,
                             processDefinition.getId(), activityDefinition, flowNodeInstance, loopCharacteristics, numberOfInstances, 1);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
-                        containerRegistry.executeFlowNode(sFlowNodeInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
-                                sFlowNodeInstance.getLogicalGroup(3));
+                        containerRegistry.executeFlowNode(sFlowNodeInstance.getId(), null, null, sFlowNodeInstance.getLogicalGroup(3));
                     }
                 }
                 return numberOfActiveInstances == 0 && (createInnerInstances == null || createInnerInstances.size() == 0);
@@ -196,7 +194,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
             for (final SActivityInstance child : children) {
                 activityInstanceService.setStateCategory(child, SStateCategory.ABORTING);
                 if (child.isStable()) {
-                    containerRegistry.executeFlowNode(child.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(), child.getLogicalGroup(3));
+                    containerRegistry.executeFlowNode(child.getId(), null, null, child.getLogicalGroup(3));
                 }
             }
 
@@ -205,7 +203,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
     }
 
     protected boolean shouldCreateANewInstance(final SMultiInstanceLoopCharacteristics loopCharacteristics, final int numberOfInstances,
-            final SMultiInstanceActivityInstance miActivityInstance) throws SDataInstanceReadException {
+            final SMultiInstanceActivityInstance miActivityInstance) throws SDataInstanceException {
         if (loopCharacteristics.getLoopCardinality() != null) {
             return miActivityInstance.getLoopCardinality() > numberOfInstances;
         } else {

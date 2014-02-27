@@ -16,7 +16,7 @@ package org.bonitasoft.engine.data.instance.exception;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SDataInstanceNotFoundException extends SDataInstanceReadException {
+public class SDataInstanceNotFoundException extends SDataInstanceException {
 
     private static final long serialVersionUID = 8088523217807814937L;
 

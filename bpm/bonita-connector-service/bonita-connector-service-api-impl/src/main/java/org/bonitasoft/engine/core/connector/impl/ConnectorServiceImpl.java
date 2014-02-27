@@ -240,25 +240,26 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private void storeImplementation(final long processDefinitionId, final SConnectorImplementationDescriptor connectorImplementation) throws CacheException {
-        String key = buildConnectorImplementationKey(processDefinitionId, connectorImplementation.getDefinitionId(), connectorImplementation.getDefinitionVersion());
+        String key = buildConnectorImplementationKey(processDefinitionId, connectorImplementation.getDefinitionId(),
+                connectorImplementation.getDefinitionVersion());
         cacheService.store(CONNECTOR_CACHE_NAME, key, connectorImplementation);
     }
 
     private String buildConnectorImplementationKey(final long rootDefinitionId, final String connectorId, final String version) {
         return new StringBuilder()
-        .append(rootDefinitionId)
-        .append(":")
-        .append(connectorId)
-        .append("-")
-        .append(version)
-        .toString();
+                .append(rootDefinitionId)
+                .append(":")
+                .append(connectorId)
+                .append("-")
+                .append(version)
+                .toString();
     }
 
     @Override
     public ConnectorResult executeMutipleEvaluation(final long processDefinitionId, final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, SExpression> connectorInputParameters,
             final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
-                    throws SConnectorException {
+            throws SConnectorException {
         String implementationClassName;
         final SConnectorImplementationDescriptor implementation;
         try {

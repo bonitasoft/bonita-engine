@@ -3,6 +3,7 @@ package org.bonitasoft.engine.execution.work;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
+@Deprecated
 public class FailureHandlingBonitaWorkExtended extends FailureHandlingBonitaWork {
 
     private final TenantServiceAccessor tenantServiceAccessor;

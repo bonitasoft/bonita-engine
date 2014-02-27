@@ -32,8 +32,9 @@ import org.bonitasoft.engine.data.SDataSourceInactiveException;
 import org.bonitasoft.engine.data.SDataSourceInitializationException;
 import org.bonitasoft.engine.data.SDataSourceNotFoundException;
 import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.data.model.SDataSource;
@@ -78,14 +79,14 @@ public class DataInstanceServiceImplTest {
     /**
      * Test method for {@link org.bonitasoft.engine.data.instance.api.impl.DataInstanceServiceImpl#getDataInstance(long)}.
      * 
-     * @throws SDataInstanceReadException
+     * @throws SDataInstanceException
      * @throws SDataException
      * @throws SDataSourceInactiveException
      * @throws SDataSourceInitializationException
      * @throws SDataSourceNotFoundException
      */
     @Test
-    public final void getTransientDataInstanceById() throws SDataInstanceReadException, SDataSourceNotFoundException, SDataSourceInitializationException,
+    public final void getTransientDataInstanceById() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
             SDataSourceInactiveException, SDataException {
         final long dataInstanceId = 456L;
         final SDataSource dataSource = mock(SDataSource.class);
@@ -99,7 +100,7 @@ public class DataInstanceServiceImplTest {
     }
 
     @Test
-    public final void getDefaultDataInstanceById() throws SDataInstanceReadException, SDataSourceNotFoundException, SDataSourceInitializationException,
+    public final void getDefaultDataInstanceById() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
             SDataSourceInactiveException, SDataException {
         final long dataInstanceId = 456L;
         // Throw exception when get transient data
@@ -125,7 +126,7 @@ public class DataInstanceServiceImplTest {
     }
 
     @Test(expected = SDataInstanceReadException.class)
-    public final void getDataInstanceByIdNotExists() throws SDataInstanceReadException, SDataSourceNotFoundException, SDataSourceInitializationException,
+    public final void getDataInstanceByIdNotExists() throws SDataInstanceException, SDataSourceNotFoundException, SDataSourceInitializationException,
             SDataSourceInactiveException, SDataException {
         final long dataInstanceId = 456L;
         final SDataSource transientSDataSource = mock(SDataSource.class);

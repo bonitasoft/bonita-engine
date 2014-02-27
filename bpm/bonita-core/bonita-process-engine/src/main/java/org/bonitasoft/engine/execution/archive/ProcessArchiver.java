@@ -66,6 +66,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SASubPr
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -92,7 +93,7 @@ public class ProcessArchiver {
         final long archiveDate = saProcessInstance.getEndDate();
         try {
             dataInstanceService.removeContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.toString());
-        } catch (final SDataInstanceReadException e) {
+        } catch (final SDataInstanceException e) {
             throw new SArchivingException("unable to delete data mapping", e);
         }
         SProcessDefinition processDefinition = null;
@@ -234,7 +235,7 @@ public class ProcessArchiver {
             final long archiveDate) throws SArchivingException {
         try {
             dataInstanceService.archiveLocalDataInstancesFromProcessInstance(processInstance.getId(), archiveDate);
-        } catch (final SDataInstanceReadException e) {
+        } catch (final SDataInstanceException e) {
             throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
         }
     }

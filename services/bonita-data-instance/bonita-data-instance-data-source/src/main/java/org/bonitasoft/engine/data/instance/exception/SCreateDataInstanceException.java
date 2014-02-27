@@ -16,7 +16,7 @@ package org.bonitasoft.engine.data.instance.exception;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class SCreateDataInstanceException extends SDataInstanceReadException {
+public class SCreateDataInstanceException extends SDataInstanceException {
 
     private static final long serialVersionUID = 3429369002565466683L;
 

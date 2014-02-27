@@ -1,11 +1,13 @@
-package org.bonitasoft.engine.execution.work;
+package org.bonitasoft.engine.execution.work.failurehandling;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,8 +30,8 @@ import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Before;
 import org.junit.Test;
 
-@Deprecated
-public class FailureHandlingBonitaWorkTest {
+@SuppressWarnings("javadoc")
+public class FailureHandlingProcessDefinitionContextWorkTest {
 
     private final BonitaWork wrappedWork = mock(BonitaWork.class);
 
@@ -48,10 +50,13 @@ public class FailureHandlingBonitaWorkTest {
     @Before
     public void before() {
         tenantAccessor = mock(TenantServiceAccessor.class);
-        txBonitawork = new FailureHandlingBonitaWorkExtended(wrappedWork, tenantAccessor);
+        txBonitawork = spy(new FailureHandlingProcessDefinitionContextWork(wrappedWork, 2));
+        doReturn("The description").when(txBonitawork).getDescription();
+        doReturn(tenantAccessor).when(txBonitawork).getTenantAccessor();
         sessionService = mock(SessionService.class);
         incidentService = mock(IncidentService.class);
         loggerService = mock(TechnicalLoggerService.class);
+        doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         sessionAccessor = mock(SessionAccessor.class);
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
@@ -67,7 +72,7 @@ public class FailureHandlingBonitaWorkTest {
     }
 
     @Test
-    public void testWorkFailureIsHandled() throws Exception {
+    public void testWorkFailureIsHandled() throws Throwable {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         final Exception e = new Exception();
         doThrow(e).when(wrappedWork).work(singletonMap);
@@ -77,7 +82,7 @@ public class FailureHandlingBonitaWorkTest {
     }
 
     @Test
-    public void testFailureHandlingFail() throws Exception {
+    public void testFailureHandlingFail() throws Throwable {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         final Exception e1 = new Exception();
         final Exception e2 = new Exception();
@@ -109,7 +114,7 @@ public class FailureHandlingBonitaWorkTest {
     }
 
     @Test
-    public void handleFailure() throws Exception {
+    public void handleFailure() throws Throwable {
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         final Exception e = new Exception();
         txBonitawork.handleFailure(e, context);
@@ -140,38 +145,41 @@ public class FailureHandlingBonitaWorkTest {
     }
 
     @Test
-    public void doNotHandleFailureWhenGettingASFlowNodeNotFoundException() throws Exception {
+    public void doNotHandleFailureWhenGettingASFlowNodeNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
         final Exception e = new Exception(new SFlowNodeNotFoundException(83));
         doThrow(e).when(wrappedWork).work(context);
         txBonitawork.work(context);
         verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(FailureHandlingBonitaWorkExtended.class, TechnicalLogSeverity.DEBUG);
+        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
+        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
     }
 
     @Test
-    public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Exception {
+    public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
         final Exception e = new Exception(new SProcessInstanceNotFoundException(83));
         doThrow(e).when(wrappedWork).work(context);
         when(wrappedWork.getDescription()).thenReturn("");
         txBonitawork.work(context);
         verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(FailureHandlingBonitaWorkExtended.class, TechnicalLogSeverity.DEBUG);
+        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
+        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
     }
 
     @Test
-    public void doNotHandleFailureWhenGettingASProcessDefinitionNotFoundException() throws Exception {
+    public void doNotHandleFailureWhenGettingASProcessDefinitionNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
         final Exception e = new Exception(new SProcessDefinitionNotFoundException("message"));
         doThrow(e).when(wrappedWork).work(context);
         txBonitawork.work(context);
         verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(FailureHandlingBonitaWorkExtended.class, TechnicalLogSeverity.DEBUG);
+        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
+        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
     }
 
     @Test
-    public void handleFailureForAllOtherExceptions() throws Exception {
+    public void handleFailureForAllOtherExceptions() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
         final Exception e = new Exception();
         doThrow(e).when(wrappedWork).work(context);

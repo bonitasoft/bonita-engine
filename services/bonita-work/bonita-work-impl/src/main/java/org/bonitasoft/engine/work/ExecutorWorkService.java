@@ -61,7 +61,7 @@ public class ExecutorWorkService implements WorkService {
     }
 
     @Override
-    public void registerWork(final BonitaWork work) throws WorkRegisterException {
+    public void registerWork(final BonitaWork work) throws SWorkRegisterException {
         final AbstractWorkSynchronization synchro = getContinuationSynchronization(work);
         if (synchro != null) {
             synchro.addWork(work);
@@ -69,16 +69,16 @@ public class ExecutorWorkService implements WorkService {
     }
 
     @Override
-    public void executeWork(final BonitaWork work) throws WorkRegisterException {
+    public void executeWork(final BonitaWork work) throws SWorkRegisterException {
         try {
             work.setTenantId(sessionAccessor.getTenantId());
         } catch (STenantIdNotSetException e) {
-            throw new WorkRegisterException("Unable to read tenant id from session", e);
+            throw new SWorkRegisterException("Unable to read tenant id from session", e);
         }
         this.threadPoolExecutor.submit(work);
     }
 
-    private AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws WorkRegisterException {
+    private AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws SWorkRegisterException {
         if (threadPoolExecutor == null || threadPoolExecutor.isShutdown()) {
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
                     + " but the work service is shutdown. work will be restarted with the node");
@@ -90,7 +90,7 @@ public class ExecutorWorkService implements WorkService {
             try {
                 transactionService.registerBonitaSynchronization(synchro);
             } catch (final STransactionNotFoundException e) {
-                throw new WorkRegisterException(e.getMessage(), e);
+                throw new SWorkRegisterException(e.getMessage(), e);
             }
             synchronizations.set(synchro);
         }

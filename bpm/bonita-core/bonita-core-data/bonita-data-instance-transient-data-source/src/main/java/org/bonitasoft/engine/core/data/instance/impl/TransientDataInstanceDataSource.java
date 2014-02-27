@@ -28,8 +28,9 @@ import org.bonitasoft.engine.data.DataSourceConfiguration;
 import org.bonitasoft.engine.data.SDataSourceInitializationException;
 import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
 import org.bonitasoft.engine.data.instance.exception.SCreateDataInstanceException;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -114,7 +115,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
     }
 
     @Override
-    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceReadException {
+    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
         try {
             final String key = getKey(dataInstance);
 
@@ -145,7 +146,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
     }
 
     @Override
-    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceReadException {
+    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceException {
         try {
             final List<?> cacheKeys = getCacheKeys(TRANSIENT_DATA_CACHE_NAME);
             for (final Object key : cacheKeys) {
@@ -161,7 +162,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
     }
 
     @Override
-    public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceReadException {
+    public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
         try {
             final List<?> cacheKeys = getCacheKeys(TRANSIENT_DATA_CACHE_NAME);
             final String key = getKey(dataName, containerId, containerType);
@@ -196,7 +197,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
 
     @Override
     public List<SDataInstance> getDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
-            throws SDataInstanceReadException {
+            throws SDataInstanceException {
         final String matchingKey = containerId + ":" + containerType;
         final List<SDataInstance> dataInstances = new ArrayList<SDataInstance>();
         try {
@@ -228,7 +229,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
         for (final Long dataInstanceId : dataInstanceIds) {
             try {
                 results.add(getDataInstance(dataInstanceId));
-            } catch (final SDataInstanceReadException e) {
+            } catch (final SDataInstanceException e) {
             }
         }
         return results;

@@ -23,7 +23,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -55,7 +55,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
                     }
                 }
             } while (sFlowNodeInstances.size() == queryOptions.getNumberOfResults());
-        } catch (final WorkRegisterException e) {
+        } catch (final SWorkRegisterException e) {
             throw new RestartException("Unable to restart flowNodes: can't register work", e);
         } catch (final SBonitaException e) {
             throw new RestartException("Unable to restart flowNodes: can't read flow nodes", e);
@@ -70,7 +70,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
     }
 
     private void createExecuteFlowNodeWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
-            throws WorkRegisterException {
+            throws SWorkRegisterException {
         logInfo(logger, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":" + sFlowNodeInstance.getId());
         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
         workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null,
@@ -78,12 +78,12 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
     }
 
     private void createNotifyChildFinishedWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
-            throws WorkRegisterException {
+            throws SWorkRegisterException {
         logInfo(logger, "restarting flow node (Notify...) " + sFlowNodeInstance.getName() + ":" + sFlowNodeInstance.getId());
         // NotifyChildFinishedWork, if it is terminal it means the notify was not called yet
         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(),
                 sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(),
-                sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
+                sFlowNodeInstance.getParentContainerType().name()));
     }
 
 }

@@ -88,7 +88,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
                 Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader("process", processDefinitionId));
             }
 
-            final Map<SExpression, SExpression> dataReplacement = Collections.emptyMap();
+            final Map<SExpression, SExpression> dataReplacement = new HashMap<SExpression, SExpression>();
             // We incrementaly build the Map of already resolved expressions:
             final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
             // Let's evaluate all expressions with no dependencies first:

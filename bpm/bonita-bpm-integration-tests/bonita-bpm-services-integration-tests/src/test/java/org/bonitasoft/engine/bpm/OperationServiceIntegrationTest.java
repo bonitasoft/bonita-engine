@@ -21,6 +21,7 @@ import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
@@ -138,7 +139,8 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
         final SLeftOperand leftOperand = BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(dataInstanceName).done();
         final SExpression expression = BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setContent(newConstantValue)
                 .setReturnType(String.class.getName()).setExpressionType(ExpressionType.TYPE_CONSTANT.name()).setReturnType(String.class.getName()).done();
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(SOperatorType.ASSIGNMENT)
+        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator("=").setLeftOperand(leftOperand)
+                .setType(SOperatorType.ASSIGNMENT)
                 .setRightOperand(expression).done();
     }
 
@@ -206,7 +208,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     }
 
     private void deleteDataInstance(final SDataInstance dataInstance) throws STransactionCommitException, STransactionCreationException,
-            SDataInstanceReadException, STransactionRollbackException {
+            SDataInstanceException, STransactionRollbackException {
         transactionService.begin();
         dataInstanceService.deleteDataInstance(dataInstance);
         transactionService.complete();

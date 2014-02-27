@@ -22,8 +22,9 @@ import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.data.DataSourceConfiguration;
 import org.bonitasoft.engine.data.instance.exception.SCreateDataInstanceException;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -74,7 +75,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     }
 
     @Override
-    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException {
+    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         try {
             final InsertRecord insertRecord = new InsertRecord(dataInstance);
             final SInsertEvent insertEvent = getInsertEvent(dataInstance);
@@ -85,7 +86,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     }
 
     @Override
-    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceReadException {
+    public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dataInstance, descriptor);
         final SUpdateEvent updateEvent = getUpdateEvent(dataInstance);
@@ -97,7 +98,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     }
 
     @Override
-    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException {
+    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
         final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
         final SDeleteEvent deleteEvent = getDeleteEvent(dataInstance);
@@ -109,7 +110,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     }
 
     @Override
-    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceReadException {
+    public SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstanceId);
         try {
             final SelectByIdDescriptor<SDataInstance> selectDescriptor = new SelectByIdDescriptor<SDataInstance>("getDataInstanceById", SDataInstance.class,
@@ -180,13 +181,14 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
             return persistenceRead.selectList(new SelectListDescriptor<SDataInstance>("getDataInstancesByContainer", paraMap, SDataInstance.class,
                     SDataInstance.class, new QueryOptions(fromIndex, numberOfResults)));
         } catch (final SBonitaReadException e) {
-            throw new SDataInstanceReadException("Unable to check if a data instance already exists for the data container of type " + containerType + " with id "
+            throw new SDataInstanceReadException("Unable to check if a data instance already exists for the data container of type " + containerType
+                    + " with id "
                     + containerId + " for reason: " + e.getMessage(), e);
         }
     }
 
     @Override
-    public List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) throws SDataInstanceReadException {
+    public List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstanceIds);
         if (dataInstanceIds.isEmpty()) {
             return Collections.emptyList();

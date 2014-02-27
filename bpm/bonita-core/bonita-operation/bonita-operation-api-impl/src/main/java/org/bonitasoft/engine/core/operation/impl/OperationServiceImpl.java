@@ -31,7 +31,7 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -156,7 +156,7 @@ public class OperationServiceImpl implements OperationService {
             try {
                 dataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(names), expressionContext.getContainerId(),
                         expressionContext.getContainerType());
-            } catch (final SDataInstanceReadException e) {
+            } catch (final SDataInstanceException e) {
                 throw new SOperationExecutionException(e);
             }
             final Map<String, Object> inputValues = expressionContext.getInputValues();

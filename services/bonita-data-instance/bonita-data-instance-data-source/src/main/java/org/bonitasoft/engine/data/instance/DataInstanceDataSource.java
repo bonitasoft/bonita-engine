@@ -16,7 +16,7 @@ package org.bonitasoft.engine.data.instance;
 import java.util.List;
 
 import org.bonitasoft.engine.data.DataSourceImplementation;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -28,15 +28,15 @@ public interface DataInstanceDataSource extends DataSourceImplementation {
 
     String DATA_INSTANCE = "DATA_INSTANCE";
 
-    void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException;
+    void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException;
 
-    void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceReadException;
+    void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException;
 
-    void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException;
+    void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException;
 
-    SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceReadException;
+    SDataInstance getDataInstance(final long dataInstanceId) throws SDataInstanceException;
 
-    SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceReadException;
+    SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException;
 
     /**
      * Returns a paginated list of DataInstance objects
@@ -50,11 +50,11 @@ public interface DataInstanceDataSource extends DataSourceImplementation {
      * @param numberOfResults
      *            the max expected number of results
      * @return the corresponding list
-     * @throws SDataInstanceReadException
+     * @throws SDataInstanceException
      *             in case a search exception occurs.
      */
-    List<SDataInstance> getDataInstances(long containerId, String containerType, int fromIndex, int numberOfResults) throws SDataInstanceReadException;
+    List<SDataInstance> getDataInstances(long containerId, String containerType, int fromIndex, int numberOfResults) throws SDataInstanceException;
 
-    List<SDataInstance> getDataInstances(List<Long> dataInstanceIds) throws SDataInstanceReadException;
+    List<SDataInstance> getDataInstances(List<Long> dataInstanceIds) throws SDataInstanceException;
 
 }

@@ -303,6 +303,7 @@ import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilde
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
@@ -5463,7 +5464,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, processInstanceId,
                     DataInstanceContainer.PROCESS_INSTANCE.toString());
             return ModelConvertor.toArchivedDataInstance(dataInstance);
-        } catch (final SDataInstanceReadException sdie) {
+        } catch (final SDataInstanceException sdie) {
             throw new ArchivedDataNotFoundException(sdie);
         }
     }
@@ -5476,7 +5477,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, activityInstanceId,
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString());
             return ModelConvertor.toArchivedDataInstance(dataInstance);
-        } catch (final SDataInstanceReadException sdie) {
+        } catch (final SDataInstanceException sdie) {
             throw new ArchivedDataNotFoundException(sdie);
         }
     }
@@ -5489,7 +5490,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<SADataInstance> dataInstances = dataInstanceService.getLastLocalSADataInstances(processInstanceId,
                     DataInstanceContainer.PROCESS_INSTANCE.toString(), startIndex, maxResults);
             return ModelConvertor.toArchivedDataInstances(dataInstances);
-        } catch (final SDataInstanceReadException sdie) {
+        } catch (final SDataInstanceException sdie) {
             throw new RetrieveException(sdie);
         }
     }
@@ -5502,7 +5503,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<SADataInstance> dataInstances = dataInstanceService.getLastLocalSADataInstances(activityInstanceId,
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString(), startIndex, maxResults);
             return ModelConvertor.toArchivedDataInstances(dataInstances);
-        } catch (final SDataInstanceReadException sdie) {
+        } catch (final SDataInstanceException sdie) {
             throw new RetrieveException(sdie);
         }
     }

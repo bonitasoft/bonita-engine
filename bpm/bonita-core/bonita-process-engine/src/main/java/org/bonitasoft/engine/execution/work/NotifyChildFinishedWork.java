@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -41,18 +41,13 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     private final String parentType;
 
-    private final int stateId;
-
     private final long parentId;
 
-    NotifyChildFinishedWork(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId, final long parentId,
-            final String parentType,
-            final int stateId) {
+    NotifyChildFinishedWork(final long processDefinitionId, final long flowNodeInstanceId, final long parentId, final String parentType) {
         this.processDefinitionId = processDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
         this.parentId = parentId;
         this.parentType = parentType;
-        this.stateId = stateId;
     }
 
     protected ClassLoader getClassLoader(final Map<String, Object> context) throws SBonitaException {
@@ -66,7 +61,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         try {
             Thread.currentThread().setContextClassLoader(processClassloader);
             final ContainerRegistry containerRegistry = getTenantAccessor(context).getContainerRegistry();
-            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, stateId, parentId, parentType);
+            containerRegistry.nodeReachedState(processDefinitionId, flowNodeInstanceId, parentId, parentType);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
@@ -77,6 +72,7 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
         return getClass().getSimpleName() + ": processInstanceId:" + parentId + ", flowNodeInstanceId: " + flowNodeInstanceId;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();

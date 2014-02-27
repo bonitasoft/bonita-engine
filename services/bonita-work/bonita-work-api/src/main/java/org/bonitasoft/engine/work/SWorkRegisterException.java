@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 Bonitasoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,34 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.test;
+package org.bonitasoft.engine.work;
 
-import java.util.Map;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
-import org.bonitasoft.engine.work.BonitaWork;
-
-final class FailingWork extends BonitaWork {
+/**
+ * @author Charles Souillard
+ * @author Baptiste Mesta
+ * @author Celine Souchet
+ */
+public class SWorkRegisterException extends SBonitaException {
 
     private static final long serialVersionUID = 1L;
 
-    @Override
-    public String getDescription() {
-        return "MyJob";
+    public SWorkRegisterException(final String message, final Throwable t) {
+        super(message, t);
     }
 
-    @Override
-    public String getRecoveryProcedure() {
-        return "The recovery procedure";
-    }
-
-    @Override
-    public void work(final Map<String, Object> context) throws Exception {
-        throw new Exception("an unexpected exception");
-
-    }
-
-    @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
-        throw new Exception("unable to handle failure");
+    /**
+     * @param string
+     */
+    public SWorkRegisterException(final String message) {
+        super(message);
     }
 }

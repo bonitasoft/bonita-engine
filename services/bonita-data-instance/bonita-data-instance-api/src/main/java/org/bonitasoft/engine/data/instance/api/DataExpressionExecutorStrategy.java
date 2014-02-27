@@ -22,7 +22,7 @@ import java.util.Map;
 
 import javax.lang.model.SourceVersion;
 
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
@@ -109,7 +109,7 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
                 throw new SExpressionEvaluationException("Some data were not found " + dataNames, dataNames.get(0));
             }
             return buildExpressionResultSameOrderAsInputList(expressions, results);
-        } catch (final SDataInstanceReadException e) {
+        } catch (final SDataInstanceException e) {
             throw new SExpressionEvaluationException(e, null);
         }
     }
