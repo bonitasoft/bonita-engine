@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
