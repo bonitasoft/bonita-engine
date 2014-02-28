@@ -65,7 +65,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(PlatformMonitoringAPI.class.getName(), new PlatformMonitoringAPIImpl());
         apis.put(LoginAPI.class.getName(), new LoginAPIExt());
         apis.put(com.bonitasoft.engine.api.LoginAPI.class.getName(), new LoginAPIExt());
-        apis.put(IdentityAPI.class.getName(), new IdentityAPIImpl());
+        apis.put(IdentityAPI.class.getName(), new IdentityAPIExt());
         apis.put(com.bonitasoft.engine.api.IdentityAPI.class.getName(), new IdentityAPIExt());
         apis.put(MonitoringAPI.class.getName(), new MonitoringAPIImpl());
         apis.put(ProcessAPI.class.getName(), new ProcessAPIExt());
@@ -75,9 +75,9 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(PlatformCommandAPI.class.getName(), new PlatformCommandAPIImpl());
         apis.put(NodeAPI.class.getName(), new NodeAPIImpl());
         apis.put(com.bonitasoft.engine.api.ReportingAPI.class.getName(), new ReportingAPIExt());
-        apis.put(ProfileAPI.class.getName(), new ProfileAPIImpl());
+        apis.put(ProfileAPI.class.getName(), new ProfileAPIExt());
         apis.put(com.bonitasoft.engine.api.ProfileAPI.class.getName(), new ProfileAPIExt());
-        apis.put(ThemeAPI.class.getName(), new ThemeAPIImpl());
+        apis.put(ThemeAPI.class.getName(), new ThemeAPIExt());
         apis.put(com.bonitasoft.engine.api.ThemeAPI.class.getName(), new ThemeAPIExt());
         apis.put(com.bonitasoft.engine.api.TenantManagementAPI.class.getName(), new TenantManagementAPIExt());
     }

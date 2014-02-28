@@ -205,6 +205,11 @@ public class TenantTest {
         tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
         try {
             tenantManagementAPI.isInMaintenance();
+            // test with bos accessor
+            org.bonitasoft.engine.api.TenantAPIAccessor.getThemeAPI(apiTestSPUtil.getSession()).getLastUpdateDate(ThemeType.PORTAL);
+            org.bonitasoft.engine.api.TenantAPIAccessor.getIdentityAPI(apiTestSPUtil.getSession()).getNumberOfUsers();
+            org.bonitasoft.engine.api.TenantAPIAccessor.getProfileAPI(apiTestSPUtil.getSession()).searchProfiles(new SearchOptionsBuilder(0, 1).done());
+            // test with sp accessor
             apiTestSPUtil.getThemeAPI().getLastUpdateDate(ThemeType.PORTAL);
             apiTestSPUtil.getIdentityAPI().getNumberOfUsers();
             apiTestSPUtil.getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).done());

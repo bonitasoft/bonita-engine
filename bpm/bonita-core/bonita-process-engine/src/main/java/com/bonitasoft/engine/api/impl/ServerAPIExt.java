@@ -42,9 +42,9 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
         super(cleanSession, accessResolver);
     }
 
-    protected void logTenantInMaintenanceMessage(final String apiInterfaceName, final String methodName) {
+    protected void logTenantInMaintenanceMessage(final Object apiImpl, final String apiInterfaceName, final String methodName) {
         logTechnicalErrorMessage("Tenant in Maintenance. Method '" + apiInterfaceName + "." + methodName
-                + "' cannot be called until the tenant mode is RUNNING again (TenantAPI.setTenantMode())");
+                + "' of '" + apiImpl + "' cannot be called until the tenant mode is RUNNING again (TenantAPI.setTenantMode())");
     }
 
     private boolean isTenantInAValidModeFor(final Object apiImpl, final Method method, final long tenantId, final Session session) {
@@ -61,7 +61,7 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
         if (session instanceof APISession) {
             long tenantId = ((APISession) session).getTenantId();
             if (!isTenantInAValidModeFor(apiImpl, method, tenantId, session)) {
-                logTenantInMaintenanceMessage(apiInterfaceName, method.getName());
+                logTenantInMaintenanceMessage(apiImpl, apiInterfaceName, method.getName());
                 throw new TenantInMaintenanceException("Tenant with ID " + tenantId + " is in maintenance, no API call on this tenant can be made for now.");
             }
         }
