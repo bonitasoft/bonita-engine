@@ -158,6 +158,7 @@
 								<inherited>false</inherited>
 								<configuration>
 									<target>
+										<echo message="!!!!!!!!!!!!!!!! tomcat/${db.vendor}/server.xml !!!!!!!!!!!"/>
 										<taskdef name="if" classname="${if.task}" classpathref="maven.runtime.classpath" />
 										<available property="tomcat.present" file="${tomcat.zip.folder}/${tomcat.name}.zip" />
 										<if>
@@ -195,10 +196,14 @@
 										<if>
 											<equals arg1="${db.vendor}" arg2="h2" />
 											<then>
-												<copy todir="${tomcat.conf.dir}">
-													<fileset file="tomcat/${db.vendor}/server.xml" />
+												<copy todir="${tomcat.conf.dir}" overwrite="true">
+													<fileset dir="tomcat/${db.vendor}">
+														<include name="server.xml" />
+													</fileset>
 												</copy>
+												<replace file="${tomcat.conf.dir}/server.xml" token="#db.server.port#" value="${db.server.port}" />
 											</then>
+											
 										</if>
 										
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8080&quot;" value="&lt;Connector port=&quot;${provider.port}&quot;" />
