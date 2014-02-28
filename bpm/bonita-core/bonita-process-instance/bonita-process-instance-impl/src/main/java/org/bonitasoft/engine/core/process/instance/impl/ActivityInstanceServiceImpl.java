@@ -1088,11 +1088,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
                 queryOptions);
         try {
             List<Long> userIds = getPersistenceRead().selectList(elements);
-            if (userIds.isEmpty()) {
-                final SelectListDescriptor<Long> selectDescriptor = new SelectListDescriptor<Long>("getPossibleUserIdsOfPendingTasksWithoutMemberships",
-                        parameters, SActivityInstance.class, queryOptions);
-                userIds = getPersistenceRead().selectList(selectDescriptor);
-            }
             return userIds;
         } catch (final SBonitaReadException e) {
             throw new SActivityReadException(e);

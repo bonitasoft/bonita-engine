@@ -1358,23 +1358,4 @@
         ORDER BY MIN(user.userName)
 	</query>
 	
-	<query name="getPossibleUserIdsOfPendingTasksWithoutMemberships">
-		SELECT user.id
-		FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
-			 org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
-			 org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping
-		WHERE mapping.activityId = :humanTaskInstanceId
-		AND (
-			mapping.userId = user.id
-			OR (
-				mapping.actorId = actor.id
-				AND actor.id = actormember.actorId
-				AND	actormember.userId = user.id
-        	)
-		)
-		GROUP BY user.id
-		ORDER BY MIN(user.userName)
-	</query>
-
 </hibernate-mapping>
