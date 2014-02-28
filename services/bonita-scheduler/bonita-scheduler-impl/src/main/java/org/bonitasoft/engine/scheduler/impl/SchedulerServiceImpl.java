@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -395,6 +396,16 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public boolean isStillScheduled(final SJobDescriptor jobDescriptor) throws SSchedulerException {
         return schedulerExecutor.isStillScheduled(getTenantId(), jobDescriptor.getJobName());
+    }
+
+    @Override
+    public void pause() throws SBonitaException, TimeoutException {
+        pauseJobs(getTenantId());
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        resumeJobs(getTenantId());
     }
 
 }

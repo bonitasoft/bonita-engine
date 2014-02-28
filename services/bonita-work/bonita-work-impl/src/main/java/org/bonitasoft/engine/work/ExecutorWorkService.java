@@ -13,9 +13,12 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.Queue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -35,7 +38,7 @@ public class ExecutorWorkService implements WorkService {
 
     private final TransactionService transactionService;
 
-    private ThreadPoolExecutor threadPoolExecutor;
+    private ExecutorService executor;
 
     private final WorkSynchronizationFactory workSynchronizationFactory;
 
@@ -47,7 +50,7 @@ public class ExecutorWorkService implements WorkService {
 
     private final BonitaExecutorServiceFactory bonitaExecutorServiceFactory;
 
-    private boolean deactivated = true;
+    private Queue<Runnable> queue;
 
     public ExecutorWorkService(final TransactionService transactionService, final WorkSynchronizationFactory workSynchronizationFactory,
             final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor, final BonitaExecutorServiceFactory bonitaExecutorServiceFactory) {
@@ -60,22 +63,20 @@ public class ExecutorWorkService implements WorkService {
 
     @Override
     public void registerWork(final BonitaWork work) throws WorkRegisterException {
-        if (isDeactivated()) {
+        if (isStopped()) {
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
-                    + " but the work service is paused");
+                    + " but the work service is stopped");
             return;
         }
         final AbstractWorkSynchronization synchro = getContinuationSynchronization(work);
-        if (synchro != null) {
-            synchro.addWork(work);
-        }
+        synchro.addWork(work);
     }
 
     @Override
     public void executeWork(final BonitaWork work) throws WorkRegisterException {
-        if (isDeactivated()) {
+        if (isStopped()) {
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
-                    + " but the work service is paused");
+                    + " but the work service is stopped");
             return;
         }
 
@@ -84,18 +85,13 @@ public class ExecutorWorkService implements WorkService {
         } catch (TenantIdNotSetException e) {
             throw new WorkRegisterException("Unable to read tenant id from session", e);
         }
-        this.threadPoolExecutor.submit(work);
+        this.executor.submit(work);
     }
 
     private AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws WorkRegisterException {
-        if (isStopped()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
-                    + " but the work service is shutdown. work will be restarted with the node");
-            return null;
-        }
         AbstractWorkSynchronization synchro = synchronizations.get();
         if (synchro == null || synchro.isExecuted()) {
-            synchro = workSynchronizationFactory.getWorkSynchronization(threadPoolExecutor, loggerService, sessionAccessor, this);
+            synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor, this);
             try {
                 transactionService.registerBonitaSynchronization(synchro);
             } catch (final STransactionNotFoundException e) {
@@ -107,49 +103,55 @@ public class ExecutorWorkService implements WorkService {
     }
 
     public boolean isStopped() {
-        return threadPoolExecutor == null || threadPoolExecutor.isShutdown() || isDeactivated();
+        return executor == null || executor.isShutdown();
     }
 
     @Override
     public void stop() {
-        if (!isStopped()) {
-            threadPoolExecutor.shutdown();
-            pause();
+        // we don't throw exception just stop it and log if something happend
+        try {
+            stopWithException();
+        } catch (WorkException e) {
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
+        } catch (TimeoutException e) {
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
         }
     }
 
     @Override
     public void start() {
         if (isStopped()) {
-            threadPoolExecutor = bonitaExecutorServiceFactory.createExecutorService();
-            deactivated = false;
+            Pair<ExecutorService, Queue<Runnable>> createExecutorService = bonitaExecutorServiceFactory.createExecutorService();
+            executor = createExecutorService.getLeft();
+            queue = createExecutorService.getRight();
         }
     }
 
     @Override
-    public void pause() {
-        if (!isStopped()) {
-            try {
-                if (!threadPoolExecutor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
-                }
-            } catch (InterruptedException e) {
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "error while waiting termination of all work ", e);
-            }
+    public void pause() throws TimeoutException, WorkException {
+        stopWithException();
+    }
 
+    private void stopWithException() throws TimeoutException, WorkException {
+        if (isStopped()) {
+            return;
         }
-        deactivated = true;
-
+        executor.shutdown();
+        queue.clear();
+        try {
+            if (!executor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
+                throw new TimeoutException("Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
+            }
+        } catch (InterruptedException e) {
+            throw new WorkException("Interrupted while pausing the work service", e);
+        }
+        executor = null;
+        queue = null;
     }
 
     @Override
     public void resume() {
         start();
-
-    }
-
-    public boolean isDeactivated() {
-        return deactivated;
     }
 
 }

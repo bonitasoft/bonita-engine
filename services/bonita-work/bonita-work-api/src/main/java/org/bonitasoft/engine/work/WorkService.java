@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.concurrent.TimeoutException;
-
 import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 
 /**
@@ -41,36 +39,5 @@ public interface WorkService extends ServiceWithLifecycle {
      * @since 6.0
      */
     void executeWork(final BonitaWork work) throws WorkRegisterException;
-
-    /**
-     * 
-     * Stop the execution of work for this local work service
-     * 
-     * @throws TimeoutException
-     */
-    void stop() throws TimeoutException;
-
-    /**
-     * 
-     * start the execution of work for this local work service
-     * 
-     * @throws TimeoutException
-     */
-    void start();
-
-    /**
-     * 
-     * pause the execution of work for this local work service
-     * 
-     */
-    void pause();
-
-    /**
-     * 
-     * resume the execution of work for this local work service
-     * 
-     */
-
-    void resume();
 
 }
