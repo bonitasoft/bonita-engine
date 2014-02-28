@@ -2,6 +2,7 @@ package com.bonitasoft.engine.api.impl;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -13,6 +14,8 @@ import java.util.Arrays;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
@@ -20,6 +23,7 @@ import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.work.WorkException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
@@ -102,6 +106,14 @@ public class TenantManagementAPIExtTest {
         verify(workService).resume();
     }
 
+    @Test(expected = UpdateException.class)
+    public void should_setMaintenanceMode_to_AVAILLABLE_throw_exception_when_workservice_fail() throws Exception {
+        doThrow(WorkException.class).when(workService).resume();
+
+        // given a tenant moved to available mode
+        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+    }
+
     @Test
     public void should_setMaintenanceMode_to_AVAILLABLE_restart_elements() throws Exception {
 
@@ -111,6 +123,14 @@ public class TenantManagementAPIExtTest {
         // then elements must be restarted
         verify(tenantRestartHandler1, times(1)).handleRestart(platformServiceAccessor, tenantServiceAccessor);
         verify(tenantRestartHandler2, times(1)).handleRestart(platformServiceAccessor, tenantServiceAccessor);
+    }
+
+    @Test(expected = UpdateException.class)
+    public void should_setMaintenanceMode_to_AVAILLABLE__throw_exception_when_RestartHandler_fail() throws Exception {
+        doThrow(RestartException.class).when(tenantRestartHandler2).handleRestart(platformServiceAccessor, tenantServiceAccessor);
+
+        // given a tenant moved to available mode
+        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
     }
 
     @Test
