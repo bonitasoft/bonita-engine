@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.api.impl;
 
+import java.util.concurrent.TimeoutException;
+
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -79,15 +81,25 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         try {
             schedulerService.pauseJobs(tenantId);
             sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
-            workService.pause();
         } catch (SSchedulerException e) {
             throw new UpdateException("Unable to pause the scheduler.", e);
+        }
+        try {
+            workService.pause();
+        } catch (SBonitaException e) {
+            throw new UpdateException("Unable to pause the work service.", e);
+        } catch (TimeoutException e) {
+            throw new UpdateException("Unable to pause the work service.", e);
         }
     }
 
     private void resumeServicesForTenant(final WorkService workService, final SchedulerService schedulerService, final long tenantId) throws UpdateException {
         try {
             workService.resume();
+        } catch (SBonitaException e) {
+            throw new UpdateException("Unable to resume the work service.", e);
+        }
+        try {
             schedulerService.resumeJobs(tenantId);
         } catch (SSchedulerException e) {
             throw new UpdateException("Unable to resume the scheduler.", e);

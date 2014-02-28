@@ -47,15 +47,16 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
     private final HazelcastInstance hazelcastInstance;
 
     public ClusteredThreadPoolExecutorLocalQueue(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
-            final ThreadFactory threadFactory, final RejectedExecutionHandler handler, final HazelcastInstance hazelcastInstance) {
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, createWorkQueue(hazelcastInstance), threadFactory, handler);
+            final ThreadFactory threadFactory, final RejectedExecutionHandler handler, final HazelcastInstance hazelcastInstance,
+            final BlockingQueue<Runnable> queue) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, queue, threadFactory, handler);
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
         this.hazelcastInstance = hazelcastInstance;
         Cluster cluster = hazelcastInstance.getCluster();
         cluster.addMembershipListener(this);
-        this.workQueue = hazelcastInstance.getQueue(memberWorkQueueName(cluster.getLocalMember()));
+        this.workQueue = queue;
         this.executingRunnable = hazelcastInstance.getQueue(memberExecutingWorkQueueName(cluster.getLocalMember()));
         // Do we have to check is the queue is empty or not ? If not, what to do ?
     }
@@ -64,7 +65,7 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
      * @param localMember
      * @return
      */
-    private static String memberExecutingWorkQueueName(final Member localMember) {
+    static String memberExecutingWorkQueueName(final Member localMember) {
         return "ExecutingWorkQueue@" + localMember.getUuid();
     }
 
@@ -72,13 +73,8 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
      * @param localMember
      * @return
      */
-    private static String memberWorkQueueName(final Member localMember) {
+    static String memberWorkQueueName(final Member localMember) {
         return "WorkQueue@" + localMember.getUuid();
-    }
-
-    private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {
-        Cluster cluster = hazelcastInstance.getCluster();
-        return hazelcastInstance.getQueue(memberWorkQueueName(cluster.getLocalMember()));
     }
 
     @Override
