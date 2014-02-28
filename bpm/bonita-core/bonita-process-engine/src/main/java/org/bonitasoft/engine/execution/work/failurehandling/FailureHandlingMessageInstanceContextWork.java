@@ -38,10 +38,10 @@ public class FailureHandlingMessageInstanceContextWork extends FailureHandlingBo
 
 	@Override
 	protected void setExceptionContext(SBonitaException sBonitaException, Map<String, Object> context) throws SBonitaException {
-		sBonitaException.setMessageInstanceName(messageInstance.getMessageName());
-		sBonitaException.setMessageInstanceTargetProcess(messageInstance.getTargetProcess());
-		sBonitaException.setMessageInstanceTargetFlowNode(messageInstance.getTargetFlowNode());
-		sBonitaException.setWaitingMessageEventType(waitingMessageEvent.getEventType().name());
+		sBonitaException.setMessageInstanceNameOnContext(messageInstance.getMessageName());
+		sBonitaException.setMessageInstanceTargetProcessOnContext(messageInstance.getTargetProcess());
+		sBonitaException.setMessageInstanceTargetFlowNodeOnContext(messageInstance.getTargetFlowNode());
+		sBonitaException.setWaitingMessageEventTypeOnContext(waitingMessageEvent.getEventType().name());
 	}
 
 }

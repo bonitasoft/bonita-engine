@@ -22,8 +22,9 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
- * @author Celine Souchet
+ * Adding context information about Process definition to exception for better logging
  * 
+ * @author Celine Souchet
  */
 public class FailureHandlingProcessDefinitionContextWork extends FailureHandlingBonitaWork {
 
@@ -31,23 +32,15 @@ public class FailureHandlingProcessDefinitionContextWork extends FailureHandling
 
     private long processDefinitionId;
 
-
-	/**
+    /**
      * @param wrappedWork
+     *            The work to wrap
      * @param processDefinitionId
      *            The identifier of the process definition
      */
     public FailureHandlingProcessDefinitionContextWork(final BonitaWork wrappedWork, final long processDefinitionId) {
         super(wrappedWork);
         this.processDefinitionId = processDefinitionId;
-    }
-    
-    /**
-     * @param wrappedWork
-     * Take care to call setProcessDefitionID later on
-     */
-    protected FailureHandlingProcessDefinitionContextWork(final BonitaWork wrappedWork){
-    	 super(wrappedWork);
     }
 
     @Override
@@ -61,12 +54,25 @@ public class FailureHandlingProcessDefinitionContextWork extends FailureHandling
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SProcessDefinitionDeployInfo processDeploymentInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
 
-        sBonitaException.setProcessDefinitionId(processDefinitionId);
-        sBonitaException.setProcessDefinitionName(processDeploymentInfo.getName());
-        sBonitaException.setProcessDefinitionVersion(processDeploymentInfo.getVersion());
+        sBonitaException.setProcessDefinitionIdOnContext(processDefinitionId);
+        sBonitaException.setProcessDefinitionNameOnContext(processDeploymentInfo.getName());
+        sBonitaException.setProcessDefinitionVersionOnContext(processDeploymentInfo.getVersion());
     }
 
-    public void setProcessDefinitionId(long processDefinitionId) {
-    	this.processDefinitionId = processDefinitionId;
+    /**
+     * @return The identifier of the process definition
+     * @since 6.3
+     */
+    public long getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    /**
+     * @param processDefinitionId
+     *            The identifier of the process definition
+     * @since 6.3
+     */
+    protected void setProcessDefinitionId(long processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
 }

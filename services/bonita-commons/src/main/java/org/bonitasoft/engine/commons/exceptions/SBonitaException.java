@@ -113,113 +113,140 @@ public abstract class SBonitaException extends Exception {
     }
 
     /**
-     * @param processDefinitionId
+     * @param id
      *            The identifier of the process definition to set
      * @since 6.3
      */
-    public void setProcessDefinitionId(final Long processDefinitionId) {
-        context.put(SContext.PROCESS_DEFINITION_ID, processDefinitionId);
+    public void setProcessDefinitionIdOnContext(final Long id) {
+        context.put(SContext.PROCESS_DEFINITION_ID, id);
     }
 
     /**
-     * @param processDefinitionName
+     * @param name
      *            The name of the process definition to set
      * @since 6.3
      */
-    public void setProcessDefinitionName(final String processDefinitionName) {
-        context.put(SContext.PROCESS_NAME, processDefinitionName);
+    public void setProcessDefinitionNameOnContext(final String name) {
+        context.put(SContext.PROCESS_NAME, name);
     }
 
     /**
-     * @param processDefinitionVersion
+     * @param version
      *            The version of the process definition to set
      * @since 6.3
      */
-    public void setProcessDefinitionVersion(final String processDefinitionVersion) {
-        context.put(SContext.PROCESS_VERSION, processDefinitionVersion);
+    public void setProcessDefinitionVersionOnContext(final String version) {
+        context.put(SContext.PROCESS_VERSION, version);
     }
 
     /**
-     * @param processInstanceId
+     * @param id
      *            The identifier of the process instance to set
      * @since 6.3
      */
-    public void setProcessInstanceId(final Long processInstanceId) {
-        context.put(SContext.PROCESS_INSTANCE_ID, processInstanceId);
+    public void setProcessInstanceIdOnContext(final Long id) {
+        context.put(SContext.PROCESS_INSTANCE_ID, id);
     }
 
     /**
-     * @param rootProcessInstanceId
+     * @param id
      *            The identifier of the root process instance to set
      * @since 6.3
      */
-    public void setRootProcessInstanceId(final Long rootProcessInstanceId) {
-        context.put(SContext.ROOT_PROCESS_INSTANCE_ID, rootProcessInstanceId);
+    public void setRootProcessInstanceIdOnContext(final Long id) {
+        context.put(SContext.ROOT_PROCESS_INSTANCE_ID, id);
     }
 
     /**
-     * @param flowNodeDefinitionId
-     * 				The identifier of the flow node definition id
+     * @param name
+     *            The name of the connector definition to set
      * @since 6.3
      */
-    public void setFlowNodeDefinitionId(long flowNodeDefinitionId) {
-    	context.put(SContext.FLOW_NODE_DEFINITION_ID, flowNodeDefinitionId);
+    public void setConnectorDefinitionNameOnContext(final String name) {
+        context.put(SContext.CONNECTOR_DEFINITION_NAME, name);
     }
-    
+
     /**
-     * @param flowNodeInstanceId
-     * 				The identifier of the flow node instance to set
+     * @param activationEvent
+     *            The event which activates the connector to set
      * @since 6.3
      */
-    public void setFlowNodeInstanceId(long flowNodeInstanceId) {
-    	context.put(SContext.FLOW_NODE_INSTANCE_ID, flowNodeInstanceId); 	
+    public void setConnectorActivationEventOnContext(final String activationEvent) {
+        context.put(SContext.CONNECTOR_ACTIVATION_EVENT, activationEvent);
     }
-    
+
     /**
-     * @param flowNodeName
-     * 				The name of the flow node to set
+     * @param id
+     *            The identifier of the connector instance to set
      * @since 6.3
      */
-    public void setFlowNodeName(String flowNodeName) {
-    	context.put(SContext.FLOW_NODE_NAME, flowNodeName);
+    public void setConnectorInstanceIdOnContext(final long id) {
+        context.put(SContext.CONNECTOR_INSTANCE_ID, id);
     }
-    
+
     /**
-     * @param messageName
-     * 				The name of the message instance to set
+     * @param id
+     *            The identifier of the flow node definition to set
      * @since 6.3
      */
-    public void setMessageInstanceName(String messageName) {
-    	context.put(SContext.MESSAGE_INSTANCE_NAME, messageName);
+    public void setFlowNodeDefinitionIdOnContext(final long id) {
+        context.put(SContext.FLOW_NODE_DEFINITION_ID, id);
     }
-    
+
     /**
-     * @param targetProcess
-     *				The target process name of the message instance to set
+     * @param id
+     *            The identifier of the flow node instance to set
      * @since 6.3
      */
-    public void setMessageInstanceTargetProcess(String targetProcess) {
-    	context.put(SContext.MESSAGE_INSTANCE_TARGET_PROCESS_NAME, targetProcess);
+    public void setFlowNodeInstanceIdOnContext(final long id) {
+        context.put(SContext.FLOW_NODE_INSTANCE_ID, id);
     }
-    
+
     /**
-     * @param targetFlowNode
-     *				The target flow node name of the message instance to set 
+     * @param name
+     *            The name of the flow node to set
      * @since 6.3
      */
-    public void setMessageInstanceTargetFlowNode(String targetFlowNode) {
-    	context.put(SContext.MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, targetFlowNode);
+    public void setFlowNodeNameOnContext(final String name) {
+        context.put(SContext.FLOW_NODE_NAME, name);
     }
-    
+
+    /**
+     * @param name
+     *            The name of the message instance to set
+     * @since 6.3
+     */
+    public void setMessageInstanceNameOnContext(final String name) {
+        context.put(SContext.MESSAGE_INSTANCE_NAME, name);
+    }
+
+    /**
+     * @param name
+     *            The target process name of the message instance to set
+     * @since 6.3
+     */
+    public void setMessageInstanceTargetProcessOnContext(final String name) {
+        context.put(SContext.MESSAGE_INSTANCE_TARGET_PROCESS_NAME, name);
+    }
+
+    /**
+     * @param name
+     *            The target flow node name of the message instance to set
+     * @since 6.3
+     */
+    public void setMessageInstanceTargetFlowNodeOnContext(final String name) {
+        context.put(SContext.MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, name);
+    }
+
     /**
      * @param eventType
-     *				The event type of the waiting message instance to set 
+     *            The event type of the waiting message instance to set
      * @since 6.3
      */
-    public void setWaitingMessageEventType(String eventType) {
-    	context.put(SContext.WAITING_MESSAGE_INSTANCE_TYPE, eventType);
+    public void setWaitingMessageEventTypeOnContext(String eventType) {
+        context.put(SContext.WAITING_MESSAGE_INSTANCE_TYPE, eventType);
     }
-    
+
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder();
@@ -228,24 +255,22 @@ public abstract class SBonitaException extends Exception {
         return stringBuilder.toString();
     }
 
-	private void appendCauseMessage(final StringBuilder stringBuilder) {
-		String message = super.getMessage();
+    private void appendCauseMessage(final StringBuilder stringBuilder) {
+        String message = super.getMessage();
         if (message != null && message.isEmpty() && getCause() != null) {
             message = getCause().getMessage();
         }
         if (message != null && !message.trim().equals("")) {
             stringBuilder.append(message);
         }
-	}
-	
-	private void appendContextMessage(final StringBuilder stringBuilder) {
-		if (!context.isEmpty()) {
+    }
+
+    private void appendContextMessage(final StringBuilder stringBuilder) {
+        if (!context.isEmpty()) {
             for (final Entry<SContext, Serializable> entry : context.entrySet()) {
                 stringBuilder.append(entry.getKey() + " = " + entry.getValue() + " | ");
             }
         }
-	}
-
-
+    }
 
 }

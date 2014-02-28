@@ -194,7 +194,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 } else if (!state.isStable() && !state.isInterrupting()) {
                     try {
                         // reschedule this work but without the operations
-                        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(flowNodeInstanceId, null, null, processInstanceId));
+                        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processInstanceId, flowNodeInstanceId, null, null));
                     } catch (final SWorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }

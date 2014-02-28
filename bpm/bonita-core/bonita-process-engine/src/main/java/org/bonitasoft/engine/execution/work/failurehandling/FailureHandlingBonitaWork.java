@@ -33,7 +33,7 @@ import org.bonitasoft.engine.work.BonitaWork;
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  */
-public abstract class FailureHandlingBonitaWork extends WrappingBonitaWork {
+public class FailureHandlingBonitaWork extends WrappingBonitaWork {
 
     private static final long serialVersionUID = 1L;
 
@@ -107,5 +107,7 @@ public abstract class FailureHandlingBonitaWork extends WrappingBonitaWork {
         getWrappedWork().handleFailure(e, context);
     }
 
-    protected abstract void setExceptionContext(SBonitaException sBonitaException, Map<String, Object> context) throws SBonitaException;
+    @SuppressWarnings("unused")
+    protected void setExceptionContext(SBonitaException SBonitaException, Map<String, Object> context) throws SBonitaException {
+    }
 }

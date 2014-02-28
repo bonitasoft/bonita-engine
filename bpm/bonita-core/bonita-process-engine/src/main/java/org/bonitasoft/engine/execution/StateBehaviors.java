@@ -706,8 +706,8 @@ public class StateBehaviors {
         final String connectorDefinitionName = sConnectorDefinition.getName();
         try {
             connectorInstanceService.setState(connector, ConnectorState.EXECUTING.name());
-            workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, processInstanceId, flowNodeDefinitionId, flowNodeInstanceId,
-                    connectorInstanceId, connectorDefinitionName));
+            workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId,
+                    connectorDefinitionName));
         } catch (SConnectorInstanceModificationException e) {
             throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING", e);
         } catch (final SWorkRegisterException e) {

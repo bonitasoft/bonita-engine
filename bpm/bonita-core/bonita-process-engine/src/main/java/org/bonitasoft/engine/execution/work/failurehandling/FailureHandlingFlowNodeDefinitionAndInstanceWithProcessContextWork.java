@@ -22,28 +22,42 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
+ * Adding context information about Flow Node & Process definition and instance to exception for better logging
+ * 
  * @author Aurelien Pupier
- * Adding context information about Flow Node instance to exception for better logging
+ * @author Celine Souchet
  */
-public class FailureHandlingFlowNodeInstanceContextWork extends FailureHandlingBonitaWork {
+public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWork extends FailureHandlingProcessDefinitionAndInstanceContextWork {
 
-	private static final long serialVersionUID = -8192129441020811731L;
-	private final long flowNodeInstanceId;
-	
-	public FailureHandlingFlowNodeInstanceContextWork(BonitaWork wrappedWork, final long flowNodeInstanceId) {
-		super(wrappedWork);
-		this.flowNodeInstanceId = flowNodeInstanceId;
-	}
+    private static final long serialVersionUID = -8192129441020811731L;
 
-	@Override
-	protected void setExceptionContext(SBonitaException sBonitaException, Map<String, Object> context) throws SBonitaException {
+    private final long flowNodeInstanceId;
+
+    /**
+     * @param wrappedWork
+     *            The work to wrap
+     * @param flowNodeInstanceId
+     *            The identifier of the flow node instance
+     */
+    public FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWork(final BonitaWork wrappedWork, final long flowNodeInstanceId) {
+        super(wrappedWork, -1);
+        this.flowNodeInstanceId = flowNodeInstanceId;
+    }
+
+    @Override
+    protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-                
-        sBonitaException.setFlowNodeDefinitionId(flowNodeInstance.getFlowNodeDefinitionId());
-        sBonitaException.setFlowNodeInstanceId(flowNodeInstanceId);
-        sBonitaException.setFlowNodeName(flowNodeInstance.getName());
-	}
+
+        sBonitaException.setFlowNodeDefinitionIdOnContext(flowNodeInstance.getFlowNodeDefinitionId());
+        sBonitaException.setFlowNodeInstanceIdOnContext(flowNodeInstanceId);
+        sBonitaException.setFlowNodeNameOnContext(flowNodeInstance.getName());
+
+        setProcessDefinitionId(flowNodeInstance.getProcessDefinitionId());
+        setProcessInstanceId(flowNodeInstance.getParentProcessInstanceId());
+        setRootProcessInstanceId(flowNodeInstance.getRootProcessInstanceId());
+        super.setExceptionContext(sBonitaException, context);
+    }
 
 }

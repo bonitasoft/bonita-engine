@@ -403,8 +403,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     if (sConnectorDefinition.getName().equals(nextConnectorInstance.getName())) {
                         final Long connectorInstanceId = nextConnectorInstance.getId();
                         final String connectorDefinitionName = sConnectorDefinition.getName();
-                        workService.registerWork(WorkFactory.createExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName,
-                                sProcessInstance.getId(), sProcessInstance.getRootProcessInstanceId(), activationEvent));
+                        workService.registerWork(WorkFactory.createExecuteConnectorOfProcess(processDefinitionId, sProcessInstance.getId(), sProcessInstance.getRootProcessInstanceId(),
+                                connectorInstanceId, connectorDefinitionName, activationEvent));
                         return true;
                     }
                 }
@@ -497,7 +497,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 toExecute = true;
             }
             if (toExecute) {
-                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(nextFlowNodeInstanceId, null, null, parentProcessInstanceId));
+                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(parentProcessInstanceId, nextFlowNodeInstanceId, null, null));
             }
         } catch (final SBonitaException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
@@ -864,7 +864,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SGatewayInstance gatewayInstance = gatewayInstanceService.getGatewayMergingToken(processInstanceId, tokenRefId);
             if (gatewayInstance != null && gatewayInstanceService.checkMergingCondition(processDefinition, gatewayInstance)) {
                 gatewayInstanceService.setFinish(gatewayInstance);
-                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(gatewayInstance.getId(), null, null, processInstanceId));
+                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processInstanceId, gatewayInstance.getId(), null, null));
             }
         }
         // consume on token parent if there is one and if there is no other token having the same refId
@@ -1007,7 +1007,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
         for (final SFlowNodeInstance flowNode : flowNodeInstances) {
             try {
-                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(flowNode.getId(), null, null, sProcessInstance.getId()));
+                workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sProcessInstance.getId(), flowNode.getId(), null, null));
             } catch (final SWorkRegisterException e) {
                 throw new SFlowNodeExecutionException("unable to trigger execution of flow node " + flowNode, e);
             }
@@ -1032,7 +1032,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         // Execute Activities
         for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
-            workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null, parentProcessInstanceId));
+            workService.registerWork(WorkFactory.createExecuteFlowNodeWork(parentProcessInstanceId, sFlowNodeInstance.getId(), null, null));
         }
     }
 }

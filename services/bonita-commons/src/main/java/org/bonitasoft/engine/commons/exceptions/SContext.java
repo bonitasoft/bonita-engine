@@ -67,6 +67,18 @@ public enum SContext {
     /**
      * Corresponding to the event type of the Waiting Message Instance
      */
-    WAITING_MESSAGE_INSTANCE_TYPE;
+    WAITING_MESSAGE_INSTANCE_TYPE,
+    /**
+     * Corresponding to the name of the connector definition
+     */
+    CONNECTOR_DEFINITION_NAME,
+    /**
+     * Corresponding to the event which activates the connector
+     */
+    CONNECTOR_ACTIVATION_EVENT,
+    /**
+     * Corresponding to the identifier of the connector instance
+     */
+    CONNECTOR_INSTANCE_ID;
 
 }

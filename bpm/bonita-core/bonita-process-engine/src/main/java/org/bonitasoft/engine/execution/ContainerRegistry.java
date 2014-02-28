@@ -83,7 +83,7 @@ public class ContainerRegistry {
      */
     public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
             final long processInstanceId) throws SWorkRegisterException {
-        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(flowNodeInstanceId, operations, contextDependency, processInstanceId));
+        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processInstanceId, flowNodeInstanceId, operations, contextDependency));
     }
 
     /**

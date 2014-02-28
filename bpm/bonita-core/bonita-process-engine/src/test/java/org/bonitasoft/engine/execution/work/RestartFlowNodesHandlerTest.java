@@ -81,7 +81,7 @@ public class RestartFlowNodesHandlerTest {
         restartFlowNodesHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
 
         PowerMockito.verifyStatic(times(1));
-        WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null, sFlowNodeInstance.getParentProcessInstanceId());
+        WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), null, null);
     }
 
     @Test
