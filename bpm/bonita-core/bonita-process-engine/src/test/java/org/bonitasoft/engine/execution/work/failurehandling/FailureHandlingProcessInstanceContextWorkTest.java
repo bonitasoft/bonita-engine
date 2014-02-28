@@ -31,7 +31,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -59,6 +61,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class FailureHandlingProcessInstanceContextWorkTest {
 
     private static final long PROCESS_INSTANCE_ID = 2;
+    
+    private static final long PROCESS_DEFINITION_ID = 5;
 
     private static final long ROOT_PROCESS_INSTANCE_ID = 3;
 
@@ -79,18 +83,25 @@ public class FailureHandlingProcessInstanceContextWorkTest {
 
     @Mock
     private SessionAccessor sessionAccessor;
-
+    
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
+    
     @Mock
     private ProcessInstanceService processInstanceService;
 
     @Mock
     private SProcessInstance sProcessInstance;
-
+    
+    @Mock
+    private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
+    
     private FailureHandlingProcessInstanceContextWork txBonitawork;
 
     @Before
     public void before() throws Exception {
         doReturn(ROOT_PROCESS_INSTANCE_ID).when(sProcessInstance).getRootProcessInstanceId();
+        doReturn(PROCESS_DEFINITION_ID).when(sProcessInstance).getProcessDefinitionId();
 
         doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
 
@@ -99,12 +110,16 @@ public class FailureHandlingProcessInstanceContextWorkTest {
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
         when(tenantAccessor.getSessionService()).thenReturn(sessionService);
         when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
+        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
 
         txBonitawork = spy(new FailureHandlingProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID));
         doReturn("The description").when(txBonitawork).getDescription();
         doReturn(tenantAccessor).when(txBonitawork).getTenantAccessor();
 
         doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
+        
+        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(PROCESS_DEFINITION_ID);
+        doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
     }
 
     @Test
@@ -167,20 +182,6 @@ public class FailureHandlingProcessInstanceContextWorkTest {
         verify(wrappedWork).handleFailure(e, context);
         assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
         assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
-    }
-
-    @Test
-    public void handleFailureWithProcessInstanceAndRootProcessInstanceIds() throws Throwable {
-        txBonitawork = spy(new FailureHandlingProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID, 5));
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
-        final SBonitaException e = new SBonitaException() {
-
-            private static final long serialVersionUID = -6748168976371554636L;
-        };
-        txBonitawork.handleFailure(e, context);
-        verify(wrappedWork).handleFailure(e, context);
-        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + 5));
     }
 
     @Test

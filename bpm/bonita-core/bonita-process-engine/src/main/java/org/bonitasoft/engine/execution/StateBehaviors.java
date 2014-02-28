@@ -699,14 +699,14 @@ public class StateBehaviors {
         } while (childrenToEnd.size() == numberOfResults);
     }
 
-    public void executeConnectorInWork(final Long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
+    public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
             final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition) throws SActivityStateExecutionException {
         final long connectorInstanceId = connector.getId();
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();
         try {
             connectorInstanceService.setState(connector, ConnectorState.EXECUTING.name());
-            workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId,
+            workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, processInstanceId, flowNodeDefinitionId, flowNodeInstanceId,
                     connectorInstanceId, connectorDefinitionName));
         } catch (SConnectorInstanceModificationException e) {
             throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING", e);

@@ -38,19 +38,20 @@ public class WorkFactory {
 		//Utility classes should not have a public constructor
 	}
 
-    public static BonitaWork createExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
+    public static BonitaWork createExecuteConnectorOfActivity(final long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
             final long connectorInstanceId, final String connectorDefinitionName) {
-        final ExecuteConnectorOfActivity wrappedWork = new ExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId,
+        BonitaWork wrappedWork = new ExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId,
                 connectorInstanceId, connectorDefinitionName);
-        final FailureHandlingProcessDefinitionContextWork wrappedFailureHandlingProcessDefinitionContextWork = new FailureHandlingProcessDefinitionContextWork(wrappedWork, processDefinitionId);
-		return new FailureHandlingFlowNodeInstanceContextWork(wrappedFailureHandlingProcessDefinitionContextWork, flowNodeInstanceId);
+        wrappedWork = new FailureHandlingProcessDefinitionContextWork(wrappedWork, processDefinitionId);
+        wrappedWork = new FailureHandlingProcessInstanceContextWork(wrappedWork, processInstanceId);
+		return new FailureHandlingFlowNodeInstanceContextWork(wrappedWork, flowNodeInstanceId);
     }
 
     public static BonitaWork createExecuteConnectorOfProcess(final long processDefinitionId, final long connectorInstanceId,
             final String connectorDefinitionName, final long processInstanceId, final long rootProcessInstanceId, final ConnectorEvent activationEvent) {
         BonitaWork wrappedWork = new ExecuteConnectorOfProcess(processDefinitionId, connectorInstanceId, connectorDefinitionName, processInstanceId,
                 rootProcessInstanceId, activationEvent);
-        wrappedWork = new FailureHandlingProcessInstanceContextWork(wrappedWork, processInstanceId, rootProcessInstanceId);
+        wrappedWork = new FailureHandlingProcessInstanceContextWork(wrappedWork, processInstanceId);
         return new FailureHandlingProcessDefinitionContextWork(wrappedWork, processDefinitionId);
     }
 
@@ -80,6 +81,7 @@ public class WorkFactory {
         BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId, parentId, parentType);
         wrappedWork = new LockProcessInstanceWork(new TxBonitaWork(wrappedWork), processInstanceId);
         wrappedWork = new FailureHandlingFlowNodeInstanceContextWork(wrappedWork, flowNodeInstanceId);
+        wrappedWork = new FailureHandlingProcessInstanceContextWork(wrappedWork, processInstanceId);
         return new FailureHandlingProcessDefinitionContextWork(wrappedWork, processDefinitionId);
     }
 }

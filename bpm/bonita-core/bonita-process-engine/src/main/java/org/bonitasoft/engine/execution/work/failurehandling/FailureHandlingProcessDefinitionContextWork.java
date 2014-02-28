@@ -29,9 +29,10 @@ public class FailureHandlingProcessDefinitionContextWork extends FailureHandling
 
     private static final long serialVersionUID = 6958842321501639910L;
 
-    private final long processDefinitionId;
+    private long processDefinitionId;
 
-    /**
+
+	/**
      * @param wrappedWork
      * @param processDefinitionId
      *            The identifier of the process definition
@@ -39,6 +40,14 @@ public class FailureHandlingProcessDefinitionContextWork extends FailureHandling
     public FailureHandlingProcessDefinitionContextWork(final BonitaWork wrappedWork, final long processDefinitionId) {
         super(wrappedWork);
         this.processDefinitionId = processDefinitionId;
+    }
+    
+    /**
+     * @param wrappedWork
+     * Take care to call setProcessDefitionID later on
+     */
+    protected FailureHandlingProcessDefinitionContextWork(final BonitaWork wrappedWork){
+    	 super(wrappedWork);
     }
 
     @Override
@@ -57,4 +66,7 @@ public class FailureHandlingProcessDefinitionContextWork extends FailureHandling
         sBonitaException.setProcessDefinitionVersion(processDeploymentInfo.getVersion());
     }
 
+    public void setProcessDefinitionId(long processDefinitionId) {
+    	this.processDefinitionId = processDefinitionId;
+    }
 }
