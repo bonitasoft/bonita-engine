@@ -33,7 +33,22 @@ public interface LoginService {
      * @throws SLoginException
      *             if login fails
      */
-    public SSession login(Map<String, Serializable> credentials) throws SLoginException;
+    SSession login(Map<String, Serializable> credentials) throws SLoginException;
+
+    /**
+     * login the current user with the given username and password on the given tenant
+     * 
+     * @param tenantId
+     *            the tenant to log the user into
+     * @param userName
+     *            the username to use
+     * @param password
+     *            the password to use
+     * @return true if authentication succeed
+     * @throws SLoginException
+     *             if login fails
+     */
+    SSession login(final long tenantId, final String userName, final String password) throws SLoginException;
 
     boolean isValid(final long sessionId);
 

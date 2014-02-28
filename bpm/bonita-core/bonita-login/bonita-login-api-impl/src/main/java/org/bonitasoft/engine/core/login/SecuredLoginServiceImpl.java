@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.login;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -24,6 +25,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.AuthenticationService;
+import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -41,7 +43,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class SecuredLoginServiceImpl implements LoginService {
 
-    private final AuthenticationService authenticationService;
+    private AuthenticationService authenticationService = null;
+
+    private GenericAuthenticationService genericAuthenticationService = null;
 
     private final SessionService sessionService;
 
@@ -57,6 +61,24 @@ public class SecuredLoginServiceImpl implements LoginService {
         this.identityService = identityService;
     }
 
+    public SecuredLoginServiceImpl(final GenericAuthenticationService genericAuthenticationService, final SessionService sessionService,
+            final SessionAccessor sessionAccessor, final IdentityService identityService) {
+        this.genericAuthenticationService = genericAuthenticationService;
+        this.sessionService = sessionService;
+        this.sessionAccessor = sessionAccessor;
+        this.identityService = identityService;
+    }
+    
+    @Override
+    public SSession login(final long tenantId, final String userName, final String password) throws SLoginException {
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, String.valueOf(tenantId));
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
+        return this.login(credentials);
+
+    }
+
     @Override
     public SSession login(Map<String, Serializable> credentials) throws SLoginException {
         if (credentials == null) {
@@ -67,18 +89,19 @@ public class SecuredLoginServiceImpl implements LoginService {
         long userId;
         boolean isTechnicalUser = false;
         String userName = null;
-        if (!credentials.containsKey(AuthenticationConstants.BASIC_USERNAME) || credentials.get(AuthenticationConstants.BASIC_USERNAME) == null
-                || StringUtils.isBlank((userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME))))) {
-            throw new SLoginException("invalid credentials, username is blank");
-        }
         try {
-            final boolean valid = authenticationService.checkUserCredentials(credentials);
-            if (valid) {
+            userName = loginChoosingAppropriateAuthenticationService(credentials);
+            if (StringUtils.isNotBlank(userName)) {
                 final SUser user = identityService.getUserByUserName(userName);
                 userId = user.getId();
             } else {
                 // if authentication fails it can be due to the technical user
                 final TechnicalUser technicalUser = getTechnicalUser(tenantId);
+
+                if (credentials.containsKey(AuthenticationConstants.BASIC_USERNAME) && credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) {
+                    userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
+                }
+
                 if (technicalUser.getUserName().equals(userName)
                         && technicalUser.getPassword().equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)))) {
                     isTechnicalUser = true;
@@ -105,6 +128,66 @@ public class SecuredLoginServiceImpl implements LoginService {
         } catch (final SSessionException e) {
             throw new SLoginException(e);
         }
+    }
+
+    /**
+     * login to the internal authentication service if it is not null or to the Generic Authentication Service
+     * 
+     * @param credentials
+     *            the credentials to use to login
+     * @return the username of the logged in user
+     */
+    protected String loginChoosingAppropriateAuthenticationService(Map<String, Serializable> credentials) throws AuthenticationException, SLoginException {
+        if (authenticationService != null) {
+            String userName = null, password = null;
+            userName = retrieveUsernameFromCredentials(credentials);
+            password = retrievePasswordFromCredentials(credentials);
+            if (authenticationService.checkUserCredentials(userName, password)) {
+                return userName;
+            }
+            return null;
+        } else if (genericAuthenticationService != null) {
+            return genericAuthenticationService.checkUserCredentials(credentials);
+        }
+        throw new AuthenticationException("no implementation of authentication supplied");
+    }
+
+    /**
+     * retrieve password from credentials assuming it is stored under the {@link AuthenticationConstants.BASIC_PASSWORD} key
+     * 
+     * @param credentials
+     *            the credentials to check
+     * @return the password
+     * @throws SLoginException
+     *             if password is absent or if credentials is null
+     */
+    protected String retrievePasswordFromCredentials(Map<String, Serializable> credentials) throws SLoginException {
+        String password;
+        if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_PASSWORD)
+                || credentials.get(AuthenticationConstants.BASIC_PASSWORD) == null) {
+            throw new SLoginException("invalid credentials, password is absent");
+        }
+        password = String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD));
+        return password;
+    }
+
+    /**
+     * retrieve username from credentials assuming it is stored under the {@link AuthenticationConstants.BASIC_USERNAME} key
+     * 
+     * @param credentials
+     *            the credentials to check
+     * @return the username
+     * @throws SLoginException
+     *             if username is absent, blank or if credentials is null
+     */
+    protected String retrieveUsernameFromCredentials(Map<String, Serializable> credentials) throws SLoginException {
+        String userName;
+        if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_USERNAME)
+                || credentials.get(AuthenticationConstants.BASIC_USERNAME) == null
+                || StringUtils.isBlank((userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME))))) {
+            throw new SLoginException("invalid credentials, username is blank");
+        }
+        return userName;
     }
 
     @Override

@@ -13,8 +13,6 @@
  */
 package org.bonitasoft.engine.authentication;
 
-import java.io.Serializable;
-import java.util.Map;
 
 
 /**
@@ -26,22 +24,13 @@ public interface AuthenticationService {
     /**
      * Check user credentials by give user name and passwordHash
      * 
-     * @param credentials
-     *            the credentials elements to use to authenticate
-     * @return true if user is authenticated
+     * @param username
+     *            Name of user
+     * @param password
+     *            Password of user
+     * @return user corresponding to the user name and password
      * @throws AuthenticationException
      *             Error thrown if either the password is invalid or the user is not found.
      */
-    boolean checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException;
-
-    /**
-     * logout given user from the authentication service set up
-     * 
-     * @param credentials
-     *            the credentials used to call authentication service
-     * @throws AuthenticationException
-     *             if a problem occurs during logout or if credentials are not valid
-     */
-    void logout(Map<String, Serializable> credentials) throws AuthenticationException;
-
+    boolean checkUserCredentials(final String username, final String password) throws AuthenticationException;
 }
