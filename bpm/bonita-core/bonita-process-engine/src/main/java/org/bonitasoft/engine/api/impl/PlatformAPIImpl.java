@@ -70,6 +70,7 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -96,6 +97,7 @@ import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -540,8 +542,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             // add tenant to database
             final String createdBy = "defaultUser";
             final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
-                    .createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true)
-                    .setDescription(description).done();
+                    .createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true).setDescription(description).done();
             final Long tenantId = platformService.createTenant(tenant);
 
             transactionService.complete();
@@ -645,14 +646,12 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void createDefaultCommands(final TenantServiceAccessor tenantServiceAccessor)
-            throws SCommandAlreadyExistsException, SCommandCreationException {
+    protected void createDefaultCommands(final TenantServiceAccessor tenantServiceAccessor) throws SCommandAlreadyExistsException, SCommandCreationException {
         final CommandService commandService = tenantServiceAccessor.getCommandService();
         final DefaultCommandProvider provider = tenantServiceAccessor.getDefaultCommandProvider();
         final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
         for (final CommandDescriptor command : provider.getDefaultCommands()) {
-            final SCommand sCommand = fact.createNewInstance(command.getName(), command.getDescription(), command.getImplementation())
-                    .setSystem(true).done();
+            final SCommand sCommand = fact.createNewInstance(command.getName(), command.getDescription(), command.getImplementation()).setSystem(true).done();
             commandService.create(sCommand);
         }
     }
@@ -664,7 +663,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                 .done();
         dataService.createDataSource(bonitaDataSource);
 
-        final SDataSource transientDataSource = BuilderFactory.get(SDataSourceBuilderFactory.class)
+        final SDataSource transientDataSource = BuilderFactory
+                .get(SDataSourceBuilderFactory.class)
                 .createNewInstance("bonita_transient_data_source", "6.0", SDataSourceState.ACTIVE,
                         "org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource").done();
         dataService.createDataSource(transientDataSource);
@@ -876,6 +876,18 @@ public class PlatformAPIImpl implements PlatformAPI {
     // Overrided in SP
     protected String getProfileFileName() {
         return PROFILES_FILE;
+    }
+
+    @Override
+    public void rescheduleErroneousTriggers() throws UpdateException {
+        try {
+            final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            platformAccessor.getSchedulerService().rescheduleErroneousTriggers();
+        } catch (final SSchedulerException sse) {
+            throw new UpdateException(sse);
+        } catch (final Exception e) {
+            throw new UpdateException(e);
+        }
     }
 
 }
