@@ -9,8 +9,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
+import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
@@ -46,6 +49,12 @@ public class TenantManagementAPIExtTest {
 
     private TenantServiceAccessor tenantServiceAccessor;
 
+    private NodeConfiguration nodeConfiguration;
+
+    private TenantRestartHandler tenantRestartHandler1;
+
+    private TenantRestartHandler tenantRestartHandler2;
+
     @Before
     public void before() throws Exception {
         tenantManagementAPI = spy(new TenantManagementAPIExt());
@@ -54,12 +63,17 @@ public class TenantManagementAPIExtTest {
         sessionService = mock(SessionService.class);
         platformServiceAccessor = mock(PlatformServiceAccessor.class);
         tenantServiceAccessor = mock(TenantServiceAccessor.class);
+        nodeConfiguration = mock(NodeConfiguration.class);
         workService = mock(WorkService.class);
+        tenantRestartHandler1 = mock(TenantRestartHandler.class);
+        tenantRestartHandler2 = mock(TenantRestartHandler.class);
         doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
+        doReturn(nodeConfiguration).when(platformServiceAccessor).getPlaformConfiguration();
         doReturn(sessionService).when(platformServiceAccessor).getSessionService();
         doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(Mockito.anyLong());
+        doReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)).when(nodeConfiguration).getTenantRestartHandlers();
 
         tenantId = 17;
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
@@ -86,6 +100,17 @@ public class TenantManagementAPIExtTest {
 
         // then his work service should be resumed
         verify(workService).resume();
+    }
+
+    @Test
+    public void should_setMaintenanceMode_to_AVAILLABLE_restart_elements() throws Exception {
+
+        // given a tenant moved to available mode
+        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+
+        // then elements must be restarted
+        verify(tenantRestartHandler1, times(1)).handleRestart(platformServiceAccessor, tenantServiceAccessor);
+        verify(tenantRestartHandler2, times(1)).handleRestart(platformServiceAccessor, tenantServiceAccessor);
     }
 
     @Test

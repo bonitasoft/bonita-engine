@@ -1,13 +1,17 @@
 package com.bonitasoft.engine.api.impl;
 
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
+import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.execution.work.RestartException;
+import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
@@ -21,6 +25,7 @@ import org.bonitasoft.engine.work.WorkService;
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 public class TenantManagementAPIExt implements TenantManagementAPI {
@@ -54,20 +59,21 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         SessionService sessionService = platformServiceAccessor.getSessionService();
+        NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
 
         long tenantId = getTenantId();
-        WorkService workService = platformServiceAccessor.getTenantServiceAccessor(tenantId).getWorkService();
+        TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
+        WorkService workService = tenantServiceAccessor.getWorkService();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
         switch (mode) {
             case AVAILABLE:
                 descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), STenantBuilderFactory.AVAILABLE);
-                resumeServicesForTenant(workService, schedulerService, tenantId);
+                resumeServicesForTenant(workService, schedulerService, tenantId, nodeConfiguration, platformServiceAccessor, tenantServiceAccessor);
                 break;
             case MAINTENANCE:
                 descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), STenantBuilderFactory.IN_MAINTENANCE);
                 pauseServicesForTenant(workService, schedulerService, sessionService, tenantId);
-
                 break;
             default:
                 break;
@@ -93,11 +99,20 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         }
     }
 
-    private void resumeServicesForTenant(final WorkService workService, final SchedulerService schedulerService, final long tenantId) throws UpdateException {
+    private void resumeServicesForTenant(final WorkService workService, final SchedulerService schedulerService, final long tenantId,
+            final NodeConfiguration nodeConfiguration, final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
+            throws UpdateException {
         try {
+
             workService.resume();
+            List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
+            for (TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
+                tenantRestartHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
+            }
         } catch (SBonitaException e) {
             throw new UpdateException("Unable to resume the work service.", e);
+        } catch (RestartException e) {
+            throw new UpdateException("Unable to resume all elements of the work service.", e);
         }
         try {
             schedulerService.resumeJobs(tenantId);
