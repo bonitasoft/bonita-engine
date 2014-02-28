@@ -61,16 +61,25 @@ public class StartEventTest extends CommonAPITest {
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10)
                 .sort(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
+
         List<HumanTaskInstance> humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done())
                 .getResult();
 
         // timerValue is slower than startProcess time
         // then we have 2 tasks
+
+        HumanTaskInstance waitForUserTaskStep1 = waitForUserTask("step1");
+        long rootContainerId = waitForUserTaskStep1.getRootContainerId();
+
         assertTrue(humanTaskInstances.size() > 0);
 
-        // the start event should be the first one
-        // even if step1WithTimer is fired
-        assertEquals("step1", humanTaskInstances.get(0).getName());
+        for (HumanTaskInstance humanTaskInstance : humanTaskInstances) {
+            if (humanTaskInstance.getRootContainerId() == rootContainerId)
+                // even if step1WithTimer is fired
+                // the start event should be the first one
+                assertEquals("step1", humanTaskInstance.getName());
+        }
+
 
         // Verify that the start without trigger, and the start with a timer are started
         // wait for process instance creation
