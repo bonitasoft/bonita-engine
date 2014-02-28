@@ -8,10 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -36,12 +32,12 @@ public class NoAuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public boolean checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException {
+    public boolean checkUserCredentials(final String userName, final String password) throws AuthenticationException {
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "checkUserCredentials"));
             }
-            identityService.getUserByUserName(String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME)));
+            identityService.getUserByUserName(userName);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "checkUserCredentials"));
             }
