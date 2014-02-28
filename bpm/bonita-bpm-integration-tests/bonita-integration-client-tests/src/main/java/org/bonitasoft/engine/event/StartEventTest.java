@@ -2,6 +2,7 @@ package org.bonitasoft.engine.event;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class StartEventTest extends CommonAPITest {
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Start" }, story = "Execute process with several start event.", jira = "ENGINE-1592, ENGINE-1593")
     @Test
     public void executeSeveralStartEventsInSameProcessDefinition() throws Exception {
-        int timerValue = 3000;
+        int timerValue = 1000;
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(timerValue);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -58,13 +59,17 @@ public class StartEventTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
 
-        // Verify that just the start without trigger is started
-        checkNbPendingTaskOf(1, user);
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10)
                 .sort(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
         List<HumanTaskInstance> humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done())
                 .getResult();
-        assertEquals(1, humanTaskInstances.size());
+
+        // timerValue is slower than startProcess time
+        // then we have 2 tasks
+        assertTrue(humanTaskInstances.size() > 0);
+
+        // the start event should be the first one
+        // even if step1WithTimer is fired
         assertEquals("step1", humanTaskInstances.get(0).getName());
 
         // Verify that the start without trigger, and the start with a timer are started
@@ -81,6 +86,7 @@ public class StartEventTest extends CommonAPITest {
         // Verify that the start without trigger, the start with a timer, and the start with signal are started
         getProcessAPI().sendSignal("signalName");
         waitForUserTask("step1WithSignal");
+
         humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
         assertEquals(3, humanTaskInstances.size());
         assertEquals("step1", humanTaskInstances.get(0).getName());
