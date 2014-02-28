@@ -64,6 +64,7 @@
 		<!-- Tests -->
 		<powermock.version>1.5.1</powermock.version>
 		<festassert.version>1.4</festassert.version>
+		<assertj.version>1.5.0</assertj.version>
 	</properties>
 
 	<dependencyManagement>
@@ -108,6 +109,12 @@
 				<groupId>org.easytesting</groupId>
 				<artifactId>fest-assert</artifactId>
 				<version>${festassert.version}</version>
+			</dependency>
+			<dependency>
+				  <groupId>org.assertj</groupId>
+				  <artifactId>assertj-core</artifactId>
+				  <version>${assertj.version}</version>
+				  <scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
