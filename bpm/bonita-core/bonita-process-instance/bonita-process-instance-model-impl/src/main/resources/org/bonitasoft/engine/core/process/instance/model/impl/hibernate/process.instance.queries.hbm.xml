@@ -1334,25 +1334,25 @@
           OR user.id IN (
               SELECT actormember.userId
               FROM    org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember,
-                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS map,
+                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping,
                       org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor
               WHERE 
-                  map.activityId = :humanTaskInstanceId
-                  AND map.actorId = actor.id 
+                  mapping.activityId = :humanTaskInstanceId
+                  AND mapping.actorId = actor.id 
                   AND actor.id = actormember.actorId
          )
          OR user.id IN (
               SELECT user_membership.userId
               FROM    org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS user_membership,
-                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS m,
-                      org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS a,
-                      org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS am
+                      org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl AS mapping,
+                      org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl AS actor,
+                      org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
               WHERE
-                  m.activityId = :humanTaskInstanceId
-                  AND m.actorId = a.id
-                  AND a.id = am.actorId
-                  AND (am.groupId = user_membership.groupId
-                  OR am.roleId = user_membership.roleId)
+                  mapping.activityId = :humanTaskInstanceId
+                  AND mapping.actorId = actor.id
+                  AND actor.id = actormember.actorId
+                  AND (actormember.groupId = user_membership.groupId
+                  OR actormember.roleId = user_membership.roleId)
           )
         GROUP BY user.id
         ORDER BY MIN(user.userName)
