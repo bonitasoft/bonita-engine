@@ -158,7 +158,6 @@
 								<inherited>false</inherited>
 								<configuration>
 									<target>
-										<echo message="!!!!!!!!!!!!!!!! tomcat/${db.vendor}/server.xml !!!!!!!!!!!"/>
 										<taskdef name="if" classname="${if.task}" classpathref="maven.runtime.classpath" />
 										<available property="tomcat.present" file="${tomcat.zip.folder}/${tomcat.name}.zip" />
 										<if>
