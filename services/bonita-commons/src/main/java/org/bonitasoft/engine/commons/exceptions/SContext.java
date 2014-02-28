@@ -51,6 +51,22 @@ public enum SContext {
     /**
      * Corresponding to the name of the flow node
      */
-    FLOW_NODE_NAME;
+    FLOW_NODE_NAME,
+    /**
+     * Corresponding to the name of the Message Instance
+     */
+    MESSAGE_INSTANCE_NAME,
+    /**
+     * Corresponding to the target process name of the Message Instance
+     */
+    MESSAGE_INSTANCE_TARGET_PROCESS_NAME,
+    /**
+     * Corresponding to the target flow node name of the Message Instance
+     */
+    MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME,
+    /**
+     * Corresponding to the event type of the Waiting Message Instance
+     */
+    WAITING_MESSAGE_INSTANCE_TYPE;
 
 }

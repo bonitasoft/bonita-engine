@@ -21,6 +21,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingFlowNodeInstanceContextWork;
+import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingMessageInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingProcessDefinitionContextWork;
 import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingProcessInstanceContextWork;
 import org.bonitasoft.engine.work.BonitaWork;
@@ -70,6 +71,7 @@ public class WorkFactory {
         if (waitingMessage.getParentProcessInstanceId() > 0) {
             work = new LockProcessInstanceWork(work, waitingMessage.getParentProcessInstanceId());
         }
+        work = new FailureHandlingMessageInstanceContextWork(work, messageInstance, waitingMessage);
         return new FailureHandlingProcessDefinitionContextWork(work, waitingMessage.getProcessDefinitionId());
     }
 

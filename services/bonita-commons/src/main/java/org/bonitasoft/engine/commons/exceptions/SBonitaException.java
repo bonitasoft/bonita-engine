@@ -1,5 +1,4 @@
 /**
- * Copyright (C) 2011, 2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -185,6 +184,42 @@ public abstract class SBonitaException extends Exception {
     	context.put(SContext.FLOW_NODE_NAME, flowNodeName);
     }
     
+    /**
+     * @param messageName
+     * 				The name of the message instance to set
+     * @since 6.3
+     */
+    public void setMessageInstanceName(String messageName) {
+    	context.put(SContext.MESSAGE_INSTANCE_NAME, messageName);
+    }
+    
+    /**
+     * @param targetProcess
+     *				The target process name of the message instance to set
+     * @since 6.3
+     */
+    public void setMessageInstanceTargetProcess(String targetProcess) {
+    	context.put(SContext.MESSAGE_INSTANCE_TARGET_PROCESS_NAME, targetProcess);
+    }
+    
+    /**
+     * @param targetFlowNode
+     *				The target flow node name of the message instance to set 
+     * @since 6.3
+     */
+    public void setMessageInstanceTargetFlowNode(String targetFlowNode) {
+    	context.put(SContext.MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME, targetFlowNode);
+    }
+    
+    /**
+     * @param eventType
+     *				The event type of the waiting message instance to set 
+     * @since 6.3
+     */
+    public void setWaitingMessageEventType(String eventType) {
+    	context.put(SContext.WAITING_MESSAGE_INSTANCE_TYPE, eventType);
+    }
+    
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder();
@@ -202,7 +237,7 @@ public abstract class SBonitaException extends Exception {
             stringBuilder.append(message);
         }
 	}
-
+	
 	private void appendContextMessage(final StringBuilder stringBuilder) {
 		if (!context.isEmpty()) {
             for (final Entry<SContext, Serializable> entry : context.entrySet()) {
@@ -210,6 +245,7 @@ public abstract class SBonitaException extends Exception {
             }
         }
 	}
+
 
 
 }
