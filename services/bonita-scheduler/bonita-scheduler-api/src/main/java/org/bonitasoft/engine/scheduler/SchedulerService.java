@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,8 +14,9 @@
 package org.bonitasoft.engine.scheduler;
 
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -25,7 +26,7 @@ import org.bonitasoft.engine.scheduler.trigger.Trigger;
  * @author Matthieu Chaffotte
  * @since 6.0
  */
-public interface SchedulerService extends ServiceWithLifecycle {
+public interface SchedulerService {
 
     String JOB_DESCRIPTOR = "JOB_DESCRIPTOR";
 
@@ -133,7 +134,6 @@ public interface SchedulerService extends ServiceWithLifecycle {
      */
     List<String> getJobs() throws SSchedulerException;
 
-
     /**
      * Get all jobs on all tenants
      * \/!\Must be replaced by a platform scheduler/!\
@@ -145,5 +145,16 @@ public interface SchedulerService extends ServiceWithLifecycle {
     List<String> getAllJobs() throws SSchedulerException;
 
     boolean isStillScheduled(SJobDescriptor jobDescriptor) throws SSchedulerException;
+
+    /**
+     * Start the service
+     * 
+     * @throws SBonitaException
+     */
+    public void start() throws SBonitaException;
+
+    public void stop() throws SBonitaException, TimeoutException;
+
+    void rescheduleErroneousTriggers() throws SSchedulerException;
 
 }

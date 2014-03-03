@@ -13,58 +13,37 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class RefreshPlatformClassLoader implements TransactionContentWithResult<List<Long>> {
+public class RefreshPlatformClassLoader implements Callable<Object> {
 
     private final PlatformServiceAccessor platformAccessor;
-
-    private List<Long> tenantIds;
 
     public RefreshPlatformClassLoader(final PlatformServiceAccessor platformAccessor) {
         this.platformAccessor = platformAccessor;
     }
 
     @Override
-    public void execute() throws SBonitaException {
+    public Object call() throws SBonitaException {
         final DependencyService platformDependencyService = platformAccessor.getDependencyService();
         final ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
         platformDependencyService.refreshClassLoader(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
                 classLoaderService.getGlobalClassLoaderId());
         final PlatformService platformService = platformAccessor.getPlatformService();
-        List<STenant> tenants;
-        final int maxResults = 100;
-        int i = 0;
-        tenantIds = new ArrayList<Long>();
-        do {
-            tenants = platformService.getTenants(new QueryOptions(i, maxResults));
-            i += maxResults;
-            for (final STenant sTenant : tenants) {
-                tenantIds.add(sTenant.getId());
-            }
-        } while (tenants.size() == maxResults);
         // reput the platform in cache at the node start
         platformService.getPlatform();
-    }
-
-    @Override
-    public List<Long> getResult() {
-        return tenantIds;
+        return null;
     }
 
 }

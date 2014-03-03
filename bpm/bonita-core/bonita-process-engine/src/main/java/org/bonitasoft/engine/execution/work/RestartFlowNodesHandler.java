@@ -43,8 +43,8 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
         try {
             QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
             List<SFlowNodeInstance> sFlowNodeInstances;
+            logInfo(logger, "Restarting flow nodes...");
             do {
-                logInfo(logger, "Restarting flow nodes...");
                 sFlowNodeInstances = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
                 for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
@@ -73,17 +73,16 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
             throws WorkRegisterException {
         logInfo(logger, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":" + sFlowNodeInstance.getId());
         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
-        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null,
-                sFlowNodeInstance.getParentProcessInstanceId()));
+        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null, sFlowNodeInstance.getParentProcessInstanceId()));
     }
 
     private void createNotifyChildFinishedWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
             throws WorkRegisterException {
         logInfo(logger, "restarting flow node (Notify...) " + sFlowNodeInstance.getName() + ":" + sFlowNodeInstance.getId());
         // NotifyChildFinishedWork, if it is terminal it means the notify was not called yet
-        workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(),
-                sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(),
-                sFlowNodeInstance.getParentContainerType().name(), sFlowNodeInstance.getStateId()));
+        workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
+                .getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType()
+                .name(), sFlowNodeInstance.getStateId()));
     }
 
 }

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -57,6 +58,7 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.SDataException;
 import org.bonitasoft.engine.data.SDataSourceAlreadyExistException;
@@ -68,12 +70,14 @@ import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -93,6 +97,7 @@ import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -215,7 +220,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }
 
@@ -247,26 +252,26 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        final WorkService workService = platformAccessor.getWorkService();
-        final List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
+        final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+        final List<ServiceWithLifecycle> otherServicesToStart = platformConfiguration.getServicesToStart();
         try {
             try {
                 final PlatformService platformService = platformAccessor.getPlatformService();
-                final TransactionExecutor executor = platformAccessor.getTransactionExecutor();
+                final TransactionService transactionService = platformAccessor.getTransactionService();
                 final CheckPlatformVersion checkPlatformVersion = new CheckPlatformVersion(platformService, BonitaHomeServer.getInstance());
-                executor.execute(checkPlatformVersion);
-                if (!checkPlatformVersion.sameVersion()) {
+                if (!transactionService.executeInTransaction(checkPlatformVersion)) {
                     throw new StartNodeException(checkPlatformVersion.getErrorMessage());
                 }
                 for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of platform:" + serviceWithLifecycle.getClass().getName());
                     serviceWithLifecycle.start();
                 }
-                final RefreshPlatformClassLoader refreshPlatformClassLoader = new RefreshPlatformClassLoader(platformAccessor);
-                executor.execute(refreshPlatformClassLoader);
-                final List<Long> tenantIds = refreshPlatformClassLoader.getResult();
+
+                transactionService.executeInTransaction(new RefreshPlatformClassLoader(platformAccessor));
 
                 // set tenant classloader
                 final SessionService sessionService = platformAccessor.getSessionService();
+                final List<Long> tenantIds = getTenantIds(platformService, transactionService);
                 for (final Long tenantId : tenantIds) {
                     long sessionId = -1;
                     long platformSessionId = -1;
@@ -277,13 +282,16 @@ public class PlatformAPIImpl implements PlatformAPI {
                         final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
                         final TransactionExecutor tenantExecutor = tenantServiceAccessor.getTransactionExecutor();
                         tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
+                        // start the connector executor thread pool
+                        // TODO should be like the platform services to start...
+                        final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
+                        logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of tenant " + tenantId + ": " + connectorExecutor.getClass().getName());
+                        connectorExecutor.start();
                     } finally {
                         sessionService.deleteSession(sessionId);
                         cleanSessionAccessor(sessionAccessor, platformSessionId);
                     }
                 }
-                // FIXME: shouldn't we also stop the workService?:
-                workService.start();
                 if (!isNodeStarted()) {
                     if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
                         schedulerService.start();
@@ -316,7 +324,16 @@ public class PlatformAPIImpl implements PlatformAPI {
                         sessionService.deleteSession(sessionId);
                     }
                     for (final RestartHandler restartHandler : platformConfiguration.getRestartHandlers()) {
-                        restartHandler.execute();
+
+                        final Callable<Void> callable = new Callable<Void>() {
+
+                            @Override
+                            public Void call() throws Exception {
+                                restartHandler.execute();
+                                return null;
+                            }
+                        };
+                        platformAccessor.getTransactionService().executeInTransaction(callable);
                     }
                 }
             } catch (final ClassLoaderException e) {
@@ -342,8 +359,30 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
+    private List<Long> getTenantIds(final PlatformService platformService, final TransactionService transactionService) throws Exception {
+        final List<Long> tenantIds = transactionService.executeInTransaction(new Callable<List<Long>>() {
+
+            @Override
+            public List<Long> call() throws Exception {
+                List<STenant> tenants;
+                final int maxResults = 100;
+                int i = 0;
+                final List<Long> tenantIds = new ArrayList<Long>();
+                do {
+                    tenants = platformService.getTenants(new QueryOptions(i, maxResults));
+                    i += maxResults;
+                    for (final STenant sTenant : tenants) {
+                        tenantIds.add(sTenant.getId());
+                    }
+                } while (tenants.size() == maxResults);
+                return tenantIds;
+            }
+        });
+        return tenantIds;
+    }
+
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
-    BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
     }
 
@@ -353,20 +392,31 @@ public class PlatformAPIImpl implements PlatformAPI {
     public void stopNode() throws StopNodeException {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            final List<ServiceWithLifecycle> otherServicesToStart = platformAccessor.getServicesToStart();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
+            final PlatformService platformService = platformAccessor.getPlatformService();
+            final TransactionService transactionService = platformAccessor.getTransactionService();
+            final List<ServiceWithLifecycle> otherServicesToStart = plaformConfiguration.getServicesToStart();
+            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
             if (plaformConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
                 shutdownScheduler(schedulerService);
             }
-            final WorkService workService = platformAccessor.getWorkService();
-            workService.stop();
             if (plaformConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
             for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
                 serviceWithLifecycle.stop();
+            }
+            final List<Long> tenantIds = getTenantIds(platformService, transactionService);
+            for (final Long tenantId : tenantIds) {
+                // stop the connector executor thread pool
+                // TODO should be like the platform services to stop...
+                final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+                final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenantId + ": " + connectorExecutor.getClass().getName());
+                connectorExecutor.stop();
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
@@ -501,8 +551,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             // add tenant to database
             final String createdBy = "defaultUser";
             final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
-                    .createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true)
-                    .setDescription(description).done();
+                    .createNewInstance(tenantName, createdBy, System.currentTimeMillis(), STATUS_DEACTIVATED, true).setDescription(description).done();
             final Long tenantId = platformService.createTenant(tenant);
 
             transactionService.complete();
@@ -606,14 +655,12 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    protected void createDefaultCommands(final TenantServiceAccessor tenantServiceAccessor)
-            throws SCommandAlreadyExistsException, SCommandCreationException {
+    protected void createDefaultCommands(final TenantServiceAccessor tenantServiceAccessor) throws SCommandAlreadyExistsException, SCommandCreationException {
         final CommandService commandService = tenantServiceAccessor.getCommandService();
         final DefaultCommandProvider provider = tenantServiceAccessor.getDefaultCommandProvider();
         final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
         for (final CommandDescriptor command : provider.getDefaultCommands()) {
-            final SCommand sCommand = fact.createNewInstance(command.getName(), command.getDescription(), command.getImplementation())
-                    .setSystem(true).done();
+            final SCommand sCommand = fact.createNewInstance(command.getName(), command.getDescription(), command.getImplementation()).setSystem(true).done();
             commandService.create(sCommand);
         }
     }
@@ -625,7 +672,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                 .done();
         dataService.createDataSource(bonitaDataSource);
 
-        final SDataSource transientDataSource = BuilderFactory.get(SDataSourceBuilderFactory.class)
+        final SDataSource transientDataSource = BuilderFactory
+                .get(SDataSourceBuilderFactory.class)
                 .createNewInstance("bonita_transient_data_source", "6.0", SDataSourceState.ACTIVE,
                         "org.bonitasoft.engine.core.data.instance.impl.TransientDataInstanceDataSource").done();
         dataService.createDataSource(transientDataSource);
@@ -674,7 +722,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
         SchedulerService schedulerService = null;
-        final boolean schedulerStarted = false;
+        // final boolean schedulerStarted = false;
         long platformSessionId = -1;
         try {
             platformAccessor = getPlatformAccessor();
@@ -712,15 +760,15 @@ public class PlatformAPIImpl implements PlatformAPI {
             log(platformAccessor, e);
             throw new STenantActivationException(e);
         } finally {
-            if (schedulerStarted && schedulerService != null) {
-                try {
-                    // stop scheduler after scheduling global jobs
-                    schedulerService.stop();
-                } catch (final Exception e) {
-                    log(platformAccessor, e);
-                    throw new STenantActivationException(e);
-                }
-            }
+            // if (schedulerStarted && schedulerService != null) {
+            // try {
+            // // stop scheduler after scheduling global jobs
+            // schedulerService.stop();
+            // } catch (final Exception e) {
+            // log(platformAccessor, e);
+            // throw new STenantActivationException(e);
+            // }
+            // }
             cleanSessionAccessor(sessionAccessor, platformSessionId);
         }
     }
@@ -837,6 +885,18 @@ public class PlatformAPIImpl implements PlatformAPI {
     // Overrided in SP
     protected String getProfileFileName() {
         return PROFILES_FILE;
+    }
+
+    @Override
+    public void rescheduleErroneousTriggers() throws UpdateException {
+        try {
+            final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            platformAccessor.getSchedulerService().rescheduleErroneousTriggers();
+        } catch (final SSchedulerException sse) {
+            throw new UpdateException(sse);
+        } catch (final Exception e) {
+            throw new UpdateException(e);
+        }
     }
 
 }

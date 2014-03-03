@@ -17,7 +17,6 @@ package org.bonitasoft.engine.bpm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -34,7 +33,6 @@ import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
@@ -111,7 +109,6 @@ import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.XMLWriter;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * @author Baptiste Mesta
@@ -152,6 +149,7 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(Recorder.class);
     }
 
+    @Override
     public TransactionService getTransactionService() {
         return getInstanceOf(TransactionService.class);
     }
@@ -539,16 +537,6 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public ThemeService getThemeService() {
         return getInstanceOf(ThemeService.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ServiceWithLifecycle> getServicesToStart() {
-        try {
-            return getInstanceOf("servicesToStart", List.class);
-        } catch (NoSuchBeanDefinitionException e) {
-            return Collections.emptyList();
-        }
     }
 
     @Override
