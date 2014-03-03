@@ -26,6 +26,7 @@ import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.RepeatXTimesTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
@@ -167,7 +168,7 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
                 .createNewInstance(IncrementItselfJob.class.getName(), "IncrementVariableJob").done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testExecuteOnceAJob").done());
-        final Trigger trigger = new OneExecutionTrigger("events", now, 10);
+        final Trigger trigger = new OneExecutionTrigger("events", now, 10, MisfireRestartPolicy.NONE);
 
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
@@ -724,6 +725,38 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         getTransactionService().complete();
     }
 
+    // test is too long and just test quartz...
+    // @Test
+    // public void should_pause_and_resume_jobs_of_a_tenant_reexecute_all_missed_job() throws Exception {
+    // IncrementItselfJob.reset();
+    // final String jobName = "ReleaseWaitersJob";
+    // Date now = new Date();
+    // SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+    // .createNewInstance(IncrementItselfJob.class.getName(), jobName + "1").done();
+    // List<SJobParameter> parameters = new ArrayList<SJobParameter>();
+    // parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
+    // parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobKey", "1").done());
+    // Trigger trigger = new UnixCronTrigger("events", now, 10, "0/1 * * * * ?", MisfireRestartPolicy.ALL);
+    //
+    // // trigger it
+    // getTransactionService().begin();
+    // schedulerService.schedule(jobDescriptor, parameters, trigger);
+    // getTransactionService().complete();
+    // // pause
+    // getTransactionService().begin();
+    // schedulerService.pauseJobs(defaultTenantId);
+    // getTransactionService().complete();
+    // Thread.sleep(2000);
+    // // resume after 3s
+    // getTransactionService().begin();
+    // schedulerService.resumeJobs(defaultTenantId);
+    // getTransactionService().complete();
+    // Thread.sleep(2000);
+    //
+    // // there should be more than 5 execution after 5sec because 3 jobs had to execute themselves before
+    // assertTrue(IncrementItselfJob.getValue() > 2);
+    // }
+
     /*
      * We must ensure that:
      * * pause only jobs of the current tenant
@@ -793,7 +826,6 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         schedulerService.resumeJobs(defaultTenantId);
         getTransactionService().complete();
 
-        // loose 20 seconds here
         ReleaseWaitersJob.waitForJobToExecuteOnce();
     }
 

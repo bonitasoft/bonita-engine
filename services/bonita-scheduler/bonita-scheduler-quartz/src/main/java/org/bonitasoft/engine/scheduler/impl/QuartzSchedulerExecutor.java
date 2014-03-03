@@ -166,19 +166,41 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    private org.quartz.Trigger getQuartzTrigger(final Trigger trigger, final String jobName, final String tenantId) {
+    org.quartz.Trigger getQuartzTrigger(final Trigger trigger, final String jobName, final String tenantId) {
         final TriggerBuilder<? extends org.quartz.Trigger> triggerBuilder;
         final TriggerBuilder<org.quartz.Trigger> base = TriggerBuilder.newTrigger().forJob(jobName, tenantId).withIdentity(trigger.getName(), tenantId)
                 .startNow();
         if (trigger instanceof CronTrigger) {
             final CronTrigger cronTrigger = (CronTrigger) trigger;
             final CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronTrigger.getExpression());
+            switch (cronTrigger.getMisfireHandlingPolicy()) {
+                case NONE:
+                    cronScheduleBuilder.withMisfireHandlingInstructionDoNothing();
+                    break;
+                case ALL:
+                    cronScheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
+                    break;
+                case ONE:
+                    cronScheduleBuilder.withMisfireHandlingInstructionFireAndProceed();
+                    break;
+            }
             triggerBuilder = base.withSchedule(cronScheduleBuilder).endAt(cronTrigger.getEndDate());
         } else if (trigger instanceof RepeatTrigger) {
             final RepeatTrigger repeatTrigger = (RepeatTrigger) trigger;
             final SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(repeatTrigger.getInterval())
-                    .withRepeatCount(repeatTrigger.getCount());
+                    .withRepeatCount(repeatTrigger.getCount()).withMisfireHandlingInstructionIgnoreMisfires();
             triggerBuilder = base.withSchedule(scheduleBuilder).startAt(repeatTrigger.getStartDate());
+            switch (repeatTrigger.getMisfireHandlingPolicy()) {
+                case NONE:
+                    scheduleBuilder.withMisfireHandlingInstructionNextWithRemainingCount();
+                    break;
+                case ALL:
+                    scheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
+                    break;
+                case ONE:
+                    scheduleBuilder.withMisfireHandlingInstructionNowWithRemainingCount();
+                    break;
+            }
         } else {
             triggerBuilder = base.startAt(trigger.getStartDate());
         }

@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.scheduler.job;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +18,7 @@ public class ReleaseWaitersJob extends GroupJob {
 
     @Override
     public void execute() {
+        System.out.println("EXECUTE on " + new Date().getSeconds());
         if (semaphore != null) {
             semaphore.key = jobKey;
             semaphore.release();

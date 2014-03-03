@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -8,8 +9,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
+import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
@@ -18,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.quartz.CronTrigger;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -98,5 +103,44 @@ public class QuartzSchedulerExecutorTest {
         doThrow(SchedulerException.class).when(scheduler).resumeTriggers((GroupMatcher<TriggerKey>) any());
 
         quartzSchedulerExecutor.resumeJobs(123l);
+    }
+
+    @Test
+    public void should_getQuartzTrigger_with_restart_ALL_have_a_ignore_misfire_policy() throws Exception {
+        // given
+        Date triggerEndTime = new Date(System.currentTimeMillis() + 10000);
+        UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??", MisfireRestartPolicy.ALL);
+
+        // when
+        CronTrigger quartzTrigger = (CronTrigger) quartzSchedulerExecutor.getQuartzTrigger(unixCronTrigger, "MyJob", "12");
+
+        // then
+        assertEquals(CronTrigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY, quartzTrigger.getMisfireInstruction());
+    }
+
+    @Test
+    public void should_getQuartzTrigger_with_restart_NONE_have_a_do_nothing_misfire_policy() throws Exception {
+        // given
+        Date triggerEndTime = new Date(System.currentTimeMillis() + 10000);
+        UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??", MisfireRestartPolicy.NONE);
+
+        // when
+        CronTrigger quartzTrigger = (CronTrigger) quartzSchedulerExecutor.getQuartzTrigger(unixCronTrigger, "MyJob", "12");
+
+        // then
+        assertEquals(CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING, quartzTrigger.getMisfireInstruction());
+    }
+
+    @Test
+    public void should_getQuartzTrigger_with_restart_ONE_have_a_fire_once_misfire_policy() throws Exception {
+        // given
+        Date triggerEndTime = new Date(System.currentTimeMillis() + 10000);
+        UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??", MisfireRestartPolicy.ONE);
+
+        // when
+        CronTrigger quartzTrigger = (CronTrigger) quartzSchedulerExecutor.getQuartzTrigger(unixCronTrigger, "MyJob", "12");
+
+        // then
+        assertEquals(CronTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW, quartzTrigger.getMisfireInstruction());
     }
 }

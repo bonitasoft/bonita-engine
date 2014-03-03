@@ -55,4 +55,9 @@ public class QueriableLogTrigger implements Trigger {
         return DEFAULT_PRIORITY;
     }
 
+    @Override
+    public MisfireRestartPolicy getMisfireHandlingPolicy() {
+        return MisfireRestartPolicy.NONE;
+    }
+
 }

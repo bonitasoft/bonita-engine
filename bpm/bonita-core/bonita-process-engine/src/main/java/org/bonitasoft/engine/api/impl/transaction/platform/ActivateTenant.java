@@ -39,6 +39,7 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -129,7 +130,8 @@ public final class ActivateTenant implements TransactionContent {
                         .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final String cron = tenantConfiguration.getEventHandlingJobCron(); //
-                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
+                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron,
+                        MisfireRestartPolicy.NONE);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
                     logger.log(ProcessAPI.class, TechnicalLogSeverity.INFO, "Starting event handling job with frequency: " + cron);
                 }
@@ -151,7 +153,8 @@ public final class ActivateTenant implements TransactionContent {
                         .createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
                         .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
+                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron,
+                        MisfireRestartPolicy.NONE);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
                     logger.log(ProcessAPI.class, TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency: " + cron);
                 }

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.scheduler.trigger;
 
 import java.util.Date;
 
-
 /**
  * @author Matthieu Chaffotte
  */
@@ -31,22 +30,10 @@ public class UnixCronTrigger extends OneShotTrigger implements CronTrigger {
         this.endDate = null;
     }
 
-    public UnixCronTrigger(final String name, final Date startDate, final String expression, final int priority) {
-        super(name, startDate, priority);
+    public UnixCronTrigger(final String name, final Date startDate, final String expression, final MisfireRestartPolicy misfireHandlingPolicy) {
+        super(name, startDate, misfireHandlingPolicy);
         this.expression = expression;
         this.endDate = null;
-    }
-
-    public UnixCronTrigger(final String name, final Date startDate, final String expression, final Date endDate) {
-        super(name, startDate);
-        this.expression = expression;
-        this.endDate = endDate;
-    }
-
-    public UnixCronTrigger(final String name, final Date startDate, final String expression, final Date endDate, final int priority) {
-        super(name, startDate, priority);
-        this.expression = expression;
-        this.endDate = endDate;
     }
 
     @Override
