@@ -80,7 +80,6 @@ public final class ActivateTenant implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        // pass -1 because the user is the technical user, which is inexistant in DB:
         final boolean tenantWasActivated = platformService.activateTenant(tenantId);
         // we execute that only if the tenant was not already activated
         if (tenantWasActivated) {

@@ -25,13 +25,7 @@ public class STenantBuilderFactoryImpl implements STenantBuilderFactory {
 
     @Override
     public STenantBuilder createNewInstance(final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {
-        return createNewInstance(name, createdBy, created, status, defaultTenant, AVAILABLE);
-    }
-
-    @Override
-    public STenantBuilder createNewInstance(final String name, final String createdBy, final long created, final String status, final boolean defaultTenant,
-            final boolean inMaintenance) {
-        final STenantImpl object = new STenantImpl(name, createdBy, created, status, defaultTenant, inMaintenance);
+        final STenantImpl object = new STenantImpl(name, createdBy, created, status, defaultTenant);
         return new STenantBuilderImpl(object);
     }
 
@@ -78,11 +72,6 @@ public class STenantBuilderFactoryImpl implements STenantBuilderFactory {
     @Override
     public String getDefaultTenantKey() {
         return "defaultTenant";
-    }
-
-    @Override
-    public String getInMaintenanceKey() {
-        return "inMaintenance";
     }
 
 }

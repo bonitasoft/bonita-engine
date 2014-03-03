@@ -23,7 +23,6 @@
     <property name="iconPath" column="iconpath" type="java.lang.String"/>
     <property name="name" column="name" type="java.lang.String"/>
 	<property name="status" column="status" type="java.lang.String"/>
-    <property name="inMaintenance" column="inMaintenance" type="java.lang.Boolean"/>
   </class>
 
 </hibernate-mapping>

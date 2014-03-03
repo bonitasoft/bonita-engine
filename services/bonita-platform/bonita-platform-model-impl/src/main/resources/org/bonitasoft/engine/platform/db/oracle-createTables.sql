@@ -18,6 +18,5 @@ CREATE TABLE tenant (
   iconpath VARCHAR2(255),
   name VARCHAR2(50) NOT NULL,
   status VARCHAR2(15) NOT NULL,
-  inMaintenance NUMBER(1) NOT NULL,
   PRIMARY KEY (id)
 );

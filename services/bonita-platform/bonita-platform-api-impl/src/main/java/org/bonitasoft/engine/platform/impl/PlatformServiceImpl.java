@@ -324,7 +324,7 @@ public class PlatformServiceImpl implements PlatformService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteTenant"));
         }
         final STenant tenant = getTenant(tenantId);
-        if (tenant.getStatus().equals(ACTIVATED)) {
+        if (tenant.getStatus().equals(STenant.ACTIVATED)) {
             throw new SDeletingActivatedTenantException();
         }
         try {
@@ -376,7 +376,7 @@ public class PlatformServiceImpl implements PlatformService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteTenantObjects"));
         }
         final STenant tenant = getTenant(tenantId);
-        if (tenant.getStatus().equals(ACTIVATED)) {
+        if (tenant.getStatus().equals(STenant.ACTIVATED)) {
             throw new SDeletingActivatedTenantException();
         }
         try {
@@ -621,7 +621,7 @@ public class PlatformServiceImpl implements PlatformService {
             return false;
         } else {
             final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-            desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), ACTIVATED);
+            desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.ACTIVATED);
             try {
                 platformPersistenceService.update(desc);
                 if (trace) {
@@ -650,7 +650,7 @@ public class PlatformServiceImpl implements PlatformService {
         }
         final STenant tenant = getTenant(tenantId);
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), DEACTIVATED);
+        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.DEACTIVATED);
         try {
             platformPersistenceService.update(desc);
             if (trace) {
@@ -707,7 +707,8 @@ public class PlatformServiceImpl implements PlatformService {
 
     @Override
     public boolean isTenantActivated(final STenant sTenant) {
-        return ACTIVATED.equals(sTenant.getStatus());
+        // the tenant is activated as soon as it is not deactivated (but it can be paused)
+        return !STenant.DEACTIVATED.equals(sTenant.getStatus());
     }
 
     @Override

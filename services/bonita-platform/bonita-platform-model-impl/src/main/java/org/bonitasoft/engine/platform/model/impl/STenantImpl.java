@@ -42,21 +42,17 @@ public class STenantImpl implements STenant {
 
     private boolean defaultTenant;
 
-    private boolean inMaintenance = false;
-
     @SuppressWarnings("unused")
     private STenantImpl() {
     }
 
-    public STenantImpl(final String name, final String createdBy, final long created, final String status, final boolean defaultTenant,
-            final boolean inMaintenance) {
+    public STenantImpl(final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {
         super();
         this.name = name;
         this.createdBy = createdBy;
         this.created = created;
         this.status = status;
         this.defaultTenant = defaultTenant;
-        this.inMaintenance = inMaintenance;
     }
 
     public long getTenantId() {
@@ -156,18 +152,14 @@ public class STenantImpl implements STenant {
     }
 
     @Override
-    public boolean isInMaintenance() {
-        return inMaintenance;
-    }
-
-    public void setInMaintenance(final boolean inMaintenance) {
-        this.inMaintenance = inMaintenance;
+    public boolean isPaused() {
+        return PAUSED.equals(status);
     }
 
     @Override
     public String toString() {
         return "STenantImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", description=" + description + ", iconName=" + iconName
                 + ", iconPath=" + iconPath + ", status=" + status + ", created=" + created + ", createdBy=" + createdBy + ", defaultTenant=" + defaultTenant
-                + ", inMaintenance=" + inMaintenance + "]";
+                + "]";
     }
 }
