@@ -54,11 +54,11 @@ public class ClusteredTestSuiteIT {
     }
 
     protected static void changeToNode1() throws Exception {
-        setConnectionPort("7180");
+        setConnectionPort("8186");
     }
 
     protected static void changeToNode2() throws Exception {
-        setConnectionPort("7280");
+        setConnectionPort("8187");
     }
 
     private static void setConnectionPort(final String port) throws Exception {

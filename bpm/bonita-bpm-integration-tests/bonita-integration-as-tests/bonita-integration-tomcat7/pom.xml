@@ -14,8 +14,8 @@
 	<name>Bonita - Integration Tests on Tomcat 7</name>
 
 	<properties>
-		<server.port>8384</server.port>
-		<provider.port>8124</provider.port>
+		<server.port>8385</server.port>
+		<provider.port>8185</provider.port>
 		<tomcat.version>7.0.50</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
 		<tomcat.home>${project.build.directory}/${tomcat.name}</tomcat.home>
