@@ -60,7 +60,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     }
 
     @Override
-    public void work(final Map<String, Object> context) {
+    public void work(final Map<String, Object> context) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         loggerService = tenantAccessor.getTechnicalLoggerService();
         sessionAccessor = tenantAccessor.getSessionAccessor();
@@ -73,15 +73,21 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             }
             getWrappedWork().work(context);
         } catch (final Exception e) {
+            // Enrich the exception before log it.
+            if (e instanceof SBonitaException) {
+                setExceptionContext(((SBonitaException) e), context);
+            }
+
             final Throwable cause = e.getCause();
             if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
                     || cause instanceof SProcessDefinitionNotFoundException) {
                 if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work fails during its execution due to: " + getDescription(), cause);
+                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work fails during its execution due to [" + getDescription() + "]", cause);
                 }
             } else {
                 // final Edge case we cannot manage
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed, The failure will be handled, work is:  " + getDescription());
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed. The failure will be handled. The work is [" + getDescription()
+                        + "]");
                 loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage(), e);
 
                 try {
@@ -96,15 +102,6 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         } finally {
             sessionAccessor.deleteTenantId();
         }
-    }
-
-    @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
-        if (e instanceof SBonitaException) {
-            setExceptionContext(((SBonitaException) e), context);
-        }
-
-        getWrappedWork().handleFailure(e, context);
     }
 
     @SuppressWarnings("unused")

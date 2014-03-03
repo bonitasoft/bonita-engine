@@ -163,7 +163,7 @@ public class FailureHandlingProcessDefinitionAndInstanceContextWorkTest {
     }
 
     @Test
-    public void putInMap() {
+    public void putInMap() throws SBonitaException {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));
@@ -190,49 +190,6 @@ public class FailureHandlingProcessDefinitionAndInstanceContextWorkTest {
         };
         txBonitawork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
-        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
-        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
-        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
-    }
-
-    @Test
-    public void handleFailureProcessDefinitionAndInstanceId() throws Throwable {
-        txBonitawork = spy(new FailureHandlingProcessDefinitionAndInstanceContextWork(wrappedWork, 9, PROCESS_INSTANCE_ID));
-        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(9);
-        doReturn(9L).when(sProcessInstance).getProcessDefinitionId();
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
-        final SBonitaException e = new SBonitaException() {
-
-            private static final long serialVersionUID = -6748168976371554636L;
-        };
-        txBonitawork.handleFailure(e, context);
-        verify(wrappedWork).handleFailure(e, context);
-        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + 9));
-        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
-        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
-    }
-
-    @Test
-    public void handleFailureProcessDefinitionAndInstanceAndRootIds() throws Throwable {
-        txBonitawork = spy(new FailureHandlingProcessDefinitionAndInstanceContextWork(wrappedWork, 9, PROCESS_INSTANCE_ID,
-                5));
-        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(9);
-        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
-        final SBonitaException e = new SBonitaException() {
-
-            private static final long serialVersionUID = -6748168976371554636L;
-        };
-        txBonitawork.handleFailure(e, context);
-        verify(wrappedWork).handleFailure(e, context);
-        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + 5));
-        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + 9));
-        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
-        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
     }
 
     @Test
@@ -261,9 +218,16 @@ public class FailureHandlingProcessDefinitionAndInstanceContextWorkTest {
     @Test
     public void doNotHandleFailureWhenGettingASFlowNodeNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SFlowNodeNotFoundException(83));
+        final SProcessDefinitionNotFoundException e = new SProcessDefinitionNotFoundException(new SFlowNodeNotFoundException(83));
         doThrow(e).when(wrappedWork).work(context);
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
@@ -272,10 +236,17 @@ public class FailureHandlingProcessDefinitionAndInstanceContextWorkTest {
     @Test
     public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessInstanceNotFoundException(83));
+        final SProcessDefinitionNotFoundException e = new SProcessDefinitionNotFoundException(new SProcessInstanceNotFoundException(83));
         doThrow(e).when(wrappedWork).work(context);
         when(wrappedWork.getDescription()).thenReturn("");
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
@@ -284,20 +255,83 @@ public class FailureHandlingProcessDefinitionAndInstanceContextWorkTest {
     @Test
     public void doNotHandleFailureWhenGettingASProcessDefinitionNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessDefinitionNotFoundException("message"));
+        final SProcessDefinitionNotFoundException e = new SProcessDefinitionNotFoundException(new SProcessDefinitionNotFoundException("message"));
         doThrow(e).when(wrappedWork).work(context);
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
     }
 
     @Test
-    public void handleFailureForAllOtherExceptions() throws Throwable {
+    public void handleFailureForAllOtherExceptionsWithProcessInstanceId() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception();
+        final SBonitaException e = new SBonitaException() {
+
+            private static final long serialVersionUID = -6748168976371554636L;
+        };
         doThrow(e).when(wrappedWork).work(context);
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
+        verify(wrappedWork, times(1)).handleFailure(e, context);
+    }
+
+    @Test
+    public void handleFailureForAllOtherExceptionsWithProcessDefinitionAndInstanceIds() throws Throwable {
+        txBonitawork = spy(new FailureHandlingProcessDefinitionAndInstanceContextWork(wrappedWork, 9, PROCESS_INSTANCE_ID));
+        doReturn(tenantAccessor).when(txBonitawork).getTenantAccessor();
+        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(9);
+        doReturn(9L).when(sProcessInstance).getProcessDefinitionId();
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final SBonitaException e = new SBonitaException() {
+
+            private static final long serialVersionUID = -6748168976371554636L;
+        };
+        doThrow(e).when(wrappedWork).work(context);
+
+        txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + 9));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
+        verify(wrappedWork, times(1)).handleFailure(e, context);
+    }
+
+    @Test
+    public void handleFailureForAllOtherExceptionsWithProcessDefinitionAndInstanceAndRootIds() throws Throwable {
+        txBonitawork = spy(new FailureHandlingProcessDefinitionAndInstanceContextWork(wrappedWork, 9, PROCESS_INSTANCE_ID,
+                5));
+        doReturn(tenantAccessor).when(txBonitawork).getTenantAccessor();
+        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(9);
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final SBonitaException e = new SBonitaException() {
+
+            private static final long serialVersionUID = -6748168976371554636L;
+        };
+        doThrow(e).when(wrappedWork).work(context);
+
+        txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + 5));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + 9));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork, times(1)).handleFailure(e, context);
     }
 

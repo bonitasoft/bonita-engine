@@ -54,38 +54,41 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
 public class FailureHandlingMessageInstanceContextWorkTest {
-	
-	@Mock
+
+    @Mock
     private BonitaWork wrappedWork;
-	
-	@Mock
+
+    @Mock
     private FailureHandlingBonitaWork txBonitawork;
-	
-	@Mock
+
+    @Mock
     private TenantServiceAccessor tenantAccessor;
 
-	@Mock
+    @Mock
     private SessionService sessionService;
-	
-	@Mock
+
+    @Mock
     private IncidentService incidentService;
-	
-	@Mock
+
+    @Mock
     private TechnicalLoggerService loggerService;
-		
-	@Mock
+
+    @Mock
     private SessionAccessor sessionAccessor;
-    
-	@Mock
-	private SMessageInstance messageInstance;
-	
-	@Mock
-	private SWaitingMessageEvent waitingMessageEvent;
-	
-	private final static String MESSAGE_INSTANCE_NAME = "name";
-	private final static String MESSAGE_INSTANCE_TARGET_PROCESS_NAME = "process";
-	private final static String MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME = "flowNode name";
-	private final static SBPMEventType WAITING_MESSAGE_EVENT_TYPE = SBPMEventType.INTERMEDIATE_THROW_EVENT;
+
+    @Mock
+    private SMessageInstance messageInstance;
+
+    @Mock
+    private SWaitingMessageEvent waitingMessageEvent;
+
+    private final static String MESSAGE_INSTANCE_NAME = "name";
+
+    private final static String MESSAGE_INSTANCE_TARGET_PROCESS_NAME = "process";
+
+    private final static String MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME = "flowNode name";
+
+    private final static SBPMEventType WAITING_MESSAGE_EVENT_TYPE = SBPMEventType.INTERMEDIATE_THROW_EVENT;
 
     @Before
     public void before() throws SFlowNodeNotFoundException, SFlowNodeReadException {
@@ -134,7 +137,7 @@ public class FailureHandlingMessageInstanceContextWorkTest {
     }
 
     @Test
-    public void putInMap() {
+    public void putInMap() throws SBonitaException {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));
@@ -161,10 +164,6 @@ public class FailureHandlingMessageInstanceContextWorkTest {
         };
         txBonitawork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
-        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_NAME = " + MESSAGE_INSTANCE_NAME));
-        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_PROCESS_NAME = " + MESSAGE_INSTANCE_TARGET_PROCESS_NAME));
-        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME = " + MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME));
-        assertTrue(e.getMessage().contains("WAITING_MESSAGE_INSTANCE_TYPE = " + WAITING_MESSAGE_EVENT_TYPE.name()));
     }
 
     @Test
@@ -193,9 +192,15 @@ public class FailureHandlingMessageInstanceContextWorkTest {
     @Test
     public void doNotHandleFailureWhenGettingASFlowNodeNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SFlowNodeNotFoundException(83));
+        final SProcessDefinitionNotFoundException e = new SProcessDefinitionNotFoundException(new SFlowNodeNotFoundException(83));
         doThrow(e).when(wrappedWork).work(context);
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_NAME = " + MESSAGE_INSTANCE_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_PROCESS_NAME = " + MESSAGE_INSTANCE_TARGET_PROCESS_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME = " + MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("WAITING_MESSAGE_INSTANCE_TYPE = " + WAITING_MESSAGE_EVENT_TYPE.name()));
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
@@ -204,10 +209,16 @@ public class FailureHandlingMessageInstanceContextWorkTest {
     @Test
     public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessInstanceNotFoundException(83));
+        final SProcessDefinitionNotFoundException e = new SProcessDefinitionNotFoundException(new SProcessInstanceNotFoundException(83));
         doThrow(e).when(wrappedWork).work(context);
         when(wrappedWork.getDescription()).thenReturn("");
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_NAME = " + MESSAGE_INSTANCE_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_PROCESS_NAME = " + MESSAGE_INSTANCE_TARGET_PROCESS_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME = " + MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("WAITING_MESSAGE_INSTANCE_TYPE = " + WAITING_MESSAGE_EVENT_TYPE.name()));
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
@@ -216,9 +227,15 @@ public class FailureHandlingMessageInstanceContextWorkTest {
     @Test
     public void doNotHandleFailureWhenGettingASProcessDefinitionNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessDefinitionNotFoundException("message"));
+        final SProcessDefinitionNotFoundException e = new SProcessDefinitionNotFoundException(new SProcessDefinitionNotFoundException("message"));
         doThrow(e).when(wrappedWork).work(context);
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_NAME = " + MESSAGE_INSTANCE_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_PROCESS_NAME = " + MESSAGE_INSTANCE_TARGET_PROCESS_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME = " + MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("WAITING_MESSAGE_INSTANCE_TYPE = " + WAITING_MESSAGE_EVENT_TYPE.name()));
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
@@ -227,9 +244,18 @@ public class FailureHandlingMessageInstanceContextWorkTest {
     @Test
     public void handleFailureForAllOtherExceptions() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception();
+        final SBonitaException e = new SBonitaException() {
+
+            private static final long serialVersionUID = -6748168976371554636L;
+        };
         doThrow(e).when(wrappedWork).work(context);
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_NAME = " + MESSAGE_INSTANCE_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_PROCESS_NAME = " + MESSAGE_INSTANCE_TARGET_PROCESS_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME = " + MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("WAITING_MESSAGE_INSTANCE_TYPE = " + WAITING_MESSAGE_EVENT_TYPE.name()));
         verify(wrappedWork, times(1)).handleFailure(e, context);
     }
 

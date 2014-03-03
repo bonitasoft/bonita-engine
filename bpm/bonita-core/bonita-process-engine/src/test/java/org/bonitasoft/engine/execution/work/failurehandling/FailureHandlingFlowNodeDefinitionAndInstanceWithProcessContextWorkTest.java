@@ -161,7 +161,7 @@ public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWorkT
     }
 
     @Test
-    public void putInMap() {
+    public void putInMap() throws SBonitaException {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));
@@ -188,14 +188,6 @@ public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWorkT
         };
         txBonitawork.handleFailure(e, context);
         verify(wrappedWork).handleFailure(e, context);
-        assertTrue(e.getMessage().contains("FLOW_NODE_DEFINITION_ID = " + FLOW_NODE_DEFINITION_ID));
-        assertTrue(e.getMessage().contains("FLOW_NODE_NAME = " + FLOW_NODE_NAME));
-        assertTrue(e.getMessage().contains("FLOW_NODE_INSTANCE_ID = " + FLOW_NODE_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
-        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
-        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
     }
 
     @Test
@@ -224,9 +216,19 @@ public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWorkT
     @Test
     public void doNotHandleFailureWhenGettingASFlowNodeNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SFlowNodeNotFoundException(83));
+        final SProcessDefinitionNotFoundException e = new SProcessDefinitionNotFoundException(new SFlowNodeNotFoundException(83));
         doThrow(e).when(wrappedWork).work(context);
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("FLOW_NODE_DEFINITION_ID = " + FLOW_NODE_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("FLOW_NODE_NAME = " + FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("FLOW_NODE_INSTANCE_ID = " + FLOW_NODE_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
@@ -235,10 +237,20 @@ public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWorkT
     @Test
     public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessInstanceNotFoundException(83));
+        final SProcessDefinitionNotFoundException e = new SProcessDefinitionNotFoundException(new SProcessInstanceNotFoundException(83));
         doThrow(e).when(wrappedWork).work(context);
         when(wrappedWork.getDescription()).thenReturn("");
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("FLOW_NODE_DEFINITION_ID = " + FLOW_NODE_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("FLOW_NODE_NAME = " + FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("FLOW_NODE_INSTANCE_ID = " + FLOW_NODE_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
@@ -247,9 +259,19 @@ public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWorkT
     @Test
     public void doNotHandleFailureWhenGettingASProcessDefinitionNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessDefinitionNotFoundException("message"));
+        final SProcessDefinitionNotFoundException e = new SProcessDefinitionNotFoundException(new SProcessDefinitionNotFoundException("message"));
         doThrow(e).when(wrappedWork).work(context);
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("FLOW_NODE_DEFINITION_ID = " + FLOW_NODE_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("FLOW_NODE_NAME = " + FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("FLOW_NODE_INSTANCE_ID = " + FLOW_NODE_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork, never()).handleFailure(e, context);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
         verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
@@ -258,9 +280,22 @@ public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWorkT
     @Test
     public void handleFailureForAllOtherExceptions() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception();
+        final SBonitaException e = new SBonitaException() {
+
+            private static final long serialVersionUID = -6748168976371554636L;
+        };
         doThrow(e).when(wrappedWork).work(context);
+
         txBonitawork.work(context);
+
+        assertTrue(e.getMessage().contains("FLOW_NODE_DEFINITION_ID = " + FLOW_NODE_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("FLOW_NODE_NAME = " + FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("FLOW_NODE_INSTANCE_ID = " + FLOW_NODE_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork, times(1)).handleFailure(e, context);
     }
 
