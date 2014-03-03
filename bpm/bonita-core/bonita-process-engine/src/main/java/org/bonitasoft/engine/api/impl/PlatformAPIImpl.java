@@ -252,7 +252,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-        TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+        final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
         final List<ServiceWithLifecycle> otherServicesToStart = platformConfiguration.getServicesToStart();
         try {
             try {
@@ -271,7 +271,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
                 // set tenant classloader
                 final SessionService sessionService = platformAccessor.getSessionService();
-                List<Long> tenantIds = getTenantIds(platformService, transactionService);
+                final List<Long> tenantIds = getTenantIds(platformService, transactionService);
                 for (final Long tenantId : tenantIds) {
                     long sessionId = -1;
                     long platformSessionId = -1;
@@ -284,7 +284,7 @@ public class PlatformAPIImpl implements PlatformAPI {
                         tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
                         // start the connector executor thread pool
                         // TODO should be like the platform services to start...
-                        ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
+                        final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of tenant " + tenantId + ": " + connectorExecutor.getClass().getName());
                         connectorExecutor.start();
                     } finally {
@@ -324,7 +324,16 @@ public class PlatformAPIImpl implements PlatformAPI {
                         sessionService.deleteSession(sessionId);
                     }
                     for (final RestartHandler restartHandler : platformConfiguration.getRestartHandlers()) {
-                        restartHandler.execute();
+
+                        final Callable<Void> callable = new Callable<Void>() {
+
+                            @Override
+                            public Void call() throws Exception {
+                                restartHandler.execute();
+                                return null;
+                            }
+                        };
+                        platformAccessor.getTransactionService().executeInTransaction(callable);
                     }
                 }
             } catch (final ClassLoaderException e) {
@@ -351,14 +360,14 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private List<Long> getTenantIds(final PlatformService platformService, final TransactionService transactionService) throws Exception {
-        List<Long> tenantIds = transactionService.executeInTransaction(new Callable<List<Long>>() {
+        final List<Long> tenantIds = transactionService.executeInTransaction(new Callable<List<Long>>() {
 
             @Override
             public List<Long> call() throws Exception {
                 List<STenant> tenants;
                 final int maxResults = 100;
                 int i = 0;
-                List<Long> tenantIds = new ArrayList<Long>();
+                final List<Long> tenantIds = new ArrayList<Long>();
                 do {
                     tenants = platformService.getTenants(new QueryOptions(i, maxResults));
                     i += maxResults;
@@ -385,10 +394,10 @@ public class PlatformAPIImpl implements PlatformAPI {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
-            PlatformService platformService = platformAccessor.getPlatformService();
-            TransactionService transactionService = platformAccessor.getTransactionService();
+            final PlatformService platformService = platformAccessor.getPlatformService();
+            final TransactionService transactionService = platformAccessor.getTransactionService();
             final List<ServiceWithLifecycle> otherServicesToStart = plaformConfiguration.getServicesToStart();
-            TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
             if (plaformConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
                 shutdownScheduler(schedulerService);
@@ -400,12 +409,12 @@ public class PlatformAPIImpl implements PlatformAPI {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
                 serviceWithLifecycle.stop();
             }
-            List<Long> tenantIds = getTenantIds(platformService, transactionService);
+            final List<Long> tenantIds = getTenantIds(platformService, transactionService);
             for (final Long tenantId : tenantIds) {
                 // stop the connector executor thread pool
                 // TODO should be like the platform services to stop...
                 final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-                ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
+                final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenantId + ": " + connectorExecutor.getClass().getName());
                 connectorExecutor.stop();
             }
