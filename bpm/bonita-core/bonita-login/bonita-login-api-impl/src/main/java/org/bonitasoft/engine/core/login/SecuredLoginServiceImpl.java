@@ -133,6 +133,9 @@ public class SecuredLoginServiceImpl implements LoginService {
     /**
      * login to the internal authentication service if it is not null or to the Generic Authentication Service
      * 
+     * @since 6.3
+     * Ensure backward compatibility with previous version
+     * 
      * @param credentials
      *            the credentials to use to login
      * @return the username of the logged in user
