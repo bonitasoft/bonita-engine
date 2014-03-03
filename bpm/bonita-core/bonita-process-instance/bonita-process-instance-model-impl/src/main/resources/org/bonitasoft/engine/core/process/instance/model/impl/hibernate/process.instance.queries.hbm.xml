@@ -1351,8 +1351,11 @@
                   mapping.activityId = :humanTaskInstanceId
                   AND mapping.actorId = actor.id
                   AND actor.id = actormember.actorId
-                  AND (actormember.roleId = user_membership.roleId
-                  OR actormember.groupId = user_membership.groupId)
+                  AND (
+                    (actormember.roleId = -1 AND actormember.groupId = user_membership.groupId)
+                    OR (actormember.groupId = -1 AND actormember.roleId = user_membership.roleId)
+                    OR (actormember.roleId = user_membership.roleId AND actormember.groupId = user_membership.groupId) 
+                  )                  
           )
         GROUP BY user.id
         ORDER BY MIN(user.userName)

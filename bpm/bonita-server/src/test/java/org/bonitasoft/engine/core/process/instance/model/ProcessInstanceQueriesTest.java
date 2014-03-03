@@ -51,7 +51,7 @@ public class ProcessInstanceQueriesTest {
         
         List<Long> userIds = getPossibleUserIdsOfPendingTasks(addedPendingMapping.getActivityId());
         
-        assertThat(userIds).containsExactly(expectedUser.getId());
+        assertThat(userIds).containsOnly(expectedUser.getId());
     }
     
     @Test
@@ -64,7 +64,7 @@ public class ProcessInstanceQueriesTest {
         
         List<Long> userIds = getPossibleUserIdsOfPendingTasks(addedPendingMapping.getActivityId());
         
-        assertThat(userIds).containsExactly(expectedUser.getId());
+        assertThat(userIds).containsOnly(expectedUser.getId());
     }
     
     @Test
@@ -82,7 +82,7 @@ public class ProcessInstanceQueriesTest {
         
         List<Long> userIds = getPossibleUserIdsOfPendingTasks(addedPendingMapping.getActivityId());
         
-        assertThat(userIds).containsExactly(expectedUser.getId());
+        assertThat(userIds).containsOnly(expectedUser.getId());
     }
     
     @Test
@@ -100,7 +100,7 @@ public class ProcessInstanceQueriesTest {
         
         List<Long> userIds = getPossibleUserIdsOfPendingTasks(addedPendingMapping.getActivityId());
         
-        assertThat(userIds).containsExactly(expectedUser.getId());
+        assertThat(userIds).containsOnly(expectedUser.getId());
     }
     
     
@@ -124,7 +124,7 @@ public class ProcessInstanceQueriesTest {
         
         List<Long> userIds = getPossibleUserIdsOfPendingTasks(addedPendingMapping.getActivityId());
         
-        assertThat(userIds).containsExactly(1L, 4L);
+        assertThat(userIds).containsOnly(1L, 4L);
     }
     
     @Test

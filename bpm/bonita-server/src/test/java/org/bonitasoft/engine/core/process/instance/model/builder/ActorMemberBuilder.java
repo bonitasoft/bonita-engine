@@ -7,9 +7,9 @@ import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
 public class ActorMemberBuilder extends PersistentObjectBuilder<SActorMemberImpl> {
 
     private long actorId;
-    private long userId;
-    private long groupId;
-    private long roleId;
+    private Long userId;
+    private Long groupId;
+    private Long roleId;
 
     public static ActorMemberBuilder anActorMember() {
         return new ActorMemberBuilder();
@@ -18,10 +18,10 @@ public class ActorMemberBuilder extends PersistentObjectBuilder<SActorMemberImpl
     @Override
     SActorMemberImpl _build() {
         SActorMemberImpl actorMember = new SActorMemberImpl();
-        actorMember.setUserId(userId);
         actorMember.setActorId(actorId);
-        actorMember.setGroupId(groupId);
-        actorMember.setRoleId(roleId);
+        if (userId != null) actorMember.setUserId(userId);
+        if (groupId != null) actorMember.setGroupId(groupId);
+        if (roleId != null) actorMember.setRoleId(roleId);
         return actorMember;
     }
 
