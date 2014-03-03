@@ -4,7 +4,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
 
 
-public class ActorMemberBuilder extends Builder<SActorMemberImpl> {
+public class ActorMemberBuilder extends PersistentObjectBuilder<SActorMemberImpl> {
 
     private long actorId;
     private long userId;

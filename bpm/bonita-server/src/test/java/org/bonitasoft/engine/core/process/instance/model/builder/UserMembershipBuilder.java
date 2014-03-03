@@ -4,7 +4,7 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl;
 
 
-public class UserMembershipBuilder extends Builder<SUserMembershipImpl> {
+public class UserMembershipBuilder extends PersistentObjectBuilder<SUserMembershipImpl> {
 
     private long groupId;
     private long userId;

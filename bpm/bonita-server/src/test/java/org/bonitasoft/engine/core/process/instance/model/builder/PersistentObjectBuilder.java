@@ -5,7 +5,7 @@ import java.util.Random;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 
-public abstract class Builder<T extends PersistentObject> {
+public abstract class PersistentObjectBuilder<T extends PersistentObject> {
     static final long DEFAULT_TENANT_ID = 1L;
     
     protected long id = new Random().nextLong();

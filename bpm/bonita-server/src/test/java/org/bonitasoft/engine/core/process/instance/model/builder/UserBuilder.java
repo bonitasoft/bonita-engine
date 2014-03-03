@@ -3,7 +3,7 @@ package org.bonitasoft.engine.core.process.instance.model.builder;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 
 
-public class UserBuilder extends Builder<SUserImpl> {
+public class UserBuilder extends PersistentObjectBuilder<SUserImpl> {
 
     private String userName = "userName" + id;
 
