@@ -662,9 +662,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 case STATUS:
                     descriptor.addField(tenantBuilderFact.getStatusKey(), field.getValue());
                     break;
-                case IN_MAINTENANCE:
-                    descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), field.getValue());
-                    break;
                 default:
                     break;
             }

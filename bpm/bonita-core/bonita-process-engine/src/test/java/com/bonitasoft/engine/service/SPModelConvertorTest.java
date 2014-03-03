@@ -19,12 +19,11 @@ public class SPModelConvertorTest {
         long created = 4874411255L;
         String status = "activated";
         boolean defaultTenant = false;
-        boolean inMaintenance = true;
         String description = "this tenant serves test purposes";
         String iconName = "kikoolol_Tenant.gif";
         String iconPath = "icons/tenant_icons/";
 
-        final STenantImpl sTenant = new STenantImpl(name, createdBy, created, status, defaultTenant, inMaintenance);
+        final STenantImpl sTenant = new STenantImpl(name, createdBy, created, status, defaultTenant);
         sTenant.setDescription(description);
         sTenant.setIconName(iconName);
         sTenant.setIconPath(iconPath);
@@ -36,7 +35,6 @@ public class SPModelConvertorTest {
         assertThat(tenant.getIconName()).isEqualTo(iconName);
         assertThat(tenant.getIconPath()).isEqualTo(iconPath);
         assertThat(tenant.getState()).isEqualTo(status);
-        assertThat(tenant.isInMaintenance()).isEqualTo(inMaintenance);
     }
 
     @Test

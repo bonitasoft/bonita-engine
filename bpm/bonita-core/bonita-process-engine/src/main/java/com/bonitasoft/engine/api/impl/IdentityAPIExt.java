@@ -26,7 +26,7 @@ import com.bonitasoft.manager.Features;
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-@AvailableOnMaintenanceTenant
+@AvailableWhenTenantIsPaused
 public class IdentityAPIExt extends IdentityAPIImpl implements IdentityAPI {
 
     // In order to not have an API break, this interface is still present even if it has no methods.

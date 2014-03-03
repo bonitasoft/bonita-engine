@@ -23,11 +23,11 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
+@AvailableWhenTenantIsPaused
 public class TenantManagementAPIExt implements TenantManagementAPI {
 
     protected long getTenantId() {
@@ -40,21 +40,28 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     @Override
-    @AvailableOnMaintenanceTenant
-    public boolean isInMaintenance() {
+    public boolean isPaused() {
         long tenantId = getTenantId();
         final GetTenantInstance getTenant = new GetTenantInstance(tenantId, getPlatformAccessorNoException().getPlatformService());
         try {
             getTenant.execute();
-            return getTenant.getResult().isInMaintenance();
+            return getTenant.getResult().isPaused();
         } catch (final SBonitaException e) {
             throw new RetrieveException("Unable to retrieve the tenant with id " + tenantId, e);
         }
     }
 
     @Override
-    @AvailableOnMaintenanceTenant
-    public void setMaintenanceMode(final TenantMode mode) throws UpdateException {
+    public void pause() throws UpdateException {
+        setTenantPaused(true);
+    }
+
+    @Override
+    public void resume() throws UpdateException {
+        setTenantPaused(false);
+    }
+
+    private void setTenantPaused(final boolean shouldBePaused) throws UpdateException {
         PlatformServiceAccessor platformServiceAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
@@ -66,18 +73,14 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         WorkService workService = tenantServiceAccessor.getWorkService();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
-        switch (mode) {
-            case AVAILABLE:
-                descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), STenantBuilderFactory.AVAILABLE);
-                resumeServicesForTenant(workService, schedulerService, tenantId, nodeConfiguration, platformServiceAccessor, tenantServiceAccessor);
-                break;
-            case MAINTENANCE:
-                descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), STenantBuilderFactory.IN_MAINTENANCE);
-                pauseServicesForTenant(workService, schedulerService, sessionService, tenantId);
-                break;
-            default:
-                break;
+        if (shouldBePaused) {
+            descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.PAUSED);
+            pauseServicesForTenant(workService, schedulerService, sessionService, tenantId);
+        } else {
+            descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.ACTIVATED);
+            resumeServicesForTenant(workService, schedulerService, tenantId, nodeConfiguration, platformServiceAccessor, tenantServiceAccessor);
         }
+        // FIXME throw update exception if wrong lifecycle change
         updateTenantFromId(tenantId, platformService, descriptor);
     }
 

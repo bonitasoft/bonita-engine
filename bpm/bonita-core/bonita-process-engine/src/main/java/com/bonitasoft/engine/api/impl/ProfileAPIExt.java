@@ -83,7 +83,7 @@ import com.bonitasoft.manager.Features;
 /**
  * @author Celine Souchet
  */
-@AvailableOnMaintenanceTenant
+@AvailableWhenTenantIsPaused
 public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override

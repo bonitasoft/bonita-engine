@@ -14,21 +14,36 @@ import org.bonitasoft.engine.exception.UpdateException;
  * This API gives access to tenant management.
  * 
  * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
 public interface TenantManagementAPI {
 
     /**
-     * Allows to set the tenand mode.
      * 
-     * @param mode
-     *            the mode to set: "in maintenance", "running"
+     * @return
+     *         true if the tenant is paused.
+     */
+    boolean isPaused();
+
+    /**
+     * 
+     * Pause the tenant so nothing is executed anymore.
+     * 
+     * when the tenant is paused:
+     * Only technical user can login when the tenant is paused.
+     * All users connected are disconnected (apart from the technical user).
+     * Only IdentityAPI, ThemeAPI and ProfileAPI are accessible.
      * 
      * @throws UpdateException
-     *             if the update could not be performed.
-     * @see {@link TenantMode}
      */
-    void setMaintenanceMode(TenantMode mode) throws UpdateException;
+    void pause() throws UpdateException;
 
-    boolean isInMaintenance();
+    /**
+     * 
+     * Resume the tenant to a normal state after a pause.
+     * 
+     * @throws UpdateException
+     */
+    void resume() throws UpdateException;
 
 }

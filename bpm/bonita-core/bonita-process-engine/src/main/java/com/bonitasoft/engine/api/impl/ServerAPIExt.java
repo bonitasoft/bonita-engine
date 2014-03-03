@@ -18,7 +18,7 @@ import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.Session;
 
-import com.bonitasoft.engine.api.TenantInMaintenanceException;
+import com.bonitasoft.engine.api.TenantIsPausedException;
 import com.bonitasoft.engine.api.TenantManagementAPI;
 
 /**
@@ -28,7 +28,7 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String IS_IN_MAINTENANCE_METHOD_NAME = "isInMaintenance";
+    private static final String IS_PAUSED = "isPaused";
 
     public ServerAPIExt() {
         super();
@@ -48,8 +48,8 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
     }
 
     private boolean isTenantInAValidModeFor(final Object apiImpl, final Method method, final long tenantId, final Session session) {
-        return apiImpl.getClass().isAnnotationPresent(AvailableOnMaintenanceTenant.class)
-                || method.isAnnotationPresent(AvailableOnMaintenanceTenant.class) || isTenantAvailable(tenantId, session);
+        return apiImpl.getClass().isAnnotationPresent(AvailableWhenTenantIsPaused.class)
+                || method.isAnnotationPresent(AvailableWhenTenantIsPaused.class) || isTenantAvailable(tenantId, session);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
             long tenantId = ((APISession) session).getTenantId();
             if (!isTenantInAValidModeFor(apiImpl, method, tenantId, session)) {
                 logTenantInMaintenanceMessage(apiImpl, apiInterfaceName, method.getName());
-                throw new TenantInMaintenanceException("Tenant with ID " + tenantId + " is in maintenance, no API call on this tenant can be made for now.");
+                throw new TenantIsPausedException("Tenant with ID " + tenantId + " is in maintenance, no API call on this tenant can be made for now.");
             }
         }
 
@@ -72,15 +72,15 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
      * @param tenantId
      *            the ID of the tenant to check
      * @param session
-     * @return true if the tenant is available, false otherwise (if the tenant mode is in Maintenance)
+     * @return true if the tenant is available, false otherwise (if the tenant is paused)
      */
     protected boolean isTenantAvailable(final long tenantId, final Session session) {
         Object apiImpl;
         try {
             apiImpl = accessResolver.getAPIImplementation(TenantManagementAPI.class.getName());
-            final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_IN_MAINTENANCE_METHOD_NAME);
-            Boolean inMaintenance = (Boolean) invokeAPIInTransaction(new Object[0], apiImpl, method, session);
-            return !inMaintenance;
+            final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_PAUSED);
+            Boolean paused = (Boolean) invokeAPIInTransaction(new Object[0], apiImpl, method, session);
+            return !paused;
         } catch (Throwable e) {
             throw new BonitaRuntimeException("Cannot determine if the tenant with ID " + tenantId + " is accessible", e);
         }

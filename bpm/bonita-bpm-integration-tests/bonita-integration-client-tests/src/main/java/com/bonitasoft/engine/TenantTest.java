@@ -53,9 +53,8 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.api.TenantInMaintenanceException;
+import com.bonitasoft.engine.api.TenantIsPausedException;
 import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.TenantActivationException;
@@ -146,19 +145,19 @@ public class TenantTest {
 
     }
 
-    @Test(expected = TenantInMaintenanceException.class)
-    @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantModeException, tenant maintenance" }, concept = BPMNConcept.NONE)
+    @Test(expected = TenantIsPausedException.class)
+    @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantIsPausedException, tenant paused" }, concept = BPMNConcept.NONE)
     public void cannotAccessTenantAPIsOnMaintenanceTenant() throws Exception {
         APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         apiTestSPUtil.loginWith(userName, password, tenantId);
         TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
-        tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
+        tenantManagementAPI.pause();
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         apiSession = loginAPI.login(tenantId, userName, password);
         try {
             apiTestSPUtil.getProcessAPI().getNumberOfProcessInstances();
         } finally {
-            tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+            tenantManagementAPI.resume();
             loginAPI.logout(apiSession);
         }
     }
@@ -172,19 +171,19 @@ public class TenantTest {
         IdentityAPI identityAPI = apiTestSPUtil.getIdentityAPI();
         User john = identityAPI.createUser("john", "bpm");
         TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
-        tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
+        tenantManagementAPI.pause();
         loginAPI.logout(apiTestSPUtil.getSession());
         // login with normal user: not working
         try {
             loginAPI.login(tenantId, "john", "bpm");
             fail("should not be able to login using other user than technical");
-        } catch (TenantInMaintenanceException e) {
+        } catch (TenantIsPausedException e) {
             // ok, can't login with user that is not technical
         }
         // login with normal user: not working
         APISession loginWithTechnical = loginAPI.login(tenantId, userName, password);
         // ok to login with technical user
-        TenantAPIAccessor.getTenantManagementAPI(loginWithTechnical).setMaintenanceMode(TenantMode.AVAILABLE);
+        TenantAPIAccessor.getTenantManagementAPI(loginWithTechnical).resume();
         loginAPI.logout(loginWithTechnical);
         // can now login with normal user
         APISession login = loginAPI.login(tenantId, "john", "bpm");
@@ -202,9 +201,9 @@ public class TenantTest {
         APITestSPUtil apiTestSPUtil = new APITestSPUtil();
         apiTestSPUtil.loginWith(userName, password, tenantId);
         TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
-        tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
+        tenantManagementAPI.pause();
         try {
-            tenantManagementAPI.isInMaintenance();
+            tenantManagementAPI.isPaused();
             // test with bos accessor
             org.bonitasoft.engine.api.TenantAPIAccessor.getThemeAPI(apiTestSPUtil.getSession()).getLastUpdateDate(ThemeType.PORTAL);
             org.bonitasoft.engine.api.TenantAPIAccessor.getIdentityAPI(apiTestSPUtil.getSession()).getNumberOfUsers();
@@ -214,7 +213,7 @@ public class TenantTest {
             apiTestSPUtil.getIdentityAPI().getNumberOfUsers();
             apiTestSPUtil.getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).done());
         } finally {
-            tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+            tenantManagementAPI.resume();
             apiTestSPUtil.logoutTenant(apiTestSPUtil.getSession());
         }
     }

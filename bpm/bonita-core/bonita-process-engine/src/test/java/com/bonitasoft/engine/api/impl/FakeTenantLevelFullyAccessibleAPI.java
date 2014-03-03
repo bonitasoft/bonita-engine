@@ -13,7 +13,7 @@ import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 /**
  * @author Baptiste Mesta
  */
-@AvailableOnMaintenanceTenant
+@AvailableWhenTenantIsPaused
 public class FakeTenantLevelFullyAccessibleAPI {
 
     @AvailableOnStoppedNode

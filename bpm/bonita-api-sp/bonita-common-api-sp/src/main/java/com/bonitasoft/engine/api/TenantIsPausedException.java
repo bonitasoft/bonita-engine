@@ -8,15 +8,24 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
+
 /**
- * In addition to tenant state (enable / disable), there is a tenant "mode", saying on an enabled tenant if the tenant is in {@link #AVAILABLE} mode or in a
- * {@link #MAINTENANCE} mode, that is, if we can normally access it, or if only maintenance actions can be made.
  * 
- * @see AvailableOnMaintenanceTenant
+ * occurs when we try to login with an other user than the technical user on a tenant that is in maintenance
+ * 
  * @author Emmanuel Duchastenier
  */
-public enum TenantMode {
+public class TenantIsPausedException extends BonitaRuntimeException {
 
-    AVAILABLE, // normal mode, the tenant is available (if tenant is enabled)
-    MAINTENANCE // in maintenance, only some few specific tenant API calls can be made
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * @param message
+     *            the exception message
+     */
+    public TenantIsPausedException(final String message) {
+        super(message);
+    }
+
 }

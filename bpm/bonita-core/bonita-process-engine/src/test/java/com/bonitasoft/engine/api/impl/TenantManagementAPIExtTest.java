@@ -18,6 +18,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -29,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -82,7 +82,7 @@ public class TenantManagementAPIExtTest {
         tenantId = 17;
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
         doReturn(workService).when(tenantServiceAccessor).getWorkService();
-        sTenant = new STenantImpl("myTenant", "john", 123456789, "MAINTENANCE", false, false);
+        sTenant = new STenantImpl("myTenant", "john", 123456789, STenant.PAUSED, false);
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
     }
 
@@ -90,7 +90,7 @@ public class TenantManagementAPIExtTest {
     public void setMaintenanceModeToMAINTENANCEShouldPauseWorkService() throws Exception {
 
         // given a tenant moved to maintenance mode
-        tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
+        tenantManagementAPI.pause();
 
         // then his work service should be pause
         verify(workService).pause();
@@ -100,7 +100,7 @@ public class TenantManagementAPIExtTest {
     public void setMaintenanceModeToAVAILLABLEShouldResumeWorkService() throws Exception {
 
         // given a tenant moved to available mode
-        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+        tenantManagementAPI.resume();
 
         // then his work service should be resumed
         verify(workService).resume();
@@ -111,14 +111,14 @@ public class TenantManagementAPIExtTest {
         doThrow(WorkException.class).when(workService).resume();
 
         // given a tenant moved to available mode
-        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+        tenantManagementAPI.resume();
     }
 
     @Test
     public void should_setMaintenanceMode_to_AVAILLABLE_restart_elements() throws Exception {
 
         // given a tenant moved to available mode
-        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+        tenantManagementAPI.resume();
 
         // then elements must be restarted
         verify(tenantRestartHandler1, times(1)).handleRestart(platformServiceAccessor, tenantServiceAccessor);
@@ -130,67 +130,53 @@ public class TenantManagementAPIExtTest {
         doThrow(RestartException.class).when(tenantRestartHandler2).handleRestart(platformServiceAccessor, tenantServiceAccessor);
 
         // given a tenant moved to available mode
-        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+        tenantManagementAPI.resume();
     }
 
     @Test
     public void setTenantMaintenanceModeShouldUpdateMaintenanceField() throws Exception {
 
-        tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
+        tenantManagementAPI.pause();
 
         EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        String inMaintenanceKey = BuilderFactory.get(STenantBuilderFactory.class).getInMaintenanceKey();
-        entityUpdateDescriptor.addField(inMaintenanceKey, true);
+        String inMaintenanceKey = BuilderFactory.get(STenantBuilderFactory.class).getStatusKey();
+        entityUpdateDescriptor.addField(inMaintenanceKey, STenant.PAUSED);
 
         verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
     }
 
     @Test
     public void should_setMaintenanceMode_to_MAINTENANCE_pause_jobs() throws Exception {
-        tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
+        tenantManagementAPI.pause();
 
         verify(schedulerService).pauseJobs(tenantId);
     }
 
     @Test
     public void should_setMaintenanceMode_to_AVAILABLE_pause_jobs() throws Exception {
-        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+        tenantManagementAPI.resume();
 
         verify(schedulerService).resumeJobs(tenantId);
     }
 
     @Test
     public void should_setMaintenanceMode_to_MAINTENANCE_delete_sessions() throws Exception {
-        tenantManagementAPI.setMaintenanceMode(TenantMode.MAINTENANCE);
+        tenantManagementAPI.pause();
 
         verify(sessionService).deleteSessionsOfTenantExceptTechnicalUser(tenantId);
     }
 
     @Test
     public void should_setMaintenanceMode_to_AVAILABLE_delete_sessions() throws Exception {
-        tenantManagementAPI.setMaintenanceMode(TenantMode.AVAILABLE);
+        tenantManagementAPI.resume();
 
         verify(sessionService, times(0)).deleteSessionsOfTenantExceptTechnicalUser(tenantId);
     }
 
     @Test
     public void setTenantMaintenanceModeShouldHaveAnnotationAvailableOnMaintenanceTenant() throws Exception {
-        // given:
-        Method method = TenantManagementAPIExt.class.getMethod("setMaintenanceMode", TenantMode.class);
-
-        // then:
-        assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method TenantManagementAPIExt.setTenantMaintenanceMode()",
-                method.isAnnotationPresent(AvailableOnMaintenanceTenant.class));
-    }
-
-    @Test
-    public void isTenantInMaintenanceShouldHaveAnnotationAvailableOnMaintenanceTenant() throws Exception {
-        // given:
-        Method method = TenantManagementAPIExt.class.getMethod("isInMaintenance");
-
-        // then:
-        assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method TenantManagementAPIExt.isTenantInMaintenance()",
-                method.isAnnotationPresent(AvailableOnMaintenanceTenant.class));
+        assertTrue("Annotation @AvailableWhenTenantIsPaused should be present on API method TenantManagementAPIExt",
+                TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
     }
 
     @Test
@@ -200,7 +186,7 @@ public class TenantManagementAPIExtTest {
 
         // then:
         assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method LoginAPIExt.login(long, String, String)",
-                method.isAnnotationPresent(AvailableOnMaintenanceTenant.class));
+                method.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
     }
 
     @Test
@@ -210,6 +196,6 @@ public class TenantManagementAPIExtTest {
 
         // then:
         assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method LoginAPIExt.login(String, String)",
-                method.isAnnotationPresent(AvailableOnMaintenanceTenant.class));
+                method.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
     }
 }

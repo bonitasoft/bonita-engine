@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.api.TenantInMaintenanceException;
+import com.bonitasoft.engine.api.TenantIsPausedException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServerAPIExtTest {
@@ -79,7 +79,7 @@ public class ServerAPIExtTest {
         // no TenantModeException must be thrown. If so, test would fail.
     }
 
-    @Test(expected = TenantInMaintenanceException.class)
+    @Test(expected = TenantIsPausedException.class)
     public void checkMethodAccessibilityOnTenantAPIShouldNotBePossibleOnNOTAnnotatedMethodsIfTenantInMaintenance() throws Exception {
         // Given:
         long tenantId = 54L;
