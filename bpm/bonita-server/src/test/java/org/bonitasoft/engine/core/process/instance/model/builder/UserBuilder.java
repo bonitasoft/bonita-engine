@@ -5,6 +5,8 @@ import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 
 public class UserBuilder extends Builder<SUserImpl> {
 
+    private String userName = "userName" + id;
+
     public static UserBuilder aUser() {
         return new UserBuilder();
     }
@@ -14,11 +16,17 @@ public class UserBuilder extends Builder<SUserImpl> {
         SUserImpl user = new SUserImpl();
         user.setFirstName("aFirstName" + id);
         user.setLastName("aLastName" + id);
+        user.setUserName(userName);
         return user;
     }
     
     public UserBuilder withId(long id) {
         this.id = id;
+        return this;
+    }
+    
+    public UserBuilder withUserName(String userName) {
+        this.userName = userName;
         return this;
     }
 }

@@ -104,7 +104,6 @@ public class ProcessInstanceQueriesTest {
     }
     
     
-    @Ignore
     @Test
     public void getPossibleUserIdsOfPendingTasks_should_return_users_mapped_by_a_membership_based_actormember_to_pending_activity() throws Exception {
         SUser addedUser = addToRepository(aUser().withId(1L).build());
@@ -115,10 +114,11 @@ public class ProcessInstanceQueriesTest {
         long aRoleId = 999L;
         long aGroupId = 888L;
         long anotherGroupId = 777L;
+        long anotherRoleId = 546L;
         addToRepository(anActorMember().forActor(actor).withRoleId(aRoleId).withGroupId(aGroupId).build());
         addToRepository(aUserMembership().forUser(addedUser).memberOf(aGroupId, aRoleId).build());
-        addToRepository(aUserMembership().forUser(user2).memberOf(562L, aRoleId).build());
-        addToRepository(aUserMembership().forUser(user3).memberOf(aGroupId, 6541L).build());
+        addToRepository(aUserMembership().forUser(user2).memberOf(anotherGroupId, aRoleId).build());
+        addToRepository(aUserMembership().forUser(user3).memberOf(aGroupId, anotherRoleId).build());
         addToRepository(aUserMembership().forUser(user4).memberOf(aGroupId, aRoleId).build());
         SPendingActivityMappingImpl addedPendingMapping = addToRepository(aPendingActivityMapping().withActorId(actor.getId()).build());
         
@@ -129,7 +129,25 @@ public class ProcessInstanceQueriesTest {
     
     @Test
     public void getPossibleUserIdsOfPendingTasks_return_userIds_ordered_by_userName() throws Exception {
+        SUser john = addToRepository(aUser().withUserName("john").withId(1L).build());
+        SUser paul = addToRepository(aUser().withUserName("paul").withId(2L).build());
+        SUser walter = addToRepository(aUser().withUserName("walter").withId(3L).build());
+        SUser marie = addToRepository(aUser().withUserName("marie").withId(4L).build());
         
+        long aRoleId = 999L;
+        long aGroupId = 888L;
+        SActorImpl actor = addToRepository(anActor().build());
+        addToRepository(anActorMember().forActor(actor).withRoleId(aRoleId).withGroupId(aGroupId).build());
+        SPendingActivityMappingImpl addedPendingMapping = addToRepository(aPendingActivityMapping().withActorId(actor.getId()).build());
+        
+        addToRepository(aUserMembership().forUser(john).memberOf(aGroupId, aRoleId).build());
+        addToRepository(aUserMembership().forUser(paul).memberOf(aGroupId, aRoleId).build());
+        addToRepository(aUserMembership().forUser(walter).memberOf(aGroupId, aRoleId).build());
+        addToRepository(aUserMembership().forUser(marie).memberOf(aGroupId, aRoleId).build());
+        
+        List<Long> userIds = getPossibleUserIdsOfPendingTasks(addedPendingMapping.getActivityId());
+        
+        assertThat(userIds).containsExactly(john.getId(), marie.getId(), paul.getId(), walter.getId());
     }
     
     private List<Long> getPossibleUserIdsOfPendingTasks(long activityInstanceId) {
