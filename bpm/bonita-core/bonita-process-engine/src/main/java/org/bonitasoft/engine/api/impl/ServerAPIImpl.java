@@ -43,6 +43,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.NodeNotStartedException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.session.PlatformSessionService;
+import org.bonitasoft.engine.platform.session.SSessionException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.service.APIAccessResolver;
@@ -64,7 +65,9 @@ import org.bonitasoft.engine.transaction.UserTransactionService;
  */
 public class ServerAPIImpl implements ServerAPI {
 
-    private static final String IS_NODE_STARTED_METHOD_NAME = "isNodeStarted";
+    private static final String SESSION = "session";
+
+	private static final String IS_NODE_STARTED_METHOD_NAME = "isNodeStarted";
 
     private static final long serialVersionUID = -161775388604256321L;
 
@@ -103,7 +106,7 @@ public class ServerAPIImpl implements ServerAPI {
         try {
             try {
                 sessionAccessor = beforeInvokeMethod(options, apiInterfaceName);
-                final Session session = (Session) options.get("session");
+                final Session session = (Session) options.get(SESSION);
                 return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
             } catch (final ServerAPIRuntimeException sapire) {
                 throw sapire.getCause();
@@ -113,26 +116,32 @@ public class ServerAPIImpl implements ServerAPI {
         } catch (final BonitaException be) {
             throw new ServerWrappedException(be);
         } catch (final UndeclaredThrowableException ute) {
-            if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, ute);
-            }
+            technicalDebugLog(ute);
             throw new ServerWrappedException(ute);
         } catch (final Throwable cause) {
-            if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, cause);
-            }
+        	technicalDebugLog(cause);
             throw new ServerWrappedException(new BonitaRuntimeException(cause));
         } finally {
-            if (cleanSession) {
-                // clean session id
-                if (sessionAccessor != null) {
-                    sessionAccessor.deleteSessionId();
-                }
-            }
+            cleanSessionIfNeeded(sessionAccessor);
             // reset class loader
             Thread.currentThread().setContextClassLoader(baseClassLoader);
         }
     }
+
+	private void cleanSessionIfNeeded(SessionAccessor sessionAccessor) {
+		if (cleanSession) {
+		    // clean session id
+		    if (sessionAccessor != null) {
+		        sessionAccessor.deleteSessionId();
+		    }
+		}
+	}
+
+	private void technicalDebugLog(final Throwable throwableToLog) {
+		if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+		    technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, throwableToLog);
+		}
+	}
 
     private static final class ServerAPIRuntimeException extends RuntimeException {
 
@@ -153,33 +162,18 @@ public class ServerAPIImpl implements ServerAPI {
         final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
 
         ClassLoader serverClassLoader = null;
-        final Session session = (Session) options.get("session");
+        final Session session = (Session) options.get(SESSION);
         if (session != null) {
             final SessionType sessionType = getSessionType(session);
             sessionAccessor = serviceAccessorFactory.createSessionAccessor();
             switch (sessionType) {
-            case PLATFORM:
-                final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
-                final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
+                case PLATFORM:
+                	serverClassLoader = beforeInvokeMethodForPlatformSession(sessionAccessor, platformServiceAccessor, session);
+                    break;
 
-                if (!loginService.isValid(session.getId())) {
-                    throw new InvalidSessionException("Invalid session");
-                }
-                platformSessionService.renewSession(session.getId());
-                sessionAccessor.setSessionInfo(session.getId(), -1);
-                serverClassLoader = getPlatformClassLoader(platformServiceAccessor);
-                setTechnicalLogger(platformServiceAccessor.getTechnicalLoggerService());
-                break;
-
-            case API:
-                final SessionService sessionService = platformServiceAccessor.getSessionService();
-
-                checkTenantSession(platformServiceAccessor, session);
-                sessionService.renewSession(session.getId());
-                sessionAccessor.setSessionInfo(session.getId(), ((APISession) session).getTenantId());
-                serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
-                setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(((APISession) session).getTenantId()).getTechnicalLoggerService());
-                break;
+                case API:
+				serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, serviceAccessorFactory, platformServiceAccessor, session);
+                    break;
 
             default:
                 throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
@@ -193,6 +187,46 @@ public class ServerAPIImpl implements ServerAPI {
 
         return sessionAccessor;
     }
+
+	private ClassLoader beforeInvokeMethodForAPISession(
+			SessionAccessor sessionAccessor,
+			final ServiceAccessorFactory serviceAccessorFactory,
+			final PlatformServiceAccessor platformServiceAccessor,
+			final Session session) throws SSchedulerException,
+			org.bonitasoft.engine.session.SSessionException,
+			ClassLoaderException, SBonitaException, BonitaHomeNotSetException,
+			IOException, BonitaHomeConfigurationException,
+			NoSuchMethodException, InstantiationException,
+			IllegalAccessException, InvocationTargetException {
+		ClassLoader serverClassLoader;
+		final SessionService sessionService = platformServiceAccessor.getSessionService();
+
+		checkTenantSession(platformServiceAccessor, session);
+		sessionService.renewSession(session.getId());
+		sessionAccessor.setSessionInfo(session.getId(), ((APISession) session).getTenantId());
+		serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
+		setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(((APISession) session).getTenantId()).getTechnicalLoggerService());
+		return serverClassLoader;
+	}
+
+	private ClassLoader beforeInvokeMethodForPlatformSession(
+			SessionAccessor sessionAccessor,
+			final PlatformServiceAccessor platformServiceAccessor,
+			final Session session) throws SSessionException,
+			ClassLoaderException {
+		ClassLoader serverClassLoader;
+		final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
+		final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
+
+		if (!loginService.isValid(session.getId())) {
+		    throw new InvalidSessionException("Invalid session");
+		}
+		platformSessionService.renewSession(session.getId());
+		sessionAccessor.setSessionInfo(session.getId(), -1);
+		serverClassLoader = getPlatformClassLoader(platformServiceAccessor);
+		setTechnicalLogger(platformServiceAccessor.getTechnicalLoggerService());
+		return serverClassLoader;
+	}
 
     private SessionType getSessionType(final Session session) {
         SessionType sessionType = null;
