@@ -50,7 +50,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
 
     private final PersistenceService persistenceService;
 
-    private final QueriableLoggerStrategy loggerConfiguration;
+    private final QueriableLoggerStrategy loggerStrategy;
 
     private final QueriableLogSessionProvider sessionProvider;
 
@@ -60,7 +60,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
             final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final PlatformService platformService) {
         NullCheckingUtil.checkArgsNotNull(persistenceService, loggerStrategy, sessionProvider);
         this.persistenceService = persistenceService;
-        loggerConfiguration = loggerStrategy;
+        this.loggerStrategy = loggerStrategy;
         this.sessionProvider = sessionProvider;
         this.platformService = platformService;
     }
@@ -133,7 +133,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
     @Override
     public boolean isLoggable(final String actionType, final SQueriableLogSeverity severity) {
         NullCheckingUtil.checkArgsNotNull(actionType, severity);
-        return loggerConfiguration.isLoggable(actionType, severity);
+        return loggerStrategy.isLoggable(actionType, severity);
     }
 
     @Override
@@ -194,7 +194,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
     }
 
     protected QueriableLoggerStrategy getQueriableLogConfiguration() {
-        return loggerConfiguration;
+        return loggerStrategy;
     }
 
     @Override
