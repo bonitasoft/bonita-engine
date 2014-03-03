@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.core.process.instance.model.builder;
+package org.bonitasoft.engine.test.persistence.builder;
 
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl;
 

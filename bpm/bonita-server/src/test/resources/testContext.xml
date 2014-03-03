@@ -31,6 +31,7 @@
            <props>
                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
                <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+               <prop key="hibernate.show_sql">false</prop>
            </props>
        </property>
    </bean>
@@ -38,6 +39,9 @@
    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
        <property name="sessionFactory" ref="sessionFactory" />
    </bean>
-
+    
+   <bean id="processInstanceRepository" class="org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository">
+        <constructor-arg ref="sessionFactory" />
+   </bean>
 
 </beans>
