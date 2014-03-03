@@ -15,7 +15,6 @@ import org.bonitasoft.engine.persistence.PersistenceTests;
 import org.bonitasoft.engine.platform.auth.PlatformAuthenticationServiceTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationTest;
 import org.bonitasoft.engine.profile.ProfileServiceTest;
-import org.bonitasoft.engine.queriablelogger.QueriableLoggerServiceTest;
 import org.bonitasoft.engine.recorder.RecorderTest;
 import org.bonitasoft.engine.scheduler.impl.JobTest;
 import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorTest;
@@ -36,7 +35,6 @@ import org.junit.runners.Suite.SuiteClasses;
         ClassLoaderServiceTest.class,
         DataTest.class,
         ExpressionServiceTest.class,
-        QueriableLoggerServiceTest.class,
         IdentityServiceTest.class,
         AuthenticationServiceTest.class,
         PlatformAuthenticationServiceTest.class,
