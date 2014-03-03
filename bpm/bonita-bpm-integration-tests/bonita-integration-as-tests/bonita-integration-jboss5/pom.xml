@@ -29,6 +29,8 @@
 
 		<bonita.home>${jboss.home}/bonita</bonita.home>
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
+		
+		<db.vendor>h2</db.vendor>
 	</properties>
 	
 	<dependencies>
@@ -43,6 +45,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+            <groupId>org.bonitasoft.jboss</groupId>
+            <artifactId>bonita-jboss-h2-mbean</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 	</dependencies>
 	
 	<profiles>
@@ -53,6 +60,28 @@
 	      </activation>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy2</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.bonitasoft.jboss</groupId>
+            								<artifactId>bonita-jboss-h2-mbean</artifactId>
+											<outputDirectory>${project.build.directory}/driver</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
@@ -77,6 +106,9 @@
 											</then>
 										</if>
 										<unzip dest="${project.build.directory}" src="${env.HOME}/${jboss.name}.zip" />
+												
+										<!-- Update database configuration -->
+										<property file="jboss/${db.vendor}/database.properties" />
 																				
 										<property name="bindings.xml" location="${jboss.conf.dir}/bindingservice.beans/META-INF/bindings-jboss-beans.xml" />
 										<replace file="${bindings.xml}" token="&lt;property name=&quot;port&quot;&gt;1099&lt;/property&gt;" value="&lt;property name=&quot;port&quot;&gt;${provider.port}&lt;/property&gt;" />
@@ -107,16 +139,28 @@
 										
 										<copy todir="${jboss.deploy.dir}" file="${distrib.dir}/ear/ejb3/bonita-deploy-ear3${bonita.version}-${project.version}.ear" />
 		
+		
+										<echo message="!!!!!!!!!!!!!!!! System Properties used to configure build (Begin) !!!!!!!!!!!"/>
+										<echo message="db.vendor: '${db.vendor}'"/>
+										<echo message="database.ip: '${database.ip}'"/>
+										<echo message="database.port: '${database.port}'"/>
+										<echo message="database.user: '${database.user}'"/>
+										<echo message="database.password: '${database.password}'"/>
+										<echo message="database.name: '${database.name}'"/>
+										<echo message="!!!!!!!!!!!!!!!! System Properties used to configure build (End)   !!!!!!!!!!!"/>
+		
+		
+		
 										<copy todir="${jboss.deploy.dir}">
 											<fileset dir="jboss/server/default/deploy">
-												<include name="*xml" />
+												<include name="${db.vendor}-ds.xml" />
 											</fileset>
 										</copy>
-										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.ip#" value="${database.ip}"/>
-										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.port#" value="${database.port}"/>
-										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.user#" value="${database.user}"/>
-										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.password#" value="${database.password}"/>
-										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.name#" value="${database.name}"/>
+										<replace file="${jboss.deploy.dir}/${db.vendor}-ds.xml" token="#database.ip#" value="${database.ip}"/>
+										<replace file="${jboss.deploy.dir}/${db.vendor}-ds.xml" token="#database.port#" value="${database.port}"/>
+										<replace file="${jboss.deploy.dir}/${db.vendor}-ds.xml" token="#database.user#" value="${database.user}"/>
+										<replace file="${jboss.deploy.dir}/${db.vendor}-ds.xml" token="#database.password#" value="${database.password}"/>
+										<replace file="${jboss.deploy.dir}/${db.vendor}-ds.xml" token="#database.name#" value="${database.name}"/>
 										<copy todir="${jboss.lib.dir}">
 											<fileset dir="target/driver">
 												<include name="*jar" />
