@@ -707,12 +707,12 @@
             <version>3.1.0.RELEASE</version>
             <scope>test</scope>
         </dependency>
-		<!-- <dependency>
-	        <groupId>javax.transaction</groupId>
-	        <artifactId>jta</artifactId>
-	        <version>1.1</version>
-	        <scope>test</scope>
-	    </dependency> -->
+		<dependency>
+		  <groupId>javax.inject</groupId>
+		  <artifactId>javax.inject</artifactId>
+		  <version>1</version>
+		  <scope>test</scope>
+		</dependency>
 	    <dependency>
 		    <groupId>org.hibernate</groupId>
 		    <artifactId>hibernate-core</artifactId>

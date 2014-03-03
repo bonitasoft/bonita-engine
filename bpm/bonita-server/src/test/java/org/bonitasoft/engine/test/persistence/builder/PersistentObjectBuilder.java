@@ -11,10 +11,10 @@ public abstract class PersistentObjectBuilder<T extends PersistentObject> {
     protected long id = new Random().nextLong();
     
     public T build() {
-        T t = _build();
-        t.setId(id);
-        t.setTenantId(DEFAULT_TENANT_ID);
-        return t;
+        T persistentObject = _build();
+        persistentObject.setId(id);
+        persistentObject.setTenantId(DEFAULT_TENANT_ID);
+        return persistentObject;
     }
     
     abstract T _build();
