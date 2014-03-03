@@ -62,15 +62,16 @@ public class StartEventTest extends CommonAPITest {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10)
                 .sort(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
 
+
+
+        HumanTaskInstance waitForUserTaskStep1 = waitForUserTask("step1");
+
         List<HumanTaskInstance> humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done())
                 .getResult();
+        long rootContainerId = waitForUserTaskStep1.getRootContainerId();
 
         // timerValue is slower than startProcess time
         // then we have 2 tasks
-
-        HumanTaskInstance waitForUserTaskStep1 = waitForUserTask("step1");
-        long rootContainerId = waitForUserTaskStep1.getRootContainerId();
-
         assertTrue(humanTaskInstances.size() > 0);
 
         for (HumanTaskInstance humanTaskInstance : humanTaskInstances) {
