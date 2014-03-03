@@ -14,7 +14,7 @@
 	<name>Bonita - Integration Tests on Tomcat 6</name>
 
 	<properties>
-		<server.port>8382</server.port>
+		<server.port>8383</server.port>
 		<provider.port>8182</provider.port>
 		<tomcat.version>6.0.37</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
