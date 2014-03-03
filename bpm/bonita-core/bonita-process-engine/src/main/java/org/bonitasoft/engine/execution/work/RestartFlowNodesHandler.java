@@ -43,11 +43,11 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
         try {
             QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
             List<SFlowNodeInstance> sFlowNodeInstances;
+            final boolean info = logger.isLoggable(getClass(), TechnicalLogSeverity.INFO);
+            if (info) {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting flow nodes...");
+            }
             do {
-                final boolean info = logger.isLoggable(getClass(), TechnicalLogSeverity.INFO);
-                if (info) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting flow nodes...");
-                }
                 sFlowNodeInstances = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
                 for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
@@ -56,7 +56,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
                         // if it is terminal it means the notify was not called yet
                         if (info) {
                             logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting flow node (Notify...) with name = " + sFlowNodeInstance.getName()
-                                    + ", and id = " + sFlowNodeInstance.getId());
+                                    + ", and id = " + sFlowNodeInstance.getId() + " in state " + sFlowNodeInstance.getStateName());
                         }
                         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(),
                                 sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(),
@@ -64,7 +64,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
                     } else {
                         if (info) {
                             logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting flow node (Execute..) with name = " + sFlowNodeInstance.getName()
-                                    + ", and id = " + sFlowNodeInstance.getId());
+                                    + ", and id = " + sFlowNodeInstance.getId() + " in state " + sFlowNodeInstance.getStateName());
                         }
                         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
                         workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null,
