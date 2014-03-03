@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 
 public class InsertBatchLogsJobRegister implements JobRegister {
@@ -45,7 +46,7 @@ public class InsertBatchLogsJobRegister implements JobRegister {
 
     @Override
     public Trigger getTrigger() {
-        return new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cronExpression);
+        return new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cronExpression, MisfireRestartPolicy.NONE);
     }
 
     @Override
