@@ -9,43 +9,24 @@
 package com.bonitasoft.engine.authentication.impl;
 
 import java.io.Serializable;
-import java.security.Principal;
-import java.security.acl.Group;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-import javax.security.auth.Subject;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
-
-import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.AuthenticationService;
-import org.bonitasoft.engine.authentication.GenericAuthenticationService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class JAASAuthenticationServiceImpl implements AuthenticationService, GenericAuthenticationService {
+public class JAASAuthenticationServiceImpl implements AuthenticationService {
 
-    private static final String LOGIN_CONTEXT_PREFIX = "BonitaAuthentication";
-
-    private static final String CALLER_PRINCIPAL = "CallerPrincipal";
-
-    private final TechnicalLoggerService logger;
-
-    private final ReadSessionAccessor sessionAccessor;
+    protected JAASGenericAuthenticationServiceImpl jaasGenericAuthenticationServiceImpl;
 
     public JAASAuthenticationServiceImpl(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor) {
-        this.logger = logger;
-        this.sessionAccessor = sessionAccessor;
+        this.jaasGenericAuthenticationServiceImpl = new JAASGenericAuthenticationServiceImpl(logger, sessionAccessor);
     }
 
     @Override
@@ -53,71 +34,10 @@ public class JAASAuthenticationServiceImpl implements AuthenticationService, Gen
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
         credentials.put(AuthenticationConstants.BASIC_USERNAME, username);
-        this.checkUserCredentials(credentials);
+        // TODO in case we are in a CAS environment, maybe we can use the login from the CAS server directly because wa have the
+        // login/mdp to provide... but that will not be a JAAS Standard...
+        this.jaasGenericAuthenticationServiceImpl.checkUserCredentials(credentials);
         // if the authentication fails, an exception is thrown, so we assume that passing this point is a login success
         return true;
-    }
-
-    @Override
-    public String checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException {
-        LoginContext loginContext = null;
-        try {
-            loginContext = new LoginContext(getLoginContext(), new AuthenticationCallbackHandler(credentials));
-        } catch (final Exception e) {
-            throw new AuthenticationException(e);
-        }
-        try {
-            loginContext.login();
-        } catch (final LoginException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "", e);
-            }
-            throw new AuthenticationException(e);
-        }
-        try {
-            loginContext.logout();
-        } catch (final LoginException e) {
-            throw new AuthenticationException(e);
-        }
-        return extractUserFromSubjet(loginContext);
-    }
-
-    /**
-     * it seems that there is a gap in the JAAS protocol to retrieve the user associated with the succeeded authentication.
-     * Implementations seem to use the Principal called "CallerPrincipal" that should be a group of principal where user should be present
-     * (yes, it is a lot of should...) <br>
-     * <br>
-     * It is at least what CAS is giving us. It is then acceptable.
-     * 
-     * @param loginContext
-     *            the login context to extract user from
-     * @return the user if it had succeed, null otherwise
-     */
-    private String extractUserFromSubjet(LoginContext loginContext) {
-        try {
-            Subject subject = loginContext.getSubject();
-            Set<Principal> principals = subject.getPrincipals();
-            for (Principal principal : principals) {
-                if (StringUtils.equals(principal.getName(), CALLER_PRINCIPAL) && principal.getClass().isAssignableFrom(Group.class)) {
-                    Group group = (Group) principal;
-                    @SuppressWarnings("unchecked")
-                    Enumeration<Principal> enumeration = (Enumeration<Principal>) group.members();
-                    if (enumeration.hasMoreElements()) {
-                        return enumeration.nextElement().getName();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // since it is a supposition that the principal holds the user name,
-            // error should happen if something goes wrong and we don't want to manage it yet
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "impossible to retrieve username from credentials", e);
-            }
-        }
-        return null;
-    }
-
-    private String getLoginContext() throws TenantIdNotSetException {
-        return LOGIN_CONTEXT_PREFIX + "-" + sessionAccessor.getTenantId();
     }
 }

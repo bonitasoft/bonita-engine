@@ -8,8 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.bonitasoft.engine.api.impl.LoginAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
+import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 
@@ -52,4 +56,18 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
         return TenantServiceSingleton.getInstance(tenantId);
     }
 
+    @Override
+    public APISession login(final long tenantId, final Map<String, Serializable> credentials) throws LoginException {
+        if (!LicenseChecker.getInstance().checkLicence()) {
+            throw new LoginException("The node is not started");
+        }
+        if (credentials != null) {
+            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+        }
+        try {
+            return login(credentials);
+        } catch (Throwable e) {
+            throw new LoginException(e);
+        }
+    }
 }

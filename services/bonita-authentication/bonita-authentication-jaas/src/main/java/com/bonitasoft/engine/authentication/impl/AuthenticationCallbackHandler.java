@@ -48,7 +48,7 @@ public class AuthenticationCallbackHandler implements CallbackHandler {
     /**
      * @param pc
      */
-    private void handlePassword(final PasswordCallback pc) {
+    protected void handlePassword(final PasswordCallback pc) {
         if (StringUtils.equals(pc.getPrompt(), AuthenticationConstants.CAS_TICKET)) {
             String password = String.valueOf(credentials.get(AuthenticationConstants.CAS_TICKET));
             pc.setPassword(password.toCharArray());
@@ -61,7 +61,7 @@ public class AuthenticationCallbackHandler implements CallbackHandler {
     /**
      * @param nc
      */
-    private void handleName(final NameCallback nc) {
+    protected void handleName(final NameCallback nc) {
         if (StringUtils.equals(nc.getPrompt(), AuthenticationConstants.CAS_SERVICE)) {
             String userName = String.valueOf(credentials.get(AuthenticationConstants.CAS_SERVICE));
             nc.setName(userName);

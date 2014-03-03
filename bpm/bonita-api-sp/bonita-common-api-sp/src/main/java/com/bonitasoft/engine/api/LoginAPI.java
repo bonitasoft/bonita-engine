@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.bonitasoft.engine.api.NoSessionRequired;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
@@ -33,5 +36,22 @@ public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
      */
     @NoSessionRequired
     APISession login(long tenantId, String userName, String password) throws LoginException;
+
+    /**
+     * Connects the user in order to use API methods of a tenant.
+     * 
+     * @param tenantId
+     *            the tenant identifier
+     * @param userName
+     *            the user name
+     * @param password
+     *            the password
+     * @return the session to use with other tenant API methods
+     * @throws LoginException
+     *             occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
+     *             since 6.0
+     */
+    @NoSessionRequired
+    APISession login(long tenantId, Map<String, Serializable> credentials) throws LoginException;
 
 }
