@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.api.internal;
 
+
 /**
  * 
  * @author Matthieu Chaffotte
@@ -45,5 +46,4 @@ public class ServerWrappedException extends Exception {
     public ServerWrappedException(final String message, final Throwable cause) {
         super(message, cause);
     }
-
 }

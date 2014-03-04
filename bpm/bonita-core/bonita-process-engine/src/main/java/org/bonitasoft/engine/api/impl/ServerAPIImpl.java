@@ -18,6 +18,8 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -33,6 +35,7 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
+import org.bonitasoft.engine.exception.BonitaContextException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
@@ -55,6 +58,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
@@ -76,6 +80,10 @@ public class ServerAPIImpl implements ServerAPI {
     private final boolean cleanSession;
 
     private TechnicalLoggerService technicalLogger;
+    
+    private String hostname = null;
+
+	private boolean hostnameResolutionAlreadyTried = false;
 
     private enum SessionType {
         PLATFORM, API;
@@ -94,39 +102,107 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    void setTechnicalLogger(final TechnicalLoggerService technicalLoggerService) {
+    /**
+     * For Test Mock usage
+     * @param cleanSession
+     * @param accessResolver
+     */
+    ServerAPIImpl(boolean cleanSession, APIAccessResolver accessResolver) {
+    	this.cleanSession = cleanSession;
+    	this.accessResolver = accessResolver;
+	}
+
+	void setTechnicalLogger(final TechnicalLoggerService technicalLoggerService) {
         technicalLogger = technicalLoggerService;
     }
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
+    	technicalTraceLog("Starting ", apiInterfaceName, methodName);
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         SessionAccessor sessionAccessor = null;
+        Session session = null;
         try {
             try {
-                sessionAccessor = beforeInvokeMethod(options, apiInterfaceName);
-                final Session session = (Session) options.get(SESSION);
+            	session = (Session) options.get(SESSION);
+                sessionAccessor = beforeInvokeMethod(session, apiInterfaceName);
                 return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
             } catch (final ServerAPIRuntimeException sapire) {
                 throw sapire.getCause();
             }
         } catch (final BonitaRuntimeException bre) {
-            throw new ServerWrappedException(bre);
+        	fillGlobalContextForException(sessionAccessor, session, bre);
+            throw createServerWrappedException(bre);
         } catch (final BonitaException be) {
-            throw new ServerWrappedException(be);
+        	fillGlobalContextForException(sessionAccessor, session, be);
+            throw createServerWrappedException(be);
         } catch (final UndeclaredThrowableException ute) {
             technicalDebugLog(ute);
-            throw new ServerWrappedException(ute);
+			throw createServerWrappedException(ute);
         } catch (final Throwable cause) {
         	technicalDebugLog(cause);
-            throw new ServerWrappedException(new BonitaRuntimeException(cause));
+            final BonitaRuntimeException throwableToWrap = new BonitaRuntimeException(cause);
+            fillGlobalContextForException(sessionAccessor, session, throwableToWrap);
+            throw createServerWrappedException(throwableToWrap);
         } finally {
             cleanSessionIfNeeded(sessionAccessor);
             // reset class loader
             Thread.currentThread().setContextClassLoader(baseClassLoader);
+            technicalTraceLog("End ", apiInterfaceName, methodName);
         }
     }
+
+	private ServerWrappedException createServerWrappedException(final Throwable throwableToWrap) {
+		return new ServerWrappedException(throwableToWrap);
+	}
+
+    private void fillGlobalContextForException(SessionAccessor sessionAccessor, Session session, BonitaContextException be) {
+    	fillTenantIdContextForException(sessionAccessor, be);
+    	fillUserNameContextForException(session, be);
+    	fillHostnameContextForException(be);
+    	fillThreadIdContextForException(be);
+    }
+
+	private void fillThreadIdContextForException(BonitaContextException be) {
+		be.setThreadId(Thread.currentThread().getId());
+	}
+
+	private void fillHostnameContextForException(BonitaContextException be) {
+		if(hostname == null && !hostnameResolutionAlreadyTried ){
+    		hostnameResolutionAlreadyTried = true;
+    		try {
+				hostname = InetAddress.getLocalHost().getHostName();
+			} catch (UnknownHostException e) {
+				technicalDebugLog(e);
+			}
+    	}
+    	if(hostname != null){
+    		be.setHostname(hostname);
+    	}
+	}
+
+	private void fillUserNameContextForException(Session session, BonitaContextException be) {
+		if (session != null) {
+    		final String userName = session.getUserName();
+    		if(userName != null){
+    			be.setUserName(userName);
+    		}
+    	}
+	}
+
+	private void fillTenantIdContextForException(SessionAccessor sessionAccessor,
+			BonitaContextException be) {
+		if (sessionAccessor != null) {
+    		long tenantId = -1;
+    		try {
+    			tenantId = sessionAccessor.getTenantId();
+    		} catch (STenantIdNotSetException e) {
+    			technicalDebugLog(e);
+    		}
+    		be.setTenantId(tenantId);
+    	}
+	}
 
 	private void cleanSessionIfNeeded(SessionAccessor sessionAccessor) {
 		if (cleanSession) {
@@ -142,6 +218,12 @@ public class ServerAPIImpl implements ServerAPI {
 		    technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, throwableToLog);
 		}
 	}
+	
+	private void technicalTraceLog(String prefix, String apiInterfaceName, String methodName) {
+		if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+		    technicalLogger.log(this.getClass(), TechnicalLogSeverity.TRACE,prefix + "Server API call "+ apiInterfaceName+" "+methodName);
+		}		
+	}
 
     private static final class ServerAPIRuntimeException extends RuntimeException {
 
@@ -153,7 +235,7 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private SessionAccessor beforeInvokeMethod(final Map<String, Serializable> options, final String apiInterfaceName) throws BonitaHomeNotSetException,
+    SessionAccessor beforeInvokeMethod(final Session session, final String apiInterfaceName) throws BonitaHomeNotSetException,
     InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException, NoSuchMethodException,
     InvocationTargetException, SBonitaException {
         SessionAccessor sessionAccessor = null;
@@ -162,7 +244,6 @@ public class ServerAPIImpl implements ServerAPI {
         final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
 
         ClassLoader serverClassLoader = null;
-        final Session session = (Session) options.get(SESSION);
         if (session != null) {
             final SessionType sessionType = getSessionType(session);
             sessionAccessor = serviceAccessorFactory.createSessionAccessor();
@@ -238,7 +319,7 @@ public class ServerAPIImpl implements ServerAPI {
         return sessionType;
     }
 
-    private Object invokeAPI(final String apiInterfaceName, final String methodName, final List<String> classNameParameters, final Object[] parametersValues,
+    Object invokeAPI(final String apiInterfaceName, final String methodName, final List<String> classNameParameters, final Object[] parametersValues,
             final Session session) throws Throwable {
         final Class<?>[] parameterTypes = getParameterTypes(classNameParameters);
 
