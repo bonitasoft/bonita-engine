@@ -35,17 +35,18 @@ class BatchLogSynchronization implements BonitaTransactionSynchronization {
 
     private InsertBatchLogsJobRegister jobRegister;
 
-    private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<BatchLogSynchronization>();
-
     private final List<SQueriableLog> logs = new ArrayList<SQueriableLog>();
 
+    private BatchQueriableLoggerImpl loggerService;
+
     public BatchLogSynchronization(PersistenceService persistenceService, BatchLogBuffer batchLogBuffer, InsertBatchLogsJobRegister jobRegister,
-            boolean delayable) {
+            boolean delayable, BatchQueriableLoggerImpl loggerService) {
         super();
         this.persistenceService = persistenceService;
         this.jobRegister = jobRegister;
         this.delayable = delayable;
         this.batchLogBuffer = batchLogBuffer;
+        this.loggerService = loggerService;
     }
 
     @Override
@@ -54,7 +55,7 @@ class BatchLogSynchronization implements BonitaTransactionSynchronization {
             batchLogBuffer.addLogs(this.logs);
             jobRegister.registerJobIfNotRegistered();
         }
-        synchronizations.remove();
+        loggerService.cleanSynchronization();
     }
 
     @Override

@@ -37,6 +37,9 @@ public class BatchLogSynchronizationTest {
     private InsertBatchLogsJobRegister jobRegister;
     
     @Mock
+    private BatchQueriableLoggerImpl loggerService;
+    
+    @Mock
     private SQueriableLog log1;
 
     @Mock
@@ -51,9 +54,9 @@ public class BatchLogSynchronizationTest {
     }
     
     @Test
-    public void afterCompletion_add_logs_to_buffer_and_register_job_if_delayable_and_transaction_was_committed() throws Exception {
+    public void afterCompletion_add_logs_to_buffer_register_job_and_clean_synchro_if_delayable_and_transaction_was_committed() throws Exception {
         //given
-        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, true);
+        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, true, loggerService);
         synchro.addLog(log1);
         synchro.addLog(log2);
 
@@ -63,12 +66,13 @@ public class BatchLogSynchronizationTest {
         //then
         verify(batchLogBuffer, times(1)).addLogs(Arrays.asList(log1, log2));
         verify(jobRegister, times(1)).registerJobIfNotRegistered();
+        verify(loggerService, times(1)).cleanSynchronization();
     }
 
     @Test
-    public void afterCompletion_doesnt_add_logs_to_buffer_nor_register_job_if_not_delayable_and_transaction_was_committed() throws Exception {
+    public void afterCompletion_clear_synchro_but_doesnt_add_logs_to_buffer_nor_register_job_if_not_delayable_and_transaction_was_committed() throws Exception {
         //given
-        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, false);
+        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, false, loggerService);
         synchro.addLog(log1);
         synchro.addLog(log2);
         
@@ -78,12 +82,13 @@ public class BatchLogSynchronizationTest {
         //then
         verify(batchLogBuffer, never()).addLogs(Matchers.<List<SQueriableLog>>any());
         verify(jobRegister, never()).registerJobIfNotRegistered();
+        verify(loggerService, times(1)).cleanSynchronization();
     }
 
     @Test
     public void afterCompletion_doesnt_add_logs_to_buffer_nor_register_job_if_delayable_and_transaction_wasnt_committed() throws Exception {
         //given
-        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, true);
+        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, true, loggerService);
         synchro.addLog(log1);
         synchro.addLog(log2);
         
@@ -98,7 +103,7 @@ public class BatchLogSynchronizationTest {
     @Test
     public void beforeCommit_should_insert_batch_and_fush_if_not_delayable() throws Exception {
         //given
-        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, false);
+        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, false, loggerService);
         synchro.addLog(log1);
         synchro.addLog(log2);
 
@@ -114,7 +119,7 @@ public class BatchLogSynchronizationTest {
     @Test
     public void beforeCommit_should_not_insert_batch_neither_fush_if_delayable() throws Exception {
         //given
-        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, true);
+        BatchLogSynchronization synchro = new BatchLogSynchronization(persistenceService, batchLogBuffer, jobRegister, true, loggerService);
         synchro.addLog(log1);
         synchro.addLog(log2);
         

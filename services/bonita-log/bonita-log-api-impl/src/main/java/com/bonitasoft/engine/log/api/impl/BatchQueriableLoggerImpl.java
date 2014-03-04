@@ -50,7 +50,7 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     protected synchronized BatchLogSynchronization getBatchLogSynchronization() throws STransactionNotFoundException {
         BatchLogSynchronization synchro = synchronizations.get();
         if (synchro == null) {
-            synchro = new BatchLogSynchronization(persistenceService, BatchLogBuffer.getInstance(), InsertBatchLogsJobRegister.getInstance(), delayable);
+            synchro = new BatchLogSynchronization(persistenceService, BatchLogBuffer.getInstance(), InsertBatchLogsJobRegister.getInstance(), delayable, this);
             synchronizations.set(synchro);
             this.transactionService.registerBonitaSynchronization(synchro);
         }
@@ -69,5 +69,10 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
             this.logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found");
         }
     }
+
+    protected void cleanSynchronization() {
+        synchronizations.remove();
+    }
+    
 
 }
