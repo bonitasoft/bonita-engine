@@ -1156,10 +1156,18 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
 	</query>
 	
+	<query name="getProcessInstancesInStates">
+		SELECT p
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+		WHERE p.stateId IN (:stateIds)
+		ORDER BY id
+	</query>
+	
 	<query name="getProcessInstancesInState">
 		SELECT p
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
 		WHERE p.stateId = :state
+		ORDER BY id
 	</query>
 
 	<query name="getNumberOfChildInstancesOfProcessInstance">

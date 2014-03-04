@@ -95,10 +95,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
-            final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
-            final ProcessDefinitionService processDefinitionService, final SCommentService commentService, final ProcessInstanceService processInstanceService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
-            final WorkService workService, final TransactionService transactionService) {
+            final TechnicalLoggerService logger, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
+            final SCommentService commentService, final ProcessInstanceService processInstanceService, final ConnectorInstanceService connectorInstanceService,
+            final ClassLoaderService classLoaderService, final WorkService workService, final TransactionService transactionService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -187,8 +186,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     try {
                         // we notify in a work: transitions and so on will be executed
                         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(processDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
-                                sFlowNodeInstance.getId(), sFlowNodeInstance
-                                        .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), state.getId()));
+                                sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(),
+                                state.getId()));
                     } catch (final WorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
@@ -233,8 +232,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 try {
                     // reschedule this work but without the operations
                     workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
-                            sFlowNodeInstance.getId(), sFlowNodeInstance
-                                    .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
+                            sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
                 } catch (final WorkRegisterException e) {
                     throw new SFlowNodeExecutionException(e);
                 }
@@ -268,13 +266,13 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             throws SBonitaException {
         final long callerId = childProcInst.getCallerId();
         if (isTerminalState(childState) && callerId > 0) {
-            final SActivityInstance activityInstance;
-            activityInstance = activityInstanceService.getActivityInstance(childProcInst.getCallerId());
-            final int tokenCount = activityInstance.getTokenCount() - 1;
-            activityInstanceService.setTokenCount(activityInstance, tokenCount);
+            final SActivityInstance callActivityInstance;
+            callActivityInstance = activityInstanceService.getActivityInstance(childProcInst.getCallerId());
+            final int tokenCount = callActivityInstance.getTokenCount() - 1;
+            activityInstanceService.setTokenCount(callActivityInstance, tokenCount);
             if (!hasActionsToExecute) {
-                containerRegistry.executeFlowNode(activityInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
-                        activityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
+                containerRegistry.executeFlowNode(callActivityInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
+                        callActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
             }
         }
 
