@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -52,11 +52,10 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 
-;
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
 
@@ -160,7 +159,8 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                     createInnerInstances = InitializingMultiInstanceActivityStateImpl.createInnerInstances(bpmInstancesCreator, activityInstanceService,
                             processDefinition.getId(), activityDefinition, flowNodeInstance, loopCharacteristics, numberOfInstances, 1);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
-                        containerRegistry.executeFlowNode(sFlowNodeInstance.getId(), null, null, sFlowNodeInstance.getLogicalGroup(3));
+                        containerRegistry.executeFlowNode(processDefinition.getId(), sFlowNodeInstance.getLogicalGroup(3), sFlowNodeInstance.getId(), null,
+                                null);
                     }
                 }
                 return numberOfActiveInstances == 0 && (createInnerInstances == null || createInnerInstances.size() == 0);
@@ -194,7 +194,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
             for (final SActivityInstance child : children) {
                 activityInstanceService.setStateCategory(child, SStateCategory.ABORTING);
                 if (child.isStable()) {
-                    containerRegistry.executeFlowNode(child.getId(), null, null, child.getLogicalGroup(3));
+                    containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), child.getLogicalGroup(3), child.getId(), null, null);
                 }
             }
 

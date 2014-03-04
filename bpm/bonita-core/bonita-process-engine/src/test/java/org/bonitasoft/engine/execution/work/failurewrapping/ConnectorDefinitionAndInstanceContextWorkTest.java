@@ -1,0 +1,182 @@
+/**
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.execution.work.failurewrapping;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.execution.work.TransactionServiceForTest;
+import org.bonitasoft.engine.incident.IncidentService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.work.BonitaWork;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
+
+/**
+ * @author Celine Souchet
+ * 
+ */
+@SuppressWarnings("javadoc")
+@RunWith(MockitoJUnitRunner.class)
+public class ConnectorDefinitionAndInstanceContextWorkTest {
+
+    private static final String CONNECTOR_DEFINITION_NAME = "connector_name";
+
+    private static final ConnectorEvent ACTIVATION_EVENT = ConnectorEvent.ON_ENTER;
+
+    private static final long CONNECTOR_INSTANCE_ID = 10L;
+
+    @Mock
+    private BonitaWork wrappedWork;
+
+    @Mock
+    private TenantServiceAccessor tenantAccessor;
+
+    @Mock
+    private SessionService sessionService;
+
+    @Mock
+    private IncidentService incidentService;
+
+    @Mock
+    private TechnicalLoggerService loggerService;
+
+    @Mock
+    private SessionAccessor sessionAccessor;
+
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
+
+    @Mock
+    private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
+
+    @Spy
+    private TransactionServiceForTest transactionService;
+
+    private ConnectorDefinitionAndInstanceContextWork txBonitawork;
+
+    @Before
+    public void before() {
+        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
+        when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
+        when(tenantAccessor.getSessionService()).thenReturn(sessionService);
+        when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
+        doReturn(transactionService).when(tenantAccessor).getTransactionService();
+
+        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID));
+        doReturn("The description").when(txBonitawork).getDescription();
+
+        doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
+    }
+
+    @Test
+    public void testWork() throws Exception {
+        final Map<String, Object> singletonMap = new HashMap<String, Object>();
+        txBonitawork.work(singletonMap);
+        verify(wrappedWork, times(1)).work(singletonMap);
+    }
+
+    @Test
+    public void getDescription() {
+        when(wrappedWork.getDescription()).thenReturn("The description");
+        assertEquals("The description", txBonitawork.getDescription());
+    }
+
+    @Test
+    public void getRecoveryProcedure() {
+        when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
+        assertEquals("recoveryProcedure", txBonitawork.getRecoveryProcedure());
+    }
+
+    @Test
+    public void handleFailureWithNameAndId() throws Throwable {
+        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final SBonitaException e = new SBonitaException() {
+
+            private static final long serialVersionUID = -6748168976371554636L;
+        };
+
+        txBonitawork.handleFailure(e, context);
+
+        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_NAME = " + CONNECTOR_DEFINITION_NAME));
+        assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID = " + CONNECTOR_INSTANCE_ID));
+        verify(wrappedWork).handleFailure(e, context);
+    }
+
+    @Test
+    public void handleFailureWithNameAndIdAndActivationEvent() throws Throwable {
+        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID,
+                ACTIVATION_EVENT));
+        doReturn("The description").when(txBonitawork).getDescription();
+        final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
+        final SBonitaException e = new SBonitaException() {
+
+            private static final long serialVersionUID = -6748168976371554636L;
+        };
+        doThrow(e).when(wrappedWork).work(context);
+
+        txBonitawork.handleFailure(e, context);
+
+        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_NAME = " + CONNECTOR_DEFINITION_NAME));
+        assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID = " + CONNECTOR_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("CONNECTOR_ACTIVATION_EVENT = " + ACTIVATION_EVENT));
+        verify(wrappedWork, times(1)).handleFailure(e, context);
+    }
+
+    @Test
+    public void getTenantId() {
+        when(wrappedWork.getTenantId()).thenReturn(12l);
+        assertEquals(12, txBonitawork.getTenantId());
+    }
+
+    @Test
+    public void setTenantId() {
+        txBonitawork.setTenantId(12l);
+        verify(wrappedWork).setTenantId(12l);
+    }
+
+    @Test
+    public void getWrappedWork() {
+        assertEquals(wrappedWork, txBonitawork.getWrappedWork());
+    }
+
+    @Test
+    public void testToString() {
+        when(wrappedWork.toString()).thenReturn("the to string");
+        assertEquals("the to string", txBonitawork.toString());
+    }
+
+}

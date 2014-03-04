@@ -81,9 +81,10 @@ public class ContainerRegistry {
      * @param processInstanceId
      * @throws SWorkRegisterException
      */
-    public void executeFlowNode(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final long processInstanceId) throws SWorkRegisterException {
-        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processInstanceId, flowNodeInstanceId, operations, contextDependency));
+    public void executeFlowNode(final long processDefinitionId, final long processInstanceId, final long flowNodeInstanceId,
+            final SExpressionContext contextDependency, final List<SOperation> operations) throws SWorkRegisterException {
+        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, flowNodeInstanceId, operations,
+                contextDependency));
     }
 
     /**
@@ -95,8 +96,8 @@ public class ContainerRegistry {
      * @throws SFlowNodeReadException
      * @throws SFlowNodeExecutionException
      */
-    public void executeFlowNodeInSameThread(final long flowNodeInstanceId, final SExpressionContext contextDependency, final List<SOperation> operations,
-            final String containerType, final Long processInstanceId) throws SFlowNodeReadException, SFlowNodeExecutionException {
+    public void executeFlowNodeInSameThread(final Long processInstanceId, final long flowNodeInstanceId, final SExpressionContext contextDependency,
+            final List<SOperation> operations, final String containerType) throws SFlowNodeReadException, SFlowNodeExecutionException {
         final ContainerExecutor containerExecutor = getContainerExecutor(containerType);
         containerExecutor.executeFlowNode(flowNodeInstanceId, contextDependency, operations, processInstanceId, null, null);
     }

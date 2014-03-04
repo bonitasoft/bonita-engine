@@ -57,7 +57,7 @@ public class TransactionExecutorImplTest {
         verify(transactionService, times(1)).executeInTransaction(any(Callable.class));
     }
 
-    // Minimal implementation of a TransactionService (we do not (and don't want to !) see the JTATransactionServiceImpl)
+    // Minimal implementation of a TransactionService (we do not (and don't want to !) see the TransactionServiceForTest)
     class MockTransactionService implements TransactionService {
 
         @Override

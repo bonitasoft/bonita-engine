@@ -398,8 +398,8 @@ public class EventsHandler {
             throws SFlowNodeReadException, SFlowNodeExecutionException {
         // in same thread because we delete the message instance after triggering the catch event. The data is of the message
         // is deleted so we will be unable to execute the flow node instance
-        containerRegistry.executeFlowNodeInSameThread(flowNodeInstanceId, operations.getContext(), operations.getOperations(), operations.getContainerType(),
-                processInstanceId);
+        containerRegistry.executeFlowNodeInSameThread(processInstanceId, flowNodeInstanceId, operations.getContext(), operations.getOperations(),
+                operations.getContainerType());
     }
 
     private void instantiateProcess(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final OperationsWithContext operations)

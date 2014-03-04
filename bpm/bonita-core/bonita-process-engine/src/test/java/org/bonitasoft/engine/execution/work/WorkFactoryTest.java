@@ -21,10 +21,10 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
-import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWork;
-import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingMessageInstanceContextWork;
-import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingProcessDefinitionAndInstanceContextWork;
-import org.bonitasoft.engine.execution.work.failurehandling.FailureHandlingProcessDefinitionContextWork;
+import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
+import org.bonitasoft.engine.execution.work.failurewrapping.MessageInstanceContextWork;
+import org.bonitasoft.engine.execution.work.failurewrapping.ProcessDefinitionContextWork;
+import org.bonitasoft.engine.execution.work.failurewrapping.ProcessInstanceContextWork;
 import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,53 +64,53 @@ public class WorkFactoryTest {
     @Test
     public void createExecuteMessageCoupleWork() {
         WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
-        Assert.assertTrue("A FailureHandlingMessageInstanceContextWork is missing", containsFailureHandlingMessageInstance(work));
+        Assert.assertTrue("A MessageInstanceContextWork is missing", containsFailureHandlingMessageInstance(work));
         Assert.assertTrue("A FailureHandlingProcessDefinitionCOntextWork is missing", containsFailureHandlingProcessDefinition(work));
     }
 
     @Test
     public void createExecuteFlowNode() {
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteFlowNodeWork(1L, 1L, Collections.<SOperation> emptyList(), null);
-        Assert.assertTrue("A FailureHandlingProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
-        Assert.assertTrue("A FailureHandlingProcessDefinitionAndInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
-        Assert.assertTrue("A FailureHandlingProcessDefinitionAndInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
+        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteFlowNodeWork(1L, 1L, 3, Collections.<SOperation> emptyList(), null);
+        Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
+        Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
+        Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
     }
 
     @Test
     public void createExecuteConnectorOfProcess() {
         WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfProcess(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER);
-        Assert.assertTrue("A FailureHandlingProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
+        Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
     }
 
     @Test
     public void createExecuteConnectorOfActivity() {
-        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfActivity(1L, 3L, 4L, 5L, "connectorDefName");
-        Assert.assertTrue("A FailureHandlingProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
-        Assert.assertTrue("A FailureHandlingProcessDefinitionAndInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
+        WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfActivity(1L, 3L, 4L, 5L, 6, "connectorDefName");
+        Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
+        Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
     }
 
     @Test
     public void createNotifyChildFinishedWork() {
         WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createNotifyChildFinishedWork(1L, 2L, 3L, 4L, "parentType");
-        Assert.assertTrue("A FailureHandlingProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
-        Assert.assertTrue("A FailureHandlingProcessDefinitionAndInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
-        Assert.assertTrue("A FailureHandlingProcessDefinitionAndInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
+        Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
+        Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
+        Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
     }
 
     private boolean containsFailureHandlingFlowNodeInstance(WrappingBonitaWork work) {
-        return containsWorkOfClass(work, FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWork.class);
+        return containsWorkOfClass(work, FlowNodeDefinitionAndInstanceContextWork.class);
     }
 
     private boolean containsFailureHandlingProcessInstance(WrappingBonitaWork work) {
-        return containsWorkOfClass(work, FailureHandlingProcessDefinitionAndInstanceContextWork.class);
+        return containsWorkOfClass(work, ProcessInstanceContextWork.class);
     }
 
     private boolean containsFailureHandlingProcessDefinition(WrappingBonitaWork work) {
-        return containsWorkOfClass(work, FailureHandlingProcessDefinitionContextWork.class);
+        return containsWorkOfClass(work, ProcessDefinitionContextWork.class);
     }
 
     private boolean containsFailureHandlingMessageInstance(WrappingBonitaWork work) {
-        return containsWorkOfClass(work, FailureHandlingMessageInstanceContextWork.class);
+        return containsWorkOfClass(work, MessageInstanceContextWork.class);
     }
 
     private boolean containsLockProcessInstanceWork(WrappingBonitaWork work) {

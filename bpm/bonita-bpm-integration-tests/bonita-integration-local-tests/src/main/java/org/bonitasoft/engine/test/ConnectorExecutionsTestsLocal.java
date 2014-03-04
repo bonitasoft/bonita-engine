@@ -671,7 +671,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final String logs = myOut.toString();
         System.out.println(logs);
         assertTrue("should have written in logs an exception", logs.contains("SConnectorException"));
-        assertTrue("should have written in logs an exception", logs.contains("java.lang.ClassNotFoundException: org.unknown.MyUnknownClass"));
+        assertTrue("should have written in logs an exception", logs.contains("org.unknown.MyUnknownClass"));
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-773")

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,8 +16,6 @@ package org.bonitasoft.engine;
 import javax.naming.Context;
 
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.util.TestUtil;
@@ -37,6 +35,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class CommonServiceTest {
 
@@ -87,11 +86,13 @@ public class CommonServiceTest {
         @Override
         public void failed(final Throwable e, final Description d) {
             LOGGER.info("Failed test: " + d.getTestClass().getName() + "." + d.getMethodName());
+            LOGGER.info("-----------------------------------------------------------------------------------------------");
         }
 
         @Override
         public void succeeded(final Description d) {
             LOGGER.info("Succeeded test: " + d.getTestClass().getName() + "." + d.getMethodName());
+            LOGGER.info("-----------------------------------------------------------------------------------------------");
         }
 
     };

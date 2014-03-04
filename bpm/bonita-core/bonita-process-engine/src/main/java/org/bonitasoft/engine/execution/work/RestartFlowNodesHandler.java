@@ -73,8 +73,8 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
             throws SWorkRegisterException {
         logInfo(logger, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":" + sFlowNodeInstance.getId());
         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
-        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), null,
-                null));
+        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(),
+                sFlowNodeInstance.getParentProcessInstanceId(), sFlowNodeInstance.getId(), null, null));
     }
 
     private void createNotifyChildFinishedWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)

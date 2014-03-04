@@ -11,14 +11,11 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work.failurehandling;
+package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,11 +27,8 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.incident.Incident;
+import org.bonitasoft.engine.execution.work.TransactionServiceForTest;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -46,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
@@ -54,7 +49,13 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
-public class FailureHandlingBonitaWorkTest {
+public class ProcessDefinitionContextWorkTest {
+
+    private static final long PROCESS_DEFINITION_ID = 2;
+
+    private static final String VERSION = "version";
+
+    private static final String NAME = "name";
 
     @Mock
     private BonitaWork wrappedWork;
@@ -80,18 +81,27 @@ public class FailureHandlingBonitaWorkTest {
     @Mock
     private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
 
-    private FailureHandlingBonitaWork txBonitawork;
+    @Spy
+    private TransactionServiceForTest transactionService;
+
+    private ProcessDefinitionContextWork txBonitawork;
 
     @Before
-    public void before() {
+    public void before() throws Exception {
+        doReturn(NAME).when(sProcessDefinitionDeployInfo).getName();
+        doReturn(VERSION).when(sProcessDefinitionDeployInfo).getVersion();
+
+        doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(PROCESS_DEFINITION_ID);
+
+        doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
         when(tenantAccessor.getSessionService()).thenReturn(sessionService);
         when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
+        doReturn(transactionService).when(tenantAccessor).getTransactionService();
 
-        txBonitawork = spy(new FailureHandlingBonitaWork(wrappedWork));
+        txBonitawork = spy(new ProcessDefinitionContextWork(wrappedWork, PROCESS_DEFINITION_ID));
         doReturn("The description").when(txBonitawork).getDescription();
-        doReturn(tenantAccessor).when(txBonitawork).getTenantAccessor();
 
         doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
     }
@@ -101,36 +111,6 @@ public class FailureHandlingBonitaWorkTest {
         final Map<String, Object> singletonMap = new HashMap<String, Object>();
         txBonitawork.work(singletonMap);
         verify(wrappedWork, times(1)).work(singletonMap);
-    }
-
-    @Test
-    public void testWorkFailureIsHandled() throws Throwable {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
-        final Exception e = new Exception();
-        doThrow(e).when(wrappedWork).work(singletonMap);
-        txBonitawork.work(singletonMap);
-        verify(wrappedWork, times(1)).work(singletonMap);
-        verify(wrappedWork, times(1)).handleFailure(e, singletonMap);
-    }
-
-    @Test
-    public void testFailureHandlingFail() throws Throwable {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
-        final Exception e1 = new Exception();
-        final Exception e2 = new Exception();
-        doThrow(e1).when(wrappedWork).work(singletonMap);
-        doThrow(e2).when(wrappedWork).handleFailure(e1, singletonMap);
-        txBonitawork.work(singletonMap);
-        verify(wrappedWork, times(1)).work(singletonMap);
-        verify(wrappedWork, times(1)).handleFailure(e1, singletonMap);
-        verify(incidentService, times(1)).report(eq(0l), any(Incident.class));
-    }
-
-    @Test
-    public void putInMap() throws SBonitaException {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
-        txBonitawork.work(singletonMap);
-        assertEquals(tenantAccessor, singletonMap.get("tenantAccessor"));
     }
 
     @Test
@@ -152,7 +132,12 @@ public class FailureHandlingBonitaWorkTest {
 
             private static final long serialVersionUID = -6748168976371554636L;
         };
+
         txBonitawork.handleFailure(e, context);
+
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork).handleFailure(e, context);
     }
 
@@ -177,49 +162,6 @@ public class FailureHandlingBonitaWorkTest {
     public void testToString() {
         when(wrappedWork.toString()).thenReturn("the to string");
         assertEquals("the to string", txBonitawork.toString());
-    }
-
-    @Test
-    public void doNotHandleFailureWhenGettingASFlowNodeNotFoundException() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SFlowNodeNotFoundException(83));
-        doThrow(e).when(wrappedWork).work(context);
-        txBonitawork.work(context);
-        verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
-    }
-
-    @Test
-    public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessInstanceNotFoundException(83));
-        doThrow(e).when(wrappedWork).work(context);
-        when(wrappedWork.getDescription()).thenReturn("");
-        txBonitawork.work(context);
-        verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
-    }
-
-    @Test
-    public void doNotHandleFailureWhenGettingASProcessDefinitionNotFoundException() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessDefinitionNotFoundException("message"));
-        doThrow(e).when(wrappedWork).work(context);
-        txBonitawork.work(context);
-        verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
-    }
-
-    @Test
-    public void handleFailureForAllOtherExceptions() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception();
-        doThrow(e).when(wrappedWork).work(context);
-        txBonitawork.work(context);
-        verify(wrappedWork, times(1)).handleFailure(e, context);
     }
 
 }

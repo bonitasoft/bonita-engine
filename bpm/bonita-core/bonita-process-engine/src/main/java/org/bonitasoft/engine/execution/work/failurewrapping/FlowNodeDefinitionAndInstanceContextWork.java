@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work.failurehandling;
+package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import java.util.Map;
 
@@ -19,7 +19,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * Adding context information about Flow Node & Process definition and instance to exception for better logging
@@ -27,7 +26,7 @@ import org.bonitasoft.engine.work.BonitaWork;
  * @author Aurelien Pupier
  * @author Celine Souchet
  */
-public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWork extends FailureHandlingProcessDefinitionAndInstanceContextWork {
+public class FlowNodeDefinitionAndInstanceContextWork extends TxInHandleFailureWrappingWork {
 
     private static final long serialVersionUID = -8192129441020811731L;
 
@@ -39,8 +38,8 @@ public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWork 
      * @param flowNodeInstanceId
      *            The identifier of the flow node instance
      */
-    public FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWork(final BonitaWork wrappedWork, final long flowNodeInstanceId) {
-        super(wrappedWork, -1);
+    public FlowNodeDefinitionAndInstanceContextWork(final ProcessInstanceContextWork wrappedWork, final long flowNodeInstanceId) {
+        super(wrappedWork);
         this.flowNodeInstanceId = flowNodeInstanceId;
     }
 
@@ -49,15 +48,9 @@ public class FailureHandlingFlowNodeDefinitionAndInstanceWithProcessContextWork 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-
         sBonitaException.setFlowNodeDefinitionIdOnContext(flowNodeInstance.getFlowNodeDefinitionId());
         sBonitaException.setFlowNodeInstanceIdOnContext(flowNodeInstanceId);
         sBonitaException.setFlowNodeNameOnContext(flowNodeInstance.getName());
-
-        setProcessDefinitionId(flowNodeInstance.getProcessDefinitionId());
-        setProcessInstanceId(flowNodeInstance.getParentProcessInstanceId());
-        setRootProcessInstanceId(flowNodeInstance.getRootProcessInstanceId());
-        super.setExceptionContext(sBonitaException, context);
     }
 
 }

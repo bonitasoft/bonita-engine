@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work.failurehandling;
+package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ import org.bonitasoft.engine.work.BonitaWork;
  * 
  * @author Celine Souchet
  */
-public class FailureHandlingProcessDefinitionContextWork extends FailureHandlingBonitaWork {
+public class ProcessDefinitionContextWork extends TxInHandleFailureWrappingWork {
 
     private static final long serialVersionUID = 6958842321501639910L;
 
@@ -38,7 +38,7 @@ public class FailureHandlingProcessDefinitionContextWork extends FailureHandling
      * @param processDefinitionId
      *            The identifier of the process definition
      */
-    public FailureHandlingProcessDefinitionContextWork(final BonitaWork wrappedWork, final long processDefinitionId) {
+    public ProcessDefinitionContextWork(final BonitaWork wrappedWork, final long processDefinitionId) {
         super(wrappedWork);
         this.processDefinitionId = processDefinitionId;
     }

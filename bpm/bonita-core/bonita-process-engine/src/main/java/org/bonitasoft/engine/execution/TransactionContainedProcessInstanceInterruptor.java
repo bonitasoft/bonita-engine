@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -35,6 +35,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class TransactionContainedProcessInstanceInterruptor extends AbstractProcessInstanceInterruptor {
 
@@ -64,8 +65,8 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
         final SFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(childId);
         final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
-        containerRegistry.executeFlowNode(flowNodeInstance.getId(), null, null,
-                flowNodeInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()));
+        containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), flowNodeInstance.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex()), flowNodeInstance.getId(), null,
+                null);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -136,7 +136,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     @Override
     public FlowNodeState stepForward(final long flowNodeInstanceId, final SExpressionContext expressionContext, final List<SOperation> operations,
             final long processInstanceId, final Long executerId, final Long executerDelegateId) throws SFlowNodeExecutionException {
-
         FlowNodeState state = null;
 
         // retrieve the activity and execute its state
@@ -177,6 +176,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     // the state is still executing set the executing flag
                     activityInstanceService.setExecuting(sFlowNodeInstance);
                 }
+            } catch (final SFlowNodeExecutionException e) {
+                throw e;
             } catch (final SBonitaException e) {
                 throw new SFlowNodeExecutionException(e);
             }
@@ -194,7 +195,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 } else if (!state.isStable() && !state.isInterrupting()) {
                     try {
                         // reschedule this work but without the operations
-                        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processInstanceId, flowNodeInstanceId, null, null));
+                        workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, flowNodeInstanceId, null, null));
                     } catch (final SWorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
@@ -272,8 +273,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final int tokenCount = activityInstance.getTokenCount() - 1;
             activityInstanceService.setTokenCount(activityInstance, tokenCount);
             if (!hasActionsToExecute) {
-                containerRegistry.executeFlowNode(activityInstance.getId(), null, null,
-                        activityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
+                containerRegistry.executeFlowNode(activityInstance.getProcessDefinitionId(), activityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()), activityInstance.getId(), null,
+                        null);
             }
         }
 

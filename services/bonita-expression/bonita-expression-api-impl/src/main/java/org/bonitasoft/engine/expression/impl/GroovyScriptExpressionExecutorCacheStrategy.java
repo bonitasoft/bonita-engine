@@ -101,7 +101,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             final StringBuilder builder = new StringBuilder("Expression ");
-            builder.append(expressionName).append(" with content: ").append(expressionContent).append(" depends on ").append(property)
+            builder.append(expressionName).append(" with content : ").append(expressionContent).append(" depends on ").append(property)
                     .append(" is neither defined in the script nor in dependencies");
             throw new SExpressionEvaluationException(builder.toString(), e, expressionName);
         } catch (final GroovyRuntimeException e) {
@@ -109,10 +109,15 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         } catch (final CacheException e) {
             throw new SExpressionEvaluationException("Problem accessing the Script Cache from GroovyScriptExpressionExecutorCacheStrategy", e, expressionName);
         } catch (final ClassLoaderException e) {
-            throw new SExpressionEvaluationException("Unable to retrieve the correct classloader to execute the groovy script: " + expression, e,
+            throw new SExpressionEvaluationException("Unable to retrieve the correct classloader to execute the groovy script : " + expression, e,
                     expressionName);
         } catch (final Throwable e) {
-            throw new SExpressionEvaluationException("Script throws an exception" + expression, e, expressionName);
+            String message = e.getMessage();
+            if (message == null || message.isEmpty()) {
+                message = "No message";
+            }
+            throw new SExpressionEvaluationException("Groovy script throws an exception of type " + e.getClass() + " with message = " + message
+                    + System.lineSeparator() + "Expression : " + expression, e, expressionName);
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -666,8 +666,8 @@ public class StateBehaviors {
             do {
                 childrenOfAnActivity = activityInstanceService.getChildrenOfAnActivity(flowNodeInstance.getId(), i, BATCH_SIZE);
                 for (final SActivityInstance sActivityInstance : childrenOfAnActivity) {
-                    containerRegistry.executeFlowNode(sActivityInstance.getId(), null, null,
-                            sActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
+                    containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), sActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()), sActivityInstance.getId(), null,
+                            null);
                 }
                 i += BATCH_SIZE;
             } while (childrenOfAnActivity.size() == BATCH_SIZE);
@@ -691,23 +691,24 @@ public class StateBehaviors {
             for (final SActivityInstance child : childrenToEnd) {
                 activityInstanceService.setStateCategory(child, stateCategory);
                 if (child.isStable()) {
-                    containerRegistry.executeFlowNode(child.getId(), null, null,
-                            child.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
+                    containerRegistry.executeFlowNode(child.getProcessDefinitionId(), child.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()), child.getId(), null,
+                            null);
                 }
             }
             queryOptions = QueryOptions.getNextPage(queryOptions);
         } while (childrenToEnd.size() == numberOfResults);
     }
 
-    public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
+    public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
+            final long flowNodeInstanceId,
             final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition) throws SActivityStateExecutionException {
         final long connectorInstanceId = connector.getId();
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();
         try {
             connectorInstanceService.setState(connector, ConnectorState.EXECUTING.name());
-            workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId, connectorInstanceId,
-                    connectorDefinitionName));
+            workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, processInstanceId, flowNodeDefinitionId,
+                    flowNodeInstanceId, connectorInstanceId, connectorDefinitionName));
         } catch (SConnectorInstanceModificationException e) {
             throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING", e);
         } catch (final SWorkRegisterException e) {
@@ -749,8 +750,8 @@ public class StateBehaviors {
                                     rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId(),
                                     activityInstance.getTokenRefId());
                             // no need to handle failed state, creation is in the same tx
-                            containerRegistry.executeFlowNodeInSameThread(boundaryEventInstance.getId(), null, null, containerType.name(),
-                                    parentProcessInstanceId);
+                            containerRegistry.executeFlowNodeInSameThread(parentProcessInstanceId, boundaryEventInstance.getId(), null, null,
+                                    containerType.name());
                         }
                     } catch (final SBonitaException e) {
                         throw new SActivityStateExecutionException("Unable to create boundary events attached to activity " + activityInstance.getName(), e);
@@ -773,8 +774,8 @@ public class StateBehaviors {
                     interrupWaitinEvents(processDefinition, boundaryEventInstance, catchEventDef);
                     activityInstanceService.setStateCategory(boundaryEventInstance, categoryState);
                     if (stable) {
-                        containerRegistry.executeFlowNode(boundaryEventInstance.getId(), null, null,
-                                boundaryEventInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()));
+                        containerRegistry.executeFlowNode(processDefinition.getId(), boundaryEventInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()), boundaryEventInstance.getId(), null,
+                                null);
                     }
                 }
             }

@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution.work.failurehandling;
+package org.bonitasoft.engine.execution.work.failurewrapping;
 
 import java.util.Map;
 
@@ -19,14 +19,13 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * Adding context information about Process definition and instance to exception for better logging
  * 
  * @author Celine Souchet
  */
-public class FailureHandlingProcessDefinitionAndInstanceContextWork extends FailureHandlingProcessDefinitionContextWork {
+public class ProcessInstanceContextWork extends TxInHandleFailureWrappingWork {
 
     private static final long serialVersionUID = 6958842321501639910L;
 
@@ -40,20 +39,8 @@ public class FailureHandlingProcessDefinitionAndInstanceContextWork extends Fail
      * @param processInstanceId
      *            The identifier of the process instance
      */
-    public FailureHandlingProcessDefinitionAndInstanceContextWork(final BonitaWork wrappedWork, final long processInstanceId) {
-        this(wrappedWork, -1, processInstanceId);
-    }
-
-    /**
-     * @param wrappedWork
-     *            The work to wrap
-     * @param processDefinitionId
-     *            The identifier of the process definition
-     * @param processInstanceId
-     *            The identifier of the process instance
-     */
-    public FailureHandlingProcessDefinitionAndInstanceContextWork(final BonitaWork wrappedWork, final long processDefinitionId, final long processInstanceId) {
-        this(wrappedWork, processDefinitionId, processInstanceId, -1);
+    public ProcessInstanceContextWork(final ProcessDefinitionContextWork wrappedWork, final long processInstanceId) {
+        this(wrappedWork, processInstanceId, -1);
     }
 
     /**
@@ -66,9 +53,8 @@ public class FailureHandlingProcessDefinitionAndInstanceContextWork extends Fail
      * @param rootProcessInstanceId
      *            The identifier of the root process instance
      */
-    public FailureHandlingProcessDefinitionAndInstanceContextWork(final BonitaWork wrappedWork, final long processDefinitionId, final long processInstanceId,
-            final long rootProcessInstanceId) {
-        super(wrappedWork, processDefinitionId);
+    public ProcessInstanceContextWork(final ProcessDefinitionContextWork wrappedWork, final long processInstanceId, final long rootProcessInstanceId) {
+        super(wrappedWork);
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;
     }
@@ -88,18 +74,14 @@ public class FailureHandlingProcessDefinitionAndInstanceContextWork extends Fail
 
     @Override
     protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) throws SBonitaException {
-        sBonitaException.setProcessInstanceIdOnContext(processInstanceId);
-
-        if (rootProcessInstanceId < 0 || getProcessDefinitionId() < 0) {
+        if (rootProcessInstanceId < 0) {
             final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
             final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
             final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
             rootProcessInstanceId = sProcessInstance.getRootProcessInstanceId();
-            setProcessDefinitionId(sProcessInstance.getProcessDefinitionId());
         }
+        sBonitaException.setProcessInstanceIdOnContext(processInstanceId);
         sBonitaException.setRootProcessInstanceIdOnContext(rootProcessInstanceId);
-
-        super.setExceptionContext(sBonitaException, context);
     }
 
 }
