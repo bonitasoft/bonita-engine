@@ -19,7 +19,6 @@
 		<module>bonita-log-model-impl</module>
 		<module>bonita-log-api</module>
 		<module>bonita-log-impl</module>
-		<module>bonita-log-model-impl-hibernate</module>
 		<module>bonita-log-technical-api</module>
 		<module>bonita-log-technical-slf4j</module>
 	</modules>
