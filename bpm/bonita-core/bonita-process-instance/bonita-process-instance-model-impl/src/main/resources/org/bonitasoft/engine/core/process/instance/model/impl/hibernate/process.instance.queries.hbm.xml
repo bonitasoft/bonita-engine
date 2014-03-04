@@ -1323,7 +1323,7 @@
 	</query>
 
 	<query name="getPossibleUserIdsOfPendingTasks">
-		SELECT user.id
+        SELECT user.id
         FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user
         WHERE
           user.id IN (
@@ -1359,6 +1359,6 @@
           )
         GROUP BY user.id
         ORDER BY MIN(user.userName)
-	</query>
+    </query>
 	
 </hibernate-mapping>

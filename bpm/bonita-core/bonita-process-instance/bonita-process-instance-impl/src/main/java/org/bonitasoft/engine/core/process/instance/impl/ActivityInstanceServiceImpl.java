@@ -1087,8 +1087,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstanceServiceImpl imp
         final SelectListDescriptor<Long> elements = new SelectListDescriptor<Long>("getPossibleUserIdsOfPendingTasks", parameters, SActivityInstance.class,
                 queryOptions);
         try {
-            List<Long> userIds = getPersistenceRead().selectList(elements);
-            return userIds;
+            return getPersistenceRead().selectList(elements);
         } catch (final SBonitaReadException e) {
             throw new SActivityReadException(e);
         }
