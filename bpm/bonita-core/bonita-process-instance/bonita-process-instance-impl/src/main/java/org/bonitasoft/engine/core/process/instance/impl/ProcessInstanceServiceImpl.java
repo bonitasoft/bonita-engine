@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -884,6 +885,32 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);
         }
+    }
+
+    @Override
+    public List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions, final ProcessInstanceState... states)
+            throws SProcessInstanceReadException {
+        Set<Integer> stateIds = getStateIdsFromStates(states);
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(1);
+        inputParameters.put("stateIds", stateIds);
+        final SelectListDescriptor<SProcessInstance> selectProcessInstancesInStates = new SelectListDescriptor<SProcessInstance>("getProcessInstancesInStates",
+                inputParameters, SProcessInstance.class, queryOptions);
+        try {
+            return persistenceRead.selectList(selectProcessInstancesInStates);
+        } catch (final SBonitaReadException e) {
+            throw new SProcessInstanceReadException(e);
+        }
+    }
+
+    protected Set<Integer> getStateIdsFromStates(final ProcessInstanceState... states) {
+        if (states.length < 1) {
+            throw new IllegalArgumentException("ProcessInstanceServiceImpl.getProcessInstancesInStates() must have at least one state as parameter");
+        }
+        Set<Integer> stateIds = new HashSet<Integer>(states.length);
+        for (int i = 0; i < states.length; i++) {
+            stateIds.add(states[i].getId());
+        }
+        return stateIds;
     }
 
     @Override

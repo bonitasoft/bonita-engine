@@ -724,7 +724,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     private boolean executePostThrowEventHandlers(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance,
             final SFlowNodeInstance child) throws SBonitaException {
         boolean hasActionsToExecute = false;
-        if (sProcessInstance.getInterruptingEventId() != -1) {
+        if (sProcessInstance.hasBeenInterruptedByEvent()) {
             final SFlowNodeInstance endEventInstance = activityInstanceService.getFlowNodeInstance(sProcessInstance.getInterruptingEventId());
             final SEndEventDefinition endEventDefinition = (SEndEventDefinition) sProcessDefinition.getProcessContainer().getFlowNode(
                     endEventInstance.getFlowNodeDefinitionId());
@@ -753,8 +753,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         archiveInvalidTransitions(child, transitionsDescriptor);
 
-        final List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<STransitionDefinition>(transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
-        final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<SFlowNodeDefinition>(transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
+        final List<STransitionDefinition> chosenGatewaysTransitions = new ArrayList<STransitionDefinition>(transitionsDescriptor
+                .getValidOutgoingTransitionDefinitions().size());
+        final List<SFlowNodeDefinition> chosenFlowNode = new ArrayList<SFlowNodeDefinition>(transitionsDescriptor.getValidOutgoingTransitionDefinitions()
+                .size());
         for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getValidOutgoingTransitionDefinitions()) {
             final SFlowNodeDefinition flowNodeDefinition = processDefinitionService.getNextFlowNode(sProcessDefinition, sTransitionDefinition.getName());
             // we archive a transition to keep a track of where the flow was
@@ -771,7 +773,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
         TokenInfo outputTokenInfo = merger.getOutputTokenInfo();
         // execute transition/activities
-        createAndExecuteActivities(sProcessDefinition.getId(), child, sProcessInstance.getId(), chosenFlowNode, child.getRootProcessInstanceId(), outputTokenInfo.outputTokenRefId);
+        createAndExecuteActivities(sProcessDefinition.getId(), child, sProcessInstance.getId(), chosenFlowNode, child.getRootProcessInstanceId(),
+                outputTokenInfo.outputTokenRefId);
         for (STransitionDefinition sTransitionDefinition : chosenGatewaysTransitions) {
             executeGateway(sProcessDefinition, sTransitionDefinition, child, outputTokenInfo.outputTokenRefId);
         }
@@ -785,10 +788,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
         }
-        }
+    }
 
     private int updateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
-            final int numberOfTokenToMerge, FlowNodeTransitionsWrapper transitionsDescriptor, FlowMerger merger)
+            final int numberOfTokenToMerge, final FlowNodeTransitionsWrapper transitionsDescriptor, final FlowMerger merger)
             throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
             WorkRegisterException, SBonitaException {
         // handle token creation/deletion
@@ -797,7 +800,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
         if (merger.mustCreateTokenOnFinish()) {
             TokenInfo outputTokenInfo = merger.getOutputTokenInfo();
-            tokenService.createTokens(sProcessInstance.getId(), outputTokenInfo.outputTokenRefId, outputTokenInfo.outputParentTokenRefId, transitionsDescriptor.getValidOutgoingTransitionDefinitions().size());
+            tokenService.createTokens(sProcessInstance.getId(), outputTokenInfo.outputTokenRefId, outputTokenInfo.outputParentTokenRefId, transitionsDescriptor
+                    .getValidOutgoingTransitionDefinitions().size());
         }
         if (merger.isImplicitEnd()) {
             final Long tokenRefId = child.getTokenRefId();
@@ -809,7 +813,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return tokenService.getNumberOfToken(sProcessInstance.getId());
     }
 
-    private void archiveInvalidTransitions(final SFlowNodeInstance child, FlowNodeTransitionsWrapper transitionsDescriptor)
+    private void archiveInvalidTransitions(final SFlowNodeInstance child, final FlowNodeTransitionsWrapper transitionsDescriptor)
             throws STransitionCreationException {
         for (final STransitionDefinition sTransitionDefinition : transitionsDescriptor.getAllOutgoingTransitionDefinitions()) {
             if (!transitionsDescriptor.getValidOutgoingTransitionDefinitions().contains(sTransitionDefinition)) {
@@ -819,18 +823,19 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    private FlowNodeTransitionsWrapper buildTransitionsWrapper(final SFlowNodeDefinition flowNode, SProcessDefinition sProcessDefinition, SFlowNodeInstance child) throws SBonitaException {
+    private FlowNodeTransitionsWrapper buildTransitionsWrapper(final SFlowNodeDefinition flowNode, final SProcessDefinition sProcessDefinition,
+            final SFlowNodeInstance child) throws SBonitaException {
         FlowNodeTransitionsWrapper transitionsDescriptor = new FlowNodeTransitionsWrapper();
         // Retrieve all outgoing transitions
         if (flowNode == null) {
             // not in definition
             transitionsDescriptor.setInputTransitionsSize(0);
-            transitionsDescriptor.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition>emptyList());
+            transitionsDescriptor.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
         } else {
             transitionsDescriptor.setInputTransitionsSize(flowNode.getIncomingTransitions().size());
             transitionsDescriptor.setAllOutgoingTransitionDefinitions(new ArrayList<STransitionDefinition>(flowNode.getOutgoingTransitions()));
         }
-        
+
         // Evaluate all outgoing transitions, and retrieve valid outgoing transitions
         transitionsDescriptor.setValidOutgoingTransitionDefinitions(evaluateOutgoingTransitions(transitionsDescriptor.getAllOutgoingTransitionDefinitions(),
                 sProcessDefinition, child));
@@ -871,9 +876,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public SProcessInstance start(final long starterId, final long starterDelegateId,
-            final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput, FlowNodeSelector selector)
-            throws SProcessInstanceCreationException {
+    public SProcessInstance start(final long starterId, final long starterDelegateId, final List<SOperation> operations, final Map<String, Object> context,
+            final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final FlowNodeSelector selector) throws SProcessInstanceCreationException {
         return start(starterId, starterDelegateId, null, operations, context, connectorsWithInput, -1, selector);
     }
 
@@ -885,8 +889,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
-            return start(starterId, starterDelegateId, expressionContext, operations, context,
-                    connectorsWithInput, callerId, selector);
+            return start(starterId, starterDelegateId, expressionContext, operations, context, connectorsWithInput, callerId, selector);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new SProcessInstanceCreationException(e);
         } catch (final SProcessDefinitionReadException e) {
@@ -902,10 +905,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public SProcessInstance start(final long starterId,
-            final long starterDelegateId, final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
-            final List<ConnectorDefinitionWithInputValues> connectors, final long callerId, final FlowNodeSelector selector)
-            throws SProcessInstanceCreationException {
+    public SProcessInstance start(final long starterId, final long starterDelegateId, final SExpressionContext expressionContext,
+            final List<SOperation> operations, final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectors,
+            final long callerId, final FlowNodeSelector selector) throws SProcessInstanceCreationException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
