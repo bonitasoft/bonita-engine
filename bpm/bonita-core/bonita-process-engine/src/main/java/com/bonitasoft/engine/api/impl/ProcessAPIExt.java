@@ -575,7 +575,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setState(activityInstance, flowNodeStateManager.getState(activityInstance.getPreviousStateId()));
             activityInstanceService.setExecuting(activityInstance);
 
-            containerRegistry.executeFlowNode(activityInstanceId, null, null, activityInstance.getParentProcessInstanceId());
+            containerRegistry.executeFlowNode(activityInstance.getProcessDefinitionId(), activityInstance.getParentProcessInstanceId(), activityInstanceId,
+                    null, null);
         } catch (final SActivityInstanceNotFoundException e) {
             throw new ActivityInstanceNotFoundException(e);
         } catch (final SBonitaException e) {
