@@ -180,8 +180,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                             AuthenticationConstants.BASIC_TENANT_ID)), 0L);
                     sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
                     sessionAccessor.setSessionInfo(session.getId(), tenantId);
-                    final SUser sUser = identityService.getUserByUserName(String.valueOf(credentials.get(
-                            AuthenticationConstants.BASIC_USERNAME)));
+                    final SUser sUser = identityService.getUserByUserName(session.getUserName());
                     if (!sUser.isEnabled()) {
                         throw new LoginException("Unable to login: the user is disable");
                     }

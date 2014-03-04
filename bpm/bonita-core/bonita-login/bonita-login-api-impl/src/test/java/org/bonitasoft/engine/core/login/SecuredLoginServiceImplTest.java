@@ -2,6 +2,7 @@ package org.bonitasoft.engine.core.login;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -124,6 +125,60 @@ public class SecuredLoginServiceImplTest {
         } catch (Exception e) {
             assertThat(e.getMessage()).isEqualToIgnoringCase("User name or password is not valid!");
         }
+    }
+
+    @Test
+    public void testSecuredLoginServiceWithInvalidPlatformCredentialsWithGenericAuthenticationService() throws Exception {
+        this.securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService);
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        Long tenantId = new Long(1);
+        Long userId = new Long(-1);
+        String login = "julien";
+        String password = "julien";
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        when(genericAuthenticationService.checkUserCredentials(any(Map.class))).thenThrow(new AuthenticationException());
+
+        SSession sSession = mock(SSession.class);
+        when(sessionService.createSession(tenantId, userId, login, true)).thenReturn(sSession);
+
+        SSession sSessionResult;
+        try {
+            sSessionResult = this.securedLoginServiceImpl.login(credentials);
+
+        } catch (SLoginException e) {
+            verify(genericAuthenticationService, times(1)).checkUserCredentials(any(Map.class));
+            verify(sessionAccessor, times(1)).deleteSessionId();
+            verify(sessionService, times(0)).createSession(tenantId, userId, login, true);
+            assertThat(e).hasRootCauseExactlyInstanceOf(AuthenticationException.class);
+        }
+        fail();
+
+    }
+
+    @Test
+    public void testSecuredLoginServiceWithPlatformCredentialsWithGenericAuthenticationService() throws Exception {
+        this.securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService);
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        Long tenantId = new Long(1);
+        Long userId = new Long(-1);
+        String login = "install";
+        String password = "install";
+        credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        when(genericAuthenticationService.checkUserCredentials(any(Map.class))).thenThrow(new AuthenticationException());
+
+        SSession sSession = mock(SSession.class);
+        when(sessionService.createSession(tenantId, userId, login, true)).thenReturn(sSession);
+
+        SSession sSessionResult = this.securedLoginServiceImpl.login(credentials);
+
+        verify(genericAuthenticationService, times(1)).checkUserCredentials(any(Map.class));
+        verify(sessionAccessor, times(1)).deleteSessionId();
+        verify(sessionService, times(1)).createSession(tenantId, userId, login, true);
+        assertThat(sSessionResult).isSameAs(sSession);
     }
 
     @Test

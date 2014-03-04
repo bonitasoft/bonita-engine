@@ -86,11 +86,18 @@ public class SecuredLoginServiceImpl implements LoginService {
         }
         Long tenantId = NumberUtils.toLong(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)), -1);
         sessionAccessor.setSessionInfo(-1, tenantId); // necessary to check user credentials
-        long userId;
+        long userId = 0;
         boolean isTechnicalUser = false;
         String userName = null;
+        AuthenticationException authenticationException = null;
         try {
             userName = loginChoosingAppropriateAuthenticationService(credentials);
+        } catch (final AuthenticationException ae) {
+            // even if authentication fails, we need to check if credentials are not the platform ones
+            // thus, we keep the exception for a later process
+            authenticationException = ae;
+        }
+        try {
             if (StringUtils.isNotBlank(userName)) {
                 final SUser user = identityService.getUserByUserName(userName);
                 userId = user.getId();
@@ -107,16 +114,10 @@ public class SecuredLoginServiceImpl implements LoginService {
                     isTechnicalUser = true;
                     userId = -1;
                 } else {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (final InterruptedException e) {
-                        throw new SLoginException("User name or password is not valid!");
-                    }
-                    throw new SLoginException("User name or password is not valid!");
+                    // now we are sure authentication Failed
+                    authenticationFailed(authenticationException);
                 }
             }
-        } catch (final AuthenticationException ae) {
-            throw new SLoginException(ae);
         } catch (final SUserNotFoundException e) {
             throw new SLoginException("Unable to found user " + userName);
         } finally {
@@ -127,6 +128,27 @@ public class SecuredLoginServiceImpl implements LoginService {
             return sessionService.createSession(tenantId, userId, userName, isTechnicalUser);
         } catch (final SSessionException e) {
             throw new SLoginException(e);
+        }
+    }
+
+    /**
+     * process the failed authentication behaviour
+     * 
+     * @param authenticationException
+     *            the authentication that may have risen from authentication service
+     * @throws SLoginException
+     *             the appropriate exception
+     */
+    protected void authenticationFailed(AuthenticationException authenticationException) throws SLoginException {
+        if (authenticationException != null) {
+            throw new SLoginException(authenticationException);
+        } else {
+            try {
+                Thread.sleep(3000);
+            } catch (final InterruptedException e) {
+                throw new SLoginException("User name or password is not valid!");
+            }
+            throw new SLoginException("User name or password is not valid!");
         }
     }
 
