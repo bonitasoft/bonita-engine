@@ -70,4 +70,5 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
             throw new LoginException(e);
         }
     }
+
 }

@@ -49,7 +49,7 @@ public class JAASGenericAuthenticationServiceImplTest {
     @Test
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void testExtractUserFromSubjet() throws Exception {
-        jaasGenericAuthenticationServiceImpl = spy(jaasGenericAuthenticationServiceImpl);
+        // jaasGenericAuthenticationServiceImpl = spy(jaasGenericAuthenticationServiceImpl);
         String username = "install";
         LoginContext lc = mock(LoginContext.class);
         Subject subject = new Subject();
@@ -81,11 +81,16 @@ public class JAASGenericAuthenticationServiceImplTest {
         principals.add(principalUnknown);
         principals.add(principalCaller);
 
-        when(jaasGenericAuthenticationServiceImpl.isGroupPrincipal(principalCaller)).thenReturn(true);
+        // when(jaasGenericAuthenticationServiceImpl.isGroupPrincipal(principalCaller)).thenReturn(true);
 
         String result = jaasGenericAuthenticationServiceImpl.extractUserFromSubjet(lc);
         verify(principalCaller, times(1)).getName();
         assertThat(result).isSameAs(username);
+    }
+
+    @Test
+    public void testIsGroupPrincipal() throws Exception {
+        throw new RuntimeException("not yet implemented");
     }
 
 }

@@ -62,10 +62,10 @@ public class AuthenticationCallbackHandler implements CallbackHandler {
      * @param nc
      */
     protected void handleName(final NameCallback nc) {
-        if (StringUtils.equals(nc.getPrompt(), AuthenticationConstants.CAS_SERVICE)) {
+        if (StringUtils.equals(nc.getPrompt(), AuthenticationConstants.CAS_SERVICE) && credentials.get(AuthenticationConstants.CAS_SERVICE) != null) {
             String userName = String.valueOf(credentials.get(AuthenticationConstants.CAS_SERVICE));
             nc.setName(userName);
-        } else {
+        } else if (credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) {
             String userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
             nc.setName(userName);
         }

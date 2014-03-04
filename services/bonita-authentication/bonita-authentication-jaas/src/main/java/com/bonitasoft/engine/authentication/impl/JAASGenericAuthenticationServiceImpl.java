@@ -61,11 +61,13 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
             }
             throw new AuthenticationException(e);
         }
-        try {
-            loginContext.logout();
-        } catch (final LoginException e) {
-            throw new AuthenticationException(e);
-        }
+        /*
+         * try {
+         * loginContext.logout();
+         * } catch (final LoginException e) {
+         * throw new AuthenticationException(e);
+         * }
+         */
         return extractUserFromSubjet(loginContext);
     }
 
@@ -109,7 +111,7 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
      * @return
      */
     protected boolean isGroupPrincipal(Principal principal) {
-        return principal.getClass().isAssignableFrom(Group.class);
+        return Group.class.isAssignableFrom(principal.getClass());
     }
 
     private String getLoginContext() throws TenantIdNotSetException {

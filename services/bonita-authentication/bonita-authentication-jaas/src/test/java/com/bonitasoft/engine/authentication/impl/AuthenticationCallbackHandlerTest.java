@@ -1,5 +1,6 @@
 package com.bonitasoft.engine.authentication.impl;
 
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.Serializable;
@@ -46,6 +47,41 @@ public class AuthenticationCallbackHandlerTest {
         authenticationCallbackHandler.handleName(pc);
         verify(pc, times(1)).setName(username);
 
+    }
+
+    @Test
+    public void testHandleUsernameEmpty() throws Exception {
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        authenticationCallbackHandler = new AuthenticationCallbackHandler(credentials);
+        NameCallback pc = mock(NameCallback.class);
+
+        authenticationCallbackHandler.handleName(pc);
+        verify(pc, times(0)).setName(anyString());
+
+    }
+
+    @Test
+    public void testHandleService() throws Exception {
+        String service = "service";
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        credentials.put(AuthenticationConstants.CAS_SERVICE, service);
+        authenticationCallbackHandler = new AuthenticationCallbackHandler(credentials);
+        NameCallback nc = mock(NameCallback.class);
+        when(nc.getPrompt()).thenReturn(AuthenticationConstants.CAS_SERVICE);
+
+        authenticationCallbackHandler.handleName(nc);
+        verify(nc, times(1)).setName(service);
+    }
+
+    @Test
+    public void testHandleServiceEmpty() throws Exception {
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        authenticationCallbackHandler = new AuthenticationCallbackHandler(credentials);
+        NameCallback nc = mock(NameCallback.class);
+        when(nc.getPrompt()).thenReturn(AuthenticationConstants.CAS_SERVICE);
+
+        authenticationCallbackHandler.handleName(nc);
+        verify(nc, times(0)).setName(anyString());
     }
 
 }
