@@ -54,7 +54,8 @@
 		<xstream.version>1.4.2</xstream.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
+        <spring.version>3.1.2.RELEASE</spring.version>
+        
 		<!-- Tests -->
 		<powermock.version>1.5.1</powermock.version>
 		<festassert.version>1.4</festassert.version>
@@ -111,7 +112,7 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-context</artifactId>
-				<version>3.1.2.RELEASE</version>
+				<version>${spring.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -124,6 +125,12 @@
 				<artifactId>junit</artifactId>
 				<version>4.11</version>
 			</dependency>
+			<dependency>
+	             <groupId>org.assertj</groupId>
+	             <artifactId>assertj-core</artifactId>
+	             <version>1.5.0</version>
+	             <scope>test</scope>
+	        </dependency>
 			<dependency>
 				<groupId>org.easytesting</groupId>
 				<artifactId>fest-assert</artifactId>
