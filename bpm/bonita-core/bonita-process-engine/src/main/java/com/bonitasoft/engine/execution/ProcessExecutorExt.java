@@ -56,7 +56,6 @@ import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
@@ -81,13 +80,11 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry,
             final BPMInstancesCreator bpmInstancesCreator, final TokenService tokenService, final EventsHandler eventsHandler,
-            final TransactionService transactionService, final FlowNodeStateManager flowNodeStateManager) {
-        super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService,
-                gatewayInstanceService, transitionService, eventInstanceService, connectorService,
-                connectorInstanceService, classLoaderService, operationService, expressionResolverService, eventService, handlers,
-                processDocumentService, sessionAccessor, containerRegistry, bpmInstancesCreator, tokenService,
-                eventsHandler, transactionService, flowNodeStateManager);
-
+            final FlowNodeStateManager flowNodeStateManager) {
+        super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
+                transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
+                expressionResolverService, eventService, handlers, processDocumentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
+                tokenService, eventsHandler, flowNodeStateManager);
     }
 
     @Override
