@@ -254,19 +254,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public boolean delete(final String jobName) throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "delete");
-        final boolean delete = schedulerExecutor.delete(jobName);
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(new FilterOption(SJobDescriptor.class, "jobName", jobName));
-        final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
-        try {
-            final List<SJobDescriptor> jobDescriptors = jobService.searchJobDescriptors(queryOptions);
-            if (!jobDescriptors.isEmpty()) {
-                final SJobDescriptor sJobDescriptor = jobDescriptors.get(0);
-                jobService.deleteJobDescriptor(sJobDescriptor);
-            }
-        } catch (final SBonitaSearchException sbse) {
-            throw new SSchedulerException(sbse);
-        }
+        boolean delete = schedulerExecutor.delete(jobName);
+        jobService.deleteJobDescriptorByJobName(jobName);
         logAfterMethod(TechnicalLogSeverity.TRACE, "delete");
         return delete;
     }

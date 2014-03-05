@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -11,6 +12,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
@@ -143,6 +145,27 @@ public class SchedulerServiceImplTest {
 
         verify(schedulerExecutor).shutdown();
         verify(eventService).fireEvent(any(SEvent.class));
+    }
+    
+    @Test
+    public void delete_delete_job_and_jobDescription() throws Exception {
+        String jobName = "aJobName";
+        
+        schedulerService.delete(jobName);
+        
+        verify(schedulerExecutor).delete(jobName);
+        verify(jobService).deleteJobDescriptorByJobName(jobName);
+    }
+    
+    @Test
+    public void delete_return_schedulerexecutor_deletion_status() throws Exception {
+        boolean expectedDeletionStatus = new Random().nextBoolean();
+        String jobName = "jobName";
+        when(schedulerExecutor.delete(jobName)).thenReturn(expectedDeletionStatus);
+        
+        boolean deletionStatus = schedulerExecutor.delete(jobName);
+        
+        assertThat(deletionStatus).isEqualTo(expectedDeletionStatus);
     }
 
     @Test(expected = SSchedulerException.class)

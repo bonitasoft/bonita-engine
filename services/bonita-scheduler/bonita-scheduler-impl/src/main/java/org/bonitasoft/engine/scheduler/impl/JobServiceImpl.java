@@ -68,8 +68,7 @@ public class JobServiceImpl implements JobService {
 
     private final ReadPersistenceService readPersistenceService;
 
-    public JobServiceImpl(final EventService eventService,
-            final Recorder recorder, final ReadPersistenceService readPersistenceService) {
+    public JobServiceImpl(final EventService eventService, final Recorder recorder, final ReadPersistenceService readPersistenceService) {
         this.readPersistenceService = readPersistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
@@ -318,6 +317,22 @@ public class JobServiceImpl implements JobService {
             return readPersistenceService.selectList(SelectDescriptorBuilder.getFailedJobs(queryOptions));
         } catch (final SBonitaReadException sbre) {
             throw new SFailedJobReadException(sbre);
+        }
+    }
+
+    @Override
+    public void deleteJobDescriptorByJobName(String jobName) throws SJobDescriptorDeletionException {
+        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        filters.add(new FilterOption(SJobDescriptor.class, "jobName", jobName));
+        final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
+        try {
+            List<SJobDescriptor> jobDescriptors = searchJobDescriptors(queryOptions);
+            if (!jobDescriptors.isEmpty()) {
+                final SJobDescriptor sJobDescriptor = jobDescriptors.get(0);
+                deleteJobDescriptor(sJobDescriptor);
+            }
+        } catch (SBonitaSearchException e) {
+            throw new SJobDescriptorDeletionException("Job " + jobName + " not found, can't delete corresponding job descriptor");
         }
     }
 

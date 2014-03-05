@@ -81,6 +81,14 @@ public interface JobService {
      * @since 6.1
      */
     void deleteJobDescriptor(SJobDescriptor sJobDescriptor) throws SJobDescriptorDeletionException;
+    
+    /**
+     * Delete a job descriptor corresponding to the given job name
+     * 
+     * @param jobName name of job we want the jobDsecriptor to be deleted
+     * @since 6.3
+     */
+    void deleteJobDescriptorByJobName(String jobName) throws SJobDescriptorDeletionException;
 
     /**
      * Get a specific job descriptor
