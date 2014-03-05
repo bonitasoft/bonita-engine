@@ -44,8 +44,8 @@ public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
         if (newJob instanceof QuartzJob) {
             final QuartzJob quartzJob = (QuartzJob) newJob;
             final JobDataMap jobDataMap = bundle.getJobDetail().getJobDataMap();
-            final Long tenantId = (Long) jobDataMap.get("tenantId");
-            final Long jobId = (Long) jobDataMap.get("jobId");
+            final Long tenantId = Long.valueOf((String) jobDataMap.get("tenantId"));
+            final Long jobId = Long.valueOf((String) jobDataMap.get("jobId"));
             final String jobName = (String) jobDataMap.get("jobName");
             final JobIdentifier jobIdentifier = new JobIdentifier(jobId, tenantId, jobName);
             try {
