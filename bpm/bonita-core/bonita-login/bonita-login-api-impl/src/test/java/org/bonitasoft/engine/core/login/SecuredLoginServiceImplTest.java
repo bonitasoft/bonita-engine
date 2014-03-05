@@ -152,6 +152,7 @@ public class SecuredLoginServiceImplTest {
             verify(sessionAccessor, times(1)).deleteSessionId();
             verify(sessionService, times(0)).createSession(tenantId, userId, login, true);
             assertThat(e).hasRootCauseExactlyInstanceOf(AuthenticationException.class);
+            return;
         }
         fail();
 
