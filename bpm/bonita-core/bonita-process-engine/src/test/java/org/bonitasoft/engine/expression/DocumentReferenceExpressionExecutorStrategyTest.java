@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.expression;
 
 import static java.util.Arrays.asList;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -88,18 +88,12 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test(expected = SExpressionEvaluationException.class)
     public void evaluate_should_throw_an_exception_when_container_id_is_null() throws Exception {
-        strategy.evaluate(
-                Collections.<SExpression>emptyList(),
-                Collections.<String, Object>emptyMap(),
-                null);
+        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> emptyMap(), null);
     }
 
     @Test(expected = SExpressionEvaluationException.class)
     public void evaluate_should_throw_an_exception_when_container_type_is_null() throws Exception {
-        strategy.evaluate(
-                Collections.<SExpression> emptyList(),
-                Collections.<String, Object> singletonMap("containerId", PROCESS_INSTANCE_ID),
-                null);
+        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> singletonMap("containerId", PROCESS_INSTANCE_ID), null);
     }
 
     @Test
@@ -110,9 +104,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
         List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains(ModelConvertor.toDocument(document));
+        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(document));
     }
 
     @Test
@@ -123,9 +115,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
         List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains(ModelConvertor.toDocument(parentDocument));
+        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(parentDocument));
     }
 
     @Test
@@ -137,9 +127,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
         List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains((Document) null);
+        assertThat(result).hasSize(1).contains((Document) null);
     }
 
     @Test
@@ -151,9 +139,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
         List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains((Document) null);
+        assertThat(result).hasSize(1).contains((Document) null);
     }
 
     @Test
@@ -165,8 +151,6 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
         List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains(ModelConvertor.toDocument(archivedDocument));
+        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(archivedDocument));
     }
 }

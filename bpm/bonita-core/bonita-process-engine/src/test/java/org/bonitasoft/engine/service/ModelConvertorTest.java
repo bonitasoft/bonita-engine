@@ -1,10 +1,10 @@
 package org.bonitasoft.engine.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.fest.assertions.Assertions.assertThat;
 
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -33,7 +33,7 @@ public class ModelConvertorTest {
         final DataInstance dataInstance = ModelConvertor.toDataInstance(sDataInstance);
         assertFalse(dataInstance.isTransientData());
     }
-    
+
     @Test
     public void convertSUserToUserDoesntShowPassword() {
         SUser sUser = mock(SUser.class);

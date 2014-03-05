@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.execution;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.EXECUTING;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_BE_EXECUTED;
 import static org.bonitasoft.engine.execution.StateBehaviors.AFTER_ON_FINISH;
@@ -7,7 +8,6 @@ import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_ENTER;
 import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_FINISH;
 import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_ENTER;
 import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_FINISH;
-import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyLong;
