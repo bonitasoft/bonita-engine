@@ -305,10 +305,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
         try {
             sessionAccessor.setTenantId(jobIdentifier.getTenantId());
-
-            final Callable<JobWrapper> callable = buildGetPersistedJobCallable(jobIdentifier);
             logAfterMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
-            return transactionService.executeInTransaction(callable);
+            return transactionService.executeInTransaction(new PersistedJobCallable(jobIdentifier));
         } catch (final Exception e) {
             throw new SSchedulerException("The job class couldn't be instantiated", e);
         } finally {
@@ -316,34 +314,38 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
-    private Callable<JobWrapper> buildGetPersistedJobCallable(final JobIdentifier jobIdentifier) {
-        return new Callable<JobWrapper>() {
 
-            @Override
-            public JobWrapper call() throws Exception {
-                final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobIdentifier.getId());
-                // FIXME do something here if the job does not exist
-                if (sJobDescriptor == null) {
-                    return null;
-                }
-                final String jobClassName = sJobDescriptor.getJobClassName();
-                final Class<?> jobClass = Class.forName(jobClassName);
-                final StatelessJob statelessJob = (StatelessJob) jobClass.newInstance();
+    private class PersistedJobCallable implements Callable<JobWrapper> {
 
-                final FilterOption filterOption = new FilterOption(SJobParameter.class, "jobDescriptorId", jobIdentifier.getId());
-                final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, Collections.singletonList(filterOption),
-                        null);
-                final List<SJobParameter> parameters = jobService.searchJobParameters(queryOptions);
-                final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
-                for (final SJobParameter sJobParameterImpl : parameters) {
-                    parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
-                }
-                statelessJob.setAttributes(parameterMap);
-                final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger, jobIdentifier.getTenantId(), eventService,
-                        sessionAccessor, transactionService);
-                return jobWrapper;
+        private final JobIdentifier jobIdentifier;
+
+        public PersistedJobCallable(JobIdentifier jobIdentifier) {
+            this.jobIdentifier = jobIdentifier;
+        }
+
+        @Override
+        public JobWrapper call() throws Exception {
+            final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobIdentifier.getId());
+            // FIXME do something here if the job does not exist
+            if (sJobDescriptor == null) {
+                return null;
             }
-        };
+            final String jobClassName = sJobDescriptor.getJobClassName();
+            final Class<?> jobClass = Class.forName(jobClassName);
+            final StatelessJob statelessJob = (StatelessJob) jobClass.newInstance();
+
+            final FilterOption filterOption = new FilterOption(SJobParameter.class, "jobDescriptorId", jobIdentifier.getId());
+            final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, Collections.singletonList(filterOption), null);
+            final List<SJobParameter> parameters = jobService.searchJobParameters(queryOptions);
+            final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
+            for (final SJobParameter sJobParameterImpl : parameters) {
+                parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
+            }
+            statelessJob.setAttributes(parameterMap);
+            final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger, jobIdentifier.getTenantId(), eventService,
+                    sessionAccessor, transactionService);
+            return jobWrapper;
+        }
     }
 
     @Override
