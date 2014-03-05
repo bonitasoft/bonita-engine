@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.scheduler.impl;
+package org.bonitasoft.engine.scheduler.job;
 
 import java.io.Serializable;
 import java.util.HashMap;

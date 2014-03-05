@@ -19,6 +19,7 @@ import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.job.IncrementItselfJob;
 import org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy;
+import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
@@ -550,7 +551,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         final Date now = new Date(System.currentTimeMillis() + 10000000);
         final String variableName = "testMultiTenancy";
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy", "IncrementVariableJob").done();
+                .createNewInstance(IncrementVariableJobWithMultiTenancy.class.getName(), "IncrementVariableJob").done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testExecuteOnceAJob").done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
