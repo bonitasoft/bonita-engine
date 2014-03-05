@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-connector-service</artifactId>
 		<groupId>org.bonitasoft.engine.core.connector</groupId>
-		<version>6.2.4.TESTCG</version>
+		<version>6.2.5-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-connector-service-api-impl</artifactId>

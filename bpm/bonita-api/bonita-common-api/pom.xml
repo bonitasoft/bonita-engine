@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-api</artifactId>
 		<groupId>org.bonitasoft.engine.api</groupId>
-		<version>6.2.4.TESTCG</version>
+		<version>6.2.5-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-common-api</artifactId>

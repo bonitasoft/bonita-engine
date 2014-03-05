@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.2.4.TESTCG</version>
+		<version>6.2.5-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-server</artifactId>
