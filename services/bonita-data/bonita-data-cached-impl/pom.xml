@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.bonitasoft.engine.data</groupId>
         <artifactId>bonita-data</artifactId>
-        <version>6.2.4.TESTCG</version>
+        <version>6.2.5-SNAPSHOT</version>
     </parent>
     <artifactId>bonita-data-cached-impl</artifactId>
 
