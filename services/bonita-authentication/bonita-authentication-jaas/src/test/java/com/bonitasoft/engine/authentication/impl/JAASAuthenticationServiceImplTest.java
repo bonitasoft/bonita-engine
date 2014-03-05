@@ -8,10 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
+import javax.security.auth.login.LoginException;
+
+import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.AfterClass;
@@ -62,8 +65,13 @@ public class JAASAuthenticationServiceImplTest {
 
     @Test
     public void cannotLoginWithWrongPassword() throws Exception {
-        final boolean valid = jaasAuthService.checkUserCredentials("admin", "wrongPassWord");
-        assertFalse(valid);
+        try {
+            jaasAuthService.checkUserCredentials("admin", "wrongPassWord");
+        } catch (AuthenticationException e) {
+            assertThat(e).hasCauseExactlyInstanceOf(LoginException.class);
+            return;
+        }
+        fail();
     }
 
 }

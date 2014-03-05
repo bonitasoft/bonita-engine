@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
+import javax.security.auth.spi.LoginModule;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.authentication.AuthenticationException;
@@ -47,12 +48,20 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
 
     @Override
     public String checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException {
-        LoginContext loginContext = null;
-        try {
-            loginContext = new LoginContext(getLoginContext(), new AuthenticationCallbackHandler(credentials));
-        } catch (final Exception e) {
-            throw new AuthenticationException(e);
-        }
+        LoginContext loginContext = createContext(new AuthenticationCallbackHandler(credentials));
+        login(loginContext);
+        return extractUserFromSubjet(loginContext);
+    }
+
+    /**
+     * attempts a login on the given {@link LoginContext}. see JAAS documentation for more information
+     * 
+     * @param loginContext
+     *            the {@link LoginContext} to use to login
+     * @throws AuthenticationException
+     *             if the authentication fails
+     */
+    protected void login(LoginContext loginContext) throws AuthenticationException {
         try {
             loginContext.login();
         } catch (final LoginException e) {
@@ -61,14 +70,23 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
             }
             throw new AuthenticationException(e);
         }
-        /*
-         * try {
-         * loginContext.logout();
-         * } catch (final LoginException e) {
-         * throw new AuthenticationException(e);
-         * }
-         */
-        return extractUserFromSubjet(loginContext);
+    }
+
+    /**
+     * creates {@link LoginContext} to use to authenticate
+     * 
+     * @param authenticationCallbackHandler
+     *            the callback handler to use when managing callback in underlying {@link LoginModule}
+     * @return the created {@link LoginContext}
+     * @throws AuthenticationException
+     *             if a problem occurs during context creation
+     */
+    protected LoginContext createContext(AuthenticationCallbackHandler authenticationCallbackHandler) throws AuthenticationException {
+        try {
+            return new LoginContext(getLoginContext(), authenticationCallbackHandler);
+        } catch (final Exception e) {
+            throw new AuthenticationException(e);
+        }
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.bonitasoft.engine.authentication.impl;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.security.Principal;
@@ -10,22 +11,49 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
+import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class JAASGenericAuthenticationServiceImplTest {
 
     JAASGenericAuthenticationServiceImpl jaasGenericAuthenticationServiceImpl;
 
+    private static final String JAVA_SECURITY_AUTH_LOGIN_CONFIG = "java.security.auth.login.config";
+
+    @Mock
+    AuthenticationCallbackHandler authenticationCallbackHandler;
+
+    @Mock
+    TechnicalLoggerService logger;
+
+    @Mock
+    ReadSessionAccessor sessionAccessor;
+
     @Before
-    public void setup() {
+    public void setup() throws TenantIdNotSetException {
+        jaasGenericAuthenticationServiceImpl = new JAASGenericAuthenticationServiceImpl(logger, sessionAccessor);
+    }
 
-        jaasGenericAuthenticationServiceImpl = new JAASGenericAuthenticationServiceImpl(mock(TechnicalLoggerService.class), mock(ReadSessionAccessor.class));
+    @BeforeClass
+    public static void classSetUp() {
+        System.setProperty(JAVA_SECURITY_AUTH_LOGIN_CONFIG, "src/test/resources/jaas-test.cfg");
+    }
 
+    @AfterClass
+    public static void classTearDown() {
+        System.clearProperty(JAVA_SECURITY_AUTH_LOGIN_CONFIG);
     }
 
     @Test
@@ -47,9 +75,8 @@ public class JAASGenericAuthenticationServiceImplTest {
     }
 
     @Test
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void testExtractUserFromSubjet() throws Exception {
-        // jaasGenericAuthenticationServiceImpl = spy(jaasGenericAuthenticationServiceImpl);
+
         String username = "install";
         LoginContext lc = mock(LoginContext.class);
         Subject subject = new Subject();
@@ -62,15 +89,8 @@ public class JAASGenericAuthenticationServiceImplTest {
         Group principalCaller = mock(Group.class);
         Principal principalUser = mock(Principal.class);
         when(principalUser.getName()).thenReturn(username);
-        // when(principalUser.getClass()).thenAnswer(new Answer<Principal>() {
-        //
-        // Group answer(InvocationOnMock invocation) {
-        // Object[] args = invocation.getArguments();
-        // Object mock = invocation.getMock();
-        // return Group.class;
-        // }
-        // });
         Enumeration enumeration = mock(Enumeration.class);
+
         when(enumeration.hasMoreElements()).thenReturn(true, false, false, false);
         when(enumeration.nextElement()).thenReturn(principalUser);
 
@@ -81,16 +101,45 @@ public class JAASGenericAuthenticationServiceImplTest {
         principals.add(principalUnknown);
         principals.add(principalCaller);
 
-        // when(jaasGenericAuthenticationServiceImpl.isGroupPrincipal(principalCaller)).thenReturn(true);
-
         String result = jaasGenericAuthenticationServiceImpl.extractUserFromSubjet(lc);
         verify(principalCaller, times(1)).getName();
         assertThat(result).isSameAs(username);
     }
 
     @Test
-    public void testIsGroupPrincipal() throws Exception {
-        throw new RuntimeException("not yet implemented");
+    public void testIsGroupPrincipalWithPrincipal() throws Exception {
+        assertThat(jaasGenericAuthenticationServiceImpl.isGroupPrincipal(mock(Principal.class))).isFalse();
+    }
+
+    @Test
+    public void testIsGroupPrincipalWithGroup() throws Exception {
+        assertThat(jaasGenericAuthenticationServiceImpl.isGroupPrincipal(mock(Group.class))).isTrue();
+    }
+
+    @Test
+    public void testCreateContextWithWrongTenantId() throws Exception {
+        try {
+            jaasGenericAuthenticationServiceImpl.createContext(authenticationCallbackHandler);
+        } catch (AuthenticationException e) {
+            assertThat(e).hasCauseExactlyInstanceOf(LoginException.class);
+            return;
+        }
+        fail();
+
+    }
+
+    @Test
+    public void testCreateContext() throws Exception {
+        when(sessionAccessor.getTenantId()).thenReturn(1L);
+        LoginContext lc = jaasGenericAuthenticationServiceImpl.createContext(authenticationCallbackHandler);
+        assertThat(lc).isNotNull();
+    }
+
+    @Test
+    public void testLogin() throws Exception {
+        LoginContext loginContext = mock(LoginContext.class);
+        jaasGenericAuthenticationServiceImpl.login(loginContext);
+        verify(loginContext, times(1)).login();
     }
 
 }
