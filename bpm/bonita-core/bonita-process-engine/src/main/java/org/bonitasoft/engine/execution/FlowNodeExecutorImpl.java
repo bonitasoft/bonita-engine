@@ -265,13 +265,13 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             throws SBonitaException {
         final long callerId = childProcInst.getCallerId();
         if (isTerminalState(childState) && callerId > 0) {
-            final SActivityInstance callActivityInstance;
-            callActivityInstance = activityInstanceService.getActivityInstance(childProcInst.getCallerId());
+            final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(childProcInst.getCallerId());
             final int tokenCount = callActivityInstance.getTokenCount() - 1;
             activityInstanceService.setTokenCount(callActivityInstance, tokenCount);
             if (!hasActionsToExecute) {
-                containerRegistry.executeFlowNode(activityInstance.getProcessDefinitionId(), activityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()), callActivityInstance.getId(), null,
-                        null);
+                containerRegistry.executeFlowNode(callActivityInstance.getProcessDefinitionId(),
+                        callActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
+                        callActivityInstance.getId(), null, null);
             }
         }
 

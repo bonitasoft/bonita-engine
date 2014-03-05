@@ -93,7 +93,7 @@ public class ProcessInstanceContextWorkTest {
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
         when(tenantAccessor.getSessionService()).thenReturn(sessionService);
         when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
-        doReturn(transactionService).when(tenantAccessor).getTransactionService();
+        doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
 
         txBonitawork = spy(new ProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID));
         doReturn("The description").when(txBonitawork).getDescription();

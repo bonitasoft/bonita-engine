@@ -99,7 +99,7 @@ public class MessageInstanceContextWorkTest {
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
         when(tenantAccessor.getSessionService()).thenReturn(sessionService);
         when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
-        doReturn(transactionService).when(tenantAccessor).getTransactionService();
+        doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
     }
 
     @Test

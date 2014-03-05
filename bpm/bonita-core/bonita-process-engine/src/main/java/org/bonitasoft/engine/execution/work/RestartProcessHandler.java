@@ -106,8 +106,8 @@ public class RestartProcessHandler implements TenantRestartHandler {
                         // Should always be in a CallActivity:
                         if (callerId > 0) {
                             final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(processInstance.getCallerId());
-                            workService.registerWork(WorkFactory.createExecuteFlowNodeWork(callActivityInstance.getId(), null, null,
-                                    callActivityInstance.getParentProcessInstanceId()));
+                            workService.registerWork(WorkFactory.createExecuteFlowNodeWork(callActivityInstance.getProcessDefinitionId(),
+                                    callActivityInstance.getParentProcessInstanceId(), callActivityInstance.getId(), null, null));
                         }
                     }
                 }

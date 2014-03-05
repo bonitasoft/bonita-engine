@@ -30,10 +30,8 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Baptiste Mesta
@@ -123,8 +121,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
             final ConnectorResult result = connectorService.executeConnector(processDefinitionId, connectorInstance, processClassloader,
                     callable.getInputParameters());
             // evaluate output and trigger the execution of the flow node
-            final WorkService workService = tenantAccessor.getWorkService();
-            userTransactionService.executeInTransaction(new EvaluateConnectorOutputsTxContent(result, sConnectorDefinition, workService, context));
+            userTransactionService.executeInTransaction(new EvaluateConnectorOutputsTxContent(result, sConnectorDefinition, context));
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
@@ -210,17 +207,17 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
         public Boolean call() throws Exception {
             final SConnectorDefinition sConnectorDefinition = getSConnectorDefinition(processDefinitionService);
             switch (sConnectorDefinition.getFailAction()) {
-            case ERROR_EVENT:
-                errorEventOnFail(context, sConnectorDefinition, e);
-                return false;
-            case FAIL:
-                setConnectorAndContainerToFailed(context, e);
-                return false;
-            case IGNORE:
-                setConnectorOnlyToFailed(context, e);
-                return true;
-            default:
-                throw new Exception("No action defined for " + sConnectorDefinition.getFailAction());
+                case ERROR_EVENT:
+                    errorEventOnFail(context, sConnectorDefinition, e);
+                    return false;
+                case FAIL:
+                    setConnectorAndContainerToFailed(context, e);
+                    return false;
+                case IGNORE:
+                    setConnectorOnlyToFailed(context, e);
+                    return true;
+                default:
+                    throw new Exception("No action defined for " + sConnectorDefinition.getFailAction());
             }
         }
     }

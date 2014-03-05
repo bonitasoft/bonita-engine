@@ -19,7 +19,7 @@ import java.util.concurrent.Callable;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -46,8 +46,8 @@ public abstract class TxInHandleFailureWrappingWork extends WrappingBonitaWork {
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         // Enrich the exception before log it.
         if (e instanceof SBonitaException) {
-            TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-            TransactionService transactionService = tenantAccessor.getTransactionService();
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
+            final UserTransactionService transactionService = tenantAccessor.getUserTransactionService();
             transactionService.executeInTransaction(new Callable<Void>() {
 
                 @Override

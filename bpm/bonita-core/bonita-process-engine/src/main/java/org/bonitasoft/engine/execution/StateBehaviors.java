@@ -186,7 +186,7 @@ public class StateBehaviors {
 
     private final IdentityService identityService;
 
-    private TokenService tokenService;
+    private final TokenService tokenService;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
@@ -677,7 +677,9 @@ public class StateBehaviors {
             do {
                 childrenOfAnActivity = activityInstanceService.getChildrenOfAnActivity(flowNodeInstance.getId(), i, BATCH_SIZE);
                 for (final SActivityInstance sActivityInstance : childrenOfAnActivity) {
-                    containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), sActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()), sActivityInstance.getId(), null,
+                    containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(),
+                            sActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
+                            sActivityInstance.getId(), null,
                             null);
                 }
                 i += BATCH_SIZE;
@@ -702,7 +704,9 @@ public class StateBehaviors {
             for (final SActivityInstance child : childrenToEnd) {
                 activityInstanceService.setStateCategory(child, stateCategory);
                 if (child.isStable()) {
-                    containerRegistry.executeFlowNode(child.getProcessDefinitionId(), child.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()), child.getId(), null,
+                    containerRegistry.executeFlowNode(child.getProcessDefinitionId(),
+                            child.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
+                            child.getId(), null,
                             null);
                 }
             }
@@ -739,20 +743,20 @@ public class StateBehaviors {
     private void createAttachedBoundaryEvents(final SProcessDefinition processDefinition, final SActivityInstance activityInstance,
             final SActivityDefinition activityDefinition) throws SActivityStateExecutionException {
         final List<SBoundaryEventDefinition> boundaryEventDefinitions = activityDefinition.getBoundaryEventDefinitions();
-            try {
-                final SBoundaryEventInstanceBuilderFactory boundaryEventInstanceBuilder = BuilderFactory
-                        .get(SBoundaryEventInstanceBuilderFactory.class);
-                final long rootProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getRootProcessInstanceIndex());
-                final long parentProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getParentProcessInstanceIndex());
-            final     SFlowElementsContainerType containerType = getContainerType(activityInstance, boundaryEventInstanceBuilder);
+        try {
+            final SBoundaryEventInstanceBuilderFactory boundaryEventInstanceBuilder = BuilderFactory
+                    .get(SBoundaryEventInstanceBuilderFactory.class);
+            final long rootProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getRootProcessInstanceIndex());
+            final long parentProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getParentProcessInstanceIndex());
+            final SFlowElementsContainerType containerType = getContainerType(activityInstance, boundaryEventInstanceBuilder);
 
-                for (final SBoundaryEventDefinition boundaryEventDefinition : boundaryEventDefinitions) {
-                    createBoundaryEvent(processDefinition, activityInstance, rootProcessInstanceId, parentProcessInstanceId, containerType,
-                            boundaryEventDefinition);
-                }
-            } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException("Unable to create boundary events attached to activity " + activityInstance.getName(), e);
+            for (final SBoundaryEventDefinition boundaryEventDefinition : boundaryEventDefinitions) {
+                createBoundaryEvent(processDefinition, activityInstance, rootProcessInstanceId, parentProcessInstanceId, containerType,
+                        boundaryEventDefinition);
             }
+        } catch (final SBonitaException e) {
+            throw new SActivityStateExecutionException("Unable to create boundary events attached to activity " + activityInstance.getName(), e);
+        }
     }
 
     private void createBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance, final long rootProcessInstanceId,
@@ -764,14 +768,13 @@ public class StateBehaviors {
                 rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
                 rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId(),
                 tokenInfo.outputTokenRefId);
-        
+
         // we create token here to be sure the token is put synchronously
         tokenService.createTokens(activityInstance.getParentProcessInstanceId(), tokenInfo.outputTokenRefId, tokenInfo.outputParentTokenRefId, 1);
         // no need to handle failed state, creation is in the same tx
-        containerRegistry.executeFlowNodeInSameThread(boundaryEventInstance.getId(), null, null, containerType.name(),
-                parentProcessInstanceId);
+        containerRegistry.executeFlowNodeInSameThread(parentProcessInstanceId, boundaryEventInstance.getId(), null, null, containerType.name());
     }
-    
+
     private SFlowElementsContainerType getContainerType(final SActivityInstance activityInstance,
             final SBoundaryEventInstanceBuilderFactory boundaryEventInstanceBuilder) {
         SFlowElementsContainerType containerType = SFlowElementsContainerType.PROCESS;
@@ -784,7 +787,7 @@ public class StateBehaviors {
 
     private boolean mustAddBoundaryEvents(final SActivityInstance activityInstance, final SActivityDefinition activityDefinition) {
         // avoid to add boundary events in children of multi instance
-        boolean mustAddBoundaries = activityDefinition != null 
+        boolean mustAddBoundaries = activityDefinition != null
                 && !activityDefinition.getBoundaryEventDefinitions().isEmpty()
                 && !isChildOfLoopOrMultiInstance(activityInstance, activityDefinition);
         return mustAddBoundaries;
@@ -809,7 +812,8 @@ public class StateBehaviors {
                     interrupWaitinEvents(processDefinition, boundaryEventInstance, catchEventDef);
                     activityInstanceService.setStateCategory(boundaryEventInstance, categoryState);
                     if (stable) {
-                        containerRegistry.executeFlowNode(processDefinition.getId(), boundaryEventInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()), boundaryEventInstance.getId(), null,
+                        containerRegistry.executeFlowNode(processDefinition.getId(),
+                                boundaryEventInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()), boundaryEventInstance.getId(), null,
                                 null);
                     }
                 }

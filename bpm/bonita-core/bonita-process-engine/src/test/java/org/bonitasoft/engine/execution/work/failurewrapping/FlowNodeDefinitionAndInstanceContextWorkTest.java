@@ -83,7 +83,7 @@ public class FlowNodeDefinitionAndInstanceContextWorkTest {
 
     @Before
     public void before() throws Exception {
-        doReturn(transactionService).when(tenantAccessor).getTransactionService();
+        doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
 
         when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);

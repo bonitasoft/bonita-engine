@@ -98,7 +98,7 @@ public class ProcessDefinitionContextWorkTest {
         when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
         when(tenantAccessor.getSessionService()).thenReturn(sessionService);
         when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
-        doReturn(transactionService).when(tenantAccessor).getTransactionService();
+        doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
 
         txBonitawork = spy(new ProcessDefinitionContextWork(wrappedWork, PROCESS_DEFINITION_ID));
         doReturn("The description").when(txBonitawork).getDescription();

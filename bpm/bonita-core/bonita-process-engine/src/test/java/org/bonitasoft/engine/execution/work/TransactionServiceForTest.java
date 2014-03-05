@@ -16,40 +16,12 @@ package org.bonitasoft.engine.execution.work;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
-import org.bonitasoft.engine.transaction.STransactionException;
-import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.transaction.TransactionState;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
-public class TransactionServiceForTest implements TransactionService {
+public class TransactionServiceForTest implements UserTransactionService {
 
     public TransactionServiceForTest() {
-    }
-
-    @Override
-    public void begin() {
-    }
-
-    @Override
-    public void complete() {
-    }
-
-    @Override
-    public TransactionState getState() throws STransactionException {
-        return null;
-    }
-
-    @Override
-    public boolean isTransactionActive() throws STransactionException {
-        return false;
-    }
-
-    @Override
-    public void setRollbackOnly() {
-    }
-
-    @Override
-    public boolean isRollbackOnly() throws STransactionException {
-        return false;
     }
 
     @Override
@@ -62,8 +34,7 @@ public class TransactionServiceForTest implements TransactionService {
     }
 
     @Override
-    public long getNumberOfActiveTransactions() {
-        return -1;
+    public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
     }
 
 }

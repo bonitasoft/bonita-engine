@@ -85,10 +85,10 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final Throwable cause = e.getCause();
         if (e instanceof SFlowNodeNotFoundException || e instanceof SProcessInstanceNotFoundException || e instanceof SProcessDefinitionNotFoundException) {
-                logFailureCause(e);
-            } else if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
-                    || cause instanceof SProcessDefinitionNotFoundException) {
-                logFailureCause(cause);
+            logFailureCause(loggerService, e);
+        } else if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
+                || cause instanceof SProcessDefinitionNotFoundException) {
+            logFailureCause(loggerService, cause);
         } else {
             // final Edge case we cannot manage
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
@@ -123,7 +123,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         }
     }
 
-    protected void logFailureCause(final Throwable e) {
+    protected void logFailureCause(final TechnicalLoggerService loggerService, final Throwable e) {
         if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work [" + getDescription() + "] failed to execute due to : ", e);
         }
