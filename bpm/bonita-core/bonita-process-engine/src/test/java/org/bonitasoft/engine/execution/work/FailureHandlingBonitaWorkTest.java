@@ -189,6 +189,17 @@ public class FailureHandlingBonitaWorkTest {
     }
 
     @Test
+    public void doNotHandleFailureWhenGettingASFlowNodeNotFoundExceptionAsMainCause() throws Exception {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final Exception flownodeNotFound = new SFlowNodeNotFoundException(11547L);
+        doThrow(flownodeNotFound).when(wrappedWork).work(context);
+        txBonitawork.work(context);
+        verify(wrappedWork, never()).handleFailure(flownodeNotFound, context);
+        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
+        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
+    }
+
+    @Test
     public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();;
         final Exception e = new Exception(new SProcessInstanceNotFoundException(83));

@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api;
@@ -47,8 +47,8 @@ import org.bonitasoft.engine.session.InvalidSessionException;
  * execute method of this class.<br/>
  * TenantCommand is a class available only in bonita-server.jar. In order to create the jar you will need to have a dependency on that jar.
  * <p>
- * The jar containing the command class must be added to the engine using the {@link addDependency} method with a name to identify the dependency so that it can
- * be removed later.<br/>
+ * The jar containing the command class must be added to the engine using the {@link CommandAPI#addDependency} method with a name to identify the dependency so
+ * that it can be removed later.<br/>
  * Then the command must be registered using {@link CommandAPI#register(String, String, String)} with a name to identify it and an implementation that is the
  * fully qualified name of the command class.<br/>
  * After registration, the command can be executed using {@link CommandAPI#execute(long, Map)} with the id returned by the register method or
@@ -168,7 +168,29 @@ public interface CommandAPI {
      * @since 6.0
      */
     Serializable execute(String name, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
-            CommandExecutionException;
+    CommandExecutionException;
+
+    /**
+     * Execute a command according to its name and a map of parameters. During the execution of this method, the command's implementation
+     * will have to manage itself its transactions.
+     * 
+     * @param name
+     *            the command name
+     * @param parameters
+     *            the parameters
+     * @return the result of the command execution.
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws CommandNotFoundException
+     *             occurs when the name does not refer to any existing command
+     * @throws CommandParameterizationException
+     *             when command parameters are not correct
+     * @throws CommandExecutionException
+     *             occurs when an exception is thrown during command execution
+     * @since 6.2
+     */
+    Serializable executeWithUserTransactions(String name, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
+    CommandExecutionException;
 
     /**
      * Execute a command according to its id and a map of parameters.
@@ -189,7 +211,30 @@ public interface CommandAPI {
      * @since 6.0
      */
     Serializable execute(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
-            CommandExecutionException;
+    CommandExecutionException;
+
+    /**
+     * Execute a command according to its id and a map of parameters. During the execution of this method, the command's implementation
+     * will have to manage itself its transactions.
+     * 
+     * @param commandId
+     *            the command commandId
+     * @param parameters
+     *            the parameters
+     * @return the result of the command execution.
+     * @throws InvalidSessionException
+     *             Generic exception thrown if API Session is invalid, e.g session has expired.
+     * @throws CommandNotFoundException
+     *             occurs when the name does not refer to any existing command
+     * @throws CommandParameterizationException
+     *             when command parameters are not correct
+     * @throws CommandExecutionException
+     *             occurs when an exception is thrown during command execution
+     * @since 6.2
+     */
+    Serializable executeWithUserTransactions(long commandId, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
+    CommandExecutionException;
+
 
     /**
      * Delete a command through its name.
@@ -299,7 +344,7 @@ public interface CommandAPI {
      * 
      * @param commandId
      *            identifier of command to indicate which command will be updated
-     * @param updater
+     * @param updateDescriptor
      *            the update descriptor
      * @throws InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
@@ -309,7 +354,7 @@ public interface CommandAPI {
      *             occurs when an exception is thrown during command update
      * @since 6.0
      */
-    void update(long commandId, CommandUpdater updater) throws CommandNotFoundException, UpdateException;
+    void update(long commandId, CommandUpdater updateDescriptor) throws CommandNotFoundException, UpdateException;
 
     /**
      * Delete a command through its id.

@@ -7,7 +7,7 @@
 				<prop key="org.quartz.scheduler.skipUpdateCheck">${org.quartz.scheduler.skipUpdateCheck:true}</prop>
 				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
 				<prop key="org.quartz.threadPool.threadCount">10</prop>
-				<prop key="org.quartz.jobStore.class">org.quartz.impl.jdbcjobstore.JobStoreCMT</prop>
+				<prop key="org.quartz.jobStore.class">org.bonitasoft.engine.scheduler.impl.BonitaJobStoreCMT</prop>
 				<prop key="org.quartz.jobStore.driverDelegateClass">${quartz.connection.jobstoredriver:org.quartz.impl.jdbcjobstore.StdJDBCDelegate}</prop>
 				<prop key="org.quartz.jobStore.dataSource">managedDS</prop>
 				<prop key="org.quartz.jobStore.nonManagedTXDataSource">notManagedDS</prop>

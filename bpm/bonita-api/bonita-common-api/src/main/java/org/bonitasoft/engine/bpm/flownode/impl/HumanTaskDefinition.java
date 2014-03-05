@@ -13,23 +13,13 @@
  **/
 package org.bonitasoft.engine.bpm.flownode.impl;
 
-import org.bonitasoft.engine.bpm.flownode.TaskDefinition;
-import org.bonitasoft.engine.bpm.userfilter.UserFilterDefinition;
-
 /**
  * A Human task is a task having an actor and that can be assigned.
  * 
  * @author Baptiste Mesta
+ * @deprecated since 6.2.3
  */
-public interface HumanTaskDefinition extends TaskDefinition {
+@Deprecated
+public interface HumanTaskDefinition extends org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition {
 
-    String getActorName();
-
-    void setUserFilter(UserFilterDefinition userFilterDefinition);
-
-    UserFilterDefinition getUserFilter();
-
-    Long getExpectedDuration();
-
-    String getPriority();
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.dependency.model.impl;
 
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 
 public class SDependencyMappingImpl implements SDependencyMapping {
 
@@ -23,7 +24,7 @@ public class SDependencyMappingImpl implements SDependencyMapping {
 
     private long artifactId;
 
-    private String artifactType;
+    private ScopeType artifactType;
 
     private long dependencyId;
 
@@ -33,7 +34,7 @@ public class SDependencyMappingImpl implements SDependencyMapping {
         super();
     }
 
-    public SDependencyMappingImpl(final long artifactId, final String artifactType, final long dependencyId) {
+    public SDependencyMappingImpl(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super();
         this.artifactId = artifactId;
         this.artifactType = artifactType;
@@ -63,7 +64,7 @@ public class SDependencyMappingImpl implements SDependencyMapping {
         this.artifactId = artifactId;
     }
 
-    public void setArtifactType(final String artifactType) {
+    public void setArtifactType(final ScopeType artifactType) {
         this.artifactType = artifactType;
     }
 
@@ -77,7 +78,7 @@ public class SDependencyMappingImpl implements SDependencyMapping {
     }
 
     @Override
-    public String getArtifactType() {
+    public ScopeType getArtifactType() {
         return artifactType;
     }
 
@@ -93,7 +94,8 @@ public class SDependencyMappingImpl implements SDependencyMapping {
 
     @Override
     public String toString() {
-        return "SDependencyMappingImpl [artifactId=" + artifactId + ", artifactType=" + artifactType + ", dependencyId=" + dependencyId + ", id=" + id + "]";
+        return "SDependencyMappingImpl [id=" + id + ", artifactId=" + artifactId + ", artifactType=" + artifactType + ", dependencyId=" + dependencyId
+                + ", tenantId=" + tenantId + "]";
     }
 
     @Override

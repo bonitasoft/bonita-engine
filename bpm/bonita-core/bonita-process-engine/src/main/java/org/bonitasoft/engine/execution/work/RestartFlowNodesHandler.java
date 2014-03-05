@@ -43,8 +43,8 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
         try {
             QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
             List<SFlowNodeInstance> sFlowNodeInstances;
+            logInfo(logger, "Restarting flow nodes...");
             do {
-                logInfo(logger, "restarting flow nodes...");
                 sFlowNodeInstances = activityInstanceService.getFlowNodeInstancesToRestart(queryOptions);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
                 for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {

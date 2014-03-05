@@ -5,15 +5,21 @@ import static org.junit.Assert.assertEquals;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public abstract class TransactionServiceTest {
 
     protected abstract TransactionService getTxService() throws Exception;
+    TransactionService txService;
+
+    @Before
+    public void before() throws Exception {
+        txService = getTxService();
+    }
 
     @After
     public void afterTest() throws Exception {
-        final TransactionService txService = this.getTxService();
         try {
             txService.complete();
         } catch (Exception e) {
@@ -23,32 +29,30 @@ public abstract class TransactionServiceTest {
 
     @Test(expected = STransactionCreationException.class)
     public void testCantCreateATransactionWithActiveTx() throws Exception {
-        final TransactionService txService = this.getTxService();
-
         txService.begin();
         txService.begin();
     }
 
     @Test(expected = STransactionCreationException.class)
     public void testCantCreateATransactionWithCreatedTx() throws Exception {
-        final TransactionService txService = this.getTxService();
         txService.begin();
         txService.begin();
     }
 
     @Test(expected = STransactionCreationException.class)
     public void testCantCreateATransactionWithRollbackOnlyTx() throws Exception {
-        final TransactionService txService = this.getTxService();
-
         txService.begin();
         txService.setRollbackOnly();
-        txService.begin();
+
+        try {
+            txService.begin();
+        } finally {
+            txService.complete();
+        }
     }
 
     @Test
     public void getNumberOfActiveTransactionsWithTransactionOpen() throws Exception {
-        final TransactionService txService = this.getTxService();
-
         txService.begin();
         assertEquals(1, txService.getNumberOfActiveTransactions());
         txService.complete();
@@ -57,8 +61,6 @@ public abstract class TransactionServiceTest {
 
     @Test
     public void getNumberOfActiveTransactionsWithTransactionMarkedAsRollback() throws Exception {
-        final TransactionService txService = this.getTxService();
-
         txService.begin();
         assertEquals(1, txService.getNumberOfActiveTransactions());
         txService.setRollbackOnly();
@@ -69,7 +71,6 @@ public abstract class TransactionServiceTest {
 
     @Test
     public void getNumberOfActiveTransactionsWith2TransactionsOpen() throws Exception {
-        final TransactionService txService = this.getTxService();
         CountDownLatch lock1 = new CountDownLatch(1);
         CountDownLatch lock2 = new CountDownLatch(1);
 

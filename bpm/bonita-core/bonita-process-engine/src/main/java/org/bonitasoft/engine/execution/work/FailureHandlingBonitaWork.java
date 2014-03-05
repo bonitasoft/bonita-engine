@@ -84,16 +84,15 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
         final Throwable cause = e.getCause();
-        if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
-                || cause instanceof SProcessDefinitionNotFoundException) {
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work fails during its execution due to [" + getDescription() + "]", cause);
-            }
+        if (e instanceof SFlowNodeNotFoundException || e instanceof SProcessInstanceNotFoundException || e instanceof SProcessDefinitionNotFoundException) {
+                logFailureCause(e);
+            } else if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
+                    || cause instanceof SProcessDefinitionNotFoundException) {
+                logFailureCause(cause);
         } else {
             // final Edge case we cannot manage
             if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed. The failure will be handled. The work is [" + getDescription()
-                        + "]");
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "The work [" + getDescription() + "] failed. The failure will be handled.");
             }
             // To do before log, because we want to set the context of the exception.
             handleFailureWrappedWork(loggerService, e, context);
@@ -124,4 +123,9 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         }
     }
 
+    protected void logFailureCause(final Throwable e) {
+        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work [" + getDescription() + "] failed to execute due to : ", e);
+        }
+    }
 }

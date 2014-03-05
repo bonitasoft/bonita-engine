@@ -88,7 +88,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             final InsertRecord insertRecord = new InsertRecord(documentMapping);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DOCUMENTMAPPING).setObject(documentMapping)
+                        .done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
             return documentMapping;
@@ -103,7 +104,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             final DeleteRecord deleteRecord = new DeleteRecord(documentMapping);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping)
+                        .done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {
@@ -126,11 +128,11 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             final SDocumentMapping documentMapping = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SDocumentMapping.class,
                     "DocumentMapping", documentMappingId));
             if (documentMapping == null) {
-                throw new SDocumentMappingNotFoundException("Cannot get documentMapping with id: " + documentMappingId);
+                throw new SDocumentMappingNotFoundException(documentMappingId);
             }
             return documentMapping;
         } catch (final SBonitaReadException e) {
-            throw new SDocumentMappingNotFoundException("Cannot get documentMapping with id: " + documentMappingId, e);
+            throw new SDocumentMappingNotFoundException(documentMappingId, e);
         }
     }
 
@@ -148,9 +150,10 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             throw handleNotFoundError("Can't get the document mappings", e);
         }
     }
-    
+
     @Override
-    public List<SDocumentMapping> getDocumentMappingsForProcessInstanceOrderedById(final long processInstanceId, final int fromIndex, final int maxResults) throws SDocumentMappingException {
+    public List<SDocumentMapping> getDocumentMappingsForProcessInstanceOrderedById(final long processInstanceId, final int fromIndex, final int maxResults)
+            throws SDocumentMappingException {
         try {
             List<SDocumentMapping> documentMappingList = persistenceService.selectList(SelectDescriptorBuilder.getDocumentMappingsforProcessInstance(
                     processInstanceId, fromIndex, maxResults, null, null));
@@ -198,7 +201,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             final List<SADocumentMapping> docMapping = persistenceService.selectList(SelectDescriptorBuilder.getArchivedDocumentByName(processInstanceId,
                     documentName, time));
             if (docMapping.isEmpty()) {
-                throw new SDocumentMappingNotFoundException("can't find the archived document named " + documentName + " on process instance with id "
+                throw new SDocumentMappingNotFoundException("Can't find the archived document named " + documentName + " on process instance with id "
                         + processInstanceId + " for the time " + time);
             }
             return docMapping.get(0);
@@ -213,7 +216,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
         try {
             return persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfDocumentMappingsforProcessInstance(processInstanceId));
         } catch (final SBonitaReadException e) {
-            throw new SDocumentMappingException("Unable to count number of documents for process instance: " + processInstanceId, e);
+            throw new SDocumentMappingException("Unable to count number of documents for process instance : " + processInstanceId, e);
         }
     }
 
@@ -239,9 +242,10 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
                 archiveService.recordInsert(archiveDate, insertRecord);
             } catch (final Exception e) {
                 if (technicalLogger.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
-                    technicalLogger.log(this.getClass(), TechnicalLogSeverity.ERROR, "the document mapping was not archived id=" + docMapping.getId(), e);
+                    technicalLogger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The document mapping was not archived id = <" + docMapping.getId() + ">",
+                            e);
                 }
-                throw new SDocumentMappingException("Unable to archive the document with id " + docMapping.getId(), e);
+                throw new SDocumentMappingException(docMapping.getId(), e);
             }
         }
     }
@@ -272,7 +276,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             recorder.recordUpdate(updateRecord, updateEvent);
             return docMapping;
         } catch (final SRecorderException e) {
-            throw new SDocumentMappingException("Impossible to update document. ", e);
+            throw new SDocumentMappingException("Impossible to update document.", e);
         }
     }
 
@@ -362,7 +366,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
         try {
             final SADocumentMapping docMapping = persistenceService.selectById(SelectDescriptorBuilder.getArchivedDocumentById(archivedDocumentId));
             if (docMapping == null) {
-                throw new SDocumentMappingNotFoundException("Cannot find the archived document named with identifier: " + archivedDocumentId);
+                throw new SDocumentMappingNotFoundException(archivedDocumentId);
             }
             return docMapping;
         } catch (final SBonitaReadException e) {
@@ -376,7 +380,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
         try {
             final SADocumentMapping docMapping = persistenceService.selectOne(SelectDescriptorBuilder.getArchivedVersionOdDocument(documentId));
             if (docMapping == null) {
-                throw new SDocumentMappingNotFoundException("Cannot find the archived document named with identifier: " + documentId);
+                throw new SDocumentMappingNotFoundException(documentId);
             }
             return docMapping;
         } catch (final SBonitaReadException e) {
@@ -390,7 +394,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
             final DeleteRecord deleteRecord = new DeleteRecord(documentMapping);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping)
+                        .done();
             }
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {

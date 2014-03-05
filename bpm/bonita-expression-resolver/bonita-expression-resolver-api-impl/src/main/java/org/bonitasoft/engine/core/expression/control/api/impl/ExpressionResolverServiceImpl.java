@@ -85,7 +85,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             }
             final Long processDefinitionId = evaluationContext.getProcessDefinitionId();
             if (processDefinitionId != null) {
-                Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader("process", processDefinitionId));
+                Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId));
             }
 
             final Map<SExpression, SExpression> dataReplacement = new HashMap<SExpression, SExpression>();

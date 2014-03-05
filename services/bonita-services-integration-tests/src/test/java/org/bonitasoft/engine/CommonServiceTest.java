@@ -94,7 +94,6 @@ public class CommonServiceTest {
             LOGGER.info("Succeeded test: " + d.getTestClass().getName() + "." + d.getMethodName());
             LOGGER.info("-----------------------------------------------------------------------------------------------");
         }
-
     };
 
     static {

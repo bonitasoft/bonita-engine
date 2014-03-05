@@ -18,6 +18,8 @@ import static org.mockito.Mockito.spy;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping;
@@ -42,6 +44,12 @@ public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
         TechnicalLoggerService technicalLoggerService = getServicesBuilder().buildTechnicalLoggerService();
         ArchiveService archiveService = getServicesBuilder().buildArchiveService();
         dataInstanceServiceImpl = new DataInstanceServiceImpl(dataSourceService, recorder, persistenceService, archiveService, technicalLoggerService);
+        CacheService cacheService = getServicesBuilder().buildCacheService();
+        try {
+            cacheService.start();
+        } catch (SBonitaException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

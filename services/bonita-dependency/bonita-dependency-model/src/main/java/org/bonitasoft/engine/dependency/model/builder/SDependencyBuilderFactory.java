@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,16 +13,36 @@
  **/
 package org.bonitasoft.engine.dependency.model.builder;
 
+import org.bonitasoft.engine.dependency.model.ScopeType;
 
+/**
+ * 
+ * @author Celine Souchet
+ * 
+ */
 public interface SDependencyBuilderFactory {
 
-    SDependencyBuilder createNewInstance(final String name, final String version, final String fileName, final byte[] value);
+    /**
+     * @param name
+     *            The name of the dependency
+     * @param artifactId
+     *            The identifier of the scope
+     * @param artifactType
+     *            The type of the scope
+     * @param version
+     *            The version of the dependency
+     * @param fileName
+     *            The name of the file of the dependency
+     * @param value
+     *            The content of the dependency
+     * @return The server dependency builder
+     * @since 6.2
+     */
+    SDependencyBuilder createNewInstance(String name, long artifactId, ScopeType artifactType, String fileName, byte[] value);
 
     String getIdKey();
 
     String getNameKey();
-
-    String getVersionKey();
 
     String getDescriptionKey();
 

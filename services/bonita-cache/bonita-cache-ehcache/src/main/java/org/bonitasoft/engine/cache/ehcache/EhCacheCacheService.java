@@ -15,6 +15,7 @@ package org.bonitasoft.engine.cache.ehcache;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.cache.CacheConfigurations;
@@ -56,6 +57,9 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
 
     @Override
     public List<String> getCachesNames() {
+        if (cacheManager == null) {
+            return Collections.emptyList();
+        }
         final String[] cacheNames = cacheManager.getCacheNames();
         final ArrayList<String> cacheNamesList = new ArrayList<String>(cacheNames.length);
         String prefix;

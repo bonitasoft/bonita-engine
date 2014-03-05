@@ -41,6 +41,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.expression.Expression;
@@ -175,7 +176,7 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
     protected ClassLoader getLocalClassLoader(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) throws ClassLoaderException {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         try {
-            return classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            return classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
         } catch (final org.bonitasoft.engine.classloader.ClassLoaderException e) {
             throw new ClassLoaderException(e);
         }
@@ -204,7 +205,8 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         try {
             getProcessDefinition.execute();
         } catch (final SBonitaException e) {
-            throw new InvalidProcessDefinitionException("invalid processDefinition with id:" + processDefinitionId);
+            e.setProcessDefinitionIdOnContext(processDefinitionId);
+            throw new InvalidProcessDefinitionException("Invalid processDefinition.");
         }
         return getProcessDefinition.getResult();
     }

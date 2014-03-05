@@ -8,10 +8,10 @@
 	</appender>
 
 	<logger name="org.bonitasoft" level="INFO" />
-	<logger name="org.bonitasoft.engine.execution.ProcessExecutorImpl" level="DEBUG" />
-	<logger name="org.bonitasoft.engine.execution.FlowNodeExecutorImpl" level="DEBUG" />
-	<logger name="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl" level="DEBUG" /> 
-	<logger name="org.bonitasoft.engine.core.process.instance.impl.TokenServiceImpl" level="DEBUG" />
+	<!--<logger name="org.bonitasoft.engine.execution.ProcessExecutorImpl" level="DEBUG" />-->
+	<!--<logger name="org.bonitasoft.engine.execution.FlowNodeExecutorImpl" level="DEBUG" />-->
+	<!--<logger name="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl" level="DEBUG" /> -->
+	<!--<logger name="org.bonitasoft.engine.core.process.instance.impl.TokenServiceImpl" level="DEBUG" />-->
 
 
 	<root level="WARN">

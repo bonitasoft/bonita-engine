@@ -23,11 +23,10 @@ import org.bonitasoft.engine.dependency.model.impl.SPlatformDependency;
 public class SPlatformDependencyBuilderFactoryImpl implements SPlatformDependencyBuilderFactory {
 
     @Override
-    public SPlatformDependencyBuilder createNewInstance(final String name, final String version, final String fileName, final byte[] value) {
-        final SPlatformDependency object = new SPlatformDependency(name, version, fileName, value);
+    public SPlatformDependencyBuilder createNewInstance(final String name, final String fileName, final byte[] value) {
+        final SPlatformDependency object = new SPlatformDependency(name, fileName, value);
         return new SPlatformDependencyBuilderImpl(object);
     }
-    
 
     @Override
     public String getDescriptionKey() {
@@ -52,11 +51,6 @@ public class SPlatformDependencyBuilderFactoryImpl implements SPlatformDependenc
     @Override
     public String getValueKey() {
         return "value_";
-    }
-
-    @Override
-    public String getVersionKey() {
-        return "version";
     }
 
 }

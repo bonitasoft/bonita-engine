@@ -10,9 +10,9 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        BPMLocalSuiteTests.class,
-        BPMRemoteTests.class,
-        APIMethodTest.class })
+    BPMLocalSuiteTests.class,
+    BPMRemoteTests.class,
+    APIMethodTest.class })
 @Initializer(TestsInitializer.class)
 public class LocalIntegrationTests {
 
@@ -23,7 +23,7 @@ public class LocalIntegrationTests {
 
     @AfterClass
     public static void afterClass() {
-        System.err.println("=================== LocalIntegrationTests teardown");
+        System.err.println("=================== LocalIntegrationTests afterClass");
     }
 
 }

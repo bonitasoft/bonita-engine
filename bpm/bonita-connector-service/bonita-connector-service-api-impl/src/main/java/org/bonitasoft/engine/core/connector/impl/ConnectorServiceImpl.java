@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         return stb.toString();
     }
 
-    private static String buildConnectorInputMessage(Map<String, Object> inputParameters) {
+    private static String buildConnectorInputMessage(final Map<String, Object> inputParameters) {
         StringBuilder stb = new StringBuilder();
         if (inputParameters != null && !inputParameters.isEmpty()) {
             stb.append(LINE_SEPARATOR);
@@ -400,23 +400,20 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private void deployNewDependencies(final long processDefinitionId, final long tenantId) throws SDependencyException, IOException, BonitaHomeNotSetException {
-        // delete existing ones:
-        dependencyService.deleteDependencies(processDefinitionId, "process");
         // deploy new ones from the filesystem (bonita-home):
         final File processFolder = new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId)), String.valueOf(processDefinitionId));
         final File file = new File(processFolder, CLASSPATH_FOLDER);
+        ArrayList<SDependency> dependencies = new ArrayList<SDependency>();
         if (file.exists() && file.isDirectory()) {
             final File[] listFiles = file.listFiles();
             for (final File jarFile : listFiles) {
                 final String name = jarFile.getName();
                 final byte[] jarContent = IOUtil.getAllContentFrom(jarFile);
-                final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, "1.0", name + ".jar", jarContent)
-                        .done();
-                dependencyService.createDependency(sDependency);
-                final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
-                        .createNewInstance(sDependency.getId(), processDefinitionId, "process").done();
-                dependencyService.createDependencyMapping(sDependencyMapping);
+                final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class)
+                        .createNewInstance(name, processDefinitionId, ScopeType.PROCESS, name + ".jar", jarContent).done();
+                dependencies.add(sDependency);
             }
+            dependencyService.updateDependenciesOfArtifact(processDefinitionId, ScopeType.PROCESS, dependencies);
         }
 
     }

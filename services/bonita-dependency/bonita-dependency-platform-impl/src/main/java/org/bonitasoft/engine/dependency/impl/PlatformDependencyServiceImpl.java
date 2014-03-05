@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012; 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -32,6 +32,7 @@ import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -45,6 +46,7 @@ import org.bonitasoft.engine.services.UpdateDescriptor;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class PlatformDependencyServiceImpl implements DependencyService {
 
@@ -261,7 +263,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public List<SDependencyMapping> getDependencyMappings(final long artifactId, final String artifactType, final QueryOptions queryOptions)
+    public List<SDependencyMapping> getDependencyMappings(final long artifactId, final ScopeType artifactType, final QueryOptions queryOptions)
             throws SDependencyException {
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>();
@@ -289,7 +291,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public List<Long> getDependencyIds(final long artifactId, final String artifactType, final QueryOptions queryOptions) throws SDependencyException {
+    public List<Long> getDependencyIds(final long artifactId, final ScopeType artifactType, final QueryOptions queryOptions) throws SDependencyException {
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("artifactId", artifactId);
@@ -303,7 +305,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     }
 
     @Override
-    public long getLastUpdatedTimestamp(final String artifactType, final long artifactId) {
+    public long getLastUpdatedTimestamp(final ScopeType artifactType, final long artifactId) {
         final String key = getKey(artifactType, artifactId);
         if (lastUpdates.containsKey(key)) {
             return lastUpdates.get(key);
@@ -357,15 +359,15 @@ public class PlatformDependencyServiceImpl implements DependencyService {
         return result;
     }
 
-    private String getKey(final String artifactType, final long artifactId) {
-        final StringBuffer sb = new StringBuffer(artifactType);
+    private String getKey(final ScopeType scopeType, final long artifactId) {
+        final StringBuffer sb = new StringBuffer(scopeType.name());
         sb.append("________");
         sb.append(artifactId);
         return sb.toString();
     }
 
     @Override
-    public void deleteDependencies(final long id, final String type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException {
+    public void deleteDependencies(final long id, final ScopeType type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException {
         QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
         final ArrayList<Long> allDependencyIds = new ArrayList<Long>();
         List<Long> dependencyIds;
@@ -384,11 +386,11 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     }
 
     private void refreshClassLoader() throws SDependencyException {
-        refreshClassLoader(classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
+        refreshClassLoader(ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()), classLoaderService.getGlobalClassLoaderId());
     }
 
     @Override
-    public void refreshClassLoader(final String type, final long id) throws SDependencyException {
+    public void refreshClassLoader(final ScopeType type, final long id) throws SDependencyException {
         final Map<String, byte[]> resources = getDependenciesResources();
         try {
             classLoaderService.refreshGlobalClassLoader(resources);
@@ -405,7 +407,8 @@ public class PlatformDependencyServiceImpl implements DependencyService {
 
         do {
             final QueryOptions queryOptions = new QueryOptions(fromIndex, pageSize);
-            dependencyIds = getDependencyIds(classLoaderService.getGlobalClassLoaderId(), classLoaderService.getGlobalClassLoaderType(), queryOptions);
+            dependencyIds = getDependencyIds(classLoaderService.getGlobalClassLoaderId(), ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType()),
+                    queryOptions);
             if (dependencyIds != null && dependencyIds.size() > 0) {
                 final List<SDependency> dependencies = getDependencies(dependencyIds);
                 for (final SDependency dependency : dependencies) {
@@ -415,6 +418,11 @@ public class PlatformDependencyServiceImpl implements DependencyService {
             fromIndex = fromIndex + pageSize;
         } while (dependencyIds.size() == pageSize);
         return resources;
+    }
+
+    @Override
+    public void updateDependenciesOfArtifact(final long id, final ScopeType type, final ArrayList<SDependency> dependencies) throws SDependencyException {
+        throw new UnsupportedOperationException("only one artifact at platform level, no need to update in batch all dependencies");
     }
 
 }

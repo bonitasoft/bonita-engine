@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.ArchivingStrategy;
@@ -39,8 +42,6 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     private final SArchiveDescriptor definitiveArchiveDescriptor;
 
-    private final ThreadLocal<BatchArchiveSynchronization> synchronizations = new ThreadLocal<BatchArchiveSynchronization>();
-
     private final TransactionService transactionService;
 
     private final PersistenceService definitiveArchivePersistenceService;
@@ -62,25 +63,26 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Override
     public void recordInsert(final long time, final ArchiveInsertRecord record) throws SRecorderException {
         if (isArchivable(record.getEntity().getPersistentObjectInterface())) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "recordInsert"));
-            }
-            final ArchivedPersistentObject entity = record.getEntity();
-            setArchiveDate(entity, time);
-
-            BatchArchiveSynchronization synchro;
-            try {
-                synchro = getBatchArchiveSynchronization();
-                synchro.addArchivedObject(entity);
-            } catch (final STransactionNotFoundException e) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization for the archives : transaction not found", e);
-                }
-            }
-
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "recordInsert"));
-            }
+            recordInserts(time, record);
+            //            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            //                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "recordInsert"));
+            //            }
+            //            final ArchivedPersistentObject entity = record.getEntity();
+            //            setArchiveDate(entity, time);
+            //
+            //            final BatchArchiveCallable callable = new BatchArchiveCallable(definitiveArchivePersistenceService, entity);
+            //            try {
+            //                transactionService.registerBonitaSynchronization(new BatchArchiveSynchronization(definitiveArchivePersistenceService, callable));
+            //                transactionService.registerBeforeCommitCallable(callable);
+            //            } catch (final STransactionNotFoundException e) {
+            //                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
+            //                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization for the archives : transaction not found", e);
+            //                }
+            //            }
+            //
+            //            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            //                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "recordInsert"));
+            //            }
         }
     }
 
@@ -89,38 +91,29 @@ public class ArchiveServiceImpl implements ArchiveService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "recordInsert"));
         }
-        BatchArchiveSynchronization synchro;
-        try {
-            synchro = getBatchArchiveSynchronization();
+        if (records != null) {
+            final List<ArchivedPersistentObject> archivedObjects = new ArrayList<ArchivedPersistentObject>();
             for (final ArchiveInsertRecord record : records) {
                 final ArchivedPersistentObject entity = record.getEntity();
                 setArchiveDate(entity, time);
-                synchro.addArchivedObject(entity);
+                archivedObjects.add(entity);
             }
-        } catch (final STransactionNotFoundException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found", e);
+
+            final BatchArchiveCallable callable = new BatchArchiveCallable(definitiveArchivePersistenceService, archivedObjects);
+
+            try {
+                transactionService.registerBonitaSynchronization(new BatchArchiveSynchronization(definitiveArchivePersistenceService, callable));
+                transactionService.registerBeforeCommitCallable(callable);
+            } catch (final STransactionNotFoundException e) {
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found", e);
+                }
             }
         }
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "recordInsert"));
         }
-    }
-
-    /**
-     * get or create and return the batch synchronization registered on the current transaction
-     * 
-     * @return
-     * @throws STransactionNotFoundException
-     */
-    private BatchArchiveSynchronization getBatchArchiveSynchronization() throws STransactionNotFoundException {
-        BatchArchiveSynchronization synchro = synchronizations.get();
-        if (synchro == null) {
-            synchro = new BatchArchiveSynchronization(definitiveArchivePersistenceService);
-            transactionService.registerBonitaSynchronization(synchro);
-        }
-        return synchro;
     }
 
     private void setArchiveDate(final ArchivedPersistentObject entity, final long time) throws SRecorderException {

@@ -114,6 +114,14 @@ public class TransactionExecutorImplTest {
             // TODO Auto-generated method stub
 
         }
+        
+        @Override
+        public void registerBeforeCommitCallable(Callable<Void> callable)
+                throws STransactionNotFoundException {
+            // TODO Auto-generated method stub
+            
+        }
+
 
         @Override
         public long getNumberOfActiveTransactions() {

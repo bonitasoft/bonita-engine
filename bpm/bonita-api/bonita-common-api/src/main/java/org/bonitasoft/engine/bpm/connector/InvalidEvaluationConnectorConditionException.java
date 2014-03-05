@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,15 +16,31 @@ package org.bonitasoft.engine.bpm.connector;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Thrown when the evaluation of the condition of the connector instance is invalid.
+ * 
+ * The class InvalidEvaluationConnectorConditionException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
+ * The class InvalidEvaluationConnectorConditionException that is not also subclasses of {@link RuntimeException} are checked exceptions.
+ * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
+ * constructor and propagate outside the method or constructor boundary.
+ * 
  * @author Zhao Na
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class InvalidEvaluationConnectorConditionException extends BonitaException {
 
     private static final long serialVersionUID = -7035298849808114112L;
 
-    public InvalidEvaluationConnectorConditionException(final int c1, final int c2) {
-        super(c1 + " is not equal to " + c2 + " .");
+    /**
+     * Constructs a new exception with the two conditions to compare
+     * 
+     * @param condition1
+     *            The first condition
+     * @param condition2
+     *            The second condition
+     */
+    public InvalidEvaluationConnectorConditionException(final int condition1, final int condition2) {
+        super(condition1 + " is not equal to " + condition2 + " .");
     }
 
 }
