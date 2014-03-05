@@ -4,7 +4,7 @@
     <parent>
         <artifactId>bonita-integration-as-tests</artifactId>
         <groupId>com.bonitasoft.engine</groupId>
-        <version>6.2.4-SNAPSHOT</version>
+        <version>6.2.4.rc-01</version>
     </parent>
 
     <artifactId>bonita-integration-tomcat7</artifactId>
