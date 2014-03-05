@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.scheduler.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -20,9 +22,6 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
-import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
-import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilder;
@@ -39,7 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -94,41 +92,57 @@ public class SchedulerServiceImplTest {
 
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor);
     }
-    
+
     @Test
     public void isStarted_return_true_if_schedulorExecutor_is_started() throws Exception {
         when(schedulerExecutor.isStarted()).thenReturn(true);
-        
+
         boolean started = schedulerService.isStarted();
-        
+
         assertTrue(started);
     }
-    
+
     @Test
     public void isStarted_return_false_if_schedulorExecutor_is_not_started() throws Exception {
         when(schedulerExecutor.isStarted()).thenReturn(false);
-        
+
         boolean started = schedulerService.isStarted();
-        
+
         assertFalse(started);
     }
 
     @Test
     public void isStopped_return_true_if_executor_is_shutodown() throws Exception {
         when(schedulerExecutor.isShutdown()).thenReturn(true);
-        
+
         boolean stopped = schedulerService.isStopped();
-        
+
         assertTrue(stopped);
     }
-    
+
     @Test
     public void isStopped_return_false_if_executor_is_not_shutodown() throws Exception {
         when(schedulerExecutor.isShutdown()).thenReturn(false);
-        
+
         boolean stopped = schedulerService.isStopped();
-        
+
         assertFalse(stopped);
+    }
+
+    @Test
+    public void start_start_schedulerexecutor_and_fire_a_start_event() throws Exception {
+        schedulerService.start();
+
+        verify(schedulerExecutor).start();
+        verify(eventService).fireEvent(any(SEvent.class));
+    }
+
+    @Test
+    public void stop_shutdown_schedulerexecutor_and_fire_a_stop_event() throws Exception {
+        schedulerService.stop();
+
+        verify(schedulerExecutor).shutdown();
+        verify(eventService).fireEvent(any(SEvent.class));
     }
 
     @Test(expected = SSchedulerException.class)
@@ -138,16 +152,17 @@ public class SchedulerServiceImplTest {
 
         schedulerService.schedule(jobDescriptor, parameters, null);
     }
-    
+
     @Test(expected = SSchedulerException.class)
-    public void cannotScheduleANullJob() throws Exception {
-        final Trigger trigger = mock(Trigger.class);
+    public void cannot_schedule_a_null_job() throws Exception {
+        Trigger trigger = mock(Trigger.class);
         when(jobService.createJobDescriptor(any(SJobDescriptor.class), any(Long.class))).thenThrow(new SJobDescriptorCreationException(""));
+        
         schedulerService.schedule(null, trigger);
     }
 
     @Test
-    public void rescheduleErroneousTriggers() throws Exception {
+    public void rescheduleErroneousTriggers_call_same_method_in_schedulerexecutor() throws Exception {
         schedulerService.rescheduleErroneousTriggers();
 
         verify(schedulerExecutor).rescheduleErroneousTriggers();
