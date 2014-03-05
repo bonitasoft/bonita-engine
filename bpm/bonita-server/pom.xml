@@ -493,11 +493,6 @@
 			<artifactId>bonita-scheduler-quartz</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Service Commons -->
 
@@ -847,7 +842,6 @@
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>
-									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl-hibernate</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-quartz</include>
 									<!-- Service Commons -->
 									<include>org.bonitasoft.engine:bonita-commons</include>

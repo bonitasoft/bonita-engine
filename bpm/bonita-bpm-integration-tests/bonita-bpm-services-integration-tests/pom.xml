@@ -560,15 +560,8 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Sequence -->
-
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-sequence-api</artifactId>
