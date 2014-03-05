@@ -86,6 +86,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProce
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -501,14 +502,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    /**
-     * byte[] is a zip file exported from studio
-     * clear: remove the old .impl file; put the new .impl file in the connector directory
-     * reload the cache, connectorId and connectorVersion are used here.
-     * Warning filesystem operation are not rolledback
-     * 
-     * @throws InvalidConnectorImplementationException
-     */
     @Override
     public void setConnectorImplementation(final long processDefinitionId, final String connectorId, final String connectorVersion,
             final byte[] connectorImplementationArchive) throws InvalidConnectorImplementationException, UpdateException {
@@ -529,7 +522,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         // refresh classloader in an other transaction.
         final DependencyService dependencyService = getTenantAccessor().getDependencyService();
         try {
-            dependencyService.refreshClassLoader("process", processDefinitionId);
+            dependencyService.refreshClassLoader(ScopeType.PROCESS, processDefinitionId);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
@@ -691,7 +684,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             getArchivedProcessInstanceList.execute();
             final ArchivedProcessInstance saprocessInstance = getArchivedProcessInstanceList.getResult().get(0);
             final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
-            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
 
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
@@ -754,7 +747,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SProcessInstance processInstance = processInstanceService.getProcessInstance(activityInstance.getLogicalGroup(sUserTaskInstanceBuilderFactory
                     .getParentProcessInstanceIndex()));
             final long processDefinitionId = processInstance.getProcessDefinitionId();
-            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(activityInstanceId);
@@ -809,7 +802,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             getLastArchivedProcessInstance.execute();
 
             final long processDefinitionId = getLastArchivedProcessInstance.getResult().getProcessDefinitionId();
-            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
 
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
@@ -863,7 +856,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             getLastArchivedProcessInstance.execute();
             final ArchivedProcessInstance saprocessInstance = getLastArchivedProcessInstance.getResult();
             final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
-            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
 
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
@@ -921,7 +914,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
             final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
             final long processDefinitionId = processInstance.getProcessDefinitionId();
-            final ClassLoader classLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final ClassLoader classLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);

@@ -75,31 +75,39 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@SuppressWarnings("javadoc")
 public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
     private static final String FLOWNODE = "flowNode";
 
-    private static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
+    private static final String CONNECTOR_INPUT_NAME = "input1";
 
-    private static final String TEST_CONNECTOR_ID = "org.bonitasoft.connector.testConnector";
+    private static final String VALUE_INPUT1 = "Lily";
 
-    private static final String TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID = "testConnectorThatThrowException";
+    private static final String VALUE_INPUT2 = "Lucy";
 
-    private static final String CONNECTOR_VERSION = "1.0";
+    private static final String VALUE_INPUT3 = "Mett";
 
-    private static final String CONNECTOR_OUTPUT_NAME = "output1";
+    private static final String MAIN_EXP_CONTENT = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
 
-    private static final String CONNECOTR_INPUT_NAME = "input1";
+    private static final String NAME_INPUT1 = "valueOfInput1";
+
+    private static final String NAME_INPUT2 = "valueOfInput2";
+
+    private static final String NAME_INPUT3 = "valueOfInput3";
+
+    private static final String NAME_INPUT_MAIN = "param1";
+
+    private static final String RESULT_CONTENT = "welcome Lily and Lucy and Mett";
 
     @Test
     public void getConnectorInstancesOnActivity() throws Exception {
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("none");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
-        final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addShortTextData(dataName, defaultValueExpression).addUserTask("step2", ACTOR_NAME);
+        designProcessDefinition.addShortTextData("myVar", defaultValueExpression).addUserTask("step2", ACTOR_NAME);
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         addUserTask.addConnector("myConnector1", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput("kind",
                 input1Expression);
@@ -146,7 +154,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         subProcessDefinitionBuilder.addActor(ACTOR_NAME);
         subProcessDefinitionBuilder.addStartEvent("SubStart").addEndEvent("SubEnd");
         subProcessDefinitionBuilder.addUserTask("StepWithConnector", ACTOR_NAME)
-                .addConnector("myConnector1", TEST_CONNECTOR_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput(CONNECOTR_INPUT_NAME, input1Expression);
+                .addConnector("myConnector1", TEST_CONNECTOR_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput(CONNECTOR_INPUT_NAME, input1Expression);
         subProcessDefinitionBuilder.addUserTask("Step2", ACTOR_NAME);
         // Transitions
         subProcessDefinitionBuilder.addTransition("SubStart", "StepWithConnector").addTransition("StepWithConnector", "Step2").addTransition("Step2", "SubEnd");
@@ -164,11 +172,9 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("none");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
 
-        final String dataName = "myVar";
-
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData("myVar", defaultValueExpression);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addConnector("myConnector1", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput(
                 "kind", input1Expression);
@@ -196,7 +202,6 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     public void setConnectorState() throws Exception {
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("normal");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
-
         final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
@@ -283,11 +288,9 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
 
-        final String dataName = "myVar";
-
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData("myVar", defaultValueExpression);
         designProcessDefinition.addAutomaticTask("step1")
                 .addConnector("myConnector", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput("kind", normal);
 
@@ -318,11 +321,10 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     public void replayActivityWithResetConnectorStates() throws Exception {
         final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
-        final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData("myVar", defaultValueExpression);
         designProcessDefinition.addAutomaticTask("step1")
                 .addConnector("myConnector", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER).addInput("kind", normal);
         final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
@@ -353,11 +355,10 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");
         final Expression none = new ExpressionBuilder().createConstantStringExpression("none");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
-        final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData("myVar", defaultValueExpression);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step1");
         addAutomaticTask.addConnector("myConnector1", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
                 .addInput("kind", none);
@@ -393,11 +394,10 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final Expression normal = new ExpressionBuilder().createConstantStringExpression("normal");
         final Expression none = new ExpressionBuilder().createConstantStringExpression("none");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
-        final String dataName = "myVar";
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
+        designProcessDefinition.addShortTextData("myVar", defaultValueExpression);
         final AutomaticTaskDefinitionBuilder addAutomaticTask = designProcessDefinition.addAutomaticTask("step1");
         addAutomaticTask.addConnector("myConnector1", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
                 .addInput("kind", none);
@@ -704,34 +704,24 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "At process instanciation" }, story = "Execute connector at process instanciation.", jira = "")
     @Test
     public void executeConnectorAtProcessInstanciation() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-        final String resContent = "welcome Lily and Lucy and Mett";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step0", ACTOR_NAME).addOperation(
-                new OperationBuilder().createSetDataOperation(inputName3, new ExpressionBuilder().createConstantStringExpression("not Mett")));
+                new OperationBuilder().createSetDataOperation(NAME_INPUT3, new ExpressionBuilder().createConstantStringExpression("not Mett")));
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        designProcessDefinition.addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addShortTextData(NAME_INPUT3, input3DefaultExpression);
         designProcessDefinition.addTransition("step0", "step1");
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
 
@@ -740,68 +730,58 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // check first value is "Mett", then it's changed to "not Mett"
         final ActivityInstance step0 = waitForUserTask("step0", processInstance);
-        assertEquals("Mett", getProcessAPI().getProcessDataInstance(inputName3, processInstance.getId()).getValue());
+        assertEquals("Mett", getProcessAPI().getProcessDataInstance(NAME_INPUT3, processInstance.getId()).getValue());
         assignAndExecuteStep(step0, user);
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        assertEquals("not Mett", getProcessAPI().getProcessDataInstance(inputName3, processInstance.getId()).getValue());
+        assertEquals("not Mett", getProcessAPI().getProcessDataInstance(NAME_INPUT3, processInstance.getId()).getValue());
 
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorAtProcessInstantiation(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, processInstance.getId());
         // we should have the string finishing with "Mett" and not "no Mett"
-        assertEquals(resContent, res.get(mainInputName1));
+        assertEquals(RESULT_CONTENT, res.get(NAME_INPUT_MAIN));
         // check also when finished
         assignAndExecuteStep(step1, user);
         waitForProcessToFinish(processInstance);
         final Map<String, Serializable> res2 = getProcessAPI().executeConnectorAtProcessInstantiation(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, processInstance.getId());
-        assertEquals(resContent, res2.get(mainInputName1));
+        assertEquals(RESULT_CONTENT, res2.get(NAME_INPUT_MAIN));
         disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance" }, story = "Execute connector on an activity instance.", jira = "")
     @Test
     public void executeConnectorOnActivityInstance() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-        final String resContent = "welcome Lily and Lucy and Mett";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(NAME_INPUT3, input3DefaultExpression);
 
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final HumanTaskInstance step0 = waitForUserTask("step0", processInstance);
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, step0.getId());
 
-        assertEquals(resContent, res.get(mainInputName1));
+        assertEquals(RESULT_CONTENT, res.get(NAME_INPUT_MAIN));
         assertTrue((Boolean) res.get("hasBeenValidated"));
 
         disableAndDeleteProcess(processDefinition);
@@ -810,46 +790,36 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance", "Loop" }, story = "Execute connector on a loop.", jira = "BS-2090")
     @Test
     public void executeConnectorOnActivityInstanceWithLoop() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-        final String resContent = "welcome Lily and Lucy and Mett";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addEndEvent("End").addTerminateEventTrigger();
-        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addLoop(false, condition).addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addLoop(false, condition).addShortTextData(NAME_INPUT3, input3DefaultExpression);
         designProcessDefinition.addTransition("step0", "End");
 
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final HumanTaskInstance step0 = waitForUserTask("step0", processInstance);
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, step0.getId());
 
-        assertEquals(resContent, res.get(mainInputName1));
+        assertEquals(RESULT_CONTENT, res.get(NAME_INPUT_MAIN));
         assertTrue((Boolean) res.get("hasBeenValidated"));
 
         disableAndDeleteProcess(processDefinition);
@@ -858,44 +828,29 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Activity instance", "No serializable output" }, story = "Execute connector on an activity instance with no serializable output.", jira = "ENGINE-823")
     @Test(expected = ConnectorExecutionException.class)
     public void executeConnectorOnActivityInstanceWithNotSerializableOutput() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
-                PROCESS_VERSION);
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(NAME_INPUT3, input3DefaultExpression);
 
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance activity = waitForUserTask("step0", processInstance);
 
-        // get activityInstanceId
-        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 5);
-        final ActivityInstance activity = activities.get(0);
-
-        waitForUserTask("step0", processInstance);
-
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
         inputValues.putAll(getInputValues("returnNotSerializableOutput", null, null));
 
         try {
@@ -909,31 +864,21 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed activity", "Activity instance" }, story = "Execute connector on completed activity instance.", jira = "")
     @Test
     public void executeConnectorOnCompletedActivityInstance() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-        final String resContent = "welcome Lily and Lucy and Mett";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(NAME_INPUT3, input3DefaultExpression);
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         designProcessDefinition.addTransition("step0", "step1");
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
@@ -943,18 +888,18 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // step0 should be completed
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
 
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
         Map<String, Serializable> res = getProcessAPI().executeConnectorOnCompletedActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, activity.getId());
-        assertEquals(resContent, res.get(mainInputName1));
+        assertEquals(RESULT_CONTENT, res.get(NAME_INPUT_MAIN));
         assignAndExecuteStep(step1, user);
         waitForProcessToFinish(processInstance);
         // after process completion
         res = getProcessAPI().executeConnectorOnCompletedActivityInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, activity.getId());
-        assertEquals(resContent, res.get(mainInputName1));
+        assertEquals(RESULT_CONTENT, res.get(NAME_INPUT_MAIN));
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -962,30 +907,21 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed activity", "No serializable output" }, story = "Execute connector on completed activity instance with no serializable output.", jira = "ENGINE-823")
     @Test(expected = ConnectorExecutionException.class)
     public void executeConnectorOnCompletedActivityInstanceWithNotSerializableOutput() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
-        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addUserTask("step0", ACTOR_NAME).addShortTextData(NAME_INPUT3, input3DefaultExpression);
 
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -996,16 +932,16 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         assertTrue(!activityDataInstances.isEmpty());
         assertEquals(1, activityDataInstances.size());
-        assertEquals(inputName3, activityDataInstances.get(0).getName());
-        assertEquals(valueOfInput3, activityDataInstances.get(0).getValue());
+        assertEquals(NAME_INPUT3, activityDataInstances.get(0).getName());
+        assertEquals(VALUE_INPUT3, activityDataInstances.get(0).getValue());
 
         assignAndExecuteStep(activity, user);
         waitForProcessToFinish(processInstance);
 
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
         inputValues.putAll(getInputValues("returnNotSerializableOutput", null, null));
 
         try {
@@ -1019,45 +955,35 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On completed process instance", "Process instance" }, story = "Execute connector on completed process instance.", jira = "")
     @Test
     public void executeConnectorOnCompletedProcessInstance() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-        final String resContent = "welcome Lily and Lucy and Mett";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step0", ACTOR_NAME);
-        designProcessDefinition.addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addShortTextData(NAME_INPUT3, input3DefaultExpression);
 
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         waitForUserTaskAndExecuteIt("step0", processInstance.getId(), user);
         waitForProcessToFinish(processInstance);
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnCompletedProcessInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, processInstance.getId());
-        assertEquals(resContent, res.get(mainInputName1));
+        assertEquals(RESULT_CONTENT, res.get(NAME_INPUT_MAIN));
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -1066,31 +992,22 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
             "No serializable output" }, story = "Execute connector on completed process instance with no serializable output.", jira = "ENGINE-823")
     @Test(expected = ConnectorExecutionException.class)
     public void executeConnectorOnCompletedProcessInstanceWithNotSerializableOutput() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME,
                 PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addUserTask("step0", ACTOR_NAME);
-        designProcessDefinition.addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addShortTextData(NAME_INPUT3, input3DefaultExpression);
 
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -1101,16 +1018,16 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         assertTrue(!processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
-        assertEquals(inputName3, processDataInstances.get(0).getName());
-        assertEquals(valueOfInput3, processDataInstances.get(0).getValue());
+        assertEquals(NAME_INPUT3, processDataInstances.get(0).getName());
+        assertEquals(VALUE_INPUT3, processDataInstances.get(0).getValue());
 
         assignAndExecuteStep(activity, user);
         waitForProcessToFinish(processInstance);
 
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
         inputValues.putAll(getInputValues("returnNotSerializableOutput", null, null));
 
         try {
@@ -1124,44 +1041,34 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Process instance" }, story = "Execute connector on process instance.", jira = "")
     @Test
     public void executeConnectorOnProcessInstance() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-        final String resContent = "welcome Lily and Lucy and Mett";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addUserTask("step0", ACTOR_NAME);
-        designProcessDefinition.addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addShortTextData(NAME_INPUT3, input3DefaultExpression);
 
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         waitForUserTask("step0", processInstance);
 
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnProcessInstance(ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_ID,
                 ConnectorExecutionTest.DEFAULT_EXTERNAL_CONNECTOR_VERSION, connectorInputParameters, inputValues, processInstance.getId());
 
-        assertEquals(resContent, res.get(mainInputName1));
+        assertEquals(RESULT_CONTENT, res.get(NAME_INPUT_MAIN));
         assertTrue((Boolean) res.get("hasBeenValidated"));
 
         disableAndDeleteProcess(processDefinition);
@@ -1170,38 +1077,29 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Process instance", "No serializable output" }, story = "Execute connector on process instance with no serializable output.", jira = "ENGINE-823")
     @Test(expected = ConnectorExecutionException.class)
     public void executeConnectorOnProcessInstanceWithNotSerializableOutput() throws Exception {
-        final String valueOfInput1 = "Lily";
-        final String valueOfInput2 = "Lucy";
-        final String valueOfInput3 = "Mett";
-        final String mainExpContent = "'welcome '+valueOfInput1+' and '+valueOfInput2+' and '+valueOfInput3";
-        final String inputName1 = "valueOfInput1";
-        final String inputName2 = "valueOfInput2";
-        final String inputName3 = "valueOfInput3";
-        final String mainInputName1 = "param1";
-
         // Input expression
-        final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
-        final Expression input2Expression = new ExpressionBuilder().createInputExpression(inputName2, String.class.getName());
+        final Expression input1Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT1, String.class.getName());
+        final Expression input2Expression = new ExpressionBuilder().createInputExpression(NAME_INPUT2, String.class.getName());
         // Data expression
-        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(valueOfInput3);
-        final Expression input3Expression = new ExpressionBuilder().createDataExpression(inputName3, String.class.getName());
+        final Expression input3DefaultExpression = new ExpressionBuilder().createConstantStringExpression(VALUE_INPUT3);
+        final Expression input3Expression = new ExpressionBuilder().createDataExpression(NAME_INPUT3, String.class.getName());
 
         // Main Expression
-        final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, mainExpContent, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
+        final Expression mainExp = new ExpressionBuilder().createExpression(NAME_INPUT_MAIN, MAIN_EXP_CONTENT, ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
                 String.class.getName(), ExpressionInterpreter.GROOVY.toString(), Arrays.asList(input1Expression, input2Expression, input3Expression));
 
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addUserTask("step0", ACTOR_NAME);
-        designProcessDefinition.addShortTextData(inputName3, input3DefaultExpression);
+        designProcessDefinition.addShortTextData(NAME_INPUT3, input3DefaultExpression);
         final ProcessDefinition processDefinition = deployProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         waitForUserTask("step0", processInstance);
 
-        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(mainInputName1, mainExp);
+        final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
-        final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, Arrays.asList(inputName1, inputName2),
-                Arrays.asList(valueOfInput1, valueOfInput2));
+        final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
+                Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
         inputValues.putAll(getInputValues("returnNotSerializableOutput", null, null));
 
         try {
@@ -1257,14 +1155,47 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(classes = { ProcessAPI.class, ConnectorImplementationDescriptor.class }, concept = BPMNConcept.CONNECTOR, jira = "BS-6876", keywords = { "Set",
+            "ConnectorImplementation", "Dependency" }, story = "Set the same connector implementation on 2 different processes after deployement.")
+    @Test
+    public void setSameConnectorImplementationOn2ProcessesDefinition() throws Exception {
+        final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("valueOfInput");
+
+        // prepare zip byte array of connector implementation
+        final String implSourchFile = "/org/bonitasoft/engine/connectors/TestConnectorWithModifiedOutput.impl";
+        final Class<TestConnectorWithModifiedOutput> implClass = TestConnectorWithModifiedOutput.class;
+        final byte[] connectorImplementationArchive = generateZipByteArrayForConnector(implSourchFile, implClass);
+
+        // Build & deploy first process definition
+        final ProcessDefinitionBuilderExt designProcessDefinition1 = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        designProcessDefinition1.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("step1");
+        designProcessDefinition1.addConnector("myConnector", TEST_CONNECTOR_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
+                .addInput(CONNECTOR_INPUT_NAME, input1Expression);
+        final ProcessDefinition processDefinition1 = deployProcessWithTestConnectorAndParameter(ACTOR_NAME, user, designProcessDefinition1, null);
+
+        // Build & deploy second process definition
+        final ProcessDefinitionBuilderExt designProcessDefinition2 = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME + "2", PROCESS_VERSION);
+        designProcessDefinition2.addActor(ACTOR_NAME).addDescription(DESCRIPTION).addAutomaticTask("step1");
+        designProcessDefinition2.addConnector("myConnector", TEST_CONNECTOR_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
+                .addInput(CONNECTOR_INPUT_NAME, input1Expression);
+        final ProcessDefinition processDefinition2 = deployProcessWithTestConnectorAndParameter(ACTOR_NAME, user, designProcessDefinition2, null);
+
+        // Change implementation of connector of first process definition
+        getProcessAPI().setConnectorImplementation(processDefinition1.getId(), CONNECTOR_WITH_OUTPUT_ID, CONNECTOR_VERSION, connectorImplementationArchive);
+
+        // Change implementation of connector of second process definition
+        getProcessAPI().setConnectorImplementation(processDefinition2.getId(), CONNECTOR_WITH_OUTPUT_ID, CONNECTOR_VERSION, connectorImplementationArchive);
+
+        disableAndDeleteProcess(processDefinition1, processDefinition2);
+    }
+
     @Cover(classes = { ProcessAPI.class, ConnectorImplementationDescriptor.class }, concept = BPMNConcept.CONNECTOR, keywords = { "Set",
             "ConnectorImplementation", "Bad", "ConnectorDefinitionId" }, jira = "ENGINE-737")
     @Test
     public void setConnectorImplementationWithBadConnectorDefinitionId() throws Exception {
-        final String valueOfInput = "valueOfInput";
         final String connectorId = "org.bonitasoft.connector.testExternalConnector";
 
-        final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression(valueOfInput);
+        final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression("valueOfInput");
         final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
 
         final ProcessDefinitionBuilderExt designProcessDefinition = buildProcessWithOuputConnector(ACTOR_NAME, input1Expression, defaultValueExpression,
@@ -1331,11 +1262,11 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final String valueOfInput = "valueOfInput";
         final Expression input1Expression = new ExpressionBuilder().createConstantStringExpression(valueOfInput);
         // create process
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
 
+        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector", TEST_CONNECTOR_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
-                .addInput(CONNECOTR_INPUT_NAME, input1Expression);
+                .addInput(CONNECTOR_INPUT_NAME, input1Expression);
         designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         designProcessDefinition.addTransition("step1", "step2");
 
@@ -1382,7 +1313,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition
                 .addAutomaticTask("step1")
                 .addConnector("myConnector", connectorId, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
-                .addInput(CONNECOTR_INPUT_NAME, input1Expression)
+                .addInput(CONNECTOR_INPUT_NAME, input1Expression)
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         designProcessDefinition.addUserTask("step2", actor);
@@ -1402,7 +1333,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         definitionBuilder
                 .addUserTask("step1", ACTOR_NAME)
                 .addConnector("paramConnector", CONNECTOR_WITH_OUTPUT_ID, CONNECTOR_VERSION, ConnectorEvent.ON_ENTER)
-                .addInput(CONNECOTR_INPUT_NAME, parameterExpression)
+                .addInput(CONNECTOR_INPUT_NAME, parameterExpression)
                 .addOutput(new LeftOperandBuilder().createNewInstance().setName(processData).done(), OperatorType.ASSIGNMENT, "=", "",
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         final ProcessDefinition processDefinition = deployProcessWithTestConnectorAndParameter(ACTOR_NAME, user, definitionBuilder,
