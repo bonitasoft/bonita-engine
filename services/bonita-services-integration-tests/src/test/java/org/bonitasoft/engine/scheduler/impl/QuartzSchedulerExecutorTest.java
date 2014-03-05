@@ -90,22 +90,6 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         schedulerService.start();
     }
 
-    @Test(expected = SSchedulerException.class)
-    public void testExecuteAJobWithANullTrigger() throws Exception {
-        final String variableName = "myVar";
-
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, null);
-        getTransactionService().complete();
-    }
-
     @Test
     public void testExecuteOnceAJob() throws Exception {
         IncrementItselfJob.reset();
