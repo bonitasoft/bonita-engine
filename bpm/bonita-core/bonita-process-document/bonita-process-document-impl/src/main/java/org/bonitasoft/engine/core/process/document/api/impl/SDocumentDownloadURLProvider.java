@@ -14,9 +14,6 @@
  */
 package org.bonitasoft.engine.core.process.document.api.impl;
 
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
-import org.bonitasoft.engine.document.model.SDocument;
-
 /**
  * @author Nicolas Chabanoles
  * @author Baptiste Mesta
@@ -24,6 +21,6 @@ import org.bonitasoft.engine.document.model.SDocument;
  */
 public interface SDocumentDownloadURLProvider {
 
-    String generateURL(SProcessDocument document, SDocument sDocument);
+    String generateURL(String documentName, String contentStorageId);
 
 }

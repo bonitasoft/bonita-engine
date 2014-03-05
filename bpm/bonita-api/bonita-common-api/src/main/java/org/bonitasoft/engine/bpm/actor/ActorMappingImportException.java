@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,16 +16,40 @@ package org.bonitasoft.engine.bpm.actor;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
+ * Thrown when it's not possible to import the actor mappings.
+ * 
+ * The class ActorMappingImportException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
+ * The class ActorMappingImportException that is not also subclasses of {@link RuntimeException} are checked exceptions.
+ * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
+ * constructor and propagate outside the method or constructor boundary.
+ * 
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ActorMappingImportException extends ExecutionException {
 
     private static final long serialVersionUID = -415010231497905681L;
 
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     * 
+     * @param message
+     *            The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     * @param cause
+     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *            cause is nonexistent or unknown.)
+     */
     public ActorMappingImportException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Constructs a new exception with the specified detail cause.
+     * 
+     * @param cause
+     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *            cause is nonexistent or unknown.)
+     */
     public ActorMappingImportException(final Throwable cause) {
         super(cause);
     }

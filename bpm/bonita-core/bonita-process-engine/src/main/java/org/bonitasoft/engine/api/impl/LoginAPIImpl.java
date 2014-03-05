@@ -77,7 +77,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
         // first call before create session: put the platform in cache if necessary
-        putPlatformInCacheIfNecessary(platformServiceAccessor, platformService);
+//        putPlatformInCacheIfNecessary(platformServiceAccessor, platformService);
         TransactionContentWithResult<STenant> getTenant;
         if (tenantId == null) {
             getTenant = new GetDefaultTenantInstance(platformService);

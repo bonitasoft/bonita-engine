@@ -13,8 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.SPlatform;
@@ -24,11 +25,9 @@ import org.bonitasoft.engine.platform.model.SPlatformProperties;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
-public class CheckPlatformVersion implements TransactionContent {
+public class CheckPlatformVersion implements Callable<Boolean> {
 
     private final PlatformService platformService;
-
-    private boolean same;
 
     private SPlatform platform;
 
@@ -44,7 +43,7 @@ public class CheckPlatformVersion implements TransactionContent {
     }
 
     @Override
-    public void execute() throws SBonitaException {
+    public Boolean call() throws SBonitaException {
         // the database version
         platform = platformService.getPlatform();
         String dbVersion = platform.getVersion();
@@ -56,7 +55,7 @@ public class CheckPlatformVersion implements TransactionContent {
         bonitaHomeVersion = bonitaHomeServer.getVersion();
         final String platformMinorVersion = format(dbVersion);
         final String propertiesMinorVersion = format(jarVersion);
-        same = platformMinorVersion.equals(propertiesMinorVersion);
+        boolean same = platformMinorVersion.equals(propertiesMinorVersion);
         if (!same) {
             errorMessage = "The version of the platform in database is not the same as expected: bonita-server version is <" + jarVersion
                     + "> and database version is <" + dbVersion + ">";
@@ -67,6 +66,7 @@ public class CheckPlatformVersion implements TransactionContent {
                         + "> and bonita home version is <" + bonitaHomeVersion + ">";
             }
         }
+        return same;
     }
 
     private String format(final String version) {
@@ -76,10 +76,6 @@ public class CheckPlatformVersion implements TransactionContent {
             return trimVersion;
         }
         return trimVersion.substring(0, endIndex);
-    }
-
-    public Boolean sameVersion() {
-        return same;
     }
 
     public SPlatform getPlatform() {

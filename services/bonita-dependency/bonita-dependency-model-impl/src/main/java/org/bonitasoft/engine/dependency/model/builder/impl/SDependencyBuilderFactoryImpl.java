@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,17 +13,29 @@
  **/
 package org.bonitasoft.engine.dependency.model.builder.impl;
 
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.impl.SDependencyImpl;
 
 /**
  * @author Charles Souillard
+ * @author Celine Souchet
  */
 public class SDependencyBuilderFactoryImpl implements SDependencyBuilderFactory {
+
     @Override
-    public SDependencyBuilder createNewInstance(final String name, final String version, final String fileName, final byte[] value) {
-        final SDependencyImpl object = new SDependencyImpl(name, version, fileName, value);
+    public SDependencyBuilder createNewInstance(final String name, final long artifactId, final ScopeType artifactType, final String fileName,
+            final byte[] value) {
+        final SDependencyImpl object;
+        switch (artifactType) {
+            case PROCESS:
+                object = new SDependencyImpl(artifactId + "_" + name, artifactId + "_" + fileName, value);
+                break;
+            default:
+                object = new SDependencyImpl(name, fileName, value);
+                break;
+        }
         return new SDependencyBuilderImpl(object);
     }
 
@@ -50,11 +62,6 @@ public class SDependencyBuilderFactoryImpl implements SDependencyBuilderFactory 
     @Override
     public String getValueKey() {
         return "value_";
-    }
-
-    @Override
-    public String getVersionKey() {
-        return "version";
     }
 
 }

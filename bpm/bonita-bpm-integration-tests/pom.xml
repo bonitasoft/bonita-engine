@@ -15,7 +15,8 @@
 		<module>bonita-client-test-util</module>
 		<module>bonita-integration-client-tests</module>
 		<module>bonita-integration-local-tests</module>
-	</modules>
+        <module>bonita-query-tests</module> 
+  </modules>
 
 	<build>
 		<plugins>

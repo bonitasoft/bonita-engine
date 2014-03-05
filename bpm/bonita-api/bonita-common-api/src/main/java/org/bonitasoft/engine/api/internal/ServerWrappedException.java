@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,16 +14,34 @@
 package org.bonitasoft.engine.api.internal;
 
 /**
+ * 
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ServerWrappedException extends Exception {
 
     private static final long serialVersionUID = 2098815926771801085L;
 
+    /**
+     * Constructs a new exception with the specified detail cause.
+     * 
+     * @param cause
+     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *            cause is nonexistent or unknown.)
+     */
     public ServerWrappedException(final Throwable cause) {
         super(cause);
     }
-    
+
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     * 
+     * @param message
+     *            The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     * @param cause
+     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *            cause is nonexistent or unknown.)
+     */
     public ServerWrappedException(final String message, final Throwable cause) {
         super(message, cause);
     }

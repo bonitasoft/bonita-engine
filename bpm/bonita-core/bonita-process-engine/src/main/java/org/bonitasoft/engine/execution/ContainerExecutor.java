@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -32,7 +32,9 @@ public interface ContainerExecutor {
      * method called to notify this container executor that a child reached the given state
      * 
      * @param processDefinitionId
+     *            The identifier of the process instance
      * @param flowNodeInstanceId
+     *            The identifier of the flow node instance
      * @param stateId
      * @param parentId
      * @throws SBonitaException
@@ -40,15 +42,29 @@ public interface ContainerExecutor {
     void childFinished(long processDefinitionId, long flowNodeInstanceId, int stateId, long parentId) throws SBonitaException;
 
     /**
-     * execute a flow node in the context of this container executor
+     * Execute a flow node in the context of this container executor
      * 
+     * @param flowNodeInstanceId
+     *            The identifier of the flow node instance
      * @param contextDependency
      * @param operations
-     * @return
+     * @param processInstanceId
+     *            The identifier of the process instance
+     * @param executerId
+     *            The identifier of the user which execute the flow node
+     * @param executerDelegateId
+     *            The identifier of the delegated user which execute the flow node
+     * @return The new state of the flow node after execution
+     * @throws SFlowNodeReadException
+     * @throws SFlowNodeExecutionException
+     *             Throw if there is an error when execute the flow node
      */
     FlowNodeState executeFlowNode(long flowNodeInstanceId, SExpressionContext contextDependency, List<SOperation> operations, long processInstanceId,
             final Long executerId, final Long executerDelegateId) throws SFlowNodeReadException, SFlowNodeExecutionException;
 
+    /**
+     * @return The handled type
+     */
     String getHandledType();
 
 }

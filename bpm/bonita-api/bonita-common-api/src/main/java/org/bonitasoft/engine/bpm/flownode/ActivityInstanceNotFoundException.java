@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,19 +18,44 @@ import org.bonitasoft.engine.exception.NotFoundException;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ActivityInstanceNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = -5980531959067888526L;
 
+    /**
+     * Constructs a new exception with the specified detail message.
+     * 
+     * @param activityInstanceId
+     *            The identifier of the searched activity displayed in the detail message (which is saved for later retrieval by the
+     *            {@link Throwable#getMessage()} method).
+     */
     public ActivityInstanceNotFoundException(final long activityInstanceId) {
         super("activity with id " + activityInstanceId + " not found");
     }
 
-    public ActivityInstanceNotFoundException(final long activityInstanceId, final Exception e) {
-        super("activity with id " + activityInstanceId + " not found", e);
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     * 
+     * @param activityInstanceId
+     *            The identifier of the searched activity displayed in the detail message (which is saved for later retrieval by the
+     *            {@link Throwable#getMessage()} method).
+     * @param cause
+     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *            cause is nonexistent or unknown.)
+     */
+    public ActivityInstanceNotFoundException(final long activityInstanceId, final Exception cause) {
+        super("activity with id " + activityInstanceId + " not found", cause);
     }
 
+    /**
+     * Constructs a new exception with the specified detail cause.
+     * 
+     * @param cause
+     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *            cause is nonexistent or unknown.)
+     */
     public ActivityInstanceNotFoundException(final Throwable cause) {
         super(cause);
     }

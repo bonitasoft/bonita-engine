@@ -71,15 +71,15 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             }
             getWrappedWork().work(context);
         } catch (final Throwable e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
+            Throwable cause = e.getCause();
+            if (e instanceof SFlowNodeNotFoundException || e instanceof SProcessInstanceNotFoundException || e instanceof SProcessDefinitionNotFoundException) {
+                logFailureCause(e);
+            } else if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
                     || cause instanceof SProcessDefinitionNotFoundException) {
-                if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work fails during its execution due to: " + getDescription(), cause);
-                }
+                logFailureCause(cause);
             } else {
                 // final Edge case we cannot manage
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "A work failed, The failure will be handled, work is:  " + getDescription());
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Work " + getDescription() + " failed. The failure will be handled.");
                 loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Exception was:" + e.getMessage(), e);
 
                 try {
@@ -87,12 +87,18 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
                 } catch (final Throwable e1) {
                     loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work " + getDescription()
                             + ". You may consider restarting the system. This will restart all works.", e);
-                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure ", e);
+                    loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure", e);
                     logIncident(e, e1);
                 }
             }
         } finally {
             sessionAccessor.deleteTenantId();
+        }
+    }
+
+    protected void logFailureCause(final Throwable e) {
+        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work '" + getDescription() + "' failed to execute due to: ", e);
         }
     }
 }

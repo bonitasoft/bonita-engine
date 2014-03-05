@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,10 +19,12 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class RefreshTenantClassLoaders implements TransactionContent {
 
@@ -40,7 +42,7 @@ public class RefreshTenantClassLoaders implements TransactionContent {
         // set tenant classloader
         final int maxResults = 100;
         final DependencyService dependencyService = tenantServiceAccessor.getDependencyService();
-        dependencyService.refreshClassLoader("tenant", tenantId);
+        dependencyService.refreshClassLoader(ScopeType.TENANT, tenantId);
         final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
         List<Long> processDefinitionIds;
         int j = 0;
@@ -48,7 +50,7 @@ public class RefreshTenantClassLoaders implements TransactionContent {
             processDefinitionIds = processDefinitionService.getProcessDefinitionIds(j, maxResults);
             j += maxResults;
             for (final Long id : processDefinitionIds) {
-                dependencyService.refreshClassLoader("process", id);
+                dependencyService.refreshClassLoader(ScopeType.PROCESS, id);
             }
         } while (processDefinitionIds.size() == maxResults);
     }

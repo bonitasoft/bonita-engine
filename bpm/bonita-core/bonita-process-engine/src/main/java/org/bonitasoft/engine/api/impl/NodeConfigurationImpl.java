@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.scheduler.JobRegister;
 
@@ -42,6 +43,8 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     private List<TenantRestartHandler> tenantRestartHandlers;
 
     private List<JobRegister> jobsToRegister;
+
+    private List<ServiceWithLifecycle> servicesToStart;
 
     @Override
     public boolean shouldStartScheduler() {
@@ -121,7 +124,15 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     }
 
     private <T> List<T> emptyOrUnmodifiable(final List<T> list) {
-        return list == null ?Collections.<T>emptyList() :Collections.unmodifiableList(list);
+        return list == null ? Collections.<T> emptyList() : Collections.unmodifiableList(list);
     }
 
+    @Override
+    public List<ServiceWithLifecycle> getServicesToStart() {
+        return servicesToStart;
+    }
+
+    public void setServicesToStart(final List<ServiceWithLifecycle> servicesToStart) {
+        this.servicesToStart = servicesToStart;
+    }
 }

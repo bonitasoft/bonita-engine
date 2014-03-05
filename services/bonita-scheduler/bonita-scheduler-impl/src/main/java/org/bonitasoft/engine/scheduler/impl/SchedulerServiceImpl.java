@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -84,9 +84,8 @@ public class SchedulerServiceImpl implements SchedulerService {
      * Create a new instance of scheduler service. Synchronous
      * QueriableLoggerService must be used to avoid an infinite loop.
      */
-    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService,
-            final TechnicalLoggerService logger, final EventService eventService,
-            final TransactionService transactionService, final SessionAccessor sessionAccessor) {
+    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
+            final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor) {
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.logger = logger;
@@ -351,8 +350,8 @@ public class SchedulerServiceImpl implements SchedulerService {
                     parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
                 }
                 statelessJob.setAttributes(parameterMap);
-                final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger,
-                        jobIdentifier.getTenantId(), eventService, sessionAccessor, transactionService);
+                final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger, jobIdentifier.getTenantId(), eventService,
+                        sessionAccessor, transactionService);
                 return jobWrapper;
             }
         };
@@ -361,6 +360,11 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public boolean isStillScheduled(final SJobDescriptor jobDescriptor) throws SSchedulerException {
         return schedulerExecutor.isStillScheduled(getTenantId(), jobDescriptor.getJobName());
+    }
+
+    @Override
+    public void rescheduleErroneousTriggers() throws SSchedulerException {
+        schedulerExecutor.rescheduleErroneousTriggers();
     }
 
 }
