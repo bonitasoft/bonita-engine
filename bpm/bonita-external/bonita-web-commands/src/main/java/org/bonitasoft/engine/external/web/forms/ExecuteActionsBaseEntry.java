@@ -204,7 +204,8 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         try {
             getProcessDefinition.execute();
         } catch (final SBonitaException e) {
-            throw new InvalidProcessDefinitionException("invalid processDefinition with id:" + processDefinitionId);
+            e.setProcessDefinitionIdOnContext(processDefinitionId);
+            throw new InvalidProcessDefinitionException("Invalid processDefinition.");
         }
         return getProcessDefinition.getResult();
     }

@@ -42,7 +42,8 @@ public abstract class AbstractEventServiceImpl implements EventService {
 
                 if (handlers.size() > 0) {
                     if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Found " + handlers.size() + " for event " + event.getType() + " All handlers: " + handlers);
+                        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Found " + handlers.size() + " for event " + event.getType()
+                                + ". All handlers: " + handlers);
                     }
                     FireEventException fireEventException = null;
                     for (final SHandler<SEvent> handler : handlers) {
@@ -53,12 +54,12 @@ public abstract class AbstractEventServiceImpl implements EventService {
                             }
                         } catch (final Exception e) {
                             if (fireEventException == null) {
-                                fireEventException = new FireEventException("Unable to execute some handler");
+                                fireEventException = new FireEventException("Unable to execute some handler.");
                             }
                             fireEventException.addHandlerException(e);
                             // for now, I just log the Exception into the console
                             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to execute handler", e);
+                                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to execute handler.", e);
                             }
                         }
                     }
@@ -79,7 +80,7 @@ public abstract class AbstractEventServiceImpl implements EventService {
         }
     }
 
-    protected abstract  Collection<SHandler<SEvent>> getHandlersFor(final String type);
+    protected abstract Collection<SHandler<SEvent>> getHandlersFor(final String type);
 
     protected abstract boolean containsHandlerFor(final String type);
 
@@ -171,17 +172,17 @@ public abstract class AbstractEventServiceImpl implements EventService {
         String key = eventType;
         if (actionType != null) {
             switch (actionType) {
-            case CREATED:
-                key += SEvent.CREATED;
-                break;
-            case DELETED:
-                key += SEvent.DELETED;
-                break;
-            case UPDATED:
-                key += SEvent.UPDATED;
-                break;
-            default:
-                return false;
+                case CREATED:
+                    key += SEvent.CREATED;
+                    break;
+                case DELETED:
+                    key += SEvent.DELETED;
+                    break;
+                case UPDATED:
+                    key += SEvent.UPDATED;
+                    break;
+                default:
+                    return false;
             }
         }
         return containsHandlerFor(key);

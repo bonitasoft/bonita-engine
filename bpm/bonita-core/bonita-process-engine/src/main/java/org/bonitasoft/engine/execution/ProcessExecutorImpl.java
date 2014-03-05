@@ -72,6 +72,8 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
@@ -117,7 +119,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -177,8 +178,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final TokenService tokenService, final EventsHandler eventsHandler, final TransactionService transactionService,
-            final FlowNodeStateManager flowNodeStateManager) {
+            final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -287,7 +287,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
             if (defaultTransition == null) {
                 throw new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
-                        + " but no outgoing transition had a valid condition");
+                        + ", but no outgoing transition had a valid condition");
             }
             chosenTransitions.add(defaultTransition);
             outgoingTransitionDefinitions.add(defaultTransition);
@@ -308,7 +308,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
             if (defaultTransition == null) {
                 throw new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
-                        + " but no outgoing transition had a valid condition");
+                        + ", but no outgoing transition had a valid condition.");
             }
             chosenTransitions.add(defaultTransition);
             outgoingTransitionDefinitions.add(defaultTransition);
@@ -344,7 +344,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
             if (defaultTransition == null) {
                 throw new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
-                        + " but no outgoing transition had a valid condition");
+                        + ", but no outgoing transition had a valid condition.");
             }
             chosenTransitions.add(defaultTransition);
         }
@@ -376,7 +376,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             return null;
         }
         if (!Boolean.class.getName().equals(expression.getReturnType())) {
-            throw new SExpressionEvaluationException("Condition expression must return a boolean. on transition: " + sTransitionDefinition.getName(),
+            throw new SExpressionEvaluationException("Condition expression must return a boolean, on transition: " + sTransitionDefinition.getName(),
                     expression.getName());
         }
         return (Boolean) expressionResolverService.evaluate(expression, contextDependency);
@@ -424,6 +424,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             return bpmInstancesCreator.createFlowNodeInstances(selector.getProcessDefinition().getId(), rootProcessInstanceId, sProcessInstance.getId(),
                     flownNodeDefinitions, rootProcessInstanceId, sProcessInstance.getId(), SStateCategory.NORMAL, selector.getProcessDefinition().getId());
         } catch (final SBonitaException e) {
+            setExceptionContext(selector.getProcessDefinition(), sProcessInstance, e);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             }
@@ -443,27 +444,26 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected SProcessInstance createProcessInstance(final SProcessDefinition processDefinition, final long starterId, final long starterDelegateId,
             final long callerId) throws SProcessInstanceCreationException {
-        final SActivityInstance callerInstance = getCaller(callerId);
-        final SProcessInstance sProcessInstance;
-        if (callerInstance != null) {
-            sProcessInstance = createProcessInstance(processDefinition, starterId, starterDelegateId, callerId, callerInstance.getType(),
-                    callerInstance.getRootContainerId());
-        } else {
-            sProcessInstance = createProcessInstance(processDefinition, starterId, starterDelegateId, callerId, null, -1);
+        try {
+            final SActivityInstance callerInstance = getCaller(callerId);
+            final SProcessInstance sProcessInstance;
+            if (callerInstance != null) {
+                sProcessInstance = createProcessInstance(processDefinition, starterId, starterDelegateId, callerId, callerInstance.getType(),
+                        callerInstance.getRootContainerId());
+            } else {
+                sProcessInstance = createProcessInstance(processDefinition, starterId, starterDelegateId, callerId, null, -1);
+            }
+            return sProcessInstance;
+        } catch (final SBonitaException e) {
+            throw new SProcessInstanceCreationException("Unable to get caller.", e);
         }
-        return sProcessInstance;
     }
 
-    private SActivityInstance getCaller(final long callerId) throws SProcessInstanceCreationException {
-        SActivityInstance callerInstance = null;
+    private SActivityInstance getCaller(final long callerId) throws SActivityReadException, SActivityInstanceNotFoundException {
         if (callerId > 0) {
-            try {
-                callerInstance = activityInstanceService.getActivityInstance(callerId);
-            } catch (final SBonitaException e) {
-                throw new SProcessInstanceCreationException("Unable to get caller", e);
-            }
+            return activityInstanceService.getActivityInstance(callerId);
         }
-        return callerInstance;
+        return null;
     }
 
     private void executeGateway(final SProcessDefinition sProcessDefinition, final STransitionDefinition sTransitionDefinition,
@@ -480,7 +480,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SProcessInstance parentProcessInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
             final SStateCategory stateCategory = parentProcessInstance.getStateCategory();
             if (isGateway) {
-                final SGatewayInstance gatewayInstance = createOrRetreiveGateway(processDefinitionId, sFlowNodeDefinition, stateCategory, tokenRefId,
+                final SGatewayInstance gatewayInstance = createOrRetreiveGateway(sProcessDefinition, sFlowNodeDefinition, stateCategory, tokenRefId,
                         parentProcessInstanceId, rootProcessInstanceId, sTransitionDefinition);
                 gatewayInstanceService.hitTransition(gatewayInstance, sFlowNodeDefinition.getTransitionIndex(sTransitionDefinition.getName()));
                 nextFlowNodeInstanceId = gatewayInstance.getId();
@@ -489,12 +489,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     toExecute = true;
                 }
             } else {
-                final SFlowNodeInstance flowNodeInstance = bpmInstancesCreator.toFlowNodeInstance(processDefinitionId,
+                final SFlowNodeInstance sFlowNodeInstance = bpmInstancesCreator.toFlowNodeInstance(processDefinitionId,
                         flowNodeThatTriggeredTheTransition.getRootContainerId(), flowNodeThatTriggeredTheTransition.getParentContainerId(),
                         SFlowElementsContainerType.PROCESS, sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, true, -1, stateCategory, -1,
                         tokenRefId);
-                new CreateEventInstance((SEventInstance) flowNodeInstance, eventInstanceService).call();
-                nextFlowNodeInstanceId = flowNodeInstance.getId();
+                new CreateEventInstance((SEventInstance) sFlowNodeInstance, eventInstanceService).call();
+                nextFlowNodeInstanceId = sFlowNodeInstance.getId();
                 toExecute = true;
             }
             if (toExecute) {
@@ -502,6 +502,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         null, null));
             }
         } catch (final SBonitaException e) {
+            setExceptionContext(sProcessDefinition, flowNodeThatTriggeredTheTransition, e);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             }
@@ -513,7 +514,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * try to gate active gateway.
      * if the gateway is already hit by this transition or by the same token, we create a new gateway
      */
-    private SGatewayInstance createOrRetreiveGateway(final Long processDefinitionId, final SFlowNodeDefinition flowNodeDefinition,
+    private SGatewayInstance createOrRetreiveGateway(final SProcessDefinition sProcessDefinition, final SFlowNodeDefinition flowNodeDefinition,
             final SStateCategory stateCategory, final Long tokenRefId, final long parentProcessInstanceId, final long rootProcessInstanceId,
             final STransitionDefinition transitionDefinition) throws SBonitaException {
         SGatewayInstance gatewayInstance = null;
@@ -531,16 +532,18 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             gatewayInstance = null;// already hit we create a new one
         }
         if (gatewayInstance != null && !tokenRefId.equals(gatewayInstance.getTokenRefId())) {
-            throw new SFlowNodeExecutionException("Error while executing the join on gateway <" + gatewayInstance.getName() + "> of process instance <"
-                    + gatewayInstance.getParentProcessInstanceId() + "> of process definition <" + gatewayInstance.getProcessDefinitionId()
-                    + ">, this can happen when you try to join branches that are not from the same split level "
-                    + "(some branches were split more times than others). Check if your design is valid in the Bonita Studio." + " token is: <" + tokenRefId
-                    + "> expected <" + gatewayInstance.getTokenRefId() + ">");
+            final StringBuilder builder = new StringBuilder("Error while executing the join on the gateway. ");
+            builder.append("This can happen when you try to join branches that are not from the same split level (some branches were split more times than others). ");
+            builder.append("Check if your design is valid in the Bonita Studio. ");
+            builder.append("Token is <" + tokenRefId + "> expected <" + gatewayInstance.getTokenRefId() + ">");
+            final SFlowNodeExecutionException exception = new SFlowNodeExecutionException(builder.toString());
+            setExceptionContext(sProcessDefinition, gatewayInstance, exception);
+            throw exception;
         }
         if (gatewayInstance != null) {
             return gatewayInstance;
         }
-        return createGateway(processDefinitionId, flowNodeDefinition, stateCategory, parentProcessInstanceId, tokenRefId, rootProcessInstanceId);
+        return createGateway(sProcessDefinition.getId(), flowNodeDefinition, stateCategory, parentProcessInstanceId, tokenRefId, rootProcessInstanceId);
     }
 
     private SGatewayInstance createGateway(final Long processDefinitionId, final SFlowNodeDefinition flowNodeDefinition, final SStateCategory stateCategory,
@@ -615,7 +618,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), document.getUrl(),
                             authorId);
                 } else {
-                    throw new SProcessInstanceCreationException("Unable to create documents, a document was defined without url or content");
+                    throw new SProcessInstanceCreationException("Unable to create documents. A document was defined without url or content.");
                 }
             }
         }
@@ -660,6 +663,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return documentBuilder;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final long parentId) throws SBonitaException {
         final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
@@ -807,7 +811,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (merger.isImplicitEnd()) {
             final Long tokenRefId = child.getTokenRefId();
             if (tokenRefId == null) {
-                throw new SObjectNotFoundException("no token ref id set for " + child);
+                throw new SObjectNotFoundException("No token ref id set for " + child);
             }
             implicitEnd(sProcessDefinition, sProcessInstance.getId(), numberOfTokenToMerge, tokenRefId);
         }
@@ -977,17 +981,17 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    protected void handleEventSubProcess(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance, final long subProcessDefinitionId)
+    protected void handleEventSubProcess(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final long subProcessDefinitionId)
             throws SActivityExecutionException {
         if (subProcessDefinitionId == -1) {
             try {
                 // modify that to support event sub-processes within sub-processes
-                eventsHandler.handleEventSubProcess(processDefinition, sProcessInstance);
+                eventsHandler.handleEventSubProcess(sProcessDefinition, sProcessInstance);
             } catch (final SActivityExecutionException e) {
                 throw e;
             } catch (final SBonitaException e) {
-                throw new SActivityExecutionException("Unable to register events for event sub process in process " + processDefinition.getName() + " "
-                        + processDefinition.getVersion(), e);
+                setExceptionContext(sProcessDefinition, sProcessInstance, e);
+                throw new SActivityExecutionException("Unable to register events for event sub process in process.", e);
             }
         }
     }
@@ -1008,14 +1012,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             tokenService.createTokens(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId(), null, size);
             processInstanceService.setState(sProcessInstance, state);
         } catch (final SBonitaException e) {
-            throw new SProcessInstanceCreationException("Unable to set the state on the process", e);
+            throw new SProcessInstanceCreationException("Unable to set the state on the process.", e);
         }
-        for (final SFlowNodeInstance flowNode : flowNodeInstances) {
+        for (final SFlowNodeInstance sFlowNodeInstance : flowNodeInstances) {
             try {
                 workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sProcessInstance.getProcessDefinitionId(), sProcessInstance.getId(),
-                        flowNode.getId(), null, null));
+                        sFlowNodeInstance.getId(), null, null));
             } catch (final SWorkRegisterException e) {
-                throw new SFlowNodeExecutionException("unable to trigger execution of flow node " + flowNode, e);
+                setExceptionContext(sProcessInstance, sFlowNodeInstance, e);
+                throw new SFlowNodeExecutionException("Unable to trigger execution of the flow node.", e);
             }
         }
         return sProcessInstance;
@@ -1041,5 +1046,43 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             workService
                     .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId(), null, null));
         }
+    }
+
+    private void setExceptionContext(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance sFlowNodeInstance,
+            final SBonitaException e) {
+        setExceptionContext(sProcessDefinition, e);
+        e.setProcessInstanceIdOnContext(sFlowNodeInstance.getParentProcessInstanceId());
+        e.setRootProcessInstanceIdOnContext(sFlowNodeInstance.getRootProcessInstanceId());
+        setExceptionContext(sFlowNodeInstance, e);
+    }
+
+    private void setExceptionContext(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance,
+            final SBonitaException e) {
+        setExceptionContext(sProcessDefinition, e);
+        setExceptionContext(sProcessInstance, e);
+    }
+
+    private void setExceptionContext(final SProcessInstance sProcessInstance, final SFlowNodeInstance sFlowNodeInstance, final SBonitaException e) {
+        e.setProcessDefinitionIdOnContext(sProcessInstance.getProcessDefinitionId());
+        e.setProcessDefinitionNameOnContext(sProcessInstance.getName());
+        setExceptionContext(sProcessInstance, e);
+        setExceptionContext(sFlowNodeInstance, e);
+    }
+
+    private void setExceptionContext(final SProcessDefinition sProcessDefinition, final SBonitaException e) {
+        e.setProcessDefinitionIdOnContext(sProcessDefinition.getId());
+        e.setProcessDefinitionNameOnContext(sProcessDefinition.getName());
+        e.setProcessDefinitionVersionOnContext(sProcessDefinition.getVersion());
+    }
+
+    private void setExceptionContext(final SProcessInstance sProcessInstance, final SBonitaException e) {
+        e.setProcessInstanceIdOnContext(sProcessInstance.getId());
+        e.setRootProcessInstanceIdOnContext(sProcessInstance.getRootProcessInstanceId());
+    }
+
+    private void setExceptionContext(final SFlowNodeInstance sFlowNodeInstance, final SBonitaException e) {
+        e.setFlowNodeDefinitionIdOnContext(sFlowNodeInstance.getFlowNodeDefinitionId());
+        e.setFlowNodeInstanceIdOnContext(sFlowNodeInstance.getId());
+        e.setFlowNodeNameOnContext(sFlowNodeInstance.getName());
     }
 }

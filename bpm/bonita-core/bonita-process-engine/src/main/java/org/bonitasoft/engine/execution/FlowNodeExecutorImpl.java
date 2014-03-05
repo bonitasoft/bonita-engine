@@ -48,13 +48,11 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.WorkFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -94,10 +92,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
-            final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
-            final ProcessDefinitionService processDefinitionService, final SCommentService commentService, final ProcessInstanceService processInstanceService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
-            final WorkService workService, final TransactionService transactionService) {
+            final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService, final SCommentService commentService,
+            final ProcessInstanceService processInstanceService, final ConnectorInstanceService connectorInstanceService,
+            final ClassLoaderService classLoaderService, final WorkService workService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -273,7 +270,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             final int tokenCount = activityInstance.getTokenCount() - 1;
             activityInstanceService.setTokenCount(activityInstance, tokenCount);
             if (!hasActionsToExecute) {
-                containerRegistry.executeFlowNode(activityInstance.getProcessDefinitionId(), activityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()), activityInstance.getId(), null,
+                containerRegistry.executeFlowNode(activityInstance.getProcessDefinitionId(),
+                        activityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
+                        activityInstance.getId(), null,
                         null);
             }
         }

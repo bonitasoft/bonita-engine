@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
@@ -30,6 +30,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * 
  * @author Charles Souillard
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ExecutorWorkService implements WorkService {
 
@@ -73,7 +74,7 @@ public class ExecutorWorkService implements WorkService {
         try {
             work.setTenantId(sessionAccessor.getTenantId());
         } catch (STenantIdNotSetException e) {
-            throw new SWorkRegisterException("Unable to read tenant id from session", e);
+            throw new SWorkRegisterException("Unable to read tenant id from session.", e);
         }
         this.threadPoolExecutor.submit(work);
     }
@@ -81,7 +82,7 @@ public class ExecutorWorkService implements WorkService {
     private AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws SWorkRegisterException {
         if (threadPoolExecutor == null || threadPoolExecutor.isShutdown()) {
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
-                    + " but the work service is shutdown. work will be restarted with the node");
+                    + ", but the work service is shutdown. The work will be restarted with the node.");
             return null;
         }
         AbstractWorkSynchronization synchro = synchronizations.get();
@@ -117,10 +118,11 @@ public class ExecutorWorkService implements WorkService {
             threadPoolExecutor.shutdown();
             try {
                 if (!threadPoolExecutor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.INFO, "Waited termination of all work " + TIMEOUT + "s but all task were not finished");
+                    loggerService
+                            .log(getClass(), TechnicalLogSeverity.INFO, "Waited termination of all work " + TIMEOUT + "s, but all task were not finished.");
                 }
             } catch (InterruptedException e) {
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "error while waiting termination of all work ", e);
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Error while waiting termination of all work.", e);
             }
         }
     }

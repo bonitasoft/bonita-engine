@@ -94,7 +94,7 @@ public class ProcessArchiver {
         try {
             dataInstanceService.removeContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.toString());
         } catch (final SDataInstanceException e) {
-            throw new SArchivingException("unable to delete data mapping", e);
+            throw new SArchivingException("Unable to delete data mapping.", e);
         }
         SProcessDefinition processDefinition = null;
         try {
@@ -104,21 +104,20 @@ public class ProcessArchiver {
         }
         if (!processDefinition.getProcessContainer().getDataDefinitions().isEmpty()) {
             // Archive SADataInstance
-            archiveDataInstances(processInstance, dataInstanceService, archiveDate);
+            archiveDataInstances(processDefinition, processInstance, dataInstanceService, archiveDate);
         }
         // Archive SComment
-        archiveComments(processInstance, archiveService, logger, commentService, archiveDate);
+        archiveComments(processDefinition, processInstance, archiveService, logger, commentService, archiveDate);
 
         // archive document mappings
-        archiveDocumentMappings(processInstance, documentMappingService, archiveDate);
+        archiveDocumentMappings(processDefinition, processInstance, documentMappingService, archiveDate);
 
         if (!processDefinition.getProcessContainer().getConnectors().isEmpty()) {
             archiveConnectors(connectorInstanceService, archiveDate, processInstance.getId(), SConnectorInstance.PROCESS_TYPE);
         }
 
         // Archive
-        archiveProcessInstance(processInstance, archiveService, processInstanceService, logger, saProcessInstance, archiveDate);
-
+        archiveProcessInstance(processDefinition, processInstance, saProcessInstance, archiveDate, archiveService, processInstanceService, logger);
     }
 
     /**
@@ -146,53 +145,57 @@ public class ProcessArchiver {
         }
     }
 
-    private static void archiveProcessInstance(final SProcessInstance processInstance, final ArchiveService archiveService,
-            final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger,
-            final SAProcessInstance saProcessInstance, final long archiveDate) throws SArchivingException {
+    private static void archiveProcessInstance(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
+            final SAProcessInstance saProcessInstance, final long archiveDate,
+            final ArchiveService archiveService, final ProcessInstanceService processInstanceService, final TechnicalLoggerService logger)
+            throws SArchivingException {
         try {
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saProcessInstance);
             archiveService.recordInsert(archiveDate, insertRecord);
 
             if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.DEBUG)) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.DEBUG, MessageFormat.format("archiving {0} with id {1} and state {2}", processInstance
-                        .getClass().getSimpleName(), processInstance.getId(), processInstance.getStateId()));
+                final StringBuilder builder = new StringBuilder();
+                builder.append("Archiving " + processInstance.getClass().getSimpleName());
+                builder.append("with id = <" + processInstance.getId() + ">");
+                logger.log(ProcessArchiver.class, TechnicalLogSeverity.DEBUG, MessageFormat.format(" and state {2}", processInstance.getStateId()));
             }
             try {
                 processInstanceService.deleteProcessInstance(processInstance.getId());
             } catch (final SBonitaException e) {
-                throw new SArchivingException("Unable to delete the process instance during the archiving", e);
+                throw new SArchivingException("Unable to delete the process instance during the archiving.", e);
             }
         } catch (final SRecorderException e) {
-            throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
+            setExceptionContext(processDefinition, processInstance, e);
+            throw new SArchivingException("Unable to archive the process instance.", e);
         } catch (final SDefinitiveArchiveNotFound e) {
+            setExceptionContext(processDefinition, processInstance, e);
             if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "the process instance was not archived id=" + processInstance.getId(), e);
+                logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "The process instance was not archived.", e);
             }
         }
     }
 
-    private static void archiveDocumentMappings(final SProcessInstance processInstance, final DocumentMappingService documentMappingService,
-            final long archiveDate) throws SArchivingException {
-        List<SDocumentMapping> sDocumentMappings = null;
-        do {
-            try {
+    private static void archiveDocumentMappings(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
+            final DocumentMappingService documentMappingService, final long archiveDate) throws SArchivingException {
+        try {
+            List<SDocumentMapping> sDocumentMappings = null;
+            do {
                 sDocumentMappings = documentMappingService.getDocumentMappingsForProcessInstance(processInstance.getId(), 0, BATCH_SIZE, null, null);
-            } catch (final SPageOutOfRangeException e1) {
-                throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e1);
-            } catch (final SDocumentMappingException e1) {
-                throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e1);
-            }
-            for (final SDocumentMapping sDocumentMapping : sDocumentMappings) {
-                try {
+                for (final SDocumentMapping sDocumentMapping : sDocumentMappings) {
                     documentMappingService.archive(sDocumentMapping, archiveDate);
-                } catch (final SDocumentMappingException e) {
-                    throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
                 }
-            }
-        } while (sDocumentMappings.size() == BATCH_SIZE);
+            } while (sDocumentMappings.size() == BATCH_SIZE);
+        } catch (final SPageOutOfRangeException e) {
+            setExceptionContext(processDefinition, processInstance, e);
+            throw new SArchivingException("Unable to archive the process instance.", e);
+        } catch (final SDocumentMappingException e) {
+            setExceptionContext(processDefinition, processInstance, e);
+            throw new SArchivingException("Unable to archive the process instance.", e);
+        }
     }
 
-    private static void archiveComments(final SProcessInstance processInstance, final ArchiveService archiveService, final TechnicalLoggerService logger,
+    private static void archiveComments(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
+            final ArchiveService archiveService, final TechnicalLoggerService logger,
             final SCommentService commentService, final long archiveDate)
             throws SArchivingException {
         List<SComment> sComments = null;
@@ -201,42 +204,55 @@ public class ProcessArchiver {
             try {
                 sComments = commentService.getComments(processInstance.getId(), new QueryOptions(startIndex, BATCH_SIZE));
             } catch (final SBonitaReadException e) {
+                setExceptionContext(processDefinition, processInstance, e);
                 if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "No process comment found for process with id: " + processInstance.getId(), e);
+                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "No process comment found for the process instance.", e);
                 }
             }
             if (sComments != null) {
                 for (final SComment sComment : sComments) {
-                    archiveComment(processInstance, archiveService, logger, archiveDate, sComment);
+                    archiveComment(processDefinition, processInstance, archiveService, logger, archiveDate, sComment);
                 }
             }
             startIndex += BATCH_SIZE;
-        } while (sComments.size() > 0);
+        } while (sComments != null && sComments.size() > 0);
     }
 
-    private static void archiveComment(final SProcessInstance processInstance, final ArchiveService archiveService, final TechnicalLoggerService logger,
-            final long archiveDate, final SComment sComment) throws SArchivingException {
+    private static void archiveComment(final SProcessDefinition processDefinition, final SProcessInstance processInstance, final ArchiveService archiveService,
+            final TechnicalLoggerService logger, final long archiveDate, final SComment sComment) throws SArchivingException {
         final SAComment saComment = BuilderFactory.get(SACommentBuilderFactory.class).createNewInstance(sComment).done();
         if (saComment != null) {
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
             try {
                 archiveService.recordInsert(archiveDate, insertRecord);
             } catch (final SRecorderException e) {
-                throw new SArchivingException("Unable to archive the process instance comments with id " + processInstance.getId(), e);
+                setExceptionContext(processDefinition, processInstance, e);
+                throw new SArchivingException("Unable to archive the process instance comments.", e);
             } catch (final SDefinitiveArchiveNotFound e) {
+                setExceptionContext(processDefinition, processInstance, e);
                 if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "the process instance were not archived id=" + processInstance.getId(), e);
+                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "The process instance was not archived.", e);
                 }
             }
         }
     }
 
-    private static void archiveDataInstances(final SProcessInstance processInstance, final DataInstanceService dataInstanceService,
-            final long archiveDate) throws SArchivingException {
+    private static void setExceptionContext(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
+            final SBonitaException e) {
+        e.setProcessInstanceIdOnContext(processInstance.getId());
+        e.setRootProcessInstanceIdOnContext(processInstance.getRootProcessInstanceId());
+        e.setProcessDefinitionIdOnContext(processInstance.getProcessDefinitionId());
+        e.setProcessDefinitionNameOnContext(processDefinition.getName());
+        e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
+    }
+
+    private static void archiveDataInstances(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
+            final DataInstanceService dataInstanceService, final long archiveDate) throws SArchivingException {
         try {
             dataInstanceService.archiveLocalDataInstancesFromProcessInstance(processInstance.getId(), archiveDate);
         } catch (final SDataInstanceException e) {
-            throw new SArchivingException("Unable to archive the process instance with id " + processInstance.getId(), e);
+            setExceptionContext(processDefinition, processInstance, e);
+            throw new SArchivingException("Unable to archive the process instance.", e);
         }
     }
 
@@ -351,15 +367,17 @@ public class ProcessArchiver {
 
     public static void archiveFlowNodeInstance(final SFlowNodeInstance intTxflowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId,
             final ProcessInstanceService processInstanceService, final ProcessDefinitionService processDefinitionService, final ArchiveService archiveService,
-            final DataInstanceService dataInstanceService,
-            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService) throws SActivityExecutionException {
-        final SProcessDefinition processDefinition;
+            final DataInstanceService dataInstanceService, final ActivityInstanceService activityInstanceService,
+            final ConnectorInstanceService connectorInstanceService) throws SActivityExecutionException {
         try {
-            processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+            archiveFlowNodeInstance(intTxflowNodeInstance, deleteAfterArchive, processInstanceService, archiveService, dataInstanceService,
+                    processDefinition, activityInstanceService, connectorInstanceService);
+        } catch (final SActivityExecutionException e) {
+            throw e;
         } catch (final SBonitaException e) {
             throw new SActivityExecutionException(e);
         }
-        archiveFlowNodeInstance(intTxflowNodeInstance, deleteAfterArchive, processInstanceService, archiveService, dataInstanceService,
-                processDefinition, activityInstanceService, connectorInstanceService);
+
     }
 }
