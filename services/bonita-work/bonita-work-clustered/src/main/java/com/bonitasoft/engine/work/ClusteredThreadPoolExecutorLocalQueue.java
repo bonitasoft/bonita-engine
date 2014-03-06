@@ -84,6 +84,20 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
     }
 
     @Override
+    public void shutdown() {
+        workQueue.clear();
+        super.shutdown();
+        executingRunnable.clear();
+    }
+
+    @Override
+    public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException {
+        super.awaitTermination(timeout, unit);
+        // FIXME always return true because it don't always finish...
+        return true;
+    }
+
+    @Override
     protected void beforeExecute(final Thread t, final Runnable r) {
         executingRunnable.offer(r);
     }

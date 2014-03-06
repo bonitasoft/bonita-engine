@@ -1,6 +1,7 @@
 package com.bonitasoft.engine.api.impl;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -9,11 +10,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
@@ -31,8 +35,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.bonitasoft.engine.service.BroadcastService;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
+import com.bonitasoft.engine.service.impl.BroadcastServiceLocal;
 
 public class TenantManagementAPIExtTest {
 
@@ -60,6 +66,8 @@ public class TenantManagementAPIExtTest {
 
     private TenantRestartHandler tenantRestartHandler2;
 
+    private final BroadcastService broadcastService = new BroadcastServiceLocal();
+
     @Before
     public void before() throws Exception {
         tenantManagementAPI = spy(new TenantManagementAPIExt());
@@ -73,6 +81,27 @@ public class TenantManagementAPIExtTest {
         tenantRestartHandler1 = mock(TenantRestartHandler.class);
         tenantRestartHandler2 = mock(TenantRestartHandler.class);
         doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
+        doReturn(new PauseServices(tenantId) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+                    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+                return platformServiceAccessor;
+            }
+        }).when(tenantManagementAPI).createPauseServicesTask(anyLong());
+        doReturn(new ResumeServices(tenantId) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+                    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+                return platformServiceAccessor;
+            }
+        }).when(tenantManagementAPI).createResumeServicesTask(anyLong());
+        doReturn(broadcastService).when(platformServiceAccessor).getBroadcastService();
         doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
         doReturn(nodeConfiguration).when(platformServiceAccessor).getPlaformConfiguration();

@@ -1,7 +1,8 @@
 package com.bonitasoft.engine.api.impl;
 
 import java.util.List;
-import java.util.concurrent.TimeoutException;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
@@ -21,10 +22,11 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
+import com.bonitasoft.engine.service.BroadcastService;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
+import com.bonitasoft.engine.service.TaskResult;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
@@ -65,9 +67,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     private void setTenantPaused(final boolean shouldBePaused) throws UpdateException {
         PlatformServiceAccessor platformServiceAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
-        SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
-        SessionService sessionService = platformServiceAccessor.getSessionService();
-        NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
+        BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
 
         long tenantId = getTenantId();
         STenant tenant;
@@ -80,57 +80,80 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             throw new UpdateException("Can't " + (shouldBePaused ? "pause" : "resume") + " a tenant in state " + tenant.getStatus());
         }
 
-        TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
-        WorkService workService = tenantServiceAccessor.getWorkService();
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
         if (shouldBePaused) {
             descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.PAUSED);
-            pauseServicesForTenant(workService, schedulerService, sessionService, tenantId);
+            pauseServicesForTenant(platformServiceAccessor, broadcastService, tenantId);
         } else {
             descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.ACTIVATED);
-            resumeServicesForTenant(workService, schedulerService, tenantId, nodeConfiguration, platformServiceAccessor, tenantServiceAccessor);
+            resumeServicesForTenant(platformServiceAccessor, broadcastService, tenantId);
         }
         updateTenantFromId(platformService, descriptor, tenant);
     }
 
-    private void pauseServicesForTenant(final WorkService workService, final SchedulerService schedulerService, final SessionService sessionService,
+    private void pauseServicesForTenant(final PlatformServiceAccessor platformServiceAccessor, final BroadcastService broadcastService,
             final long tenantId)
             throws UpdateException {
+
+        // clustered services
+        SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+        SessionService sessionService = platformServiceAccessor.getSessionService();
         try {
             schedulerService.pauseJobs(tenantId);
             sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
         } catch (SSchedulerException e) {
             throw new UpdateException("Unable to pause the scheduler.", e);
         }
-        try {
-            workService.pause();
-        } catch (SBonitaException e) {
-            throw new UpdateException("Unable to pause the work service.", e);
-        } catch (TimeoutException e) {
-            throw new UpdateException("Unable to pause the work service.", e);
-        }
+
+        // on all nodes
+        Map<String, TaskResult<Void>> result = broadcastService.execute(createPauseServicesTask(tenantId), tenantId);
+        handleResult(result);
     }
 
-    private void resumeServicesForTenant(final WorkService workService, final SchedulerService schedulerService, final long tenantId,
-            final NodeConfiguration nodeConfiguration, final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
-            throws UpdateException {
-        try {
+    PauseServices createPauseServicesTask(final long tenantId) {
+        return new PauseServices(tenantId);
+    }
 
-            workService.resume();
-            List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
-            for (TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
-                tenantRestartHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
-            }
-        } catch (SBonitaException e) {
-            throw new UpdateException("Unable to resume the work service.", e);
-        } catch (RestartException e) {
-            throw new UpdateException("Unable to resume all elements of the work service.", e);
-        }
+    private void resumeServicesForTenant(final PlatformServiceAccessor platformServiceAccessor, final BroadcastService broadcastService, final long tenantId)
+            throws UpdateException {
+        // clustered services
+        SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         try {
             schedulerService.resumeJobs(tenantId);
         } catch (SSchedulerException e) {
             throw new UpdateException("Unable to resume the scheduler.", e);
+        }
+        // on all nodes
+        Map<String, TaskResult<Void>> result = broadcastService.execute(createResumeServicesTask(tenantId), tenantId);
+        handleResult(result);
+
+        NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
+        TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
+        try {
+            List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
+            for (TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
+                tenantRestartHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
+            }
+        } catch (RestartException e) {
+            throw new UpdateException("Unable to resume all elements of the work service.", e);
+        }
+
+    }
+
+    ResumeServices createResumeServicesTask(final long tenantId) {
+        return new ResumeServices(tenantId);
+    }
+
+    private void handleResult(final Map<String, TaskResult<Void>> result) throws UpdateException {
+        for (Entry<String, TaskResult<Void>> entry : result.entrySet()) {
+            if (entry.getValue().isError()) {
+                throw new UpdateException("There is at least one exception on the node " + entry.getKey(), entry.getValue().getThrowable());
+            }
+            if (entry.getValue().isError()) {
+                throw new UpdateException("There is at least one timeout after " + entry.getValue().getTimeout() + " " + entry.getValue().getTimeunit()
+                        + " on the node " + entry.getKey());
+            }
         }
     }
 
