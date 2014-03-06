@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.events.impl;
+package org.bonitasoft.engine.events;
 
 import org.bonitasoft.engine.events.model.SEvent;
 
