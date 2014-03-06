@@ -18,6 +18,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
@@ -88,6 +89,7 @@ public class TenantManagementAPIExtTest {
 
     @Test
     public void setMaintenanceModeToMAINTENANCEShouldPauseWorkService() throws Exception {
+        whenTenantIsInState(STenant.ACTIVATED);
 
         // given a tenant moved to maintenance mode
         tenantManagementAPI.pause();
@@ -135,6 +137,7 @@ public class TenantManagementAPIExtTest {
 
     @Test
     public void setTenantMaintenanceModeShouldUpdateMaintenanceField() throws Exception {
+        whenTenantIsInState(STenant.ACTIVATED);
 
         tenantManagementAPI.pause();
 
@@ -147,6 +150,8 @@ public class TenantManagementAPIExtTest {
 
     @Test
     public void should_setMaintenanceMode_to_MAINTENANCE_pause_jobs() throws Exception {
+        whenTenantIsInState(STenant.ACTIVATED);
+
         tenantManagementAPI.pause();
 
         verify(schedulerService).pauseJobs(tenantId);
@@ -161,6 +166,8 @@ public class TenantManagementAPIExtTest {
 
     @Test
     public void should_setMaintenanceMode_to_MAINTENANCE_delete_sessions() throws Exception {
+        whenTenantIsInState(STenant.ACTIVATED);
+
         tenantManagementAPI.pause();
 
         verify(sessionService).deleteSessionsOfTenantExceptTechnicalUser(tenantId);
@@ -198,4 +205,45 @@ public class TenantManagementAPIExtTest {
         assertTrue("Annotation @AvailableOnMaintenanceTenant should be present on API method LoginAPIExt.login(String, String)",
                 method.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
     }
+
+    @Test(expected = UpdateException.class)
+    public void should_pause_on_a_paused_tenant_throw_update_exception() throws Exception {
+        whenTenantIsInState(STenant.PAUSED);
+
+        tenantManagementAPI.pause();
+    }
+
+    @Test(expected = UpdateException.class)
+    public void should_pause_on_a_deactivated_tenant_throw_update_exception() throws Exception {
+        whenTenantIsInState(STenant.DEACTIVATED);
+
+        tenantManagementAPI.pause();
+    }
+
+    @Test(expected = UpdateException.class)
+    public void should_resume_on_a_paused_tenant_throw_update_exception() throws Exception {
+        whenTenantIsInState(STenant.ACTIVATED);
+
+        tenantManagementAPI.resume();
+    }
+
+    @Test(expected = UpdateException.class)
+    public void should_resume_on_a_deactivated_tenant_throw_update_exception() throws Exception {
+        whenTenantIsInState(STenant.DEACTIVATED);
+
+        tenantManagementAPI.resume();
+    }
+
+    private void whenTenantIsInState(final String status) throws STenantNotFoundException {
+        sTenant = new STenantImpl("myTenant", "john", 123456789, status, false);
+        when(platformService.getTenant(tenantId)).thenReturn(sTenant);
+    }
+
+    @Test(expected = UpdateException.class)
+    public void should_pause_on_a_unexisting_tenant_throw_update_exception() throws Exception {
+        doThrow(STenantNotFoundException.class).when(platformService).getTenant(tenantId);
+
+        tenantManagementAPI.resume();
+    }
+
 }
