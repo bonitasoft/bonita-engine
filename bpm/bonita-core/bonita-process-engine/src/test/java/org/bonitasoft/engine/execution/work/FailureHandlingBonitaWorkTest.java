@@ -30,7 +30,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -214,7 +214,7 @@ public class FailureHandlingBonitaWorkTest {
     @Test
     public void doNotHandleFailureWhenGettingASProcessDefinitionNotFoundException() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessDefinitionNotFoundException("message"));
+        final Exception e = new Exception(new SProcessDefinitionNotFoundException("message", 2));
         doThrow(e).when(wrappedWork).work(context);
         txBonitawork.work(context);
         verify(wrappedWork, never()).handleFailure(e, context);

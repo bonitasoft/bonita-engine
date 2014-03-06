@@ -26,7 +26,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -99,7 +98,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     @Override
     public Map<String, Object> execute(final SConnector sConnector, final Map<String, Object> inputParameters) throws SConnectorException {
         if (threadPoolExecutor == null) {
-            throw new SConnectorException("Unable to execute a connector if the node is node started. Start it first");
+            throw new SConnectorException("Unable to execute a connector, if the node is node started. Start it first");
         }
         final Callable<Map<String, Object>> callable = new ExecuteConnectorCallable(inputParameters, sConnector);
         final Future<Map<String, Object>> submit = threadPoolExecutor.submit(callable);
@@ -180,19 +179,19 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "The work was rejected, requeue work: " + task.toString());
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "The work was rejected. Requeue work : " + task.toString());
             }
             try {
                 executor.getQueue().put(task);
             } catch (final InterruptedException e) {
-                throw new RejectedExecutionException("queuing " + task + " got interrupted", e);
+                throw new RejectedExecutionException("Queuing " + task + " got interrupted.", e);
             }
         }
 
     }
 
     @Override
-    public void start() throws SBonitaException {
+    public void start() {
         final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<Runnable>(queueCapacity);
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler(loggerService);
         final ConnectorExecutorThreadFactory threadFactory = new ConnectorExecutorThreadFactory("ConnectorExecutor");
@@ -205,10 +204,10 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             threadPoolExecutor.shutdown();
             try {
                 if (!threadPoolExecutor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
-                    loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Timeout  (5s) trying to stop the connector executor thread pool");
+                    loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Timeout (5s) trying to stop the connector executor thread pool.");
                 }
             } catch (InterruptedException e) {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while stopping the connector executor thread pool", e);
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while stopping the connector executor thread pool.", e);
             }
         }
     }

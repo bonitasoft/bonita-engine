@@ -18,9 +18,8 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -52,7 +51,6 @@ public class RestartProcessHandler implements TenantRestartHandler {
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
         final WorkService workService = tenantServiceAccessor.getWorkService();
         final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
-        final ConnectorService connectorService = tenantServiceAccessor.getConnectorService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         // get all process in initializing
         // call executeConnectors on enter on them (only case they can be in initializing)

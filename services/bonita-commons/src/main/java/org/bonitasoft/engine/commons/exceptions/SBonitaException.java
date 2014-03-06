@@ -243,8 +243,17 @@ public abstract class SBonitaException extends Exception {
      *            The event type of the waiting message instance to set
      * @since 6.3
      */
-    public void setWaitingMessageEventTypeOnContext(String eventType) {
+    public void setWaitingMessageEventTypeOnContext(final String eventType) {
         context.put(SContext.WAITING_MESSAGE_INSTANCE_TYPE, eventType);
+    }
+
+    /**
+     * @param userId
+     *            The identifier of the user
+     * @since 6.3
+     */
+    public void setUserIdOnContext(final long userId) {
+        context.put(SContext.USER_ID, userId);
     }
 
     @Override

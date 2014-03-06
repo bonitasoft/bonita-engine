@@ -34,7 +34,7 @@ import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -182,9 +182,9 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         }
     }
 
-    protected SProcessDefinition getServerProcessDefinition(final long processDefinitionUUID, final ProcessDefinitionService processDefinitionService)
+    protected SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
             throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionUUID,
+        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionId,
                 processDefinitionService);
         try {
             transactionContentWithResult.execute();
@@ -194,7 +194,7 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         } catch (final SProcessDefinitionReadException e) {
             throw e;
         } catch (final SBonitaException e) {
-            throw new SProcessDefinitionNotFoundException(e);
+            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
         }
     }
 

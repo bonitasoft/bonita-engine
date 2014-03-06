@@ -362,7 +362,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws STaskVisibilityException
      * @since 6.0
      */
-    List<SHiddenTaskInstance> searchHiddenTasksForActivity(long activityInstanceId, QueryOptions searchOptions) throws STaskVisibilityException;
+    List<SHiddenTaskInstance> searchHiddenTasksForActivity(long activityInstanceId) throws STaskVisibilityException;
 
     /**
      * Get the number of UserTask instances assigned to a specific user

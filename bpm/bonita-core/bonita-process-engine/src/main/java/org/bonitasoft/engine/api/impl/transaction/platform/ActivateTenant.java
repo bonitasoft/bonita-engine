@@ -89,13 +89,14 @@ public final class ActivateTenant implements TransactionContent {
         final String jobClassName = BPMEventHandlingJob.class.getName();
         if (schedulerService.isStarted()) {
             if (plaformConfiguration.shouldStartEventHandlingJob()) {
-                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(jobClassName, BPM_EVENT_HANDLING, true)
+                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                        .createNewInstance(jobClassName, BPM_EVENT_HANDLING, true)
                         .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final String cron = plaformConfiguration.getEventHandlingJobCron(); //
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting event handling job with frequency: " + cron);
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting event handling job with frequency : " + cron);
                 }
                 schedulerService.schedule(jobDescriptor, jobParameters, trigger);
             }
@@ -111,12 +112,13 @@ public final class ActivateTenant implements TransactionContent {
         if (schedulerService.isStarted()) {
             final String cron = plaformConfiguration.getCleanInvalidSessionsJobCron();
             if (!cron.equalsIgnoreCase("none")) {
-                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
+                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                        .createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
                         .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency: " + cron);
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency : " + cron);
                 }
                 schedulerService.schedule(jobDescriptor, jobParameters, trigger);
             }

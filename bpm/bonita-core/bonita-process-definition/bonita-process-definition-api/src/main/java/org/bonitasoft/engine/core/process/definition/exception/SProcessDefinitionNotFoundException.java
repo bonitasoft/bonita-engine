@@ -13,21 +13,33 @@
  **/
 package org.bonitasoft.engine.core.process.definition.exception;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 
 /**
- * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class SDeletingEnabledProcessException extends SBonitaException {
+public class SProcessDefinitionNotFoundException extends SProcessDefinitionException {
 
-    private static final long serialVersionUID = -8265428109141653941L;
+    private static final long serialVersionUID = 1702422492322010491L;
 
-    public SDeletingEnabledProcessException(final String message, final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
+    public SProcessDefinitionNotFoundException(final String message, final long id) {
         super(message);
+        setProcessDefinitionIdOnContext(id);
+    }
 
-        setProcessDefinitionIdOnContext(processDefinitionDeployInfo.getId());
+    public SProcessDefinitionNotFoundException(final Throwable cause, final long id) {
+        super(cause);
+        setProcessDefinitionIdOnContext(id);
+    }
+
+    public SProcessDefinitionNotFoundException(final String message, final Throwable e, final long id) {
+        super(message, e);
+        setProcessDefinitionIdOnContext(id);
+    }
+
+    public SProcessDefinitionNotFoundException(final Throwable cause, final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
+        this(cause, processDefinitionDeployInfo.getId());
         setProcessDefinitionNameOnContext(processDefinitionDeployInfo.getName());
         setProcessDefinitionVersionOnContext(processDefinitionDeployInfo.getVersion());
     }

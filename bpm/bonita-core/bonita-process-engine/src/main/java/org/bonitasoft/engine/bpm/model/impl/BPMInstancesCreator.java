@@ -637,11 +637,11 @@ public class BPMInstancesCreator {
                     try {
                         dataValue = (Serializable) ((List<?>) dataInstance.getValue()).get(index);
                     } catch (final ClassCastException e) {
-                        throw new SDataInstanceReadException("loopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
-                                + " is not a list or the value is not serializable");
+                        throw new SDataInstanceReadException("LoopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
+                                + " is not a list or the value is not serializable.");
                     }
                 } else {
-                    throw new SDataInstanceReadException("loopDataInput ref named " + loopDataInputRef + " is not visible for " + containerId + " "
+                    throw new SDataInstanceReadException("LoopDataInput ref named " + loopDataInputRef + " is not visible for " + containerId + " "
                             + containerType);
                 }
             } else {

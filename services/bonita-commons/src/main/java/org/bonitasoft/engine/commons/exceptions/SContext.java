@@ -79,6 +79,10 @@ public enum SContext {
     /**
      * Corresponding to the identifier of the connector instance
      */
-    CONNECTOR_INSTANCE_ID;
+    CONNECTOR_INSTANCE_ID,
+    /**
+     * Corresponding to the identifier of the user
+     */
+    USER_ID;
 
 }

@@ -247,7 +247,7 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
@@ -533,9 +533,9 @@ public class ProcessAPIImpl implements ProcessAPI {
                     try {
                         processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
                     } catch (final BonitaHomeNotSetException e) {
-                        throw new SProcessDeletionException(e);
+                        throw new SProcessDeletionException(e, processDefinitionId);
                     } catch (final IOException e) {
-                        throw new SProcessDeletionException(e);
+                        throw new SProcessDeletionException(e, processDefinitionId);
                     }
                     return null;
                 }
@@ -640,8 +640,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (callerId > 0) {
             try {
                 final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(callerId);
-                throw new SProcessInstanceHierarchicalDeletionException("Unable to delete the process instance because the parent is still active: activity "
-                        + flowNodeInstance.getName() + " with id " + flowNodeInstance.getId(), flowNodeInstance.getRootProcessInstanceId());
+                final long rootProcessInstanceId = flowNodeInstance.getRootProcessInstanceId();
+                final SProcessInstanceHierarchicalDeletionException exception = new SProcessInstanceHierarchicalDeletionException(
+                        "Unable to delete the process instance, because the parent is still active.", rootProcessInstanceId);
+                exception.setProcessInstanceIdOnContext(processInstanceId);
+                exception.setRootProcessInstanceIdOnContext(rootProcessInstanceId);
+                exception.setFlowNodeDefinitionIdOnContext(flowNodeInstance.getFlowNodeDefinitionId());
+                exception.setFlowNodeInstanceIdOnContext(flowNodeInstance.getId());
+                exception.setFlowNodeNameOnContext(flowNodeInstance.getName());
+                exception.setProcessDefinitionIdOnContext(flowNodeInstance.getProcessDefinitionId());
+                throw exception;
             } catch (final SFlowNodeNotFoundException e) {
                 // ok the activity that called this process do not exists anymore
             }

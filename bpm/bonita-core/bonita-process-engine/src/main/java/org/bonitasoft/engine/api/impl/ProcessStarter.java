@@ -27,7 +27,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -48,23 +48,25 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
-
-
 /**
  * @author Elias Ricken de Medeiros
  * @author Vincent Elcrin
- *
+ * 
  */
 public class ProcessStarter {
 
-    private long userId;
-    private long processDefinitionId;
-    private List<Operation> operations;
-    private Map<String, Serializable> context;
+    private final long userId;
+
+    private final long processDefinitionId;
+
+    private final List<Operation> operations;
+
+    private final Map<String, Serializable> context;
+
     private final Filter<SFlowNodeDefinition> filter;
 
     private ProcessStarter(long userId, long processDefinitionId, List<Operation> operations,
-                           Map<String, Serializable> context, Filter<SFlowNodeDefinition> filter) {
+            Map<String, Serializable> context, Filter<SFlowNodeDefinition> filter) {
         this.userId = userId;
         this.processDefinitionId = processDefinitionId;
         this.operations = operations;
@@ -79,7 +81,7 @@ public class ProcessStarter {
     public ProcessStarter(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context, List<String> activityNames) {
         this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames));
     }
-    
+
     public ProcessInstance start() throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
@@ -132,7 +134,7 @@ public class ProcessStarter {
             stb.append("The user <");
             stb.append(SessionInfos.getUserNameFromSession());
             if (starterId != userIdFromSession) {
-                stb.append(">acting as delegate of user with id <");
+                stb.append("> acting as delegate of user with id <");
                 stb.append(starterId);
             }
             stb.append("> has started instance <");
@@ -158,5 +160,5 @@ public class ProcessStarter {
             throw new BonitaRuntimeException(e);
         }
     }
-    
+
 }

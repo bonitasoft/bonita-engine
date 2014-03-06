@@ -153,9 +153,11 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
             final SCatchEventInstance eventInstance) {
         final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
         jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("processDefinitionId", processDefinition.getId()).done());
-        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("containerType", SFlowElementsContainerType.PROCESS.name()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("containerType", SFlowElementsContainerType.PROCESS.name())
+                .done());
         jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("eventType", eventDefinition.getType().name()).done());
-        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("targetSFlowNodeDefinitionId", eventDefinition.getId()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("targetSFlowNodeDefinitionId", eventDefinition.getId())
+                .done());
         if (SFlowNodeType.START_EVENT.equals(eventDefinition.getType())) {
             final SStartEventDefinition startEvent = (SStartEventDefinition) eventDefinition;
             jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("isInterrupting", startEvent.isInterrupting()).done());
@@ -172,7 +174,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         jobParameters.addAll(getJobParameters(processDefinition, eventDefinition, eventInstance));
         jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("subProcessId", subProcessId).done());
         jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("processInstanceId", parentProcessInstance.getId()).done());
-        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("rootProcessInstanceId", parentProcessInstance.getRootProcessInstanceId()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class)
+                .createNewInstance("rootProcessInstanceId", parentProcessInstance.getRootProcessInstanceId()).done());
         return jobParameters;
     }
 
@@ -182,9 +185,9 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     @Override
     public void unregisterCatchEvent(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessIsnstance)
+            final SEventTriggerDefinition sEventTriggerDefinition, final long subProcessId, final SProcessInstance parentProcessInstance)
             throws SBonitaException {
-        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, parentProcessIsnstance.getId(), subProcessId);
+        final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, parentProcessInstance.getId(), subProcessId);
         final boolean delete = schedulerService.delete(jobName);
         if (!delete) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
@@ -193,11 +196,11 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
                 stb.append(jobName);
                 stb.append("' when interrupting timer catch event named '");
                 stb.append(eventDefinition.getName());
-                stb.append(". In process [name: ");
+                stb.append(". In process definition [name = <");
                 stb.append(processDefinition.getName());
-                stb.append(", version: ");
+                stb.append(">, version = <");
                 stb.append(processDefinition.getVersion());
-                stb.append("]");
+                stb.append(">]");
                 stb.append("'. It was probably already triggered.");
                 final String message = stb.toString();
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
