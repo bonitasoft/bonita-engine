@@ -25,7 +25,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -120,7 +120,8 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         SProcessInstance startedInstance;
         try {
             final List<SOperation> sOperations = toSOperation(operations);
-            startedInstance = processExecutor.start(starterId, session.getUserId(), sOperations, context, connectorsWithInput, new FlowNodeSelector(sDefinition, new StartFlowNodeFilter()));
+            startedInstance = processExecutor.start(starterId, session.getUserId(), sOperations, context, connectorsWithInput, new FlowNodeSelector(
+                    sDefinition, new StartFlowNodeFilter()));
         } catch (final SBonitaException e) {
             log(tenantAccessor, e);
             throw new CreationException(e);

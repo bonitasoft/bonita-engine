@@ -66,7 +66,7 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadExce
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -217,9 +217,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
     }
 
-    private SProcessDefinition getServerProcessDefinition(final long processDefinitionUUID, final ProcessDefinitionService processDefinitionService)
+    private SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
             throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionUUID,
+        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionId,
                 processDefinitionService);
         try {
             transactionContentWithResult.execute();
@@ -229,7 +229,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SProcessDefinitionReadException e) {
             throw e;
         } catch (final SBonitaException e) {
-            throw new SProcessDefinitionNotFoundException(e);
+            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
         }
     }
 
