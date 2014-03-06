@@ -82,13 +82,13 @@ public class StackTraceTransformerTest {
     }
 
     @Test
-    public void merge_stack_when_no_cause() throws Exception {
+    public void merge_stack_when_no_cause() {
         ProcessInstanceNotFoundException cause = new ProcessInstanceNotFoundException("the process");
         ServerWrappedException e = new ServerWrappedException(cause);
 
         ServerWrappedException newE = StackTraceTransformer.mergeStackTraces(e);
 
-        assertEquals("the process", cause.getMessage());
+        assertEquals("threadId[NA]  | the process", cause.getMessage());
         assertEquals(cause, newE.getCause());
     }
 
