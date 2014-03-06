@@ -199,14 +199,10 @@ public class PlatformTest {
         }
     }
 
-    /**
-     * @param thread
-     * @return
-     */
     private boolean isEngine(final Thread thread) {
         String name = thread.getName();
         ThreadGroup threadGroup = thread.getThreadGroup();
-        if (threadGroup != null && thread.getName().equals("system")) {
+        if (threadGroup != null && threadGroup.getName().equals("system")) {
             return false;
         }
         List<String> startWithFilter = Arrays.asList("H2 ", "BoneCP", "bitronix", "main", "Reference Handler", "Signal Dispatcher", "Finalizer",
