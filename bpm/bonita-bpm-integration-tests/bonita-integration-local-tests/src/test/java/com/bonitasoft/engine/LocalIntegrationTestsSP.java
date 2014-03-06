@@ -26,6 +26,7 @@ import com.bonitasoft.engine.theme.ThemeTest;
         ConnectorExecutionTimeOutTest.class,
         ConnectorImplementationLocalSPTest.class,
         ThemeTest.class,
+        TenantMaintenanceTestSP.class
 })
 @Initializer(TestsInitializerSP.class)
 public class LocalIntegrationTestsSP {
