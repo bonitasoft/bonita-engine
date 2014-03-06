@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,16 +13,19 @@
  **/
 package org.bonitasoft.engine.dependency;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  * @since 6.0
  */
 public interface DependencyService {
@@ -208,7 +211,7 @@ public interface DependencyService {
      * @return a list of SDependencyMapping objects
      * @throws SDependencyException
      */
-    List<SDependencyMapping> getDependencyMappings(long artifactId, String artifactType, QueryOptions queryOptions) throws SDependencyException;
+    List<SDependencyMapping> getDependencyMappings(long artifactId, ScopeType artifactType, QueryOptions queryOptions) throws SDependencyException;
 
     /**
      * Get all dependencyMappings for specific dependency
@@ -234,7 +237,7 @@ public interface DependencyService {
      * @return a list of Long objects
      * @throws SDependencyException
      */
-    List<Long> getDependencyIds(long artifactId, String artifactType, QueryOptions queryOptions) throws SDependencyException;
+    List<Long> getDependencyIds(long artifactId, ScopeType artifactType, QueryOptions queryOptions) throws SDependencyException;
 
     // returns the last time an artifact has been impacted by a dependency change: update on a dependency, new/updated/removed mapping...
     /**
@@ -246,7 +249,7 @@ public interface DependencyService {
      *            The identifier of artifact
      * @return
      */
-    long getLastUpdatedTimestamp(String artifactType, long artifactId);
+    long getLastUpdatedTimestamp(ScopeType artifactType, long artifactId);
 
     /**
      * Remove the disconnected dependencyMappings.
@@ -278,8 +281,23 @@ public interface DependencyService {
      * @throws SDependencyNotFoundException
      * @throws SDependencyDeletionException
      */
-    void deleteDependencies(long id, String type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException;
+    void deleteDependencies(long id, ScopeType type) throws SDependencyException, SDependencyNotFoundException, SDependencyDeletionException;
 
-    void refreshClassLoader(String type, long id) throws SDependencyException;
+    void refreshClassLoader(ScopeType type, long id) throws SDependencyException;
+
+    /**
+     * 
+     * Update dependencies of this artifact with the given list of dependencies.
+     * 
+     * If a dependency with the same name exists it will update it.
+     * If it does not it will create a new one.
+     * If the list does not contains a existing dependency of the element it will delete it.
+     * 
+     * @param id
+     * @param type
+     * @param dependencies
+     * @throws SDependencyException
+     */
+    void updateDependenciesOfArtifact(long id, ScopeType type, ArrayList<SDependency> dependencies) throws SDependencyException;
 
 }

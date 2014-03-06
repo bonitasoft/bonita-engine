@@ -31,8 +31,6 @@ public class SDependencyImpl implements SDependency {
 
     private String name;
 
-    private String version;
-
     private String fileName;
 
     private String description;
@@ -43,10 +41,9 @@ public class SDependencyImpl implements SDependency {
         super();
     }
 
-    public SDependencyImpl(final String name, final String version, final String fileName, final byte[] value) {
+    public SDependencyImpl(final String name, final String fileName, final byte[] value) {
         super();
         this.name = name;
-        this.version = version;
         this.fileName = fileName;
         this.value_ = value;
     }
@@ -55,6 +52,7 @@ public class SDependencyImpl implements SDependency {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
@@ -68,6 +66,7 @@ public class SDependencyImpl implements SDependency {
         this.description = description;
     }
 
+    @Override
     public void setId(final long id) {
         this.id = id;
     }
@@ -89,10 +88,6 @@ public class SDependencyImpl implements SDependency {
         this.name = name;
     }
 
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
     public void setFileName(final String fileName) {
         this.fileName = fileName;
     }
@@ -100,11 +95,6 @@ public class SDependencyImpl implements SDependency {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public String getVersion() {
-        return version;
     }
 
     @Override
@@ -124,21 +114,19 @@ public class SDependencyImpl implements SDependency {
 
     @Override
     public String toString() {
-        return "SDependencyImpl [description=" + description + ", fileName=" + fileName + ", id=" + id + ", name=" + name + ", value="
-                + Arrays.toString(value_) + ", version=" + version + "]";
+        return "SDependencyImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", fileName=" + fileName + ", description=" + description + "]";
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + (int) (tenantId ^ (tenantId >>> 32));
+        result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (fileName == null ? 0 : fileName.hashCode());
+        result = prime * result + (int) (id ^ id >>> 32);
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (int) (tenantId ^ tenantId >>> 32);
         result = prime * result + Arrays.hashCode(value_);
-        result = prime * result + ((version == null) ? 0 : version.hashCode());
         return result;
     }
 
@@ -182,13 +170,6 @@ public class SDependencyImpl implements SDependency {
             return false;
         }
         if (!Arrays.equals(value_, other.value_)) {
-            return false;
-        }
-        if (version == null) {
-            if (other.version != null) {
-                return false;
-            }
-        } else if (!version.equals(other.version)) {
             return false;
         }
         return true;

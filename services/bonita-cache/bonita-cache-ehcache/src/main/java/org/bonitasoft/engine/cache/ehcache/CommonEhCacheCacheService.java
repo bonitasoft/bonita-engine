@@ -2,9 +2,11 @@ package org.bonitasoft.engine.cache.ehcache;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -15,19 +17,22 @@ import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
 public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
-    protected final CacheManager cacheManager;
+    protected CacheManager cacheManager;
 
     protected final TechnicalLoggerService logger;
 
     protected final ReadSessionAccessor sessionAccessor;
 
     protected final Map<String, CacheConfiguration> cacheConfigurations;
+
+    private final URL configFile;
 
     public CommonEhCacheCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
             final CacheConfigurations cacheConfigurations) {
@@ -38,12 +43,12 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             final CacheConfigurations cacheConfigurations, final URL configFile) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
+        this.configFile = configFile;
         final List<org.bonitasoft.engine.cache.CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
         this.cacheConfigurations = new HashMap<String, CacheConfiguration>(configurations.size());
         for (final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig : configurations) {
             this.cacheConfigurations.put(cacheConfig.getName(), getEhCacheConfiguration(cacheConfig));
         }
-        cacheManager = configFile != null ? CacheManager.create(configFile) : CacheManager.create();
     }
 
     protected CacheConfiguration getEhCacheConfiguration(final org.bonitasoft.engine.cache.CacheConfiguration cacheConfig) {
@@ -57,6 +62,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
     }
 
     protected synchronized Cache createCache(final String cacheName, final String internalCacheName) throws CacheException {
+        if (cacheManager == null) {
+            throw new CacheException("The cache is not stated, call start() on the cache service");
+        }
         Cache cache = cacheManager.getCache(internalCacheName);
         if (cache == null) {
             final CacheConfiguration cacheConfiguration = cacheConfigurations.get(cacheName);
@@ -76,6 +84,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
     public void store(final String cacheName, final Serializable key, final Object value) throws CacheException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "store"));
+        }
+        if (cacheManager == null) {
+            throw new CacheException("The cache is not started, call start() on the cache service");
         }
         final String cacheNameKey = getKeyFromCacheName(cacheName);
         try {
@@ -111,6 +122,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     @Override
     public Object get(final String cacheName, final Object key) throws CacheException {
+        if (cacheManager == null) {
+            return null;
+        }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "get"));
         }
@@ -154,6 +168,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     @Override
     public boolean clear(final String cacheName) throws CacheException {
+        if (cacheManager == null) {
+            return true;
+        }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "clear"));
         }
@@ -188,6 +205,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     @Override
     public int getCacheSize(final String cacheName) throws CacheException {
+        if (cacheManager == null) {
+            return 0;
+        }
         final Cache cache = cacheManager.getCache(getKeyFromCacheName(cacheName));
         if (cache == null) {
             return 0;
@@ -197,6 +217,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     @Override
     public void clearAll() throws CacheException {
+        if (cacheManager == null) {
+            return;
+        }
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "clearAll"));
@@ -218,7 +241,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     @Override
     public boolean remove(final String cacheName, final Object key) throws CacheException {
-        // Why is there no try/catch for this method ?
+        if (cacheManager == null) {
+            return false;
+        }
 
         final String cacheNameKey = getKeyFromCacheName(cacheName);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -235,6 +260,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     @Override
     public List<Object> getKeys(final String cacheName) throws CacheException {
+        if (cacheManager == null) {
+            return Collections.emptyList();
+        }
         final String cacheNameKey = getKeyFromCacheName(cacheName);
         try {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -242,9 +270,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             }
             final Cache cache = cacheManager.getCache(cacheNameKey);
             if (cache == null) {
-                final StringBuilder message = new StringBuilder("The cache '");
-                message.append(cacheNameKey).append("' does not exist");
-                throw new CacheException(message.toString());
+                return Collections.emptyList();
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getKeys"));
@@ -266,8 +292,31 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         }
     }
 
-    public void destroy() {
-        this.cacheManager.shutdown();
+    public void destroy() throws SBonitaException, TimeoutException {
+        stop();
+    }
+
+    @Override
+    public synchronized void start() throws SBonitaException {
+        this.cacheManager = configFile != null ? CacheManager.create(configFile) : CacheManager.create();
+    }
+
+    @Override
+    public synchronized void stop() throws SBonitaException, TimeoutException {
+        if (cacheManager != null) {
+            this.cacheManager.shutdown();
+            this.cacheManager = null;
+        }
+    }
+
+    @Override
+    public void pause() throws SBonitaException, TimeoutException {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        // nothing to do
     }
 
 }

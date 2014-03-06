@@ -107,7 +107,7 @@ public class LoopTest extends CommonAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "expression context", "flownode container hierarchy" }, jira = "ENGINE-1848")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "expression context", "flow node container hierarchy" }, jira = "ENGINE-1848")
     public void evaluateExpressionsOnLoopUserTask() throws Exception {
         final String actorName = "Golf Players";
 

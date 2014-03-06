@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.service.impl;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
@@ -34,7 +33,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * @author Matthieu Chaffotte
@@ -193,20 +191,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
             platformCacheService = SpringPlatformFileSystemBeanAccessor.getService(PlatformCacheService.class);
         }
         return platformCacheService;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ServiceWithLifecycle> getServicesToStart() {
-        if (servicesToStart == null) {
-            try {
-
-                servicesToStart = SpringPlatformFileSystemBeanAccessor.getService("servicesToStart", List.class);
-            } catch (NoSuchBeanDefinitionException e) {
-                servicesToStart = Collections.emptyList();
-            }
-        }
-        return servicesToStart;
     }
 
     @Override

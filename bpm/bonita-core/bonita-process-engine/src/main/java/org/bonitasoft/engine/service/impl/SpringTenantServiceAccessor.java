@@ -91,6 +91,7 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
@@ -285,12 +286,16 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return technicalLoggerService;
     }
 
-    @Override
-    public TransactionService getTransactionService() {
+    private TransactionService getTransactionService() {
         if (transactionService == null) {
             transactionService = beanAccessor.getService(TransactionService.class);
         }
         return transactionService;
+    }
+
+    @Override
+    public UserTransactionService getUserTransactionService() {
+        return getTransactionService();
     }
 
     @Override

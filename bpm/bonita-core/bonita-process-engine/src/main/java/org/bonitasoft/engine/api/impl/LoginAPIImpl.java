@@ -77,13 +77,11 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
             final PlatformService platformService = platformServiceAccessor.getPlatformService();
             final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
             // first call before create session: put the platform in cache if necessary
-            putPlatformInCacheIfNecessary(platformServiceAccessor, platformService);
+            // putPlatformInCacheIfNecessary(platformServiceAccessor, platformService);
             TransactionContentWithResult<STenant> getTenant;
             if (tenantId == null) {
-                // platformService.getDefaultTenant()
                 getTenant = new GetDefaultTenantInstance(platformService);
             } else {
-                // platformService.getTenant(tenantId)
                 getTenant = new GetTenantInstance(tenantId, platformService);
             }
             platformTransactionExecutor.execute(getTenant);
@@ -94,7 +92,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
             final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(resolvedTenantId);
             final LoginService loginService = serviceAccessor.getLoginService();
             final IdentityService identityService = serviceAccessor.getIdentityService();
-            final TransactionService transactionService = serviceAccessor.getTransactionService();
+            final TransactionService transactionService = platformServiceAccessor.getTransactionService();
 
             SSession sSession = transactionService.executeInTransaction(new LoginAndRetrieveUser(loginService, identityService, resolvedTenantId, userName,
                     password));

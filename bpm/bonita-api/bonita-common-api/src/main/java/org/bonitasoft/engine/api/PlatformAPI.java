@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api;
 
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformState;
@@ -191,5 +192,14 @@ public interface PlatformAPI {
      * @since 6.1
      */
     boolean isNodeStarted();
+
+    /**
+     * Reschedules triggers which are in error state.
+     * 
+     * @throws UpdateException
+     *             If an exception occurs during the scheduling
+     * @since 6.2
+     */
+    void rescheduleErroneousTriggers() throws UpdateException;
 
 }

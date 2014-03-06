@@ -5,7 +5,6 @@
 	<class name="SPlatformDependency" table="pdependency">
 		<id name="id" column="id" type="long" />
 		<property name="name" type="java.lang.String" column="name" />
-		<property name="version" type="java.lang.String" column="version" />
 		<property name="description" type="java.lang.String" column="description" />
 		<property name="fileName" type="java.lang.String" column="fileName" />
 		<property name="value_" type="binary" column="value_" />
@@ -14,7 +13,13 @@
 	<class name="SPlatformDependencyMapping" table="pdependencymapping">
 		<id name="id" column="id" type="long" />
 		<property name="artifactId" type="long" column="artifactId" />
-		<property name="artifactType" type="java.lang.String" column="artifactType" />
+		<property name="artifactType" column="artifactType">
+	      <type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
+	        <param name="enumClass">
+	          org.bonitasoft.engine.dependency.model.ScopeType
+	        </param>
+	      </type>
+	    </property>
 		<property name="dependencyId" type="long" column="dependencyId" />
 	</class>
 

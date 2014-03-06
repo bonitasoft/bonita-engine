@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,22 +21,23 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
  * 
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  * @see ActorDefinition
  */
 public interface ActorInstance extends DescriptionElement, BaseElement {
 
     /**
-     * @return the ID of the process definition where this actor is defined.
+     * @return The identifier of the process definition where this actor is defined.
      */
     long getProcessDefinitionId();
 
     /**
-     * @return the display name of the actor, as designed is {@link ActorDefinition}
+     * @return The display name of the actor, as designed is {@link ActorDefinition}
      */
     String getDisplayName();
 
     /**
-     * @return true if this actor is the actor initiator of the process, that is, the actor that can start the process.
+     * @return True if this actor is the actor initiator of the process, that is, the actor that can start the process.
      */
     boolean isInitiator();
 

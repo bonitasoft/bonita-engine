@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 
 /**
@@ -35,6 +36,8 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     private boolean shouldStartEventHandlingJob = true;
 
     private List<TenantRestartHandler> tenantRestartHandlers;
+
+    private List<ServiceWithLifecycle> servicesToStart;
 
     @Override
     public boolean shouldStartScheduler() {
@@ -86,4 +89,12 @@ public class NodeConfigurationImpl implements NodeConfiguration {
         return true;
     }
 
+    @Override
+    public List<ServiceWithLifecycle> getServicesToStart() {
+        return servicesToStart;
+    }
+
+    public void setServicesToStart(final List<ServiceWithLifecycle> servicesToStart) {
+        this.servicesToStart = servicesToStart;
+    }
 }

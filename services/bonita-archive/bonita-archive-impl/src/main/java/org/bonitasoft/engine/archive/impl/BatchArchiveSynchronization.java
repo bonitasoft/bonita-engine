@@ -13,13 +13,7 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.services.PersistenceService;
-import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionState;
 
@@ -32,13 +26,12 @@ import org.bonitasoft.engine.transaction.TransactionState;
 public class BatchArchiveSynchronization implements BonitaTransactionSynchronization {
 
     private final PersistenceService persistenceService;
+    private final BatchArchiveCallable batchArchiveCallable;
 
-    private final List<ArchivedPersistentObject> archivedObjects;
-
-    public BatchArchiveSynchronization(final PersistenceService persistenceService) {
+    public BatchArchiveSynchronization(final PersistenceService persistenceService, final BatchArchiveCallable batchArchiveCallable) {
         super();
         this.persistenceService = persistenceService;
-        this.archivedObjects = new ArrayList<ArchivedPersistentObject>();
+        this.batchArchiveCallable = batchArchiveCallable;
     }
 
     @Override
@@ -48,21 +41,14 @@ public class BatchArchiveSynchronization implements BonitaTransactionSynchroniza
 
     @Override
     public void beforeCommit() {
-        if (this.archivedObjects != null && !this.archivedObjects.isEmpty()) {
+        if (this.batchArchiveCallable.hasObjects()) {
             try {
-                this.persistenceService.insertInBatch(new ArrayList<PersistentObject>(this.archivedObjects));
+                this.batchArchiveCallable.call();
                 this.persistenceService.flushStatements();
-            } catch (final SPersistenceException spe) {
-                throw new RuntimeException(spe);
-            } finally {
-                this.archivedObjects.clear();
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
             }
         }
-    }
-
-    public void addArchivedObject(final ArchivedPersistentObject archivedPersistentObject) {
-        // no synchronized block required as we are working on a threadLocal:
-        this.archivedObjects.add(archivedPersistentObject);
     }
 
 }

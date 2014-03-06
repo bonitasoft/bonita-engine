@@ -48,6 +48,12 @@ public class SBoundaryEventInstanceImpl extends SCatchEventInstanceImpl implemen
     public void setActivityInstanceId(final long activityInstanceId) {
         this.activityInstanceId = activityInstanceId;
     }
+    
+    @Override
+    public boolean mustExecuteOnAbortOrCancelProcess() {
+        //a boundary event never must be executed when the process instance is aborted because it will be aborted by the attached activity
+        return false;
+    }
 
     @Override
     public int hashCode() {

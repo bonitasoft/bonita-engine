@@ -67,7 +67,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.theme.ThemeService;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -100,7 +100,9 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     TechnicalLoggerService getTechnicalLoggerService();
 
-    TransactionService getTransactionService();
+//    TransactionService getTransactionService();
+
+    UserTransactionService getUserTransactionService();
 
     ProcessDefinitionService getProcessDefinitionService();
 
