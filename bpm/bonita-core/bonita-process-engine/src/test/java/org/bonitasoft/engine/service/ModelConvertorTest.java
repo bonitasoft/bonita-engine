@@ -1,11 +1,12 @@
 package org.bonitasoft.engine.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.fest.assertions.Assertions.assertThat;
-
 
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -44,13 +45,15 @@ public class ModelConvertorTest {
     public void getProcessInstanceState_conversionOnNullStateShouldThrowException() throws Exception {
         ModelConvertor.getProcessInstanceState(null);
     }
-    
+
     @Test
     public void convertSUserToUserDoesntShowPassword() {
-        SUser sUser = mock(SUser.class);
-        User testUser = ModelConvertor.toUser(sUser);
+        final SUser sUser = mock(SUser.class);
+
+        final User testUser = ModelConvertor.toUser(sUser);
 
         assertThat(testUser.getPassword()).isEqualTo("");
+        verify(sUser, never()).getPassword();
     }
 
 }

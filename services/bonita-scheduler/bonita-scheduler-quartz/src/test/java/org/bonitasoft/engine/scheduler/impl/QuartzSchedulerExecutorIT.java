@@ -4,9 +4,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 
+import org.assertj.core.api.Fail;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.fest.assertions.Fail;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
