@@ -24,7 +24,7 @@ import org.junit.Test;
  */
 public class SimpleProcessDesignerTest {
 
-    ProcessDefinitionBuilder builder = getProcessDefinitionBuilder();
+    ProcessDefinitionBuilder builder = createProcessDefinitionBuilder();
 
     @Test
     public void should_be_able_to_design_a_linear_process() throws Exception {
@@ -138,7 +138,7 @@ public class SimpleProcessDesignerTest {
         assertEquals("[A_->_B, A_->_C, B_->_G, C_->_D, C_->_E, D_->_F, E_->_F, F_->_G, G_->_H, H_->_I]", DesignerTestUtils.getTransactions(design));
     }
 
-    private ProcessDefinitionBuilder getProcessDefinitionBuilder() {
+    private ProcessDefinitionBuilder createProcessDefinitionBuilder() {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder();
         builder.createNewInstance("Designed by designer", "1.0");
         return builder;

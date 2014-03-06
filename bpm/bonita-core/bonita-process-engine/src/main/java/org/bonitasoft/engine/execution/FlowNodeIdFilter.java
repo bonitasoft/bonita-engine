@@ -16,7 +16,7 @@ public class FlowNodeIdFilter implements Filter<SFlowNodeDefinition> {
     }
 
     @Override
-    public boolean select(SFlowNodeDefinition flowNode) {
+    public boolean mustSelect(SFlowNodeDefinition flowNode) {
         return flowNode.getId() == id;
     }
 }
