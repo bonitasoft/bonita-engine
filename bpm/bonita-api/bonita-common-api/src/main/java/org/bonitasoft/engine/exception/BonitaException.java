@@ -26,11 +26,14 @@ package org.bonitasoft.engine.exception;
 public class BonitaException extends Exception implements BonitaContextException {
 
     private static final long serialVersionUID = -5413586694735909486L;
-    
+
     private long tenantId = -1;
+
     private String hostname = "";
+
     private String userName = "";
-	private long threadId = -1;
+
+    private long threadId = -1;
 
     /**
      * Constructs a new exception with the specified detail message and cause.
@@ -66,81 +69,89 @@ public class BonitaException extends Exception implements BonitaContextException
         super(cause);
     }
 
-	/* (non-Javadoc)
-	 * @see org.bonitasoft.engine.exception.BonitaContextException#getTenantId()
-	 */
-	@Override
-	public long getTenantId() {
-		return tenantId;
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.exception.BonitaContextException#getTenantId()
+     */
+    @Override
+    public long getTenantId() {
+        return tenantId;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.bonitasoft.engine.exception.BonitaContextException#setTenantId(long)
-	 */
-	@Override
-	public void setTenantId(long tenantId) {
-		this.tenantId = tenantId;
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.exception.BonitaContextException#setTenantId(long)
+     */
+    @Override
+    public void setTenantId(long tenantId) {
+        this.tenantId = tenantId;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.bonitasoft.engine.exception.BonitaContextException#getHostname()
-	 */
-	@Override
-	public String getHostname() {
-		return hostname;
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.exception.BonitaContextException#getHostname()
+     */
+    @Override
+    public String getHostname() {
+        return hostname;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.bonitasoft.engine.exception.BonitaContextException#setHostname(java.lang.String)
-	 */
-	@Override
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.exception.BonitaContextException#setHostname(java.lang.String)
+     */
+    @Override
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.bonitasoft.engine.exception.BonitaContextException#getUserName()
-	 */
-	@Override
-	public String getUserName() {
-		return userName;
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.exception.BonitaContextException#getUserName()
+     */
+    @Override
+    public String getUserName() {
+        return userName;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.bonitasoft.engine.exception.BonitaContextException#setUserName(java.lang.String)
-	 */
-	@Override
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-	
-	public long getThreadId() {
-		return threadId;
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.bonitasoft.engine.exception.BonitaContextException#setUserName(java.lang.String)
+     */
+    @Override
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public void setThreadId(long threadId) {
-		this.threadId = threadId;
-	}
+    @Override
+    public long getThreadId() {
+        return threadId;
+    }
 
-	@Override
-	public String getMessage() {
-		return  getHostNameMessage() + getTenantIdMessage() + getUserNameMessage() + super.getMessage();
-	}
+    @Override
+    public void setThreadId(long threadId) {
+        this.threadId = threadId;
+    }
 
-	private String getHostNameMessage() {
-		return !hostname.isEmpty() ? "hostname "+hostname+ " " : "";
-	}
+    @Override
+    public String getMessage() {
+        return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage() + getUserNameMessage() + super.getMessage();
+    }
 
-	private String getUserNameMessage() {
-		return !userName.isEmpty() ? "userName " +userName + " " : "";
-	}
+    private String getThreadIdMessage() {
+        return threadId != -1 ? "threadId[" + threadId + "] " : "";
+    }
 
-	private String getTenantIdMessage() {
-		return tenantId != -1 ? "tenandId " +tenantId + " " : "";
-	}
-	
-	private String getThreadIdMessage() {
-		return threadId  != -1 ? "threadId[" +threadId + "] " : "";
-	}
+    private String getHostNameMessage() {
+        return hostname != null && !hostname.isEmpty() ? "hostname[" + hostname + "] " : "";
+    }
+
+    private String getUserNameMessage() {
+        return userName != null && !userName.isEmpty() ? "userName[" + userName + "] " : "";
+    }
+
+    private String getTenantIdMessage() {
+        return tenantId != -1 ? "tenandId[" + tenantId + "] " : "";
+    }
 
 }
