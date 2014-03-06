@@ -79,7 +79,8 @@ public class ParameterExpressionExecutorStrategy extends NonEmptyContentExpressi
         super.validate(expression);
         // $ can be part of variable name
         if (!expression.getContent().matches("(^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]*")) {
-            throw new SInvalidExpressionException("The expression content does not matches with (^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]* in expression: " + expression);
+            throw new SInvalidExpressionException("The expression content does not matches with (^[a-zA-Z]+|^\\$)[a-zA-Z0-9$]* in expression: " + expression,
+                    expression.getName());
         }
 
     }
