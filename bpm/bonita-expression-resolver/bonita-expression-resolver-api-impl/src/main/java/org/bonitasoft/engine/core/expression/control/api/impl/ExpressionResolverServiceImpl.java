@@ -121,10 +121,14 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
         final Map<ExpressionKind, List<SExpression>> expressionMapByKind = flattenDependencies(expressions);
         final List<SExpression> variableExpressions = expressionMapByKind.get(new ExpressionKind(ExpressionType.TYPE_VARIABLE.name()));
-        if (evaluationContext.isEvaluateInDefinition() && variableExpressions != null && variableExpressions.size() > 0
-                && !variablesAreAllProvided(variableExpressions, evaluationContext)) {
-            // We forbid the evaluation of expressions of type VARIABLE at process definition level:
-            throw new SInvalidExpressionException("Evaluation of expressions of type VARIABLE is forbidden at process definition level");
+
+        if (evaluationContext.isEvaluateInDefinition() && variableExpressions != null && variableExpressions.size() > 0) {
+            final SExpression expressionNotProvided = variablesAreAllProvided(variableExpressions, evaluationContext);
+            if (expressionNotProvided != null) {
+                // We forbid the evaluation of expressions of type VARIABLE at process definition level:
+                throw new SExpressionEvaluationException("Evaluation of expressions of type VARIABLE is forbidden at process definition level.",
+                        expressionNotProvided.getName());
+            }
         }
         for (final ExpressionKind kind : ExpressionExecutorStrategy.NO_DEPENDENCY_EXPRESSION_EVALUATION_ORDER) {
             resolvedExpressions.putAll(evaluateExpressionsOfKind(dependencyValues, expressionMapByKind.get(kind), kind, dataReplacement, resolvedExpressions));
@@ -133,15 +137,16 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         return resolvedExpressions;
     }
 
-    private boolean variablesAreAllProvided(final List<SExpression> variableExpressions, final SExpressionContext evaluationContext) {
-        boolean containsAll = true;
+    private SExpression variablesAreAllProvided(final List<SExpression> variableExpressions, final SExpressionContext evaluationContext) {
         final Iterator<SExpression> iterator = variableExpressions.iterator();
         final Map<String, Object> inputValues = evaluationContext.getInputValues();
-        while (containsAll && iterator.hasNext()) {
+        while (iterator.hasNext()) {
             final SExpression next = iterator.next();
-            containsAll = inputValues.containsKey(next.getContent());
+            if (!inputValues.containsKey(next.getContent())) {
+                return next;
+            }
         }
-        return containsAll;
+        return null;
     }
 
     private Map<? extends Integer, ? extends Object> evaluateExpressionWithResolvedDependencies(final SExpression sExpression,
@@ -214,14 +219,14 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         return expressionMapByKind;
     }
 
-    private void fillContext(final SExpressionContext evaluationContext, final Map<String, Object> dependencyValues) throws SInvalidExpressionException {
+    private void fillContext(final SExpressionContext evaluationContext, final Map<String, Object> dependencyValues) throws SExpressionEvaluationException {
         if (evaluationContext.getContainerId() == null && evaluationContext.getProcessDefinitionId() != null) {
             try {
                 final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(evaluationContext.getProcessDefinitionId());
                 evaluationContext.setProcessDefinition(processDefinition);
                 evaluationContext.setEvaluateInDefinition(true);
             } catch (final SBonitaException e) {
-                throw new SInvalidExpressionException("Process definition not found with id " + evaluationContext.getProcessDefinitionId(), e);
+                throw new SExpressionEvaluationException("Process definition not found with id = <" + evaluationContext.getProcessDefinitionId() + ">", e, null);
             }
         }
         if (evaluationContext.getContainerId() != null) {

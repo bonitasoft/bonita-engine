@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,6 +22,7 @@ import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 
 /**
  * @author Zhao Na
+ * @author Celine Souchet
  */
 public class SExpressionBuilderImpl implements SExpressionBuilder {
 
@@ -32,11 +33,10 @@ public class SExpressionBuilderImpl implements SExpressionBuilder {
         this.expression = expression;
     }
 
-
     @Override
     public SExpression done() throws SInvalidExpressionException {
         if (expression.getReturnType() == null) {
-            throw new SInvalidExpressionException("Expression return type must be set");
+            throw new SInvalidExpressionException("Expression return type must be set.", expression.getName());
         }
         return expression;
     }

@@ -35,8 +35,8 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
-import org.bonitasoft.engine.exception.BonitaContextException;
 import org.bonitasoft.engine.dependency.model.ScopeType;
+import org.bonitasoft.engine.exception.BonitaContextException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -71,7 +71,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     private static final String SESSION = "session";
 
-	private static final String IS_NODE_STARTED_METHOD_NAME = "isNodeStarted";
+    private static final String IS_NODE_STARTED_METHOD_NAME = "isNodeStarted";
 
     private static final long serialVersionUID = -161775388604256321L;
 
@@ -80,10 +80,10 @@ public class ServerAPIImpl implements ServerAPI {
     private final boolean cleanSession;
 
     private TechnicalLoggerService technicalLogger;
-    
+
     private String hostname = null;
 
-	private boolean hostnameResolutionAlreadyTried = false;
+    private boolean hostnameResolutionAlreadyTried = false;
 
     private enum SessionType {
         PLATFORM, API;
@@ -104,44 +104,45 @@ public class ServerAPIImpl implements ServerAPI {
 
     /**
      * For Test Mock usage
+     * 
      * @param cleanSession
      * @param accessResolver
      */
     ServerAPIImpl(boolean cleanSession, APIAccessResolver accessResolver) {
-    	this.cleanSession = cleanSession;
-    	this.accessResolver = accessResolver;
-	}
+        this.cleanSession = cleanSession;
+        this.accessResolver = accessResolver;
+    }
 
-	void setTechnicalLogger(final TechnicalLoggerService technicalLoggerService) {
+    void setTechnicalLogger(final TechnicalLoggerService technicalLoggerService) {
         technicalLogger = technicalLoggerService;
     }
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
-    	technicalTraceLog("Starting ", apiInterfaceName, methodName);
+        technicalTraceLog("Starting ", apiInterfaceName, methodName);
         final ClassLoader baseClassLoader = Thread.currentThread().getContextClassLoader();
         SessionAccessor sessionAccessor = null;
         Session session = null;
         try {
             try {
-            	session = (Session) options.get(SESSION);
+                session = (Session) options.get(SESSION);
                 sessionAccessor = beforeInvokeMethod(session, apiInterfaceName);
                 return invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
             } catch (final ServerAPIRuntimeException sapire) {
                 throw sapire.getCause();
             }
         } catch (final BonitaRuntimeException bre) {
-        	fillGlobalContextForException(sessionAccessor, session, bre);
+            fillGlobalContextForException(sessionAccessor, session, bre);
             throw createServerWrappedException(bre);
         } catch (final BonitaException be) {
-        	fillGlobalContextForException(sessionAccessor, session, be);
+            fillGlobalContextForException(sessionAccessor, session, be);
             throw createServerWrappedException(be);
         } catch (final UndeclaredThrowableException ute) {
             technicalDebugLog(ute);
-			throw createServerWrappedException(ute);
+            throw createServerWrappedException(ute);
         } catch (final Throwable cause) {
-        	technicalDebugLog(cause);
+            technicalDebugLog(cause);
             final BonitaRuntimeException throwableToWrap = new BonitaRuntimeException(cause);
             fillGlobalContextForException(sessionAccessor, session, throwableToWrap);
             throw createServerWrappedException(throwableToWrap);
@@ -153,77 +154,76 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-	private ServerWrappedException createServerWrappedException(final Throwable throwableToWrap) {
-		return new ServerWrappedException(throwableToWrap);
-	}
-
-    private void fillGlobalContextForException(SessionAccessor sessionAccessor, Session session, BonitaContextException be) {
-    	fillTenantIdContextForException(sessionAccessor, be);
-    	fillUserNameContextForException(session, be);
-    	fillHostnameContextForException(be);
-    	fillThreadIdContextForException(be);
+    private ServerWrappedException createServerWrappedException(final Throwable throwableToWrap) {
+        return new ServerWrappedException(throwableToWrap);
     }
 
-	private void fillThreadIdContextForException(BonitaContextException be) {
-		be.setThreadId(Thread.currentThread().getId());
-	}
+    private void fillGlobalContextForException(final SessionAccessor sessionAccessor, final Session session, final BonitaContextException be) {
+        fillTenantIdContextForException(sessionAccessor, be);
+        fillUserNameContextForException(session, be);
+        fillHostnameContextForException(be);
+        fillThreadIdContextForException(be);
+    }
 
-	private void fillHostnameContextForException(BonitaContextException be) {
-		if(hostname == null && !hostnameResolutionAlreadyTried ){
-    		hostnameResolutionAlreadyTried = true;
-    		try {
-				hostname = InetAddress.getLocalHost().getHostName();
-			} catch (UnknownHostException e) {
-				technicalDebugLog(e);
-			}
-    	}
-    	if(hostname != null){
-    		be.setHostname(hostname);
-    	}
-	}
+    private void fillThreadIdContextForException(final BonitaContextException be) {
+        be.setThreadId(Thread.currentThread().getId());
+    }
 
-	private void fillUserNameContextForException(Session session, BonitaContextException be) {
-		if (session != null) {
-    		final String userName = session.getUserName();
-    		if(userName != null){
-    			be.setUserName(userName);
-    		}
-    	}
-	}
+    private void fillHostnameContextForException(final BonitaContextException be) {
+        if (hostname == null && !hostnameResolutionAlreadyTried) {
+            hostnameResolutionAlreadyTried = true;
+            try {
+                hostname = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                technicalDebugLog(e);
+            }
+        }
+        if (hostname != null) {
+            be.setHostname(hostname);
+        }
+    }
 
-	private void fillTenantIdContextForException(SessionAccessor sessionAccessor,
-			BonitaContextException be) {
-		if (sessionAccessor != null) {
-    		long tenantId = -1;
-    		try {
-    			tenantId = sessionAccessor.getTenantId();
-    		} catch (STenantIdNotSetException e) {
-    			technicalDebugLog(e);
-    		}
-    		be.setTenantId(tenantId);
-    	}
-	}
+    private void fillUserNameContextForException(final Session session, final BonitaContextException be) {
+        if (session != null) {
+            final String userName = session.getUserName();
+            if (userName != null) {
+                be.setUserName(userName);
+            }
+        }
+    }
 
-	private void cleanSessionIfNeeded(SessionAccessor sessionAccessor) {
-		if (cleanSession) {
-		    // clean session id
-		    if (sessionAccessor != null) {
-		        sessionAccessor.deleteSessionId();
-		    }
-		}
-	}
+    private void fillTenantIdContextForException(final SessionAccessor sessionAccessor, final BonitaContextException be) {
+        if (sessionAccessor != null) {
+            long tenantId = -1;
+            try {
+                tenantId = sessionAccessor.getTenantId();
+            } catch (STenantIdNotSetException e) {
+                technicalDebugLog(e);
+            }
+            be.setTenantId(tenantId);
+        }
+    }
 
-	private void technicalDebugLog(final Throwable throwableToLog) {
-		if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-		    technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, throwableToLog);
-		}
-	}
-	
-	private void technicalTraceLog(String prefix, String apiInterfaceName, String methodName) {
-		if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-		    technicalLogger.log(this.getClass(), TechnicalLogSeverity.TRACE,prefix + "Server API call "+ apiInterfaceName+" "+methodName);
-		}		
-	}
+    private void cleanSessionIfNeeded(SessionAccessor sessionAccessor) {
+        if (cleanSession) {
+            // clean session id
+            if (sessionAccessor != null) {
+                sessionAccessor.deleteSessionId();
+            }
+        }
+    }
+
+    private void technicalDebugLog(final Throwable throwableToLog) {
+        if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, throwableToLog);
+        }
+    }
+
+    private void technicalTraceLog(String prefix, String apiInterfaceName, String methodName) {
+        if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            technicalLogger.log(this.getClass(), TechnicalLogSeverity.TRACE, prefix + "Server API call " + apiInterfaceName + " " + methodName);
+        }
+    }
 
     private static final class ServerAPIRuntimeException extends RuntimeException {
 
@@ -236,8 +236,8 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     SessionAccessor beforeInvokeMethod(final Session session, final String apiInterfaceName) throws BonitaHomeNotSetException,
-    InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException, NoSuchMethodException,
-    InvocationTargetException, SBonitaException {
+            InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException, NoSuchMethodException,
+            InvocationTargetException, SBonitaException {
         SessionAccessor sessionAccessor = null;
 
         final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
@@ -249,15 +249,15 @@ public class ServerAPIImpl implements ServerAPI {
             sessionAccessor = serviceAccessorFactory.createSessionAccessor();
             switch (sessionType) {
                 case PLATFORM:
-                	serverClassLoader = beforeInvokeMethodForPlatformSession(sessionAccessor, platformServiceAccessor, session);
+                    serverClassLoader = beforeInvokeMethodForPlatformSession(sessionAccessor, platformServiceAccessor, session);
                     break;
 
                 case API:
-				serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, serviceAccessorFactory, platformServiceAccessor, session);
+                    serverClassLoader = beforeInvokeMethodForAPISession(sessionAccessor, serviceAccessorFactory, platformServiceAccessor, session);
                     break;
 
-            default:
-                throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
+                default:
+                    throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
             }
         } else if (accessResolver.needSession(apiInterfaceName)) {
             throw new InvalidSessionException("Session is null!");
@@ -269,45 +269,36 @@ public class ServerAPIImpl implements ServerAPI {
         return sessionAccessor;
     }
 
-	private ClassLoader beforeInvokeMethodForAPISession(
-			SessionAccessor sessionAccessor,
-			final ServiceAccessorFactory serviceAccessorFactory,
-			final PlatformServiceAccessor platformServiceAccessor,
-			final Session session) throws SSchedulerException,
-			org.bonitasoft.engine.session.SSessionException,
-			ClassLoaderException, SBonitaException, BonitaHomeNotSetException,
-			IOException, BonitaHomeConfigurationException,
-			NoSuchMethodException, InstantiationException,
-			IllegalAccessException, InvocationTargetException {
-		ClassLoader serverClassLoader;
-		final SessionService sessionService = platformServiceAccessor.getSessionService();
+    private ClassLoader beforeInvokeMethodForAPISession(final SessionAccessor sessionAccessor, final ServiceAccessorFactory serviceAccessorFactory,
+            final PlatformServiceAccessor platformServiceAccessor, final Session session) throws SSchedulerException,
+            org.bonitasoft.engine.session.SSessionException, ClassLoaderException, SBonitaException, BonitaHomeNotSetException, IOException,
+            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        ClassLoader serverClassLoader;
+        final SessionService sessionService = platformServiceAccessor.getSessionService();
 
-		checkTenantSession(platformServiceAccessor, session);
-		sessionService.renewSession(session.getId());
-		sessionAccessor.setSessionInfo(session.getId(), ((APISession) session).getTenantId());
-		serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
-		setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(((APISession) session).getTenantId()).getTechnicalLoggerService());
-		return serverClassLoader;
-	}
+        checkTenantSession(platformServiceAccessor, session);
+        sessionService.renewSession(session.getId());
+        sessionAccessor.setSessionInfo(session.getId(), ((APISession) session).getTenantId());
+        serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
+        setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(((APISession) session).getTenantId()).getTechnicalLoggerService());
+        return serverClassLoader;
+    }
 
-	private ClassLoader beforeInvokeMethodForPlatformSession(
-			SessionAccessor sessionAccessor,
-			final PlatformServiceAccessor platformServiceAccessor,
-			final Session session) throws SSessionException,
-			ClassLoaderException {
-		ClassLoader serverClassLoader;
-		final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
-		final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
+    private ClassLoader beforeInvokeMethodForPlatformSession(final SessionAccessor sessionAccessor, final PlatformServiceAccessor platformServiceAccessor,
+            final Session session) throws SSessionException, ClassLoaderException {
+        ClassLoader serverClassLoader;
+        final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
+        final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
 
-		if (!loginService.isValid(session.getId())) {
-		    throw new InvalidSessionException("Invalid session");
-		}
-		platformSessionService.renewSession(session.getId());
-		sessionAccessor.setSessionInfo(session.getId(), -1);
-		serverClassLoader = getPlatformClassLoader(platformServiceAccessor);
-		setTechnicalLogger(platformServiceAccessor.getTechnicalLoggerService());
-		return serverClassLoader;
-	}
+        if (!loginService.isValid(session.getId())) {
+            throw new InvalidSessionException("Invalid session");
+        }
+        platformSessionService.renewSession(session.getId());
+        sessionAccessor.setSessionInfo(session.getId(), -1);
+        serverClassLoader = getPlatformClassLoader(platformServiceAccessor);
+        setTechnicalLogger(platformServiceAccessor.getTechnicalLoggerService());
+        return serverClassLoader;
+    }
 
     private SessionType getSessionType(final Session session) {
         SessionType sessionType = null;
@@ -386,20 +377,20 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     protected UserTransactionService selectUserTransactionService(final Session session, final SessionType sessionType) throws BonitaHomeNotSetException,
-    InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         UserTransactionService transactionService = null;
         final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
         final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
         switch (sessionType) {
-        case PLATFORM:
-            transactionService = platformServiceAccessor.getTransactionService();
-            break;
-        case API:
-            final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
-            transactionService = tenantAccessor.getUserTransactionService();
-            break;
-        default:
-            throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
+            case PLATFORM:
+                transactionService = platformServiceAccessor.getTransactionService();
+                break;
+            case API:
+                final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
+                transactionService = tenantAccessor.getUserTransactionService();
+                break;
+            default:
+                throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
         }
         return transactionService;
     }

@@ -41,7 +41,7 @@ public class ConstantExpressionExecutorStrategy implements ExpressionExecutorStr
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if (expression.getContent().trim().equals("")) {
-            throw new SInvalidExpressionException("The expresssion content cannot be empty. Expression: " + expression);
+            throw new SInvalidExpressionException("The expresssion content cannot be empty. Expression : " + expression, expression.getName());
         }
     }
 
