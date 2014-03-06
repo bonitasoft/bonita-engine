@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.events;
+package org.bonitasoft.engine.events.impl;
 
 import java.util.ArrayList;
 import java.util.List;
