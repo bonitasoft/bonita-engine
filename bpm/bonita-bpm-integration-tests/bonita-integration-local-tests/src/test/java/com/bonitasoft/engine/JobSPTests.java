@@ -41,6 +41,6 @@ public class JobSPTests extends CommonAPILocalTest {
                 return jobs.contains("DeleteBatchJob");
             }
         };
-        assertTrue("delete batch job is not registered", getTenantAccessor().getTransactionService().executeInTransaction(callable));
+        assertTrue("delete batch job is not registered", getPlatformAccessor().getTransactionService().executeInTransaction(callable));
     }
 }

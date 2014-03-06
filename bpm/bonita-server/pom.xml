@@ -576,11 +576,6 @@
       <artifactId>bonita-process-instance-model-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.bonitasoft.engine.core.process.instance</groupId>
-      <artifactId>bonita-process-instance-model-impl-hibernate</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- Recorder -->
     <dependency>
@@ -1031,8 +1026,6 @@
                   <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
                   <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
-                  <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-hibernate</include>
-                  <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-hibernate</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
                   <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>

@@ -27,6 +27,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -61,7 +62,7 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         try {
             final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
             processDefinitionID = flowNodeInstance.getLogicalGroup(0);
-            processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionID);
+            processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionID);
             // set the classloader and update activity instance variable
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {

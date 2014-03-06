@@ -94,12 +94,12 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     protected void changeToNode1() throws Exception {
-        setConnectionPort("7180");
+        setConnectionPort("8186");
         changeApis();
     }
 
     protected void changeToNode2() throws Exception {
-        setConnectionPort("7280");
+        setConnectionPort("8187");
         changeApis();
     }
 
