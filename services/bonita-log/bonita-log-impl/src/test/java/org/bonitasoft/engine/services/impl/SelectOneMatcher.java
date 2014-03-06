@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,28 +11,30 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.execution;
+package org.bonitasoft.engine.services.impl;
 
-import java.util.List;
-
-import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.persistence.AbstractSelectDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.mockito.ArgumentMatcher;
 
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class FlowNodeNameFilter implements Filter<SFlowNodeDefinition>{
+public class SelectOneMatcher extends ArgumentMatcher<SelectOneDescriptor<?>>{
     
-    private List<String> flowNodeNames;
+    
+    private String queryName;
 
-    public FlowNodeNameFilter(List<String> flowNodeNames) {
-        this.flowNodeNames = flowNodeNames;
+    public SelectOneMatcher(String queryName) {
+        this.queryName = queryName;
     }
 
     @Override
-    public boolean mustSelect(SFlowNodeDefinition element) {
-        return flowNodeNames.contains(element.getName());
+    public boolean matches(Object argument) {
+        return (argument instanceof AbstractSelectDescriptor)
+                && queryName.equals(((AbstractSelectDescriptor<?>)argument).getQueryName());
     }
 
 }

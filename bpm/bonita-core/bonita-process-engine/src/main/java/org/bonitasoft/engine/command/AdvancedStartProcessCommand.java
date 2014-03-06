@@ -19,8 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.ProcessStarter;
+import org.bonitasoft.engine.bpm.process.ProcessActivationException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.execution.AdvancedStartProcessValidator;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -68,19 +72,29 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
 
         ProcessInstance processInstance;
         try {
-            // validate inputs
-            final AdvancedStartProcessValidator validator = new AdvancedStartProcessValidator(serviceAccessor.getProcessDefinitionService(),
-                    processDefinitionId);
-            final List<String> problems = validator.validate(activityNames);
-            handleProblems(problems);
+            validateInputs(serviceAccessor, processDefinitionId, activityNames);
 
-            // start the process
-            final ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context, activityNames);
-            processInstance = starter.start();
+            processInstance = startProcess(processDefinitionId, activityNames, startedBy, context, operations);
         } catch (final Exception e) {
             throw new SCommandExecutionException(e);
         }
         return processInstance;
+    }
+
+    private ProcessInstance startProcess(final long processDefinitionId, final List<String> activityNames, final long startedBy,
+            final Map<String, Serializable> context, final List<Operation> operations) throws ProcessDefinitionNotFoundException, ProcessActivationException,
+            ProcessExecutionException {
+        ProcessInstance processInstance;
+        final ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context, activityNames);
+        processInstance = starter.start();
+        return processInstance;
+    }
+
+    private void validateInputs(final TenantServiceAccessor serviceAccessor, final long processDefinitionId, final List<String> activityNames)
+            throws SBonitaException, SCommandExecutionException {
+        final AdvancedStartProcessValidator validator = new AdvancedStartProcessValidator(serviceAccessor.getProcessDefinitionService(), processDefinitionId);
+        final List<String> problems = validator.validate(activityNames);
+        handleProblems(problems);
     }
 
     private void handleProblems(final List<String> problems) throws SCommandExecutionException {

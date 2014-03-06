@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,34 +11,35 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.log.asyncflush;
+package org.bonitasoft.engine.services.impl;
 
-import java.io.Serializable;
-import java.util.Map;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.mockito.ArgumentMatcher;
 
-import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.scheduler.StatelessJob;
 
 /**
  * @author Elias Ricken de Medeiros
- * @author Nicolas Chabanoles
- * @author Matthieu Chaffotte
+ *
  */
-public abstract class AbstractJob implements StatelessJob {
+public class SelectByIdMatcher extends ArgumentMatcher<SelectByIdDescriptor<?>>{
+    
+    
+    private String queryName;
+    private long id;
 
-    private static final long serialVersionUID = -3584220845546380513L;
-
-    private String name;
-
-    @Override
-    public String getName() {
-        return name;
+    public SelectByIdMatcher(String queryName, long id) {
+        this.queryName = queryName;
+        this.id = id;
     }
 
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) {
-        NullCheckingUtil.checkArgsNotNull(attributes.get("name"));
-        name = (String) attributes.get("name");
+    public boolean matches(Object argument) {
+        if (!(argument instanceof SelectByIdDescriptor)) {
+            return false;
+        }
+        SelectByIdDescriptor<?> selectDescriptor = (SelectByIdDescriptor<?>)argument;
+        return queryName.equals(selectDescriptor.getQueryName())
+                && id == selectDescriptor.getId();
     }
 
 }

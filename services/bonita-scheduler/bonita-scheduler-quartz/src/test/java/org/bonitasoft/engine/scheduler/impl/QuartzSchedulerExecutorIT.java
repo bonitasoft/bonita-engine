@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class QuartzSchedulerExecutorIT {
             Thread.sleep(50);
         } while (!isInState && startTime + timeout > System.currentTimeMillis());
         if (!isInState) {
-            Fail.fail("the trigger is not in the state" + state);
+            fail("the trigger is not in the state" + state);
         }
     }
 

@@ -52,12 +52,12 @@ public class FlowNodeNameFilterTest {
     
     @Test
     public void select_return_true_if_name_is_contained_in_the_list() throws Exception {
-        assertTrue(new FlowNodeNameFilter(names).select(flowNode1));
+        assertTrue(new FlowNodeNameFilter(names).mustSelect(flowNode1));
     }
 
     @Test
     public void select_return_false_if_name_is_contained_in_the_list() throws Exception {
-        assertFalse(new FlowNodeNameFilter(names).select(flowNode2));
+        assertFalse(new FlowNodeNameFilter(names).mustSelect(flowNode2));
     }
 
 }
