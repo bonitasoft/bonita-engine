@@ -117,7 +117,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
                 message = "No message";
             }
             throw new SExpressionEvaluationException("Groovy script throws an exception of type " + e.getClass() + " with message = " + message
-                    + System.lineSeparator() + "Expression : " + expression, e, expressionName);
+                    + System.getProperty("line.separator") + "Expression : " + expression, e, expressionName);
         }
     }
 

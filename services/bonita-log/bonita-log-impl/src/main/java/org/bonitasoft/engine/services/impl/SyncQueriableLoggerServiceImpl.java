@@ -55,7 +55,7 @@ public class SyncQueriableLoggerServiceImpl extends AbstractQueriableLoggerImpl 
             }
 
         } catch (final SPersistenceException e) {
-            final String message = "Error while persisting logs transaction :" + System.lineSeparator() + "Logs " + loggableLogs;
+            final String message = "Error while persisting logs transaction :" + System.getProperty("line.separator") + "Logs " + loggableLogs;
             if (logger != null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, message, e);
             }
