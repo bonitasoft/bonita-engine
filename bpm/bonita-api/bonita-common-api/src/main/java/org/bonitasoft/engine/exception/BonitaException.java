@@ -135,11 +135,11 @@ public class BonitaException extends Exception implements BonitaContextException
 
     @Override
     public String getMessage() {
-        return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage() + getUserNameMessage() + super.getMessage();
+        return getThreadIdMessage() + " | " + getHostNameMessage() + " | " + getTenantIdMessage() + " | " + getUserNameMessage() + " | " + super.getMessage();
     }
 
     private String getThreadIdMessage() {
-        return threadId != -1 ? "threadId[" + threadId + "] " : "";
+        return "threadId[" + (threadId != -1 ? threadId : "NA") + "] ";
     }
 
     private String getHostNameMessage() {

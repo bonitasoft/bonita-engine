@@ -106,7 +106,7 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
 
     @Override
     public String getMessage() {
-        return getThreadIdMessage() + getHostNameMessage() + getTenantIdMessage() + getUserNameMessage() + super.getMessage();
+        return getThreadIdMessage() + " | " + getHostNameMessage() + " | " + getTenantIdMessage() + " | " + getUserNameMessage() + " | " + super.getMessage();
     }
 
     private String getThreadIdMessage() {
