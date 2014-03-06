@@ -157,11 +157,11 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if (expression == null) {
-            throw new SInvalidExpressionException("The expression cannot be null.");
+            throw new SInvalidExpressionException("The expression cannot be null.", null);
         }
         final String expressionContent = expression.getContent();
         if (expressionContent == null) {
-            throw new SInvalidExpressionException("The expression content cannot be null: " + expression);
+            throw new SInvalidExpressionException("The expression content cannot be null : " + expression, expression.getName());
         }
     }
 

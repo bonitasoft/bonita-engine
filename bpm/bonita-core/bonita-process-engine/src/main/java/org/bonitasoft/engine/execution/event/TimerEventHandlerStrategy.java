@@ -38,6 +38,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
+import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.jobs.TriggerTimerEventJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -92,11 +93,12 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
             expressionContext = new SExpressionContext();
             expressionContext.setProcessDefinitionId(processDefinitionId);
         }
-        final Object result = expressionResolverService.evaluate(timerTrigger.getTimerExpression(), expressionContext);
+        final SExpression timerExpression = timerTrigger.getTimerExpression();
+        final Object result = expressionResolverService.evaluate(timerExpression, expressionContext);
         Date startDate = null;
         Trigger trigger = null;
         if (result == null) {
-            throw new SInvalidExpressionException("The duration cannot be null");
+            throw new SInvalidExpressionException("The duration cannot be null.", timerExpression.getName());
         }
         switch (timerTrigger.getTimerType()) {
             case DURATION:
