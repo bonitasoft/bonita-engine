@@ -335,7 +335,6 @@ import org.bonitasoft.engine.expression.ExpressionEvaluationException;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -4901,8 +4900,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             return (Serializable) expressionResolverService.evaluate(sExpression, expcontext);
         } catch (final SExpressionEvaluationException e) {
             throw new ExpressionEvaluationException(e, e.getExpressionName());
-        } catch (final SInvalidExpressionException e) {
-            throw new ExpressionEvaluationException(e, e.getExpressionName());
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e, null);
         }
@@ -5286,8 +5283,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             return evaluateExpressionInArchiveProcessInstance;
         } catch (final SExpressionEvaluationException e) {
             throw new ExpressionEvaluationException(e, e.getExpressionName());
-        } catch (final SInvalidExpressionException e) {
-            throw new ExpressionEvaluationException(e, e.getExpressionName());
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e, null);
         }
@@ -5302,8 +5297,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                     lastArchivedProcessInstance.getProcessDefinitionId(), lastArchivedProcessInstance.getArchiveDate().getTime());
         } catch (final SExpressionEvaluationException e) {
             throw new ExpressionEvaluationException(e, e.getExpressionName());
-        } catch (final SInvalidExpressionException e) {
-            throw new ExpressionEvaluationException(e, e.getExpressionName());
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e, null);
         }
@@ -5317,8 +5310,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             return evaluateExpressionsInstanceLevel(expressions, processInstanceId, CONTAINER_TYPE_PROCESS_INSTANCE, sProcessInstance.getProcessDefinitionId());
         } catch (final SExpressionEvaluationException e) {
             throw new ExpressionEvaluationException(e, e.getExpressionName());
-        } catch (final SInvalidExpressionException e) {
-            throw new ExpressionEvaluationException(e, e.getExpressionName());
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e, null);
         }
@@ -5330,8 +5321,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             return evaluateExpressionsDefinitionLevel(expressions, processDefinitionId);
         } catch (final SExpressionEvaluationException e) {
-            throw new ExpressionEvaluationException(e, e.getExpressionName());
-        } catch (final SInvalidExpressionException e) {
             throw new ExpressionEvaluationException(e, e.getExpressionName());
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e, null);
@@ -5347,8 +5336,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             return evaluateExpressionsInstanceLevel(expressions, activityInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE,
                     sProcessInstance.getProcessDefinitionId());
         } catch (final SExpressionEvaluationException e) {
-            throw new ExpressionEvaluationException(e, e.getExpressionName());
-        } catch (final SInvalidExpressionException e) {
             throw new ExpressionEvaluationException(e, e.getExpressionName());
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e, null);
@@ -5368,8 +5355,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final ActivityInstanceNotFoundException e) {
             throw new ExpressionEvaluationException(e, null);
         } catch (final SExpressionEvaluationException e) {
-            throw new ExpressionEvaluationException(e, e.getExpressionName());
-        } catch (final SInvalidExpressionException e) {
             throw new ExpressionEvaluationException(e, e.getExpressionName());
         } catch (final SBonitaException e) {
             throw new ExpressionEvaluationException(e, null);

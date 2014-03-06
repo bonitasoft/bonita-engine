@@ -57,7 +57,7 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
         // $ can be part of variable name
         super.validate(expression);
         if (!SourceVersion.isIdentifier(expression.getContent())) {
-            throw new SInvalidExpressionException(expression.getContent() + " is not a valid data name in expression : " + expression, expression.getName());
+            throw new SInvalidExpressionException(expression.getContent() + " is not a valid data name in expression: " + expression);
         }
     }
 

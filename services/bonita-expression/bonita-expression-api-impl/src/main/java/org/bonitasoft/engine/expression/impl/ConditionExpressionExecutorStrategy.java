@@ -192,8 +192,7 @@ public class ConditionExpressionExecutorStrategy extends NonEmptyContentExpressi
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         super.validate(expression);
         if (!validOperators.contains(expression.getContent())) {
-            throw new SInvalidExpressionException("The content of expression must be among: " + validOperators + " for expression: " + expression.toString(),
-                    expression.getName());
+            throw new SInvalidExpressionException("The content of expression must be among: " + validOperators + " for expression: " + expression.toString());
         }
     }
 

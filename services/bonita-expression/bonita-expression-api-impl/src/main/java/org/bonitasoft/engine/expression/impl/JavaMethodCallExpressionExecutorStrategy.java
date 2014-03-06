@@ -49,8 +49,7 @@ public class JavaMethodCallExpressionExecutorStrategy extends NonEmptyContentExp
         super.validate(expression);
         if (expression.getDependencies() == null || expression.getDependencies().size() != 1) {
             throw new SInvalidExpressionException("An expression of type " + TYPE_JAVA_METHOD_CALL
-                    + " must have exactly one dependency. This dependency represents the object where the method will be called. Expression :" + expression,
-                    expression.getName());
+                    + " must have exactly one dependency. This dependency represents the object where the method will be called. Expression:" + expression);
         }
     }
 

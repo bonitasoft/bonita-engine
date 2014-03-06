@@ -296,8 +296,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if (ExpressionConstantsResolver.getExpressionConstantsFromName(expression.getContent()) == null) {
-            throw new SInvalidExpressionException("Unable to get Engine Constant '" + expression.getContent() + "' in expression: " + expression,
-                    expression.getName());
+            throw new SInvalidExpressionException("Unable to get Engine Constant '" + expression.getContent() + "' in expression: " + expression);
         }
     }
 
