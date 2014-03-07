@@ -205,14 +205,14 @@ public class PlatformTest {
         if (threadGroup != null && threadGroup.getName().equals("system")) {
             return false;
         }
-        List<String> startWithFilter = Arrays.asList("H2 ", "BoneCP", "bitronix", "main", "Reference Handler", "Signal Dispatcher", "Finalizer",
+        List<String> threadsNotClosedAtNodeStop = Arrays.asList("H2 ", "BoneCP", "bitronix", "main", "Reference Handler", "Signal Dispatcher", "Finalizer",
                 "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
                 "Abandoned connection cleanup thread"/* bonecp related */, "hz."/*
                                                                                  * hazelcast
                                                                                  * related
                                                                                  */);
-        for (String prefix : startWithFilter) {
-            if (name.startsWith(prefix)) {
+        for (String threadName : threadsNotClosedAtNodeStop) {
+            if (name.startsWith(threadName)) {
                 return false;
             }
         }
