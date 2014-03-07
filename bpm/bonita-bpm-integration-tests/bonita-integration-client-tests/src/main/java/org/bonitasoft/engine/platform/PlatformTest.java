@@ -5,20 +5,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.session.APISession;
@@ -159,63 +150,4 @@ public class PlatformTest {
         }
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "all thread must be stopped after calling stop node.", jira = "BS-2353")
-    @Test
-    public void should_stopNode_stop_all_engine_threads() throws Exception {
-        LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
-        APISession tenantSession = loginAPI.login("install", "install");
-        ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(tenantSession);
-        // this will add something in process cache
-        ProcessDefinition processDefinition = processAPI.deployAndEnableProcess(new ProcessDefinitionBuilder().createNewInstance("aProcess", "plop").done());
-        platformAPI.stopNode();
-        // wait for thread to stop
-        checkThreadsAreStopped();
-        platformAPI.startNode();
-        loginAPI = TenantAPIAccessor.getLoginAPI();
-        tenantSession = loginAPI.login("install", "install");
-        processAPI = TenantAPIAccessor.getProcessAPI(tenantSession);
-        // check cache still works
-        processAPI.getProcessDefinition(processDefinition.getId());
-        processAPI.disableAndDeleteProcessDefinition(processDefinition.getId());
-    }
-
-    private void checkThreadsAreStopped() throws InterruptedException {
-        Set<Thread> keySet = Thread.getAllStackTraces().keySet();
-        Iterator<Thread> iterator = keySet.iterator();
-        ArrayList<Thread> list = new ArrayList<Thread>();
-        while (iterator.hasNext()) {
-            Thread thread = iterator.next();
-            if (isEngine(thread)) {
-                // wait for the thread to die
-                thread.join(5000);
-                // if still alive print it
-                if (thread.isAlive()) {
-                    list.add(thread);
-                }
-            }
-        }
-        if (!list.isEmpty()) {
-            throw new IllegalStateException("some threads are still active" + list);
-        }
-    }
-
-    private boolean isEngine(final Thread thread) {
-        String name = thread.getName();
-        ThreadGroup threadGroup = thread.getThreadGroup();
-        if (threadGroup != null && threadGroup.getName().equals("system")) {
-            return false;
-        }
-        List<String> threadsNotClosedAtNodeStop = Arrays.asList("H2 ", "BoneCP", "bitronix", "main", "Reference Handler", "Signal Dispatcher", "Finalizer",
-                "com.google.common.base.internal.Finalizer"/* guava, used by bonecp */, "process reaper", "ReaderThread",
-                "Abandoned connection cleanup thread"/* bonecp related */, "hz."/*
-                                                                                 * hazelcast
-                                                                                 * related
-                                                                                 */);
-        for (String threadName : threadsNotClosedAtNodeStop) {
-            if (name.startsWith(threadName)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
