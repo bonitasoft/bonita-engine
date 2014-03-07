@@ -13,36 +13,24 @@
  **/
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.execution.work.TransactionServiceForTest;
-import org.bonitasoft.engine.incident.IncidentService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
@@ -51,7 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
-public class ConnectorDefinitionAndInstanceContextWorkTest {
+public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractContextWorkTest{
 
     private static final String CONNECTOR_DEFINITION_NAME = "connector_name";
 
@@ -60,68 +48,18 @@ public class ConnectorDefinitionAndInstanceContextWorkTest {
     private static final long CONNECTOR_INSTANCE_ID = 10L;
 
     @Mock
-    private BonitaWork wrappedWork;
-
-    @Mock
-    private TenantServiceAccessor tenantAccessor;
-
-    @Mock
-    private SessionService sessionService;
-
-    @Mock
-    private IncidentService incidentService;
-
-    @Mock
-    private TechnicalLoggerService loggerService;
-
-    @Mock
-    private SessionAccessor sessionAccessor;
-
-    @Mock
     private ProcessDefinitionService processDefinitionService;
 
     @Mock
     private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
 
-    @Spy
-    private TransactionServiceForTest transactionService;
-
-    private ConnectorDefinitionAndInstanceContextWork txBonitawork;
-
     @Before
-    public void before() {
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
-        when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
-        when(tenantAccessor.getSessionService()).thenReturn(sessionService);
-        when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
-        doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
-
-        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID));
-        doReturn("The description").when(txBonitawork).getDescription();
-
-        doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
+    public void before() throws Exception {
+    	txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID));
+    	super.before();
     }
 
-    @Test
-    public void testWork() throws Exception {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
-        txBonitawork.work(singletonMap);
-        verify(wrappedWork, times(1)).work(singletonMap);
-    }
-
-    @Test
-    public void getDescription() {
-        when(wrappedWork.getDescription()).thenReturn("The description");
-        assertEquals("The description", txBonitawork.getDescription());
-    }
-
-    @Test
-    public void getRecoveryProcedure() {
-        when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
-        assertEquals("recoveryProcedure", txBonitawork.getRecoveryProcedure());
-    }
-
-    @Test
+       @Test
     public void handleFailureWithNameAndId() throws Throwable {
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         final SBonitaException e = new SBonitaException() {
@@ -155,28 +93,4 @@ public class ConnectorDefinitionAndInstanceContextWorkTest {
         assertTrue(e.getMessage().contains("CONNECTOR_ACTIVATION_EVENT = " + ACTIVATION_EVENT));
         verify(wrappedWork, times(1)).handleFailure(e, context);
     }
-
-    @Test
-    public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12l);
-        assertEquals(12, txBonitawork.getTenantId());
-    }
-
-    @Test
-    public void setTenantId() {
-        txBonitawork.setTenantId(12l);
-        verify(wrappedWork).setTenantId(12l);
-    }
-
-    @Test
-    public void getWrappedWork() {
-        assertEquals(wrappedWork, txBonitawork.getWrappedWork());
-    }
-
-    @Test
-    public void testToString() {
-        when(wrappedWork.toString()).thenReturn("the to string");
-        assertEquals("the to string", txBonitawork.toString());
-    }
-
 }

@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
+import org.bonitasoft.engine.execution.work.failurewrapping.GlobalContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.MessageInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessDefinitionContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessInstanceContextWork;
@@ -51,6 +52,7 @@ public class WorkFactoryTest {
         WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
         boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
         Assert.assertFalse("A lock Process Instance Work is used although there is no Target process", containsLockProcessInstance);
+        Assert.assertTrue("A GlobalContextWork is missing", containsGlobalContextWork(work));
     }
 
     @Test
@@ -59,6 +61,7 @@ public class WorkFactoryTest {
         WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
         boolean containsLockProcessInstance = containsLockProcessInstanceWork(work);
         Assert.assertTrue("A lock Process Instance Work is missing although there is a Target process", containsLockProcessInstance);
+        Assert.assertTrue("A GlobalContextWork is missing", containsGlobalContextWork(work));
     }
 
     @Test
@@ -66,6 +69,7 @@ public class WorkFactoryTest {
         WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteMessageCoupleWork(messageInstance, waitingMessageEvent);
         Assert.assertTrue("A MessageInstanceContextWork is missing", containsFailureHandlingMessageInstance(work));
         Assert.assertTrue("A FailureHandlingProcessDefinitionCOntextWork is missing", containsFailureHandlingProcessDefinition(work));
+        Assert.assertTrue("A GlobalContextWork is missing", containsGlobalContextWork(work));
     }
 
     @Test
@@ -74,12 +78,14 @@ public class WorkFactoryTest {
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
+        Assert.assertTrue("A GlobalContextWork is missing", containsGlobalContextWork(work));
     }
 
     @Test
     public void createExecuteConnectorOfProcess() {
         WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfProcess(1L, 2L, 4L, 3L, "connectorDefName", ConnectorEvent.ON_ENTER);
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
+        Assert.assertTrue("A GlobalContextWork is missing", containsGlobalContextWork(work));
     }
 
     @Test
@@ -87,6 +93,7 @@ public class WorkFactoryTest {
         WrappingBonitaWork work = (WrappingBonitaWork) WorkFactory.createExecuteConnectorOfActivity(1L, 3L, 4L, 5L, 6, "connectorDefName");
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
+        Assert.assertTrue("A GlobalContextWork is missing", containsGlobalContextWork(work));
     }
 
     @Test
@@ -95,9 +102,14 @@ public class WorkFactoryTest {
         Assert.assertTrue("A ProcessDefinitionContextWork is missing", containsFailureHandlingProcessDefinition(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingProcessInstance(work));
         Assert.assertTrue("A ProcessInstanceContextWork is missing", containsFailureHandlingFlowNodeInstance(work));
+        Assert.assertTrue("A GlobalContextWork is missing", containsGlobalContextWork(work));
     }
 
-    private boolean containsFailureHandlingFlowNodeInstance(WrappingBonitaWork work) {
+    private boolean containsGlobalContextWork(WrappingBonitaWork work) {
+		return containsWorkOfClass(work, GlobalContextWork.class);
+	}
+
+	private boolean containsFailureHandlingFlowNodeInstance(WrappingBonitaWork work) {
         return containsWorkOfClass(work, FlowNodeDefinitionAndInstanceContextWork.class);
     }
 

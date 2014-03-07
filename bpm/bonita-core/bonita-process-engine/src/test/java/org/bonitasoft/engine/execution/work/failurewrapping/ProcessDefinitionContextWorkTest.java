@@ -13,34 +13,21 @@
  **/
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.execution.work.TransactionServiceForTest;
-import org.bonitasoft.engine.incident.IncidentService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.work.BonitaWork;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
@@ -49,7 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
-public class ProcessDefinitionContextWorkTest {
+public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest{
 
     private static final long PROCESS_DEFINITION_ID = 2;
 
@@ -58,33 +45,10 @@ public class ProcessDefinitionContextWorkTest {
     private static final String NAME = "name";
 
     @Mock
-    private BonitaWork wrappedWork;
-
-    @Mock
-    private TenantServiceAccessor tenantAccessor;
-
-    @Mock
-    private SessionService sessionService;
-
-    @Mock
-    private IncidentService incidentService;
-
-    @Mock
-    private TechnicalLoggerService loggerService;
-
-    @Mock
-    private SessionAccessor sessionAccessor;
-
-    @Mock
     private ProcessDefinitionService processDefinitionService;
 
     @Mock
     private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
-
-    @Spy
-    private TransactionServiceForTest transactionService;
-
-    private ProcessDefinitionContextWork txBonitawork;
 
     @Before
     public void before() throws Exception {
@@ -92,37 +56,11 @@ public class ProcessDefinitionContextWorkTest {
         doReturn(VERSION).when(sProcessDefinitionDeployInfo).getVersion();
 
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(PROCESS_DEFINITION_ID);
-
         doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
-        when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
-        when(tenantAccessor.getSessionService()).thenReturn(sessionService);
-        when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
-        doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
-
+       
         txBonitawork = spy(new ProcessDefinitionContextWork(wrappedWork, PROCESS_DEFINITION_ID));
-        doReturn("The description").when(txBonitawork).getDescription();
-
-        doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
-    }
-
-    @Test
-    public void testWork() throws Exception {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
-        txBonitawork.work(singletonMap);
-        verify(wrappedWork, times(1)).work(singletonMap);
-    }
-
-    @Test
-    public void getDescription() {
-        when(wrappedWork.getDescription()).thenReturn("The description");
-        assertEquals("The description", txBonitawork.getDescription());
-    }
-
-    @Test
-    public void getRecoveryProcedure() {
-        when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
-        assertEquals("recoveryProcedure", txBonitawork.getRecoveryProcedure());
+        
+        super.before();
     }
 
     @Test
@@ -140,28 +78,4 @@ public class ProcessDefinitionContextWorkTest {
         assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
         verify(wrappedWork).handleFailure(e, context);
     }
-
-    @Test
-    public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12l);
-        assertEquals(12, txBonitawork.getTenantId());
-    }
-
-    @Test
-    public void setTenantId() {
-        txBonitawork.setTenantId(12l);
-        verify(wrappedWork).setTenantId(12l);
-    }
-
-    @Test
-    public void getWrappedWork() {
-        assertEquals(wrappedWork, txBonitawork.getWrappedWork());
-    }
-
-    @Test
-    public void testToString() {
-        when(wrappedWork.toString()).thenReturn("the to string");
-        assertEquals("the to string", txBonitawork.toString());
-    }
-
 }

@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.execution.work.failurewrapping.ConnectorDefinitionAndInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.FlowNodeDefinitionAndInstanceContextWork;
+import org.bonitasoft.engine.execution.work.failurewrapping.GlobalContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.MessageInstanceContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessDefinitionContextWork;
 import org.bonitasoft.engine.execution.work.failurewrapping.ProcessInstanceContextWork;
@@ -45,6 +46,7 @@ public class WorkFactory {
                 connectorInstanceId, connectorDefinitionName);
         wrappedWork = new ConnectorDefinitionAndInstanceContextWork(wrappedWork, connectorDefinitionName, connectorInstanceId);
         wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
+        wrappedWork = new GlobalContextWork(wrappedWork);
         return new FailureHandlingBonitaWork(wrappedWork);
     }
 
@@ -56,6 +58,7 @@ public class WorkFactory {
                 wrappedWork);
         wrappedWork = new ConnectorDefinitionAndInstanceContextWork(processInstanceContextWork, connectorDefinitionName, connectorInstanceId,
                 activationEvent);
+        wrappedWork = new GlobalContextWork(wrappedWork);
         return new FailureHandlingBonitaWork(wrappedWork);
     }
 
@@ -67,6 +70,7 @@ public class WorkFactory {
         BonitaWork wrappedWork = new ExecuteFlowNodeWork(flowNodeInstanceId, operations, contextDependency, processInstanceId);
         wrappedWork = new LockProcessInstanceWork(new TxBonitaWork(wrappedWork), processInstanceId);
         wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
+        wrappedWork = new GlobalContextWork(wrappedWork);
         return new FailureHandlingBonitaWork(wrappedWork);
     }
 
@@ -79,6 +83,7 @@ public class WorkFactory {
         wrappedWork = new MessageInstanceContextWork(wrappedWork, messageInstance, waitingMessage);
         wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(waitingMessage.getProcessDefinitionId(), waitingMessage.getParentProcessInstanceId(),
                 waitingMessage.getRootProcessInstanceId(), waitingMessage.getFlowNodeInstanceId(), wrappedWork);
+        wrappedWork = new GlobalContextWork(wrappedWork);
         return new FailureHandlingBonitaWork(wrappedWork);
     }
 
@@ -87,6 +92,7 @@ public class WorkFactory {
         BonitaWork wrappedWork = new NotifyChildFinishedWork(processDefinitionId, flowNodeInstanceId, parentId, parentType);
         wrappedWork = new LockProcessInstanceWork(new TxBonitaWork(wrappedWork), processInstanceId);
         wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
+        wrappedWork = new GlobalContextWork(wrappedWork);
         return new FailureHandlingBonitaWork(wrappedWork);
     }
 

@@ -18,6 +18,7 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -39,7 +40,7 @@ public class ProcessInstanceContextWork extends TxInHandleFailureWrappingWork {
      * @param processInstanceId
      *            The identifier of the process instance
      */
-    public ProcessInstanceContextWork(final ProcessDefinitionContextWork wrappedWork, final long processInstanceId) {
+    public ProcessInstanceContextWork(final WrappingBonitaWork wrappedWork, final long processInstanceId) {
         this(wrappedWork, processInstanceId, -1);
     }
 
@@ -53,7 +54,7 @@ public class ProcessInstanceContextWork extends TxInHandleFailureWrappingWork {
      * @param rootProcessInstanceId
      *            The identifier of the root process instance
      */
-    public ProcessInstanceContextWork(final ProcessDefinitionContextWork wrappedWork, final long processInstanceId, final long rootProcessInstanceId) {
+    public ProcessInstanceContextWork(final WrappingBonitaWork wrappedWork, final long processInstanceId, final long rootProcessInstanceId) {
         super(wrappedWork);
         this.processInstanceId = processInstanceId;
         this.rootProcessInstanceId = rootProcessInstanceId;

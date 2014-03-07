@@ -88,7 +88,7 @@ public class StackTraceTransformerTest {
 
         ServerWrappedException newE = StackTraceTransformer.mergeStackTraces(e);
 
-        assertEquals("threadId[NA]  | the process", cause.getMessage());
+        assertEquals("the process", cause.getMessage());
         assertEquals(cause, newE.getCause());
     }
 

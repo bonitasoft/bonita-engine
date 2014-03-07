@@ -61,5 +61,5 @@ public abstract class TxInHandleFailureWrappingWork extends WrappingBonitaWork {
         getWrappedWork().handleFailure(e, context);
     }
 
-    protected abstract void setExceptionContext(final SBonitaException SBonitaException, final Map<String, Object> context) throws SBonitaException;
+    protected abstract void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) throws SBonitaException;
 }

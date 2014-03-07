@@ -74,7 +74,6 @@ public class ConnectorDefinitionAndInstanceContextWork extends TxInHandleFailure
         return description;
     }
 
-    @SuppressWarnings("unused")
     @Override
     protected void setExceptionContext(final SBonitaException e, final Map<String, Object> context) {
         e.setConnectorDefinitionNameOnContext(connectorDefinitionName);

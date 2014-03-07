@@ -139,7 +139,7 @@ public class BonitaException extends Exception implements BonitaContextException
     }
 
     private String getThreadIdMessage() {
-        return "threadId[" + (threadId != -1 ? threadId : "NA") + "] " + " | ";
+    	return threadId != -1 ? "threadId[" + threadId + "] | " : "";
     }
 
     private String getHostNameMessage() {

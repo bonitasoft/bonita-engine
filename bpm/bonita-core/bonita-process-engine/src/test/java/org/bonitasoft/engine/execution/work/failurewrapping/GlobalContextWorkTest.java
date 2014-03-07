@@ -19,46 +19,36 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.InetAddress;
 import java.util.Collections;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+/**
+ * @author Aurelien Pupier
+ *
+ */
 @RunWith(MockitoJUnitRunner.class)
-public class FlowNodeDefinitionAndInstanceContextWorkTest  extends AbstractContextWorkTest{
-
-    private static final long FLOW_NODE_DEFINITION_ID = 2;
-
-    private static final long FLOW_NODE_INSTANCE_ID = 3;
-
-    private static final String FLOW_NODE_NAME = "name";
-
-    @Mock
-    private ActivityInstanceService activityInstanceService;
-
-    @Mock
-    private SFlowNodeInstance flowNodeInstance;
-
-
+public class GlobalContextWorkTest extends AbstractContextWorkTest {
+	
+	private static final long TENANT_ID = 2L;
+	private static final long THREAD_ID = 51L;
+	
+	
     @Before
     public void before() throws Exception {
-        when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
-
-        txBonitawork = spy(new FlowNodeDefinitionAndInstanceContextWork(wrappedWork, FLOW_NODE_INSTANCE_ID));
-      
-        doReturn(flowNodeInstance).when(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
-        doReturn(FLOW_NODE_DEFINITION_ID).when(flowNodeInstance).getFlowNodeDefinitionId();
-        doReturn(FLOW_NODE_NAME).when(flowNodeInstance).getName();
-        super.before();
+	    txBonitawork = spy(new GlobalContextWork(wrappedWork));
+	    super.before();
+	    ((GlobalContextWork) doReturn(THREAD_ID).when(txBonitawork)).retrieveThreadId();
+	    doReturn(TENANT_ID).when(tenantAccessor).getTenantId();
+	    when(wrappedWork.getTenantId()).thenReturn(TENANT_ID);
     }
-
+		
     @Test
     public void handleFailure() throws Throwable {
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
@@ -69,9 +59,11 @@ public class FlowNodeDefinitionAndInstanceContextWorkTest  extends AbstractConte
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("FLOW_NODE_DEFINITION_ID = " + FLOW_NODE_DEFINITION_ID));
-        assertTrue(e.getMessage().contains("FLOW_NODE_NAME = " + FLOW_NODE_NAME));
-        assertTrue(e.getMessage().contains("FLOW_NODE_INSTANCE_ID = " + FLOW_NODE_INSTANCE_ID));
+        assertTrue("TENANT_ID is not available in context "+e.getMessage(), e.getMessage().contains("TENANT_ID = " + TENANT_ID));
+        assertTrue(e.getMessage().contains("HOSTNAME = " + InetAddress.getLocalHost().getHostName()));
+        assertTrue(e.getMessage().contains("THREAD_ID = " + THREAD_ID));
         verify(wrappedWork).handleFailure(e, context);
     }
+	
+	
 }

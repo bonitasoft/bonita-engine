@@ -14,33 +14,22 @@
 
 package org.bonitasoft.engine.execution.work.failurewrapping;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
-import org.bonitasoft.engine.execution.work.TransactionServiceForTest;
-import org.bonitasoft.engine.incident.IncidentService;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
@@ -48,78 +37,27 @@ import org.mockito.runners.MockitoJUnitRunner;
  * 
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ProcessInstanceContextWorkTest {
+public class ProcessInstanceContextWorkTest extends AbstractContextWorkTest {
 
-    private static final long PROCESS_INSTANCE_ID = 2;
+    static final long PROCESS_INSTANCE_ID = 2;
 
-    private static final long ROOT_PROCESS_INSTANCE_ID = 3;
+    static final long ROOT_PROCESS_INSTANCE_ID = 3;
 
-    @Mock
-    private ProcessDefinitionContextWork wrappedWork;
+    @Mock ProcessInstanceService processInstanceService;
 
-    @Mock
-    private TenantServiceAccessor tenantAccessor;
-
-    @Mock
-    private SessionService sessionService;
-
-    @Mock
-    private IncidentService incidentService;
-
-    @Mock
-    private TechnicalLoggerService loggerService;
-
-    @Mock
-    private SessionAccessor sessionAccessor;
-
-    @Mock
-    private ProcessInstanceService processInstanceService;
-
-    @Mock
-    private SProcessInstance sProcessInstance;
-
-    @Spy
-    private TransactionServiceForTest transactionService;
-
-    private ProcessInstanceContextWork txBonitawork;
-
+    @Mock SProcessInstance sProcessInstance;
+    
+    
     @Before
     public void before() throws Exception {
-        doReturn(ROOT_PROCESS_INSTANCE_ID).when(sProcessInstance).getRootProcessInstanceId();
-        doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
-
-        doReturn(processInstanceService).when(tenantAccessor).getProcessInstanceService();
-        when(tenantAccessor.getTechnicalLoggerService()).thenReturn(loggerService);
-        when(tenantAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
-        when(tenantAccessor.getSessionService()).thenReturn(sessionService);
-        when(tenantAccessor.getIncidentService()).thenReturn(incidentService);
-        doReturn(transactionService).when(tenantAccessor).getUserTransactionService();
-
-        txBonitawork = spy(new ProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID));
-        doReturn("The description").when(txBonitawork).getDescription();
-
-        doReturn(false).when(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
+	    doReturn(ROOT_PROCESS_INSTANCE_ID).when(sProcessInstance).getRootProcessInstanceId();
+	    doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
+	
+	    doReturn(processInstanceService).when(tenantAccessor).getProcessInstanceService();
+	    txBonitawork = spy(new ProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID));
+	    super.before();
     }
-
-    @Test
-    public void testWork() throws Exception {
-        final Map<String, Object> singletonMap = new HashMap<String, Object>();
-        txBonitawork.work(singletonMap);
-        verify(wrappedWork, times(1)).work(singletonMap);
-    }
-
-    @Test
-    public void getDescription() {
-        when(wrappedWork.getDescription()).thenReturn("The description");
-        assertEquals("The description", txBonitawork.getDescription());
-    }
-
-    @Test
-    public void getRecoveryProcedure() {
-        when(wrappedWork.getRecoveryProcedure()).thenReturn("recoveryProcedure");
-        assertEquals("recoveryProcedure", txBonitawork.getRecoveryProcedure());
-    }
-
+    
     @Test
     public void handleFailureWithProcessInstanceId() throws Throwable {
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
@@ -149,29 +87,6 @@ public class ProcessInstanceContextWorkTest {
         assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
         assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + 5));
         verify(wrappedWork, times(1)).handleFailure(e, context);
-    }
-
-    @Test
-    public void getTenantId() {
-        when(wrappedWork.getTenantId()).thenReturn(12l);
-        assertEquals(12, txBonitawork.getTenantId());
-    }
-
-    @Test
-    public void setTenantId() {
-        txBonitawork.setTenantId(12l);
-        verify(wrappedWork).setTenantId(12l);
-    }
-
-    @Test
-    public void getWrappedWork() {
-        assertEquals(wrappedWork, txBonitawork.getWrappedWork());
-    }
-
-    @Test
-    public void testToString() {
-        when(wrappedWork.toString()).thenReturn("the to string");
-        assertEquals("the to string", txBonitawork.toString());
     }
 
 }

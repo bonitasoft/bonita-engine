@@ -18,6 +18,7 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.execution.work.WrappingBonitaWork;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -38,7 +39,7 @@ public class FlowNodeDefinitionAndInstanceContextWork extends TxInHandleFailureW
      * @param flowNodeInstanceId
      *            The identifier of the flow node instance
      */
-    public FlowNodeDefinitionAndInstanceContextWork(final ProcessInstanceContextWork wrappedWork, final long flowNodeInstanceId) {
+    public FlowNodeDefinitionAndInstanceContextWork(final WrappingBonitaWork wrappedWork, final long flowNodeInstanceId) {
         super(wrappedWork);
         this.flowNodeInstanceId = flowNodeInstanceId;
     }

@@ -83,6 +83,18 @@ public enum SContext {
     /**
      * Corresponding to the identifier of the user
      */
-    USER_ID;
+    USER_ID,
+    /**
+     * Corresponding to the identifier of the thread
+     */
+    THREAD_ID,
+    /**
+     * Corresponding to the hostname
+     */
+    HOSTNAME,
+    /**
+     * Corresponding to the identifier of the tenant
+     */
+    TENANT_ID;
 
 }
