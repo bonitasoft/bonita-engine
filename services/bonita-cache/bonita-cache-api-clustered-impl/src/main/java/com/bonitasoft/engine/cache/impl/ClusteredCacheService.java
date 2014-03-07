@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -40,14 +40,14 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
     /**
      * @param cacheName
      * @return
-     * @throws CacheException
+     * @throws SCacheException
      */
     @Override
-    protected String getKeyFromCacheName(final String cacheName) throws CacheException {
+    protected String getKeyFromCacheName(final String cacheName) throws SCacheException {
         try {
             return String.valueOf(sessionAccessor.getTenantId()) + '_' + cacheName;
         } catch (final STenantIdNotSetException e) {
-            throw new CacheException(e);
+            throw new SCacheException(e);
         }
     }
 
