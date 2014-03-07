@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -126,7 +126,7 @@ public class UserFilterServiceImpl implements UserFilterService {
     }
 
     private UserFilterImplementationDescriptor getDescriptor(final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition)
-            throws CacheException {
+            throws SCacheException {
         UserFilterImplementationDescriptor descriptor;
         descriptor = (UserFilterImplementationDescriptor) cacheService.get(FILTER_CACHE_NAME,
                 getUserFilterImplementationIdInCache(processDefinitionId, sUserFilterDefinition.getUserFilterId(), sUserFilterDefinition.getVersion()));
@@ -191,7 +191,7 @@ public class UserFilterServiceImpl implements UserFilterService {
                         throw new SUserFilterLoadingException("Can not load userFilterImplementationDescriptor XML. The file name is " + name, e);
                     } catch (final SXMLParseException e) {
                         throw new SUserFilterLoadingException("Can not load userFilterImplementationDescriptor XML. The file name is " + name, e);
-                    } catch (final CacheException e) {
+                    } catch (final SCacheException e) {
                         throw new SUserFilterLoadingException("Unable to cache the user filter implementation" + name, e);
                     }
                     resolved = true;

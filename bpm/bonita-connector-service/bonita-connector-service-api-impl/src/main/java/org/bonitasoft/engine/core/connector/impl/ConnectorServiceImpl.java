@@ -31,8 +31,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.connector.Connector;
@@ -143,7 +143,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             }
             final String implementationClassName = descriptor.getImplementationClassName();
             connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SConnectorException(e);
         } catch (final STenantIdNotSetException e) {
             throw new SConnectorException(e);
@@ -215,7 +215,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private SConnectorImplementationDescriptor getImplementation(final long rootDefinitionId, final String tenantId, final String connectorId,
-            final String version) throws SConnectorException, CacheException {
+            final String version) throws SConnectorException, SCacheException {
         SConnectorImplementationDescriptor descriptor;
         try {
             String key = buildConnectorImplementationKey(rootDefinitionId, connectorId, version);
@@ -228,13 +228,13 @@ public class ConnectorServiceImpl implements ConnectorService {
             }
         } catch (final NumberFormatException e) {
             throw new SConnectorException(e);
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw e;
         }
         return descriptor;
     }
 
-    private void storeImplementation(final long processDefinitionId, final SConnectorImplementationDescriptor connectorImplementation) throws CacheException {
+    private void storeImplementation(final long processDefinitionId, final SConnectorImplementationDescriptor connectorImplementation) throws SCacheException {
         String key = buildConnectorImplementationKey(processDefinitionId, connectorImplementation.getDefinitionId(),
                 connectorImplementation.getDefinitionVersion());
         cacheService.store(CONNECTOR_CACHE_NAME, key, connectorImplementation);
@@ -279,10 +279,6 @@ public class ConnectorServiceImpl implements ConnectorService {
                 }
             }
             return connectorResult;
-        } catch (final CacheException e) {
-            throw new SConnectorException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SConnectorException(e);
         } catch (final SConnectorException e) {
             throw e;
         } catch (final SBonitaException e) {
@@ -332,8 +328,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     public boolean loadConnectors(final SProcessDefinition sDefinition, final long tenantId) throws SConnectorException {
-        final Long processDefinitionId = sDefinition.getId();
-        return loadConnectors(processDefinitionId, tenantId);
+        return loadConnectors(sDefinition.getId(), tenantId);
     }
 
     private boolean loadConnectors(final long processDefinitionId, final long tenantId) throws SConnectorException {
@@ -351,17 +346,17 @@ public class ConnectorServiceImpl implements ConnectorService {
                         try {
                             final Object objectFromXML = parser.getObjectFromXML(file);
                             if (objectFromXML == null) {
-                                throw new SConnectorException("Can not parse ConnectorImplementation XML. The file name is " + name);
+                                throw new SConnectorException("Can not parse ConnectorImplementation XML. The file name is <" + name + ">.");
                             }
                             // check dependencies in the bar
                             connectorImplementation = (SConnectorImplementationDescriptor) objectFromXML;
                             storeImplementation(processDefinitionId, connectorImplementation);
                         } catch (final IOException e) {
-                            throw new SConnectorException("Can not load ConnectorImplementation XML. The file name is " + name, e);
+                            throw new SConnectorException("Can not load ConnectorImplementation XML. The file name is <" + name + ">.", e);
                         } catch (final SXMLParseException e) {
-                            throw new SConnectorException("Can not load ConnectorImplementation XML. The file name is " + name, e);
-                        } catch (final CacheException e) {
-                            throw new SConnectorException("Unable to cache the connector implementation" + name, e);
+                            throw new SConnectorException("Can not load ConnectorImplementation XML. The file name is <" + name + ">.", e);
+                        } catch (final SCacheException e) {
+                            throw new SConnectorException("Unable to cache the connector implementation " + name + ".", e);
                         }
                         // TODO parse the definitions to ensure all connectors are loaded
                         resolved = true;
@@ -369,7 +364,7 @@ public class ConnectorServiceImpl implements ConnectorService {
                 }
             }
         } catch (final BonitaHomeNotSetException e) {
-            throw new BonitaRuntimeException("Bonita home is not set");
+            throw new BonitaRuntimeException("Bonita home is not set !!");
         }
         return resolved;
     }
@@ -390,11 +385,11 @@ public class ConnectorServiceImpl implements ConnectorService {
         try {
             deployNewDependencies(sDefinition.getId(), tenantId);
         } catch (final SDependencyException e) {
-            throw new SConnectorException("Problem recording connector dependencies", e);
+            throw new SConnectorException("Problem recording connector dependencies.", e);
         } catch (final BonitaHomeNotSetException e) {
             throw new SConnectorException(e);
         } catch (final IOException e) {
-            throw new SConnectorException("Problem reading connector dependency jar files", e);
+            throw new SConnectorException("Problem reading connector dependency jar files.", e);
         }
     }
 
@@ -433,18 +428,15 @@ public class ConnectorServiceImpl implements ConnectorService {
                     final SConnectorImplementationDescriptor connectorImplementationDescriptor = getConnectorImplementationDescriptor(zipInputstream);
                     if (!connectorImplementationDescriptor.getDefinitionId().equals(connectorId)
                             || !connectorImplementationDescriptor.getDefinitionVersion().equals(connectorVersion)) {
-                        throw new SInvalidConnectorImplementationException("The connector must implement the connectorDefinition with id '" + connectorId
-                                + "' and version '" + connectorVersion + "'. The connector had definition id '"
-                                + connectorImplementationDescriptor.getDefinitionId() + "' and definition version '"
-                                + connectorImplementationDescriptor.getDefinitionVersion() + "'");
+                        throw new SInvalidConnectorImplementationException("The connector must implement the connectorDefinition with id = <" + connectorId
+                                + "> and version = <" + connectorVersion + ">.", connectorImplementationDescriptor);
                     }
                     isClosed = true;
                     // stream already closed by the parser
                     return;
-                } else {
-                    zipInputstream.closeEntry();
-                    zipEntry = zipInputstream.getNextEntry();
                 }
+                zipInputstream.closeEntry();
+                zipEntry = zipInputstream.getNextEntry();
             }
             throw new SInvalidConnectorImplementationException("There no Implementation file is the zip");
         } catch (final IOException e) {
@@ -586,7 +578,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             cacheService.remove(CONNECTOR_CACHE_NAME, connectorKey);
             // re_load connectors
             loadConnectors(sProcessDefinition, tenantId);
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SConnectorException(e);
         }
     }
@@ -669,7 +661,7 @@ public class ConnectorServiceImpl implements ConnectorService {
                     }
                 }
             }
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             // If cache name not found, ignore it.
         }
         return sConnectorImplementationDescriptors;
@@ -706,7 +698,7 @@ public class ConnectorServiceImpl implements ConnectorService {
                             + " in process + " + processDefinitionId);
                 }
             }
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SConnectorException(e);
         }
         return connectorImplementationDescriptor;

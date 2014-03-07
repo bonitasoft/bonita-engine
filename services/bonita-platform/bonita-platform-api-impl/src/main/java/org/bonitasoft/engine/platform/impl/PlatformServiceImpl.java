@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -247,7 +247,7 @@ public class PlatformServiceImpl implements PlatformService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deletePlatform", e));
             }
             throw new SPlatformDeletionException("Unable to delete the platform row : " + e.getMessage(), e);
-        } catch (CacheException e) {
+        } catch (SCacheException e) {
             throw new SPlatformDeletionException("Unable to delete the platform from cache : " + e.getMessage(), e);
         }
     }
@@ -358,7 +358,7 @@ public class PlatformServiceImpl implements PlatformService {
                 cachePlatform(sPlatform);
             }
             return sPlatform;
-        } catch (CacheException e) {
+        } catch (SCacheException e) {
             throw new SPlatformNotFoundException("Platform not present in cache.", e);
         }
     }
@@ -372,7 +372,7 @@ public class PlatformServiceImpl implements PlatformService {
     private void cachePlatform(final SPlatform platform) {
         try {
             platformCacheService.store(CACHE_KEY, CACHE_KEY, platform);
-        } catch (CacheException e) {
+        } catch (SCacheException e) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Can't cache the platform, maybe the platform cache service is not started yet");
         }
     }

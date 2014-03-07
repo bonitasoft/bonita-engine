@@ -27,7 +27,7 @@ import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
@@ -175,7 +175,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(processId, SQueriableLog.STATUS_OK, logBuilder, "delete");
             dependencyService.deleteDependencies(processId, ScopeType.PROCESS);
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDefinitionNotFoundException(e, processDefinitionDeployInfo);
         } catch (final SRecorderException e) {
@@ -328,7 +328,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 storeProcessDefinition(processId, sProcessDefinition);
             }
             return sProcessDefinition;
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SProcessDefinitionNotFoundException(e, processId);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw e;
@@ -347,7 +347,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return Math.abs(UUID.randomUUID().getLeastSignificantBits());
     }
 
-    private void storeProcessDefinition(final Long id, final SProcessDefinition sProcessDefinition) throws CacheException {
+    private void storeProcessDefinition(final Long id, final SProcessDefinition sProcessDefinition) throws SCacheException {
         cacheService.store(PROCESS_CACHE_NAME, id, sProcessDefinition);
     }
 

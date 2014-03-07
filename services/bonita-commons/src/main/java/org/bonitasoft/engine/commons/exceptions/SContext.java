@@ -69,9 +69,17 @@ public enum SContext {
      */
     WAITING_MESSAGE_INSTANCE_TYPE,
     /**
-     * Corresponding to the name of the connector definition
+     * Corresponding to the identifier of the connector definition
      */
-    CONNECTOR_DEFINITION_NAME,
+    CONNECTOR_DEFINITION_ID,
+    /**
+     * Corresponding to the class name of the implementation of the connector definition
+     */
+    CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME,
+    /**
+     * Corresponding to the version of the connector definition
+     */
+    CONNECTOR_DEFINITION_VERSION,
     /**
      * Corresponding to the event which activates the connector
      */

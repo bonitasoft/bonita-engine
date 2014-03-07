@@ -158,12 +158,30 @@ public abstract class SBonitaException extends Exception {
     }
 
     /**
-     * @param name
-     *            The name of the connector definition to set
+     * @param id
+     *            The identifier of the connector definition
      * @since 6.3
      */
-    public void setConnectorDefinitionNameOnContext(final String name) {
-        context.put(SContext.CONNECTOR_DEFINITION_NAME, name);
+    public void setConnectorDefinitionIdOnContext(final String id) {
+        context.put(SContext.CONNECTOR_DEFINITION_ID, id);
+    }
+
+    /**
+     * @param name
+     *            The class name of the implementation of the connector definition to set
+     * @since 6.3
+     */
+    public void setConnectorDefinitionImplementationClassNameOnContext(final String name) {
+        context.put(SContext.CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME, name);
+    }
+
+    /**
+     * @param version
+     *            The version of the connector definition
+     * @since 6.3
+     */
+    public void setConnectorDefinitionVersionOnContext(final String version) {
+        context.put(SContext.CONNECTOR_DEFINITION_VERSION, version);
     }
 
     /**

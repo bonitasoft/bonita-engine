@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import java.util.concurrent.TimeoutException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
-import org.bonitasoft.engine.connector.exception.SConnectorValidationException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SessionService;
@@ -40,6 +39,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  * Execute connectors directly
  * 
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ConnectorExecutorImpl implements ConnectorExecutor {
 
@@ -117,6 +117,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         }
     }
 
+    @SuppressWarnings("unused")
     protected Map<String, Object> getValue(final Future<Map<String, Object>> submit) throws InterruptedException, ExecutionException, TimeoutException {
         return submit.get();
     }
@@ -125,9 +126,9 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     public void disconnect(final SConnector sConnector) throws SConnectorException {
         try {
             sConnector.disconnect();
-        } catch (SConnectorException e) {
+        } catch (final SConnectorException e) {
             throw e;
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             throw new SConnectorException(t);
         }
     }
@@ -153,8 +154,6 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
                 sConnector.validate();
                 sConnector.connect();
                 return sConnector.execute();
-            } catch (final SConnectorValidationException e) {
-                throw new SConnectorException(e);
             } finally {
                 // in case a session has been created: see ConnectorAPIAccessorImpl
                 try {

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.StringUtil;
@@ -109,7 +109,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
         throw new SCreateDataInstanceException(stb.toString());
     }
 
-    private boolean checkDataAlreadyExists(final String dataInstanceKey) throws CacheException {
+    private boolean checkDataAlreadyExists(final String dataInstanceKey) throws SCacheException {
         final List<?> keys = getCacheKeys(TRANSIENT_DATA_CACHE_NAME);
         return keys.contains(dataInstanceKey);
     }
@@ -130,7 +130,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
             }
 
             cacheService.store(TRANSIENT_DATA_CACHE_NAME, key, dataInstance);
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SDataInstanceReadException("Impossible to update transient data", e);
         }
     }
@@ -140,7 +140,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
         try {
             final String key = getKey(dataInstance);
             cacheService.remove(TRANSIENT_DATA_CACHE_NAME, key);
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SDataInstanceReadException("Impossible to delete transient data", e);
         }
     }
@@ -155,7 +155,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
                     return dataInstance;
                 }
             }
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SDataInstanceReadException("Impossible to get transient data: ", e);
         }
         throw new SDataInstanceNotFoundException("No data found. Id: " + dataInstanceId);
@@ -172,12 +172,12 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
             }
 
             return (SDataInstance) cacheService.get(TRANSIENT_DATA_CACHE_NAME, key);
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SDataInstanceReadException("Impossible to get transient data: ", e);
         }
     }
 
-    private List<?> getCacheKeys(final String cacheName) throws CacheException {
+    private List<?> getCacheKeys(final String cacheName) throws SCacheException {
         List<?> cacheKeys = Collections.emptyList();
         if (cacheService.getCachesNames().contains(cacheName)) {
             cacheKeys = cacheService.getKeys(cacheName);
@@ -218,7 +218,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
                 return Collections.emptyList();
                 // throw new SDataInstanceReadException("No data instance found for container type " + containerType + " and container id " + containerId);
             }
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SDataInstanceReadException("Impossible to get transient data: ", e);
         }
     }

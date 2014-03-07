@@ -69,7 +69,7 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_NAME = " + CONNECTOR_DEFINITION_NAME));
+        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME = " + CONNECTOR_DEFINITION_NAME));
         assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID = " + CONNECTOR_INSTANCE_ID));
         verify(wrappedWork).handleFailure(e, context);
     }
@@ -88,7 +88,7 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_NAME = " + CONNECTOR_DEFINITION_NAME));
+        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME = " + CONNECTOR_DEFINITION_NAME));
         assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID = " + CONNECTOR_INSTANCE_ID));
         assertTrue(e.getMessage().contains("CONNECTOR_ACTIVATION_EVENT = " + ACTIVATION_EVENT));
         verify(wrappedWork, times(1)).handleFailure(e, context);

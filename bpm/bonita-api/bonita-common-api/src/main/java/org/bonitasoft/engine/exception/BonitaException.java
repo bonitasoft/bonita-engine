@@ -69,8 +69,7 @@ public class BonitaException extends Exception implements BonitaContextException
         super(cause);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#getTenantId()
      */
     @Override
@@ -78,8 +77,7 @@ public class BonitaException extends Exception implements BonitaContextException
         return tenantId;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#setTenantId(long)
      */
     @Override
@@ -87,8 +85,7 @@ public class BonitaException extends Exception implements BonitaContextException
         this.tenantId = tenantId;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#getHostname()
      */
     @Override
@@ -96,8 +93,7 @@ public class BonitaException extends Exception implements BonitaContextException
         return hostname;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#setHostname(java.lang.String)
      */
     @Override
@@ -105,8 +101,7 @@ public class BonitaException extends Exception implements BonitaContextException
         this.hostname = hostname;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#getUserName()
      */
     @Override
@@ -114,8 +109,7 @@ public class BonitaException extends Exception implements BonitaContextException
         return userName;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#setUserName(java.lang.String)
      */
     @Override

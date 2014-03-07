@@ -252,9 +252,8 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             final List<SConnectorInstance> selectList = persistenceService.selectList(selectOneDescriptor);
             if (selectList.size() == 1) {
                 return selectList.get(0);
-            } else {
-                return null;
             }
+            return null;
         } catch (final SBonitaReadException e) {
             throw new SConnectorInstanceReadException(e);
         }
@@ -417,7 +416,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         final OrderByOption orderBy = new OrderByOption(SAConnectorInstance.class, BuilderFactory.get(SConnectorInstanceBuilderFactory.class).getIdKey(),
                 OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderBy), filters, null);
-        List<SAConnectorInstance> connectorInstances = null;
+        List<SAConnectorInstance> connectorInstances;
         do {
             connectorInstances = searchArchivedConnectorInstance(queryOptions, persistenceService);
             for (final SAConnectorInstance sConnectorInstance : connectorInstances) {

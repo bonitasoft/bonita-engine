@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,20 +17,21 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
-public class CacheException extends SBonitaException {
+public class SCacheException extends SBonitaException {
 
     private static final long serialVersionUID = 3608017699323834096L;
 
-    public CacheException(final String message) {
+    public SCacheException(final String message) {
         super(message);
     }
 
-    public CacheException(final Throwable t) {
+    public SCacheException(final Throwable t) {
         super(t);
     }
 
-    public CacheException(final String message, final Exception t) {
+    public SCacheException(final String message, final Exception t) {
         super(message, t);
     }
 
