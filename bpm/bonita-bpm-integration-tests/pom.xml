@@ -61,6 +61,14 @@
 				<module>bonita-bpm-services-integration-tests</module>
 			</modules>
 		</profile>
+
+		<profile>
+			<id>package</id>
+			<modules>
+				<module>bonita-query-tests</module>
+			</modules>
+		</profile>
+
 	</profiles>
 
     <dependencyManagement>
