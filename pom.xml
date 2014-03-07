@@ -158,7 +158,6 @@
 						<version>${jacoco.version}</version>
 						<configuration>
 							<includes>
-								<include>org.bonitasoft.engine.*</include>
 								<include>com.bonitasoft.engine.*</include>
 							</includes>
 						</configuration>
