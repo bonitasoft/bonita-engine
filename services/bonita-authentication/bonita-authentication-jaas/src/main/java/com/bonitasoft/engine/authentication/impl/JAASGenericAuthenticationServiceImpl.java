@@ -30,6 +30,7 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Julien Reboul
  */
 public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticationService {
 
@@ -41,6 +42,8 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
 
     private final ReadSessionAccessor sessionAccessor;
 
+    private AuthenticatorDelegate authenticatorDelegate;
+
     public JAASGenericAuthenticationServiceImpl(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
@@ -48,9 +51,21 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
 
     @Override
     public String checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException {
-        LoginContext loginContext = createContext(new AuthenticationCallbackHandler(credentials));
+        Map<String, Serializable> jaasCredentials = tryToAuthenticate(credentials);
+        LoginContext loginContext = createContext(new AuthenticationCallbackHandler(jaasCredentials));
         login(loginContext);
         return extractUserFromSubjet(loginContext);
+    }
+
+    /**
+     * @param credentials
+     */
+    protected Map<String, Serializable> tryToAuthenticate(Map<String, Serializable> credentials) {
+        if (authenticatorDelegate != null) {
+            return authenticatorDelegate.authenticate(credentials);
+        } else {
+            return credentials;
+        }
     }
 
     /**
@@ -134,5 +149,20 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
 
     private String getLoginContext() throws TenantIdNotSetException {
         return LOGIN_CONTEXT_PREFIX + "-" + sessionAccessor.getTenantId();
+    }
+
+    /**
+     * @return the authenticatorDelegate
+     */
+    public AuthenticatorDelegate getAuthenticatorDelegate() {
+        return authenticatorDelegate;
+    }
+
+    /**
+     * @param authenticatorDelegate
+     *            the authenticatorDelegate to set
+     */
+    public void setAuthenticatorDelegate(AuthenticatorDelegate authenticatorDelegate) {
+        this.authenticatorDelegate = authenticatorDelegate;
     }
 }

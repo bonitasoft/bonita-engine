@@ -1,0 +1,26 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="authenticatorDelegate"
+		class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<property name="casURLPRefix"
+			value="${authentication.delegate.cas.server.url.prefix}" /> <!--http://127.0.1.1:8180 -->
+		<property name="casService" value="${authentication.delegate.cas.service.url}" /> <!--http://127.0.1.1:8888/loginservice?redirectUrl=portal%2Fhomepage%3Fgwt.codesvr%3D127.0.0.1%3A9997&amp;gwt.codesvr=127.0.1.1:9997"/ -->
+	</bean>
+
+	<bean id="genericAuthenticationService"
+		class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<property name="authenticatorDelegate" ref="authenticatorDelegate" />
+	</bean>
+
+	<bean id="authenticationService"
+		class="org.bonitasoft.engine.authentication.impl.AuthenticationServiceImpl">
+		<constructor-arg name="identityService" ref="identityService" />
+		<constructor-arg name="logger" ref="technicalLoggerService" />
+	</bean>
+
+</beans>

@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.io.Serializable;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.security.auth.Subject;
@@ -140,6 +143,12 @@ public class JAASGenericAuthenticationServiceImplTest {
         LoginContext loginContext = mock(LoginContext.class);
         jaasGenericAuthenticationServiceImpl.login(loginContext);
         verify(loginContext, times(1)).login();
+    }
+
+    @Test
+    public void testTryToAuthenticate() throws Exception {
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        Map<String, Serializable> jaascredentials = jaasGenericAuthenticationServiceImpl.tryToAuthenticate(credentials);
     }
 
 }
