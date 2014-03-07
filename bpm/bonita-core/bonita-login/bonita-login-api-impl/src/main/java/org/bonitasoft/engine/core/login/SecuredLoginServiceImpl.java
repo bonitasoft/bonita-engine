@@ -91,31 +91,31 @@ public class SecuredLoginServiceImpl implements LoginService {
         String userName = null;
         AuthenticationException authenticationException = null;
         try {
-            userName = loginChoosingAppropriateAuthenticationService(credentials);
-        } catch (final AuthenticationException ae) {
-            // even if authentication fails, we need to check if credentials are not the platform ones
-            // thus, we keep the exception for a later process
-            authenticationException = ae;
-        }
-        try {
-            if (StringUtils.isNotBlank(userName)) {
-                final SUser user = identityService.getUserByUserName(userName);
-                userId = user.getId();
+            final TechnicalUser technicalUser = getTechnicalUser(tenantId);
+
+            if (credentials.containsKey(AuthenticationConstants.BASIC_USERNAME) && credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) {
+                userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
+            }
+
+            if (technicalUser.getUserName().equals(userName)
+                    && technicalUser.getPassword().equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)))) {
+                isTechnicalUser = true;
+                userId = -1;
             } else {
-                // if authentication fails it can be due to the technical user
-                final TechnicalUser technicalUser = getTechnicalUser(tenantId);
+                try {
+                    userName = loginChoosingAppropriateAuthenticationService(credentials);
+                    if (StringUtils.isNotBlank(userName)) {
+                        final SUser user = identityService.getUserByUserName(userName);
+                        userId = user.getId();
+                    } else {
+                        // now we are sure authentication Failed
+                        authenticationFailed(null);
 
-                if (credentials.containsKey(AuthenticationConstants.BASIC_USERNAME) && credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) {
-                    userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
-                }
-
-                if (technicalUser.getUserName().equals(userName)
-                        && technicalUser.getPassword().equals(String.valueOf(credentials.get(AuthenticationConstants.BASIC_PASSWORD)))) {
-                    isTechnicalUser = true;
-                    userId = -1;
-                } else {
-                    // now we are sure authentication Failed
-                    authenticationFailed(authenticationException);
+                    }
+                } catch (final AuthenticationException ae) {
+                    // even if authentication fails, we need to check if credentials are not the platform ones
+                    // thus, we keep the exception for a later process
+                    authenticationFailed(ae);
                 }
             }
         } catch (final SUserNotFoundException e) {

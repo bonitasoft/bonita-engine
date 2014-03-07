@@ -176,7 +176,7 @@ public class SecuredLoginServiceImplTest {
 
         SSession sSessionResult = this.securedLoginServiceImpl.login(credentials);
 
-        verify(genericAuthenticationService, times(1)).checkUserCredentials(any(Map.class));
+        verify(genericAuthenticationService, times(0)).checkUserCredentials(any(Map.class));
         verify(sessionAccessor, times(1)).deleteSessionId();
         verify(sessionService, times(1)).createSession(tenantId, userId, login, true);
         assertThat(sSessionResult).isSameAs(sSession);
@@ -199,7 +199,7 @@ public class SecuredLoginServiceImplTest {
 
         SSession sSessionResult = this.securedLoginServiceImpl.login(credentials);
 
-        verify(authenticationService, times(1)).checkUserCredentials(login, password);
+        verify(authenticationService, times(0)).checkUserCredentials(login, password);
         verify(sessionAccessor, times(1)).deleteSessionId();
         verify(sessionService, times(1)).createSession(tenantId, userId, login, true);
         assertThat(sSessionResult).isSameAs(sSession);
