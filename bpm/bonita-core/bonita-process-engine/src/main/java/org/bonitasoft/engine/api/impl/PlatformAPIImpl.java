@@ -263,7 +263,11 @@ public class PlatformAPIImpl implements PlatformAPI {
                 }
                 for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {
                     logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of platform:" + serviceWithLifecycle.getClass().getName());
-                    serviceWithLifecycle.start();
+                    // scheduler my be already running
+                    // skip service start
+                    if (!serviceWithLifecycle.getClass().isInstance(schedulerService) || !schedulerService.isStarted()) {
+                        serviceWithLifecycle.start();
+                    }
                 }
                 // set tenant classloader
                 final SessionService sessionService = platformAccessor.getSessionService();
