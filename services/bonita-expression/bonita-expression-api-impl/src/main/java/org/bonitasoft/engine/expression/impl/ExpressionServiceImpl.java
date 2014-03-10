@@ -70,7 +70,7 @@ public class ExpressionServiceImpl implements ExpressionService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "evaluate"));
         }
 
-        final ExpressionExecutorStrategy expressionExecutorStrategy = getStrategy(expression);
+        final ExpressionExecutorStrategy expressionExecutorStrategy = getStrategy(expression.getExpressionKind());
         validateExpression(expressionExecutorStrategy, expression);
         Object expressionResult = expressionExecutorStrategy.evaluate(expression, dependencyValues, resolvedExpressions);
         checkReturnType(expression, expressionResult);
@@ -95,17 +95,15 @@ public class ExpressionServiceImpl implements ExpressionService {
         }
     }
 
-    private ExpressionExecutorStrategy getStrategy(final SExpression expression) throws SExpressionTypeUnknownException {
-        final ExpressionExecutorStrategy expressionExecutorStrategy = expressionExecutorsMap.get(expression.getExpressionKind());
+    private ExpressionExecutorStrategy getStrategy(final ExpressionKind expressionKind) throws SExpressionTypeUnknownException {
+        final ExpressionExecutorStrategy expressionExecutorStrategy = expressionExecutorsMap.get(expressionKind);
         if (expressionExecutorStrategy == null) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(
-                        this.getClass(),
-                        TechnicalLogSeverity.TRACE,
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                         LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate",
-                                "Unable to find an executor for expression type " + expression.getExpressionKind()));
+                                "Unable to find an executor for expression type " + expressionKind));
             }
-            throw new SExpressionTypeUnknownException("Unable to find an executor for expression type " + expression.getExpressionKind());
+            throw new SExpressionTypeUnknownException("Unable to find an executor for expression type " + expressionKind);
         }
         return expressionExecutorStrategy;
     }
@@ -117,14 +115,7 @@ public class ExpressionServiceImpl implements ExpressionService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "evaluate"));
         }
-        final ExpressionExecutorStrategy expressionExecutorStrategy = expressionExecutorsMap.get(expressionKind);
-        if (expressionExecutorStrategy == null) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                        LogUtil.getLogOnExceptionMethod(this.getClass(), "evaluate", "Unable to find an executor for expression type " + expressionKind));
-            }
-            throw new SExpressionTypeUnknownException("Unable to find an executor for expression type " + expressionKind);
-        }
+        final ExpressionExecutorStrategy expressionExecutorStrategy = getStrategy(expressionKind);
         final List<Object> list = expressionExecutorStrategy.evaluate(expressions, dependencyValues, resolvedExpressions);
         if (list == null || list.size() != expressions.size()) {
             final String exceptionMessage = "Result list size " + (list == null ? 0 : list.size()) + " is different from expression list size "

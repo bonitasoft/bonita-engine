@@ -68,6 +68,7 @@ public class SConnectorDefinitionBinding extends ElementBinding {
         return XMLSMigrationPlan.CONNECTOR_NODE;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

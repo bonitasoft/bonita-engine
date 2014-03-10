@@ -72,6 +72,7 @@ public class SExpressionBinding extends ElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (XMLSMigrationPlan.EXPRESSION_CONTENT.equals(name)) {

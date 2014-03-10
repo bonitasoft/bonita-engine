@@ -56,11 +56,7 @@ public class ConnectorServiceDecorator implements ConnectorService {
             final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
             throws SConnectorException {
         final SExpression apiAccessorExpression;
-        try {
-            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
-        } catch (final SInvalidExpressionException e) {
-            throw new SConnectorException("Error creation apiAccessor Expression.", e);
-        }
+        apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
         final Map<String, SExpression> parameters = new HashMap<String, SExpression>(connectorInputParameters);
         parameters.put("connectorApiAccessor", apiAccessorExpression);
         return connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, parameters, inputValues,

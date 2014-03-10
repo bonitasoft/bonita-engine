@@ -36,6 +36,7 @@ public class SConnectorDefinitionInputBinding extends SNamedElementBinding {
         return XMLSProcessDefinition.CONNECTOR_INPUT;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

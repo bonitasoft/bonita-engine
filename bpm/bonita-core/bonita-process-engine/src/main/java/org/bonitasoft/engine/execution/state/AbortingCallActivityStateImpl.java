@@ -56,11 +56,13 @@ public class AbortingCallActivityStateImpl extends EndingCallActivityExceptionSt
         return SStateCategory.ABORTING;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "aborting call activity";

@@ -27,11 +27,13 @@ public class RolesBinding extends ElementBinding {
 
     private List<String> roles;
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         roles = new ArrayList<String>(5);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("role".equals(name)) {
@@ -39,6 +41,7 @@ public class RolesBinding extends ElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

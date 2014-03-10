@@ -46,6 +46,7 @@ public class JobWrapper implements StatelessJob {
             // Nothing to do
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void afterCompletion(final TransactionState txState) {
             sessionAccessor.deleteTenantId();

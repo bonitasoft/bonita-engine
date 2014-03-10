@@ -37,6 +37,7 @@ public class CompletingSubTaskStateImpl implements FlowNodeState {
         this.stateBehaviors = stateBehaviors;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return StateCode.DONE;
@@ -67,12 +68,14 @@ public class CompletingSubTaskStateImpl implements FlowNodeState {
         return "cancelling subtasks";
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         final SHumanTaskInstance sHumanTaskInstance = (SHumanTaskInstance) parentInstance;
         return sHumanTaskInstance.getTokenCount() == 0;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         final SHumanTaskInstance sHumanTaskInstance = (SHumanTaskInstance) flowNodeInstance;
@@ -91,11 +94,13 @@ public class CompletingSubTaskStateImpl implements FlowNodeState {
         return SStateCategory.NORMAL;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "";

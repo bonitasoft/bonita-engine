@@ -51,27 +51,24 @@ public class TransactionResourceImplTest extends TransactionResourceTest {
 
         return new TechnicalLoggerService() {
 
+            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
-                // TODO Auto-generated method stub
-
             }
 
+            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
-                // TODO Auto-generated method stub
-
             }
 
+            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final Throwable t) {
-                // TODO Auto-generated method stub
-
             }
 
+            @SuppressWarnings("unused")
             @Override
             public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
-                // TODO Auto-generated method stub
                 return false;
             }
         };
