@@ -92,6 +92,9 @@
 
 		<profile>
 			<id>package</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
