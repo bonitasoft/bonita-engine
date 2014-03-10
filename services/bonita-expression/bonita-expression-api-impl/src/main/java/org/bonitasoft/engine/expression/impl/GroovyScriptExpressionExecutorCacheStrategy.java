@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -55,7 +55,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         this.classLoaderService = classLoaderService;
     }
 
-    private Script getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, ClassLoaderException {
+    private Script getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
         final GroovyShell shell = getShell(definitionId);
         /*
          * We use the current thread id is the key because Scripts are not thread safe (because of binding)
@@ -71,7 +71,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         return script;
     }
 
-    private GroovyShell getShell(final Long definitionId) throws ClassLoaderException, SCacheException {
+    private GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
         final String key = SHELL_KEY + definitionId;
         GroovyShell shell = (GroovyShell) cacheService.get(GROOVY_SCRIPT_CACHE_NAME, key);
         if (shell == null) {
@@ -108,7 +108,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
             throw new SExpressionEvaluationException(e, expressionName);
         } catch (final SCacheException e) {
             throw new SExpressionEvaluationException("Problem accessing the Script Cache from GroovyScriptExpressionExecutorCacheStrategy", e, expressionName);
-        } catch (final ClassLoaderException e) {
+        } catch (final SClassLoaderException e) {
             throw new SExpressionEvaluationException("Unable to retrieve the correct classloader to execute the groovy script : " + expression, e,
                     expressionName);
         } catch (final Throwable e) {

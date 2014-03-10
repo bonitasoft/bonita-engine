@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2013-2014 Bonitasoft S.A.
+ * Copyright (C) 2011, 2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,38 +11,40 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.scheduler.impl;
+package org.bonitasoft.engine.events.model;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 /**
- * @author Matthieu Chaffotte
- * @author Baptsite Mesta : the bos job is set before the execution.
+ * @author Christophe Havard
  * @author Celine Souchet
  */
-public abstract class QuartzJob implements org.quartz.Job {
+public class SFireEventException extends SBonitaException {
 
-    private StatelessJob bosJob;
+    private static final long serialVersionUID = 752699780388742999L;
 
-    @SuppressWarnings("unused")
-    @Override
-    public void execute(final JobExecutionContext context) throws JobExecutionException {
-        try {
-            bosJob.execute();
-        } catch (final SBonitaException e) {
-            throw new JobExecutionException(e);
+    private List<Exception> handlerExceptions;
+
+    public SFireEventException(final String message) {
+        super(message);
+    }
+
+    public void addHandlerException(final Exception e) {
+        if (handlerExceptions == null) {
+            handlerExceptions = new ArrayList<Exception>();
         }
+        handlerExceptions.add(e);
     }
 
-    public StatelessJob getBosJob() {
-        return bosJob;
-    }
-
-    public void setBosJob(StatelessJob bosJob) {
-        this.bosJob = bosJob;
+    public List<Exception> getHandlerExceptions() {
+        if (handlerExceptions != null) {
+            return handlerExceptions;
+        }
+        return Collections.emptyList();
     }
 
 }

@@ -199,10 +199,14 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     public void executeOutputOperation(final List<SOperation> outputs, final SExpressionContext expressionContext, final ConnectorResult result)
-            throws SOperationExecutionException, SConnectorException {
-        expressionContext.setInputValues(new HashMap<String, Object>(result.getResult()));
-        operationService.execute(outputs, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);// data is in
-        disconnect(result);
+            throws SConnectorException {
+        try {
+            expressionContext.setInputValues(new HashMap<String, Object>(result.getResult()));
+            operationService.execute(outputs, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);// data is in
+            disconnect(result);
+        } catch (final SOperationExecutionException e) {
+            throw new SConnectorException(e);
+        }
     }
 
     @Override

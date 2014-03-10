@@ -77,6 +77,8 @@ public class AdvancedStartProcessCommand extends CommandWithParameters {
             // start the process
             final ProcessStarter starter = new ProcessStarter(startedBy, processDefinitionId, operations, context, activityNames);
             processInstance = starter.start();
+        } catch (final SCommandExecutionException e) {
+            throw e;
         } catch (final Exception e) {
             throw new SCommandExecutionException(e);
         }

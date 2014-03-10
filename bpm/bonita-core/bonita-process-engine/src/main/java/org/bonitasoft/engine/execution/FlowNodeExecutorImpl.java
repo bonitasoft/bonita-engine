@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution;
 
 import java.util.List;
 
+import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -295,7 +296,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     @Override
     public void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId)
-            throws SActivityExecutionException {
+            throws SArchivingException {
         ProcessArchiver.archiveFlowNodeInstance(flowNodeInstance, deleteAfterArchive, processDefinitionId, processInstanceService, processDefinitionService,
                 archiveService, dataInstanceService, activityInstanceService, connectorInstanceService);
     }

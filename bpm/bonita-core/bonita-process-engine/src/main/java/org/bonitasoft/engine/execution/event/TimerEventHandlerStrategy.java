@@ -84,7 +84,6 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     protected Trigger getTrigger(final STimerEventTriggerDefinition timerTrigger, final SCatchEventInstance eventInstance, final long processDefinitionId)
             throws SBonitaException {
-
         final SExpressionContext expressionContext;
         if (eventInstance != null) {
             expressionContext = new SExpressionContext(eventInstance.getParentProcessInstanceId(), DataInstanceContainer.PROCESS_INSTANCE.name(),

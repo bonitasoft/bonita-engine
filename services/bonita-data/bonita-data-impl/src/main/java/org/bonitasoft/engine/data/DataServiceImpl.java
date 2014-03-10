@@ -17,7 +17,7 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.data.model.SDataSource;
@@ -114,7 +114,7 @@ public class DataServiceImpl implements DataService {
             final DataSourceImplementationProxy dataSourceImplementationProxy = new DataSourceImplementationProxy(dataSourceImplementation);
             return (T) Proxy.newProxyInstance(dataSourceClassloader, new Class[] { dataSourceType }, dataSourceImplementationProxy);
 
-        } catch (final ClassLoaderException e) {
+        } catch (final SClassLoaderException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getDataSourceImplementation", e));
             }

@@ -172,8 +172,7 @@ public class EventsHandler {
      * @throws SBonitaException
      */
     private void handleEventSubProcess(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,
-            final long subProcessId,
-            final SProcessInstance parentProcessInstance) throws SBonitaException {
+            final long subProcessId, final SProcessInstance parentProcessInstance) throws SBonitaException {
         final List<SEventTriggerDefinition> eventTriggers = eventDefinition.getEventTriggers();
         for (final SEventTriggerDefinition sEventTriggerDefinition : eventTriggers) {
             final EventHandlerStrategy eventHandlerStrategy = handlers.get(sEventTriggerDefinition.getEventTriggerType());

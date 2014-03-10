@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.dependency.ArtifactAccessor;
@@ -394,7 +394,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
         final Map<String, byte[]> resources = getDependenciesResources();
         try {
             classLoaderService.refreshGlobalClassLoader(resources);
-        } catch (final ClassLoaderException e) {
+        } catch (final SClassLoaderException e) {
             throw new SDependencyException("can't refresh global classLoader", e);
         }
     }

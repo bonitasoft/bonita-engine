@@ -21,12 +21,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -108,11 +110,22 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
                 results.add(res);
             }
             return results;
-        } catch (final ClassLoaderException e) {
+        } catch (final SProcessDefinitionNotFoundException e) {
+            throw buildSExpressionEvaluationExceptionWhenNotFindProcess(evaluationContext, e);
+        } catch (final SProcessDefinitionReadException e) {
+            throw buildSExpressionEvaluationExceptionWhenNotFindProcess(evaluationContext, e);
+        } catch (final SClassLoaderException e) {
             throw new SExpressionEvaluationException(e, null);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
+    }
+
+    private SExpressionEvaluationException buildSExpressionEvaluationExceptionWhenNotFindProcess(final SExpressionContext evaluationContext,
+            final SBonitaException e) {
+        final SExpressionEvaluationException exception = new SExpressionEvaluationException("The process definition was not found.", e, null);
+        exception.setProcessDefinitionIdOnContext(evaluationContext.getProcessDefinitionId());
+        return exception;
     }
 
     private Map<Integer, Object> evaluateAllExpressionsWithNoDependencies(final HashMap<String, Object> dependencyValues,
@@ -219,15 +232,12 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         return expressionMapByKind;
     }
 
-    private void fillContext(final SExpressionContext evaluationContext, final Map<String, Object> dependencyValues) throws SExpressionEvaluationException {
+    private void fillContext(final SExpressionContext evaluationContext, final Map<String, Object> dependencyValues)
+            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         if (evaluationContext.getContainerId() == null && evaluationContext.getProcessDefinitionId() != null) {
-            try {
-                final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(evaluationContext.getProcessDefinitionId());
-                evaluationContext.setProcessDefinition(processDefinition);
-                evaluationContext.setEvaluateInDefinition(true);
-            } catch (final SBonitaException e) {
-                throw new SExpressionEvaluationException("Process definition not found with id = <" + evaluationContext.getProcessDefinitionId() + ">", e, null);
-            }
+            final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(evaluationContext.getProcessDefinitionId());
+            evaluationContext.setProcessDefinition(processDefinition);
+            evaluationContext.setEvaluateInDefinition(true);
         }
         if (evaluationContext.getContainerId() != null) {
             dependencyValues.put(SExpressionContext.containerIdKey, evaluationContext.getContainerId());

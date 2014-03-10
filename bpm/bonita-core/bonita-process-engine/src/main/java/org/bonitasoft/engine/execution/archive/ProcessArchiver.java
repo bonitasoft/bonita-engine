@@ -36,7 +36,6 @@ import org.bonitasoft.engine.core.process.document.mapping.exception.SPageOutOfR
 import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -67,7 +66,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserT
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -256,44 +254,9 @@ public class ProcessArchiver {
         }
     }
 
-    private static void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final boolean deleteAfterArchive,
-            final ProcessInstanceService processInstanceService, final ArchiveService archiveService,
-            final DataInstanceService dataInstanceService, final SProcessDefinition processDefinition, final ActivityInstanceService activityInstanceService,
-            final ConnectorInstanceService connectorInstanceService) throws SActivityExecutionException {
+    private static void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final ArchiveService archiveService, final long archiveDate)
+            throws SArchivingException {
         try {
-            final long archiveDate = System.currentTimeMillis();
-            // Remove data instance + data visibility mapping
-            if (deleteAfterArchive) {
-                if (flowNodeInstance instanceof SActivityInstance) {
-                    final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
-                            flowNodeInstance.getFlowNodeDefinitionId());
-                    // only do search for data instances with there are data definitions. Can be null if it's a manual data add at runtime
-                    if (activityDef != null && !activityDef.getSDataDefinitions().isEmpty()) {
-                        try {
-                            /*
-                             * Delete data instances defined at activity level:
-                             * We do not archive because it's done after update not before update
-                             */
-                            List<SDataInstance> dataInstances;
-                            do {
-                                dataInstances = dataInstanceService.getLocalDataInstances(flowNodeInstance.getId(),
-                                        DataInstanceContainer.ACTIVITY_INSTANCE.toString(), 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
-                                for (final SDataInstance sDataInstance : dataInstances) {
-                                    dataInstanceService.deleteDataInstance(sDataInstance);
-                                }
-                            } while (dataInstances != null && dataInstances.size() > 0);
-                        } catch (final SDataInstanceReadException e) {
-                            throw new SActivityExecutionException(e);
-                        }
-                    }
-
-                    if (activityDef != null && !activityDef.getConnectors().isEmpty()) {
-                        archiveConnectors(connectorInstanceService, archiveDate, flowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
-                    }
-                }
-                dataInstanceService.removeContainer(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-            }
-            // then archive the flow node instance:
             SAFlowNodeInstance saFlowNodeInstance = null;
             switch (flowNodeInstance.getType()) {// TODO archive other flow node
                 case AUTOMATIC_TASK:
@@ -355,28 +318,63 @@ public class ProcessArchiver {
                 final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saFlowNodeInstance);
                 archiveService.recordInsert(archiveDate, insertRecord);
             }
-            if (deleteAfterArchive) {
-                // Reconnect the persisted object before deleting it:
-                final SFlowNodeInstance flowNodeInstance2 = activityInstanceService.getFlowNodeInstance(flowNodeInstance.getId());
-                processInstanceService.deleteFlowNodeInstance(flowNodeInstance2, processDefinition);
-            }
         } catch (final SBonitaException e) {
-            throw new SActivityExecutionException(e);
+            throw new SArchivingException(e);
         }
+    }
+
+    private static void deleteLocalDataInstancesFromActivityInstance(final SFlowNodeInstance flowNodeInstance, final DataInstanceService dataInstanceService)
+            throws SDataInstanceException {
+        List<SDataInstance> dataInstances;
+        do {
+            dataInstances = dataInstanceService.getLocalDataInstances(flowNodeInstance.getId(),
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), 0, QueryOptions.DEFAULT_NUMBER_OF_RESULTS);
+            for (final SDataInstance sDataInstance : dataInstances) {
+                dataInstanceService.deleteDataInstance(sDataInstance);
+            }
+        } while (dataInstances != null && dataInstances.size() > 0);
     }
 
     public static void archiveFlowNodeInstance(final SFlowNodeInstance intTxflowNodeInstance, final boolean deleteAfterArchive, final long processDefinitionId,
             final ProcessInstanceService processInstanceService, final ProcessDefinitionService processDefinitionService, final ArchiveService archiveService,
             final DataInstanceService dataInstanceService, final ActivityInstanceService activityInstanceService,
-            final ConnectorInstanceService connectorInstanceService) throws SActivityExecutionException {
+            final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
         try {
             final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-            archiveFlowNodeInstance(intTxflowNodeInstance, deleteAfterArchive, processInstanceService, archiveService, dataInstanceService,
-                    processDefinition, activityInstanceService, connectorInstanceService);
-        } catch (final SActivityExecutionException e) {
+            final long archiveDate = System.currentTimeMillis();
+            // Remove data instance + data visibility mapping
+            if (deleteAfterArchive) {
+                if (intTxflowNodeInstance instanceof SActivityInstance) {
+                    final SActivityDefinition activityDef = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
+                            intTxflowNodeInstance.getFlowNodeDefinitionId());
+                    // only do search for data instances with there are data definitions. Can be null if it's a manual data add at runtime
+                    if (activityDef != null && !activityDef.getSDataDefinitions().isEmpty()) {
+                        /*
+                         * Delete data instances defined at activity level:
+                         * We do not archive because it's done after update not before update
+                         */
+                        deleteLocalDataInstancesFromActivityInstance(intTxflowNodeInstance, dataInstanceService);
+                    }
+
+                    if (activityDef != null && !activityDef.getConnectors().isEmpty()) {
+                        archiveConnectors(connectorInstanceService, archiveDate, intTxflowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
+                    }
+                }
+                dataInstanceService.removeContainer(intTxflowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+
+                // then archive the flow node instance:
+                archiveFlowNodeInstance(intTxflowNodeInstance, archiveService, archiveDate);
+
+                // Reconnect the persisted object before deleting it:
+                final SFlowNodeInstance flowNodeInstance2 = activityInstanceService.getFlowNodeInstance(intTxflowNodeInstance.getId());
+                processInstanceService.deleteFlowNodeInstance(flowNodeInstance2, processDefinition);
+            } else {
+                archiveFlowNodeInstance(intTxflowNodeInstance, archiveService, archiveDate);
+            }
+        } catch (final SArchivingException e) {
             throw e;
         } catch (final SBonitaException e) {
-            throw new SActivityExecutionException(e);
+            throw new SArchivingException(e);
         }
 
     }

@@ -24,7 +24,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -193,7 +193,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             try {
                 eventService.fireEvent(jobFailed);
-            } catch (final FireEventException e1) {
+            } catch (final SFireEventException e1) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e1);
             }
             throw new SSchedulerException(e);
@@ -236,7 +236,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void start() throws SSchedulerException, FireEventException {
+    public void start() throws SSchedulerException, SFireEventException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "start");
         schedulerExecutor.start();
         eventService.fireEvent(schedulStarted);
@@ -244,7 +244,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void stop() throws SSchedulerException, FireEventException {
+    public void stop() throws SSchedulerException, SFireEventException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "shutdown");
         schedulerExecutor.shutdown();
         eventService.fireEvent(schedulStopped);

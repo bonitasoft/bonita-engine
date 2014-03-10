@@ -29,7 +29,7 @@ import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -271,7 +271,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     private ClassLoader beforeInvokeMethodForAPISession(final SessionAccessor sessionAccessor, final ServiceAccessorFactory serviceAccessorFactory,
             final PlatformServiceAccessor platformServiceAccessor, final Session session) throws SSchedulerException,
-            org.bonitasoft.engine.session.SSessionException, ClassLoaderException, SBonitaException, BonitaHomeNotSetException, IOException,
+            org.bonitasoft.engine.session.SSessionException, SClassLoaderException, SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         ClassLoader serverClassLoader;
         final SessionService sessionService = platformServiceAccessor.getSessionService();
@@ -285,7 +285,7 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private ClassLoader beforeInvokeMethodForPlatformSession(final SessionAccessor sessionAccessor, final PlatformServiceAccessor platformServiceAccessor,
-            final Session session) throws SSessionException, ClassLoaderException {
+            final Session session) throws SSessionException, SClassLoaderException {
         ClassLoader serverClassLoader;
         final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
         final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
@@ -439,14 +439,14 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private ClassLoader getTenantClassLoader(final PlatformServiceAccessor platformServiceAccessor, final Session session) throws ClassLoaderException {
+    private ClassLoader getTenantClassLoader(final PlatformServiceAccessor platformServiceAccessor, final Session session) throws SClassLoaderException {
         final APISession apiSession = (APISession) session;
         final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(apiSession.getTenantId());
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         return classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), apiSession.getTenantId());
     }
 
-    private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor) throws ClassLoaderException {
+    private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor) throws SClassLoaderException {
         ClassLoader classLoader = null;
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         if (platformService.isPlatformCreated()) {

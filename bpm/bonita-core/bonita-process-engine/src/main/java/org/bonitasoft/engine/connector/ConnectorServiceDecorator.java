@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
@@ -38,7 +37,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 
 /**
  * This service wraps the connector service and add engine variables like apiAccessor, engineExecutionContext.
- *
+ * 
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
@@ -60,7 +59,7 @@ public class ConnectorServiceDecorator implements ConnectorService {
         try {
             apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
         } catch (final SInvalidExpressionException e) {
-            throw new SConnectorException("Error creation apiAccessor Expression", e);
+            throw new SConnectorException("Error creation apiAccessor Expression.", e);
         }
         final Map<String, SExpression> parameters = new HashMap<String, SExpression>(connectorInputParameters);
         parameters.put("connectorApiAccessor", apiAccessorExpression);
@@ -107,7 +106,7 @@ public class ConnectorServiceDecorator implements ConnectorService {
 
     @Override
     public void executeOutputOperation(final List<SOperation> outputs, final SExpressionContext expressionContext, final ConnectorResult connectorOutput)
-            throws SBonitaException {
+            throws SConnectorException {
         connectorService.executeOutputOperation(outputs, expressionContext, connectorOutput);
     }
 

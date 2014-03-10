@@ -214,7 +214,7 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDeploymentInfoImpl;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
@@ -735,7 +735,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
             processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
             unzipBar(businessArchive, sProcessDefinition, tenantAccessor.getTenantId());// TODO first unzip in temp folder
-            final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(this, businessArchive, tenantAccessor, sProcessDefinition);
+            final boolean isResolved = tenantAccessor.getDependencyResolver().resolveDependencies(businessArchive, tenantAccessor, sProcessDefinition);
             if (isResolved) {
                 tenantAccessor.getDependencyResolver().resolveAndCreateDependencies(businessArchive, processDefinitionService, dependencyService,
                         sProcessDefinition);
@@ -2547,11 +2547,11 @@ public class ProcessAPIImpl implements ProcessAPI {
      * @return
      * @throws SProcessInstanceNotFoundException
      * @throws SProcessInstanceReadException
-     * @throws ClassLoaderException
+     * @throws SClassLoaderException
      */
     protected ClassLoader getProcessInstanceClassloader(final TenantServiceAccessor tenantAccessor, final long processInstanceId)
             throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
-            ClassLoaderException {
+            SClassLoaderException {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final long processDefinitionId = processInstanceService.getProcessInstance(processInstanceId).getProcessDefinitionId();
@@ -3145,7 +3145,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     operations.add(operation);
                 }
             }
-        } catch (final ClassLoaderException cle) {
+        } catch (final SClassLoaderException cle) {
             throw new ProcessExecutionException(cle);
         } catch (final InvalidExpressionException iee) {
             throw new ProcessExecutionException(iee);

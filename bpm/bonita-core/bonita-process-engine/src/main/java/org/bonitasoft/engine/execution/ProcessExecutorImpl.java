@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
+import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.bpm.bar.DocumentsResourcesContribution;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
@@ -43,6 +44,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -62,6 +64,7 @@ import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.process.document.api.SProcessDocumentCreationException;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
 import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilderFactory;
@@ -98,7 +101,9 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.flowmerger.FlowMerger;
 import org.bonitasoft.engine.execution.flowmerger.FlowNodeCompletionTokenProvider;
@@ -120,6 +125,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -288,7 +294,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
             if (defaultTransition == null) {
                 throw new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
-                        + ", but no outgoing transition had a valid condition");
+                        + ", but no outgoing transition had a valid condition.");
             }
             chosenTransitions.add(defaultTransition);
             outgoingTransitionDefinitions.add(defaultTransition);
@@ -429,7 +435,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
             }
-            throw new RuntimeException(e);
+            throw new BonitaRuntimeException(e);
         }
     }
 
@@ -445,19 +451,18 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected SProcessInstance createProcessInstance(final SProcessDefinition processDefinition, final long starterId, final long starterDelegateId,
             final long callerId) throws SProcessInstanceCreationException {
+        SActivityInstance callerInstance;
         try {
-            final SActivityInstance callerInstance = getCaller(callerId);
-            final SProcessInstance sProcessInstance;
-            if (callerInstance != null) {
-                sProcessInstance = createProcessInstance(processDefinition, starterId, starterDelegateId, callerId, callerInstance.getType(),
-                        callerInstance.getRootContainerId());
-            } else {
-                sProcessInstance = createProcessInstance(processDefinition, starterId, starterDelegateId, callerId, null, -1);
-            }
-            return sProcessInstance;
+            callerInstance = getCaller(callerId);
         } catch (final SBonitaException e) {
             throw new SProcessInstanceCreationException("Unable to get caller.", e);
         }
+
+        if (callerInstance != null) {
+            return createProcessInstance(processDefinition, starterId, starterDelegateId, callerId, callerInstance.getType(),
+                    callerInstance.getRootContainerId());
+        }
+        return createProcessInstance(processDefinition, starterId, starterDelegateId, callerId, null, -1);
     }
 
     private SActivityInstance getCaller(final long callerId) throws SActivityReadException, SActivityInstanceNotFoundException {
@@ -573,38 +578,26 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     protected boolean initialize(final long userId, final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance,
             SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
-            throws SProcessInstanceCreationException {
-        try {
-            // Create SDataInstances
-            bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context);
-            createDocuments(sProcessDefinition, sProcessInstance, userId);
-            if (connectors != null) {
-                executeConnectors(sProcessDefinition, sProcessInstance, connectors);
-            }
-            if (expressionContext == null) {
-                expressionContext = new SExpressionContext();
-            }
-            executeOperations(operations, context, expressionContext, sProcessInstance);
-
-            // Create connectors
-            bpmInstancesCreator.createConnectorInstances(sProcessInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
-
-            return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER);
-        } catch (final SProcessInstanceCreationException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SProcessInstanceCreationException(e);
-        } catch (final BonitaHomeNotSetException e) {
-            throw new SProcessInstanceCreationException(e);
-        } catch (final IOException e) {
-            throw new SProcessInstanceCreationException(e);
-        } catch (final InvalidEvaluationConnectorConditionException e) {
-            throw new SProcessInstanceCreationException(e);
+            throws BonitaHomeNotSetException, IOException, InvalidEvaluationConnectorConditionException, SBonitaException {
+        // Create SDataInstances
+        bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context);
+        createDocuments(sProcessDefinition, sProcessInstance, userId);
+        if (connectors != null) {
+            executeConnectors(sProcessDefinition, sProcessInstance, connectors);
         }
+        if (expressionContext == null) {
+            expressionContext = new SExpressionContext();
+        }
+        executeOperations(operations, context, expressionContext, sProcessInstance);
+
+        // Create connectors
+        bpmInstancesCreator.createConnectorInstances(sProcessInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
+
+        return executeConnectors(sProcessDefinition, sProcessInstance, ConnectorEvent.ON_ENTER);
     }
 
-    protected void createDocuments(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long authorId) throws SBonitaException,
-            IOException, BonitaHomeNotSetException {
+    protected void createDocuments(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long authorId)
+            throws SProcessDocumentCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException {
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         final List<SDocumentDefinition> documentDefinitions = processContainer.getDocumentDefinitions();
         if (!documentDefinitions.isEmpty()) {
@@ -619,20 +612,20 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), document.getUrl(),
                             authorId);
                 } else {
-                    throw new SProcessInstanceCreationException("Unable to create documents. A document was defined without url or content.");
+                    throw new SProcessDocumentCreationException("Unable to create documents. A document was defined without url or content.");
                 }
             }
         }
     }
 
     protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final String url, final long authorId) throws SBonitaException {
+            final String url, final long authorId) throws SProcessDocumentCreationException {
         final SProcessDocument attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType, authorId, url);
         return processDocumentService.attachDocumentToProcessInstance(attachment);
     }
 
     protected SProcessDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final byte[] documentContent, final long authorId) throws SBonitaException {
+            final byte[] documentContent, final long authorId) throws SProcessDocumentCreationException {
         final SProcessDocument attachment = buildProcessDocument(processInstanceId, documentName, fileName, mimeType, authorId);
         return processDocumentService.attachDocumentToProcessInstance(attachment, documentContent);
     }
@@ -789,7 +782,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private void archiveFlowNodeInstance(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance)
-            throws SActivityExecutionException {
+            throws SArchivingException {
         if (child.getId() != sProcessInstance.getInterruptingEventId() || SFlowNodeType.SUB_PROCESS.equals(sProcessInstance.getCallerType())) {
             // Let's archive the final state of the child:
             flowNodeExecutor.archiveFlowNodeInstance(child, true, sProcessDefinition.getId());
@@ -917,7 +910,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final long callerId, final FlowNodeSelector selector) throws SProcessInstanceCreationException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
+            final SProcessDefinition sProcessDefinition = selector.getProcessDefinition();
             final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), sProcessDefinition.getId());
             Thread.currentThread().setContextClassLoader(localClassLoader);
             // initialize the process classloader by getting it one time
@@ -930,7 +923,15 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SFlowElementContainerDefinition processContainer = selector.getContainer();
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContext,
                     operations != null ? new ArrayList<SOperation>(operations) : operations, context, processContainer, connectors);
-            handleEventSubProcess(sProcessDefinition, sProcessInstance, selector.getSubProcessDefinitionId());
+            try {
+                handleEventSubProcess(sProcessDefinition, sProcessInstance, selector.getSubProcessDefinitionId());
+            } catch (final SProcessInstanceCreationException e) {
+                throw e;
+            } catch (final SBonitaException e) {
+                setExceptionContext(sProcessDefinition, sProcessInstance, e);
+                throw new SProcessInstanceCreationException("Unable to register events for event sub process in process.", e);
+            }
+
             if (isInitializing) {
                 // some connectors were trigger
                 processInstanceService.setState(sProcessInstance, ProcessInstanceState.INITIALIZING);
@@ -938,6 +939,12 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 return sProcessInstance;
             }
             return startElements(sProcessInstance, selector);
+        } catch (final BonitaException e) {
+            throw new SProcessInstanceCreationException(e);
+        } catch (final IOException e) {
+            throw new SProcessInstanceCreationException(e);
+        } catch (final SProcessInstanceCreationException e) {
+            throw e;
         } catch (final SBonitaException e) {
             throw new SProcessInstanceCreationException(e);
         } finally {
@@ -949,7 +956,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
      * Execute connectors then execute output operation and disconnect connectors
      */
     protected void executeConnectors(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance,
-            final List<ConnectorDefinitionWithInputValues> connectorsList) throws InvalidEvaluationConnectorConditionException, SBonitaException {
+            final List<ConnectorDefinitionWithInputValues> connectorsList) throws InvalidEvaluationConnectorConditionException, SConnectorException {
         final SExpressionContext expcontext = new SExpressionContext();
         expcontext.setProcessDefinitionId(processDefinition.getId());
         expcontext.setProcessDefinition(processDefinition);
@@ -979,17 +986,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     protected void handleEventSubProcess(final SProcessDefinition sProcessDefinition, final SProcessInstance sProcessInstance, final long subProcessDefinitionId)
-            throws SActivityExecutionException {
+            throws SBonitaException {
         if (subProcessDefinitionId == -1) {
-            try {
-                // modify that to support event sub-processes within sub-processes
-                eventsHandler.handleEventSubProcess(sProcessDefinition, sProcessInstance);
-            } catch (final SActivityExecutionException e) {
-                throw e;
-            } catch (final SBonitaException e) {
-                setExceptionContext(sProcessDefinition, sProcessInstance, e);
-                throw new SActivityExecutionException("Unable to register events for event sub process in process.", e);
-            }
+            // modify that to support event sub-processes within sub-processes
+            eventsHandler.handleEventSubProcess(sProcessDefinition, sProcessInstance);
         }
     }
 
