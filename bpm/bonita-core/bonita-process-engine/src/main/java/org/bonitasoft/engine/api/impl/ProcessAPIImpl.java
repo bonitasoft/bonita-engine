@@ -214,8 +214,8 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDeploymentInfoImpl;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -474,17 +474,21 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<HumanTaskInstance> searchHumanTaskInstances(final SearchOptions searchOptions) throws SearchException {
+        try {
+            return searchHumanTasksTransaction(searchOptions);
+        } catch (final SBonitaException e) {
+            throw new SearchException(e);
+        }
+    }
+
+    private SearchResult<HumanTaskInstance> searchHumanTasksTransaction(final SearchOptions searchOptions) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SearchHumanTaskInstances searchHumanTasksTransaction = new SearchHumanTaskInstances(activityInstanceService, flowNodeStateManager,
                 searchEntitiesDescriptor.getSearchHumanTaskInstanceDescriptor(), searchOptions);
-        try {
-            searchHumanTasksTransaction.execute();
-        } catch (final SBonitaException e) {
-            throw new SearchException(e);
-        }
+        searchHumanTasksTransaction.execute();
         return searchHumanTasksTransaction.getResult();
     }
 
@@ -530,7 +534,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
                 @Override
                 public Void call() throws Exception {
-                    deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor, tenantAccessor.getTenantId());
+                    deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
                     try {
                         processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
                     } catch (final BonitaHomeNotSetException e) {
@@ -549,7 +553,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor, final long tenantId)
+    private void deleteProcessInstancesFromProcessDefinition(final long processDefinitionId, final TenantServiceAccessor tenantAccessor)
             throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
         List<ProcessInstance> processInstances;
         final int maxResults = 1000;
@@ -2154,7 +2158,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final RemoveProcessDefinitionsOfCategory remove = new RemoveProcessDefinitionsOfCategory(categoryService, categoryId);
         try {
-            remove.execute();;
+            remove.execute();
         } catch (final SBonitaException sbe) {
             throw new DeletionException(sbe);
         }
@@ -2550,13 +2554,11 @@ public class ProcessAPIImpl implements ProcessAPI {
      * @throws SClassLoaderException
      */
     protected ClassLoader getProcessInstanceClassloader(final TenantServiceAccessor tenantAccessor, final long processInstanceId)
-            throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
-            SClassLoaderException {
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SClassLoaderException {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final long processDefinitionId = processInstanceService.getProcessInstance(processInstanceId).getProcessDefinitionId();
-        final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
-        return processClassLoader;
+        return classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
     }
 
     @Override
@@ -2854,10 +2856,6 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getOneAssignedUserTaskInstanceOfProcessDefinition(final long processDefinitionId, final long userId) {
-        // TODO change this method to do that in one request
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-
         final int assignedUserTaskInstanceNumber = (int) getNumberOfAssignedHumanTaskInstances(userId);
         final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
                 ActivityInstanceCriterion.DEFAULT);
@@ -3289,9 +3287,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (operations != null) {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationInputValues, expcontext, classLoader, tenantAccessor);
-            } else {
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
+            return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         } catch (final NotSerializableException e) {
@@ -3349,7 +3346,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void deleteProcessInstances(final long processDefinitionId) throws DeletionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor, tenantAccessor.getTenantId());
+            deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
             new DeleteArchivedProcessInstances(tenantAccessor, processDefinitionId).execute();
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
@@ -3943,7 +3940,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)
             throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4026,6 +4022,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    @Deprecated
     @Override
     public List<Comment> getComments(final long processInstanceId) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -4171,9 +4168,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                     result.add(ModelConvertor.toDocument(attachment));
                 }
                 return result;
-            } else {
-                return Collections.emptyList();
             }
+            return Collections.emptyList();
         } catch (final SBonitaException sbe) {
             throw new DocumentException(sbe);
         }
@@ -5216,31 +5212,38 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<HumanTaskInstance> getHumanTaskInstances(final long processInstanceId, final String taskName, final int startIndex, final int maxResults) {
         try {
-            return getHumanTaskInstances(processInstanceId, taskName, startIndex, maxResults, HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
-        } catch (final NotFoundException e) {
-            return Collections.emptyList();
+            final List<HumanTaskInstance> humanTaskInstances = getHumanTaskInstances(processInstanceId, taskName, startIndex, maxResults,
+                    HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
+            if (humanTaskInstances == null) {
+                return Collections.emptyList();
+            }
+            return humanTaskInstances;
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
         }
     }
 
     @Override
     public HumanTaskInstance getLastStateHumanTaskInstance(final long processInstanceId, final String taskName) throws NotFoundException {
-        return getHumanTaskInstances(processInstanceId, taskName, 0, 1, HumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE, Order.DESC).get(0);
+        try {
+            final List<HumanTaskInstance> humanTaskInstances = getHumanTaskInstances(processInstanceId, taskName, 0, 1,
+                    HumanTaskInstanceSearchDescriptor.REACHED_STATE_DATE, Order.DESC);
+            if (humanTaskInstances == null || humanTaskInstances.isEmpty()) {
+                throw new NotFoundException("Task '" + taskName + "' not found");
+            }
+            return humanTaskInstances.get(0);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        }
     }
 
     private List<HumanTaskInstance> getHumanTaskInstances(final long processInstanceId, final String taskName, final int startIndex, final int maxResults,
-            final String field, final Order order) throws NotFoundException {
+            final String field, final Order order) throws SBonitaException {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
         builder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).filter(HumanTaskInstanceSearchDescriptor.NAME, taskName);
         builder.sort(field, order);
-        try {
-            final SearchResult<HumanTaskInstance> searchHumanTasks = searchHumanTaskInstances(builder.done());
-            if (searchHumanTasks.getCount() == 0) {
-                throw new NotFoundException("Task '" + taskName + "' not found");
-            }
-            return searchHumanTasks.getResult();
-        } catch (final SearchException se) {
-            throw new RetrieveException(se);
-        }
+        final SearchResult<HumanTaskInstance> searchHumanTasks = searchHumanTasksTransaction(builder.done());
+        return searchHumanTasks.getResult();
     }
 
     @Override

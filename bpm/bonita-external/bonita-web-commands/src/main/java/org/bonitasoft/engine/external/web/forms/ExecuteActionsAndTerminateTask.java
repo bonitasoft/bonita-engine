@@ -33,7 +33,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -121,13 +120,11 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
             SFlowNodeExecutionException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        SessionInfos sessionInfos = SessionInfos.getSessionInfos();
+        final SessionInfos sessionInfos = SessionInfos.getSessionInfos();
         final long userId = sessionInfos.getUserId();
-        final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
-        final boolean isFirstState = flowNodeInstance.getStateId() == 0;
         // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-        processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, processDefinitionId, userId, userId);
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
+        processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getProcessDefinitionId(), userId, userId);
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && flowNodeInstance.getStateId() != 0 /* don't log when create subtask */) {
             final String message = "The user <" + sessionInfos.getUsername() + "> has performed the task"
                     + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
             logger.log(getClass(), TechnicalLogSeverity.INFO, message);

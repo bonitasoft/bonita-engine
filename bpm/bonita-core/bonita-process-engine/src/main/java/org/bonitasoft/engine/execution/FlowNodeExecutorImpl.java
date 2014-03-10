@@ -25,15 +25,21 @@ import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -125,7 +131,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 if (commentService.isCommentEnabled(SystemCommentType.STATE_CHANGE) && state.mustAddSystemComment(flowNodeInstance)) {
                     commentService.addSystemComment(flowNodeInstance.getRootContainerId(), state.getSystemComment(flowNodeInstance));
                 }
-            } catch (final SBonitaException e) {
+            } catch (final SCommentAddException e) {
                 throw new SActivityExecutionException(e);
             }
         }
@@ -175,6 +181,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     // the state is still executing set the executing flag
                     activityInstanceService.setExecuting(sFlowNodeInstance);
                 }
+            } catch (final SActivityStateExecutionException e) {
+                throw e;
             } catch (final SFlowNodeExecutionException e) {
                 throw e;
             } catch (final SBonitaException e) {
@@ -229,13 +237,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             archiveFlowNodeInstance(sFlowNodeInstance, false, sProcessDefinitionId);
             activityInstanceService.setState(sFlowNodeInstance, state);
             if (state.isTerminal()) {
-                try {
-                    // reschedule this work but without the operations
-                    workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
-                            sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
-                } catch (final SWorkRegisterException e) {
-                    throw new SFlowNodeExecutionException(e);
-                }
+                // reschedule this work but without the operations
+                workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
+                        sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
             }
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
@@ -243,22 +247,28 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final long parentId) throws SBonitaException {
+    public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final long parentId) throws SFlowNodeNotFoundException,
+            SFlowNodeReadException, SProcessDefinitionNotFoundException, SProcessDefinitionReadException, SArchivingException, SFlowNodeModificationException,
+            SFlowNodeExecutionException {
         final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
 
-        boolean hit = false;
         // TODO check deletion here
-        final SFlowNodeInstance sFlowNodeInstanceParent = activityInstanceService.getFlowNodeInstance(parentId);
         archiveFlowNodeInstance(sFlowNodeInstanceChild, true, processDefinitionId);
-        final SActivityInstance activityInstance = (SActivityInstance) sFlowNodeInstanceParent;
-        final int tokenCount = activityInstance.getTokenCount() - 1;
-        activityInstanceService.setTokenCount(activityInstance, tokenCount);
-        hit = flowNodeStateManager.getState(sFlowNodeInstanceParent.getStateId()).hit(sProcessDefinition, sFlowNodeInstanceParent, sFlowNodeInstanceChild);
+
+        final SActivityInstance activityInstanceParent = (SActivityInstance) activityInstanceService.getFlowNodeInstance(parentId);
+        decrementToken(activityInstanceParent);
+        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        final boolean hit = flowNodeStateManager.getState(activityInstanceParent.getStateId()).hit(sProcessDefinition, activityInstanceParent,
+                sFlowNodeInstanceChild);
         if (hit) {// we continue parent if hit of the parent return true
             // in a new work?
             stepForward(parentId, null, null, sFlowNodeInstanceChild.getParentProcessInstanceId(), null, null);
         }
+    }
+
+    private void decrementToken(final SActivityInstance sActivityInstance) throws SFlowNodeModificationException {
+        final int tokenCount = sActivityInstance.getTokenCount() - 1;
+        activityInstanceService.setTokenCount(sActivityInstance, tokenCount);
     }
 
     @Override
@@ -267,8 +277,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         final long callerId = childProcInst.getCallerId();
         if (isTerminalState(childState) && callerId > 0) {
             final SActivityInstance callActivityInstance = activityInstanceService.getActivityInstance(childProcInst.getCallerId());
-            final int tokenCount = callActivityInstance.getTokenCount() - 1;
-            activityInstanceService.setTokenCount(callActivityInstance, tokenCount);
+            decrementToken(callActivityInstance);
             if (!hasActionsToExecute) {
                 containerRegistry.executeFlowNode(callActivityInstance.getProcessDefinitionId(),
                         callActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()),
