@@ -57,12 +57,10 @@ public class ExecuteActionsAndTerminateTaskExt extends ExecuteActionsAndTerminat
         final TechnicalLoggerService logger = serviceAccessor.getTechnicalLoggerService();
         final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
-        final ClassLoader processClassloader;
-        final long processDefinitionID;
         try {
             final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
-            processDefinitionID = flowNodeInstance.getLogicalGroup(0);
-            processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionID);
+            final long processDefinitionID = flowNodeInstance.getLogicalGroup(0);
+            final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionID);
             // set the classloader and update activity instance variable
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
