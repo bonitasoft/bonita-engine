@@ -485,6 +485,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
+							<!-- Be aware not to omit ${jacoco.agent.it.arg} if overriding this property in lower-level pom files: -->
 							<argLine>-Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError ${jacoco.agent.it.arg}</argLine>
 							<!-- Listener to show coverage for each test -->
 							<properties>
