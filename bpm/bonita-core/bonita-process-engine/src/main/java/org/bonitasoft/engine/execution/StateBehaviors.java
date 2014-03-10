@@ -26,8 +26,8 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -407,16 +407,9 @@ public class StateBehaviors {
                             // first enter connector:
                             return getConnectorWithFlag(nextConnectorInstanceToExecute, connectorsOnEnter.get(0), BEFORE_ON_ENTER | DURING_ON_ENTER);
                             // Or do we have to skip the 'before on enter' phase:
-                        } else {
-                            // not the first connector, or first connector not in state TO_BE_EXECUTED => don't execute phase BEFORE_ON_ENTER:
-                            for (final SConnectorDefinition sConnectorDefinition : connectorsOnEnter) {
-                                if (sConnectorDefinition.getName().equals(nextConnectorInstanceToExecute.getName())) {
-                                    return getConnectorWithFlag(nextConnectorInstanceToExecute, sConnectorDefinition, DURING_ON_ENTER);
-                                }
-                            }
-                            throw new SActivityStateExecutionException("Connector definition of " + nextConnectorInstanceToExecute + " not found on "
-                                    + flowNodeInstance);
                         }
+                        // not the first connector, or first connector not in state TO_BE_EXECUTED => don't execute phase BEFORE_ON_ENTER:
+                        return getConnectorWithFlagIfIsNextToExecute(flowNodeInstance, connectorsOnEnter, nextConnectorInstanceToExecute, DURING_ON_ENTER);
                     }
                     // All connectors ON ENTER have already been executed:
                     onEnterExecuted = true;
@@ -433,25 +426,16 @@ public class StateBehaviors {
                             if (onEnterExecuted) {
                                 // some connectors were already executed
                                 return getConnectorWithFlag(nextConnectorInstanceToExecute, connectorDefinition, BEFORE_ON_FINISH | DURING_ON_FINISH);
-                            } else {
-                                // on finish but the first connector
-                                return getConnectorWithFlag(nextConnectorInstanceToExecute, connectorDefinition, BEFORE_ON_ENTER | BEFORE_ON_FINISH
-                                        | DURING_ON_FINISH);
                             }
-                        } else {
-                            // no the first, don't execute before
-                            for (final SConnectorDefinition sConnectorDefinition : connectorsOnFinish) {
-                                if (sConnectorDefinition.getName().equals(nextConnectorInstanceToExecute.getName())) {
-                                    return getConnectorWithFlag(nextConnectorInstanceToExecute, sConnectorDefinition, DURING_ON_FINISH);
-                                }
-                            }
-                            throw new SActivityStateExecutionException("Connector definition of " + nextConnectorInstanceToExecute + " not found on "
-                                    + flowNodeInstance);
+                            // on finish but the first connector
+                            return getConnectorWithFlag(nextConnectorInstanceToExecute, connectorDefinition, BEFORE_ON_ENTER | BEFORE_ON_FINISH
+                                    | DURING_ON_FINISH);
                         }
-                    } else {
-                        // all finish connectors executed
-                        return getConnectorWithFlag(null, null, AFTER_ON_FINISH);
+                        // no the first, don't execute before
+                        return getConnectorWithFlagIfIsNextToExecute(flowNodeInstance, connectorsOnFinish, nextConnectorInstanceToExecute, DURING_ON_FINISH);
                     }
+                    // all finish connectors executed
+                    return getConnectorWithFlag(null, null, AFTER_ON_FINISH);
                 }
                 // no ON ENTER no ON FINISH active
                 if (flowNodeInstance.isStateExecuting()) {
@@ -464,6 +448,18 @@ public class StateBehaviors {
         } catch (final SConnectorInstanceReadException e) {
             throw new SActivityStateExecutionException(e);
         }
+    }
+
+    private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorWithFlagIfIsNextToExecute(final SFlowNodeInstance flowNodeInstance,
+            final List<SConnectorDefinition> sConnectorDefinitions, final SConnectorInstance nextConnectorInstanceToExecute, final int flag)
+            throws SActivityStateExecutionException {
+        for (final SConnectorDefinition sConnectorDefinition : sConnectorDefinitions) {
+            if (sConnectorDefinition.getName().equals(nextConnectorInstanceToExecute.getName())) {
+                return getConnectorWithFlag(nextConnectorInstanceToExecute, sConnectorDefinition, flag);
+            }
+        }
+        throw new SActivityStateExecutionException("Connector definition of " + nextConnectorInstanceToExecute + " not found on "
+                + flowNodeInstance);
     }
 
     private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorWithFlag(final SConnectorInstance nextConnectorInstance,
