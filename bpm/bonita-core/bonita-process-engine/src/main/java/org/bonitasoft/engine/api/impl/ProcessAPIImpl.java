@@ -2536,8 +2536,7 @@ public class ProcessAPIImpl implements ProcessAPI {
      * @throws ClassLoaderException
      */
     protected ClassLoader getProcessInstanceClassloader(final TenantServiceAccessor tenantAccessor, final long processInstanceId)
-            throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
-            ClassLoaderException {
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException, ClassLoaderException {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final long processDefinitionId = processInstanceService.getProcessInstance(processInstanceId).getProcessDefinitionId();
@@ -3375,6 +3374,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         try {
             userTransactionService.executeInTransaction(new Callable<Void>() {
+
                 @Override
                 public Void call() throws Exception {
                     processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
@@ -3396,6 +3396,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final UserTransactionService userTxService = tenantAccessor.getUserTransactionService();
         try {
             final List<SProcessInstance> sProcessInstances = userTxService.executeInTransaction(new Callable<List<SProcessInstance>>() {
+
                 @Override
                 public List<SProcessInstance> call() throws SBonitaSearchException {
                     return searchProcessInstancesFromProcessDefinition(processInstanceService, processDefinitionId, startIndex, maxResults);
@@ -3412,6 +3413,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             try {
                 locks = createLockProcessInstances(lockService, objectType, sProcessInstances, tenantAccessor.getTenantId());
                 return userTxService.executeInTransaction(new Callable<Long>() {
+
                     @Override
                     public Long call() throws Exception {
                         return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
@@ -5464,9 +5466,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     protected List<SJobParameter> getJobParameters(final Map<String, Serializable> parameters) {
         final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
         for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
-            jobParameters.add(getSJobParameterBuilderFactory().createNewInstance(parameter.getKey(), parameter.getValue()).done());
+            jobParameters.add(buildSJobParameter(parameter.getKey(), parameter.getValue()));
         }
         return jobParameters;
+    }
+
+    protected SJobParameter buildSJobParameter(final String parameterKey, final Serializable parameterValue) {
+        return getSJobParameterBuilderFactory().createNewInstance(parameterKey, parameterValue).done();
     }
 
     protected SJobParameterBuilderFactory getSJobParameterBuilderFactory() {
