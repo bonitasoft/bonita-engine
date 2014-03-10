@@ -57,7 +57,7 @@ final class RefreshClassLoaderTask implements Callable<TaskStatus>,
     }
 
     @Override
-    public TaskStatus call() throws Exception {
+    public TaskStatus call() {
         String localUuid = ClusteredClassLoaderService.hazelcastInstance
                 .getCluster().getLocalMember().getUuid();
         try {

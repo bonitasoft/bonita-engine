@@ -11,7 +11,6 @@ package com.bonitasoft.engine.work;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.AbstractWorkSynchronization;
 import org.bonitasoft.engine.work.BonitaWork;
@@ -23,8 +22,7 @@ import org.bonitasoft.engine.work.ExecutorWorkService;
  */
 public class ParallelWorkSynchronization extends AbstractWorkSynchronization {
 
-    public ParallelWorkSynchronization(final ExecutorService executorService, final TechnicalLoggerService loggerService,
-            final SessionAccessor sessionAccessor,
+    public ParallelWorkSynchronization(final ExecutorService executorService, final SessionAccessor sessionAccessor,
             final ExecutorWorkService threadPoolWorkService) {
         super(threadPoolWorkService, executorService, sessionAccessor);
     }

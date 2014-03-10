@@ -21,9 +21,9 @@ import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- *
+ * 
  * Factory that use a hazelcast executor
- *
+ * 
  * @author Baptiste Mesta
  * @author Laurent Vaills
  */
@@ -37,7 +37,8 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
 
     private final long keepAliveTimeSeconds;
 
-    public ClusteredLocalQueueBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
+    public ClusteredLocalQueueBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds,
+            final HazelcastInstance hazelcastInstance) {
         this.hazelcastInstance = hazelcastInstance;
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
@@ -51,7 +52,8 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
     public ThreadPoolExecutor createExecutorService() {
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", maximumPoolSize);
-        return new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance);
+        return new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler,
+                hazelcastInstance);
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
@@ -59,10 +61,13 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
         public QueueRejectedExecutionHandler() {
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
-            throw new RejectedExecutionException("Unable to run the task " + task
-                    + ".\n Your work queue is full, you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
+            throw new RejectedExecutionException(
+                    "Unable to run the task "
+                            + task
+                            + ".\n Your work queue is full, you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
         }
 
     }

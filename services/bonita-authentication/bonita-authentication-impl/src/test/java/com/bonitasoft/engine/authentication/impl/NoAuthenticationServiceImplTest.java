@@ -36,7 +36,7 @@ public class NoAuthenticationServiceImplTest {
     private NoAuthenticationServiceImpl authenticationService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         when(logger.isLoggable(NoAuthenticationServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
     }

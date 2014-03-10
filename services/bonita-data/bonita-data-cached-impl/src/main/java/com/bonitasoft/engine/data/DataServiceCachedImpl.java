@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.DataServiceImpl;
 import org.bonitasoft.engine.data.DataSourceConfiguration;
 import org.bonitasoft.engine.data.DataSourceImplementation;
@@ -28,7 +27,7 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
-public class DataServiceCachedImpl extends DataServiceImpl implements DataService {
+public class DataServiceCachedImpl extends DataServiceImpl {
 
     // not using synchronized map as data is never changing.
     // We prefer having fast reads and synchronized only writes (happen only a few times during the warm up)
