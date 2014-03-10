@@ -91,7 +91,11 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
 
         getProcessAPI().importParameters(definition.getId(), "param1=toto".getBytes());
-        deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+
+        // try to fix windows issue
+        deploymentInfo = getProcessAPI().getProcessDeploymentInfo(getProcessAPI().getProcessDefinition(definition.getId()).getId());
+        // deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+
         Assert.assertEquals(TestStates.getProcessDepInfoResolvedState(), deploymentInfo.getConfigurationState());
 
         deleteProcess(definition.getId());
