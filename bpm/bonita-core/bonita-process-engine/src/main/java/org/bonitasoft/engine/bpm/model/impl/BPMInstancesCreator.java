@@ -286,7 +286,7 @@ public class BPMInstancesCreator {
                         (SBoundaryEventDefinition) sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, relatedActivityInstanceId);
                 break;
             default:
-                throw new SActivityReadException("Activity type not found: " + sFlowNodeDefinition.getType());
+                throw new SActivityReadException("Activity type not found : " + sFlowNodeDefinition.getType());
         }
         builder.setLoopCounter(loopCounter);
         builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));

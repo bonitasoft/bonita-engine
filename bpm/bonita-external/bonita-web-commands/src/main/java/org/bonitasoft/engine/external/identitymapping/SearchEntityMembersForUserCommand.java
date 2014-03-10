@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012-2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -23,11 +23,12 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * Parameter keys: USER_ID_KEY: the ID of the user to search for, DISCRIMINATOR_ID_KEY: the discriminator to isolate the different functional notions,
+ * Parameter keys: USER_ID_KEY: the ID of the user to search for, DISCRIMINATOR_ID_KEY : the discriminator to isolate the different functional notions,
  * SEARCH_OPTIONS_KEY: the Search options to filter & sort the results.
  * 
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SearchEntityMembersForUserCommand extends EntityMemberCommand {
 
@@ -42,6 +43,8 @@ public class SearchEntityMembersForUserCommand extends EntityMemberCommand {
                 + " with a SearchOptions value");
         try {
             return searchEntityMembersInvolvingUser(kind, userId, externalId, searchOptions);
+        } catch (SCommandExecutionException e) {
+            throw e;
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException("Error executing command 'SearchEntityMembersCommand'", e);
         }

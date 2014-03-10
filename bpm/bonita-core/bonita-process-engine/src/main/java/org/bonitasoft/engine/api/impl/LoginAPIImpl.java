@@ -58,6 +58,8 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
 
         try {
             return login(userName, password, null);
+        } catch (final LoginException e) {
+            throw e;
         } catch (final Throwable e) {
             throw new LoginException(e);
         }
@@ -77,8 +79,8 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
         final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
         // first call before create session: put the platform in cache if necessary
-//        putPlatformInCacheIfNecessary(platformServiceAccessor, platformService);
-        TransactionContentWithResult<STenant> getTenant;
+        // putPlatformInCacheIfNecessary(platformServiceAccessor, platformService);
+        final TransactionContentWithResult<STenant> getTenant;
         if (tenantId == null) {
             getTenant = new GetDefaultTenantInstance(platformService);
         } else {
@@ -102,7 +104,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         } catch (final BonitaRuntimeException e) {
             throw e.getCause();
         }
-
         return ModelConvertor.toAPISession(txContent.getResult(), sTenant.getName());
     }
 
@@ -145,7 +146,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                     sessionAccessor.setSessionInfo(session.getId(), tenantId);
                     final SUser sUser = identityService.getUserByUserName(userName);
                     if (!sUser.isEnabled()) {
-                        throw new LoginException("Unable to login: the user is disable");
+                        throw new LoginException("Unable to login : the user is disable.");
                     }
                     final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
                     final long lastConnection = System.currentTimeMillis();

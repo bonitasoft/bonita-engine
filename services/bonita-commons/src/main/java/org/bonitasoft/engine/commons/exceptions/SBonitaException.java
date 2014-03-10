@@ -273,32 +273,32 @@ public abstract class SBonitaException extends Exception {
     public void setUserIdOnContext(final long userId) {
         context.put(SContext.USER_ID, userId);
     }
-    
+
     /**
      * @param threadId
-     * 			The thread id to set
+     *            The thread id to set
      * @since 6.3
      */
     public void setThreadId(final long threadId) {
-    	context.put(SContext.THREAD_ID, threadId);
+        context.put(SContext.THREAD_ID, threadId);
     }
-    
+
     /**
      * @param hostname
-     * 			The hostname to set
+     *            The hostname to set
      * @since 6.3
      */
     public void setHostname(final String hostname) {
-    	context.put(SContext.HOSTNAME, hostname);
+        context.put(SContext.HOSTNAME, hostname);
     }
-    
+
     /**
      * @param tenantId
-     * 			The tenant id to set
+     *            The tenant id to set
      * @since 6.3
      */
     public void setTenantID(final long tenantId) {
-    	context.put(SContext.TENANT_ID, tenantId);
+        context.put(SContext.TENANT_ID, tenantId);
     }
 
     @Override
