@@ -92,7 +92,7 @@ public class ClusterTests extends CommonAPISPTest {
         changeApis();
     }
 
-    private void setConnectionPort(final String port) throws Exception {
+    private void setConnectionPort(final String port) {
         Map<String, String> parameters = new HashMap<String, String>(2);
         parameters.put("server.url", "http://localhost:" + port);
         parameters.put("application.name", "bonita");

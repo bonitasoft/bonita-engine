@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.PersistenceService;
 
@@ -46,7 +44,7 @@ public class DeleteBatchJob implements StatelessJob {
     }
 
     @Override
-    public void execute() throws SJobExecutionException, FireEventException {
+    public void execute() throws SJobExecutionException {
         for (final String classToPurge : classesToPurge) {
             try {
                 persistenceService.purge(classToPurge);
@@ -56,8 +54,9 @@ public class DeleteBatchJob implements StatelessJob {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+    public void setAttributes(final Map<String, Serializable> attributes) {
     }
 
     public static void setClassesToPurge(final List<String> classesToPurge) {

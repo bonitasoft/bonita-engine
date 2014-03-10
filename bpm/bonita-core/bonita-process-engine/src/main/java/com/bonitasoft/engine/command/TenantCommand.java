@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -18,17 +18,18 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public abstract class TenantCommand extends CommandWithParameters {
 
     @Override
     public final Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
-        if (serviceAccessor instanceof com.bonitasoft.engine.service.TenantServiceAccessor) {
-            return execute(parameters, (com.bonitasoft.engine.service.TenantServiceAccessor) serviceAccessor);
-        } else {
-            throw new SCommandExecutionException("The tenant service accessor is not the SP one");
+        if (!(serviceAccessor instanceof com.bonitasoft.engine.service.TenantServiceAccessor)) {
+            throw new SCommandExecutionException("The tenant service accessor is not the SP one !!");
         }
+        return execute(parameters, (com.bonitasoft.engine.service.TenantServiceAccessor) serviceAccessor);
+
     }
 
     public abstract Serializable execute(final Map<String, Serializable> parameters, final com.bonitasoft.engine.service.TenantServiceAccessor serviceAccessor)

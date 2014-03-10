@@ -22,11 +22,9 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -105,13 +103,11 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         // Retrieval of the process definition:
         SProcessDefinition sDefinition;
         try {
-            final GetProcessDeploymentInfo transactionContentWithResult = new GetProcessDeploymentInfo(processDefinitionId, processDefinitionService);
-            transactionContentWithResult.execute();
-            final SProcessDefinitionDeployInfo deployInfo = transactionContentWithResult.getResult();
+            final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
             if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
                 throw new ProcessDefinitionNotEnabledException(deployInfo.getName(), deployInfo.getVersion(), deployInfo.getProcessId());
             }
-            sDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
+            sDefinition = getProcessDefinition(tenantAccessor, processDefinitionId);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw new ProcessDefinitionNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -146,33 +142,6 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
         }
         return ModelConvertor.toProcessInstance(sDefinition, startedInstance);
-    }
-
-    /**
-     * @author Baptiste Mesta
-     */
-    private final class GetProcessDeploymentInfo implements TransactionContentWithResult<SProcessDefinitionDeployInfo> {
-
-        private final Long processDefinitionUUID;
-
-        private final ProcessDefinitionService processDefinitionService;
-
-        private SProcessDefinitionDeployInfo processDefinitionDI;
-
-        private GetProcessDeploymentInfo(final Long processDefinitionUUID, final ProcessDefinitionService processDefinitionService) {
-            this.processDefinitionUUID = processDefinitionUUID;
-            this.processDefinitionService = processDefinitionService;
-        }
-
-        @Override
-        public void execute() throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-            processDefinitionDI = processDefinitionService.getProcessDeploymentInfo(processDefinitionUUID);
-        }
-
-        @Override
-        public SProcessDefinitionDeployInfo getResult() {
-            return processDefinitionDI;
-        }
     }
 
 }

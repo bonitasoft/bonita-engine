@@ -11,12 +11,10 @@ package com.bonitasoft.engine.service.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.commons.ServiceWithLifecycle;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
@@ -105,12 +103,12 @@ public class BonitaHazelcastInstanceFactory implements ServiceWithLifecycle {
     }
 
     @Override
-    public void start() throws SBonitaException {
+    public void start() {
         // Do nothing, spring start hazelcast...
     }
 
     @Override
-    public void stop() throws SBonitaException, TimeoutException {
+    public void stop() {
         // Do nothing it's spring that shutdown hazelcast...
     }
 

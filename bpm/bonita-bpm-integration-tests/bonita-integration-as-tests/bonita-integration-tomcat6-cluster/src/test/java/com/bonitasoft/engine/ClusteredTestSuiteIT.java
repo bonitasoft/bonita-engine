@@ -53,15 +53,15 @@ public class ClusteredTestSuiteIT {
         APITestSPUtil.deletePlatformStructure();
     }
 
-    protected static void changeToNode1() throws Exception {
+    protected static void changeToNode1() {
         setConnectionPort("8186");
     }
 
-    protected static void changeToNode2() throws Exception {
+    protected static void changeToNode2() {
         setConnectionPort("8187");
     }
 
-    private static void setConnectionPort(final String port) throws Exception {
+    private static void setConnectionPort(final String port) {
         Map<String, String> parameters = new HashMap<String, String>(2);
         parameters.put("server.url", "http://localhost:" + port);
         parameters.put("application.name", "bonita");

@@ -470,15 +470,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws UpdateException,
-            ConnectorInstanceNotFoundException {
+    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws UpdateException {
         final Map<Long, ConnectorStateReset> connectorsToReset = new HashMap<Long, ConnectorStateReset>(1);
         connectorsToReset.put(connectorInstanceId, state);
         setConnectorInstanceState(connectorsToReset);
     }
 
     @Override
-    public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorInstanceNotFoundException, UpdateException {
+    public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.SET_CONNECTOR_STATE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();

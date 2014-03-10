@@ -87,19 +87,21 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
         return null;
     }
 
+    @SuppressWarnings("unused")
     @Override
     protected void beforeExecute(final Thread t, final Runnable r) {
         executingRunnable.offer(r);
     }
 
+    @SuppressWarnings("unused")
     @Override
     protected void afterExecute(final Runnable r, final Throwable t) {
         executingRunnable.remove(r);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void memberAdded(final MembershipEvent membershipEvent) {
-
     }
 
     @Override

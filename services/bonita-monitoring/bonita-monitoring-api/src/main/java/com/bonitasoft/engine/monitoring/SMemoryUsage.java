@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -8,11 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring;
 
-import java.lang.management.MemoryUsage;
-
 /**
  * @see MemoryUsage
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface SMemoryUsage {
 
