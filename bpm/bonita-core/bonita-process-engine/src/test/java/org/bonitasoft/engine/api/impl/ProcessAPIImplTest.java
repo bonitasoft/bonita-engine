@@ -199,7 +199,6 @@ public class ProcessAPIImplTest {
         verify(myProcessAPI).replayFailedJob(jobDescriptorId, null);
     }
 
-    @Test
     public void getJobParametersShouldConvertMapIntoList() throws Exception {
         // given:
         Map<String, Serializable> parameters = new HashMap<String, Serializable>(2);
