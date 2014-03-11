@@ -53,9 +53,9 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         final String operator = getOperator(operation);
-        String operatorParameterClassName = getOperatorParameterClassName(operation);
+        final String operatorParameterClassName = getOperatorParameterClassName(operation);
         try {
-            Object objectToInvokeJavaMethodOn = getBusinessDataObjectAndPutInContextIfNotAlready(containerId, containerType, expressionContext, operation
+            final Object objectToInvokeJavaMethodOn = getBusinessDataObjectAndPutInContextIfNotAlready(containerId, containerType, expressionContext, operation
                     .getLeftOperand().getName());
             return new JavaMethodInvoker().invokeJavaMethod(operation.getRightOperand().getReturnType(), value, objectToInvokeJavaMethodOn, operator,
                     operatorParameterClassName);
@@ -65,7 +65,7 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     }
 
     protected String getOperatorParameterClassName(final SOperation operation) {
-        String[] split = operation.getOperator().split(":", 2);
+        final String[] split = operation.getOperator().split(":", 2);
         if (split.length > 1) {
             return split[1];
         }
@@ -79,10 +79,10 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     protected Object getBusinessDataObjectAndPutInContextIfNotAlready(final long containerId, final String containerType,
             final SExpressionContext expressionContext, final String businessDataName) throws SOperationExecutionException, SFlowNodeNotFoundException,
             SFlowNodeReadException {
-        Map<String, Object> inputValues = expressionContext.getInputValues();
+        final Map<String, Object> inputValues = expressionContext.getInputValues();
         Object objectToInvokeJavaMethodOn = inputValues.get(businessDataName);
         if (objectToInvokeJavaMethodOn == null) {
-            long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
             objectToInvokeJavaMethodOn = getBusinessData(businessDataName, processInstanceId);
             // put it in context for further reuse:
             inputValues.put(businessDataName, objectToInvokeJavaMethodOn);
@@ -92,12 +92,17 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
 
     protected Object getBusinessData(final String bizDataName, final long processInstanceId) throws SOperationExecutionException {
         try {
-            SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
-            Class<?> bizClass = Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
-            return businessDataRepository.find(bizClass, refBusinessDataInstance.getDataId());
-        } catch (SBonitaReadException e) {
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
+            final Class<?> dataClass = Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
+            final Long dataId = refBusinessDataInstance.getDataId();
+            if (dataId != null) {
+                return businessDataRepository.find(dataClass, dataId);
+            } else {
+                return dataClass.newInstance();
+            }
+        } catch (final SBonitaReadException e) {
             throw new SOperationExecutionException("Unable to retrieve business data instance with name " + bizDataName);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SOperationExecutionException(e);
         }
     }
@@ -106,26 +111,26 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     public void update(final SLeftOperand sLeftOperand, Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         try {
-            long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
                     processInstanceId);
             newValue = businessDataRepository.merge(newValue);
-            if(!(newValue instanceof Entity)){
-            	  throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() +" must implements "+Entity.class.getName()));
+            if (!(newValue instanceof Entity)) {
+                throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() + " must implements " + Entity.class.getName()));
             }
             if (refBusinessDataInstance != null) {
-                final Long id = ((Entity)newValue).getPersistenceId();
+                final Long id = ((Entity) newValue).getPersistenceId();
                 refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
             }
         } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
             throw new SOperationExecutionException(srbdinfe);
         } catch (final SBonitaReadException sbre) {
             throw new SOperationExecutionException(sbre);
-        }  catch (final SRefBusinessDataInstanceModificationException srbsme) {
+        } catch (final SRefBusinessDataInstanceModificationException srbsme) {
             throw new SOperationExecutionException(srbsme);
-        } catch (SFlowNodeNotFoundException e) {
+        } catch (final SFlowNodeNotFoundException e) {
             throw new SOperationExecutionException(e);
-        } catch (SFlowNodeReadException e) {
+        } catch (final SFlowNodeReadException e) {
             throw new SOperationExecutionException(e);
         }
     }

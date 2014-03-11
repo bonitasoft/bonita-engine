@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -31,120 +32,162 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateBusinessDataOperationExecutorStrategyTest {
 
-	@Mock
-	private BusinessDataRepository businessDataRepository;
+    @Mock
+    private BusinessDataRepository businessDataRepository;
 
-	@Mock
-	private FlowNodeInstanceService flowNodeInstanceService;
+    @Mock
+    private FlowNodeInstanceService flowNodeInstanceService;
 
-	@Mock
-	private RefBusinessDataService refBusinessDataService;
+    @Mock
+    private RefBusinessDataService refBusinessDataService;
 
-	@InjectMocks
-	private UpdateBusinessDataOperationExecutorStrategy updateBizDataStrategy;
+    @InjectMocks
+    private UpdateBusinessDataOperationExecutorStrategy updateBizDataStrategy;
 
-	@Test
-	public void getValueOnBizDataExistingInContextShouldReturnJavaEvaluatedObject() throws Exception {
-		final String bizDataName = "travel";
-		final int nbDaysToSet = 25;
+    @Test
+    public void getValueOnBizDataExistingInContextShouldReturnJavaEvaluatedObject() throws Exception {
+        final String bizDataName = "travel";
+        final int nbDaysToSet = 25;
 
-		UpdateBusinessDataOperationExecutorStrategy spy = spy(updateBizDataStrategy);
-		doReturn("setNbDays").when(spy).getOperator(any(SOperation.class));
-		doReturn("int").when(spy).getOperatorParameterClassName(any(SOperation.class));
-		doReturn(new Travel()).when(spy).getBusinessDataObjectAndPutInContextIfNotAlready(anyLong(), anyString(), any(SExpressionContext.class), anyString());
+        final UpdateBusinessDataOperationExecutorStrategy spy = spy(updateBizDataStrategy);
+        doReturn("setNbDays").when(spy).getOperator(any(SOperation.class));
+        doReturn("int").when(spy).getOperatorParameterClassName(any(SOperation.class));
+        doReturn(new Travel()).when(spy).getBusinessDataObjectAndPutInContextIfNotAlready(anyLong(), anyString(), any(SExpressionContext.class), anyString());
 
-		SOperationImpl operation = new SOperationImpl();
-		SLeftOperandImpl leftOperand = new SLeftOperandImpl();
-		leftOperand.setName(bizDataName);
-		operation.setLeftOperand(leftOperand);
-		SExpressionImpl rightOperand = new SExpressionImpl();
-		rightOperand.setReturnType(Integer.class.getName());
-		operation.setRightOperand(rightOperand);
+        final SOperationImpl operation = new SOperationImpl();
+        final SLeftOperandImpl leftOperand = new SLeftOperandImpl();
+        leftOperand.setName(bizDataName);
+        operation.setLeftOperand(leftOperand);
+        final SExpressionImpl rightOperand = new SExpressionImpl();
+        rightOperand.setReturnType(Integer.class.getName());
+        operation.setRightOperand(rightOperand);
 
-		Travel realValue = (Travel) spy.getValue(operation, nbDaysToSet, -1L, "unused", null);
+        final Travel realValue = (Travel) spy.getValue(operation, nbDaysToSet, -1L, "unused", null);
 
-		assertThat(realValue.getNbDays()).isEqualTo(nbDaysToSet);
-	}
+        assertThat(realValue.getNbDays()).isEqualTo(nbDaysToSet);
+    }
 
-	@Test
-	public void getBusinessObjectShouldPutItInContextIfNotAlready() throws Exception {
-		// given:
-		String bizDataName = "myTravel";
-		Travel myTravel = new Travel();
+    @Test
+    public void getBusinessObjectShouldPutItInContextIfNotAlready() throws Exception {
+        // given:
+        final String bizDataName = "myTravel";
+        final Travel myTravel = new Travel();
 
-		UpdateBusinessDataOperationExecutorStrategy spy = spy(updateBizDataStrategy);
-		doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong());
-		Map<String, Serializable> inputValues = new HashMap<String, Serializable>(1);
-		SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", inputValues);
+        final UpdateBusinessDataOperationExecutorStrategy spy = spy(updateBizDataStrategy);
+        doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong());
+        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(1);
+        final SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", inputValues);
 
-		// when:
-		spy.getBusinessDataObjectAndPutInContextIfNotAlready(1L, "toto", expressionContext, bizDataName);
+        // when:
+        spy.getBusinessDataObjectAndPutInContextIfNotAlready(1L, "toto", expressionContext, bizDataName);
 
-		// then:
-		assertThat(expressionContext.getInputValues().get(bizDataName)).isEqualTo(myTravel);
-	}
+        // then:
+        assertThat(expressionContext.getInputValues().get(bizDataName)).isEqualTo(myTravel);
+    }
 
-	@Test(expected=SOperationExecutionException.class)
-	public void shouldUpdate_ThrowAnSOperationExecutionException() throws Exception {
-		// given:
-		InvalidTravel myTravel = new InvalidTravel();
+    @Test(expected = SOperationExecutionException.class)
+    public void shouldUpdate_ThrowAnSOperationExecutionException() throws Exception {
+        // given:
+        final InvalidTravel myTravel = new InvalidTravel();
 
-		UpdateBusinessDataOperationExecutorStrategy spy = spy(updateBizDataStrategy);
-		when(businessDataRepository.merge(any())).thenReturn(myTravel);
-		doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong());
-		SLeftOperand leftOp = mock(SLeftOperand.class);
-		when(leftOp.getName()).thenReturn("bizData");
-		updateBizDataStrategy.update(leftOp, new Object(), 1L, "");
+        final UpdateBusinessDataOperationExecutorStrategy spy = spy(updateBizDataStrategy);
+        when(businessDataRepository.merge(any())).thenReturn(myTravel);
+        doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong());
+        final SLeftOperand leftOp = mock(SLeftOperand.class);
+        when(leftOp.getName()).thenReturn("bizData");
+        updateBizDataStrategy.update(leftOp, new Object(), 1L, "");
 
-	}
+    }
 
-	public class InvalidTravel implements Serializable {
+    public class InvalidTravel implements Serializable {
 
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		private int nbDays;
+        private int nbDays;
 
-		public int getNbDays() {
-			return nbDays;
-		}
+        public int getNbDays() {
+            return nbDays;
+        }
 
-		public void setNbDays(final int nbDays) {
-			this.nbDays = nbDays;
-		}
-	}
+        public void setNbDays(final int nbDays) {
+            this.nbDays = nbDays;
+        }
+    }
 
-	public class Travel implements Serializable,Entity {
+    public class Travel implements Entity {
 
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		private int nbDays;
+        private int nbDays;
 
-		public int getNbDays() {
-			return nbDays;
-		}
+        public int getNbDays() {
+            return nbDays;
+        }
 
-		public void setNbDays(final int nbDays) {
-			this.nbDays = nbDays;
-		}
+        public void setNbDays(final int nbDays) {
+            this.nbDays = nbDays;
+        }
 
-		@Override
-		public Long getPersistenceId() {
-			return 1L;
-		}
+        @Override
+        public Long getPersistenceId() {
+            return 1L;
+        }
 
-		@Override
-		public Long getPersistenceVersion() {
-			return 1L;
-		}
-	}
+        @Override
+        public Long getPersistenceVersion() {
+            return 1L;
+        }
+    }
 
-	@Test
-	public void shouldGetOperatorType_Return_BUSINESS_DATA_JAVA_SETTER() throws Exception {
-		assertThat(updateBizDataStrategy.getOperationType()).isEqualTo(OperatorType.BUSINESS_DATA_JAVA_SETTER.name());
-	}
+    @Test
+    public void shouldGetOperatorType_Return_BUSINESS_DATA_JAVA_SETTER() throws Exception {
+        assertThat(updateBizDataStrategy.getOperationType()).isEqualTo(OperatorType.BUSINESS_DATA_JAVA_SETTER.name());
+    }
+
+    @Test
+    public void getBusinessDataCreateAnInstanceIfNoReferenceExists() throws Exception {
+        final SRefBusinessDataInstance refInstance = mock(SRefBusinessDataInstance.class);
+        final String bizDataName = "employee";
+        final int processInstanceId = 457;
+        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
+        when(refInstance.getDataId()).thenReturn(null);
+        when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
+
+        final Employee employee = (Employee) updateBizDataStrategy.getBusinessData(bizDataName, processInstanceId);
+
+        assertThat(employee).isNotNull();
+        assertThat(employee.getPersistenceId()).isNull();
+        assertThat(employee.getFirstName()).isNull();
+        assertThat(employee.getLastName()).isNull();
+    }
+
+    @Test(expected = SOperationExecutionException.class)
+    public void getBusinessDataDoesNotCreateAnInstanceIfNoReferenceExistsWhenTheClassNameIsWrong() throws Exception {
+        final SRefBusinessDataInstance refInstance = mock(SRefBusinessDataInstance.class);
+        final String bizDataName = "employee";
+        final int processInstanceId = 457;
+        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
+        when(refInstance.getDataId()).thenReturn(null);
+        when(refInstance.getDataClassName()).thenReturn("fr.bonitasoft.engine.Employee");
+
+        updateBizDataStrategy.getBusinessData(bizDataName, processInstanceId);
+    }
+
+    @Test(expected = SOperationExecutionException.class)
+    public void getBusinessDataDoesNotCreateAnInstanceIfNoReferenceExistsWhenTheClassNameIsAnInterface() throws Exception {
+        final SRefBusinessDataInstance refInstance = mock(SRefBusinessDataInstance.class);
+        final String bizDataName = "employee";
+        final int processInstanceId = 457;
+        when(refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId)).thenReturn(refInstance);
+        when(refInstance.getDataId()).thenReturn(null);
+        when(refInstance.getDataClassName()).thenReturn(List.class.getName());
+
+        updateBizDataStrategy.getBusinessData(bizDataName, processInstanceId);
+    }
 
 }
