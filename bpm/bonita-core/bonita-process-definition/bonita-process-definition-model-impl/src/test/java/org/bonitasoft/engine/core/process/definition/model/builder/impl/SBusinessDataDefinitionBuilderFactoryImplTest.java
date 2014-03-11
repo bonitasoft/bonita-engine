@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.core.process.definition.model.builder.impl;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SBusinessDataDefinitionBuilderFactory;

@@ -334,11 +334,7 @@ public class PlatformServiceImplTest {
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField("name", tenantName);
-        try {
-            platformServiceImpl.updateTenant(tenant, descriptor);
-        } finally {
-            verify(persistenceService, never()).update(any(UpdateDescriptor.class));
-        }
+        platformServiceImpl.updateTenant(tenant, descriptor);
     }
 
     private STenant buildTenant(final long id, final String name) {

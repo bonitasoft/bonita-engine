@@ -531,6 +531,17 @@ public class PlatformServiceImpl implements PlatformService {
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateTenant"));
         }
+        final String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
+        if (tenantName != null) {
+            try {
+                final STenant sTenant = getTenantByName(tenantName);
+                if (tenant.getId() != sTenant.getId()) {
+                    throw new STenantUpdateException("Unable to update the tenant with new name " + tenantName + " : it already exists.");
+                }
+            } catch (final STenantNotFoundException e) {
+                // Ok
+            }
+        }
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
         desc.addFields(descriptor.getFields());
         try {
