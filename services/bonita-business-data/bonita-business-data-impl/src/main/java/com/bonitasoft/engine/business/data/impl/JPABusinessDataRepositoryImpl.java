@@ -26,6 +26,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 
@@ -63,11 +64,11 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     protected SDependencyMapping createDependencyMapping(final long tenantId, final SDependency sDependency) {
-        return BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), tenantId, "tenant").done();
+        return BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), tenantId, ScopeType.TENANT).done();
     }
 
-    protected SDependency createSDependency(final byte[] transformedBdrArchive) {
-        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance("BDR", "1.0", "BDR.jar", transformedBdrArchive).done();
+    protected SDependency createSDependency(final long tenantId, final byte[] transformedBdrArchive) {
+        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance("BDR", tenantId, ScopeType.TENANT, "BDR.jar", transformedBdrArchive).done();
     }
 
     protected byte[] generateBDMJar(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
@@ -86,7 +87,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     @Override
     public void deploy(final byte[] bdmZip, final long tenantId) throws SBusinessDataRepositoryDeploymentException {
         final byte[] bdmJar = generateBDMJar(bdmZip);
-        final SDependency sDependency = createSDependency(bdmJar);
+        final SDependency sDependency = createSDependency(tenantId, bdmJar);
         try {
             dependencyService.createDependency(sDependency);
             final SDependencyMapping sDependencyMapping = createDependencyMapping(tenantId, sDependency);

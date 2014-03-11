@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.monitoring;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -147,13 +146,6 @@ public class PlatformMonitoringAPITest extends CommonAPISPTest {
     public void isSchedulerStartedTest() throws Exception {
         // TODO how to improve that?
         assertTrue("The scheduler should be started", getPlatformMonitoringAPI().isSchedulerStarted());
-    }
-
-    @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Transaction", "Active" }, story = "Get number of active transactions.", jira = "")
-    @Test
-    public void getNumberOfActiveTransactions() throws Exception {
-        Thread.sleep(500);// wait for potential work to finish
-        assertEquals(0, getPlatformMonitoringAPI().getNumberOfActiveTransactions());
     }
 
     @Cover(classes = PlatformMonitoringAPI.class, concept = BPMNConcept.PROCESS, keywords = { "Process", "CPU time" }, story = "Get process cpu time", jira = "ENGINE-620")

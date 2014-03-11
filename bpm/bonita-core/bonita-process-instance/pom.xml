@@ -18,6 +18,5 @@
 		<module>bonita-process-instance-impl</module>
 		<module>bonita-process-instance-model</module>
 		<module>bonita-process-instance-model-impl</module>
-		<module>bonita-process-instance-model-impl-hibernate</module>
 	</modules>
 </project>

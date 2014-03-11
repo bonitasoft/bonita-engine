@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -22,10 +23,11 @@ import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
@@ -77,15 +79,19 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
-        final TransactionService transactionService = tenantAccessor.getTransactionService();
+        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
 
-        transactionService.begin();
-        List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
-        List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), "process",
-                QueryOptions.defaultQueryOptions());
-        transactionService.complete();
-        assertEquals(2, dependencyIds.size());
-        assertEquals(2, dependencyMappings.size());
+        Pair<List<Long>, List<SDependencyMapping>> pair;
+        pair = userTransactionService.executeInTransaction(new Callable<Pair<List<Long>, List<SDependencyMapping>>>() {
+            @Override
+            public Pair<List<Long>, List<SDependencyMapping>> call() throws Exception {
+                List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
+                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
+                return new Pair<List<Long>, List<SDependencyMapping>>(dependencyIds, dependencyMappings);
+            };
+        });
+        assertEquals(2, pair._1.size());
+        assertEquals(2, pair._2.size());
 
         // prepare zip byte array of connector implementation
         final String implSourchFile = "/com/bonitasoft/engine/connectors/NewConnector.impl";
@@ -93,14 +99,29 @@ public class ConnectorImplementationLocalSPTest extends ConnectorExecutionTest {
         final byte[] connectorImplementationArchive = generateZipByteArrayForConnector(implSourchFile, implClass);
         getProcessAPI().setConnectorImplementation(processDefinition.getId(), connectorId, connectorVersion, connectorImplementationArchive);
 
-        transactionService.begin();
         sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info
-        dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
-        dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), "process", QueryOptions.defaultQueryOptions());
-        transactionService.complete();
-        assertEquals(1, dependencyIds.size());
-        assertEquals(1, dependencyMappings.size());
+        pair = userTransactionService.executeInTransaction(new Callable<Pair<List<Long>, List<SDependencyMapping>>>() {
+            @Override
+            public Pair<List<Long>, List<SDependencyMapping>> call() throws Exception {
+                List<Long> dependencyIds = dependencyService.getDependencyIds(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
+                List<SDependencyMapping> dependencyMappings = dependencyService.getDependencyMappings(processDefinition.getId(), ScopeType.PROCESS, QueryOptions.defaultQueryOptions());
+                return new Pair<List<Long>, List<SDependencyMapping>>(dependencyIds, dependencyMappings);
+            };
+        });
+        assertEquals(1, pair._1.size());
+        assertEquals(1, pair._2.size());
 
         getProcessAPI().deleteProcess(processDefinition.getId());
+    }
+
+    private static class Pair<T, V> {
+        T _1;
+        V _2;
+
+        Pair(final T _1, final V _2) {
+            this._1 = _1;
+            this._2 = _2;
+        }
+
     }
 }

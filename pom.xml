@@ -17,30 +17,6 @@
 		<hazelcast.version>3.0.3</hazelcast.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		
-		<!-- ************************ -->
-		<!-- Sonar/Reporting settings -->
-		<!-- ************************ -->
-		<!-- Sonar/Jacoco integration. Note that these properties need to be defined outside the "coverage" profile because we want to be to able to execute mvn sonar:sonar 
-			without passing a profile -->
-		<!-- Tells Sonar to use jacoco for coverage results -->
-		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-		<!-- Jacoco version to use -->
-		<jacoco.version>0.6.4.201312101107</jacoco.version>
-		<!-- The Sonar Jacoco Listener for JUnit to extract coverage details per test -->
-		<sonar-jacoco-listeners.version>1.4</sonar-jacoco-listeners.version>
-		<!-- Don't let Sonar execute tests. We will ask it to Maven -->
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<!-- Report output directory, in Jenkins use: -Djacoco.outputDir=${WORKSPACE} -->
-		<jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
-		<!-- Jacoco output file for UTs -->
-		<jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
-		<!-- Tells Sonar where the Jacoco coverage result file is located for Unit Tests -->
-		<sonar.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</sonar.jacoco.reportPath>
-		<!-- Jacoco output file for ITs -->
-		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
-		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration Tests -->
-		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
 	</properties>
 
 	<dependencyManagement>
@@ -105,7 +81,7 @@
 		<profile>
 			<id>fast</id>
 			<properties>
-				<maven.test.skip>true</maven.test.skip>
+				<skipTests>true</skipTests>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
 			</properties>
 			<modules>
@@ -116,6 +92,9 @@
 
 		<profile>
 			<id>package</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
@@ -137,7 +116,7 @@
 				</plugins>
 			</build>
 		</profile>
-
+		
 		<profile>
 			<id>package-all</id>
 			<modules>
@@ -164,7 +143,7 @@
 				</plugins>
 			</build>
 		</profile>
-
+		
 		<profile>
 			<id>javadoc</id>
 			<properties>
@@ -203,85 +182,17 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<argLine>${jacoco.agent.ut.arg}</argLine>
-							<!-- Listener to show coverage for each test -->
-							<properties>
-								<property>
-									<name>listener</name>
-									<value>org.sonar.java.jacoco.JUnitListener</value>
-								</property>
-							</properties>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<configuration>
-							<argLine>-Xmx1024m -XX:MaxPermSize=256m ${jacoco.agent.it.arg}</argLine>
-							<!-- Listener to show coverage for each test -->
-							<properties>
-								<property>
-									<name>listener</name>
-									<value>org.sonar.java.jacoco.JUnitListener</value>
-								</property>
-							</properties>
-							<!-- workaround to have test report for IT in sonar, see http://stackoverflow.com/a/15567782/936729 -->
-							<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-						</configuration>
-					</plugin>
-					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
 						<version>${jacoco.version}</version>
 						<configuration>
 							<includes>
-								<include>org.bonitasoft.engine.*</include>
 								<include>com.bonitasoft.engine.*</include>
 							</includes>
 						</configuration>
-						<executions>
-							<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
-							<execution>
-								<id>prepare-ut-agent</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-								<configuration>
-									<destFile>${sonar.jacoco.reportPath}</destFile>
-									<propertyName>jacoco.agent.ut.arg</propertyName>
-							<append>true</append>
-						</configuration>
-							</execution>
-							<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
-							<execution>
-								<id>prepare-it-agent</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-								<configuration>
-									<destFile>${sonar.jacoco.itReportPath}</destFile>
-									<propertyName>jacoco.agent.it.arg</propertyName>
-									<append>true</append>
-								</configuration>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
-			<dependencies>
-				<dependency>
-					<groupId>org.codehaus.sonar-plugins.java</groupId>
-					<artifactId>sonar-jacoco-listeners</artifactId>
-					<version>${sonar-jacoco-listeners.version}</version>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
 		</profile>
-
 	</profiles>
 </project>

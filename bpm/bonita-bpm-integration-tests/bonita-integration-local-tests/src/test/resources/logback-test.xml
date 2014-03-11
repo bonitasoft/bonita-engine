@@ -27,5 +27,6 @@
 <!-- 	<logger name="org.bonitasoft.engine.work.BonitaWork" level="DEBUG" /> -->
 <!-- 	<logger name="org.bonitasoft.engine.synchro.SynchroServiceImpl" level="DEBUG" /> -->
 <!-- 	<logger name="com.bonitasoft.engine.synchro.ClusteredSynchroService" level="DEBUG" /> -->
+<!-- 	<logger name="org.bonitasoft.engine.dependency.impl.DependencyServiceImpl" level="DEBUG" /> -->
   
 </configuration>
