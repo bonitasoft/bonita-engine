@@ -5,6 +5,10 @@
 		<property name="jndiName" value="${transaction.manager}" />
 	</bean>
 
+	<bean id="bonitaDSJNDI" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="${database.journal.datasource.name}" />
+	</bean>
+
 	<bean id="transactionService" class="com.bonitasoft.engine.transaction.JTATransactionServiceExt" scope="singleton">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="txManager" ref="transactionManager" />

@@ -105,7 +105,7 @@ public class JPABusinessDataRepositoryImplIT {
         configuration.put("hibernate.connection.datasource", DATA_SOURCE_NAME);
 
         businessDataRepository = spy(new JPABusinessDataRepositoryImpl(dependencyService, configuration));
-        doReturn(null).when(businessDataRepository).createSDependency(any(byte[].class));
+        doReturn(null).when(businessDataRepository).createSDependency(anyLong(), any(byte[].class));
         doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
     }
 

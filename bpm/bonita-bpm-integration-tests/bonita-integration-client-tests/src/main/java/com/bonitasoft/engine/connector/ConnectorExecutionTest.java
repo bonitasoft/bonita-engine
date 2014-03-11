@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -45,16 +45,27 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public abstract class ConnectorExecutionTest extends CommonAPISPTest {
-
-    protected static final String JOHN = "john";
-
-    protected long johnUserId;
 
     public static final String DEFAULT_EXTERNAL_CONNECTOR_ID = "org.bonitasoft.connector.testExternalConnector";
 
     public static final String DEFAULT_EXTERNAL_CONNECTOR_VERSION = "1.0";
+
+    public static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
+
+    public static final String TEST_CONNECTOR_ID = "org.bonitasoft.connector.testConnector";
+
+    public static final String TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID = "testConnectorThatThrowException";
+
+    public static final String CONNECTOR_VERSION = "1.0";
+
+    public static final String CONNECTOR_OUTPUT_NAME = "output1";
+
+    protected static final String JOHN = "john";
+
+    protected long johnUserId;
 
     protected User user;
 
@@ -230,7 +241,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
             }
         }
     }
-    
+
     protected SearchOptionsBuilder getFirst100ConnectorInstanceSearchOptions(long containerId, String containerType) {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, containerId);

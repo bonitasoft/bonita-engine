@@ -12,10 +12,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -25,7 +27,7 @@ import com.hazelcast.core.HazelcastInstance;
 
 /**
  * Cache service that uses hazelcast
- *
+ * 
  * @author Baptiste Mesta
  */
 public abstract class CommonClusteredCacheService implements CommonCacheService {
@@ -212,5 +214,15 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
     }
 
     protected abstract String getKeyFromCacheName(final String cacheName) throws CacheException;
+
+    @Override
+    public void start() throws SBonitaException {
+        // do nothing, we start/stop hazelcast, not this service
+    }
+
+    @Override
+    public void stop() throws SBonitaException, TimeoutException {
+        // do nothing, we start/stop hazelcast, not this service
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -33,7 +34,7 @@ public class JPABusinessDataRepositoryImplTest {
         final byte[] zip = "zip".getBytes();
         final byte[] jar = "jar".getBytes();
         doReturn(jar).when(bdrService).generateBDMJar(zip);
-        doReturn(sDependency).when(bdrService).createSDependency(any(byte[].class));
+        doReturn(sDependency).when(bdrService).createSDependency(anyLong(), any(byte[].class));
         doReturn(dependencyMapping).when(bdrService).createDependencyMapping(1, sDependency);
 
         bdrService.deploy(zip, 1);

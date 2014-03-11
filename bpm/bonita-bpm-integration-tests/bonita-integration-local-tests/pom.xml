@@ -186,7 +186,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-					<argLine>-Xmx600m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</argLine>
 					<properties>
 						<property>
 							<name>listener</name>
@@ -244,7 +243,6 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<argLine>-Xmx600m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</argLine>
 							<properties>
 								<property>
 									<name>listener</name>
