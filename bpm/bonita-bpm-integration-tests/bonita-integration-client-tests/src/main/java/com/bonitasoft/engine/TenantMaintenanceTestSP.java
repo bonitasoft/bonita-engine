@@ -102,7 +102,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
             return processDefinitionId;
         }
 
-        public TenantParameter(String tenantUniqueName) {
+        public TenantParameter(final String tenantUniqueName) {
             this.setTenantName(tenantUniqueName);
 
             this.setTechnicalUsername("install");
@@ -116,7 +116,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
             return tenantName;
         }
 
-        public void setTenantName(String tenantName) {
+        public void setTenantName(final String tenantName) {
             this.tenantName = tenantName;
         }
 
@@ -124,11 +124,11 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
             return description;
         }
 
-        public void setDescription(String description) {
+        public void setDescription(final String description) {
             this.description = description;
         }
 
-        public void setTentantId(long tenantId) {
+        public void setTentantId(final long tenantId) {
             this.tenantId = tenantId;
         }
 
@@ -140,7 +140,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
             return technicalUsername;
         }
 
-        public void setTechnicalUsername(String technicalUsername) {
+        public void setTechnicalUsername(final String technicalUsername) {
             this.technicalUsername = technicalUsername;
         }
 
@@ -148,7 +148,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
             return technicalPassword;
         }
 
-        public void setTechnicalPassword(String technicalPassword) {
+        public void setTechnicalPassword(final String technicalPassword) {
             this.technicalPassword = technicalPassword;
         }
 
@@ -156,7 +156,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
             return actorUsername;
         }
 
-        public void setActorUsername(String actorUsername) {
+        public void setActorUsername(final String actorUsername) {
             this.actorUsername = actorUsername;
         }
 
@@ -164,16 +164,16 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
             return actorPassword;
         }
 
-        public void setActorPassword(String actorPassword) {
+        public void setActorPassword(final String actorPassword) {
             this.actorPassword = actorPassword;
         }
 
-        public void setProcessDefinitionId(long processDefinitionId) {
+        public void setProcessDefinitionId(final long processDefinitionId) {
             this.processDefinitionId = processDefinitionId;
         }
     }
 
-    private TenantParameter createTenant(String uniqueName)
+    private TenantParameter createTenant(final String uniqueName)
             throws BonitaException {
 
         logAsPlatformAdmin();
@@ -214,7 +214,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
         platformAPI = PlatformAPIAccessor.getPlatformAPI(platFormSession);
     }
 
-    private void deactivateProcess(TenantParameter tenantParameter)
+    private void deactivateProcess(final TenantParameter tenantParameter)
             throws Exception {
         logAsTechnicalUserOnTenant(tenantParameter);
         disableAndDeleteProcess(tenantParameter.getProcessDefinitionId());
@@ -301,7 +301,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
         LOGGER.info("end maintenance time");
     }
 
-    private void deactivateAndDeleteTenant(TenantParameter tenantParameter)
+    private void deactivateAndDeleteTenant(final TenantParameter tenantParameter)
             throws PlatformLoginException, BonitaHomeNotSetException,
             ServerAPIException, UnknownAPITypeException,
             TenantNotFoundException, TenantDeactivationException,
@@ -311,8 +311,8 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
         platformAPI.deleteTenant(tenantParameter.getTenantId());
     }
 
-    private void waitArchivedProcessCount(long processCount,
-            TenantParameter tenantParameter) throws Exception {
+    private void waitArchivedProcessCount(final long processCount,
+            final TenantParameter tenantParameter) throws Exception {
         final long timeout = (processCount + 1) * 1000;
         final long limit = new Date().getTime() + timeout;
         long count = 0;
@@ -321,7 +321,7 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
         }
     }
 
-    private void logNumberOfProcess(TenantParameter tenantParameter)
+    private void logNumberOfProcess(final TenantParameter tenantParameter)
             throws Exception {
         logAsTechnicalUserOnTenant(tenantParameter);
 
@@ -336,13 +336,13 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
                 numberOfProcessInstances, numberOfArchivedProcessInstances));
     }
 
-    private long getNumberOfArchivedJobs(TenantParameter tenantParameter)
+    private long getNumberOfArchivedJobs(final TenantParameter tenantParameter)
             throws Exception {
         logAsTechnicalUserOnTenant(tenantParameter);
         return getProcessAPI().getNumberOfArchivedProcessInstances();
     }
 
-    private void createProcessOnTenant(TenantParameter tenantParameter)
+    private void createProcessOnTenant(final TenantParameter tenantParameter)
             throws Exception {
         logAsNormalUserOnTenant(tenantParameter);
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
@@ -380,20 +380,20 @@ public class TenantMaintenanceTestSP extends CommonAPISPTest {
         tenantParameter.setProcessDefinitionId(processDefinition.getId());
     }
 
-    private void logAsNormalUserOnTenant(TenantParameter tenantParameter)
+    private void logAsNormalUserOnTenant(final TenantParameter tenantParameter)
             throws BonitaException {
         loginWith(tenantParameter.getActorUsername(),
                 tenantParameter.getActorPassword(),
                 tenantParameter.getTenantId());
     }
 
-    private void pauseTenant(TenantParameter tenantParameter)
+    private void pauseTenant(final TenantParameter tenantParameter)
             throws BonitaException, UpdateException {
         logAsTechnicalUserOnTenant(tenantParameter);
         getTenantManagementAPI().pause();
     }
 
-    private void resumeTenant(TenantParameter tenantParameter)
+    private void resumeTenant(final TenantParameter tenantParameter)
             throws BonitaException, UpdateException {
         logAsTechnicalUserOnTenant(tenantParameter);
         getTenantManagementAPI().resume();
