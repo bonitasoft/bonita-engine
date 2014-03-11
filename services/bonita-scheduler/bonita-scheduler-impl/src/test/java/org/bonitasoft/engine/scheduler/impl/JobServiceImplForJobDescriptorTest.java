@@ -76,12 +76,6 @@ public class JobServiceImplForJobDescriptorTest {
     @InjectMocks
     private JobServiceImpl jobServiceImpl;
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobDescriptor(org.bonitasoft.engine.scheduler.model.SJobDescriptor, long)}.
-     * 
-     * @throws SJobDescriptorCreationException
-     * @throws SRecorderException
-     */
     @Test
     public final void createJobDescriptorByTenant() throws SJobDescriptorCreationException, SRecorderException {
         final long tenantId = 2;
@@ -113,15 +107,6 @@ public class JobServiceImplForJobDescriptorTest {
         jobServiceImpl.createJobDescriptor(sJobDescriptor, tenantId);
     }
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobDescriptor(long)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SRecorderException
-     * @throws SJobDescriptorDeletionException
-     * @throws SJobDescriptorReadException
-     * @throws SJobDescriptorNotFoundException
-     */
     @Test
     public final void deleteJobDescriptorById() throws SBonitaReadException, SRecorderException, SJobDescriptorNotFoundException, SJobDescriptorReadException,
             SJobDescriptorDeletionException {
@@ -156,12 +141,6 @@ public class JobServiceImplForJobDescriptorTest {
         jobServiceImpl.deleteJobDescriptor(3);
     }
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobDescriptor(org.bonitasoft.engine.scheduler.model.SJobDescriptor)}.
-     * 
-     * @throws SRecorderException
-     * @throws SJobDescriptorDeletionException
-     */
     @Test
     public final void deleteJobDescriptorByObject() throws SRecorderException, SJobDescriptorDeletionException {
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
@@ -190,13 +169,6 @@ public class JobServiceImplForJobDescriptorTest {
         jobServiceImpl.deleteJobDescriptor(sJobDescriptor);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#getJobDescriptor(long)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SJobDescriptorReadException
-     * @throws SJobDescriptorNotFoundException
-     */
     @Test
     public void getJobDescriptorById() throws SBonitaReadException, SJobDescriptorNotFoundException, SJobDescriptorReadException {
         final long jobDescriptorId = 1;
@@ -224,12 +196,6 @@ public class JobServiceImplForJobDescriptorTest {
         jobServiceImpl.getJobDescriptor(jobDescriptorId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#getNumberOfJobDescriptors(org.bonitasoft.engine.persistence.QueryOptions)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SBonitaSearchException
-     */
     @Test
     public void getNumberOfJobDescriptors() throws SBonitaReadException, SBonitaSearchException {
         final QueryOptions options = new QueryOptions(0, 10);
@@ -248,12 +214,6 @@ public class JobServiceImplForJobDescriptorTest {
         jobServiceImpl.getNumberOfJobDescriptors(options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#searchJobDescriptors(org.bonitasoft.engine.persistence.QueryOptions)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SBonitaSearchException
-     */
     @Test
     public void searchJobDescriptors() throws SBonitaSearchException, SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
@@ -269,6 +229,19 @@ public class JobServiceImplForJobDescriptorTest {
         doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobDescriptor.class, options, null);
 
         jobServiceImpl.searchJobDescriptors(options).get(0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void createJobDescriptor_should_throw_an_exception_if_the_descriptor_is_null() throws Exception {
+        jobServiceImpl.createJobDescriptor(null, 46845);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void createJobDescriptor_should_throw_an_exception_if_the_descriptor_name_is_null() throws Exception {
+        final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
+        when(jobDescriptor.getJobName()).thenReturn(null);
+
+        jobServiceImpl.createJobDescriptor(jobDescriptor, 46845);
     }
 
 }
