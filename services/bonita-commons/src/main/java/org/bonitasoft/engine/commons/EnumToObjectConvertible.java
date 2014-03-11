@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,13 +19,14 @@ package org.bonitasoft.engine.commons;
  * 
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface EnumToObjectConvertible {
 
     /**
      * Convert this enum to an Object value
      * 
-     * @return
+     * @return The object corresponding to the Enum
      * @since 6.0
      */
     Object fromEnum();

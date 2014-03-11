@@ -127,9 +127,23 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         builder.setId(docMapping.getId());
         builder.setName(docMapping.getDocumentName());
         builder.setProcessInstanceId(docMapping.getProcessInstanceId());
-        builder.setURL(docMapping.getDocumentURL());
+        builder.setURL(getDocumentUrl(docMapping));
         builder.setContentStorageId(docMapping.getContentStorageId());
         return builder.done();
+    }
+
+    private String getDocumentUrl(SDocumentMapping docMapping) {
+        if(docMapping.documentHasContent()) {
+            return generateDocumentURL(docMapping.getDocumentName(), docMapping.getContentStorageId());
+        }
+        return docMapping.getDocumentURL();
+    }
+
+    private String getDocumentUrl(SADocumentMapping docMapping) {
+        if(docMapping.documentHasContent()) {
+            return generateDocumentURL(docMapping.getDocumentName(), docMapping.getContentStorageId());
+        }
+        return docMapping.getDocumentURL();
     }
 
     private SProcessDocument toProcessDocument(final SADocumentMapping docMapping) {
@@ -142,7 +156,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         builder.setId(docMapping.getSourceObjectId());
         builder.setName(docMapping.getDocumentName());
         builder.setProcessInstanceId(docMapping.getProcessInstanceId());
-        builder.setURL(docMapping.getDocumentURL());
+        builder.setURL(getDocumentUrl(docMapping));
         builder.setContentStorageId(docMapping.getContentStorageId());
         return builder.done();
     }
@@ -157,7 +171,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         builder.setId(docMapping.getId());
         builder.setName(docMapping.getDocumentName());
         builder.setProcessInstanceId(docMapping.getProcessInstanceId());
-        builder.setURL(docMapping.getDocumentURL());
+        builder.setURL(getDocumentUrl(docMapping));
         builder.setContentStorageId(docMapping.getContentStorageId());
         builder.setArchiveDate(docMapping.getArchiveDate());
         builder.setSourceObjectId(docMapping.getSourceObjectId());
@@ -200,13 +214,12 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     private SDocumentMapping buildDocumentMapping(final SProcessDocument document, final SDocument sDocument) {
         final SDocumentMappingBuilder builder = initDocumentMappingBuilder(document);
         builder.setDocumentStorageId(sDocument.getStorageId());
-        builder.setDocumentURL(generateURL(document, sDocument));
         builder.setHasContent(true);
         return builder.done();
     }
 
-    private String generateURL(final SProcessDocument document, final SDocument sDocument) {
-        return urlProvider.generateURL(document, sDocument);
+    private String generateDocumentURL(String name, String contentStorageId) {
+        return urlProvider.generateURL(name, contentStorageId);
     }
 
     private SDocument toSDocument(final SProcessDocument document) {

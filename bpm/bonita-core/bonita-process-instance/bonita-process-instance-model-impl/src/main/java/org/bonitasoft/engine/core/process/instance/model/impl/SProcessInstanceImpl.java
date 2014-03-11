@@ -29,6 +29,8 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
 
     private static final long serialVersionUID = -6774293249236742878L;
 
+    private static final long DEFAULT_INTERRUPTING_EVENT_ID = -1L;
+
     private long processDefinitionId;
 
     private String description;
@@ -53,7 +55,7 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
 
     private SFlowNodeType callerType;
 
-    private long interruptingEventId = -1;
+    private long interruptingEventId = DEFAULT_INTERRUPTING_EVENT_ID;
 
     private SStateCategory stateCategory;
 
@@ -381,6 +383,11 @@ public class SProcessInstanceImpl extends SNamedElementImpl implements SProcessI
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean hasBeenInterruptedByEvent() {
+        return getInterruptingEventId() != -1;
     }
 
 }

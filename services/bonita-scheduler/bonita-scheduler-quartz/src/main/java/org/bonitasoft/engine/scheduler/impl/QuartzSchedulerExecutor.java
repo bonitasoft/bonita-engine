@@ -38,9 +38,13 @@ import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
+import org.quartz.ListenerManager;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
+import org.quartz.Trigger.TriggerState;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 
@@ -125,8 +129,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             clazz = ConcurrentQuartzJob.class;
         }
         final JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobName, String.valueOf(tenantId)).build();
-        jobDetail.getJobDataMap().put("tenantId", tenantId);
-        jobDetail.getJobDataMap().put("jobId", jobId);
+        jobDetail.getJobDataMap().put("tenantId", String.valueOf(tenantId));
+        jobDetail.getJobDataMap().put("jobId", String.valueOf(jobId));
         jobDetail.getJobDataMap().put("jobName", jobName);
         return jobDetail;
     }
@@ -187,7 +191,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public boolean isStarted() throws SSchedulerException {
         try {
             return scheduler != null && scheduler.isStarted() && !scheduler.isShutdown();
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -196,7 +200,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public boolean isShutdown() throws SSchedulerException {
         try {
             return scheduler != null && scheduler.isShutdown();
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -211,14 +215,16 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 // shutdown();
             }
             scheduler = schedulerFactory.getScheduler();
-            scheduler.start();
+
+            final ListenerManager listenerManager = scheduler.getListenerManager();
             for (final AbstractJobListener jobListener : jobListeners) {
-                scheduler.getListenerManager().addJobListener(jobListener);
+                listenerManager.addJobListener(jobListener);
             }
+            scheduler.start();
 
             try {
                 if (useOptimization) {
-                    Field quartzSchedulerField = scheduler.getClass().getDeclaredField("sched");
+                    final Field quartzSchedulerField = scheduler.getClass().getDeclaredField("sched");
                     quartzSchedulerField.setAccessible(true);
                     quartzScheduler = (QuartzScheduler) quartzSchedulerField.get(scheduler);
                 }
@@ -227,7 +233,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 t.printStackTrace();
             }
 
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -237,7 +243,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             checkSchedulerState();
             scheduler.shutdown(true);
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -275,7 +281,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
             scheduler.resumeJob(jobKey(jobName, tenantId));
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
             throw new SSchedulerException(e);
@@ -289,7 +295,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             final String tenantId = String.valueOf(getTenantIdFromSession());
             final GroupMatcher<JobKey> jobGroupEquals = jobGroupEquals(tenantId);
             scheduler.resumeJobs(jobGroupEquals);
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
             throw new SSchedulerException(e);
@@ -302,7 +308,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
             scheduler.pauseJob(jobKey(jobName, tenantId));
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
             throw new SSchedulerException(e);
@@ -315,7 +321,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
             scheduler.pauseJobs(jobGroupEquals(tenantId));
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
             throw new SSchedulerException(e);
@@ -328,7 +334,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             checkSchedulerState();
             final String tenantId = String.valueOf(getTenantIdFromSession());
             return scheduler.deleteJob(jobKey(jobName, tenantId));
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
             throw new SSchedulerException(e);
@@ -344,7 +350,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             for (final JobKey jobKey : jobNames) {
                 delete(jobKey.getName());
             }
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
             throw new SSchedulerException(e);
@@ -362,7 +368,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 jobsNames.add(jobKey.getName());
             }
             return jobsNames;
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         } catch (final TenantIdNotSetException e) {
             throw new SSchedulerException(e);
@@ -379,7 +385,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 jobsNames.add(jobKey.getName());
             }
             return jobsNames;
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -409,7 +415,28 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 }
             }
             return stillScheduled;
-        } catch (final org.quartz.SchedulerException e) {
+        } catch (final SchedulerException e) {
+            throw new SSchedulerException(e);
+        }
+    }
+
+    @Override
+    public void rescheduleErroneousTriggers() throws SSchedulerException {
+        checkSchedulerState();
+        try {
+            final List<String> triggerGroupNames = scheduler.getTriggerGroupNames();
+            for (final String triggerGroupName : triggerGroupNames) {
+                final Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroupName));
+                for (final TriggerKey triggerKey : triggerKeys) {
+                    final TriggerState triggerState = scheduler.getTriggerState(triggerKey);
+                    if (TriggerState.ERROR.equals(triggerState)) {
+                        scheduler.pauseTrigger(triggerKey);
+                        scheduler.resumeTrigger(triggerKey);
+                    }
+
+                }
+            }
+        } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }
     }

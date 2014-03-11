@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,7 +18,15 @@ import java.util.List;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Thrown when the process definition is invalid.
+ * 
+ * The class InvalidProcessDefinitionException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
+ * The class InvalidProcessDefinitionException that is not also subclasses of {@link RuntimeException} are checked exceptions.
+ * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
+ * constructor and propagate outside the method or constructor boundary.
+ * 
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class InvalidProcessDefinitionException extends BonitaException {
 
@@ -26,10 +34,22 @@ public class InvalidProcessDefinitionException extends BonitaException {
 
     private static final long serialVersionUID = -6871937645264318098L;
 
+    /**
+     * Constructs a new exception with the specified detail message.
+     * 
+     * @param message
+     *            The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     */
     public InvalidProcessDefinitionException(final String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     * 
+     * @param errors
+     *            The list of errors include in the detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     */
     public InvalidProcessDefinitionException(final List<String> errors) {
         super(getErrorMessage(errors));
     }

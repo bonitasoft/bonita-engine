@@ -43,36 +43,36 @@ public class CheckPlatformVersionTest {
     public void check_db_and_jars_with_same_minor_version_is_accepted() throws Exception {
         given_DB_Jar_Home_Versions("6.1.0", "6.1.1", "6.1.1");
 
-        checkPlatformVersion.execute();
+        Boolean sameVersion = checkPlatformVersion.call();
 
-        assertTrue(checkPlatformVersion.sameVersion());
+        assertTrue(sameVersion);
     }
 
     @Test
     public void check_db_and_jars_with_same_maintenance_version_is_accepted() throws Exception {
         given_DB_Jar_Home_Versions("6.1.1", "6.1.1-SNAPSHOT", "6.1.1-SNAPSHOT");
 
-        checkPlatformVersion.execute();
+        Boolean sameVersion = checkPlatformVersion.call();
 
-        assertTrue(checkPlatformVersion.sameVersion());
+        assertTrue(sameVersion);
     }
 
     @Test
     public void check_db_and_jars_with_exact_same_version_is_accepted() throws Exception {
         given_DB_Jar_Home_Versions("6.1.1-SNAPSHOT", "6.1.1-SNAPSHOT", "6.1.1-SNAPSHOT");
 
-        checkPlatformVersion.execute();
+        Boolean sameVersion = checkPlatformVersion.call();
 
-        assertTrue(checkPlatformVersion.sameVersion());
+        assertTrue(sameVersion);
     }
 
     @Test
     public void check_db_and_jars_with_different_minor_version_is_rejected() throws Exception {
         given_DB_Jar_Home_Versions("6.0.3", "6.1.1-SNAPSHOT", "6.1.1-SNAPSHOT");
 
-        checkPlatformVersion.execute();
+        Boolean sameVersion = checkPlatformVersion.call();
 
-        assertFalse(checkPlatformVersion.sameVersion());
+        assertFalse(sameVersion);
         assertEquals(
                 "The version of the platform in database is not the same as expected: bonita-server version is <6.1.1-SNAPSHOT> and database version is <6.0.3>",
                 checkPlatformVersion.getErrorMessage());
@@ -82,8 +82,8 @@ public class CheckPlatformVersionTest {
     public void check_db_and_jars_with_different_major_version_is_rejected() throws Exception {
         given_DB_Jar_Home_Versions("5.0.3", "6.0.3", "6.0.3");
 
-        checkPlatformVersion.execute();
-        assertFalse(checkPlatformVersion.sameVersion());
+        Boolean sameVersion = checkPlatformVersion.call();
+        assertFalse(sameVersion);
         assertEquals("The version of the platform in database is not the same as expected: bonita-server version is <6.0.3> and database version is <5.0.3>",
                 checkPlatformVersion.getErrorMessage());
     }
@@ -92,9 +92,9 @@ public class CheckPlatformVersionTest {
     public void check_db_and_jars_with_different_minor_version_with_2_digits_is_rejected() throws Exception {
         given_DB_Jar_Home_Versions("6.1", "6.10", "6.10");
 
-        checkPlatformVersion.execute();
+        Boolean sameVersion = checkPlatformVersion.call();
 
-        assertFalse(checkPlatformVersion.sameVersion());
+        assertFalse(sameVersion);
         assertEquals("The version of the platform in database is not the same as expected: bonita-server version is <6.10> and database version is <6.1>",
                 checkPlatformVersion.getErrorMessage());
     }
@@ -103,9 +103,9 @@ public class CheckPlatformVersionTest {
     public void check_home_and_jars_with_different_version_is_rejected() throws Exception {
         given_DB_Jar_Home_Versions("6.2.0", "6.2.0", "6.1.0");
 
-        checkPlatformVersion.execute();
+        Boolean sameVersion = checkPlatformVersion.call();
 
-        assertFalse(checkPlatformVersion.sameVersion());
+        assertFalse(sameVersion);
         assertEquals(
                 "The version of the bonita home is not the same as expected: bonita-server version is <6.2.0> and bonita home version is <6.1.0>",
                 checkPlatformVersion.getErrorMessage());
@@ -115,9 +115,9 @@ public class CheckPlatformVersionTest {
     public void check_home_and_jars_with_different_maintenance_version_is_rejected() throws Exception {
         given_DB_Jar_Home_Versions("6.2.1", "6.2.0", "6.2.1");
 
-        checkPlatformVersion.execute();
+        Boolean sameVersion = checkPlatformVersion.call();
 
-        assertFalse(checkPlatformVersion.sameVersion());
+        assertFalse(sameVersion);
         assertEquals(
                 "The version of the bonita home is not the same as expected: bonita-server version is <6.2.0> and bonita home version is <6.2.1>",
                 checkPlatformVersion.getErrorMessage());
@@ -127,9 +127,9 @@ public class CheckPlatformVersionTest {
     public void check_home_and_db_with_different_maintenance_version_is_accepted() throws Exception {
         given_DB_Jar_Home_Versions("6.2.0", "6.2.1", "6.2.1");
 
-        checkPlatformVersion.execute();
+        Boolean sameVersion = checkPlatformVersion.call();
 
-        assertTrue(checkPlatformVersion.sameVersion());
+        assertTrue(sameVersion);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -138,7 +138,7 @@ public class CheckPlatformVersionTest {
         when(platformProperties.getPlatformVersion()).thenReturn("6");
         when(bonitaHomeServer.getVersion()).thenThrow(new IllegalStateException("error"));
 
-        checkPlatformVersion.execute();
+        checkPlatformVersion.call();
     }
 
     private void given_DB_Jar_Home_Versions(final String dbVersion, final String jarVersion, final String homeVersion) throws Exception {

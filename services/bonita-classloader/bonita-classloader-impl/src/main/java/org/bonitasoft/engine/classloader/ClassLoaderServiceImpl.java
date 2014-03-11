@@ -47,7 +47,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private static final String GLOBAL_FOLDER = "global";
 
-    public static final String GLOBAL_TYPE = "___global___";
+    public static final String GLOBAL_TYPE = "GLOBAL";
 
     public static final long GLOBAL_ID = -1;
 

@@ -2,7 +2,6 @@ CREATE TABLE dependency (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(150) NOT NULL,
-  version NVARCHAR(50) NOT NULL,
   description NVARCHAR(MAX),
   filename NVARCHAR(255) NOT NULL,
   value_ VARBINARY(MAX) NOT NULL,
@@ -11,8 +10,6 @@ CREATE TABLE dependency (
 )
 GO
 CREATE INDEX idx_dependency_name ON dependency (name, id)
-GO
-CREATE INDEX idx_dependency_version ON dependency (version, id)
 GO
 
 CREATE TABLE dependencymapping (

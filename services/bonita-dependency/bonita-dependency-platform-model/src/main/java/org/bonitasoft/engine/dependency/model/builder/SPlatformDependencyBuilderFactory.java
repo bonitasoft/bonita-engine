@@ -13,16 +13,13 @@
  **/
 package org.bonitasoft.engine.dependency.model.builder;
 
-
 public interface SPlatformDependencyBuilderFactory {
 
-    SPlatformDependencyBuilder createNewInstance(final String name, final String version, final String fileName, final byte[] value);
+    SPlatformDependencyBuilder createNewInstance(final String name, final String fileName, final byte[] value);
 
     String getIdKey();
 
     String getNameKey();
-
-    String getVersionKey();
 
     String getDescriptionKey();
 

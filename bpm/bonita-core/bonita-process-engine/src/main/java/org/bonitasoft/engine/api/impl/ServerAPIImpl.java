@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -33,6 +33,7 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -54,11 +55,12 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ServerAPIImpl implements ServerAPI {
 
@@ -86,8 +88,8 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     public ServerAPIImpl(final boolean cleanSession) {
+        this.cleanSession = cleanSession;
         try {
-            this.cleanSession = cleanSession;
             accessResolver = getServiceAccessorFactoryInstance().createAPIAccessResolver();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
@@ -267,7 +269,7 @@ public class ServerAPIImpl implements ServerAPI {
         if (session == null) {
             throw new BonitaRuntimeException("session is null");
         }
-        final TransactionService transactionService = selectTransactionService(session, getSessionType(session));
+        final UserTransactionService userTransactionService = selectUserTransactionService(session, getSessionType(session));
 
         final Callable<Object> callable = new Callable<Object>() {
 
@@ -281,24 +283,24 @@ public class ServerAPIImpl implements ServerAPI {
             }
         };
 
-        return transactionService.executeInTransaction(callable);
+        return userTransactionService.executeInTransaction(callable);
     }
 
-    protected TransactionService selectTransactionService(final Session session, final SessionType sessionType) throws BonitaHomeNotSetException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
-        TransactionService transactionService = null;
-        final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
+    protected UserTransactionService selectUserTransactionService(final Session session, final SessionType sessionType) throws BonitaHomeNotSetException,
+    InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+        UserTransactionService transactionService = null;
+        final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
         final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
         switch (sessionType) {
-            case PLATFORM:
-                transactionService = platformServiceAccessor.getTransactionService();
-                break;
-            case API:
-                final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
-                transactionService = tenantAccessor.getTransactionService();
-                break;
-            default:
-                throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
+        case PLATFORM:
+            transactionService = platformServiceAccessor.getTransactionService();
+            break;
+        case API:
+            final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
+            transactionService = tenantAccessor.getUserTransactionService();
+            break;
+        default:
+            throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
         }
         return transactionService;
     }
@@ -351,7 +353,7 @@ public class ServerAPIImpl implements ServerAPI {
         final APISession apiSession = (APISession) session;
         final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(apiSession.getTenantId());
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        return classLoaderService.getLocalClassLoader("tenant", apiSession.getTenantId());
+        return classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), apiSession.getTenantId());
     }
 
     private ClassLoader getPlatformClassLoader(final PlatformServiceAccessor platformServiceAccessor) throws ClassLoaderException {

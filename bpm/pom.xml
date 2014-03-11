@@ -62,6 +62,9 @@
 		</profile>
 		<profile>
 			<id>package</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<modules>
 				<module>bonita-common</module>
 				<module>bonita-client</module>

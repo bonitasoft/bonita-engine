@@ -65,7 +65,7 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             throw new RejectedExecutionException("Unable to run the task " + task
-                    + "\n your work queue is full you might consider changing your configuration to scale more");
+                    + "\n your work queue is full you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
         }
 
     }

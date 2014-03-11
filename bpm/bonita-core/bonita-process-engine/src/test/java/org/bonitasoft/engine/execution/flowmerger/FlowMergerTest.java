@@ -55,7 +55,7 @@ public class FlowMergerTest {
     private FlowNodeTransitionsWrapper transitionsDescriptor;
     
     @Mock
-    private TokenProvider tokenProvider;
+    private FlowNodeCompletionTokenProvider tokenProvider;
     
     @Mock
     private SFlowNodeWrapper flowNodeWrapper;
@@ -80,28 +80,28 @@ public class FlowMergerTest {
     @Test
     public void should_not__create_token_if_flowNode_is_null() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(flowNodeWrapper).isNull();
-        assertFalse(flowNodeMerger.mustCreateToken());
+        assertFalse(flowNodeMerger.mustCreateTokenOnFinish());
     }
 
     @Test
     public void should_not_create_token_if_it_is_a_boundary_event() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(flowNodeWrapper).isBoundaryEvent();
         
-        assertFalse(flowNodeMerger.mustCreateToken());
+        assertFalse(flowNodeMerger.mustCreateTokenOnFinish());
     }
 
     @Test
     public void should_not_create_token_if_it_is_exclusive() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(flowNodeWrapper).isExclusive();
         
-        assertFalse(flowNodeMerger.mustCreateToken());
+        assertFalse(flowNodeMerger.mustCreateTokenOnFinish());
     }
 
     @Test
     public void should_not_create_token_if_is_last_flow_node() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(transitionsDescriptor).isLastFlowNode();
         
-        assertFalse(transitionDependentFlowNodeMerger.mustCreateToken());
+        assertFalse(transitionDependentFlowNodeMerger.mustCreateTokenOnFinish());
     }
 
     @Test
@@ -109,7 +109,7 @@ public class FlowMergerTest {
         doReturn(false).when(transitionsDescriptor).isLastFlowNode();
         doReturn(false).when(transitionsDescriptor).hasMultipleOutgoingTransitions();
         
-        assertFalse(transitionDependentFlowNodeMerger.mustCreateToken());
+        assertFalse(transitionDependentFlowNodeMerger.mustCreateTokenOnFinish());
     }
 
     @Test
@@ -117,34 +117,34 @@ public class FlowMergerTest {
         doReturn(false).when(transitionsDescriptor).isLastFlowNode();
         doReturn(true).when(transitionsDescriptor).hasMultipleOutgoingTransitions();
         
-        assertTrue(transitionDependentFlowNodeMerger.mustCreateToken());
+        assertTrue(transitionDependentFlowNodeMerger.mustCreateTokenOnFinish());
     }
 
     @Test
     public void should_not_consume_token_if_flowNode_is_null() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(flowNodeWrapper).isNull();
-        assertFalse(flowNodeMerger.mustConsumeInputToken());
+        assertFalse(flowNodeMerger.mustConsumeInputTokenOnTakingTransition());
     }
     
     @Test
-    public void should_not_consume_token_if_it_is_a_boundary_event() throws SObjectReadException, SObjectNotFoundException {
+    public void should_not_consume_token_if_it_is_a_boundary_event_is_not_last_flow_node() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(flowNodeWrapper).isBoundaryEvent();
         
-        assertFalse(flowNodeMerger.mustConsumeInputToken());
+        assertFalse(flowNodeMerger.mustConsumeInputTokenOnTakingTransition());
     }
     
     @Test
     public void should_not_consume_token_if_it_is_exclusive() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(flowNodeWrapper).isExclusive();
         
-        assertFalse(flowNodeMerger.mustConsumeInputToken());
+        assertFalse(flowNodeMerger.mustConsumeInputTokenOnTakingTransition());
     }
     
     @Test
     public void should_not_consume_token_if_is_last_flow_node() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(transitionsDescriptor).isLastFlowNode();
         
-        assertFalse(transitionDependentFlowNodeMerger.mustConsumeInputToken());
+        assertFalse(transitionDependentFlowNodeMerger.mustConsumeInputTokenOnTakingTransition());
     }
 
     @Test
@@ -152,7 +152,7 @@ public class FlowMergerTest {
         doReturn(false).when(transitionsDescriptor).isLastFlowNode();
         doReturn(false).when(transitionsDescriptor).hasMultipleIncomingTransitions();
         
-        assertFalse(transitionDependentFlowNodeMerger.mustConsumeInputToken());
+        assertFalse(transitionDependentFlowNodeMerger.mustConsumeInputTokenOnTakingTransition());
     }
 
     @Test
@@ -161,7 +161,7 @@ public class FlowMergerTest {
         doReturn(true).when(transitionsDescriptor).hasMultipleIncomingTransitions();
         doReturn(true).when(transitionDependentFlowNodeWrapper).isParalleleOrInclusive();
         
-        assertTrue(transitionDependentFlowNodeMerger.mustConsumeInputToken());
+        assertTrue(transitionDependentFlowNodeMerger.mustConsumeInputTokenOnTakingTransition());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class FlowMergerTest {
         doReturn(true).when(transitionsDescriptor).hasMultipleIncomingTransitions();
         doReturn(false).when(transitionDependentFlowNodeWrapper).isParalleleOrInclusive();
         
-        assertFalse(transitionDependentFlowNodeMerger.mustConsumeInputToken());
+        assertFalse(transitionDependentFlowNodeMerger.mustConsumeInputTokenOnTakingTransition());
     }
     
     
@@ -181,10 +181,19 @@ public class FlowMergerTest {
     }
 
     @Test
-    public void is_not_implicite_end_if_it_is_a_boundary_event() throws SObjectReadException, SObjectNotFoundException {
+    public void is_not_implicite_end_if_it_is_a_boundary_event_and_is_not_last_flow_node() throws SObjectReadException, SObjectNotFoundException {
         doReturn(true).when(flowNodeWrapper).isBoundaryEvent();
         
         assertFalse(flowNodeMerger.isImplicitEnd());
+        doReturn(true).when(transitionsDescriptor).isLastFlowNode();
+    }
+
+    @Test
+    public void is_implicite_end_if_it_is_a_boundary_event_and_is_last_flow_node() throws SObjectReadException, SObjectNotFoundException {
+        doReturn(true).when(flowNodeWrapper).isBoundaryEvent();
+        doReturn(true).when(transitionsDescriptor).isLastFlowNode();
+        
+        assertTrue(flowNodeMerger.isImplicitEnd());
     }
 
     @Test
