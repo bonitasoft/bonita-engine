@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
@@ -72,13 +73,13 @@ public class ActorMappingServiceTest extends CommonBPMServicesTest {
     }
 
     @Test(expected = SActorNotFoundException.class)
-    public void cannotGetAnUnknownActor() throws SBonitaException {
-        transactionService.begin();
-        try {
-            actorMappingService.getActor(0);
-        } finally {
-            transactionService.complete();
-        }
+    public void cannotGetAnUnknownActor() throws Exception {
+        transactionService.executeInTransaction(new Callable<SActor>() {
+            @Override
+            public SActor call() throws Exception {
+                return actorMappingService.getActor(0);
+            }
+        });
     }
 
     @Test

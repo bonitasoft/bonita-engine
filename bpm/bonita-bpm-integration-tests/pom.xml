@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -13,8 +14,7 @@
 
 	<modules>
 		<module>bonita-client-test-util</module>
-		<module>bonita-integration-client-tests</module>
-		<module>bonita-integration-local-tests</module>
+		<module>bonita-query-tests</module>
 	</modules>
 
 	<build>
@@ -35,46 +35,65 @@
 			<id>package-all</id>
 			<modules>
 				<module>bonita-bpm-services-integration-tests</module>
+				<module>bonita-integration-client-tests</module>
+				<module>bonita-integration-local-tests</module>
 				<module>bonita-integration-as-tests</module>
 			</modules>
 		</profile>
-		
+
 		<profile>
 			<id>tests</id>
 			<modules>
 				<module>bonita-bpm-services-integration-tests</module>
+				<module>bonita-integration-client-tests</module>
+				<module>bonita-integration-local-tests</module>
 			</modules>
 		</profile>
-		
-		
+
+
 		<profile>
 			<id>as-tests</id>
 			<modules>
+				<module>bonita-integration-client-tests</module>
+				<module>bonita-integration-local-tests</module>
 				<module>bonita-integration-as-tests</module>
 			</modules>
 		</profile>
-		
+
 		<profile>
 			<id>all</id>
 			<modules>
+				<module>bonita-integration-client-tests</module>
+				<module>bonita-integration-local-tests</module>
 				<module>bonita-bpm-services-integration-tests</module>
 			</modules>
 		</profile>
+
+		<profile>
+			<id>package</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<modules>
+				<module>bonita-query-tests</module>
+			</modules>
+		</profile>
+
 	</profiles>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.26</version>
-            </dependency>
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>9.2-1003-jdbc4</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>5.1.26</version>
+			</dependency>
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>9.2-1003-jdbc4</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 </project>

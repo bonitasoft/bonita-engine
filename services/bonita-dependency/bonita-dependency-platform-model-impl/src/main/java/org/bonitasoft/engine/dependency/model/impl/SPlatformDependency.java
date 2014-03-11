@@ -28,8 +28,6 @@ public class SPlatformDependency implements SDependency {
 
     private String name;
 
-    private String version;
-
     private String fileName;
 
     private String description;
@@ -40,10 +38,9 @@ public class SPlatformDependency implements SDependency {
         // default constructor for hibernate
     }
 
-    public SPlatformDependency(final String name, final String version, final String fileName, final byte[] value) {
+    public SPlatformDependency(final String name, final String fileName, final byte[] value) {
         super();
         this.name = name;
-        this.version = version;
         this.fileName = fileName;
         value_ = value;
     }
@@ -57,10 +54,12 @@ public class SPlatformDependency implements SDependency {
         this.description = description;
     }
 
+    @Override
     public void setId(final long id) {
         this.id = id;
     }
 
+    @Override
     public void setTenantId(final long id) {
         this.tenantId = id;
     }
@@ -82,10 +81,6 @@ public class SPlatformDependency implements SDependency {
         this.name = name;
     }
 
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
     public void setFileName(final String fileName) {
         this.fileName = fileName;
     }
@@ -93,11 +88,6 @@ public class SPlatformDependency implements SDependency {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public String getVersion() {
-        return version;
     }
 
     @Override

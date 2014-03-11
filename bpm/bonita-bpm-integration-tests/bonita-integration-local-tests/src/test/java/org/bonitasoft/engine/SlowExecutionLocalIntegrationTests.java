@@ -19,7 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         TestShades.class,
-        // Same suites as in LocalIntegrationTests below:
+        // // Same suites as in LocalIntegrationTests below:
         BPMLocalSuiteTests.class,
         BPMRemoteTests.class,
         APIMethodTest.class,

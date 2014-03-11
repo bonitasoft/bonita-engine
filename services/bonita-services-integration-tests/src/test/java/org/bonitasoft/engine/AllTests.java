@@ -16,11 +16,9 @@ import org.bonitasoft.engine.platform.TenantManagementTest;
 import org.bonitasoft.engine.platform.auth.PlatformAuthenticationServiceTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationTest;
 import org.bonitasoft.engine.profile.ProfileServiceTest;
-import org.bonitasoft.engine.queriablelogger.QueriableLoggerServiceTest;
 import org.bonitasoft.engine.recorder.RecorderTest;
 import org.bonitasoft.engine.scheduler.impl.JobTest;
 import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorTest;
-import org.bonitasoft.engine.scheduler.impl.SchedulerAndQueriableLogTest;
 import org.bonitasoft.engine.session.PlatformSessionServiceTest;
 import org.bonitasoft.engine.session.SessionServiceTest;
 import org.bonitasoft.engine.xml.ParserTest;
@@ -37,7 +35,6 @@ import org.junit.runners.Suite.SuiteClasses;
         ClassLoaderServiceTest.class,
         DataTest.class,
         ExpressionServiceTest.class,
-        QueriableLoggerServiceTest.class,
         IdentityServiceTest.class,
         AuthenticationServiceTest.class,
         PlatformAuthenticationServiceTest.class,
@@ -50,7 +47,6 @@ import org.junit.runners.Suite.SuiteClasses;
         // -- SqlTest.class,
         // -- Tests using the scheduler
         RecorderTest.class,
-        SchedulerAndQueriableLogTest.class,
         QuartzSchedulerExecutorTest.class,
         JobTest.class,
         CommandServiceIntegrationTest.class,
@@ -61,10 +57,7 @@ import org.junit.runners.Suite.SuiteClasses;
         TenantManagementTest.class
 })
 /**
- * Do not run this test suite alone. Use AllTestsWithJNDI instead.
- * 
  * @author Emmanuel Duchastenier
- *
  */
 public class AllTests {
 

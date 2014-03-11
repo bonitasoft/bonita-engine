@@ -176,7 +176,17 @@ public class APITestUtil {
 
     public static final int DEFAULT_REPEAT_EACH = 500;
 
-    public static final int DEFAULT_TIMEOUT = 7 * 60 * 1000;
+    public static final int DEFAULT_TIMEOUT;
+    
+    static {
+        String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
+        if(strTimeout != null) {
+            DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
+        } else {
+            DEFAULT_TIMEOUT = 7 * 60 * 1000;
+        }
+    }
+
 
     @After
     public void clearSynchroRepository() {
@@ -745,7 +755,7 @@ public class APITestUtil {
         try {
             return getProcessAPI().getFlowNodeInstance(id);
         } catch (final FlowNodeInstanceNotFoundException e) {
-            throw new RuntimeException("no id returned for flownode instance ");
+            throw new RuntimeException("no id returned for flow node instance ");
         }
     }
 

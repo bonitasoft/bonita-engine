@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.dependency.model.builder.impl;
 
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl;
@@ -20,7 +21,7 @@ import org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl;
 public class SDependencyMappingBuilderFactoryImpl implements SDependencyMappingBuilderFactory {
 
     @Override
-    public SDependencyMappingBuilder createNewInstance(final long dependencyId, final long artifactId, final String artifactType) {
+    public SDependencyMappingBuilder createNewInstance(final long dependencyId, final long artifactId, final ScopeType artifactType) {
         final SDependencyMappingImpl object = new SDependencyMappingImpl(artifactId, artifactType, dependencyId);
         return new SDependencyMappingBuilderImpl(object);
     }

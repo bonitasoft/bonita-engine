@@ -68,22 +68,4 @@ public class JobExecutionTest extends CommonAPITest {
         }
     }
 
-    @Test
-    public void retryAJob() throws Exception {
-        getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        try {
-            getCommandAPI().execute("except", parameters);
-            Thread.sleep(1000);
-            List<FailedJob> failedJobs = getProcessAPI().getFailedJobs(0, 100);
-            assertEquals(1, failedJobs.size());
-            getProcessAPI().replayFailedJob(failedJobs.get(0).getJobDescriptorId(), Collections.singletonMap("throwException", (Serializable) Boolean.FALSE));
-            Thread.sleep(1000);
-            failedJobs = getProcessAPI().getFailedJobs(0, 100);
-            assertEquals(0, failedJobs.size());
-        } finally {
-            getCommandAPI().unregister("except");
-        }
-    }
-
 }

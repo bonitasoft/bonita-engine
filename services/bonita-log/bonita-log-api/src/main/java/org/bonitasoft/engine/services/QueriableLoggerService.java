@@ -49,50 +49,6 @@ public interface QueriableLoggerService {
     boolean isLoggable(final String actionType, final SQueriableLogSeverity severity);
 
     /**
-     * Get the queriable logs having the given value for the given Long index
-     * 
-     * @param pos
-     *            position of the LongIndex (between 0 and 4)
-     * @param value
-     *            the LongIndex value
-     * @param fromIndex
-     *            first result to be considered(>=0)
-     * @param maxSize
-     *            the max number of queriable logs to be returned (>=0)
-     * @param pageCriterion
-     *            the criterion to be used to order the result
-     * @return the queriable logs having the given value for the given Long index
-     * @throws IllegalIndexPositionException
-     *             if LongIndex position is out of range
-     * @throws SQueriableLogException
-     * @since 6.0
-     */
-    List<SQueriableLog> getLogsFromLongIndex(int pos, long value, final int fromIndex, final int numberOfResults, String fieldName, OrderByType orderByType)
-            throws IllegalIndexPositionException, SQueriableLogException;
-
-    /**
-     * Get the queriable logs having the given value for the given Long index
-     * 
-     * @param pos
-     *            position of the LongIndex (between 0 and 4)
-     * @param value
-     *            the LongIndex value
-     * @param fromIndex
-     *            first result to be considered(>=0)
-     * @param maxSize
-     *            the max number of queriable logs to be returned (>=0)
-     * @param pageCriterion
-     *            the criterion to be used to order the result
-     * @return the queriable logs having the given value for the given Long index
-     * @throws IllegalIndexPositionException
-     *             if LongIndex position is out of range
-     * @throws SQueriableLogException
-     * @since 6.0
-     */
-    List<SQueriableLog> getLogsFromLongIndex(int pos, long value, final int fromIndex, final int numberOfResults) throws IllegalIndexPositionException,
-            SQueriableLogException;
-
-    /**
      * Get the queriable log from its id.
      * 
      * @param logId

@@ -24,7 +24,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 public class StartFlowNodeFilter implements Filter<SFlowNodeDefinition> {
 
     @Override
-    public boolean select(SFlowNodeDefinition flowNode) {
+    public boolean mustSelect(SFlowNodeDefinition flowNode) {
         return flowNode.isStartable();
     }
 

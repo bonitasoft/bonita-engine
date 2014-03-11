@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
-import org.bonitasoft.engine.scheduler.impl.VariableStorage;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 

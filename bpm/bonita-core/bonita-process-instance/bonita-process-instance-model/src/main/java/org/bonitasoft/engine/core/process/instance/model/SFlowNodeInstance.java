@@ -42,13 +42,13 @@ public interface SFlowNodeInstance extends SFlowElementInstance {
     int getLoopCounter();
 
     /**
-     * @return id of the user who originally executed the flownode
+     * @return id of the user who originally executed the flow node
      * @since 6.0.1
      */
     long getExecutedBy();
 
     /**
-     * @return id of the user (delegate) who executed the flownode for the original executer
+     * @return id of the user (delegate) who executed the flow node for the original executer
      * @since 6.0.1
      */
     long getExecutedByDelegate();
@@ -58,4 +58,9 @@ public interface SFlowNodeInstance extends SFlowElementInstance {
     int getTokenCount();
 
     long getFlowNodeDefinitionId();
+    
+    /**
+     * @return true if the execution must continues automatically on abort or cancel the parent process instance
+     */
+    boolean mustExecuteOnAbortOrCancelProcess();
 }

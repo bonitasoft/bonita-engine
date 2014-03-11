@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.expression;
 
 import static java.util.Arrays.asList;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -88,85 +88,69 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test(expected = SExpressionEvaluationException.class)
     public void evaluate_should_throw_an_exception_when_container_id_is_null() throws Exception {
-        strategy.evaluate(
-                Collections.<SExpression>emptyList(),
-                Collections.<String, Object>emptyMap(),
-                null);
+        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> emptyMap(), null);
     }
 
     @Test(expected = SExpressionEvaluationException.class)
     public void evaluate_should_throw_an_exception_when_container_type_is_null() throws Exception {
-        strategy.evaluate(
-                Collections.<SExpression> emptyList(),
-                Collections.<String, Object> singletonMap("containerId", PROCESS_INSTANCE_ID),
-                null);
+        strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> singletonMap("containerId", PROCESS_INSTANCE_ID), null);
     }
 
     @Test
     public void evaluate_result_should_contains_process_document_when_container_is_a_process_instance() throws Exception {
-        Map<String, Object> dependencies = new HashMap<String, Object>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
 
-        List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains(ModelConvertor.toDocument(document));
+        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(document));
     }
 
     @Test
     public void evaluate_result_should_contains_parent_process_document_when_container_is_not_a_process_instance() throws Exception {
-        Map<String, Object> dependencies = new HashMap<String, Object>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "OTHER");
 
-        List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains(ModelConvertor.toDocument(parentDocument));
+        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(parentDocument));
     }
 
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_process_instance() throws Exception {
         doThrow(SDocumentNotFoundException.class).when(processDocumentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString());
-        Map<String, Object> dependencies = new HashMap<String, Object>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
 
-        List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains((Document) null);
+        assertThat(result).hasSize(1).contains((Document) null);
     }
 
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_parent_process_instance() throws Exception {
         doThrow(SDocumentNotFoundException.class).when(processDocumentService).getDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
-        Map<String, Object> dependencies = new HashMap<String, Object>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "OTHER");
 
-        List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains((Document) null);
+        assertThat(result).hasSize(1).contains((Document) null);
     }
 
     @Test
     public void evaluate_result_should_contains_archived_document_when_a_time_is_defined() throws Exception {
-        Map<String, Object> dependencies = new HashMap<String, Object>();
+        final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
         dependencies.put("time", A_LONG_TIME_AGO);
 
-        List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
+        final List<Object> result = strategy.evaluate(asList(expression), dependencies, null);
 
-        assertThat(result)
-                .hasSize(1)
-                .contains(ModelConvertor.toDocument(archivedDocument));
+        assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(archivedDocument));
     }
 }

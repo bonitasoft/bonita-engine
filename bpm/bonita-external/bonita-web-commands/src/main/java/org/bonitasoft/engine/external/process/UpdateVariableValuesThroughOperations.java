@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,11 +22,13 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.TenantCommand;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public abstract class UpdateVariableValuesThroughOperations extends TenantCommand {
 
@@ -73,7 +75,8 @@ public abstract class UpdateVariableValuesThroughOperations extends TenantComman
         @Override
         public void execute() throws SBonitaException {
             // logic
-            final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", getProcessDefinitionId(containerInstanceId));
+            final ClassLoader processClassloader = classLoaderService
+                    .getLocalClassLoader(ScopeType.PROCESS.name(), getProcessDefinitionId(containerInstanceId));
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);

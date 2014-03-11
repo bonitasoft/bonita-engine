@@ -19,6 +19,7 @@ import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.job.IncrementItselfJob;
 import org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy;
+import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.OneExecutionTrigger;
@@ -47,70 +48,21 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        tenant1 = PlatformUtil.createTenant(getTransactionService(), getPlatformService(), "tenant1", PlatformUtil.DEFAULT_CREATED_BY,
-                PlatformUtil.DEFAULT_TENANT_STATUS);
+        tenant1 = PlatformUtil.createTenant(
+                getTransactionService(), getPlatformService(), "tenant1", PlatformUtil.DEFAULT_CREATED_BY, PlatformUtil.DEFAULT_TENANT_STATUS);
+       
         TestUtil.startScheduler(schedulerService);
+        
         getTransactionService().begin();
         changeToDefaultTenant();
         getTransactionService().complete();
     }
 
-    @Override
     @After
-    public void tearDown() throws Exception {
-        TestUtil.closeTransactionIfOpen(getTransactionService());
+    public void stopScheduler() throws Exception {
         TestUtil.stopScheduler(schedulerService, getTransactionService());
         storage.clear();
         PlatformUtil.deleteTenant(getTransactionService(), getPlatformService(), tenant1);
-    }
-
-    /**
-     * @author Baptiste Mesta
-     */
-    private final class WaitForIncrementJobToHaveValue extends WaitFor {
-
-        private final int value;
-
-        /**
-         * @param timeout
-         * @param value
-         */
-        private WaitForIncrementJobToHaveValue(final int timeout, final int value) {
-            super(10, timeout);
-            this.value = value;
-        }
-
-        @Override
-        boolean check() {
-            return IncrementItselfJob.getValue() == value;
-        }
-    }
-
-    public abstract class WaitFor {
-
-        private final int timeout;
-
-        private final int repeatEach;
-
-        public WaitFor(final int repeatEach, final int timeout) {
-            assertTrue("timeout is not big enough", repeatEach < timeout);
-            this.repeatEach = repeatEach;
-            this.timeout = timeout;
-        }
-
-        public boolean waitFor() throws InterruptedException {
-            final long limit = new Date().getTime() + timeout;
-            while (new Date().getTime() < limit) {
-                Thread.sleep(repeatEach);
-                if (check()) {
-                    return true;
-                }
-            }
-            return check();
-        }
-
-        abstract boolean check();
-
     }
 
     @Test
@@ -136,22 +88,6 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
     @Test(expected = SSchedulerException.class)
     public void testCannotStartASchedulerWhichIsAlreadyStarted() throws Exception {
         schedulerService.start();
-    }
-
-    @Test(expected = SSchedulerException.class)
-    public void testExecuteAJobWithANullTrigger() throws Exception {
-        final String variableName = "myVar";
-
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJob", "IncrementVariableJob").done();
-        final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "job").done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());
-        parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("throwExceptionAfterNIncrements", -1).done());
-
-        getTransactionService().begin();
-        schedulerService.schedule(jobDescriptor, parameters, null);
-        getTransactionService().complete();
     }
 
     @Test
@@ -550,7 +486,7 @@ public class QuartzSchedulerExecutorTest extends CommonServiceTest {
         final Date now = new Date(System.currentTimeMillis() + 10000000);
         final String variableName = "testMultiTenancy";
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance("org.bonitasoft.engine.scheduler.job.IncrementVariableJobWithMultiTenancy", "IncrementVariableJob").done();
+                .createNewInstance(IncrementVariableJobWithMultiTenancy.class.getName(), "IncrementVariableJob").done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", "testExecuteOnceAJob").done());
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("variableName", variableName).done());

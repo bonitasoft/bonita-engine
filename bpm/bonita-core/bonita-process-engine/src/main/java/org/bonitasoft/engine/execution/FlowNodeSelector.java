@@ -47,7 +47,7 @@ public class FlowNodeSelector {
         SFlowElementContainerDefinition container = getContainer();
         ArrayList<SFlowNodeDefinition> selectedFlowNodes = new ArrayList<SFlowNodeDefinition>();
         for (SFlowNodeDefinition flowNodeDefinition : container.getFlowNodes()) {
-            if(selector.select(flowNodeDefinition)) {
+            if(selector.mustSelect(flowNodeDefinition)) {
                 selectedFlowNodes.add(flowNodeDefinition);
             }
         }

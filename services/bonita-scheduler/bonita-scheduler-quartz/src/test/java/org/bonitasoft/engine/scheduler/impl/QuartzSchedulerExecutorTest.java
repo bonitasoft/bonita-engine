@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +39,7 @@ public class QuartzSchedulerExecutorTest {
 
     @Before
     public void before() throws Exception {
-        boolean useOptimizations = false;
+        final boolean useOptimizations = false;
         quartzSchedulerExecutor = new QuartzSchedulerExecutor(schedulerFactory, new ArrayList<AbstractJobListener>(), sessionAccessor, transactionService,
                 useOptimizations);
         quartzSchedulerExecutor.setBOSSchedulerService(schedulerService);
@@ -59,6 +58,7 @@ public class QuartzSchedulerExecutorTest {
 
         quartzSchedulerExecutor.delete("timerjob");
 
-        verify(scheduler, times(1)).deleteJob(eq(new JobKey("timerjob", "1")));
+        verify(scheduler).deleteJob(eq(new JobKey("timerjob", "1")));
     }
+
 }

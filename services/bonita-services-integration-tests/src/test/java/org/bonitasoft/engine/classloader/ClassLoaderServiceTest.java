@@ -18,6 +18,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilder;
@@ -43,9 +44,9 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
 
     private ClassLoaderService classLoaderService;
 
-    private static final String TYPE1 = "type1";
+    private static final ScopeType TYPE1 = ScopeType.PROCESS;
 
-    private static final String TYPE2 = "type2";
+    private static final ScopeType TYPE2 = ScopeType.TENANT;
 
     private static final long ID1 = 1;
 
@@ -54,8 +55,8 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     @Override
     @After
     public void tearDown() throws Exception {
-        classLoaderService.removeAllLocalClassLoaders(TYPE1);
-        classLoaderService.removeAllLocalClassLoaders(TYPE2);
+        classLoaderService.removeAllLocalClassLoaders(TYPE1.name());
+        classLoaderService.removeAllLocalClassLoaders(TYPE2.name());
 
         TestUtil.closeTransactionIfOpen(getTransactionService());
 
@@ -79,13 +80,15 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
 
     private void initializeClassLoaderService() throws Exception {
         getTransactionService().begin();
-        final long globalResourceId = createPlatformDependency("globalResource", "1.0", "globalResource.jar",
+        final long globalResourceId = createPlatformDependency("globalResource", "globalResource.jar",
                 IOUtil.generateJar(GlobalClass1.class, GlobalClass2.class, SharedClass1.class));
 
-        createPlatformDependencyMapping(globalResourceId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
+        createPlatformDependencyMapping(globalResourceId, classLoaderService.getGlobalClassLoaderType(),
+                classLoaderService.getGlobalClassLoaderId());
 
-        final long localResource1Id = createDependency("LocalResource1", "1.0", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
-        final long localResource2Id = createDependency("LocalResource2", "1.0", "LocalResource2.jar",
+        final long localResource1Id = createDependency(2L, TYPE1, "LocalResource1", "LocalResource1.jar",
+                IOUtil.generateJar(LocalClass1.class, LocalClass2.class));
+        final long localResource2Id = createDependency(2L, TYPE1, "LocalResource2", "LocalResource2.jar",
                 IOUtil.generateJar(LocalClass3.class, LocalClass4.class, SharedClass1.class));
 
         createDependencyMapping(localResource1Id, TYPE1, ID1);
@@ -99,15 +102,15 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         getTransactionService().begin();
         final URL globalFile = ClassLoaderServiceTest.class.getResource("NotInPathGlobal.jar");
         final byte[] globalFileContent = IOUtil.getAllContentFrom(globalFile);
-        final long globalFileId = createPlatformDependency("NotInPathGlobal", "1.0", "NotInPathGlobal.jar", globalFileContent);
+        final long globalFileId = createPlatformDependency("NotInPathGlobal", "NotInPathGlobal.jar", globalFileContent);
 
         final URL sharedFile = ClassLoaderServiceTest.class.getResource("NotInPathShared.jar");
         final byte[] sharedFileContent = IOUtil.getAllContentFrom(sharedFile);
-        final long sharedFileId = createPlatformDependency("NotInPathShared", "1.0", "NotInPathShared.jar", sharedFileContent);
+        final long sharedFileId = createPlatformDependency("NotInPathShared", "NotInPathShared.jar", sharedFileContent);
 
         final URL localFile = ClassLoaderServiceTest.class.getResource("NotInPathLocal.jar");
         final byte[] localFileContent = IOUtil.getAllContentFrom(localFile);
-        final long localFileId = createDependency("NotInPathLocal", "1.0", "NotInPathLocal.jar", localFileContent);
+        final long localFileId = createDependency(2L, TYPE1, "NotInPathLocal", "NotInPathLocal.jar", localFileContent);
 
         createPlatformDependencyMapping(globalFileId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
         createPlatformDependencyMapping(sharedFileId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
@@ -117,15 +120,18 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         getTransactionService().complete();
     }
 
-    private long createDependency(final String name, final String version, final String fileName, final byte[] value) throws SDependencyException {
-        final SDependencyBuilder builder = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, version, fileName, value);
+    private long createDependency(final long artifactId, final ScopeType artifactType, final String name, final String fileName,
+            final byte[] value) throws SDependencyException {
+        final SDependencyBuilder builder = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, artifactId,
+                artifactType, fileName, value);
         final SDependency dependency = builder.done();
         dependencyService.createDependency(dependency);
         return dependency.getId();
     }
 
-    private long createPlatformDependency(final String name, final String version, final String fileName, final byte[] value) throws SDependencyException {
-        final SPlatformDependencyBuilder builder = BuilderFactory.get(SPlatformDependencyBuilderFactory.class).createNewInstance(name, version, fileName, value);
+    private long createPlatformDependency(final String name, final String fileName, final byte[] value) throws SDependencyException {
+        final SPlatformDependencyBuilder builder = BuilderFactory.get(SPlatformDependencyBuilderFactory.class)
+                .createNewInstance(name, fileName, value);
         final SDependency dependency = builder.done();
         platformDependencyService.createDependency(dependency);
         return dependency.getId();
@@ -133,20 +139,20 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
 
     private void initializeClassLoaderServiceWithTwoApplications() throws Exception {
         getTransactionService().begin();
-        final long globalResourceId = createPlatformDependency("globalResource", "1.0", "globalResource.jar",
+        final long globalResourceId = createPlatformDependency("globalResource", "globalResource.jar",
                 IOUtil.generateJar(GlobalClass1.class, SharedClass1.class));
         createPlatformDependencyMapping(globalResourceId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
 
-        final long localResource1Id = createDependency("LocalResource11", "1.0", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class));
-        final long localResource2Id = createDependency("LocalResource12", "1.0", "LocalResource2.jar", IOUtil.generateJar(LocalClass3.class));
+        final long localResource1Id = createDependency(2L, TYPE1, "LocalResource11", "LocalResource1.jar", IOUtil.generateJar(LocalClass1.class));
+        final long localResource2Id = createDependency(2L, TYPE1, "LocalResource12", "LocalResource2.jar", IOUtil.generateJar(LocalClass3.class));
 
         createDependencyMapping(localResource1Id, TYPE1, ID1);
         createDependencyMapping(localResource2Id, TYPE1, ID1);
 
         createDependencyMapping(localResource1Id, TYPE1, ID2);
 
-        final long localResource1Id2 = createDependency("LocalResource21", "1.0", "LocalResource1.jar", IOUtil.generateJar(LocalClass2.class));
-        final long localResource2Id2 = createDependency("LocalResource22", "1.0", "LocalResource2.jar", IOUtil.generateJar(LocalClass4.class));
+        final long localResource1Id2 = createDependency(2L, TYPE2, "LocalResource21", "LocalResource1.jar", IOUtil.generateJar(LocalClass2.class));
+        final long localResource2Id2 = createDependency(2L, TYPE2, "LocalResource22", "LocalResource2.jar", IOUtil.generateJar(LocalClass4.class));
 
         createDependencyMapping(localResource1Id2, TYPE2, ID1);
         createDependencyMapping(localResource2Id2, TYPE2, ID1);
@@ -156,14 +162,16 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     }
 
     private long createPlatformDependencyMapping(final long dependencyId, final String artifactType, final long artifactId) throws SDependencyException {
-        final SPlatformDependencyMappingBuilder builder = BuilderFactory.get(SPlatformDependencyMappingBuilderFactory.class).createNewInstance(dependencyId, artifactId, artifactType);
+        final SPlatformDependencyMappingBuilder builder = BuilderFactory.get(SPlatformDependencyMappingBuilderFactory.class).createNewInstance(dependencyId,
+                artifactId, ScopeType.valueOf(artifactType));
         final SDependencyMapping dependencyMapping = builder.done();
         platformDependencyService.createDependencyMapping(dependencyMapping);
         return dependencyMapping.getId();
     }
 
-    private long createDependencyMapping(final long dependencyId, final String artifactType, final long artifactId) throws SDependencyException {
-        final SDependencyMappingBuilder builder = BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(dependencyId, artifactId, artifactType);
+    private long createDependencyMapping(final long dependencyId, final ScopeType artifactType, final long artifactId) throws SDependencyException {
+        final SDependencyMappingBuilder builder = BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(dependencyId, artifactId,
+                artifactType);
         final SDependencyMapping dependencyMapping = builder.done();
         dependencyService.createDependencyMapping(dependencyMapping);
         return dependencyMapping.getId();
@@ -186,7 +194,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testLoadLocalClassUsingLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1, ID1);
+        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.engine.classloader.LocalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         assertTrue(isClassLoaderLocal(classLoader));
@@ -199,7 +207,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testLoadGlobalClassUsingLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1, ID1);
+        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         assertTrue(isClassLoaderGlobal(classLoader));
@@ -212,7 +220,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testLoadSharedClassUsingLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1, ID1);
+        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         assertTrue(isClassLoaderLocal(classLoader));
@@ -248,7 +256,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testLoadOnlyInPathClassUsingLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1, ID1);
+        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = classLoader.loadClass("org.bonitasoft.engine.classloader.OnlyInPathClass1");
         assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
         // getTransactionService().complete();
@@ -269,14 +277,14 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testGlobalClassLoaderIsSingleForTwoLocalClassLoaders() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader localClassLoaderP1 = classLoaderService.getLocalClassLoader(TYPE1, ID1);
+        final ClassLoader localClassLoaderP1 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazzP1 = localClassLoaderP1.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader = clazzP1.getClassLoader();
         assertTrue(isClassLoaderGlobal(classLoader));
 
         assertFalse(localClassLoaderP1 == classLoader);
 
-        final ClassLoader localClassLoaderP2 = classLoaderService.getLocalClassLoader(TYPE1, ID2);
+        final ClassLoader localClassLoaderP2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
         final Class<?> clazzP2 = localClassLoaderP2.loadClass("org.bonitasoft.engine.classloader.GlobalClass1");
         final ClassLoader classLoader2 = clazzP2.getClassLoader();
         assertTrue(isClassLoaderGlobal(classLoader2));
@@ -292,7 +300,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testLoadLocalClassUsingUsingBadLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1, ID2);
+        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
         final Class<?> clazz = classLoader.loadClass("org.bonitasoft.engine.classloader.LocalClass3");
         assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
         // getTransactionService().complete();
@@ -302,7 +310,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testLoadSharedClassUsingUsingBadLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1, ID2);
+        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
         final Class<?> clazz = classLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader classLoader2 = clazz.getClassLoader();
         assertTrue(isClassLoaderGlobal(classLoader2));
@@ -315,16 +323,16 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testRemoveLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader localClassLoader1 = classLoaderService.getLocalClassLoader(TYPE1, ID1);
-        final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1, ID2);
+        final ClassLoader localClassLoader1 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
+        final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
 
-        classLoaderService.removeLocalClassLoader(TYPE1, ID1);
+        classLoaderService.removeLocalClassLoader(TYPE1.name(), ID1);
 
-        assertNotSameClassloader(localClassLoader1, classLoaderService.getLocalClassLoader(TYPE1, ID1));
+        assertNotSameClassloader(localClassLoader1, classLoaderService.getLocalClassLoader(TYPE1.name(), ID1));
 
-        classLoaderService.removeLocalClassLoader(TYPE1, ID2);
+        classLoaderService.removeLocalClassLoader(TYPE1.name(), ID2);
 
-        assertNotSameClassloader(localClassLoader2, classLoaderService.getLocalClassLoader(TYPE1, ID2));
+        assertNotSameClassloader(localClassLoader2, classLoaderService.getLocalClassLoader(TYPE1.name(), ID2));
         // getTransactionService().complete();
     }
 
@@ -332,13 +340,13 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testRemoveAllLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         // getTransactionService().begin();
-        final ClassLoader localClassLoader1 = classLoaderService.getLocalClassLoader(TYPE1, ID1);
-        final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1, ID2);
+        final ClassLoader localClassLoader1 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
+        final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
 
-        classLoaderService.removeAllLocalClassLoaders(TYPE1);
+        classLoaderService.removeAllLocalClassLoaders(TYPE1.name());
 
-        assertNotSameClassloader(localClassLoader1, classLoaderService.getLocalClassLoader(TYPE1, ID1));
-        assertNotSameClassloader(localClassLoader2, classLoaderService.getLocalClassLoader(TYPE1, ID2));
+        assertNotSameClassloader(localClassLoader1, classLoaderService.getLocalClassLoader(TYPE1.name(), ID1));
+        assertNotSameClassloader(localClassLoader2, classLoaderService.getLocalClassLoader(TYPE1.name(), ID2));
         // getTransactionService().complete();
     }
 
@@ -350,7 +358,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
         assertFalse(isBonitaClassLoader(clazz.getClassLoader()));
 
-        final long dependencyId = createPlatformDependency("newlib", "1.0", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
+        final long dependencyId = createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
         createPlatformDependencyMapping(dependencyId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
         Thread.sleep(10); // to be sure classlaoder refresh does NOT occur.
         clazz = globalClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass3");
@@ -365,20 +373,20 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testAddResourcesToLocalClassLoader() throws Exception {
         initializeClassLoaderService();
         getTransactionService().begin();
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1, ID1);
+        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         assertTrue(isClassLoaderGlobal(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader()));
 
-        final long dependencyId = createDependency("newlib", "1.0", "newlib.jar", IOUtil.generateJar(GlobalClass2.class));
+        final long dependencyId = createDependency(2L, TYPE1, "newlib", "newlib.jar", IOUtil.generateJar(GlobalClass2.class));
         createDependencyMapping(dependencyId, TYPE1, ID1);
 
         // check the refresh has been done using the service
-        assertTrue(isClassLoaderLocal(classLoaderService.getLocalClassLoader(TYPE1, ID1).loadClass("org.bonitasoft.engine.classloader.GlobalClass2")
+        assertTrue(isClassLoaderLocal(classLoaderService.getLocalClassLoader(TYPE1.name(), ID1).loadClass("org.bonitasoft.engine.classloader.GlobalClass2")
                 .getClassLoader()));
 
         // check the refresh has been done using the old reference
         assertTrue(isClassLoaderLocal(localClassLoader.loadClass("org.bonitasoft.engine.classloader.GlobalClass2").getClassLoader()));
 
-        assertSameClassloader(localClassLoader, classLoaderService.getLocalClassLoader(TYPE1, ID1));
+        assertSameClassloader(localClassLoader, classLoaderService.getLocalClassLoader(TYPE1.name(), ID1));
         getTransactionService().complete();
     }
 
@@ -388,7 +396,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         initializeClassLoaderService();
 
         getTransactionService().begin();
-        final long dependencyId = createPlatformDependency("newlib", "1.0", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
+        final long dependencyId = createPlatformDependency("newlib", "newlib.jar", IOUtil.generateJar(GlobalClass3.class));
         final long mappingId = createPlatformDependencyMapping(dependencyId, classLoaderService.getGlobalClassLoaderType(),
                 classLoaderService.getGlobalClassLoaderId());
 
@@ -427,7 +435,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1, ID1);
+        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathGlobalClass1");
         assertTrue(isClassLoaderGlobal(clazz.getClassLoader()));
         assertNotSameClassloader(localClassLoader, clazz.getClassLoader());
@@ -441,7 +449,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1, ID1);
+        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathLocalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         assertTrue(isClassLoaderLocal(classLoader));
@@ -456,7 +464,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1, ID2);
+        final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
         // getTransactionService().complete();
         classLoader.loadClass("org.bonitasoft.classloader.test.NotInPathLocalClass1");
         fail("load class with wrong classloader");
@@ -483,7 +491,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         addNotInPathDependencies();
         // getTransactionService().begin();
 
-        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1, ID1);
+        final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathSharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         assertTrue(isClassLoaderGlobal(classLoader));
@@ -498,7 +506,7 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         final URL resourceFile = ClassLoaderServiceTest.class.getResource("resource.txt");
         final byte[] resourceFileContent = IOUtil.getAllContentFrom(resourceFile);
 
-        final long resourceId = createPlatformDependency("resource", "1.0", "resource.txt", resourceFileContent);
+        final long resourceId = createPlatformDependency("resource", "resource.txt", resourceFileContent);
         createPlatformDependencyMapping(resourceId, classLoaderService.getGlobalClassLoaderType(), classLoaderService.getGlobalClassLoaderId());
         getTransactionService().complete();
 
@@ -513,8 +521,8 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     public void testDifferentsApplicationHaveDifferentGlobalClassLoader() throws Exception {
         initializeClassLoaderServiceWithTwoApplications();
         // getTransactionService().begin();
-        final ClassLoader type1ClassLoader = classLoaderService.getLocalClassLoader(TYPE1, ID1);
-        final ClassLoader type2ClassLoader = classLoaderService.getLocalClassLoader(TYPE2, ID1);
+        final ClassLoader type1ClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
+        final ClassLoader type2ClassLoader = classLoaderService.getLocalClassLoader(TYPE2.name(), ID1);
 
         final Class<?> bpmClazz = type1ClassLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final Class<?> casesClazz = type2ClassLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");

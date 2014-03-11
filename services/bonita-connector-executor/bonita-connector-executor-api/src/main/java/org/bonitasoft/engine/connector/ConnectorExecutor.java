@@ -16,13 +16,14 @@ package org.bonitasoft.engine.connector;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
 
 /**
  * @author Feng Hui
  * @since 6.0
  */
-public interface ConnectorExecutor {
+public interface ConnectorExecutor extends ServiceWithLifecycle {
 
     /**
      * Execute a connector.

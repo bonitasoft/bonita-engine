@@ -3,8 +3,6 @@ package org.bonitasoft.engine.scheduler.job;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.scheduler.impl.VariableStorage;
-
 /**
  * @author Matthieu Chaffotte
  */

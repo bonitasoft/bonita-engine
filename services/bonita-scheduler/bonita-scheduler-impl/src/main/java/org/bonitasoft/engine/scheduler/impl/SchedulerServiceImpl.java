@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -84,9 +84,8 @@ public class SchedulerServiceImpl implements SchedulerService {
      * Create a new instance of scheduler service. Synchronous
      * QueriableLoggerService must be used to avoid an infinite loop.
      */
-    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService,
-            final TechnicalLoggerService logger, final EventService eventService,
-            final TransactionService transactionService, final SessionAccessor sessionAccessor) {
+    public SchedulerServiceImpl(final SchedulerExecutor schedulerExecutor, final JobService jobService, final TechnicalLoggerService logger,
+            final EventService eventService, final TransactionService transactionService, final SessionAccessor sessionAccessor) {
         this.schedulerExecutor = schedulerExecutor;
         this.jobService = jobService;
         this.logger = logger;
@@ -255,19 +254,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public boolean delete(final String jobName) throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "delete");
-        final boolean delete = schedulerExecutor.delete(jobName);
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(new FilterOption(SJobDescriptor.class, "jobName", jobName));
-        final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
-        try {
-            final List<SJobDescriptor> jobDescriptors = jobService.searchJobDescriptors(queryOptions);
-            if (!jobDescriptors.isEmpty()) {
-                final SJobDescriptor sJobDescriptor = jobDescriptors.get(0);
-                jobService.deleteJobDescriptor(sJobDescriptor);
-            }
-        } catch (final SBonitaSearchException sbse) {
-            throw new SSchedulerException(sbse);
-        }
+        boolean delete = schedulerExecutor.delete(jobName);
+        jobService.deleteJobDescriptorByJobName(jobName);
         logAfterMethod(TechnicalLogSeverity.TRACE, "delete");
         return delete;
     }
@@ -317,10 +305,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
         try {
             sessionAccessor.setTenantId(jobIdentifier.getTenantId());
-
-            final Callable<JobWrapper> callable = buildGetPersistedJobCallable(jobIdentifier);
             logAfterMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
-            return transactionService.executeInTransaction(callable);
+            return transactionService.executeInTransaction(new PersistedJobCallable(jobIdentifier));
         } catch (final Exception e) {
             throw new SSchedulerException("The job class couldn't be instantiated", e);
         } finally {
@@ -328,39 +314,48 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
-    private Callable<JobWrapper> buildGetPersistedJobCallable(final JobIdentifier jobIdentifier) {
-        return new Callable<JobWrapper>() {
 
-            @Override
-            public JobWrapper call() throws Exception {
-                final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobIdentifier.getId());
-                // FIXME do something here if the job does not exist
-                if (sJobDescriptor == null) {
-                    return null;
-                }
-                final String jobClassName = sJobDescriptor.getJobClassName();
-                final Class<?> jobClass = Class.forName(jobClassName);
-                final StatelessJob statelessJob = (StatelessJob) jobClass.newInstance();
+    private class PersistedJobCallable implements Callable<JobWrapper> {
 
-                final FilterOption filterOption = new FilterOption(SJobParameter.class, "jobDescriptorId", jobIdentifier.getId());
-                final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, Collections.singletonList(filterOption),
-                        null);
-                final List<SJobParameter> parameters = jobService.searchJobParameters(queryOptions);
-                final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
-                for (final SJobParameter sJobParameterImpl : parameters) {
-                    parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
-                }
-                statelessJob.setAttributes(parameterMap);
-                final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger,
-                        jobIdentifier.getTenantId(), eventService, sessionAccessor, transactionService);
-                return jobWrapper;
+        private final JobIdentifier jobIdentifier;
+
+        public PersistedJobCallable(JobIdentifier jobIdentifier) {
+            this.jobIdentifier = jobIdentifier;
+        }
+
+        @Override
+        public JobWrapper call() throws Exception {
+            final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobIdentifier.getId());
+            // FIXME do something here if the job does not exist
+            if (sJobDescriptor == null) {
+                return null;
             }
-        };
+            final String jobClassName = sJobDescriptor.getJobClassName();
+            final Class<?> jobClass = Class.forName(jobClassName);
+            final StatelessJob statelessJob = (StatelessJob) jobClass.newInstance();
+
+            final FilterOption filterOption = new FilterOption(SJobParameter.class, "jobDescriptorId", jobIdentifier.getId());
+            final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, Collections.singletonList(filterOption), null);
+            final List<SJobParameter> parameters = jobService.searchJobParameters(queryOptions);
+            final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
+            for (final SJobParameter sJobParameterImpl : parameters) {
+                parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
+            }
+            statelessJob.setAttributes(parameterMap);
+            final JobWrapper jobWrapper = new JobWrapper(jobIdentifier.getJobName(), statelessJob, logger, jobIdentifier.getTenantId(), eventService,
+                    sessionAccessor, transactionService);
+            return jobWrapper;
+        }
     }
 
     @Override
     public boolean isStillScheduled(final SJobDescriptor jobDescriptor) throws SSchedulerException {
         return schedulerExecutor.isStillScheduled(getTenantId(), jobDescriptor.getJobName());
+    }
+
+    @Override
+    public void rescheduleErroneousTriggers() throws SSchedulerException {
+        schedulerExecutor.rescheduleErroneousTriggers();
     }
 
 }

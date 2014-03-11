@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.execution;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.EXECUTING;
 import static org.bonitasoft.engine.bpm.connector.ConnectorState.TO_BE_EXECUTED;
 import static org.bonitasoft.engine.execution.StateBehaviors.AFTER_ON_FINISH;
@@ -7,7 +8,6 @@ import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_ENTER;
 import static org.bonitasoft.engine.execution.StateBehaviors.BEFORE_ON_FINISH;
 import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_ENTER;
 import static org.bonitasoft.engine.execution.StateBehaviors.DURING_ON_FINISH;
-import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyLong;
@@ -95,8 +95,8 @@ public class StateBehaviorsTest {
 
     protected void checkConnectorsPhases(final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag,
             final Integer... expectedPhases) {
-        List<Integer> expectedPhaseList = Arrays.asList(expectedPhases);
-        for (Integer expectedPhase : KNOWN_PHASES) {
+        final List<Integer> expectedPhaseList = Arrays.asList(expectedPhases);
+        for (final Integer expectedPhase : KNOWN_PHASES) {
             if (expectedPhaseList.contains(expectedPhase)) {
                 assertTrue("Phase " + getPhaseName(expectedPhase) + " should be present", isPhaseIncluded(connectorAndFlag.getKey(), expectedPhase));
             } else {
@@ -124,7 +124,7 @@ public class StateBehaviorsTest {
         // given:
         when(containerDefinition.getFlowNode(anyLong())).thenReturn(null);
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, true);
         // then:
         checkNoConnectorsAndAllDefaultPhases(connectorAndFlag);
@@ -135,7 +135,7 @@ public class StateBehaviorsTest {
         // given:
         when(flowNodeDefinition.getConnectors(ConnectorEvent.ON_ENTER)).thenReturn(mock(List.class));
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, true);
         checkNoConnectorsAndAllDefaultPhases(connectorAndFlag);
     }
@@ -143,12 +143,12 @@ public class StateBehaviorsTest {
     @Test
     public void flowNodeWithNoConnectorInstanceToExecuteShouldReturnNoConnectorsAndAllPhases() throws Exception {
         // given:
-        List<SConnectorDefinition> connectors = mock(List.class);
+        final List<SConnectorDefinition> connectors = mock(List.class);
         when(flowNodeDefinition.getConnectors(ConnectorEvent.ON_ENTER)).thenReturn(connectors);
         when(connectors.size()).thenReturn(1);
         when(connectorInstanceService.getNextExecutableConnectorInstance(eq(flownodeInstanceId), anyString(), eq(ConnectorEvent.ON_ENTER))).thenReturn(null);
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, true);
         // then:
         verify(connectorInstanceService, times(1)).getNextExecutableConnectorInstance(eq(flownodeInstanceId), anyString(), eq(ConnectorEvent.ON_ENTER));
@@ -158,17 +158,17 @@ public class StateBehaviorsTest {
     @Test(expected = SActivityStateExecutionException.class)
     public void flowNodeWithNoConnectorInstanceOnEnterInStateTO_BE_EXECUTEDShouldThrowException() throws Exception {
         // given:
-        List<SConnectorDefinition> connectors = mock(List.class);
+        final List<SConnectorDefinition> connectors = mock(List.class);
         when(flowNodeDefinition.getConnectors(ConnectorEvent.ON_ENTER)).thenReturn(connectors);
         when(connectors.size()).thenReturn(1);
-        SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
+        final SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
         when(connectorInstanceService.getNextExecutableConnectorInstance(eq(flownodeInstanceId), anyString(), eq(ConnectorEvent.ON_ENTER))).thenReturn(
                 nextConnectorInstanceToExecute);
         when(nextConnectorInstanceToExecute.getState()).thenReturn("dummyState");
         when(nextConnectorInstanceToExecute.getName()).thenReturn("no_matching_name");
-        SConnectorDefinition conn = mock(SConnectorDefinition.class);
+        final SConnectorDefinition conn = mock(SConnectorDefinition.class);
         when(conn.getName()).thenReturn("some_name");
-        Iterator<SConnectorDefinition> connIterator = addConnectorIterator(connectors, conn);
+        final Iterator<SConnectorDefinition> connIterator = addConnectorIterator(connectors, conn);
 
         // when:
         try {
@@ -183,21 +183,21 @@ public class StateBehaviorsTest {
     @Test
     public void firstConnectorNotYetInExecutingStateShouldReturnFirst2Phases() throws Exception {
         // given:
-        List<SConnectorDefinition> connectors = mock(List.class);
+        final List<SConnectorDefinition> connectors = mock(List.class);
         when(flowNodeDefinition.getConnectors(ConnectorEvent.ON_ENTER)).thenReturn(connectors);
         when(connectors.size()).thenReturn(1);
-        SConnectorDefinition connectorDefinition = mock(SConnectorDefinition.class);
+        final SConnectorDefinition connectorDefinition = mock(SConnectorDefinition.class);
         when(connectors.get(0)).thenReturn(connectorDefinition);
-        SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
+        final SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
         when(connectorInstanceService.getNextExecutableConnectorInstance(eq(flownodeInstanceId), anyString(), eq(ConnectorEvent.ON_ENTER))).thenReturn(
                 nextConnectorInstanceToExecute);
-        String connectorName = "connector_name";
+        final String connectorName = "connector_name";
         when(nextConnectorInstanceToExecute.getState()).thenReturn(TO_BE_EXECUTED.name());
         when(connectorDefinition.getName()).thenReturn(connectorName);
         when(nextConnectorInstanceToExecute.getName()).thenReturn(connectorName);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, true);
 
         // then:
@@ -210,26 +210,26 @@ public class StateBehaviorsTest {
     @Test
     public void firstConnectorAlreadyExecutingShouldReturnDURING_ON_ENTERonly() throws Exception {
         // given:
-        List<SConnectorDefinition> connectors = mock(List.class);
+        final List<SConnectorDefinition> connectors = mock(List.class);
         when(flowNodeDefinition.getConnectors(ConnectorEvent.ON_ENTER)).thenReturn(connectors);
         when(connectors.size()).thenReturn(1);
-        SConnectorDefinition connectorDefinition = mock(SConnectorDefinition.class);
+        final SConnectorDefinition connectorDefinition = mock(SConnectorDefinition.class);
         when(connectors.get(0)).thenReturn(connectorDefinition);
-        SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
+        final SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
         when(connectorInstanceService.getNextExecutableConnectorInstance(eq(flownodeInstanceId), anyString(), eq(ConnectorEvent.ON_ENTER))).thenReturn(
                 nextConnectorInstanceToExecute);
-        String connectorName = "connector_name";
+        final String connectorName = "connector_name";
         when(nextConnectorInstanceToExecute.getState()).thenReturn(EXECUTING.name());
         when(connectorDefinition.getName()).thenReturn(connectorName);
         when(nextConnectorInstanceToExecute.getName()).thenReturn(connectorName);
 
-        Iterator<SConnectorDefinition> connIterator = mock(Iterator.class);
+        final Iterator<SConnectorDefinition> connIterator = mock(Iterator.class);
         when(connectors.iterator()).thenReturn(connIterator);
         when(connIterator.hasNext()).thenReturn(true, false);
         when(connIterator.next()).thenReturn(connectorDefinition);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, true);
 
         // then:
@@ -242,16 +242,16 @@ public class StateBehaviorsTest {
     @Test
     public void secondConnectorOnExecutingFlownodeShouldReturnPhase_2_only() throws Exception {
         // given:
-        List<SConnectorDefinition> connectors = mock(List.class);
+        final List<SConnectorDefinition> connectors = mock(List.class);
         when(flowNodeDefinition.getConnectors(ConnectorEvent.ON_ENTER)).thenReturn(connectors);
         when(connectors.size()).thenReturn(2);
-        SConnectorDefinition firstConnector = mock(SConnectorDefinition.class);
-        SConnectorDefinition secondConnector = mock(SConnectorDefinition.class);
+        final SConnectorDefinition firstConnector = mock(SConnectorDefinition.class);
+        final SConnectorDefinition secondConnector = mock(SConnectorDefinition.class);
         when(connectors.get(0)).thenReturn(firstConnector);
-        SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
+        final SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
         when(connectorInstanceService.getNextExecutableConnectorInstance(eq(flownodeInstanceId), anyString(), eq(ConnectorEvent.ON_ENTER))).thenReturn(
                 nextConnectorInstanceToExecute);
-        String connectorName = "connector_name";
+        final String connectorName = "connector_name";
         when(nextConnectorInstanceToExecute.getState()).thenReturn(TO_BE_EXECUTED.name());
         when(firstConnector.getName()).thenReturn("non_matching_name");
         when(secondConnector.getName()).thenReturn(connectorName);
@@ -262,7 +262,7 @@ public class StateBehaviorsTest {
         addConnectorIterator(connectors, firstConnector, secondConnector);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, true);
 
         // then:
@@ -279,7 +279,7 @@ public class StateBehaviorsTest {
         haveConnectorsToBeExecuted(ConnectorEvent.ON_FINISH);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, true);
 
         // then:
@@ -295,7 +295,7 @@ public class StateBehaviorsTest {
         haveConnectorAlreadyExecuted(ConnectorEvent.ON_FINISH);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, true);
 
         // then:
@@ -308,16 +308,16 @@ public class StateBehaviorsTest {
     public void secondConnectorOnFinishShouldReturnPhase_4_only() throws Exception {
         // given:
         // no connectors on enter, only connectors on finish:
-        List<SConnectorDefinition> connectors = mock(List.class);
+        final List<SConnectorDefinition> connectors = mock(List.class);
         when(flowNodeDefinition.getConnectors(ConnectorEvent.ON_FINISH)).thenReturn(connectors);
         when(connectors.size()).thenReturn(2);
-        SConnectorDefinition firstConnector = mock(SConnectorDefinition.class);
-        SConnectorDefinition secondConnector = mock(SConnectorDefinition.class);
+        final SConnectorDefinition firstConnector = mock(SConnectorDefinition.class);
+        final SConnectorDefinition secondConnector = mock(SConnectorDefinition.class);
         when(connectors.get(0)).thenReturn(firstConnector);
-        SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
+        final SConnectorInstance nextConnectorInstanceToExecute = mock(SConnectorInstance.class);
         when(connectorInstanceService.getNextExecutableConnectorInstance(eq(flownodeInstanceId), anyString(), eq(ConnectorEvent.ON_FINISH))).thenReturn(
                 nextConnectorInstanceToExecute);
-        String connectorName = "connector_name";
+        final String connectorName = "connector_name";
         when(nextConnectorInstanceToExecute.getState()).thenReturn(TO_BE_EXECUTED.name());
         when(firstConnector.getName()).thenReturn("non_matching_name");
         when(secondConnector.getName()).thenReturn(connectorName);
@@ -326,7 +326,7 @@ public class StateBehaviorsTest {
         addConnectorIterator(connectors, firstConnector, secondConnector);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, true);
 
         // then:
@@ -339,9 +339,9 @@ public class StateBehaviorsTest {
 
     protected Iterator<SConnectorDefinition> addConnectorIterator(final List<SConnectorDefinition> connectors,
             final SConnectorDefinition... connectorDefinitions) {
-        Iterator<SConnectorDefinition> connIterator = mock(Iterator.class);
+        final Iterator<SConnectorDefinition> connIterator = mock(Iterator.class);
         when(connectors.iterator()).thenReturn(connIterator);
-        Boolean[] next = new Boolean[connectorDefinitions.length];
+        final Boolean[] next = new Boolean[connectorDefinitions.length];
         for (int i = 0; i < next.length - 1; i++) {
             next[i] = true;
         }
@@ -357,7 +357,7 @@ public class StateBehaviorsTest {
         haveConnectorAlreadyExecuted(ConnectorEvent.ON_ENTER);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, false, true);
 
         // then:
@@ -371,7 +371,7 @@ public class StateBehaviorsTest {
         haveConnectorsToBeExecuted(ConnectorEvent.ON_FINISH);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, false, true);
 
         // then:
@@ -387,7 +387,7 @@ public class StateBehaviorsTest {
         when(flowNodeInstance.isStateExecuting()).thenReturn(true);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, false);
 
         // then:
@@ -403,7 +403,7 @@ public class StateBehaviorsTest {
         when(flowNodeInstance.isStateExecuting()).thenReturn(true);
 
         // when:
-        BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
+        final BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> connectorAndFlag = behaviors.getConnectorToExecuteAndFlag(processDefinition,
                 flowNodeInstance, true, false);
 
         // then:
@@ -425,13 +425,13 @@ public class StateBehaviorsTest {
 
     protected void haveConnector(final ConnectorEvent connectorEventPhase, final boolean haveConnectorToBeExecuted, final ConnectorState connectorState)
             throws SConnectorInstanceReadException {
-        List<SConnectorDefinition> connectors = mock(List.class);
+        final List<SConnectorDefinition> connectors = mock(List.class);
         when(flowNodeDefinition.getConnectors(connectorEventPhase)).thenReturn(connectors);
         when(connectors.size()).thenReturn(1);
-        SConnectorDefinition connectorDefinition = mock(SConnectorDefinition.class);
+        final SConnectorDefinition connectorDefinition = mock(SConnectorDefinition.class);
         when(connectors.get(0)).thenReturn(connectorDefinition);
         SConnectorInstance connectorInstance = null;
-        String connectorName = "connector_name";
+        final String connectorName = "connector_name";
         if (haveConnectorToBeExecuted) {
             connectorInstance = mock(SConnectorInstance.class);
             when(connectorInstance.getState()).thenReturn(connectorState.name());

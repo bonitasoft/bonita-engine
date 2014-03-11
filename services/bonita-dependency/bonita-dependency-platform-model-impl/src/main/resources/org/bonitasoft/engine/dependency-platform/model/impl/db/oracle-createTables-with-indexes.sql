@@ -1,7 +1,6 @@
 CREATE TABLE pdependency (
   id NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(50) NOT NULL UNIQUE,
-  version VARCHAR2(50) NOT NULL,
+  name VARCHAR2(50) NOT NULL UNIQUE
   description VARCHAR2(1024),
   filename VARCHAR2(255) NOT NULL,
   value_ BLOB NOT NULL,

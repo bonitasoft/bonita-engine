@@ -78,14 +78,14 @@ public class JDBCJobListenerTest {
         doReturn(jobDetail).when(context).getJobDetail();
         doReturn(jobDataMap).when(jobDetail).getJobDataMap();
         doReturn(wrappedMap).when(jobDataMap).getWrappedMap();
-        doReturn(JOB_DESCRIPTOR_ID).when(wrappedMap).get("jobId");
+        doReturn(String.valueOf(JOB_DESCRIPTOR_ID)).when(wrappedMap).get("jobId");
     }
 
     @Test
     public void jobWasExecuted_shouldCallIncidentServiceIfExceptionOccurs() throws Exception {
         IncidentService incidentService = mock(IncidentService.class);
         doThrow(SBonitaSearchException.class).when(jobService).searchJobLogs(any(QueryOptions.class));
-        doReturn(13651444L).when(wrappedMap).get("tenantId");
+        doReturn("13651444").when(wrappedMap).get("tenantId");
 
         JDBCJobListener jobListener = new JDBCJobListener(jobService, incidentService);
         jobListener.jobWasExecuted(context, exeption1);

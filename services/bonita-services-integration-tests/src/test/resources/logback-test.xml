@@ -11,7 +11,7 @@
  <logger name="org.bonitasoft" level="INFO"/>
  <logger name="org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl" level="ERROR"/>
 
-  <root level="INFO">
+  <root level="WARN">
     <appender-ref ref="STDOUT" />
   </root>
 

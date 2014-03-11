@@ -28,17 +28,17 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 public interface ActorDefinition extends Serializable {
 
     /**
-     * @return the logical name of the actor.
+     * @return The logical name of the actor.
      */
     String getName();
 
     /**
-     * @return the description given to this actor.
+     * @return The description given to this actor.
      */
     String getDescription();
 
     /**
-     * @return true if this actor is the actor initiator of the process, that is, the actor that can start the process.
+     * @return True if this actor is the actor initiator of the process, that is, the actor that can start the process.
      */
     boolean isInitiator();
 

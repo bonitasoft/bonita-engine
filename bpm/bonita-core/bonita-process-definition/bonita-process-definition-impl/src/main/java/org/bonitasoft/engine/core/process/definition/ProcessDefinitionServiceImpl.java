@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -51,6 +51,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -158,12 +159,13 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             cacheService.remove(PROCESS_CACHE_NAME, processId);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESSDEFINITION, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESSDEFINITION).setObject(processDefinitionDeployInfo).done();
+                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESSDEFINITION)
+                        .setObject(processDefinitionDeployInfo).done();
             }
             final DeleteRecord deleteRecord = new DeleteRecord(processDefinitionDeployInfo);
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(processId, SQueriableLog.STATUS_OK, logBuilder, "delete");
-            dependencyService.deleteDependencies(processId, "process");
+            dependencyService.deleteDependencies(processId, ScopeType.PROCESS);
         } catch (final CacheException e) {
             initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
             throw new SProcessDefinitionNotFoundException(e);
@@ -211,7 +213,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(PROCESSDEFINITION_IS_DISABLED, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSDEFINITION_IS_DISABLED).setObject(processDefinitionDeployInfo)
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSDEFINITION_IS_DISABLED)
+                    .setObject(processDefinitionDeployInfo)
                     .done();
         }
         try {
@@ -256,7 +259,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         final SPersistenceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Enabling the process");
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(PROCESSDEFINITION_IS_ENABLED, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSDEFINITION_IS_ENABLED).setObject(processDefinitionDeployInfo)
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSDEFINITION_IS_ENABLED)
+                    .setObject(processDefinitionDeployInfo)
                     .done();
         }
         try {
@@ -399,7 +403,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final InsertRecord record = new InsertRecord(definitionDeployInfo);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(PROCESSDEFINITION, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROCESSDEFINITION).setObject(definitionDeployInfo).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROCESSDEFINITION)
+                        .setObject(definitionDeployInfo).done();
             }
             recorder.recordInsert(record, insertEvent);
             initiateLogBuilder(definition.getId(), SQueriableLog.STATUS_OK, logBuilder, "store");
@@ -448,14 +453,16 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
 
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getConfigurationStateKey(), ConfigurationState.RESOLVED.name());
+        descriptor
+                .addField(BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class).getConfigurationStateKey(), ConfigurationState.RESOLVED.name());
 
         final UpdateRecord updateRecord = getUpdateRecord(descriptor, processDefinitionDeployInfo);
         final SPersistenceLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Resolved the process");
 
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(PROCESSDEFINITION_IS_RESOLVED, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSDEFINITION_IS_RESOLVED).setObject(processDefinitionDeployInfo)
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSDEFINITION_IS_RESOLVED)
+                    .setObject(processDefinitionDeployInfo)
                     .done();
         }
         try {
@@ -598,7 +605,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         final UpdateRecord updateRecord = getUpdateRecord(descriptor, processDefinitionDeployInfo);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(PROCESSDEFINITION_DEPLOY_INFO, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSDEFINITION_DEPLOY_INFO).setObject(processDefinitionDeployInfo).done();
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(PROCESSDEFINITION_DEPLOY_INFO)
+                    .setObject(processDefinitionDeployInfo).done();
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -865,7 +873,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 }
             }
 
-            final SProcessDefinitionDeployInfo info = fact.createNewInstance(name, version).setId(id).setDescription(description).setDisplayDescription(displayDescription)
+            final SProcessDefinitionDeployInfo info = fact.createNewInstance(name, version).setId(id).setDescription(description)
+                    .setDisplayDescription(displayDescription)
                     .setActivationState(activationState).setConfigurationState(configurationState).setDeployedBy(deployedBy).setProcessId(processId)
                     .setLastUpdateDate(lastUpdateDate).setDisplayName(displayName).setDeploymentDate(deploymentDate).setIconPath(iconPath).done();
             mProcessDeploymentInfos.put(archivedProcessInstanceId, info);
