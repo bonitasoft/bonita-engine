@@ -106,6 +106,9 @@ ExternalIdentityMapping -> 10070
 MigrationPlan
 MigrationPlanDescriptor -> 10100
 
+Page
+Page -> 10110
+
 =Archived objects==
 
 ProcessInstance -> 20010
