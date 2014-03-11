@@ -55,7 +55,10 @@ import org.junit.runners.Suite.SuiteClasses;
         ParserTest.class
 })
 /**
+ * Do not run this test suite alone. Use AllTestsWithJNDI instead.
+ * 
  * @author Emmanuel Duchastenier
+ *
  */
 public class AllTests {
 
