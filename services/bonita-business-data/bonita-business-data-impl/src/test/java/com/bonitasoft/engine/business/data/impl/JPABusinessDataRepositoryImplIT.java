@@ -109,7 +109,6 @@ public class JPABusinessDataRepositoryImplIT {
         doReturn(null).when(businessDataRepository).createDependencyMapping(anyLong(), any(SDependency.class));
     }
 
-
     @Test
     public void findAnEmployeeByPrimaryKey() throws Exception {
         executeInTransaction(new RunnableInTransaction(true) {

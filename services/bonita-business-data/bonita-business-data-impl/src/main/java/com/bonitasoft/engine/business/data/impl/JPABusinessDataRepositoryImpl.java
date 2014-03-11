@@ -116,6 +116,9 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     @Override
     public <T> T find(final Class<T> entityClass, final Serializable primaryKey) throws BusinessDataNotFoundException {
+        if (primaryKey == null) {
+            throw new BusinessDataNotFoundException("Impossible to get data with a null identifier");
+        }
         final EntityManager em = getEntityManager();
         final T entity = em.find(entityClass, primaryKey);
         if (entity == null) {

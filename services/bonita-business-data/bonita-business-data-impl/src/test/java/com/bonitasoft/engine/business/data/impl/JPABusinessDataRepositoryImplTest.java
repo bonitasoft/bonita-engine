@@ -14,6 +14,8 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
+
 public class JPABusinessDataRepositoryImplTest {
 
     private DependencyService dependencyService;
@@ -39,6 +41,13 @@ public class JPABusinessDataRepositoryImplTest {
         verify(dependencyService).createDependency(sDependency);
         verify(bdrService).createDependencyMapping(1, sDependency);
         verify(dependencyService).createDependencyMapping(dependencyMapping);
+    }
+
+    @Test(expected = BusinessDataNotFoundException.class)
+    public void throwAnExceptionIfTheIdentifierIsNull() throws Exception {
+        final JPABusinessDataRepositoryImpl bdrService = new JPABusinessDataRepositoryImpl(dependencyService, Collections.<String, Object> emptyMap());
+
+        bdrService.find(String.class, null);
     }
 
 }
