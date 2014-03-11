@@ -98,7 +98,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             try {
                 initializeStringIndexes(sInstance, sDefinition);
             } catch (final SBonitaException e) {
-                throw new SProcessInstanceCreationException("unable to initialize string index on process instance", e);
+                throw new SProcessInstanceCreationException("Unable to initialize string index on process instance.", e);
             }
             createDocuments(sDefinition, sInstance, userId);
             if (connectors != null) {
