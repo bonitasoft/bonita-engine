@@ -368,11 +368,6 @@
     </dependency>
     <dependency>
       <groupId>org.bonitasoft.engine.log</groupId>
-      <artifactId>bonita-log-model-impl-hibernate</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.log</groupId>
       <artifactId>bonita-log-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -605,11 +600,6 @@
     <dependency>
       <groupId>org.bonitasoft.engine.scheduler</groupId>
       <artifactId>bonita-scheduler-quartz</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.scheduler</groupId>
-      <artifactId>bonita-scheduler-impl-hibernate</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -953,7 +943,6 @@
                   <!-- Logs -->
                   <include>org.bonitasoft.engine.log:bonita-log-model</include>
                   <include>org.bonitasoft.engine.log:bonita-log-model-impl</include>
-                  <include>org.bonitasoft.engine.log:bonita-log-model-impl-hibernate</include>
                   <include>org.bonitasoft.engine.log:bonita-log-api</include>
                   <include>com.bonitasoft.engine.log:bonita-log-api-impl</include>
                   <include>org.bonitasoft.engine.log:bonita-log-impl</include>
@@ -1045,7 +1034,6 @@
                   <!-- Scheduler -->
                   <include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
                   <include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>
-                  <include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl-hibernate</include>
                   <include>org.bonitasoft.engine.scheduler:bonita-scheduler-quartz</include>
                   <include>com.bonitasoft.engine.scheduler:bonita-scheduler-quartz-sp</include>
                   <!-- Service Commons -->

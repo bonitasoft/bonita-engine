@@ -62,6 +62,7 @@
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
 			<artifactId>bonita-platform-model-impl</artifactId>
@@ -82,6 +83,11 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			  <groupId>org.assertj</groupId>
+			  <artifactId>assertj-core</artifactId>
+			  <scope>test</scope>
 		</dependency>
 	</dependencies>
 

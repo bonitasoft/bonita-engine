@@ -55,7 +55,7 @@
 		<profile>
 			<id>fast</id>
 			<properties>
-				<maven.test.skip>true</maven.test.skip>
+				<skipTests>true</skipTests>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
 			</properties>
 			<modules>
@@ -66,6 +66,9 @@
 
 		<profile>
 			<id>package</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
@@ -158,7 +161,6 @@
 						<version>${jacoco.version}</version>
 						<configuration>
 							<includes>
-								<include>org.bonitasoft.engine.*</include>
 								<include>com.bonitasoft.engine.*</include>
 							</includes>
 						</configuration>
