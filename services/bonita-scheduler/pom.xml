@@ -17,7 +17,6 @@
 	<modules>
 		<module>bonita-scheduler-api</module>
 		<module>bonita-scheduler-impl</module>
-		<module>bonita-scheduler-impl-hibernate</module>
 		<module>bonita-scheduler-quartz</module>
 	</modules>
 </project>

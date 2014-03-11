@@ -5453,15 +5453,24 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (parameters == null || parameters.isEmpty()) {
                 schedulerService.executeAgain(jobDescriptorId);
             } else {
-                final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-                for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
-                    jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(parameter.getKey(), parameter.getValue()).done());
-                }
+                final List<SJobParameter> jobParameters = getJobParameters(parameters);
                 schedulerService.executeAgain(jobDescriptorId, jobParameters);
             }
         } catch (final SSchedulerException sse) {
             throw new ExecutionException(sse);
         }
+    }
+
+    protected List<SJobParameter> getJobParameters(final Map<String, Serializable> parameters) {
+        final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
+        for (final Entry<String, Serializable> parameter : parameters.entrySet()) {
+            jobParameters.add(getSJobParameterBuilderFactory().createNewInstance(parameter.getKey(), parameter.getValue()).done());
+        }
+        return jobParameters;
+    }
+
+    protected SJobParameterBuilderFactory getSJobParameterBuilderFactory() {
+        return BuilderFactory.get(SJobParameterBuilderFactory.class);
     }
 
     @Override

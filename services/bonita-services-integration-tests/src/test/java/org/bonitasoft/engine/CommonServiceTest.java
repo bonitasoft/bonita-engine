@@ -59,6 +59,9 @@ public class CommonServiceTest {
     private static void setupSpringContext() {
         setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
 
+        /** set bonita.services.folder to target/test-classes/conf as it is done in pom.xml -> no need to edit test configuration */
+        setSystemPropertyIfNotSet("bonita.services.folder", "target/test-classes/conf");
+
         // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
         System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");

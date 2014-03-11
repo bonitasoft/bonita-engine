@@ -20,6 +20,6 @@ package org.bonitasoft.engine.execution;
  */
 public interface Filter<E> {
 
-    boolean select(E element);
+    boolean mustSelect(E element);
     
 }

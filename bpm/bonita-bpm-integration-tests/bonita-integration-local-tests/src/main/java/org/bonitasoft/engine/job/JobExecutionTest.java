@@ -68,19 +68,6 @@ public class JobExecutionTest extends CommonAPITest {
         }
     }
 
-    @Test
-    public void retryAJob() throws Exception {
-        getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        try {
-            getCommandAPI().execute("except", parameters);
-            List<FailedJob> failedJobs = waitForFailedJobs(1);
-            getProcessAPI().replayFailedJob(failedJobs.get(0).getJobDescriptorId(), Collections.singletonMap("throwException", (Serializable) Boolean.FALSE));
-            failedJobs = waitForFailedJobs(0);
-        } finally {
-            getCommandAPI().unregister("except");
-        }
-    }
 
     private List<FailedJob> waitForFailedJobs(final int numberOfFailedJobs) throws Exception {
 
@@ -95,5 +82,6 @@ public class JobExecutionTest extends CommonAPITest {
         assertEquals(numberOfFailedJobs, failedJobs.size());
         return failedJobs;
     }
+
 
 }

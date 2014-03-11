@@ -320,21 +320,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public boolean delete(final String jobName) throws SSchedulerException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "delete");
-        final boolean delete = schedulerExecutor.delete(jobName);
-        final List<FilterOption> filters = new ArrayList<FilterOption>();
-        filters.add(new FilterOption(SJobDescriptor.class, "jobName", jobName));
-        final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters,
-                null);
-        try {
-            final List<SJobDescriptor> jobDescriptors = jobService
-                    .searchJobDescriptors(queryOptions);
-            if (!jobDescriptors.isEmpty()) {
-                final SJobDescriptor sJobDescriptor = jobDescriptors.get(0);
-                jobService.deleteJobDescriptor(sJobDescriptor);
-            }
-        } catch (final SBonitaSearchException sbse) {
-            throw new SSchedulerException(sbse);
-        }
+        boolean delete = schedulerExecutor.delete(jobName);
+        jobService.deleteJobDescriptorByJobName(jobName);
         logAfterMethod(TechnicalLogSeverity.TRACE, "delete");
         return delete;
     }
@@ -386,10 +373,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
         try {
             sessionAccessor.setTenantId(jobIdentifier.getTenantId());
-
-            final Callable<JobWrapper> callable = buildGetPersistedJobCallable(jobIdentifier);
             logAfterMethod(TechnicalLogSeverity.TRACE, "getPersistedJob");
-            return transactionService.executeInTransaction(callable);
+            return transactionService.executeInTransaction(new PersistedJobCallable(jobIdentifier));
         } catch (final Exception e) {
             throw new SSchedulerException(
                     "The job class couldn't be instantiated", e);
@@ -398,9 +383,14 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
-    private Callable<JobWrapper> buildGetPersistedJobCallable(
-            final JobIdentifier jobIdentifier) {
-        return new Callable<JobWrapper>() {
+
+    private class PersistedJobCallable implements Callable<JobWrapper> {
+
+        private final JobIdentifier jobIdentifier;
+
+        public PersistedJobCallable(JobIdentifier jobIdentifier) {
+            this.jobIdentifier = jobIdentifier;
+        }
 
             @Override
             public JobWrapper call() throws Exception {
@@ -415,14 +405,9 @@ public class SchedulerServiceImpl implements SchedulerService {
                 final StatelessJob statelessJob = (StatelessJob) jobClass
                         .newInstance();
 
-                final FilterOption filterOption = new FilterOption(
-                        SJobParameter.class, "jobDescriptorId",
-                        jobIdentifier.getId());
-                final QueryOptions queryOptions = new QueryOptions(0,
-                        QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null,
-                        Collections.singletonList(filterOption), null);
-                final List<SJobParameter> parameters = jobService
-                        .searchJobParameters(queryOptions);
+            final FilterOption filterOption = new FilterOption(SJobParameter.class, "jobDescriptorId", jobIdentifier.getId());
+            final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, Collections.singletonList(filterOption), null);
+            final List<SJobParameter> parameters = jobService.searchJobParameters(queryOptions);
                 final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
                 for (final SJobParameter sJobParameterImpl : parameters) {
                     parameterMap.put(sJobParameterImpl.getKey(),
@@ -438,7 +423,6 @@ public class SchedulerServiceImpl implements SchedulerService {
                         sessionAccessor, transactionService);
                 return jobWrapper;
             }
-        };
     }
 
     /**

@@ -13,8 +13,8 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.doReturn;
 
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
@@ -25,7 +25,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Vincent Elcrin
- *
  */
 @RunWith(MockitoJUnitRunner.class)
 public class StartFlowNodeFilterTest {
@@ -39,14 +38,14 @@ public class StartFlowNodeFilterTest {
     public void select_should_return_false_if_flow_node_is_not_startable() throws Exception {
         doReturn(false).when(flowNode).isStartable();
 
-        assertFalse(filter.select(flowNode));
+        assertFalse(filter.mustSelect(flowNode));
     }
 
     @Test
     public void select_should_return_true_if_flow_node_is_startable() throws Exception {
         doReturn(true).when(flowNode).isStartable();
 
-        assertTrue(filter.select(flowNode));
+        assertTrue(filter.mustSelect(flowNode));
     }
 
 }
