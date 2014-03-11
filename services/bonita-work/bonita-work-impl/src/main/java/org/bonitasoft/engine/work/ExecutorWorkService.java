@@ -102,6 +102,7 @@ public class ExecutorWorkService implements WorkService {
         return synchro;
     }
 
+    @Override
     public boolean isStopped() {
         return executor == null || executor.isShutdown();
     }

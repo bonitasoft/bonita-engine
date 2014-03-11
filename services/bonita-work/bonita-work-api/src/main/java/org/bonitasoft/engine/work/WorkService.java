@@ -40,4 +40,11 @@ public interface WorkService extends ServiceWithLifecycle {
      */
     void executeWork(final BonitaWork work) throws WorkRegisterException;
 
+    /**
+     * @return
+     *         true if the work service is stopped
+     * @since 6.3
+     */
+    boolean isStopped();
+
 }
