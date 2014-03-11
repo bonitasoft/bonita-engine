@@ -56,11 +56,11 @@ public class ProcessDocumentServiceImplTest {
         doReturn(documentMapping).when(documentServiceMapping).get(1L, "document");
         doReturn(archivedDocumentMapping).when(documentServiceMapping).get(1L, "document", 1L);
 
-        doReturn("document").when(documentMapping).getDocumentName();
+        doReturn("document").when(documentMapping).getDocumentContentFileName();
         doReturn("123").when(documentMapping).getContentStorageId();
         doReturn("whateverurl").when(documentMapping).getDocumentURL();
 
-        doReturn("document").when(archivedDocumentMapping).getDocumentName();
+        doReturn("document").when(archivedDocumentMapping).getDocumentContentFileName();
         doReturn("123").when(archivedDocumentMapping).getContentStorageId();
         doReturn("whateverurl").when(archivedDocumentMapping).getDocumentURL();
     }
