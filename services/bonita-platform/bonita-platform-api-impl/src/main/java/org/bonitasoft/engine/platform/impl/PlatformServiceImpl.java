@@ -531,8 +531,10 @@ public class PlatformServiceImpl implements PlatformService {
         String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
         if (tenantName != null) {
             try {
-                getTenantByName(tenantName);
-                throw new STenantUpdateException("Unable to update the tenant with new name " + tenantName + " : it already exists.");
+                if (getTenantByName(tenantName).getId() != tenant.getId())
+                {
+                    throw new STenantUpdateException("Unable to update the tenant with new name " + tenantName + " : it already exists.");
+                }
             } catch (final STenantNotFoundException e) {
                 // Ok
             }
