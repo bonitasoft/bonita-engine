@@ -33,7 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
-public class MessageInstanceContextWorkTest extends AbstractContextWorkTest{
+public class MessageInstanceContextWorkTest extends AbstractContextWorkTest {
 
     @Mock
     private SMessageInstance messageInstance;
@@ -49,6 +49,7 @@ public class MessageInstanceContextWorkTest extends AbstractContextWorkTest{
 
     private final static SBPMEventType WAITING_MESSAGE_EVENT_TYPE = SBPMEventType.INTERMEDIATE_THROW_EVENT;
 
+    @Override
     @Before
     public void before() throws Exception {
         txBonitawork = spy(new MessageInstanceContextWork(wrappedWork, messageInstance, waitingMessageEvent));
@@ -69,10 +70,10 @@ public class MessageInstanceContextWorkTest extends AbstractContextWorkTest{
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_NAME = " + MESSAGE_INSTANCE_NAME));
-        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_PROCESS_NAME = " + MESSAGE_INSTANCE_TARGET_PROCESS_NAME));
-        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME = " + MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME));
-        assertTrue(e.getMessage().contains("WAITING_MESSAGE_INSTANCE_TYPE = " + WAITING_MESSAGE_EVENT_TYPE.name()));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_NAME=" + MESSAGE_INSTANCE_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_PROCESS_NAME=" + MESSAGE_INSTANCE_TARGET_PROCESS_NAME));
+        assertTrue(e.getMessage().contains("MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME=" + MESSAGE_INSTANCE_TARGET_FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("WAITING_MESSAGE_INSTANCE_TYPE=" + WAITING_MESSAGE_EVENT_TYPE.name()));
         verify(wrappedWork).handleFailure(e, context);
     }
 }

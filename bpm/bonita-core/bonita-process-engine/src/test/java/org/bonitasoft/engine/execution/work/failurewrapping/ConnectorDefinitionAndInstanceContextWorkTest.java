@@ -39,7 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
-public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractContextWorkTest{
+public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractContextWorkTest {
 
     private static final String CONNECTOR_DEFINITION_NAME = "connector_name";
 
@@ -53,13 +53,14 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
     @Mock
     private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
 
+    @Override
     @Before
     public void before() throws Exception {
-    	txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID));
-    	super.before();
+        txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID));
+        super.before();
     }
 
-       @Test
+    @Test
     public void handleFailureWithNameAndId() throws Throwable {
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
         final SBonitaException e = new SBonitaException() {
@@ -69,8 +70,8 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME = " + CONNECTOR_DEFINITION_NAME));
-        assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID = " + CONNECTOR_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME=" + CONNECTOR_DEFINITION_NAME));
+        assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID=" + CONNECTOR_INSTANCE_ID));
         verify(wrappedWork).handleFailure(e, context);
     }
 
@@ -88,9 +89,9 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME = " + CONNECTOR_DEFINITION_NAME));
-        assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID = " + CONNECTOR_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("CONNECTOR_ACTIVATION_EVENT = " + ACTIVATION_EVENT));
+        assertTrue(e.getMessage().contains("CONNECTOR_DEFINITION_IMPLEMENTATION_CLASS_NAME=" + CONNECTOR_DEFINITION_NAME));
+        assertTrue(e.getMessage().contains("CONNECTOR_INSTANCE_ID=" + CONNECTOR_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("CONNECTOR_ACTIVATION_EVENT=" + ACTIVATION_EVENT));
         verify(wrappedWork, times(1)).handleFailure(e, context);
     }
 }

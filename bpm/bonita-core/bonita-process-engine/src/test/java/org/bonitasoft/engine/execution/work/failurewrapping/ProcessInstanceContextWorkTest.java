@@ -43,21 +43,23 @@ public class ProcessInstanceContextWorkTest extends AbstractContextWorkTest {
 
     static final long ROOT_PROCESS_INSTANCE_ID = 3;
 
-    @Mock ProcessInstanceService processInstanceService;
+    @Mock
+    ProcessInstanceService processInstanceService;
 
-    @Mock SProcessInstance sProcessInstance;
-    
-    
+    @Mock
+    SProcessInstance sProcessInstance;
+
+    @Override
     @Before
     public void before() throws Exception {
-	    doReturn(ROOT_PROCESS_INSTANCE_ID).when(sProcessInstance).getRootProcessInstanceId();
-	    doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
-	
-	    doReturn(processInstanceService).when(tenantAccessor).getProcessInstanceService();
-	    txBonitawork = spy(new ProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID));
-	    super.before();
+        doReturn(ROOT_PROCESS_INSTANCE_ID).when(sProcessInstance).getRootProcessInstanceId();
+        doReturn(sProcessInstance).when(processInstanceService).getProcessInstance(PROCESS_INSTANCE_ID);
+
+        doReturn(processInstanceService).when(tenantAccessor).getProcessInstanceService();
+        txBonitawork = spy(new ProcessInstanceContextWork(wrappedWork, PROCESS_INSTANCE_ID));
+        super.before();
     }
-    
+
     @Test
     public void handleFailureWithProcessInstanceId() throws Throwable {
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
@@ -68,8 +70,8 @@ public class ProcessInstanceContextWorkTest extends AbstractContextWorkTest {
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + ROOT_PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID=" + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID=" + ROOT_PROCESS_INSTANCE_ID));
         verify(wrappedWork).handleFailure(e, context);
     }
 
@@ -84,8 +86,8 @@ public class ProcessInstanceContextWorkTest extends AbstractContextWorkTest {
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID = " + PROCESS_INSTANCE_ID));
-        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID = " + 5));
+        assertTrue(e.getMessage().contains("PROCESS_INSTANCE_ID=" + PROCESS_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("ROOT_PROCESS_INSTANCE_ID=" + 5));
         verify(wrappedWork, times(1)).handleFailure(e, context);
     }
 

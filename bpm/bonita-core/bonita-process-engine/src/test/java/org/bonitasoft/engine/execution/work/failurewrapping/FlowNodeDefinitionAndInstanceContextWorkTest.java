@@ -32,7 +32,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FlowNodeDefinitionAndInstanceContextWorkTest  extends AbstractContextWorkTest{
+public class FlowNodeDefinitionAndInstanceContextWorkTest extends AbstractContextWorkTest {
 
     private static final long FLOW_NODE_DEFINITION_ID = 2;
 
@@ -46,13 +46,13 @@ public class FlowNodeDefinitionAndInstanceContextWorkTest  extends AbstractConte
     @Mock
     private SFlowNodeInstance flowNodeInstance;
 
-
+    @Override
     @Before
     public void before() throws Exception {
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
 
         txBonitawork = spy(new FlowNodeDefinitionAndInstanceContextWork(wrappedWork, FLOW_NODE_INSTANCE_ID));
-      
+
         doReturn(flowNodeInstance).when(activityInstanceService).getFlowNodeInstance(FLOW_NODE_INSTANCE_ID);
         doReturn(FLOW_NODE_DEFINITION_ID).when(flowNodeInstance).getFlowNodeDefinitionId();
         doReturn(FLOW_NODE_NAME).when(flowNodeInstance).getName();
@@ -69,9 +69,9 @@ public class FlowNodeDefinitionAndInstanceContextWorkTest  extends AbstractConte
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("FLOW_NODE_DEFINITION_ID = " + FLOW_NODE_DEFINITION_ID));
-        assertTrue(e.getMessage().contains("FLOW_NODE_NAME = " + FLOW_NODE_NAME));
-        assertTrue(e.getMessage().contains("FLOW_NODE_INSTANCE_ID = " + FLOW_NODE_INSTANCE_ID));
+        assertTrue(e.getMessage().contains("FLOW_NODE_DEFINITION_ID=" + FLOW_NODE_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("FLOW_NODE_NAME=" + FLOW_NODE_NAME));
+        assertTrue(e.getMessage().contains("FLOW_NODE_INSTANCE_ID=" + FLOW_NODE_INSTANCE_ID));
         verify(wrappedWork).handleFailure(e, context);
     }
 }

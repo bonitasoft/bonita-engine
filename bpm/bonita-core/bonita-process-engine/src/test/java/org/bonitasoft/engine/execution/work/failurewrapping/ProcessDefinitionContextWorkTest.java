@@ -36,7 +36,7 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
-public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest{
+public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest {
 
     private static final long PROCESS_DEFINITION_ID = 2;
 
@@ -50,6 +50,7 @@ public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest{
     @Mock
     private SProcessDefinitionDeployInfo sProcessDefinitionDeployInfo;
 
+    @Override
     @Before
     public void before() throws Exception {
         doReturn(NAME).when(sProcessDefinitionDeployInfo).getName();
@@ -57,9 +58,9 @@ public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest{
 
         doReturn(sProcessDefinitionDeployInfo).when(processDefinitionService).getProcessDeploymentInfo(PROCESS_DEFINITION_ID);
         doReturn(processDefinitionService).when(tenantAccessor).getProcessDefinitionService();
-       
+
         txBonitawork = spy(new ProcessDefinitionContextWork(wrappedWork, PROCESS_DEFINITION_ID));
-        
+
         super.before();
     }
 
@@ -73,9 +74,9 @@ public class ProcessDefinitionContextWorkTest extends AbstractContextWorkTest{
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID = " + PROCESS_DEFINITION_ID));
-        assertTrue(e.getMessage().contains("PROCESS_NAME = " + NAME));
-        assertTrue(e.getMessage().contains("PROCESS_VERSION = " + VERSION));
+        assertTrue(e.getMessage().contains("PROCESS_DEFINITION_ID=" + PROCESS_DEFINITION_ID));
+        assertTrue(e.getMessage().contains("PROCESS_NAME=" + NAME));
+        assertTrue(e.getMessage().contains("PROCESS_VERSION=" + VERSION));
         verify(wrappedWork).handleFailure(e, context);
     }
 }

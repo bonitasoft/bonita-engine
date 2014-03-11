@@ -31,24 +31,25 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Aurelien Pupier
- *
+ * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class GlobalContextWorkTest extends AbstractContextWorkTest {
-	
-	private static final long TENANT_ID = 2L;
-	private static final long THREAD_ID = 51L;
-	
-	
+
+    private static final long TENANT_ID = 2L;
+
+    private static final long THREAD_ID = 51L;
+
+    @Override
     @Before
     public void before() throws Exception {
-	    txBonitawork = spy(new GlobalContextWork(wrappedWork));
-	    super.before();
-	    ((GlobalContextWork) doReturn(THREAD_ID).when(txBonitawork)).retrieveThreadId();
-	    doReturn(TENANT_ID).when(tenantAccessor).getTenantId();
-	    when(wrappedWork.getTenantId()).thenReturn(TENANT_ID);
+        txBonitawork = spy(new GlobalContextWork(wrappedWork));
+        super.before();
+        ((GlobalContextWork) doReturn(THREAD_ID).when(txBonitawork)).retrieveThreadId();
+        doReturn(TENANT_ID).when(tenantAccessor).getTenantId();
+        when(wrappedWork.getTenantId()).thenReturn(TENANT_ID);
     }
-		
+
     @Test
     public void handleFailure() throws Throwable {
         final Map<String, Object> context = Collections.<String, Object> singletonMap("tenantAccessor", tenantAccessor);
@@ -59,11 +60,10 @@ public class GlobalContextWorkTest extends AbstractContextWorkTest {
 
         txBonitawork.handleFailure(e, context);
 
-        assertTrue("TENANT_ID is not available in context "+e.getMessage(), e.getMessage().contains("TENANT_ID = " + TENANT_ID));
-        assertTrue(e.getMessage().contains("HOSTNAME = " + InetAddress.getLocalHost().getHostName()));
-        assertTrue(e.getMessage().contains("THREAD_ID = " + THREAD_ID));
+        assertTrue("TENANT_ID is not available in context " + e.getMessage(), e.getMessage().contains("TENANT_ID=" + TENANT_ID));
+        assertTrue(e.getMessage().contains("HOSTNAME=" + InetAddress.getLocalHost().getHostName()));
+        assertTrue(e.getMessage().contains("THREAD_ID=" + THREAD_ID));
         verify(wrappedWork).handleFailure(e, context);
     }
-	
-	
+
 }
