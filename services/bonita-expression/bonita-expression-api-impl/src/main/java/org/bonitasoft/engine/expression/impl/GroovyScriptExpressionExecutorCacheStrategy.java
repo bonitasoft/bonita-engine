@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.classloader.SClassLoaderException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
@@ -101,13 +101,13 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             final StringBuilder builder = new StringBuilder("Expression ");
-            builder.append(expressionName).append(" with content : ").append(expressionContent).append(" depends on ").append(property)
-                    .append(" is neither defined in the script nor in dependencies");
+            builder.append(expressionName).append(" with content = <").append(expressionContent).append("> depends on ").append(property)
+                    .append(" is neither defined in the script nor in dependencies.");
             throw new SExpressionEvaluationException(builder.toString(), e, expressionName);
         } catch (final GroovyRuntimeException e) {
             throw new SExpressionEvaluationException(e, expressionName);
         } catch (final SCacheException e) {
-            throw new SExpressionEvaluationException("Problem accessing the Script Cache from GroovyScriptExpressionExecutorCacheStrategy", e, expressionName);
+            throw new SExpressionEvaluationException("Problem accessing the Script Cache from GroovyScriptExpressionExecutorCacheStrategy.", e, expressionName);
         } catch (final SClassLoaderException e) {
             throw new SExpressionEvaluationException("Unable to retrieve the correct classloader to execute the groovy script : " + expression, e,
                     expressionName);

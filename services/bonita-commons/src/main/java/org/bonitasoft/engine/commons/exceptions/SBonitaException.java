@@ -1,4 +1,5 @@
 /**
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -322,7 +323,7 @@ public abstract class SBonitaException extends Exception {
     private void appendContextMessage(final StringBuilder stringBuilder) {
         if (!context.isEmpty()) {
             for (final Entry<SContext, Serializable> entry : context.entrySet()) {
-                stringBuilder.append(entry.getKey() + " = " + entry.getValue() + " | ");
+                stringBuilder.append(entry.getKey() + "=" + entry.getValue() + " | ");
             }
         }
     }

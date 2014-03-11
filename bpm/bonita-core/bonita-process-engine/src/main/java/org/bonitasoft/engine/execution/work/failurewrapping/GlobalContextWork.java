@@ -24,49 +24,50 @@ import org.bonitasoft.engine.work.BonitaWork;
 
 /**
  * @author Aurelien Pupier
- *
+ * 
  */
 public class GlobalContextWork extends TxInHandleFailureWrappingWork {
 
+    private static final long serialVersionUID = -6043722230605068850L;
 
-	private static final long serialVersionUID = -6043722230605068850L;
-	private static String hostname = null;
-	private static boolean hostnameResolutionAlreadyTried;
+    private static String hostname = null;
 
-	public GlobalContextWork(BonitaWork work) {
-		super(work);
-	}
+    private static boolean hostnameResolutionAlreadyTried;
 
-	@Override
-	protected void setExceptionContext(SBonitaException sBonitaException, Map<String, Object> context) throws SBonitaException {
-		sBonitaException.setThreadId(retrieveThreadId());
-		sBonitaException.setTenantID(getTenantId());
-		fillHostnameContextForException(sBonitaException, context);
-	}
+    public GlobalContextWork(BonitaWork work) {
+        super(work);
+    }
 
-	long retrieveThreadId() {
-		return Thread.currentThread().getId();
-	}
-	
-	private void fillHostnameContextForException(SBonitaException be, final Map<String, Object> context) {
-		if(hostname == null && !hostnameResolutionAlreadyTried ){
-    		hostnameResolutionAlreadyTried = true;
-    		try {
-				hostname = InetAddress.getLocalHost().getHostName();
-			} catch (UnknownHostException e) {
-				technicalDebugLog(e, context);
-			}
-    	}
-    	if(hostname != null){
-    		be.setHostname(hostname);
-    	}
-	}
-	
-	private void technicalDebugLog(final Throwable throwableToLog, final Map<String, Object> context) {
-		TechnicalLoggerService technicalLogger = getTenantAccessor(context).getTechnicalLoggerService();
-		if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-		    technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, throwableToLog);
-		}
-	}
+    @Override
+    protected void setExceptionContext(SBonitaException sBonitaException, Map<String, Object> context) {
+        sBonitaException.setThreadId(retrieveThreadId());
+        sBonitaException.setTenantID(getTenantId());
+        fillHostnameContextForException(sBonitaException, context);
+    }
+
+    long retrieveThreadId() {
+        return Thread.currentThread().getId();
+    }
+
+    private void fillHostnameContextForException(SBonitaException be, final Map<String, Object> context) {
+        if (hostname == null && !hostnameResolutionAlreadyTried) {
+            hostnameResolutionAlreadyTried = true;
+            try {
+                hostname = InetAddress.getLocalHost().getHostName();
+            } catch (UnknownHostException e) {
+                technicalDebugLog(e, context);
+            }
+        }
+        if (hostname != null) {
+            be.setHostname(hostname);
+        }
+    }
+
+    private void technicalDebugLog(final Throwable throwableToLog, final Map<String, Object> context) {
+        TechnicalLoggerService technicalLogger = getTenantAccessor(context).getTechnicalLoggerService();
+        if (technicalLogger != null && technicalLogger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+            technicalLogger.log(this.getClass(), TechnicalLogSeverity.DEBUG, throwableToLog);
+        }
+    }
 
 }

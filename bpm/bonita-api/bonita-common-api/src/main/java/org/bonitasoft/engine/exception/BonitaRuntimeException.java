@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,6 +15,8 @@ package org.bonitasoft.engine.exception;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
+ * @author Aurelien Pupier
  */
 public class BonitaRuntimeException extends RuntimeException implements BonitaContextException {
 
@@ -40,8 +42,7 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
         super(cause);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#getTenantId()
      */
     @Override
@@ -49,8 +50,7 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
         return tenantId;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#setTenantId(long)
      */
     @Override
@@ -58,8 +58,7 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
         this.tenantId = tenantId;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#getHostname()
      */
     @Override
@@ -67,8 +66,7 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
         return hostname;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#setHostname(java.lang.String)
      */
     @Override
@@ -76,8 +74,7 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
         this.hostname = hostname;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#getUserName()
      */
     @Override
@@ -85,8 +82,7 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
         return userName;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * @see org.bonitasoft.engine.exception.BonitaContextException#setUserName(java.lang.String)
      */
     @Override
@@ -110,19 +106,19 @@ public class BonitaRuntimeException extends RuntimeException implements BonitaCo
     }
 
     private String getThreadIdMessage() {
-    	return threadId != -1 ? "threadId[" + threadId + "] | " : "";
+        return threadId != -1 ? "THREAD_ID=" + threadId + " | " : "";
     }
 
     private String getHostNameMessage() {
-        return hostname != null && !hostname.isEmpty() ? "hostname[" + hostname + "] | " : "";
+        return hostname != null && !hostname.isEmpty() ? "HOSTNAME=" + hostname + " | " : "";
     }
 
     private String getUserNameMessage() {
-        return userName != null && !userName.isEmpty() ? "userName[" + userName + "] | " : "";
+        return userName != null && !userName.isEmpty() ? "USERNAME=" + userName + " | " : "";
     }
 
     private String getTenantIdMessage() {
-        return tenantId != -1 ? "tenandId[" + tenantId + "] | " : "";
+        return tenantId != -1 ? "TENANT_ID=" + tenantId + " | " : "";
     }
 
 }

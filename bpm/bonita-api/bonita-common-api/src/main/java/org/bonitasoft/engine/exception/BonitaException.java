@@ -22,6 +22,7 @@ package org.bonitasoft.engine.exception;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Aurelien Pupier
  */
 public class BonitaException extends Exception implements BonitaContextException {
 
@@ -133,19 +134,19 @@ public class BonitaException extends Exception implements BonitaContextException
     }
 
     private String getThreadIdMessage() {
-    	return threadId != -1 ? "threadId[" + threadId + "] | " : "";
+        return threadId != -1 ? "THREAD_ID=" + threadId + " | " : "";
     }
 
     private String getHostNameMessage() {
-        return hostname != null && !hostname.isEmpty() ? "hostname[" + hostname + "] | " : "";
+        return hostname != null && !hostname.isEmpty() ? "HOSTNAME=" + hostname + " | " : "";
     }
 
     private String getUserNameMessage() {
-        return userName != null && !userName.isEmpty() ? "userName[" + userName + "] | " : "";
+        return userName != null && !userName.isEmpty() ? "USERNAME=" + userName + " | " : "";
     }
 
     private String getTenantIdMessage() {
-        return tenantId != -1 ? "tenandId[" + tenantId + "] | " : "";
+        return tenantId != -1 ? "TENANT_ID=" + tenantId + " | " : "";
     }
 
 }
