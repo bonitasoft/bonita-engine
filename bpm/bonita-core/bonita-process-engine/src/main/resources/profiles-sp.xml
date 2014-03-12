@@ -60,16 +60,9 @@
           </profileEntry>
         </childrenEntries>
       </parentProfileEntry>
-      <parentProfileEntry name="Analytics">
-        <parentName>NULL</parentName>
-        <index>2</index>
-        <description>Monitoring</description>
-        <type>link</type>
-        <page>reportlistingadminext</page>
-      </parentProfileEntry>
       <parentProfileEntry name="Organization">
         <parentName>NULL</parentName>
-        <index>4</index>
+        <index>2</index>
         <description>Organization</description>
         <type>folder</type>
         <childrenEntries>
@@ -103,16 +96,16 @@
           </profileEntry>
         </childrenEntries>
       </parentProfileEntry>
-      <parentProfileEntry name="Business Data Model">
+      <parentProfileEntry name="Analytics">
         <parentName>NULL</parentName>
-        <index>6</index>
-        <description>Manage business data model</description>
+        <index>4</index>
+        <description>Monitoring</description>
         <type>link</type>
-        <page>businessdatamodelimport</page>
+        <page>reportlistingadminext</page>
       </parentProfileEntry>
       <parentProfileEntry name="Configuration">
         <parentName>NULL</parentName>
-        <index>8</index>
+        <index>6</index>
         <description>Portal</description>
         <type>folder</type>
         <childrenEntries>
