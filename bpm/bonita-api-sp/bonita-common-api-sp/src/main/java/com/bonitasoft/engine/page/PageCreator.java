@@ -18,7 +18,7 @@ public interface PageCreator extends Serializable {
 
   
     public enum PageField {
-        NAME, DESCRIPTION, URL_TOKEN;
+        NAME, DESCRIPTION;
     }
 
     

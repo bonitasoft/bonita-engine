@@ -29,13 +29,6 @@ public interface Page extends BaseElement {
     String getName();
 
     /**
-     * Gets the name of this <code>Page</code>.
-     * 
-     * @return the url token of this <code>Page</code>.
-     */
-    String getUrlToken();
-
-    /**
      * Is this page provided by default.
      * 
      * @return true if this page is provided by default, false otherwise.

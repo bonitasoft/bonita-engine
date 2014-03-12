@@ -84,8 +84,7 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
 
     @Override
     public PageAPI getPageAPI() {
-        // TODO Auto-generated method stub
-        return null;
+        return new PageAPIExt();
     }
 
 }

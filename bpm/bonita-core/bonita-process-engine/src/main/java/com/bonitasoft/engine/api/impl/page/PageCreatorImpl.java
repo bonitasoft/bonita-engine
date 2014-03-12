@@ -6,11 +6,13 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.page;
+package com.bonitasoft.engine.api.impl.page;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.bonitasoft.engine.page.PageCreator.PageField;
 
 /**
  * @author Laurent Leseigneur
@@ -20,18 +22,13 @@ public class PageCreatorImpl implements Serializable {
 
     private static final long serialVersionUID = 8174091386958635983L;
 
-    public enum PageField {
-        NAME, DESCRIPTION, URL_TOKEN;
-    }
+
 
     private final Map<PageField, Serializable> fields;
 
-    public PageCreatorImpl(final String name, final String urlToken) {
-        fields = new HashMap<PageField, Serializable>(3);
+    public PageCreatorImpl(final String name) {
+        fields = new HashMap<PageField, Serializable>(2);
         fields.put(PageField.NAME, name);
-        fields.put(PageField.URL_TOKEN, urlToken);
-        
-
     }
 
     public PageCreatorImpl setDescription(final String description) {
