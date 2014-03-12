@@ -43,12 +43,4 @@
 		<constructor-arg name="transactionService" ref="transactionService" />
 	</bean> 
 	
-	
-	
-	<bean id="servicesToStart" class="java.util.ArrayList">
-		<constructor-arg>
-			<list>
-			</list>
-		</constructor-arg>
-	</bean>
 </beans>

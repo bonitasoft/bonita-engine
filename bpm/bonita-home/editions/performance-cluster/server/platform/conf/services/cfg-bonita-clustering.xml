@@ -4,13 +4,6 @@
 	<!-- configure the instance named bonita,it is the default instance used 
 		by bonita -->
 
-	<bean id="servicesToStart" class="java.util.ArrayList">
-		<constructor-arg>
-			<list>
-				<ref bean="hazelcastService"/>
-			</list>
-		</constructor-arg>
-	</bean>
 	<!-- the factory with start stop method that returns the hazelcast instance -->
 	<bean id="hazelcastService" class="com.bonitasoft.engine.service.impl.BonitaHazelcastInstanceFactory" scope="singleton" destroy-method="destroy"></bean>
 
