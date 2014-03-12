@@ -54,7 +54,7 @@ public class JDTCompiler {
         if (classpathEntries == null || classpathEntries.isEmpty()) {
             return emptyList();
         }
-        return asList("-cp", join(classpathEntries, ":"));
+        return asList("-cp", join(classpathEntries, File.pathSeparator));
     }
 
     private List<String> filesToBeCompiledArguments(final Collection<File> files) {
