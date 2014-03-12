@@ -86,12 +86,12 @@ public class ParameterProcessDependencyResolver extends ProcessDependencyResolve
             try {
                 parameters = parameterService.getNullValues(processDefinition.getId(), i, 100, OrderBy.NAME_ASC);
             } catch (final SBonitaException e) {
-                return Collections.singletonList((Problem) new ProblemImpl(Level.ERROR, null, "parameter", "unable to get parameter"));
+                return Collections.singletonList((Problem) new ProblemImpl(Level.ERROR, null, "parameter", "Unable to get parameter !!"));
             }
             i += 100;
             for (final SParameter parameter : parameters) {
                 if (parameter.getValue() == null) {
-                    final Problem problem = new ProblemImpl(Level.ERROR, null, "parameter", "Parameter" + parameter.getName() + " is not set");
+                    final Problem problem = new ProblemImpl(Level.ERROR, null, "parameter", "Parameter '" + parameter.getName() + "' is not set.");
                     problems.add(problem);
                 }
             }
