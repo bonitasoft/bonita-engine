@@ -58,7 +58,7 @@ public class CustomUserInfoAPIImpl {
 
     public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult) throws SIdentityException {
         List<CustomUserInfoDefinition> definitions = new ArrayList<CustomUserInfoDefinition>();
-        for (SCustomUserInfoDefinition sDefinition : service.getCustomUserInfoDefinition(startIndex, maxResult)) {
+        for (SCustomUserInfoDefinition sDefinition : service.getCustomUserInfoDefinitions(startIndex, maxResult)) {
             definitions.add(toCustomUserInfoDefinition(sDefinition));
         }
         return definitions;

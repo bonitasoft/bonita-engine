@@ -67,7 +67,7 @@ public class CustomUserInfoAPIImplTest {
 
     @Test
     public void getCustomUserDefinitions_should_return_the_list_of_CustomUserDefinition_fetch_from_the_identity_service() throws Exception {
-        given(service.getCustomUserInfoDefinition(0, 3)).willReturn(
+        given(service.getCustomUserInfoDefinitions(0, 3)).willReturn(
                 Arrays.asList(
                         createDummyServerDefinition("first", "", ""),
                         createDummyServerDefinition("second", "", ""),

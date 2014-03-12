@@ -575,22 +575,22 @@ public interface IdentityService {
     /**
      * Get profileMetadataValue by its id
      * 
-     * @param profileMetadataValueId
+     * @param customUserInfoValueId
      *            The identifier of profileMetadataValue
      * @return the profileMetadataValue
      * @throws SIdentityException
      */
-    SCustomUserInfoValue getCustomUserInfoValue(long profileMetadataValueId) throws SIdentityException;
+    SCustomUserInfoValue getCustomUserInfoValue(long customUserInfoValueId) throws SIdentityException;
 
     /**
      * Get profileMetadataValue by its name
      * 
-     * @param metadataName
+     * @param name
      *            The name of profileMetadataValue
      * @return the profileMetadataValue
      * @throws SIdentityException
      */
-    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String metadataName) throws SIdentityException;
+    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SIdentityException;
 
     /**
      * Get total number of custom user info
@@ -613,12 +613,12 @@ public interface IdentityService {
     /**
      * Get profileMetadataValues by their ids
      * 
-     * @param profileMetadataValueIds
+     * @param customUserInfoValueIds
      *            A list of identifiers of profileMetadataValue
      * @return a list of SCustomUserInfoValue objects corresponding to parameters
      * @throws SIdentityException
      */
-    List<SCustomUserInfoValue> getCustomUserInfoValues(List<Long> profileMetadataValueIds) throws SIdentityException;
+    List<SCustomUserInfoValue> getCustomUserInfoValues(List<Long> customUserInfoValueIds) throws SIdentityException;
 
     /**
      * Get custom user info in a specific interval, this is used for pagination
@@ -630,7 +630,7 @@ public interface IdentityService {
      * @return a list of SCustomUserInfo object
      * @throws SIdentityException
      */
-    List<SCustomUserInfoDefinition> getCustomUserInfoDefinition(int fromIndex, int numberOfMetadata) throws SIdentityException;
+    List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(int fromIndex, int numberOfMetadata) throws SIdentityException;
 
     /**
      * Get userMemberships in a specific interval for a user, this is used for pagination
@@ -746,42 +746,42 @@ public interface IdentityService {
     /**
      * Create custom user info definition in DB for a server given custom user info definition
      * 
-     * @param metadata
+     * @param customUserInfo
      *            SCustomUserInfoDefinition object
      * @throws SIdentityException
      */
-    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition metadata) throws SIdentityException;
+    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SIdentityException;
 
     /**
      * Update customUserInfoDefinition according to the descriptor
      * 
-     * @param metadata
+     * @param customUserInfo
      *            The customUserInfoDefinition will be updated
      * @param descriptor
      *            The update description
      * @throws SIdentityException
      */
-    void updateCustomUserInfoDefinition(SCustomUserInfoDefinition metadata, EntityUpdateDescriptor descriptor) throws SIdentityException;
+    void updateCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo, EntityUpdateDescriptor descriptor) throws SIdentityException;
 
     /**
      * Create profileMetadataValue in DB for give profileMetadataValue object
      * 
-     * @param metadataValue
+     * @param customUserInfo
      *            A profileMetadataValue object
      * @throws SIdentityException
      */
-    void createCustomUserInfoValue(SCustomUserInfoValue metadataValue) throws SIdentityException;
+    void createCustomUserInfoValue(SCustomUserInfoValue customUserInfo) throws SIdentityException;
 
     /**
      * Update profileMetadataValue according to the descriptor
      * 
-     * @param metadataValue
+     * @param customUserInfo
      *            The profileMetadataValue will be updated
      * @param descriptor
      *            The update description
      * @throws SIdentityException
      */
-    void updateCustomUserInfoValue(SCustomUserInfoValue metadataValue, EntityUpdateDescriptor descriptor) throws SIdentityException;
+    void updateCustomUserInfoValue(SCustomUserInfoValue customUserInfo, EntityUpdateDescriptor descriptor) throws SIdentityException;
 
     /**
      * Create role in DB for the given role
@@ -890,20 +890,20 @@ public interface IdentityService {
     /**
      * Delete the specific profileMetadataValue
      * 
-     * @param metadataValue
+     * @param customUserInfo
      *            The profileMetadataValue object will be deleted
      * @throws SIdentityException
      */
-    void deleteCustomUserInfoValue(SCustomUserInfoValue metadataValue) throws SIdentityException;
+    void deleteCustomUserInfoValue(SCustomUserInfoValue customUserInfo) throws SIdentityException;
 
     /**
      * Delete the id specified profileMetadataValue
      * 
-     * @param metadataValueId
+     * @param customUserInfoValueId
      *            The identifier of profileMetadataValue
      * @throws SIdentityException
      */
-    void deleteCustomUserInfoValue(long metadataValueId) throws SIdentityException;
+    void deleteCustomUserInfoValue(long customUserInfoValueId) throws SIdentityException;
 
     /**
      * Delete the specific role

@@ -45,8 +45,8 @@ import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.SUserUpdateException;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
+import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -54,9 +54,9 @@ import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionLogBuilder;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SGroupLogBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SRoleLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
@@ -164,37 +164,37 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SCustomUserInfoDefinition createCustomUserInfoDefinition(final SCustomUserInfoDefinition metadata) throws SIdentityException {
+    public SCustomUserInfoDefinition createCustomUserInfoDefinition(final SCustomUserInfoDefinition customUserInfo) throws SIdentityException {
         final String methodName = "createCustomUserInfoDefinition";
         logBeforeMethod(methodName);
         final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.CREATED, "Adding a custom user info with name "
-                + metadata.getName());
+                + customUserInfo.getName());
         try {
-            final InsertRecord insertRecord = new InsertRecord(metadata);
-            final SInsertEvent insertEvent = getInsertEvent(metadata, CUSTOM_USER_INFO_DEFINITION);
+            final InsertRecord insertRecord = new InsertRecord(customUserInfo);
+            final SInsertEvent insertEvent = getInsertEvent(customUserInfo, CUSTOM_USER_INFO_DEFINITION);
             recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
-            return metadata;
+            return customUserInfo;
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw new SIdentityException("Can't add profile metadata " + metadata, e);
+            initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw new SIdentityException("Can't add custom user info definition " + customUserInfo, e);
         }
     }
 
     @Override
-    public void createCustomUserInfoValue(final SCustomUserInfoValue metadataValue) throws SIdentityException {
-        final String methodName = "createProfileMetadataValue";
+    public void createCustomUserInfoValue(final SCustomUserInfoValue customUserInfo) throws SIdentityException {
+        final String methodName = "createCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {
-            final InsertRecord insertRecord = new InsertRecord(metadataValue);
-            final SInsertEvent insertEvent = getInsertEvent(metadataValue, CUSTOM_USER_INFO_VALUE);
+            final InsertRecord insertRecord = new InsertRecord(customUserInfo);
+            final SInsertEvent insertEvent = getInsertEvent(customUserInfo, CUSTOM_USER_INFO_VALUE);
             recorder.recordInsert(insertRecord, insertEvent);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't add metadata value " + metadataValue, e);
+            throw new SIdentityException("Can't add custom user info value " + customUserInfo, e);
         }
     }
 
@@ -403,7 +403,7 @@ public class IdentityServiceImpl implements IdentityService {
     public void deleteCustomUserInfoDefinition(final SCustomUserInfoDefinition info) throws SIdentityException {
         final String methodName = "deleteCustomUserInfoDefinition";
         logBeforeMethod(methodName);
-        final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.DELETED, "Deleting profile metadata with name "
+        final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.DELETED, "Deleting profile custom user info definition with name "
                 + info.getName());
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(info);
@@ -414,27 +414,27 @@ public class IdentityServiceImpl implements IdentityService {
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
             initiateLogBuilder(info.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw new SIdentityException("Can't delete profile metadata " + info, e);
+            throw new SIdentityException("Can't delete profile custom user info definition " + info, e);
         }
     }
 
     @Override
-    public void deleteCustomUserInfoValue(final long metadataValueId) throws SIdentityException {
-        this.deleteCustomUserInfoValue(getCustomUserInfoValue(metadataValueId));
+    public void deleteCustomUserInfoValue(final long customUserInfoValueId) throws SIdentityException {
+        this.deleteCustomUserInfoValue(getCustomUserInfoValue(customUserInfoValueId));
     }
 
     @Override
-    public void deleteCustomUserInfoValue(final SCustomUserInfoValue metadataValue) throws SIdentityException {
-        final String methodName = "deleteProfileMetadataValue";
+    public void deleteCustomUserInfoValue(final SCustomUserInfoValue customUserInfo) throws SIdentityException {
+        final String methodName = "deleteCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(metadataValue);
-            final SDeleteEvent deleteEvent = getDeleteEvent(metadataValue, CUSTOM_USER_INFO_VALUE);
+            final DeleteRecord deleteRecord = new DeleteRecord(customUserInfo);
+            final SDeleteEvent deleteEvent = getDeleteEvent(customUserInfo, CUSTOM_USER_INFO_VALUE);
             recorder.recordDelete(deleteRecord, deleteEvent);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't delete membership " + metadataValue, e);
+            throw new SIdentityException("Can't delete custom user info value" + customUserInfo, e);
         }
     }
 
@@ -796,12 +796,12 @@ public class IdentityServiceImpl implements IdentityService {
         final String methodName = "getNumberOfCustomUserInfoDefinition";
         logBeforeMethod(methodName);
         try {
-            final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("ProfileMetadata", SCustomUserInfoDefinition.class));
+            final long number = persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("CustomUserInfoDefinition", SCustomUserInfoDefinition.class));
             logAfterMethod(methodName);
             return number;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the number of profile metadata", e);
+            throw new SIdentityException("Can't get the number of custom user info", e);
         }
     }
 
@@ -890,31 +890,31 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String metadataName) throws SIdentityException {
-        final String methodName = "getProfileMetadataByName";
+    public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String name) throws SIdentityException {
+        final String methodName = "getCustomUserInfoDefinitionByName";
         logBeforeMethod(methodName);
         try {
-            final SCustomUserInfoDefinition sCustomUserInfoDefinition = persistenceService.selectOne(SelectDescriptorBuilder.getMetadataByName(metadataName));
+            final SCustomUserInfoDefinition sCustomUserInfoDefinition = persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(name));
             logAfterMethod(methodName);
             return sCustomUserInfoDefinition;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the metadata with name " + metadataName, e);
+            throw new SIdentityException("Can't get the custom user info definition with name " + name, e);
         }
     }
 
     @Override
-    public List<SCustomUserInfoDefinition> getCustomUserInfoDefinition(final int fromIndex, final int numberOfMetadata) throws SIdentityException {
-        final String methodName = "getCustomUserInfoDefinition";
+    public List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(final int fromIndex, final int maxResults) throws SIdentityException {
+        final String methodName = "getCustomUserInfoDefinitions";
         logBeforeMethod(methodName);
         try {
             final List<SCustomUserInfoDefinition> listSCustomUserInfoDefinition = persistenceService.selectList(SelectDescriptorBuilder.getElements(
-                    SCustomUserInfoDefinition.class, "ProfileMetadata", fromIndex, numberOfMetadata));
+                    SCustomUserInfoDefinition.class, "CustomUserInfoDefinition", fromIndex, maxResults));
             logAfterMethod(methodName);
             return listSCustomUserInfoDefinition;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the profile metadata", e);
+            throw new SIdentityException("Can't get the custom user info definitions", e);
         }
     }
 
@@ -924,15 +924,15 @@ public class IdentityServiceImpl implements IdentityService {
         logBeforeMethod(methodName);
         try {
             final SCustomUserInfoDefinition selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SCustomUserInfoDefinition.class,
-                    "ProfileMetadata", customUserInfoDefinitionId));
+                    "CustomUserInfoDefinition", customUserInfoDefinitionId));
             if (selectOne == null) {
-                throw new SIdentityException("Can't get the profile metadata with id " + customUserInfoDefinitionId, null);
+                throw new SIdentityException("Can't get the custom user info definition with id " + customUserInfoDefinitionId, null);
             }
             logAfterMethod(methodName);
             return selectOne;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the profile metadata with id " + customUserInfoDefinitionId, e);
+            throw new SIdentityException("Can't get the custom user info definition with id " + customUserInfoDefinitionId, e);
         }
     }
 
@@ -950,42 +950,42 @@ public class IdentityServiceImpl implements IdentityService {
             return listSCustomUserInfoDefinition;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get profiles metadata with ids " + Arrays.toString(customUserInfoDefinitionIds.toArray()), e);
+            throw new SIdentityException("Can't get custom user info definitions with ids " + Arrays.toString(customUserInfoDefinitionIds.toArray()), e);
         }
     }
 
     @Override
-    public SCustomUserInfoValue getCustomUserInfoValue(final long profileMetadataValueId) throws SIdentityException {
-        final String methodName = "getProfileMetadataValue";
+    public SCustomUserInfoValue getCustomUserInfoValue(final long customUserInfoValueId) throws SIdentityException {
+        final String methodName = "getCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {
             final SCustomUserInfoValue selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class,
-                    "SCustomUserInfoValue", profileMetadataValueId));
+                    "SCustomUserInfoValue", customUserInfoValueId));
             if (selectOne == null) {
-                throw new SIdentityException("Can't get the profile metadata value with id " + profileMetadataValueId, null);
+                throw new SIdentityException("Can't get the custom user info value with id " + customUserInfoValueId, null);
             }
             logAfterMethod(methodName);
             return selectOne;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the profile metadata value with id " + profileMetadataValueId, e);
+            throw new SIdentityException("Can't get the custom user info value with id " + customUserInfoValueId, e);
         }
     }
 
     @Override
-    public List<SCustomUserInfoValue> getCustomUserInfoValues(final List<Long> profileMetadataValueIds) throws SIdentityException {
-        final String methodName = "getProfileMetadataValues";
+    public List<SCustomUserInfoValue> getCustomUserInfoValues(final List<Long> customUserInfoValueIds) throws SIdentityException {
+        final String methodName = "getCustomUserInfoValues";
         logBeforeMethod(methodName);
-        if (profileMetadataValueIds == null || profileMetadataValueIds.isEmpty()) {
+        if (customUserInfoValueIds == null || customUserInfoValueIds.isEmpty()) {
             return Collections.emptyList();
         }
         try {
             logAfterMethod(methodName);
             return persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SCustomUserInfoValue.class, "SCustomUserInfoValue",
-                    profileMetadataValueIds));
+                    customUserInfoValueIds));
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get profiles metadata values with ids " + Arrays.toString(profileMetadataValueIds.toArray()), e);
+            throw new SIdentityException("Can't get custom user info values with ids " + Arrays.toString(customUserInfoValueIds.toArray()), e);
         }
     }
 
@@ -1402,42 +1402,42 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateCustomUserInfoDefinition(final SCustomUserInfoDefinition metadata, final EntityUpdateDescriptor descriptor) throws SIdentityException {
+    public void updateCustomUserInfoDefinition(final SCustomUserInfoDefinition customUserInfo, final EntityUpdateDescriptor descriptor) throws SIdentityException {
         final String methodName = "updateCustomUserInfoDefinition";
         logBeforeMethod(methodName);
         final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.UPDATED,
-                "Updating the profile metadata definition with name " + metadata.getName());
+                "Updating the custom user info definition with name " + customUserInfo.getName());
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(metadata, descriptor);
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(customUserInfo, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(CUSTOM_USER_INFO_DEFINITION, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CUSTOM_USER_INFO_DEFINITION).setObject(metadata).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CUSTOM_USER_INFO_DEFINITION).setObject(customUserInfo).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
-            initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw new SIdentityException("Can't update profile metadata definition " + metadata, e);
+            initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw new SIdentityException("Can't update custom user info definition " + customUserInfo, e);
         }
     }
 
     @Override
-    public void updateCustomUserInfoValue(final SCustomUserInfoValue metadataValue, final EntityUpdateDescriptor descriptor) throws SIdentityException {
-        final String methodName = "updateProfileMetadataValue";
+    public void updateCustomUserInfoValue(final SCustomUserInfoValue customUserInfo, final EntityUpdateDescriptor descriptor) throws SIdentityException {
+        final String methodName = "updateCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(metadataValue, descriptor);
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(customUserInfo, descriptor);
             SUpdateEvent updateEvent = null;
             if (eventService.hasHandlers(CUSTOM_USER_INFO_VALUE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CUSTOM_USER_INFO_VALUE).setObject(metadataValue).done();
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CUSTOM_USER_INFO_VALUE).setObject(customUserInfo).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't update profile metadata definition " + metadataValue, e);
+            throw new SIdentityException("Can't update custom user info definition " + customUserInfo, e);
         }
     }
 
