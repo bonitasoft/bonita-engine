@@ -9,6 +9,9 @@
 package com.bonitasoft.engine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
@@ -86,26 +89,33 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
 
         for (final Tenant tenant : tenants) {
             login(tenant.getId());
-            messages.addAll(checkNoCommands());
-            messages.addAll(checkNoUsers());
-            messages.addAll(checkNoGroups());
-            messages.addAll(checkNoRoles());
-            messages.addAll(checkNoProcessDefinitions());
-            messages.addAll(checkNoProcessIntances());
-            messages.addAll(checkNoArchivedProcessIntances());
-            messages.addAll(checkNoFlowNodes());
-            messages.addAll(checkNoArchivedFlowNodes());
-            messages.addAll(checkNoCategories());
-            messages.addAll(checkNoComments());
-            messages.addAll(checkNoArchivedComments());
-            messages.addAll(checkNoBreakpoints());
-            messages.addAll(checkNoReports());
+            messages.addAll(checkExistenceOfCommands());
+            messages.addAll(checkExistenceOfUsers());
+            messages.addAll(checkExistenceOfGroups());
+            messages.addAll(checkExistenceOfRoles());
+            messages.addAll(checkExistenceOfProcessDefinitions());
+            messages.addAll(checkExistenceOfProcessIntances());
+            messages.addAll(checkExistenceOfFlowNodes());
+            messages.addAll(checkExistenceOfCategories());
+            messages.addAll(checkExistenceOfBreakpoints());
+            messages.addAll(checkExistenceOfReports());
             messages.addAll(checkNoActiveTransactions());
-            // FIXME : Uncomment when fix bug : BS-7206
-            // messages.addAll(checkNoDataMappings());
+            messages.addAll(checkNoDataMapping());
             logout();
         }
         return messages;
+    }
+
+    /**
+     * @return
+     * @throws BonitaException
+     */
+    private Collection<? extends String> checkNoDataMapping() throws BonitaException {
+        Integer count = new Integer(getReportingAPI().selectList("SELECT count(*) FROM data_mapping").split("\n")[1]);
+        if (count == 0) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList("There is some data mapping present: " + count);
     }
 
 }
