@@ -435,11 +435,12 @@ public class PlatformAPIImpl implements PlatformAPI {
             final List<STenant> tenantIds = getTenants(platformService, transactionService);
             for (final STenant tenant : tenantIds) {
                 // stop the connector executor thread pool
-                // TODO should be like the platform services to stop...
                 final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
                 final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": " + connectorExecutor.getClass().getName());
-                connectorExecutor.stop();
+                WorkService workService = tenantServiceAccessor.getWorkService();
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": " + workService.getClass().getName());
+                workService.stop();
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
