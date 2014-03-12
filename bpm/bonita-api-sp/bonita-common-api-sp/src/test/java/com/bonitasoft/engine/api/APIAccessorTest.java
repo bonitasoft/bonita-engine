@@ -89,4 +89,10 @@ public class APIAccessorTest {
         assertEquals("com.bonitasoft.engine.api.ProfileAPI", method.getReturnType().getName());
     }
 
+    @Test
+    public void checkPageAPI() throws SecurityException {
+        final Method method = getAPIMethod("getPageAPI");
+        assertEquals("com.bonitasoft.engine.api.PageAPI", method.getReturnType().getName());
+    }
+
 }
