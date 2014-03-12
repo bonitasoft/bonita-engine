@@ -590,11 +590,6 @@
       <artifactId>bonita-reporting-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.bonitasoft.engine.core.reporting</groupId>
-      <artifactId>bonita-reporting-impl-hibernate</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- Scheduler -->
     <dependency>
