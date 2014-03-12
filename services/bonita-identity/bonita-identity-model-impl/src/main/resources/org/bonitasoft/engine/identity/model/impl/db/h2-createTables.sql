@@ -79,7 +79,7 @@ ALTER TABLE user_contactinfo ADD CONSTRAINT fk_contact_user FOREIGN KEY (tenanti
 CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, personal);
 
 
-CREATE TABLE p_metadata_def (
+CREATE TABLE custom_usr_inf_def (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
@@ -89,9 +89,9 @@ CREATE TABLE p_metadata_def (
   PRIMARY KEY (tenantid, id)
 );
 
-CREATE INDEX idx_p_metadata_def_name ON p_metadata_def (name);
+CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (name);
 
-CREATE TABLE p_metadata_val (
+CREATE TABLE custom_usr_inf_val (
   tenantid BIGINT NOT NULL,
   metadataName VARCHAR(50) NOT NULL,
   userName VARCHAR(50) NOT NULL,

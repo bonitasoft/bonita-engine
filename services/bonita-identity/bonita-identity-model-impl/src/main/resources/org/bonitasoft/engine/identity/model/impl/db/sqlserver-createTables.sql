@@ -87,7 +87,7 @@ CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, persona
 GO
 
 
-CREATE TABLE p_metadata_def (
+CREATE TABLE custom_usr_inf_def (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(50) NOT NULL,
@@ -98,10 +98,10 @@ CREATE TABLE p_metadata_def (
 )
 GO
 
-CREATE INDEX idx_p_metadata_def_name ON p_metadata_def (name, id)
+CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (name, id)
 GO
 
-CREATE TABLE p_metadata_val (
+CREATE TABLE custom_usr_inf_val (
   tenantid NUMERIC(19, 0) NOT NULL,
   metadataName NVARCHAR(50) NOT NULL,
   userName NVARCHAR(50) NOT NULL,

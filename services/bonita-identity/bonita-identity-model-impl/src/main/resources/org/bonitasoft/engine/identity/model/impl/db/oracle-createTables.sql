@@ -76,7 +76,7 @@ CREATE TABLE user_contactinfo (
 ALTER TABLE user_contactinfo ADD CONSTRAINT fk_contact_user FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
 
 
-CREATE TABLE p_metadata_def (
+CREATE TABLE custom_usr_inf_def (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   name VARCHAR2(50) NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE p_metadata_def (
 );
 
 
-CREATE TABLE p_metadata_val (
+CREATE TABLE custom_usr_inf_val (
   tenantid NUMBER(19, 0) NOT NULL,
   metadataName VARCHAR2(50) NOT NULL,
   userName VARCHAR2(50) NOT NULL,

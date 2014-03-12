@@ -1,8 +1,8 @@
 DROP TABLE user_membership
 GO
-DROP TABLE p_metadata_val
+DROP TABLE custom_usr_inf_val
 GO
-DROP TABLE p_metadata_def
+DROP TABLE custom_usr_inf_def
 GO
 DROP TABLE user_contactinfo
 GO
