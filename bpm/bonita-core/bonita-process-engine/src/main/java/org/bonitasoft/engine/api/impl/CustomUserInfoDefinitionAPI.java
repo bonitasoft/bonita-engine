@@ -32,11 +32,13 @@ import org.bonitasoft.engine.search.identity.SearchUsers;
 /**
  * @author Vincent Elcrin
  */
-public class CustomUserInfoAPIImpl {
+public class CustomUserInfoDefinitionAPI {
 
     private IdentityService service;
 
-    public CustomUserInfoAPIImpl(IdentityService service) {
+    private final CustomUserInfoDefinitionConverter converter = new CustomUserInfoDefinitionConverter();
+
+    public CustomUserInfoDefinitionAPI(IdentityService service) {
         this.service = service;
     }
 
@@ -50,7 +52,7 @@ public class CustomUserInfoAPIImpl {
         builder.setDisplayName(creator.getDisplayName());
         builder.setDescription(creator.getDescription());
         try {
-            return toCustomUserInfoDefinition(service.createCustomUserInfoDefinition(builder.done()));
+            return converter.convert(service.createCustomUserInfoDefinition(builder.done()));
         } catch (SIdentityException e) {
             throw new CreationException(e);
         }
@@ -60,23 +62,14 @@ public class CustomUserInfoAPIImpl {
         SCustomUserInfoDefinition definition = service.getCustomUserInfoDefinition(id);
         service.deleteCustomUserInfoDefinition(definition);
         definition.setId(-1L);
-        return toCustomUserInfoDefinition(definition);
+        return converter.convert(definition);
     }
 
     public List<CustomUserInfoDefinition> list(int startIndex, int maxResult) throws SIdentityException {
         List<CustomUserInfoDefinition> definitions = new ArrayList<CustomUserInfoDefinition>();
         for (SCustomUserInfoDefinition sDefinition : service.getCustomUserInfoDefinitions(startIndex, maxResult)) {
-            definitions.add(toCustomUserInfoDefinition(sDefinition));
+            definitions.add(converter.convert(sDefinition));
         }
         return definitions;
-    }
-
-    private CustomUserInfoDefinition toCustomUserInfoDefinition(SCustomUserInfoDefinition sDefinition) {
-        CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
-        definition.setId(sDefinition.getId());
-        definition.setName(sDefinition.getName());
-        definition.setDisplayName(sDefinition.getDisplayName());
-        definition.setDescription(sDefinition.getDescription());
-        return definition;
     }
 }

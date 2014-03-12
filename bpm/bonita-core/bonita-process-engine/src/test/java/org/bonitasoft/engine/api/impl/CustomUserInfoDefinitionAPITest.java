@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verify;
  * @author Vincent Elcrin
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CustomUserInfoAPIImplTest {
+public class CustomUserInfoDefinitionAPITest {
 
     @Mock
     private IdentityService service;
@@ -47,43 +47,41 @@ public class CustomUserInfoAPIImplTest {
     @Mock(answer = Answers.RETURNS_MOCKS)
     private SCustomUserInfoDefinitionBuilderFactory factory;
 
-    private CustomUserInfoAPIImpl api;
+    private CustomUserInfoDefinitionAPI api;
 
     @Before
     public void setUp() throws Exception {
-        api = new CustomUserInfoAPIImpl(service);
+        api = new CustomUserInfoDefinitionAPI(service);
     }
 
     @Test
     public void create_should_call_service_to_retrieve_the_item_and_return_result_as_a_CustomUserDefinition() throws Exception {
         given(service.createCustomUserInfoDefinition(any(SCustomUserInfoDefinition.class)))
-                .willReturn(createDummySDefinition("name", "display name", "description"));
+                .willReturn(new DummySCustomUserInfoDefinition(1L));
 
         CustomUserInfoDefinition definition = api.create(factory, new CustomUserInfoDefinitionCreator());
 
-        assertThat(definition.getName()).isEqualTo("name");
-        assertThat(definition.getDisplayName()).isEqualTo("display name");
-        assertThat(definition.getDescription()).isEqualTo("description");
+        assertThat(definition.getId()).isEqualTo(1L);
     }
 
     @Test
     public void list_call_service_to_retrieve_items_and_return_result_as_a_list_of_CustomUserDefinition() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 3)).willReturn(
-                Arrays.asList(
-                        createDummySDefinition("first", "", ""),
-                        createDummySDefinition("second", "", ""),
-                        createDummySDefinition("last", "", "")));
+                Arrays.<SCustomUserInfoDefinition> asList(
+                        new DummySCustomUserInfoDefinition(1L),
+                        new DummySCustomUserInfoDefinition(2L),
+                        new DummySCustomUserInfoDefinition(3L)));
 
         List<CustomUserInfoDefinition> definitions = api.list(0, 3);
 
-        assertThat(definitions.get(0).getName()).isEqualTo("first");
-        assertThat(definitions.get(1).getName()).isEqualTo("second");
-        assertThat(definitions.get(2).getName()).isEqualTo("last");
+        assertThat(definitions.get(0).getId()).isEqualTo(1L);
+        assertThat(definitions.get(1).getId()).isEqualTo(2L);
+        assertThat(definitions.get(2).getId()).isEqualTo(3L);
     }
 
     @Test
     public void delete_should_call_server_to_delete_the_item() throws Exception {
-        SCustomUserInfoDefinition definition = createDummySDefinition("name", "", "");
+        SCustomUserInfoDefinition definition = new DummySCustomUserInfoDefinition(1L);
         given(service.getCustomUserInfoDefinition(1L))
                 .willReturn(definition);
 
@@ -94,50 +92,11 @@ public class CustomUserInfoAPIImplTest {
 
     public void delete_should_return_deleted_item_with_an_invalid_id() throws Exception {
         given(service.getCustomUserInfoDefinition(1L))
-                .willReturn(createDummySDefinition("name", "", ""));
+                .willReturn(new DummySCustomUserInfoDefinition(1L, "name", "", ""));
 
         CustomUserInfoDefinition definition = api.delete(1);
 
-        assertThat(definition.getId()).isEqualTo(-1);
+        assertThat(definition.getId()).isEqualTo(-1L);
         assertThat(definition.getName()).isEqualTo("name");
-    }
-
-    private SCustomUserInfoDefinition createDummySDefinition(final String name, final String displayName, final String description) {
-        return new SCustomUserInfoDefinition() {
-            @Override
-            public String getName() {
-                return name;
-            }
-
-            @Override
-            public String getDisplayName() {
-                return displayName;
-            }
-
-            @Override
-            public String getDescription() {
-                return description;
-            }
-
-            @Override
-            public long getId() {
-                return 0;
-            }
-
-            @Override
-            public String getDiscriminator() {
-                return null;
-            }
-
-            @Override
-            public void setId(long id) {
-
-            }
-
-            @Override
-            public void setTenantId(long id) {
-
-            }
-        };
     }
 }
