@@ -16,13 +16,10 @@ import com.bonitasoft.engine.page.PageCreator.PageField;
 
 /**
  * @author Laurent Leseigneur
- *         FIXME move in correct project
  */
 public class PageCreatorImpl implements Serializable {
 
     private static final long serialVersionUID = 8174091386958635983L;
-
-
 
     private final Map<PageField, Serializable> fields;
 
