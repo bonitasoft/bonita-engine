@@ -16,16 +16,18 @@ package org.bonitasoft.engine.cache;
 import java.io.Serializable;
 import java.util.List;
 
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
+
 /**
- *
+ * 
  * @author Baptiste Mesta
- *
+ * 
  */
-public interface CommonCacheService {
+public interface CommonCacheService extends ServiceWithLifecycle {
 
     /**
      * Store an object in the cache. If the cache don't exists it will be created.
-     *
+     * 
      * @param cacheName
      *            The name of the cache in which the object must be stored
      * @param key
@@ -39,7 +41,7 @@ public interface CommonCacheService {
 
     /**
      * Remove the element according to the cache name and the key
-     *
+     * 
      * @param cacheName
      * @param key
      *            The name of the cache where the object must be stored
@@ -53,7 +55,7 @@ public interface CommonCacheService {
 
     /**
      * Get a cached object.
-     *
+     * 
      * @param cacheName
      *            The name of the cache on which to get the object
      * @param key
@@ -66,7 +68,7 @@ public interface CommonCacheService {
 
     /**
      * Get list of keys on a cache.
-     *
+     * 
      * @param cacheName
      *            The name of the cache on which to get the key list
      * @return the list of keys on the cache, or null if no keys exist
@@ -76,7 +78,7 @@ public interface CommonCacheService {
 
     /**
      * Clear the cache named by cacheName
-     *
+     * 
      * @param cacheName
      *            The name of the cache to clear
      * @return
@@ -87,7 +89,7 @@ public interface CommonCacheService {
 
     /**
      * Clear all cache of the service
-     *
+     * 
      * @throws CacheException
      *             Error thrown if has exceptions during the cache clear.
      */
@@ -95,7 +97,7 @@ public interface CommonCacheService {
 
     /**
      * Return the size of the cache with cacheName.
-     *
+     * 
      * @param cacheName
      *            The name of cache
      * @return the size of the named cache
@@ -106,7 +108,7 @@ public interface CommonCacheService {
 
     /**
      * Get the names of all the caches
-     *
+     * 
      * @return a list of caches names
      */
     List<String> getCachesNames();

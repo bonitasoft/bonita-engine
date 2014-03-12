@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,6 +17,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface SDependencyMapping extends PersistentObject {
 
@@ -24,6 +25,6 @@ public interface SDependencyMapping extends PersistentObject {
 
     long getArtifactId();
 
-    String getArtifactType();
+    ScopeType getArtifactType();
 
 }

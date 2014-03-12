@@ -16,6 +16,9 @@
  */
 package org.bonitasoft.engine.command;
 
+import static org.bonitasoft.engine.command.helper.designer.Transition.fails;
+import static org.bonitasoft.engine.command.helper.designer.Transition.meet;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +35,9 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.command.helper.ProcessDeployer;
-import org.bonitasoft.engine.command.helper.designer.*;
+import org.bonitasoft.engine.command.helper.designer.Gateway;
+import org.bonitasoft.engine.command.helper.designer.SimpleProcessDesigner;
+import org.bonitasoft.engine.command.helper.designer.UserTask;
 import org.bonitasoft.engine.command.helper.expectation.TestUtils;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -92,7 +97,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 2");
 
         process.expect("step 2").toBeReady();
         process.expect("start", "step 1").toNotHaveArchives();
@@ -111,7 +116,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                 .end());
 
         TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(),
-                Arrays.asList("step 2"),
+                "step 2",
                 Arrays.asList(createSetDataOperation("variable", "Done!")),
                 Collections.<String, Serializable> emptyMap());
 
@@ -131,51 +136,13 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
         TestUtils.Process process = startProcess(john.getId(),
                 processDefinition.getId(),
-                Arrays.asList("step 2"),
+                "step 2",
                 Collections.singletonList(new OperationBuilder().createSetDocument("document",
                         new ExpressionBuilder().createInputExpression("value", DocumentValue.class.getName()))),
                 Collections.<String, Serializable> singletonMap(
                         "value", new DocumentValue("content".getBytes(), "plain/text", "document")));
 
         process.expectDocument("document").toBe("content");
-    }
-
-    @Ignore("Need to fix token algorithm")
-    @Test
-    public void should_be_able_to_start_a_process_with_a_parallel_merge() throws Exception {
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
-                .start()
-                .then(new UserTask("step 1"), new UserTask("step 2"))
-                .then(new Gateway("merge", GatewayType.PARALLEL))
-                .then(new UserTask("step 3"))
-                .end());
-
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"));
-        process.execute(john, "step 1", "step 2", "step 3");
-
-        process.isExpected().toFinish();
-        process.expect("start").toNotHaveArchives();
-    }
-
-    @Ignore("Need to fix token algorithm")
-    @Test
-    public void should_be_able_to_start_a_process_with_consecutive_parallel_merges() throws Exception {
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
-                .start()
-                .then(
-                        new UserTask("step 1"),
-                        new Branch().start(new Gateway("parallel 1", GatewayType.PARALLEL))
-                                .then(new UserTask("step 2"), new UserTask("step 3"))
-                                .then(new Gateway("parallel 2", GatewayType.PARALLEL)))
-                .then(new Gateway("parallel 3", GatewayType.PARALLEL))
-                .then(new UserTask("step 4"))
-                .end());
-
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2", "step 3"));
-        process.execute(john, "step 1", "step 2", "step 3", "step 4");
-
-        process.isExpected().toFinish();
-        process.expect("step 1", "step 2", "step 3", "step 4").toBeExecuted(1);
     }
 
     @Test
@@ -187,7 +154,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                 .then(new UserTask("step 2"), new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
         process.execute(john, "step 1", "step 2", "step 3");
 
         process.isExpected().toFinish();
@@ -203,49 +170,12 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                 .then(new UserTask("step 3"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2"));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 2");
         process.execute(john, "step 2", "step 3");
 
         process.isExpected().toFinish();
         process.expect("start").toNotHaveArchives();
         process.expect("step 3").toBeExecuted(1);
-    }
-
-    @Test
-    public void should_be_able_to_start_a_process_with_an_exclusive_merge_and_execute_all_branches() throws Exception {
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
-                .start()
-                .then(new UserTask("step 1"), new UserTask("step 2"))
-                .then(new Gateway("exclusive", GatewayType.EXCLUSIVE))
-                .then(new UserTask("step 3"))
-                .end());
-
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"));
-        process.execute(john, "step 1", "step 2", "step 3", "step 3");
-
-        process.isExpected().toFinish();
-        process.expect("start").toNotHaveArchives();
-        process.expect("step 3").toBeExecuted(2);
-    }
-
-    @Test
-    public void should_be_able_to_start_a_process_with_an_exclusive_merge_and_conditions() throws Exception {
-        Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
-                .start()
-                .then(new UserTask("step 1"), new UserTask("step 2"))
-                .then(new Gateway("exclusive", GatewayType.EXCLUSIVE)
-                        .when("step 1", fails().toMeet(condition).goingTo(new UserTask("step 3")))
-                        .when("step 2", meet(condition).otherwise(new UserTask("step 4"))))
-                .then(new UserTask("step 5"))
-                .end());
-
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1", "step 2"));
-        process.execute(john, "step 1", "step 2", "step 3", "step 5");
-
-        process.isExpected().toFinish();
-        process.expect("start").toNotHaveArchives();
-        process.expect("step 3", "step 5").toBeExecuted(1);
     }
 
     @Test
@@ -260,7 +190,7 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                         new UserTask("step 3").when("exclusive", meet(condition)))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
         process.execute(john, "step 1", "step 3");
 
         process.isExpected().toFinish();
@@ -279,56 +209,11 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
                 .then(new UserTask("step 4"))
                 .end());
 
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 1"));
+        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
         process.execute(john, "step 1", "step 2", "step 3", "step 4");
 
         process.isExpected().toFinish();
         process.expect("start").toNotHaveArchives();
-    }
-
-    @Ignore("Need to fix token algorithm")
-    @Test
-    public void should_be_able_to_start_during_an_inclusive() throws Exception {
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
-                .start()
-                .then(new UserTask("step 1"))
-                .then(new Gateway("inclusive 1", GatewayType.INCLUSIVE))
-                .then(new UserTask("step 2"), new UserTask("step 3"))
-                .then(new Gateway("inclusive 2", GatewayType.INCLUSIVE))
-                .then(new UserTask("step 4"))
-                .end());
-
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2", "step 3"));
-        process.execute(john, "step 2", "step 3", "step 4");
-
-        process.isExpected().toFinish();
-        process.expect("step 1").toNotHaveArchives();
-        process.expect("step 4").toBeExecuted(1);
-    }
-
-    @Ignore("Need to fix token algorithm")
-    @Test
-    public void should_be_able_to_start_an_inclusive_with_boundary() throws Exception {
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
-                .start()
-                .then(new UserTask("step 1"))
-                .then(new Gateway("inclusive 1", GatewayType.INCLUSIVE))
-                .then(
-                        new UserTask("step 2"),
-                        new UserTask("step 3").with(
-                                new BoundaryEvent("boundary", new UserTask("step 4")).triggeredBy(new Signal("foo"))))
-                .then(new Gateway("inclusive 2", GatewayType.INCLUSIVE))
-                .then(new UserTask("step 5"))
-                .end());
-
-        TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), Arrays.asList("step 2", "step 3"));
-        process.execute(john, "step 2");
-        process.sendSignal("foo");
-        process.execute(john, "step 4", "step 5");
-
-        process.isExpected().toFinish();
-        process.expect("step 2", "step 4", "step 5").toBeExecuted(1);
-        process.expect("step 3").toBeAborted();
     }
 
     private Operation createSetDataOperation(String name, String value) throws InvalidExpressionException {
@@ -345,21 +230,21 @@ public class AdvancedStartProcessCommandIntegrationTest extends CommonAPITest {
 
     private TestUtils.Process startProcess(long startedBy,
                                            long processDefinitionId,
-                                           List<String> activityNames) throws Exception {
-        return startProcess(startedBy, processDefinitionId, activityNames, null, null);
+                                           String activityName) throws Exception {
+        return startProcess(startedBy, processDefinitionId, activityName, null, null);
     }
 
     private TestUtils.Process startProcess(
             long startedBy,
             long processDefinitionId,
-            List<String> activityNames,
+            String activityName,
             List<Operation> operations,
             Map<String, Serializable> context) throws Exception {
 
         Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("started_by", startedBy);
         parameters.put("process_definition_id", processDefinitionId);
-        parameters.put("activity_names", new ArrayList<String>(activityNames));
+        parameters.put("activity_name", activityName);
         if(operations != null) {
             parameters.put("operations", new ArrayList<Operation>(operations));
         }

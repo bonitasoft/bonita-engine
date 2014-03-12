@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.expression.Expression;
@@ -62,6 +63,7 @@ import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 /**
  * @author Ruiheng Fan
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
 
@@ -181,7 +183,7 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
     protected ClassLoader getLocalClassLoader(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) throws ClassLoaderException {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         try {
-            return classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            return classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
         } catch (final org.bonitasoft.engine.classloader.ClassLoaderException e) {
             throw new ClassLoaderException(e);
         }

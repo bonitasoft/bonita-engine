@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -42,6 +42,7 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -59,6 +60,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
  * @author Matthieu Chaffotte
  * @author Zhang Bole
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class PlatformCommandAPIImpl implements PlatformCommandAPI {
 
@@ -76,7 +78,7 @@ public class PlatformCommandAPIImpl implements PlatformCommandAPI {
         final DependencyService dependencyService = platformAccessor.getDependencyService();
         final ClassLoaderService classLoaderService = platformAccessor.getClassLoaderService();
         final long artifactId = classLoaderService.getGlobalClassLoaderId();
-        final String artifactType = classLoaderService.getGlobalClassLoaderType();
+        final ScopeType artifactType = ScopeType.valueOf(classLoaderService.getGlobalClassLoaderType());
         final AddSPlatformCommandDependency addSDependency = new AddSPlatformCommandDependency(dependencyService, name, jar, artifactId, artifactType);
         try {
             addSDependency.execute();

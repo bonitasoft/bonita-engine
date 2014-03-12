@@ -975,7 +975,6 @@ public class OrganizationTest extends CommonAPITest {
         assertNotNull(persistedGroup1);
     }
 
-
     @Test
     public void exportOrganization() throws Exception {
         // create records for user role, group and membership

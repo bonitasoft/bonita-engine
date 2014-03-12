@@ -13,13 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import java.util.concurrent.Callable;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.SPlatformNotFoundException;
+import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
-import org.bonitasoft.engine.transaction.STransactionException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -38,22 +40,25 @@ public class AbstractLoginApiImpl {
             // if not in cache : but there is no transaction open yet so that will fail
             platformService.getPlatform();
         } catch (final SPlatformNotFoundException e1) {
+            final TransactionService transactionService = platformAccessor.getTransactionService();
             try {
-                final TransactionService transactionService = platformAccessor.getTransactionService();
-                transactionService.begin();
-                try {
-                    // Second call that will look into the cache and fetches it from the DB but this time the
-                    platformService.getPlatform();
-                } catch (final SPlatformNotFoundException e) {
-                    final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                        logger.log(getClass(), TechnicalLogSeverity.INFO, "Platform not yet created");
+                transactionService.executeInTransaction(new Callable<SPlatform>() {
+                    @Override
+                    public SPlatform call() throws Exception {
+                        try {
+                            // Second call that will look into the cache and fetches it from the DB but this time the
+                            return platformService.getPlatform();
+                        } catch (final SPlatformNotFoundException e) {
+                            final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
+                            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                                logger.log(getClass(), TechnicalLogSeverity.INFO, "Platform not yet created");
+                            }
+                            throw e;
+                        }
                     }
-                } finally {
-                    transactionService.complete();
-                }
-            } catch (final STransactionException e) {
-                throw new BonitaRuntimeException("Transaction error on getting platform at login", e);
+                });
+            } catch (Exception e) {
+                throw new SBonitaRuntimeException(e);
             }
         }
     }

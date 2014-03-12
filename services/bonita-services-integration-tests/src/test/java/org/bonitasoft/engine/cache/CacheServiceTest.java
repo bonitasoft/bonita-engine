@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.ehcache.EhCacheCacheService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
@@ -45,11 +47,13 @@ public class CacheServiceTest {
         LOGGER.info("Testing : {}", name.getMethodName());
         cacheService = getCacheService();
         cacheService.clearAll();
+        cacheService.start();
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws SBonitaException, TimeoutException {
         LOGGER.info("Tested: {}", name.getMethodName());
+        cacheService.stop();
         cacheService = null;
     }
 
@@ -127,7 +131,7 @@ public class CacheServiceTest {
         assertEquals("Object should still be in cache", value, object);
     }
 
-    @Test(expected=CacheException.class)
+    @Test(expected = CacheException.class)
     public void cacheNotDefined() throws Exception {
         final String key = "defaultTimeout";
         final String anotherCacheName = "Should_use_default_config";

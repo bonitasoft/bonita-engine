@@ -1,7 +1,6 @@
 CREATE TABLE pdependency (
   id NUMERIC(19, 0) NOT NULL,
   name NVARCHAR(50) NOT NULL UNIQUE,
-  version NVARCHAR(50) NOT NULL,
   description NVARCHAR(MAX),
   filename NVARCHAR(255) NOT NULL,
   value_ VARBINARY(MAX) NOT NULL,
@@ -9,8 +8,6 @@ CREATE TABLE pdependency (
 )
 GO
 CREATE INDEX idx_pdependency_name ON pdependency (name, id)
-GO
-CREATE INDEX idx_pdependency_version ON pdependency (version, id)
 GO
 
 CREATE TABLE pdependencymapping (

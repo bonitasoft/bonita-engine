@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.scheduler.JobRegister;
 
@@ -79,5 +80,10 @@ public interface NodeConfiguration {
      *         true if the sessions should be cleaned when the node is stopped
      */
     boolean shouldClearSessions();
+
+    /**
+     * @return
+     */
+    List<ServiceWithLifecycle> getServicesToStart();
 
 }

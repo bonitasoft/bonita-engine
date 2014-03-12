@@ -296,10 +296,10 @@ public class ProcessDeletionTest extends CommonAPITest {
         // start P2, the call activities will start an instance of P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
         final ActivityInstance simpleTask = waitForUserTask(simpleStepName, rootProcessInstance);
-        assignAndExecuteStep(simpleTask, pedro.getId());
         final ProcessInstance simpleProcessInstance = getProcessAPI().getProcessInstance(simpleTask.getParentProcessInstanceId());
-        waitForUserTask(rootStepName, rootProcessInstance);
+        assignAndExecuteStep(simpleTask, pedro.getId());
         waitForProcessToFinish(simpleProcessInstance);
+        waitForUserTask(rootStepName, rootProcessInstance);
 
         // check that only one instance (p2) is in the journal: p1 is supposed to be archived
         List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);

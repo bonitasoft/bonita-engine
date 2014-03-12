@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,30 +18,63 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * The descriptor which contains the fields to update an actor.
+ * 
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ActorUpdater implements Serializable {
 
     private static final long serialVersionUID = -8812266250085063562L;
 
+    /**
+     * The fields that can be updated.
+     */
     public enum ActorField {
-        DISPLAY_NAME, DESCRIPTION;
+        /**
+         * The name of the field corresponding to the display name of the actor
+         */
+        DISPLAY_NAME,
+        /**
+         * The name of the field corresponding to the description of the actor
+         */
+        DESCRIPTION;
     }
 
     private final Map<ActorField, Serializable> fields;
 
+    /**
+     * The default constructor
+     */
     public ActorUpdater() {
         fields = new HashMap<ActorField, Serializable>(ActorField.values().length);
     }
 
+    /**
+     * Set the new display name
+     * 
+     * @param name
+     *            The new display name
+     */
     public void setDisplayName(final String name) {
         fields.put(ActorField.DISPLAY_NAME, name);
     }
 
+    /**
+     * Set the new description
+     * 
+     * @param description
+     *            The new description
+     */
     public void setDescription(final String description) {
         fields.put(ActorField.DESCRIPTION, description);
     }
 
+    /**
+     * Get the fields to update, and the new value
+     * 
+     * @return The map containing the pairs (field, new value) to update.
+     */
     public Map<ActorField, Serializable> getFields() {
         return fields;
     }
