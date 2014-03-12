@@ -9,21 +9,34 @@
 package com.bonitasoft.engine.page;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Laurent Leseigneur
  */
-public interface PageCreator extends Serializable {
+public class PageCreator implements Serializable {
 
-  
     public enum PageField {
         NAME, DESCRIPTION;
     }
 
-    
-    public PageCreator setDescription(final String description);
+    private static final long serialVersionUID = 8174091386958635983L;
 
-    public Map<PageField, Serializable> getFields();
+    private final Map<PageField, Serializable> fields;
+
+    public PageCreator(final String name) {
+        fields = new HashMap<PageField, Serializable>(2);
+        fields.put(PageField.NAME, name);
+    }
+
+    public PageCreator setDescription(final String description) {
+        fields.put(PageField.DESCRIPTION, description);
+        return this;
+    }
+
+    public Map<PageField, Serializable> getFields() {
+        return fields;
+    }
 
 }
