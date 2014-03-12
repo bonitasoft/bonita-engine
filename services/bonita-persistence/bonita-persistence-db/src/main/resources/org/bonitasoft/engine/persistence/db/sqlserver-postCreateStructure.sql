@@ -49,9 +49,9 @@ ALTER TABLE message_instance ADD CONSTRAINT fk_message_instance_tenantId FOREIGN
 GO
 -- ALTER TABLE migration_plan ADD CONSTRAINT fk_migration_plan_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
-ALTER TABLE p_metadata_def ADD CONSTRAINT fk_p_metadata_def_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
+ALTER TABLE custom_usr_inf_def ADD CONSTRAINT fk_custom_usr_inf_def_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
-ALTER TABLE p_metadata_val ADD CONSTRAINT fk_p_metadata_val_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_custom_usr_inf_val_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
 ALTER TABLE pending_mapping ADD CONSTRAINT fk_pending_mapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
