@@ -171,7 +171,7 @@ public class IdentityServiceImpl implements IdentityService {
                 + metadata.getName());
         try {
             final InsertRecord insertRecord = new InsertRecord(metadata);
-            final SInsertEvent insertEvent = getInsertEvent(metadata, CUSTOM_USER_INFO);
+            final SInsertEvent insertEvent = getInsertEvent(metadata, CUSTOM_USER_INFO_DEFINITION);
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
@@ -184,12 +184,12 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void createProfileMetadataValue(final SCustomUserInfoValue metadataValue) throws SIdentityException {
+    public void createCustomUserInfoValue(final SCustomUserInfoValue metadataValue) throws SIdentityException {
         final String methodName = "createProfileMetadataValue";
         logBeforeMethod(methodName);
         try {
             final InsertRecord insertRecord = new InsertRecord(metadataValue);
-            final SInsertEvent insertEvent = getInsertEvent(metadataValue, METADATAVALUE);
+            final SInsertEvent insertEvent = getInsertEvent(metadataValue, CUSTOM_USER_INFO_VALUE);
             recorder.recordInsert(insertRecord, insertEvent);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
@@ -407,7 +407,7 @@ public class IdentityServiceImpl implements IdentityService {
                 + info.getName());
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(info);
-            final SDeleteEvent deleteEvent = getDeleteEvent(info, CUSTOM_USER_INFO);
+            final SDeleteEvent deleteEvent = getDeleteEvent(info, CUSTOM_USER_INFO_DEFINITION);
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(info.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
@@ -419,17 +419,17 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void deleteProfileMetadataValue(final long metadataValueId) throws SIdentityException {
-        this.deleteProfileMetadataValue(getProfileMetadataValue(metadataValueId));
+    public void deleteCustomUserInfoValue(final long metadataValueId) throws SIdentityException {
+        this.deleteCustomUserInfoValue(getCustomUserInfoValue(metadataValueId));
     }
 
     @Override
-    public void deleteProfileMetadataValue(final SCustomUserInfoValue metadataValue) throws SIdentityException {
+    public void deleteCustomUserInfoValue(final SCustomUserInfoValue metadataValue) throws SIdentityException {
         final String methodName = "deleteProfileMetadataValue";
         logBeforeMethod(methodName);
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(metadataValue);
-            final SDeleteEvent deleteEvent = getDeleteEvent(metadataValue, METADATAVALUE);
+            final SDeleteEvent deleteEvent = getDeleteEvent(metadataValue, CUSTOM_USER_INFO_VALUE);
             recorder.recordDelete(deleteRecord, deleteEvent);
             logAfterMethod(methodName);
         } catch (final SRecorderException e) {
@@ -890,7 +890,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SCustomUserInfoDefinition getProfileMetadataByName(final String metadataName) throws SIdentityException {
+    public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String metadataName) throws SIdentityException {
         final String methodName = "getProfileMetadataByName";
         logBeforeMethod(methodName);
         try {
@@ -955,7 +955,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SCustomUserInfoValue getProfileMetadataValue(final long profileMetadataValueId) throws SIdentityException {
+    public SCustomUserInfoValue getCustomUserInfoValue(final long profileMetadataValueId) throws SIdentityException {
         final String methodName = "getProfileMetadataValue";
         logBeforeMethod(methodName);
         try {
@@ -973,7 +973,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SCustomUserInfoValue> getProfileMetadataValues(final List<Long> profileMetadataValueIds) throws SIdentityException {
+    public List<SCustomUserInfoValue> getCustomUserInfoValues(final List<Long> profileMetadataValueIds) throws SIdentityException {
         final String methodName = "getProfileMetadataValues";
         logBeforeMethod(methodName);
         if (profileMetadataValueIds == null || profileMetadataValueIds.isEmpty()) {
@@ -1410,8 +1410,8 @@ public class IdentityServiceImpl implements IdentityService {
         try {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(metadata, descriptor);
             SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(CUSTOM_USER_INFO, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CUSTOM_USER_INFO).setObject(metadata).done();
+            if (eventService.hasHandlers(CUSTOM_USER_INFO_DEFINITION, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CUSTOM_USER_INFO_DEFINITION).setObject(metadata).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             initiateLogBuilder(metadata.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
@@ -1424,14 +1424,14 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void updateProfileMetadataValue(final SCustomUserInfoValue metadataValue, final EntityUpdateDescriptor descriptor) throws SIdentityException {
+    public void updateCustomUserInfoValue(final SCustomUserInfoValue metadataValue, final EntityUpdateDescriptor descriptor) throws SIdentityException {
         final String methodName = "updateProfileMetadataValue";
         logBeforeMethod(methodName);
         try {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(metadataValue, descriptor);
             SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(METADATAVALUE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(METADATAVALUE).setObject(metadataValue).done();
+            if (eventService.hasHandlers(CUSTOM_USER_INFO_VALUE, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(CUSTOM_USER_INFO_VALUE).setObject(metadataValue).done();
             }
             recorder.recordUpdate(updateRecord, updateEvent);
             logAfterMethod(methodName);

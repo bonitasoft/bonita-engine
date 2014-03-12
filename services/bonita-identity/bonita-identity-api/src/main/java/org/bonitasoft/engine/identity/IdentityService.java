@@ -18,8 +18,8 @@ import java.util.Set;
 
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
+import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
@@ -39,9 +39,9 @@ public interface IdentityService {
 
     String GROUP = "GROUP";
 
-    String CUSTOM_USER_INFO = "CUSTOM_USER_INFO";
+    String CUSTOM_USER_INFO_DEFINITION = "CUSTOM_USER_INFO_DEFINITION";
 
-    String METADATAVALUE = "METADATAVALUE";
+    String CUSTOM_USER_INFO_VALUE = "CUSTOM_USER_INFO_VALUE";
 
     String ROLE = "ROLE";
 
@@ -580,7 +580,7 @@ public interface IdentityService {
      * @return the profileMetadataValue
      * @throws SIdentityException
      */
-    SCustomUserInfoValue getProfileMetadataValue(long profileMetadataValueId) throws SIdentityException;
+    SCustomUserInfoValue getCustomUserInfoValue(long profileMetadataValueId) throws SIdentityException;
 
     /**
      * Get profileMetadataValue by its name
@@ -590,7 +590,7 @@ public interface IdentityService {
      * @return the profileMetadataValue
      * @throws SIdentityException
      */
-    SCustomUserInfoDefinition getProfileMetadataByName(String metadataName) throws SIdentityException;
+    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String metadataName) throws SIdentityException;
 
     /**
      * Get total number of custom user info
@@ -618,7 +618,7 @@ public interface IdentityService {
      * @return a list of SCustomUserInfoValue objects corresponding to parameters
      * @throws SIdentityException
      */
-    List<SCustomUserInfoValue> getProfileMetadataValues(List<Long> profileMetadataValueIds) throws SIdentityException;
+    List<SCustomUserInfoValue> getCustomUserInfoValues(List<Long> profileMetadataValueIds) throws SIdentityException;
 
     /**
      * Get custom user info in a specific interval, this is used for pagination
@@ -770,7 +770,7 @@ public interface IdentityService {
      *            A profileMetadataValue object
      * @throws SIdentityException
      */
-    void createProfileMetadataValue(SCustomUserInfoValue metadataValue) throws SIdentityException;
+    void createCustomUserInfoValue(SCustomUserInfoValue metadataValue) throws SIdentityException;
 
     /**
      * Update profileMetadataValue according to the descriptor
@@ -781,7 +781,7 @@ public interface IdentityService {
      *            The update description
      * @throws SIdentityException
      */
-    void updateProfileMetadataValue(SCustomUserInfoValue metadataValue, EntityUpdateDescriptor descriptor) throws SIdentityException;
+    void updateCustomUserInfoValue(SCustomUserInfoValue metadataValue, EntityUpdateDescriptor descriptor) throws SIdentityException;
 
     /**
      * Create role in DB for the given role
@@ -894,7 +894,7 @@ public interface IdentityService {
      *            The profileMetadataValue object will be deleted
      * @throws SIdentityException
      */
-    void deleteProfileMetadataValue(SCustomUserInfoValue metadataValue) throws SIdentityException;
+    void deleteCustomUserInfoValue(SCustomUserInfoValue metadataValue) throws SIdentityException;
 
     /**
      * Delete the id specified profileMetadataValue
@@ -903,7 +903,7 @@ public interface IdentityService {
      *            The identifier of profileMetadataValue
      * @throws SIdentityException
      */
-    void deleteProfileMetadataValue(long metadataValueId) throws SIdentityException;
+    void deleteCustomUserInfoValue(long metadataValueId) throws SIdentityException;
 
     /**
      * Delete the specific role
