@@ -1474,8 +1474,27 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException {
-        return createCustomUserDetailsAPI()
-                .createCustomUserInfoDefinition(BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class), creator);
+        return createCustomUserDetailsAPI().create(
+                BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class),
+                creator);
+    }
+
+    @Override
+    public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult) throws RetrieveException {
+        try {
+            return createCustomUserDetailsAPI().list(startIndex, maxResult);
+        } catch (SIdentityException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    @Override
+    public CustomUserInfoDefinition deleteCustomUserInfoDefinition(long id) throws DeletionException {
+        try {
+            return createCustomUserDetailsAPI().delete(id);
+        } catch (SIdentityException e) {
+            throw new DeletionException(e);
+        }
     }
 
     private CustomUserInfoAPIImpl createCustomUserDetailsAPI() {

@@ -13,6 +13,10 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.util.List;
+
+import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
+
 /**
  * The Interface IdentityAPI.
  * 
@@ -23,5 +27,6 @@ package org.bonitasoft.engine.api;
  * @author Yanyan Liu
  */
 public interface IdentityAPI extends UserAPI, RoleAPI, GroupAPI, MembershipAPI, OrganizationAPI, CustomUserInfoAPI {
+
 
 }

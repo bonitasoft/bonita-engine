@@ -20,11 +20,18 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
  */
 public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
 
+    private long id = -1L;
+
     private String name;
 
     private String displayName;
 
     private String description;
+
+    @Override
+    public long getId() {
+        return id;
+    }
 
     @Override
     public String getName() {
@@ -39,6 +46,10 @@ public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
     @Override
     public String getDescription() {
         return description;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public void setName(String name) {

@@ -20,6 +20,8 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  */
 public interface CustomUserInfoDefinition extends BonitaObject {
 
+    long getId();
+
     String getName();
 
     String getDisplayName();

@@ -40,7 +40,7 @@ public class CustomUserInfoAPIImpl {
         this.service = service;
     }
 
-    public CustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinitionBuilderFactory factory, CustomUserInfoDefinitionCreator creator) throws CreationException {
+    public CustomUserInfoDefinition create(SCustomUserInfoDefinitionBuilderFactory factory, CustomUserInfoDefinitionCreator creator) throws CreationException {
         if (creator == null) {
             throw new CreationException("Can not create null custom user details.");
         }
@@ -56,7 +56,14 @@ public class CustomUserInfoAPIImpl {
         }
     }
 
-    public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult) throws SIdentityException {
+    public CustomUserInfoDefinition delete(long id) throws SIdentityException {
+        SCustomUserInfoDefinition definition = service.getCustomUserInfoDefinition(id);
+        service.deleteCustomUserInfoDefinition(definition);
+        definition.setId(-1L);
+        return toCustomUserInfoDefinition(definition);
+    }
+
+    public List<CustomUserInfoDefinition> list(int startIndex, int maxResult) throws SIdentityException {
         List<CustomUserInfoDefinition> definitions = new ArrayList<CustomUserInfoDefinition>();
         for (SCustomUserInfoDefinition sDefinition : service.getCustomUserInfoDefinitions(startIndex, maxResult)) {
             definitions.add(toCustomUserInfoDefinition(sDefinition));
@@ -66,6 +73,7 @@ public class CustomUserInfoAPIImpl {
 
     private CustomUserInfoDefinition toCustomUserInfoDefinition(SCustomUserInfoDefinition sDefinition) {
         CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
+        definition.setId(sDefinition.getId());
         definition.setName(sDefinition.getName());
         definition.setDisplayName(sDefinition.getDisplayName());
         definition.setDescription(sDefinition.getDescription());

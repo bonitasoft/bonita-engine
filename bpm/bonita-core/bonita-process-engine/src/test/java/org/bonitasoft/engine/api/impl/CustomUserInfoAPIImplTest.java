@@ -20,7 +20,6 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +31,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Vincent Elcrin
@@ -54,11 +55,11 @@ public class CustomUserInfoAPIImplTest {
     }
 
     @Test
-    public void createCustomUserInfoDefinition_should_return_definition_matching_server_definition_returned_by_the_identity_service() throws Exception {
+    public void create_should_call_service_to_retrieve_the_item_and_return_result_as_a_CustomUserDefinition() throws Exception {
         given(service.createCustomUserInfoDefinition(any(SCustomUserInfoDefinition.class)))
-                .willReturn(createDummyServerDefinition("name", "display name", "description"));
+                .willReturn(createDummySDefinition("name", "display name", "description"));
 
-        CustomUserInfoDefinition definition = api.createCustomUserInfoDefinition(factory, new CustomUserInfoDefinitionCreator());
+        CustomUserInfoDefinition definition = api.create(factory, new CustomUserInfoDefinitionCreator());
 
         assertThat(definition.getName()).isEqualTo("name");
         assertThat(definition.getDisplayName()).isEqualTo("display name");
@@ -66,21 +67,42 @@ public class CustomUserInfoAPIImplTest {
     }
 
     @Test
-    public void getCustomUserDefinitions_should_return_the_list_of_CustomUserDefinition_fetch_from_the_identity_service() throws Exception {
+    public void list_call_service_to_retrieve_items_and_return_result_as_a_list_of_CustomUserDefinition() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 3)).willReturn(
                 Arrays.asList(
-                        createDummyServerDefinition("first", "", ""),
-                        createDummyServerDefinition("second", "", ""),
-                        createDummyServerDefinition("last", "", "")));
+                        createDummySDefinition("first", "", ""),
+                        createDummySDefinition("second", "", ""),
+                        createDummySDefinition("last", "", "")));
 
-        List<CustomUserInfoDefinition> definitions = api.getCustomUserInfoDefinitions(0, 3);
+        List<CustomUserInfoDefinition> definitions = api.list(0, 3);
 
         assertThat(definitions.get(0).getName()).isEqualTo("first");
         assertThat(definitions.get(1).getName()).isEqualTo("second");
         assertThat(definitions.get(2).getName()).isEqualTo("last");
     }
 
-    private SCustomUserInfoDefinition createDummyServerDefinition(final String name, final String displayName, final String description) {
+    @Test
+    public void delete_should_call_server_to_delete_the_item() throws Exception {
+        SCustomUserInfoDefinition definition = createDummySDefinition("name", "", "");
+        given(service.getCustomUserInfoDefinition(1L))
+                .willReturn(definition);
+
+        api.delete(1);
+
+        verify(service, atLeastOnce()).deleteCustomUserInfoDefinition(definition);
+    }
+
+    public void delete_should_return_deleted_item_with_an_invalid_id() throws Exception {
+        given(service.getCustomUserInfoDefinition(1L))
+                .willReturn(createDummySDefinition("name", "", ""));
+
+        CustomUserInfoDefinition definition = api.delete(1);
+
+        assertThat(definition.getId()).isEqualTo(-1);
+        assertThat(definition.getName()).isEqualTo("name");
+    }
+
+    private SCustomUserInfoDefinition createDummySDefinition(final String name, final String displayName, final String description) {
         return new SCustomUserInfoDefinition() {
             @Override
             public String getName() {

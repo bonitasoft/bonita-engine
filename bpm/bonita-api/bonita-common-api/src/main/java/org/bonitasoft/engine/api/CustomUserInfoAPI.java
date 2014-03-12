@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.engine.api;
 
+import java.util.List;
+
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 
@@ -25,4 +28,9 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 public interface CustomUserInfoAPI {
 
     public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException;
+
+    public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult);
+
+    public CustomUserInfoDefinition deleteCustomUserInfoDefinition(long id) throws DeletionException;
+
 }
