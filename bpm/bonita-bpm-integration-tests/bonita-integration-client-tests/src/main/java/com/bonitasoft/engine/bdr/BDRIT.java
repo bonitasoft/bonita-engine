@@ -20,7 +20,6 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
@@ -86,7 +85,7 @@ public class BDRIT extends CommonAPISPTest {
         logout();
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException, IOException {
 
@@ -110,7 +109,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateABusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
@@ -137,7 +136,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateADefaultBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
@@ -158,7 +157,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateAndUdpateABusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder()
@@ -190,17 +189,23 @@ public class BDRIT extends CommonAPISPTest {
     @Test
     public void shouldBeAbleToUpdateBusinessDataUsingBizDataJavaSetterOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; Employee e = new Employee(); e.firstName = 'Jules'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+                + "; Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = 'UnNamed'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", "6.3-beta");
         final String businessDataName = "newBornBaby";
         final String newEmployeeFirstName = "Manon";
+        final String newEmployeeLastName = "Péuigrec";
         processDefinitionBuilder.addBusinessData(businessDataName, EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addAutomaticTask("step1").addOperation(
-                new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setFirstName", String.class.getName(),
-                        new ExpressionBuilder().createConstantStringExpression(newEmployeeFirstName)));
+        processDefinitionBuilder
+                .addAutomaticTask("step1")
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setFirstName", String.class.getName(),
+                                new ExpressionBuilder().createConstantStringExpression(newEmployeeFirstName)))
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setLastName", String.class.getName(),
+                                new ExpressionBuilder().createConstantStringExpression(newEmployeeLastName)));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -209,14 +214,19 @@ public class BDRIT extends CommonAPISPTest {
 
         waitForUserTask("step2", processInstanceId);
 
-        // Let's check the updated firstName value by calling an expression:
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(1);
-        final String expressionName = "retrieve_FirstName";
-        expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionName, businessDataName + ".firstName", String.class.getName(),
+        // Let's check the updated firstName + lastName values by calling an expression:
+        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
+        final String expressionFirstName = "retrieve_FirstName";
+        expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionFirstName, businessDataName + ".firstName", String.class.getName(),
+                new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIF_CLASSNAME)), null);
+        final String expressionLastName = "retrieve_new_lastName";
+        expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionLastName, businessDataName + ".lastName", String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIF_CLASSNAME)), null);
         final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
-        final String returnedFirstName = (String) evaluatedExpressions.get(expressionName);
+        final String returnedFirstName = (String) evaluatedExpressions.get(expressionFirstName);
+        final String returnedLastName = (String) evaluatedExpressions.get(expressionLastName);
         assertEquals(newEmployeeFirstName, returnedFirstName);
+        assertEquals(newEmployeeLastName, returnedLastName);
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -266,7 +276,7 @@ public class BDRIT extends CommonAPISPTest {
         }
     }
 
-    @Test
+    // @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void updateBusinessDataOutsideATransaction() throws Exception {
         final String taskName = "step";
@@ -289,7 +299,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition);
     }
 
-    @Test(expected = ProcessEnablementException.class)
+    // @Test(expected = ProcessEnablementException.class)
     @Ignore("the deployment is not valid due to the new check of business data")
     public void deployProcessWithBusinessDataShouldBeRetrievable() throws Exception {
         final User user = createUser("login1", "password");

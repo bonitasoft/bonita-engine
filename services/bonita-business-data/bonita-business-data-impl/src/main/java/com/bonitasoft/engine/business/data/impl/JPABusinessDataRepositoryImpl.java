@@ -71,7 +71,8 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     protected SDependency createSDependency(final long tenantId, final byte[] transformedBdrArchive) {
-        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance("BDR", tenantId, ScopeType.TENANT, "BDR.jar", transformedBdrArchive).done();
+        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance("BDR", tenantId, ScopeType.TENANT, "BDR.jar", transformedBdrArchive)
+                .done();
     }
 
     protected byte[] generateBDMJar(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
@@ -145,7 +146,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         try {
             final T entity = query.getSingleResult();
             final Class<? extends Object> entityClass = entity.getClass();
-            if (!entityClass.isPrimitive() && !ClassUtils.isPrimitiveOrWrapper(entityClass)) {
+            if (!ClassUtils.isPrimitiveOrWrapper(entityClass)) {
                 em.detach(entity);
             }
             return entity;

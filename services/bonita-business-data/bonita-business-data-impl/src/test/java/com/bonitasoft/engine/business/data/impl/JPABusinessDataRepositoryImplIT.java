@@ -244,6 +244,35 @@ public class JPABusinessDataRepositoryImplIT {
     }
 
     @Test
+    public void updateTwoFieldsInSameTransactionShouldModifySameObject() throws Exception {
+        UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.start();
+            setUpDatabase();
+            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
+            final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+            matti.setLastName("NewLastName");
+            businessDataRepository.merge(matti);
+            matti.setFirstName("NewFirstName");
+            businessDataRepository.merge(matti);
+        } finally {
+            ut.commit();
+        }
+
+        ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "NewFirstName");
+            final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+            assertThat(matti.getLastName()).isEqualTo("NewLastName");
+        } finally {
+            ut.commit();
+            businessDataRepository.stop();
+        }
+    }
+
+    @Test
     public void updateAnEmployeeUsingParameterizedQuery() throws Exception {
         UserTransaction ut = TransactionManagerServices.getTransactionManager();
         try {
@@ -252,8 +281,6 @@ public class JPABusinessDataRepositoryImplIT {
             setUpDatabase();
             final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
             final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
-            matti.setLastName("Hallonen");
-            businessDataRepository.merge(matti);
             matti.setLastName("Halonen");
             businessDataRepository.merge(matti);
         } finally {

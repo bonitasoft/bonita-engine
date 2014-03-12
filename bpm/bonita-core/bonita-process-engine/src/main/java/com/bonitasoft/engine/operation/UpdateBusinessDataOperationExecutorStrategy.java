@@ -112,15 +112,13 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
             throws SOperationExecutionException {
         try {
             final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
-                    processInstanceId);
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(), processInstanceId);
             newValue = businessDataRepository.merge(newValue);
             if (!(newValue instanceof Entity)) {
                 throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() + " must implements " + Entity.class.getName()));
             }
             if (refBusinessDataInstance != null) {
-                final Long id = ((Entity) newValue).getPersistenceId();
-                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
+                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, ((Entity) newValue).getPersistenceId());
             }
         } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
             throw new SOperationExecutionException(srbdinfe);
@@ -142,7 +140,7 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
 
     @Override
     public boolean doUpdateData() {
-        return false;
+        return true;
     }
 
 }
