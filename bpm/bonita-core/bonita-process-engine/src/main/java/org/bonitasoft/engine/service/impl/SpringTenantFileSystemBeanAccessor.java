@@ -108,10 +108,12 @@ public class SpringTenantFileSystemBeanAccessor {
             SpringPlatformFileSystemBeanAccessor.initializeContext(classLoader);
             final FileSystemXmlApplicationContext platformContext = SpringPlatformFileSystemBeanAccessor.getContext();
             // Delay the refresh so we can set our BeanFactoryPostProcessor to be able to resolve the placeholder.
-            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), false /* refresh */, platformContext);
-            context.addBeanFactoryPostProcessor(ppc);
+            AbsoluteFileSystemXmlApplicationContext localContext = new AbsoluteFileSystemXmlApplicationContext(getResources(), false /* refresh */,
+                    platformContext);
+            localContext.addBeanFactoryPostProcessor(ppc);
 
-            context.refresh();
+            localContext.refresh();
+            this.context = localContext;
         }
     }
 
