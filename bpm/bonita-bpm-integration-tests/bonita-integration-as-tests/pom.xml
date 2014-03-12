@@ -15,7 +15,6 @@
 	<name>Bonita AS Tests</name>
 
 	<properties>
-		<bitronix.version>2.1.4</bitronix.version>
 		<distrib.dir>${project.build.directory}/bonita-engine-deploy</distrib.dir>
 		<bonita.home>${project.build.directory}/bonita</bonita.home>
 		<bonita.version></bonita.version>

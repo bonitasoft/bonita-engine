@@ -54,8 +54,8 @@
 		<xstream.version>1.4.2</xstream.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<spring.version>3.1.2.RELEASE</spring.version>
-
+		        <spring.version>3.1.2.RELEASE</spring.version>
+        
 		<!-- Tests -->
 		<powermock.version>1.5.1</powermock.version>
 		<assertj.version>1.5.0</assertj.version>
@@ -157,10 +157,20 @@
 				<version>1.0.11</version>
 			</dependency>
 			<dependency>
+				<groupId>org.codehaus.btm</groupId>
+				<artifactId>btm</artifactId>
+				<version>2.1.4</version>
+			</dependency>
 				<groupId>org.easytesting</groupId>
 				<artifactId>fest-assert</artifactId>
 				<version>1.4</version>
 				<scope>test</scope>
+			<dependency>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.btm</groupId>
+				<artifactId>btm-tomcat55-lifecycle</artifactId>
+				<version>2.1.4</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
