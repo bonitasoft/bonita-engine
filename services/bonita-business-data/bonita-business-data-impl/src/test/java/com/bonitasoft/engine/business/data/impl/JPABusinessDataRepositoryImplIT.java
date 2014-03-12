@@ -1,6 +1,7 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
@@ -119,7 +120,7 @@ public class JPABusinessDataRepositoryImplIT {
                 try {
                     final Employee employee = businessDataRepository.find(Employee.class, 45l);
                     assertThat(employee).isNotNull();
-                    assertThat(employee.getId()).isEqualTo(45l);
+                    assertThat(employee.getPersistenceId()).isEqualTo(45l);
                     assertThat(employee.getFirstName()).isEqualTo("Hannu");
                     assertThat(employee.getLastName()).isEqualTo("Hakkinen");
                 } catch (final Exception e) {
@@ -154,7 +155,7 @@ public class JPABusinessDataRepositoryImplIT {
             public void run() {
                 try {
                     final Employee employee = businessDataRepository.merge(new Employee("Marja", "Halonen"));
-                    assertThat(employee.getId()).isNotNull();
+                    assertThat(employee.getPersistenceId()).isNotNull();
                 } catch (final Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -349,6 +350,82 @@ public class JPABusinessDataRepositoryImplIT {
                 assertThat(entityClassNames).isEqualTo(expected);
             }
         });
+    }
+
+    @Test(expected = BusinessDataNotFoundException.class)
+    public void removeAnEntity() throws Exception {
+        UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.start();
+            setUpDatabase();
+            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
+            final Employee matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+            businessDataRepository.remove(matti);
+        } finally {
+            ut.commit();
+        }
+
+        ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
+            businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+            fail("The employee was removed previously");
+        } finally {
+            ut.commit();
+            businessDataRepository.stop();
+        }
+    }
+
+    @Test
+    public void remove_should_not_throw_an_exception_with_a_null_entity() throws Exception {
+        executeInTransaction(new RunnableInTransaction(true) {
+
+            @Override
+            public void run() {
+                businessDataRepository.remove(null);
+            }
+        });
+    }
+
+    @Test
+    public void remove_should_not_throw_an_exception_with_an_unknown_entity_without_an_id() throws Exception {
+        executeInTransaction(new RunnableInTransaction(true) {
+
+            @Override
+            public void run() {
+                businessDataRepository.remove(new Employee("Tarja", "Makkinen"));
+            }
+        });
+    }
+
+    @Test
+    public void remove_should_not_throw_an_exception_with_an_unknown_entity() throws Exception {
+        Employee matti;
+        UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.start();
+            setUpDatabase();
+            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Matti");
+            matti = businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.firstName = :firstName", parameters);
+            businessDataRepository.remove(matti);
+        } finally {
+            ut.commit();
+        }
+
+        ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.remove(matti);
+        } catch (final Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            ut.commit();
+            businessDataRepository.stop();
+        }
     }
 
 }

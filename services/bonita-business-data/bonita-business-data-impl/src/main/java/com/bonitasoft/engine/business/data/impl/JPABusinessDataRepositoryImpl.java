@@ -35,6 +35,7 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderF
 
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BDMJarBuilder;
+import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
@@ -175,6 +176,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             entityClassNames.add(entity.getJavaType().getName());
         }
         return entityClassNames;
+    }
+
+    @Override
+    public void remove(final Entity entity) {
+        if (entity != null && entity.getPersistenceId() != null) {
+            final EntityManager em = getEntityManager();
+            final Entity attachedEntity = em.find(entity.getClass(), entity.getPersistenceId());
+            if (attachedEntity != null) {
+                em.remove(attachedEntity);
+            }
+        }
     }
 
 }

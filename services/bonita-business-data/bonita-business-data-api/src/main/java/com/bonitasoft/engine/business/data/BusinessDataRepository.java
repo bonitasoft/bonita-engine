@@ -12,6 +12,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+import com.bonitasoft.engine.bdm.Entity;
+
 /**
  * The BusinessDataRepository service allows to manage Business Data operations. It includes deploy / undeploy of a Business Data Model, search / find of
  * Business Data entity objects. Start / stop operations as well. Do we keep that?
@@ -68,6 +70,8 @@ public interface BusinessDataRepository {
     <T> T find(Class<T> entityClass, String qlString, Map<String, Object> parameters) throws BusinessDataNotFoundException, NonUniqueResultException;
 
     <T> T merge(T entity);
+
+    void remove(final Entity entity);
 
     Set<String> getEntityClassNames();
 

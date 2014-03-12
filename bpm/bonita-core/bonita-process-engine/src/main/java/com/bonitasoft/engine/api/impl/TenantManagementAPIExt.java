@@ -50,7 +50,6 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     public void deployBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
-            // TODO: should be in activate tenant
             final BusinessDataRepository bdr = tenantAccessor.getBusinessDataRepository();
             bdr.deploy(zip, tenantAccessor.getTenantId());
             bdr.start();
