@@ -89,8 +89,4 @@ public class JavaMethodInvoker {
         return o;
     }
 
-    public static void main(final String[] args) {
-        int.class.cast(new Integer(14));
-    }
-
 }
