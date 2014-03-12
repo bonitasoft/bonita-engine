@@ -10,6 +10,7 @@ package com.bonitasoft.engine.bpm.test;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 
+import com.bonitasoft.engine.core.page.PageService;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
@@ -92,5 +93,10 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
         } else {
             return getInstanceOf("monitoringService", TenantMonitoringService.class);
         }
+    }
+
+    @Override
+    public PageService getPageService() {
+        return getInstanceOf(PageService.class);
     }
 }

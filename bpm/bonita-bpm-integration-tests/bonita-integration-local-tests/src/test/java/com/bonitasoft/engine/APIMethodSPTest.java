@@ -58,4 +58,9 @@ public class APIMethodSPTest extends APIMethodTest {
         checkAllParametersAreSerializable(NodeAPIImpl.class);
     }
 
+    @Test
+    public void checkAllMethodsOfNodeAPIContainsSerializableParametersZZZZZZZZZ() {
+        checkAllParametersAreSerializable(PageAPIImpl.class);
+    }
+
 }

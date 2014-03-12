@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service;
 
+import com.bonitasoft.engine.core.page.PageService;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.TenantMonitoringService;
@@ -25,6 +26,8 @@ public interface TenantServiceAccessor extends org.bonitasoft.engine.service.Ten
     BreakpointService getBreakpointService();
 
     ReportingService getReportingService();
+
+    PageService getPageService();
 
     TenantMonitoringService getTenantMonitoringService();
 

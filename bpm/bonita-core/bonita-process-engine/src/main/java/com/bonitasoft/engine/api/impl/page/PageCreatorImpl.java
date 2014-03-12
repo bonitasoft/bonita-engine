@@ -12,12 +12,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.bonitasoft.engine.page.PageCreator.PageField;
+import com.bonitasoft.engine.page.PageCreator;
 
 /**
  * @author Laurent Leseigneur
  */
-public class PageCreatorImpl implements Serializable {
+public class PageCreatorImpl implements PageCreator {
 
     private static final long serialVersionUID = 8174091386958635983L;
 
@@ -28,11 +28,13 @@ public class PageCreatorImpl implements Serializable {
         fields.put(PageField.NAME, name);
     }
 
+    @Override
     public PageCreatorImpl setDescription(final String description) {
         fields.put(PageField.DESCRIPTION, description);
         return this;
     }
 
+    @Override
     public Map<PageField, Serializable> getFields() {
         return fields;
     }
