@@ -1474,10 +1474,11 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException {
-        return createCustomUserDetailsAPI().createCustomUserInfoDefinition(creator);
+        return createCustomUserDetailsAPI()
+                .createCustomUserInfoDefinition(BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class), creator);
     }
 
     private CustomUserInfoAPIImpl createCustomUserDetailsAPI() {
-        return new CustomUserInfoAPIImpl(getTenantAccessor().getIdentityService(), BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class));
+        return new CustomUserInfoAPIImpl(getTenantAccessor().getIdentityService());
     }
 }

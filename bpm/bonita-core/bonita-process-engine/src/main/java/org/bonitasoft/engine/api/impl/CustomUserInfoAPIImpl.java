@@ -13,7 +13,9 @@
  */
 package org.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.api.CustomUserInfoAPI;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
@@ -23,23 +25,22 @@ import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.search.identity.SearchUsers;
 
 /**
  * @author Vincent Elcrin
  */
-public class CustomUserInfoAPIImpl implements CustomUserInfoAPI {
+public class CustomUserInfoAPIImpl {
 
     private IdentityService service;
 
-    private SCustomUserInfoDefinitionBuilderFactory factory;
-
-    public CustomUserInfoAPIImpl(IdentityService service, SCustomUserInfoDefinitionBuilderFactory factory) {
+    public CustomUserInfoAPIImpl(IdentityService service) {
         this.service = service;
-        this.factory = factory;
     }
 
-    @Override
-    public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException {
+    public CustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinitionBuilderFactory factory, CustomUserInfoDefinitionCreator creator) throws CreationException {
         if (creator == null) {
             throw new CreationException("Can not create null custom user details.");
         }
@@ -53,6 +54,14 @@ public class CustomUserInfoAPIImpl implements CustomUserInfoAPI {
         } catch (SIdentityException e) {
             throw new CreationException(e);
         }
+    }
+
+    public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult) throws SIdentityException {
+        List<CustomUserInfoDefinition> definitions = new ArrayList<CustomUserInfoDefinition>();
+        for (SCustomUserInfoDefinition sDefinition : service.getCustomUserInfoDefinition(startIndex, maxResult)) {
+            definitions.add(toCustomUserInfoDefinition(sDefinition));
+        }
+        return definitions;
     }
 
     private CustomUserInfoDefinition toCustomUserInfoDefinition(SCustomUserInfoDefinition sDefinition) {
