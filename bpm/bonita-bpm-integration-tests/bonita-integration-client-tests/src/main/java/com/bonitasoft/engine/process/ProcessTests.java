@@ -21,8 +21,7 @@ import org.junit.runners.Suite.SuiteClasses;
         TaskOnDemandTest.class,
         ProcessParameterTest.class,
         AbortProcessInstanceTest.class,
-        CancelProcessInstanceTest.class,
-        ProcessWithBusinessDataTest.class
+        CancelProcessInstanceTest.class
 })
 public class ProcessTests {
 

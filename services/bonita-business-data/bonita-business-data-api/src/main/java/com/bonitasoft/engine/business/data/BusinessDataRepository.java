@@ -10,6 +10,7 @@ package com.bonitasoft.engine.business.data;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The BusinessDataRepository service allows to manage Business Data operations. It includes deploy / undeploy of a Business Data Model, search / find of
@@ -67,5 +68,7 @@ public interface BusinessDataRepository {
     <T> T find(Class<T> entityClass, String qlString, Map<String, Object> parameters) throws BusinessDataNotFoundException, NonUniqueResultException;
 
     <T> T merge(T entity);
+
+    Set<String> getEntityClassNames();
 
 }

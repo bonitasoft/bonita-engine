@@ -38,7 +38,7 @@ import com.bonitasoft.manager.Features;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class ParameterProcessDependencyResolver extends ProcessDependencyResolver {
+public class ParameterProcessDependencyResolver implements ProcessDependencyResolver {
 
     @Override
     public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
@@ -98,4 +98,5 @@ public class ParameterProcessDependencyResolver extends ProcessDependencyResolve
         } while (parameters.size() == 100);
         return problems;
     }
+
 }

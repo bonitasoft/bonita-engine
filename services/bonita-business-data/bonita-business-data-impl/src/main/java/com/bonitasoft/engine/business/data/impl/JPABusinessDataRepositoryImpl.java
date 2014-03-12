@@ -10,8 +10,10 @@ package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -19,6 +21,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -160,6 +163,17 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             return em.merge(entity);
         }
         return null;
+    }
+
+    @Override
+    public Set<String> getEntityClassNames() {
+        final EntityManager em = getEntityManager();
+        final Set<EntityType<?>> entities = em.getMetamodel().getEntities();
+        final Set<String> entityClassNames = new HashSet<String>();
+        for (final EntityType<?> entity : entities) {
+            entityClassNames.add(entity.getJavaType().getName());
+        }
+        return entityClassNames;
     }
 
 }

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -307,6 +308,20 @@ public class JPABusinessDataRepositoryImplIT {
         public boolean isSetupDatabase() {
             return setupDatabase;
         }
+    }
+
+    @Test
+    public void getEntityClassNames_returns_the_classes_managed_by_the_bdr() throws Exception {
+        executeInTransaction(new RunnableInTransaction(true) {
+
+            @Override
+            public void run() {
+                final Set<String> expected = Collections.singleton(Employee.class.getName());
+
+                final Set<String> entityClassNames = businessDataRepository.getEntityClassNames();
+                assertThat(entityClassNames).isEqualTo(expected);
+            }
+        });
     }
 
 }
