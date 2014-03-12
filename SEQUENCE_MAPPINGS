@@ -106,8 +106,9 @@ ExternalIdentityMapping -> 10070
 MigrationPlan
 MigrationPlanDescriptor -> 10100
 
-Page
-Page -> 10110
+Token -> 10110
+
+Page -> 10120
 
 =Archived objects==
 

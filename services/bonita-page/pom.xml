@@ -9,4 +9,5 @@
 	</parent>
 
 	<artifactId>bonita-page</artifactId>
+	<groupId>org.bonitasoft.engine.page</groupId>
 </project>
