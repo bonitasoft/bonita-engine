@@ -53,6 +53,8 @@ public class ReportingServiceImpl implements ReportingService {
     private static final CharSequence COMMA = ",";
 
     private static final CharSequence SEMICOLON = ";";
+    
+    private static final String NEW_LINE = "\n";
 
     private final DataSource dataSource;
 
@@ -82,38 +84,66 @@ public class ReportingServiceImpl implements ReportingService {
         if (!lowerSQ.startsWith("select")) {
             throw new SQLException("The statement is not a SELECT query");
         }
-        final StringBuilder builder = new StringBuilder();
         final Connection connection = dataSource.getConnection();
         try {
-            connection.setAutoCommit(false);
             final Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            final ResultSet resultSet = statement.executeQuery(selectQuery);
-            if (resultSet != null) {
-                final String newline = "\n";
-                final ResultSetMetaData metaData = resultSet.getMetaData();
-                final int columns = metaData.getColumnCount();
-                for (int i = 1; i < columns; i++) {
-                    final String columnName = metaData.getColumnLabel(i);
-                    // in order to use the same case for all database
-                    builder.append(columnName.toUpperCase()).append(",");
-                }
-                // Special treatment of last record (to avoid having extra comma at the end):
-                final String columnName = metaData.getColumnLabel(columns);
-                builder.append(columnName.toUpperCase()).append(newline);
-                while (resultSet.next()) {
-                    for (int j = 1; j < columns; j++) {
-                        final Object value = resultSet.getObject(j);
-                        builder.append(protect(String.valueOf(value))).append(",");
-                    }
-                    final Object value = resultSet.getObject(columns);
-                    // Special treatment of last record (to avoid having extra comma at the end):
-                    builder.append(value).append(newline);
+            try {
+                return executeQuery(selectQuery, statement);
+            } finally {
+                if (statement != null) {
+                    statement.close();
                 }
             }
-            return builder.toString();
+            
         } finally {
             connection.close();
         }
+    }
+
+    private String executeQuery(final String selectQuery, final Statement statement) throws SQLException {
+        final ResultSet resultSet = statement.executeQuery(selectQuery);
+        try {
+            return parseResultSet(resultSet);
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+        }
+    }
+
+    private String parseResultSet(final ResultSet resultSet) throws SQLException {
+        final StringBuilder builder = new StringBuilder();
+        if (resultSet != null) {
+            final int columns = appendColumnNames(resultSet, builder);
+            appendValues(resultSet, builder, columns);
+        }
+        return builder.toString();
+    }
+
+    private void appendValues(final ResultSet resultSet, final StringBuilder builder, final int columns) throws SQLException {
+        while (resultSet.next()) {
+            for (int j = 1; j < columns; j++) {
+                final Object value = resultSet.getObject(j);
+                builder.append(protect(String.valueOf(value))).append(",");
+            }
+            final Object value = resultSet.getObject(columns);
+            // Special treatment of last record (to avoid having extra comma at the end):
+            builder.append(value).append(NEW_LINE);
+        }
+    }
+
+    private int appendColumnNames(final ResultSet resultSet, final StringBuilder builder) throws SQLException {
+        final ResultSetMetaData metaData = resultSet.getMetaData();
+        final int columns = metaData.getColumnCount();
+        for (int i = 1; i < columns; i++) {
+            final String columnName = metaData.getColumnLabel(i);
+            // in order to use the same case for all database
+            builder.append(columnName.toUpperCase()).append(",");
+        }
+        // Special treatment of last record (to avoid having extra comma at the end):
+        final String columnName = metaData.getColumnLabel(columns);
+        builder.append(columnName.toUpperCase()).append(NEW_LINE);
+        return columns;
     }
 
     private String protect(final String value) {

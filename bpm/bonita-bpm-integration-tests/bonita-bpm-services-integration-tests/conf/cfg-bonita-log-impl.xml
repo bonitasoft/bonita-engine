@@ -26,6 +26,7 @@
         		<entry key="DATA_INSTANCE_UPDATED:INTERNAL" value="true" />
         		<entry key="DEPENDENCY_CREATED:INTERNAL" value="true" />
         		<entry key="DEPENDENCY_DELETED:INTERNAL" value="true" />
+        		<entry key="DEPENDENCY_UPDATED:INTERNAL" value="true" />
         		<entry key="DEPENDENCY_MAPPING_CREATED:INTERNAL" value="true" />
         		<entry key="DEPENDENCY_MAPPING_DELETED:INTERNAL" value="true" />
         		<entry key="DOCUMENTMAPPING_CREATED:INTERNAL" value="true" />
