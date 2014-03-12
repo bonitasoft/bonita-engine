@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 
@@ -33,7 +33,7 @@ import static org.mockito.Matchers.any;
  * @author Vincent Elcrin
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CustomUserDetailsAPIImplTest {
+public class CustomUserInfoAPIImplTest {
 
     @Mock
     private IdentityService service;
