@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.api.impl.page;
+package com.bonitasoft.engine.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageCreator.PageField;
 
 public class PageCreatorImplTest {
@@ -18,7 +19,7 @@ public class PageCreatorImplTest {
     @Test
     public void pageCreatorWithName() throws Exception {
         // given
-        PageCreatorImpl pageCreator = new PageCreatorImpl(NAME);
+        PageCreator pageCreator = new PageCreator(NAME);
 
         // wwhen
         Map<PageField, Serializable> fields = pageCreator.getFields();
@@ -32,7 +33,7 @@ public class PageCreatorImplTest {
     @Test
     public void pageCreatorWithNameAndDescrition() throws Exception {
         // given
-        PageCreatorImpl pageCreator = new PageCreatorImpl(NAME);
+        PageCreator pageCreator = new PageCreator(NAME);
         pageCreator.setDescription(DESCRIPTION);
 
         // when
