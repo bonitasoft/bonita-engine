@@ -45,13 +45,14 @@ import org.bonitasoft.engine.xml.Parser;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class ActorProcessDependencyResolver extends ProcessDependencyResolver {
+public class ActorProcessDependencyResolver implements ProcessDependencyResolver {
 
     @Override
     public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
             final SProcessDefinition sDefinition) throws ActorMappingImportException {
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        final SActorBuilderFactory sActorBuilderFactory = BuilderFactory.getInstance().get(SActorBuilderFactory.class);
+        BuilderFactory.getInstance();
+        final SActorBuilderFactory sActorBuilderFactory = BuilderFactory.get(SActorBuilderFactory.class);
         final IdentityService identityService = tenantAccessor.getIdentityService();
         Parser parser = null;
         try {

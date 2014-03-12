@@ -34,7 +34,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class ConnectorProcessDependencyResolver extends ProcessDependencyResolver {
+public class ConnectorProcessDependencyResolver implements ProcessDependencyResolver {
 
     @Override
     public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
