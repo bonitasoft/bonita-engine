@@ -396,6 +396,19 @@
       <version>${project.version}</version>
     </dependency>
 
+
+    <!-- Page -->
+    <dependency>
+      <groupId>org.bonitasoft.engine.page</groupId>
+      <artifactId>bonita-page</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.bonitasoft.engine.page</groupId>
+      <artifactId>bonita-page-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
     <!-- Parameter -->
     <dependency>
       <groupId>com.bonitasoft.engine.core.parameter</groupId>
@@ -950,6 +963,10 @@
                   <include>org.bonitasoft.engine.core.operation:bonita-operation-api</include>
                   <include>org.bonitasoft.engine.core.operation:bonita-operation-api-impl</include>
                   <!-- Parameter -->
+                  <include>org.bonitasoft.engine.page:bonita-page</include>
+                  <include>com.bonitasoft.engine.page:bonita-page-api</include>
+                  <include>com.bonitasoft.engine.page:bonita-page-impl</include>
+                  <!-- Parameter -->
                   <include>com.bonitasoft.engine.core.parameter:bonita-parameter-api</include>
                   <include>com.bonitasoft.engine.core.parameter:bonita-parameter-propertyfile</include>
                   <!-- Persistence -->
@@ -1023,7 +1040,6 @@
                   <include>com.bonitasoft.engine.core.reporting:bonita-reporting-api</include>
                   <include>org.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
                   <include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl</include>
-                  <include>com.bonitasoft.engine.core.reporting:bonita-reporting-impl-hibernate</include>
                   <!-- Security Manager -->
                   <include>com.bonitasoft.manager:manager</include>
                   <include>org.bonitasoft.security:sysUtil</include>
