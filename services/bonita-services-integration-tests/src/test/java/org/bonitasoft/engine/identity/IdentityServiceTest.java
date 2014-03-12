@@ -28,10 +28,10 @@ import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupBuilder;
 import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
@@ -184,7 +184,7 @@ public class IdentityServiceTest extends CommonServiceTest {
         final String name = "MyProfileMetadata";
         final SCustomUserInfoDefinition metadata = BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class).createNewInstance().setName(name).done();
         identityService.createCustomUserInfoDefinition(metadata);
-        final SCustomUserInfoDefinition metadata2 = identityService.getProfileMetadataByName(name);
+        final SCustomUserInfoDefinition metadata2 = identityService.getCustomUserInfoDefinitionByName(name);
         assertNotNull("can't find the profile metadata after adding it", metadata2);
         assertEquals("Does not retrieved the good profile metadata", name, metadata2.getName());
         getTransactionService().complete();
@@ -709,11 +709,11 @@ public class IdentityServiceTest extends CommonServiceTest {
             identityService.createCustomUserInfoDefinition(metadata);
         }
 
-        List<SCustomUserInfoDefinition> retrievedMetadata = identityService.getCustomUserInfoDefinition(5, 5);
+        List<SCustomUserInfoDefinition> retrievedMetadata = identityService.getCustomUserInfoDefinitions(5, 5);
         assertNotNull("can't find the groups after adding them", retrievedMetadata);
         assertEquals("bad number of retrieved groups", 5, retrievedMetadata.size());
 
-        retrievedMetadata = identityService.getCustomUserInfoDefinition(0, 20);
+        retrievedMetadata = identityService.getCustomUserInfoDefinitions(0, 20);
         getTransactionService().complete();
         assertNotNull("can't find the groups after adding them", retrievedMetadata);
         assertEquals("bad number of retrieved groups", 20, retrievedMetadata.size());
@@ -1184,7 +1184,7 @@ public class IdentityServiceTest extends CommonServiceTest {
     @Test
     public void testUpdateProfileMetadata() throws Exception {
         getTransactionService().begin();
-        final SCustomUserInfoDefinition metadata = identityService.getCustomUserInfoDefinition(0, 1).get(0);
+        final SCustomUserInfoDefinition metadata = identityService.getCustomUserInfoDefinitions(0, 1).get(0);
         final long metadataId = metadata.getId();
         final String newName = "theNewName";
         final EntityUpdateDescriptor changeDescriptor = BuilderFactory.get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance().updateName(newName).done();
