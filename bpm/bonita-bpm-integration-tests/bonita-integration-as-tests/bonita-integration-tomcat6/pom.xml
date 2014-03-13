@@ -225,6 +225,10 @@
 											<fileset dir="${distrib.dir}/resources/home/" />
 										</copy>
 
+										<!-- Change Dialect of BDR -->
+										<property file="tomcat/${db.vendor}/bdm.properties" />
+										<replace file="${bonita.home}/server/platform/tenant-template/conf/services/cfg-bonita-business-data-impl.xml" token="org.hibernate.dialect.H2Dialect" value="${bdm.dialect}" failOnNoReplacements="true" /> 
+										
 										<copy todir="${bonita.home}/server/licenses" failonerror="true">
 											<fileset dir="${user.home}/lic" includes="*.lic" />
 										</copy>
