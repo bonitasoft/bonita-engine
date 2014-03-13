@@ -65,7 +65,6 @@
 								<artifactItem>
 									<groupId>com.bonitasoft.engine</groupId>
 									<artifactId>bonita-engine-deploy</artifactId>
-									<classifier>${bonita.home.classifier}</classifier>
 									<version>${project.version}</version>
 									<type>zip</type>
 									<overWrite>false</overWrite>
