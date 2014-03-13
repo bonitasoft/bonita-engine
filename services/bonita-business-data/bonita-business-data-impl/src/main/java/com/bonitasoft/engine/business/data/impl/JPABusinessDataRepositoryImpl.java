@@ -40,6 +40,7 @@ import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
 /**
  * @author Matthieu Chaffotte
@@ -99,6 +100,15 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             dependencyService.createDependencyMapping(sDependencyMapping);
         } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryDeploymentException(e);
+        }
+    }
+
+    @Override
+    public void undeploy(final long tenantId) throws SBusinessDataRepositoryException {
+        try {
+            dependencyService.deleteDependency("BDR");
+        } catch (final SDependencyException sde) {
+            throw new SBusinessDataRepositoryException(sde);
         }
     }
 

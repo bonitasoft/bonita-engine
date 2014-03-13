@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -11,6 +11,7 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.UpdateException;
 
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 
@@ -22,7 +23,7 @@ import com.bonitasoft.engine.platform.TenantNotFoundException;
 public interface TenantManagementAPI {
 
     /**
-     * Deploys a new Business Data Repository on the current tenant.
+     * Installs a new business data model.
      * 
      * @param zip
      *            the binary content of the business object model.
@@ -31,10 +32,18 @@ public interface TenantManagementAPI {
      * @throws BusinessDataRepositoryDeploymentException
      *             if the deployment cannot be fulfilled completely.
      */
-    void deployBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
+    void installBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
     /**
-     * Allows to set the tenand mode.
+     * Uninstalls the business data model.
+     * 
+     * @throws BusinessDataRepositoryDeploymentException
+     *             if the deployment cannot be fulfilled completely.
+     */
+    void uninstallBusinessDataRepository() throws BusinessDataRepositoryException;
+
+    /**
+     * Allows to set the tenant mode.
      * 
      * @param tenantId
      *            the ID of the tenant to set the maintenance mode for.

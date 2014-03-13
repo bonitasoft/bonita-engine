@@ -25,7 +25,9 @@ import com.bonitasoft.engine.api.TenantMode;
 import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryDeploymentException;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.InvalidBusinessDataModelException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
@@ -33,9 +35,12 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
+/**
+ * @author Matthieu Chaffotte
+ */
 public class TenantManagementAPIExt implements TenantManagementAPI {
 
-    private static TenantServiceAccessor getTenantAccessor() {
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -47,7 +52,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     @Override
     @AvailableOnMaintenanceTenant
-    public void deployBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
+    public void installBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final BusinessDataRepository bdr = tenantAccessor.getBusinessDataRepository();
@@ -57,6 +62,18 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             throw new InvalidBusinessDataModelException(e);
         } catch (final SBusinessDataRepositoryDeploymentException e) {
             throw new BusinessDataRepositoryDeploymentException(e);
+        }
+    }
+
+    @Override
+    @AvailableOnMaintenanceTenant
+    public void uninstallBusinessDataRepository() throws BusinessDataRepositoryException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            final BusinessDataRepository bdr = tenantAccessor.getBusinessDataRepository();
+            bdr.undeploy(tenantAccessor.getTenantId());
+        } catch (final SBusinessDataRepositoryException sbdre) {
+            throw new BusinessDataRepositoryException(sbdre);
         }
     }
 

@@ -35,6 +35,8 @@ public interface BusinessDataRepository {
      */
     void deploy(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
 
+    void undeploy(long tenantId) throws SBusinessDataRepositoryException;
+
     void start() throws SBusinessDataRepositoryDeploymentException;
 
     void stop();

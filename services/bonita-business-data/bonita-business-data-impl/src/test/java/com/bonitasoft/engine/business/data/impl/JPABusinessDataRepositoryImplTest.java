@@ -3,6 +3,7 @@ package com.bonitasoft.engine.business.data.impl;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -10,25 +11,31 @@ import static org.mockito.Mockito.verify;
 import java.util.Collections;
 
 import org.bonitasoft.engine.dependency.DependencyService;
+import org.bonitasoft.engine.dependency.SDependencyDeletionException;
+import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
 public class JPABusinessDataRepositoryImplTest {
 
     private DependencyService dependencyService;
 
+    private JPABusinessDataRepositoryImpl repository;
+
     @Before
     public void setUp() throws Exception {
         dependencyService = mock(DependencyService.class);
+        repository = new JPABusinessDataRepositoryImpl(dependencyService, Collections.<String, Object> emptyMap());
     }
 
     @Test
     public void deployABOMShouldCreatetheBOMJARAndAddANewTenantDependency() throws Exception {
-        final JPABusinessDataRepositoryImpl bdrService = spy(new JPABusinessDataRepositoryImpl(dependencyService, Collections.<String, Object> emptyMap()));
+        final JPABusinessDataRepositoryImpl bdrService = spy(repository);
         final SDependency sDependency = mock(SDependency.class);
         final SDependencyMapping dependencyMapping = mock(SDependencyMapping.class);
         final byte[] zip = "zip".getBytes();
@@ -46,9 +53,28 @@ public class JPABusinessDataRepositoryImplTest {
 
     @Test(expected = BusinessDataNotFoundException.class)
     public void throwAnExceptionIfTheIdentifierIsNull() throws Exception {
-        final JPABusinessDataRepositoryImpl bdrService = new JPABusinessDataRepositoryImpl(dependencyService, Collections.<String, Object> emptyMap());
+        repository.find(String.class, null);
+    }
 
-        bdrService.find(String.class, null);
+    @Test
+    public void uninstall_should_delete_a_dependency() throws Exception {
+        repository.undeploy(45l);
+
+        verify(dependencyService).deleteDependency("BDR");
+    }
+
+    @Test(expected = SBusinessDataRepositoryException.class)
+    public void uninstall_should_throw_an_exception_if_the_dependency_does_not_exist() throws Exception {
+        doThrow(new SDependencyNotFoundException("error")).when(dependencyService).deleteDependency("BDR");
+
+        repository.undeploy(45l);
+    }
+
+    @Test(expected = SBusinessDataRepositoryException.class)
+    public void uninstall_should_throw_an_exception_if_an_exception_occurs_during_the_dependency_deletion() throws Exception {
+        doThrow(new SDependencyDeletionException("error")).when(dependencyService).deleteDependency("BDR");
+
+        repository.undeploy(45l);
     }
 
 }

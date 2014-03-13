@@ -20,6 +20,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
@@ -76,16 +77,17 @@ public class BDRIT extends CommonAPISPTest {
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
-        getTenantManagementAPI().deployBusinessDataRepository(zip);
+        getTenantManagementAPI().installBusinessDataRepository(zip);
     }
 
     @After
     public void tearDown() throws BonitaException {
+        getTenantManagementAPI().uninstallBusinessDataRepository();
         deleteUser(matti);
         logout();
     }
 
-    // @Test
+    @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException, IOException {
 
@@ -109,7 +111,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    // @Test
+    @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateABusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
@@ -136,7 +138,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    // @Test
+    @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateADefaultBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
@@ -157,7 +159,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    // @Test
+    @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateAndUdpateABusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder()
@@ -276,7 +278,7 @@ public class BDRIT extends CommonAPISPTest {
         }
     }
 
-    // @Test
+    @Test
     @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void updateBusinessDataOutsideATransaction() throws Exception {
         final String taskName = "step";
@@ -299,7 +301,7 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition);
     }
 
-    // @Test(expected = ProcessEnablementException.class)
+    @Test(expected = ProcessEnablementException.class)
     @Ignore("the deployment is not valid due to the new check of business data")
     public void deployProcessWithBusinessDataShouldBeRetrievable() throws Exception {
         final User user = createUser("login1", "password");
