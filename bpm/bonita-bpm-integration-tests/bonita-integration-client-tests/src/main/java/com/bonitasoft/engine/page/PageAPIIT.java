@@ -10,6 +10,7 @@ package com.bonitasoft.engine.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -49,10 +50,23 @@ public class PageAPIIT extends CommonAPISPTest {
         assertThat(returnedPage).isEqualTo(page);
     }
 
+    @Test(expected = AlreadyExistsException.class)
+    public void should_createPage_with_same_name_throw_already_exists() throws BonitaException {
+        // given
+        getPageAPI().createPage(new PageCreator("mypagedup").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+
+        // when
+        getPageAPI().createPage(new PageCreator("mypagedup").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+
+        // then: expected exception
+    }
+
     @Test
     public void should_getPageContent_return_the_content() throws BonitaException {
         // given
-        Page page = getPageAPI().createPage(new PageCreator("mypage").setDescription("page description").setDisplayName("My Päge"),
+        Page page = getPageAPI().createPage(new PageCreator("mypagewithcontent").setDescription("page description").setDisplayName("My Päge"),
                 "my page content in a zip file".getBytes());
 
         // when
@@ -65,7 +79,7 @@ public class PageAPIIT extends CommonAPISPTest {
     @Test(expected = PageNotFoundException.class)
     public void should_deletePage_delete_the_page() throws BonitaException {
         // given
-        Page page = getPageAPI().createPage(new PageCreator("mypage").setDescription("page description").setDisplayName("My Päge"),
+        Page page = getPageAPI().createPage(new PageCreator("mypagetodelete").setDescription("page description").setDisplayName("My Päge"),
                 "my page content in a zip file".getBytes());
 
         // when

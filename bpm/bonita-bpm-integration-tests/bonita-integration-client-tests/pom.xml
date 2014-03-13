@@ -19,12 +19,6 @@
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-integration-client-tests</artifactId>
 			<version>${project.version}</version>
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>org.bonitasoft.engine</groupId> -->
-<!-- 					<artifactId>bonita-client</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
 		</dependency>
         <dependency>
             <groupId>junit</groupId>
