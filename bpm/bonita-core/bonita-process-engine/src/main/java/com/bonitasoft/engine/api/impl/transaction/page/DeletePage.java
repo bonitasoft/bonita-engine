@@ -23,10 +23,10 @@ public class DeletePage implements TransactionContent {
 
     private final long reportId;
 
-    public DeletePage(final TenantServiceAccessor serviceAccessor, final long reportId) {
+    public DeletePage(final TenantServiceAccessor serviceAccessor, final long pageId) {
         super();
         this.serviceAccessor = serviceAccessor;
-        this.reportId = reportId;
+        this.reportId = pageId;
     }
 
     @Override
