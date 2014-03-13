@@ -36,7 +36,7 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     private final boolean delayable;
 
     private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<BatchLogSynchronization>();
-    
+
     public BatchQueriableLoggerImpl(final PersistenceService persistenceService, final TransactionService transactionService,
             final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider,
             final TechnicalLoggerService logger, final PlatformService platformService, final Boolean delayable) {
@@ -50,7 +50,7 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     protected synchronized BatchLogSynchronization getBatchLogSynchronization() throws STransactionNotFoundException {
         BatchLogSynchronization synchro = synchronizations.get();
         if (synchro == null) {
-            synchro = new BatchLogSynchronization(persistenceService, BatchLogBuffer.getInstance(), InsertBatchLogsJobRegister.getInstance(), delayable, this);
+            synchro = new BatchLogSynchronization(persistenceService, BatchLogBuffer.getInstance(), delayable, this);
             synchronizations.set(synchro);
             this.transactionService.registerBonitaSynchronization(synchro);
         }
@@ -73,6 +73,5 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     protected void cleanSynchronization() {
         synchronizations.remove();
     }
-    
 
 }

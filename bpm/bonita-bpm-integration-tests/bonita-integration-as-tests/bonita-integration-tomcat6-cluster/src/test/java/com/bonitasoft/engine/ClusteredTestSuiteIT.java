@@ -50,7 +50,7 @@ public class ClusteredTestSuiteIT {
         platformLoginAPI.logout(platformSession);
         System.err.println("=================== ClusteredTestSuiteIT.afterClass()");
         SPBPMTestUtil.destroyPlatformAndTenants();
-        APITestSPUtil.deletePlatformStructure();
+        new APITestSPUtil().deletePlatformStructure();
     }
 
     protected static void changeToNode1() throws Exception {

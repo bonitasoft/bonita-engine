@@ -13,8 +13,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.NodeAPI;
+import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
 public class NodeAPITest extends CommonAPISPTest {
 
