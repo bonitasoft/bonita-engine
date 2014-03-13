@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
+import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 import com.bonitasoft.engine.api.ProcessAPI;
@@ -72,6 +73,8 @@ public class APITestSPUtil extends APITestUtil {
 
     private ReportingAPI reportingAPI;
 
+    private PageAPI pageAPI;
+
     private ThemeAPI themeAPI;
 
     private TenantManagementAPI tenantManagementAPI;
@@ -97,6 +100,10 @@ public class APITestSPUtil extends APITestUtil {
 
     protected void setReportingAPI(final ReportingAPI reportingAPI) {
         this.reportingAPI = reportingAPI;
+    }
+
+    protected void setPagegAPI(final PageAPI pageAPI) {
+        this.pageAPI = pageAPI;
     }
 
     protected void setPlatformMonitoringAPI(final PlatformMonitoringAPI platformMonitoringAPI) {
@@ -139,6 +146,10 @@ public class APITestSPUtil extends APITestUtil {
         return reportingAPI;
     }
 
+    public PageAPI getPageAPI() {
+        return pageAPI;
+    }
+
     public LogAPI getLogAPI() {
         return logAPI;
     }
@@ -159,6 +170,7 @@ public class APITestSPUtil extends APITestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setPagegAPI(TenantAPIAccessor.getPageAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
@@ -173,6 +185,7 @@ public class APITestSPUtil extends APITestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setPagegAPI(TenantAPIAccessor.getPageAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
@@ -188,6 +201,7 @@ public class APITestSPUtil extends APITestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setPagegAPI(TenantAPIAccessor.getPageAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
@@ -202,6 +216,7 @@ public class APITestSPUtil extends APITestUtil {
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setReportingAPI(TenantAPIAccessor.getReportingAPI(getSession()));
+        setPagegAPI(TenantAPIAccessor.getPageAPI(getSession()));
         setMonitoringAPI(TenantAPIAccessor.getMonitoringAPI(getSession()));
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));

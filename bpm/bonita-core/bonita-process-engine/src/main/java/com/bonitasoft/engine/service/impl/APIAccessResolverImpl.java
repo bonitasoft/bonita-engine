@@ -22,11 +22,8 @@ import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
-import org.bonitasoft.engine.api.impl.IdentityAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformCommandAPIImpl;
 import org.bonitasoft.engine.api.impl.PlatformLoginAPIImpl;
-import org.bonitasoft.engine.api.impl.ProfileAPIImpl;
-import org.bonitasoft.engine.api.impl.ThemeAPIImpl;
 import org.bonitasoft.engine.exception.APIImplementationNotFoundException;
 import org.bonitasoft.engine.service.APIAccessResolver;
 
@@ -40,6 +37,7 @@ import com.bonitasoft.engine.api.impl.LogAPIExt;
 import com.bonitasoft.engine.api.impl.LoginAPIExt;
 import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.NodeAPIImpl;
+import com.bonitasoft.engine.api.impl.PageAPIExt;
 import com.bonitasoft.engine.api.impl.PlatformAPIExt;
 import com.bonitasoft.engine.api.impl.PlatformMonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.ProcessAPIExt;
@@ -80,6 +78,7 @@ public class APIAccessResolverImpl implements APIAccessResolver {
         apis.put(ThemeAPI.class.getName(), new ThemeAPIExt());
         apis.put(com.bonitasoft.engine.api.ThemeAPI.class.getName(), new ThemeAPIExt());
         apis.put(com.bonitasoft.engine.api.TenantManagementAPI.class.getName(), new TenantManagementAPIExt());
+        apis.put(com.bonitasoft.engine.api.PageAPI.class.getName(), new PageAPIExt());
     }
 
     @Override
