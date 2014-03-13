@@ -236,7 +236,8 @@ public final class SPModelConvertor extends ModelConvertor {
     }
 
     public static Page toPage(final SPage sPage) {
-        final PageImpl page = new PageImpl(sPage.getId(), sPage.getName(), sPage.isProvided(), sPage.getDescription(), sPage.getInstallationDate(),
+        final PageImpl page = new PageImpl(sPage.getId(), sPage.getName(), sPage.getDisplayName(), sPage.isProvided(), sPage.getDescription(),
+                sPage.getInstallationDate(),
                 sPage.getInstalledBy(), sPage.getLastModificationDate());
         return page;
     }
