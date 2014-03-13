@@ -74,6 +74,18 @@ public class CustomUserInfoAPITest {
         assertThat(result.get(1).getValue()).isEqualTo("value 2");
     }
 
+    @Test
+    public void list_should_return_a_null_value_for_a_not_found_definition_matching_value() throws Exception {
+        given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(Arrays.<SCustomUserInfoDefinition>asList(
+                new DummySCustomUserInfoDefinition(1L, "definition", "", "")));
+        given(service.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(2L, Arrays.asList(1L)))))
+                .willReturn(Collections.<SCustomUserInfoValue> emptyList());
+
+        List<CustomUserInfo> result = api.list(2L, 0, 2);
+
+        assertThat(result.get(0).getValue()).isEqualTo(null);
+    }
+
     private class QueryOptionsMatcher extends ArgumentMatcher<QueryOptions> {
 
         private long userId;
