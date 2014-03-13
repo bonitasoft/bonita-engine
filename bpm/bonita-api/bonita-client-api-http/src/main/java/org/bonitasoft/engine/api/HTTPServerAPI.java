@@ -46,6 +46,7 @@ import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.StackTraceTransformer;
 import org.bonitasoft.engine.http.BonitaResponseHandler;
 
 import com.thoughtworks.xstream.XStream;
@@ -118,9 +119,9 @@ public class HTTPServerAPI implements ServerAPI {
         }
         serverUrl = parameters.get(SERVER_URL);
         applicationName = parameters.get(APPLICATION_NAME);
-        basicAuthenticationActive  = "true".equalsIgnoreCase(parameters.get(BASIC_AUTHENTICATION_ACTIVE));
-        basicAuthenticationUserName  = parameters.get(BASIC_AUTHENTICATION_USERNAME);
-        basicAuthenticationPassword  = parameters.get(BASIC_AUTHENTICATION_PASSWORD);
+        basicAuthenticationActive = "true".equalsIgnoreCase(parameters.get(BASIC_AUTHENTICATION_ACTIVE));
+        basicAuthenticationUserName = parameters.get(BASIC_AUTHENTICATION_USERNAME);
+        basicAuthenticationPassword = parameters.get(BASIC_AUTHENTICATION_PASSWORD);
     }
 
     @Override
@@ -136,6 +137,8 @@ public class HTTPServerAPI implements ServerAPI {
             }
             throw new ServerWrappedException(e);
         } catch (final Throwable e) {
+            StackTraceElement[] stackTrace = new Exception().getStackTrace();
+            StackTraceTransformer.addStackTo(e, stackTrace);
             throw new ServerWrappedException(e.getMessage() + "response= " + response, e);
         }
     }

@@ -68,6 +68,17 @@ public class StackTraceTransformer {
         }
     }
 
+    public static void addStackTo(final Throwable e, final StackTraceElement[] clientStackTrace) {
+        StackTraceElement[] causeStack = e.getStackTrace();
+
+        StackTraceElement[] newStack = new StackTraceElement[causeStack.length + clientStackTrace.length + 1];
+
+        System.arraycopy(clientStackTrace, 0, newStack, 0, clientStackTrace.length);
+        newStack[clientStackTrace.length] = new StackTraceElement("\t< ========== Beginning of the server stack trace ========== >", " ", " ", -3);
+        System.arraycopy(causeStack, 0, newStack, clientStackTrace.length + 1, causeStack.length);
+        e.setStackTrace(newStack);
+    }
+
     private ServerWrappedException merge() throws Exception {
         Throwable cause = e.getCause();
         if (field != null) {
@@ -86,7 +97,7 @@ public class StackTraceTransformer {
         }
     }
 
-    private void transfertStack(final Throwable newCause, final Throwable cause) {
+    private void transfertStack(final Throwable mergeStackInside, final Throwable cause) {
         Throwable subCause = cause.getCause();
         if (subCause == null) {
             // no stak to merge
@@ -115,10 +126,9 @@ public class StackTraceTransformer {
             // add remove the frames in common to the total length but add one to put the "...23 more" if there is some in common
             causeslength += trace.length + 1 - framesInCommon + (framesInCommon == 0 ? 0 : 1);
         } while ((subCause = subCause.getCause()) != null);
-        final StackTraceElement[] mergedStackTrace = new StackTraceElement[currentStack.length + causeslength + 1];
+        final StackTraceElement[] mergedStackTrace = new StackTraceElement[currentStack.length + causeslength];
         System.arraycopy(currentStack, 0, mergedStackTrace, 0, currentStack.length);
-        mergedStackTrace[currentStack.length] = new StackTraceElement("\t< ========== Beginning of the server stack trace ========== >", " ", " ", -3);
-        int current = currentStack.length + 1;
+        int current = currentStack.length;
         int i = 0;
         for (final StackTraceElement[] stackTraceElements : causesStacks) {
             Integer framesInCommon = framesInCommons.get(i);
@@ -134,7 +144,7 @@ public class StackTraceTransformer {
             }
             i++;
         }
-        newCause.setStackTrace(mergedStackTrace);
+        mergeStackInside.setStackTrace(mergedStackTrace);
     }
 
     /*

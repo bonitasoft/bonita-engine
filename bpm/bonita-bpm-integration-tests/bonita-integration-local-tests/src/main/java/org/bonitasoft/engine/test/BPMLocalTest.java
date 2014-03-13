@@ -91,7 +91,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
     @Test(expected = InvalidSessionException.class)
     public void useAFakeSessionId() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final FakeSession fakeSession = new FakeSession(session);
         fakeSession.setId(fakeSession.getId() + 1);
 
@@ -432,7 +432,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         waitForUserTaskAndExecuteIt("step1", pi3, john);
         System.out.println("executed step1");
         logout();
-        final PlatformSession loginPlatform = APITestUtil.loginPlatform();
+        final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         new WaitUntil(10, 15000) {
 
@@ -468,7 +468,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         System.out.println("start node");
         platformAPI.startNode();
         System.out.println("node started");
-        APITestUtil.logoutPlatform(loginPlatform);
+        logoutPlatform(loginPlatform);
         login();
         // check we have all task ready
         waitForPendingTasks(john.getId(), 3);

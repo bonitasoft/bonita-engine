@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.ServerAPIImpl;
+import org.bonitasoft.engine.api.impl.ServerAPIFactory;
+import org.bonitasoft.engine.api.internal.ServerAPI;
 
 /**
  * @author Charles Souillard
@@ -25,12 +26,12 @@ import org.bonitasoft.engine.api.impl.ServerAPIImpl;
 public class TcpServer {
 
     private final List<ServerSocketThread> sockets = new ArrayList<ServerSocketThread>();
-    
+
     public TcpServer(final List<Integer> ports) throws InterruptedException, IOException {
-        final int nbOfPorts = ports.size(); 
+        final int nbOfPorts = ports.size();
         int i = 1;
-        final ServerAPIImpl apiImpl = new ServerAPIImpl();
-        //System.out.println(this.getClass().getSimpleName() + " - starting...");
+        final ServerAPI apiImpl = ServerAPIFactory.getServerAPI();
+        // System.out.println(this.getClass().getSimpleName() + " - starting...");
         for (final int port : ports) {
             final String threadName = ServerSocketThread.class.getSimpleName() + "-" + String.format("%" + nbOfPorts + "d", i) + "-p" + port;
             sockets.add(new ServerSocketThread(threadName, apiImpl, port));
