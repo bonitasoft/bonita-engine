@@ -40,6 +40,7 @@ import com.bonitasoft.engine.theme.exception.SetThemeException;
 /**
  * @author Celine Souchet
  */
+@AvailableWhenTenantIsPaused
 public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
 
     @Override

@@ -105,4 +105,14 @@ public class DelegatingCacheService implements CacheService {
         // do nothing it's done on on each instance using the NodeConfiguration that have all ServiceWithLifeCycle autowired using spring
     }
 
+    @Override
+    public void pause() throws SBonitaException, TimeoutException {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        // nothing to do
+    }
+
 }

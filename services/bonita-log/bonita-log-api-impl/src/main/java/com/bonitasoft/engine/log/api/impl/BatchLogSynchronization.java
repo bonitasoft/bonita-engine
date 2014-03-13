@@ -31,19 +31,16 @@ class BatchLogSynchronization implements BonitaTransactionSynchronization {
 
     private Exception exception;
 
-    private BatchLogBuffer batchLogBuffer;
-
-    private InsertBatchLogsJobRegister jobRegister;
+    private final BatchLogBuffer batchLogBuffer;
 
     private final List<SQueriableLog> logs = new ArrayList<SQueriableLog>();
 
-    private BatchQueriableLoggerImpl loggerService;
+    private final BatchQueriableLoggerImpl loggerService;
 
-    public BatchLogSynchronization(PersistenceService persistenceService, BatchLogBuffer batchLogBuffer, InsertBatchLogsJobRegister jobRegister,
-            boolean delayable, BatchQueriableLoggerImpl loggerService) {
+    public BatchLogSynchronization(final PersistenceService persistenceService, final BatchLogBuffer batchLogBuffer,
+            final boolean delayable, final BatchQueriableLoggerImpl loggerService) {
         super();
         this.persistenceService = persistenceService;
-        this.jobRegister = jobRegister;
         this.delayable = delayable;
         this.batchLogBuffer = batchLogBuffer;
         this.loggerService = loggerService;
@@ -53,7 +50,6 @@ class BatchLogSynchronization implements BonitaTransactionSynchronization {
     public void afterCompletion(final TransactionState transactionState) {
         if (delayable && TransactionState.COMMITTED == transactionState) {
             batchLogBuffer.addLogs(this.logs);
-            jobRegister.registerJobIfNotRegistered();
         }
         loggerService.cleanSynchronization();
     }

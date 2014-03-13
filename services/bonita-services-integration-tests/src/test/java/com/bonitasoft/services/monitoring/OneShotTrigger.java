@@ -45,4 +45,9 @@ public class OneShotTrigger implements Trigger {
         return priority;
     }
 
+    @Override
+    public MisfireRestartPolicy getMisfireHandlingPolicy() {
+        return MisfireRestartPolicy.ALL;
+    }
+
 }

@@ -15,38 +15,36 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class InsertBatchLogsJobTest {
+
     @Mock
     private PersistenceService persistenceService;
-    
+
     @Mock
     private SQueriableLog log1;
 
     @Mock
     private SQueriableLog log2;
-    
+
     @Before
     public void setUp() throws Exception {
         BatchLogBuffer.getInstance().clearLogs();
     }
-    
-    
+
     @Test
     public void execute_should_insert_batch_via_persitence_service() throws Exception {
-        //given
+        // given
         BatchLogBuffer logBuffer = BatchLogBuffer.getInstance();
         logBuffer.addLogs(Arrays.asList(log1, log2));
-        
+
         InsertBatchLogsJob insertBatchLogsJob = new InsertBatchLogsJob();
-        InsertBatchLogsJob.setPersistenceService(persistenceService);
-        
-        
-        //when
+        insertBatchLogsJob.setPersistenceService(persistenceService);
+
+        // when
         insertBatchLogsJob.execute();
 
-        //then
+        // then
         verify(persistenceService, times(1)).insertInBatch(new ArrayList<PersistentObject>(Arrays.asList(log1, log2)));
     }
 }
