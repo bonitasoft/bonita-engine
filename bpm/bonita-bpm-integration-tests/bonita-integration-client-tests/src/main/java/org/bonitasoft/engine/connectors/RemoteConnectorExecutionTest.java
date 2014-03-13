@@ -1152,26 +1152,17 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // start check value1,stop, check still value1, start, check value 2, check step2 is active
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
-        assertTrue(waitForConnector.waitUntil());
+        waitForDataValue(processInstance, "data", "value1");
         logout();
         final PlatformSession loginPlatform = APITestUtil.loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        System.out.println("stopping node");
         platformAPI.stopNode();
-        System.out.println("node stopped");
         Thread.sleep(300);
-        System.out.println("starting node");
         platformAPI.startNode();
-        System.out.println("node started");
         APITestUtil.logoutPlatform(loginPlatform);
         login();
-        assertEquals("value1", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
         // connector restarted
-        assertEquals("value2", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
-        assignAndExecuteStep(step1, johnUserId);
-        waitForProcessToFinish(processInstance);
+        waitForDataValue(processInstance, "data", "value2");
         disableAndDeleteProcess(processDefinition.getId());
     }
 
