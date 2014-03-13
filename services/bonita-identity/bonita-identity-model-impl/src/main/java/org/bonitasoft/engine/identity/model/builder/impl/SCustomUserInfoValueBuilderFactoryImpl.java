@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2014 BonitaSoft S.A.
+ * Copyright (C) 2011-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,15 +20,14 @@ import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
- * @author Elias Ricken de Medeiros
  */
 public class SCustomUserInfoValueBuilderFactoryImpl implements SCustomUserInfoValueBuilderFactory {
 
     static final String ID = "id";
 
-    static final String USER_ID = "userId";
+    static final String USER_NAME = "userName";
 
-    static final String DEFINITION_ID = "definitionId";
+    static final String METADATA_NAME = "metadataName";
 
     static final String VALUE = "value";
 
@@ -44,12 +43,12 @@ public class SCustomUserInfoValueBuilderFactoryImpl implements SCustomUserInfoVa
 
     @Override
     public String getUserNameKey() {
-        return USER_ID;
+        return USER_NAME;
     }
 
     @Override
-    public String getDefinitionIdKey() {
-        return DEFINITION_ID;
+    public String getMetadataNameKey() {
+        return METADATA_NAME;
     }
 
     @Override

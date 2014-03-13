@@ -41,8 +41,8 @@ public class SCustomUserInfoValueBuilderImpl implements SCustomUserInfoValueBuil
     }
 
     @Override
-    public SCustomUserInfoValueBuilder setDefinitionId(final long definitionId) {
-        entity.setDefinitionId(definitionId);
+    public SCustomUserInfoValueBuilder setMetadataName(final String metadataName) {
+        entity.setName(metadataName);
         return this;
     }
 

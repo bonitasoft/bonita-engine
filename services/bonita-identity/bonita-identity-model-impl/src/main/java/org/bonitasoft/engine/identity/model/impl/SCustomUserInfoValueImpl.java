@@ -26,7 +26,7 @@ public class SCustomUserInfoValueImpl extends SPersistentObjectImpl implements S
 
     protected long userId;
 
-    protected long definitionId;
+    protected String name;
 
     protected String value;
 
@@ -47,15 +47,14 @@ public class SCustomUserInfoValueImpl extends SPersistentObjectImpl implements S
     public void setUserId(final long userId) {
         this.userId = userId;
     }
-    
-    
+
     @Override
-    public long getDefinitionId() {
-        return definitionId;
+    public String getName() {
+        return this.name;
     }
-    
-    public void setDefinitionId(long definitionId) {
-        this.definitionId = definitionId;
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override
@@ -72,7 +71,7 @@ public class SCustomUserInfoValueImpl extends SPersistentObjectImpl implements S
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (int) (definitionId ^ (definitionId >>> 32));
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + (int) (userId ^ (userId >>> 32));
         result = prime * result + ((value == null) ? 0 : value.hashCode());
         return result;
@@ -87,7 +86,10 @@ public class SCustomUserInfoValueImpl extends SPersistentObjectImpl implements S
         if (getClass() != obj.getClass())
             return false;
         SCustomUserInfoValueImpl other = (SCustomUserInfoValueImpl) obj;
-        if (definitionId != other.definitionId)
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
             return false;
         if (userId != other.userId)
             return false;
@@ -101,7 +103,7 @@ public class SCustomUserInfoValueImpl extends SPersistentObjectImpl implements S
 
     @Override
     public String toString() {
-        return "SCustomUserInfoValueImpl [definitionId=" + this.definitionId + ", userId=" + this.userId + ", value=" + this.value + ", getId()="
+        return "SCustomUserInfoValueImpl [name=" + this.name + ", userId=" + this.userId + ", value=" + this.value + ", getId()="
                 + this.getId() + "]";
     }
 

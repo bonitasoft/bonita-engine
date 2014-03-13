@@ -10,8 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
     RoleTest.class,
     GroupTest.class,
     MembershipTest.class,
-    OrganizationTest.class,
-    CustomUserInfoIT.class
+    OrganizationTest.class
 })
 public class IdentityTests {
 

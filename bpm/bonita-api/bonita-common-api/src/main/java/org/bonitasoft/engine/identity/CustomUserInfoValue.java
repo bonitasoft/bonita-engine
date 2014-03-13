@@ -24,7 +24,7 @@ public interface CustomUserInfoValue extends BonitaObject {
 
     long getUserId();
 
-    long getDefinitionId();
+    String getName();
 
     String getValue();
     

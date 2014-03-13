@@ -25,8 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         IdentityServiceImplForUserTest.class,
         IdentityServiceImplForUserMembershipTest.class,
-        IdentityServiceImplForGroupTest.class,
-        IdentityServiceImplForCustomUserInfoTest.class
+        IdentityServiceImplForGroupTest.class
 })
 public class IdentityServiceImplTests {
 

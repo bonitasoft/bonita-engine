@@ -7,25 +7,23 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
  */
 public class DummySCustomUserInfoValue implements SCustomUserInfoValue {
 
-    private static final long serialVersionUID = 1L;
-
     public static final String MESSAGE = "This is a dummy object!";
 
     private long userId = -1L;
 
-    private long definitionId;
+    private String name;
 
     private String value = "";
 
-    public DummySCustomUserInfoValue(long definitionId, String value, long userId) {
-        this.definitionId = definitionId;
+    public DummySCustomUserInfoValue(String name, String value, long userId) {
+        this.name = name;
         this.value = value;
         this.userId = userId;
     }
 
     @Override
-    public long getDefinitionId() {
-        return definitionId;
+    public String getName() {
+        return name;
     }
 
     @Override

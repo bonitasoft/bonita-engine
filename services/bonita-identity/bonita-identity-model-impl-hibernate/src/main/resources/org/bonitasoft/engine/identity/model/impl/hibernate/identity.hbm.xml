@@ -104,7 +104,7 @@
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="ID" type="long" />
 		</composite-id>
-		<property name="definitionId" type="long" column="name" />
+		<property name="name" type="java.lang.String" column="name" />
 		<property name="userId" type="long" column="userId" />
 		<property name="value" type="java.lang.String" column="value" />
 		<filter name="tenantFilter" />

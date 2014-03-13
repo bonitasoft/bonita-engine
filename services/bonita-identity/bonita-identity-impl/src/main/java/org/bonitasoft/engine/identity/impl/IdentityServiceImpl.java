@@ -31,8 +31,6 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.SCustomUserInfoValueNotFoundException;
-import org.bonitasoft.engine.identity.SCustomUserInfoValueReadException;
 import org.bonitasoft.engine.identity.SGroupCreationException;
 import org.bonitasoft.engine.identity.SGroupDeletionException;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
@@ -957,20 +955,20 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SCustomUserInfoValue getCustomUserInfoValue(final long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException, SCustomUserInfoValueReadException {
+    public SCustomUserInfoValue getCustomUserInfoValue(final long customUserInfoValueId) throws SIdentityException {
         final String methodName = "getCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {
             final SCustomUserInfoValue selectOne = persistenceService.selectById(SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class,
                     "SCustomUserInfoValue", customUserInfoValueId));
             if (selectOne == null) {
-                throw new SCustomUserInfoValueNotFoundException(customUserInfoValueId);
+                throw new SIdentityException("Can't get the custom user info value with id " + customUserInfoValueId, null);
             }
             logAfterMethod(methodName);
             return selectOne;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SCustomUserInfoValueReadException(e);
+            throw new SIdentityException("Can't get the custom user info value with id " + customUserInfoValueId, e);
         }
     }
 
@@ -1840,15 +1838,6 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public List<SCustomUserInfoValue> searchCustomUserInfoValue(QueryOptions options) throws SBonitaSearchException {
-        final String methodName = "searchCustomUserInfoValue";
-        logBeforeMethod(methodName);
-        try {
-            final List<SCustomUserInfoValue> result = persistenceService.searchEntity(SCustomUserInfoValue.class, options, null);
-            logAfterMethod(methodName);
-            return result;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod(methodName, bre);
-            throw new SBonitaSearchException(bre);
-        }
+        return Collections.emptyList();
     }
 }
