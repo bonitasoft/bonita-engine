@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -62,13 +63,15 @@
 		<!-- ************************ -->
 		<!-- Sonar/Reporting settings -->
 		<!-- ************************ -->
-		<!-- Sonar/Jacoco integration. Note that these properties need to be defined outside the "coverage" profile because we want to be to able to execute mvn sonar:sonar 
-			without passing a profile -->
+		<!-- Sonar/Jacoco integration. Note that these properties need to be defined 
+			outside the "coverage" profile because we want to be to able to execute mvn 
+			sonar:sonar without passing a profile -->
 		<!-- Tells Sonar to use jacoco for coverage results -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<!-- Jacoco version to use -->
 		<jacoco.version>0.6.4.201312101107</jacoco.version>
-		<!-- The Sonar Jacoco Listener for JUnit to extract coverage details per test -->
+		<!-- The Sonar Jacoco Listener for JUnit to extract coverage details per 
+			test -->
 		<sonar-jacoco-listeners.version>1.4</sonar-jacoco-listeners.version>
 		<!-- Don't let Sonar execute tests. We will ask it to Maven -->
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -76,11 +79,13 @@
 		<jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
 		<!-- Jacoco output file for UTs -->
 		<jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
-		<!-- Tells Sonar where the Jacoco coverage result file is located for Unit Tests -->
+		<!-- Tells Sonar where the Jacoco coverage result file is located for Unit 
+			Tests -->
 		<sonar.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</sonar.jacoco.reportPath>
 		<!-- Jacoco output file for ITs -->
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
-		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration Tests -->
+		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration 
+			Tests -->
 		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
 	</properties>
 
@@ -155,6 +160,12 @@
 				<groupId>org.codehaus.btm</groupId>
 				<artifactId>btm</artifactId>
 				<version>2.1.4</version>
+			</dependency>
+			<dependency>
+				<groupId>org.easytesting</groupId>
+				<artifactId>fest-assert</artifactId>
+				<version>1.4</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.btm</groupId>
@@ -324,7 +335,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-					<argLine>-Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</argLine>
+					<argLine>-Xmx1024m -XX:MaxPermSize=256m
+						-XX:+HeapDumpOnOutOfMemoryError</argLine>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -492,8 +504,10 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<!-- Be aware not to omit ${jacoco.agent.it.arg} if overriding this property in lower-level pom files: -->
-							<argLine>-Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError ${jacoco.agent.it.arg}</argLine>
+							<!-- Be aware not to omit ${jacoco.agent.it.arg} if overriding this 
+								property in lower-level pom files: -->
+							<argLine>-Xmx1024m -XX:MaxPermSize=256m
+								-XX:+HeapDumpOnOutOfMemoryError ${jacoco.agent.it.arg}</argLine>
 							<!-- Listener to show coverage for each test -->
 							<properties>
 								<property>
@@ -515,7 +529,8 @@
 							</includes>
 						</configuration>
 						<executions>
-							<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
+							<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info 
+								to be passed to the JVM hosting the code being tested. -->
 							<execution>
 								<id>prepare-ut-agent</id>
 								<phase>process-test-classes</phase>
@@ -528,7 +543,8 @@
 									<append>true</append>
 								</configuration>
 							</execution>
-							<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
+							<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info 
+								to be passed to the JVM hosting the code being tested. -->
 							<execution>
 								<id>prepare-it-agent</id>
 								<phase>pre-integration-test</phase>

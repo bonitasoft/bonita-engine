@@ -87,7 +87,7 @@ public class SpringPlatformFileSystemBeanAccessor {
     }
 
     public static void destroy() {
-        context.destroy();
+        context.close();
         context = null;
     }
 

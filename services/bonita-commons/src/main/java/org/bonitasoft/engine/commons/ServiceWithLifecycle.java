@@ -22,4 +22,19 @@ public interface ServiceWithLifecycle {
 
     public void stop() throws SBonitaException, TimeoutException;
 
+    /**
+     * 
+     * Temporary halt the execution of this service.
+     * 
+     */
+    void pause() throws SBonitaException, TimeoutException;
+
+    /**
+     * 
+     * resume the execution the service
+     * 
+     */
+
+    void resume() throws SBonitaException;
+
 }

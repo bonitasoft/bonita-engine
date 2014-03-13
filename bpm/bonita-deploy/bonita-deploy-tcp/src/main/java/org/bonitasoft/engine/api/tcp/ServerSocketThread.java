@@ -19,10 +19,11 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.impl.ServerAPIImpl;
+import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.exception.StackTraceTransformer;
 
@@ -30,18 +31,18 @@ public class ServerSocketThread extends Thread {
 
     private final ServerSocket serverSocket;
 
-    private final ServerAPIImpl apiImpl;
+    private final ServerAPI serverApi;
 
-    public ServerSocketThread(final String name, final ServerAPIImpl apiImpl, final int port) throws IOException {
+    public ServerSocketThread(final String name, final ServerAPI serverApi, final int port) throws IOException {
         super(name);
-        this.apiImpl = apiImpl;
+        this.serverApi = serverApi;
         // System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + "starting...");
         serverSocket = new ServerSocket(port);
         // System.out.println(this.getClass().getSimpleName() + " - " + this.getName() + "serverSocket build: " + serverSocket);
 
     }
 
-    private Object invokeMethod(final MethodCall methodCall) throws ServerWrappedException {
+    private Object invokeMethod(final MethodCall methodCall) throws ServerWrappedException, RemoteException {
         final Map<String, Serializable> options = methodCall.getOptions();
         final String apiInterfaceName = methodCall.getApiInterfaceName();
         final String methodName = methodCall.getMethodName();
@@ -99,7 +100,7 @@ public class ServerSocketThread extends Thread {
     }
 
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
-        return apiImpl.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+        return serverApi.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
     }
 }

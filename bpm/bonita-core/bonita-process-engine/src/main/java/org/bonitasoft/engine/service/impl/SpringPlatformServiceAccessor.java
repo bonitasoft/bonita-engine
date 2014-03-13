@@ -33,7 +33,6 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Matthieu Chaffotte
@@ -67,8 +66,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private PlatformSessionService platformSessionService;
 
     private NodeConfiguration platformConfguration;
-
-    private WorkService workService;
 
     private PlatformCacheService platformCacheService;
 
@@ -186,14 +183,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
             platformConfguration = SpringPlatformFileSystemBeanAccessor.getService(NodeConfiguration.class);
         }
         return platformConfguration;
-    }
-
-    @Override
-    public WorkService getWorkService() {
-        if (workService == null) {
-            workService = SpringPlatformFileSystemBeanAccessor.getService(WorkService.class);
-        }
-        return workService;
     }
 
     @Override

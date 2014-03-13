@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.service;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
+import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
@@ -206,6 +207,10 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     JobService getJobService();
 
     ThemeService getThemeService();
+
+    TenantConfiguration getTenantConfiguration();
+
+    <T> T lookup(String serviceName);
 
     void destroy();
 

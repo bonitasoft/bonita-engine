@@ -37,14 +37,6 @@ public interface SchedulerExecutor {
 
     void rescheduleErroneousTriggers() throws SSchedulerException;
 
-    void resume(String jobName) throws SSchedulerException;
-
-    void resumeJobs() throws SSchedulerException;
-
-    void pause(String jobName) throws SSchedulerException;
-
-    void pauseJobs() throws SSchedulerException;
-
     boolean delete(String jobName) throws SSchedulerException;
 
     void deleteJobs() throws SSchedulerException;
@@ -62,5 +54,9 @@ public interface SchedulerExecutor {
     boolean isStillScheduled(long tenantId, String jobName) throws SSchedulerException;
 
     void executeAgain(long jobId, long tenantId, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
+
+    void pauseJobs(long tenantId) throws SSchedulerException;
+
+    void resumeJobs(long tenantId) throws SSchedulerException;
 
 }

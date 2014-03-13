@@ -42,7 +42,6 @@ public class STenantImpl implements STenant {
 
     private boolean defaultTenant;
 
-    // for mybatis
     @SuppressWarnings("unused")
     private STenantImpl() {
     }
@@ -57,16 +56,17 @@ public class STenantImpl implements STenant {
     }
 
     public long getTenantId() {
-        return this.tenantId;
+        return tenantId;
     }
 
+    @Override
     public void setTenantId(final long tenantId) {
         this.tenantId = tenantId;
     }
 
     @Override
     public long getCreated() {
-        return this.created;
+        return created;
     }
 
     public void setCreated(final long created) {
@@ -75,7 +75,7 @@ public class STenantImpl implements STenant {
 
     @Override
     public String getCreatedBy() {
-        return this.createdBy;
+        return createdBy;
     }
 
     public void setCreatedBy(final String createdBy) {
@@ -84,7 +84,7 @@ public class STenantImpl implements STenant {
 
     @Override
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     public void setDescription(final String description) {
@@ -93,7 +93,7 @@ public class STenantImpl implements STenant {
 
     @Override
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(final String name) {
@@ -102,9 +102,10 @@ public class STenantImpl implements STenant {
 
     @Override
     public long getId() {
-        return this.id;
+        return id;
     }
 
+    @Override
     public void setId(final long id) {
         this.id = id;
     }
@@ -116,7 +117,7 @@ public class STenantImpl implements STenant {
 
     @Override
     public String getStatus() {
-        return this.status;
+        return status;
     }
 
     public void setStatus(final String status) {
@@ -124,14 +125,8 @@ public class STenantImpl implements STenant {
     }
 
     @Override
-    public String toString() {
-        return "STenantImpl [created=" + this.created + ", createdBy=" + this.createdBy + ", description=" + this.description + ", id=" + this.id + ", name="
-                + this.name + ", status=" + this.status + "]";
-    }
-
-    @Override
     public String getIconName() {
-        return this.iconName;
+        return iconName;
     }
 
     public void setIconName(final String iconName) {
@@ -140,7 +135,7 @@ public class STenantImpl implements STenant {
 
     @Override
     public String getIconPath() {
-        return this.iconPath;
+        return iconPath;
     }
 
     public void setIconPath(final String iconPath) {
@@ -149,10 +144,22 @@ public class STenantImpl implements STenant {
 
     @Override
     public boolean isDefaultTenant() {
-        return this.defaultTenant;
+        return defaultTenant;
     }
 
     public void setDefaultTenant(final boolean defaultTenant) {
         this.defaultTenant = defaultTenant;
+    }
+
+    @Override
+    public boolean isPaused() {
+        return PAUSED.equals(status);
+    }
+
+    @Override
+    public String toString() {
+        return "STenantImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", description=" + description + ", iconName=" + iconName
+                + ", iconPath=" + iconPath + ", status=" + status + ", created=" + created + ", createdBy=" + createdBy + ", defaultTenant=" + defaultTenant
+                + "]";
     }
 }

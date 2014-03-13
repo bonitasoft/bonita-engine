@@ -212,4 +212,14 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             }
         }
     }
+
+    @Override
+    public void pause() throws SBonitaException, TimeoutException {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        // nothing to do
+    }
 }

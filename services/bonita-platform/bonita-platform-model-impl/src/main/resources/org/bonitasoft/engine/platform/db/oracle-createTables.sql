@@ -13,7 +13,7 @@ CREATE TABLE tenant (
   created NUMBER(19, 0) NOT NULL,
   createdBy VARCHAR2(50) NOT NULL,
   description VARCHAR2(255),
-  defaultTenant NUMBER(1)  NOT NULL,
+  defaultTenant NUMBER(1) NOT NULL,
   iconname VARCHAR2(50),
   iconpath VARCHAR2(255),
   name VARCHAR2(50) NOT NULL,

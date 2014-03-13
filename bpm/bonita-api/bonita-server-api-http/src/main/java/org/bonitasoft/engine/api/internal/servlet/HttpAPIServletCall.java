@@ -29,7 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileUploadException;
-import org.bonitasoft.engine.api.impl.ServerAPIImpl;
+import org.bonitasoft.engine.api.impl.ServerAPIFactory;
+import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.StackTraceTransformer;
@@ -104,7 +105,7 @@ public class HttpAPIServletCall extends ServletCall {
                 }
             }
 
-            final ServerAPIImpl serverAPI = new ServerAPIImpl();
+            final ServerAPI serverAPI = ServerAPIFactory.getServerAPI();
 
             final Object invokeMethod;
             try {

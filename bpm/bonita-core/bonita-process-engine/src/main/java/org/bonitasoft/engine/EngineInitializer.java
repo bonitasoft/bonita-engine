@@ -133,6 +133,7 @@ public class EngineInitializer {
         PlatformAPIImpl platformAPI = createPlatformAPI();
         try {
             if (platformProperties.shouldStopPlatform()) {
+                LOGGER.log(Level.INFO, "Stopping the services...");
                 platformManager.stopPlatform(platformAPI);
             }
         } catch (PlatformNotFoundException e) {
