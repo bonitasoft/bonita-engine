@@ -1,6 +1,6 @@
 package com.bonitasoft.engine.service;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.platform.model.STenant;
