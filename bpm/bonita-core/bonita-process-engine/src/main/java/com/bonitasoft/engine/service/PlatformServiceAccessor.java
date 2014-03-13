@@ -25,4 +25,6 @@ public interface PlatformServiceAccessor extends org.bonitasoft.engine.service.P
     TenantServiceAccessor getTenantServiceAccessor(long tenantId);
 
     PlatformMonitoringService getPlatformMonitoringService();
+
+    BroadcastService getBroadcastService();
 }

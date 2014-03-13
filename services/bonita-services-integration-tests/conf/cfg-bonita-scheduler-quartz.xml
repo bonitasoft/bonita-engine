@@ -57,6 +57,9 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="servicesResolver" >
+			<bean class="org.bonitasoft.engine.test.util.TestsServicesResolver" />
+		</constructor-arg>
 	</bean>
 
 	<bean class="org.bonitasoft.engine.persistence.DBConfiguration">

@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.search;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,9 +38,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Baptiste Mesta

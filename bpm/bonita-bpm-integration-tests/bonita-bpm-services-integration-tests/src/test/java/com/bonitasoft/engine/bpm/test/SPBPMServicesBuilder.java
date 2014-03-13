@@ -21,6 +21,7 @@ import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
+import com.bonitasoft.engine.service.BroadcastService;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -93,6 +94,11 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
         } else {
             return getInstanceOf("monitoringService", TenantMonitoringService.class);
         }
+    }
+
+    @Override
+    public BroadcastService getBroadcastService() {
+        return getInstanceOf(BroadcastService.class);
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.bonitasoft.engine.platform.Tenant;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Emmanuel Duchastenier
  */
 public class TenantImpl implements Tenant {
 
@@ -35,12 +36,19 @@ public class TenantImpl implements Tenant {
 
     private boolean defaultTenant;
 
+    private boolean inMaintenance;
+
     public TenantImpl() {
         super();
     }
 
     public TenantImpl(final String name, final String description, final String iconName, final String iconPath, final String state, final Date creationDate,
             final boolean defaultTenant) {
+        this(name, description, iconName, iconPath, state, creationDate, defaultTenant, false);
+    }
+
+    public TenantImpl(final String name, final String description, final String iconName, final String iconPath, final String state, final Date creationDate,
+            final boolean defaultTenant, final boolean inMaintenance) {
         super();
         this.name = name;
         this.description = description;
@@ -49,6 +57,7 @@ public class TenantImpl implements Tenant {
         this.state = state;
         this.creationDate = creationDate;
         this.defaultTenant = defaultTenant;
+        this.inMaintenance = inMaintenance;
     }
 
     @Override
@@ -121,6 +130,16 @@ public class TenantImpl implements Tenant {
 
     public void setDefaultTenant(final boolean defaultTenant) {
         this.defaultTenant = defaultTenant;
+    }
+
+    @Override
+    public boolean isInMaintenance() {
+        return inMaintenance;
+    }
+
+    public void setInMaintenance(final boolean inMaintenance) {
+        this.inMaintenance = inMaintenance;
+
     }
 
 }

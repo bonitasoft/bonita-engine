@@ -70,7 +70,7 @@ import com.bonitasoft.engine.reporting.impl.ReportImpl;
  */
 public final class SPModelConvertor extends ModelConvertor {
 
-    private static final String PLATFORM_STATUS_DEACTIVATED = "DEACTIVATED";
+    private static final String TENANT_STATUS_DEACTIVATED = "DEACTIVATED";
 
     public static List<Log> toLogs(final Collection<SQueriableLog> sQueriableLogs) {
         final List<Log> logs = new ArrayList<Log>();
@@ -110,8 +110,7 @@ public final class SPModelConvertor extends ModelConvertor {
     public static STenant constructTenant(final TenantCreator tCreator) {
         final Map<TenantField, Serializable> fields = tCreator.getFields();
         final STenantBuilder sTenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance((String) fields.get(TenantField.NAME),
-                "defaultUser", System.currentTimeMillis(), PLATFORM_STATUS_DEACTIVATED,
-                (Boolean) fields.get(TenantField.DEFAULT_TENANT));
+                "defaultUser", System.currentTimeMillis(), TENANT_STATUS_DEACTIVATED, (Boolean) fields.get(TenantField.DEFAULT_TENANT));
         sTenantBuilder.setDescription((String) fields.get(TenantField.DESCRIPTION));
         sTenantBuilder.setIconName((String) fields.get(TenantField.ICON_NAME));
         sTenantBuilder.setIconPath((String) fields.get(TenantField.ICON_PATH));
@@ -165,8 +164,7 @@ public final class SPModelConvertor extends ModelConvertor {
     public static SProfileEntry constructSProfileEntry(final ProfileEntryCreator creator) {
         final Map<ProfileEntryField, Serializable> fields = creator.getFields();
         final SProfileEntryBuilder newSProfileEntryBuilder = BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(
-                (String) fields.get(ProfileEntryField.NAME),
-                (Long) fields.get(ProfileEntryField.PROFILE_ID));
+                (String) fields.get(ProfileEntryField.NAME), (Long) fields.get(ProfileEntryField.PROFILE_ID));
         final String description = (String) fields.get(ProfileEntryField.DESCRIPTION);
         if (description != null) {
             newSProfileEntryBuilder.setDescription(description);
