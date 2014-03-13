@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.identity.CustomUserInfo;
@@ -42,5 +43,14 @@ public class CustomUserInfoAPITest {
 
         assertThat(result.get(0).getDefinition().getId()).isEqualTo(1L);
         assertThat(result.get(1).getDefinition().getId()).isEqualTo(2L);
+    }
+
+    @Test
+    public void list_should_return_an_empty_when_there_is_no_definitions() throws Exception {
+        given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(Collections. <SCustomUserInfoDefinition>emptyList());
+
+        List<CustomUserInfo> result = api.list(1, 0, 2);
+
+        assertThat(result).isEmpty();
     }
 }

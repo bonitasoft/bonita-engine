@@ -77,6 +77,7 @@ import org.bonitasoft.engine.external.identity.mapping.ExternalIdentityMappingSe
 import org.bonitasoft.engine.identity.ContactData;
 import org.bonitasoft.engine.identity.ContactDataUpdater;
 import org.bonitasoft.engine.identity.ContactDataUpdater.ContactDataField;
+import org.bonitasoft.engine.identity.CustomUserInfo;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.Group;
@@ -134,6 +135,7 @@ import org.bonitasoft.engine.identity.xml.ImportOrganization;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -1474,7 +1476,7 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException {
-        return createCustomUserDetailsAPI().create(
+        return createCustomUserInfoDefinitionAPI().create(
                 BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class),
                 creator);
     }
@@ -1482,7 +1484,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult) throws RetrieveException {
         try {
-            return createCustomUserDetailsAPI().list(startIndex, maxResult);
+            return createCustomUserInfoDefinitionAPI().list(startIndex, maxResult);
         } catch (SIdentityException e) {
             throw new RetrieveException(e);
         }
@@ -1491,13 +1493,26 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public CustomUserInfoDefinition deleteCustomUserInfoDefinition(long id) throws DeletionException {
         try {
-            return createCustomUserDetailsAPI().delete(id);
+            return createCustomUserInfoDefinitionAPI().delete(id);
         } catch (SIdentityException e) {
             throw new DeletionException(e);
         }
     }
 
-    private CustomUserInfoDefinitionAPI createCustomUserDetailsAPI() {
+    @Override
+    public List<CustomUserInfo> getCustomUserInfo(long userId, int startIndex, int maxResult) {
+        try {
+            return createCustomUserInfoAPI().list(userId, startIndex, maxResult);
+        } catch (SBonitaException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    private CustomUserInfoAPI createCustomUserInfoAPI() {
+        return new CustomUserInfoAPI(getTenantAccessor().getIdentityService());
+    }
+
+    private CustomUserInfoDefinitionAPI createCustomUserInfoDefinitionAPI() {
         return new CustomUserInfoDefinitionAPI(getTenantAccessor().getIdentityService());
     }
 }

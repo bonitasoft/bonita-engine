@@ -21,13 +21,9 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
-import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
-import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
-import org.bonitasoft.engine.search.identity.SearchUsers;
 
 /**
  * @author Vincent Elcrin
@@ -36,7 +32,7 @@ public class CustomUserInfoDefinitionAPI {
 
     private IdentityService service;
 
-    private final CustomUserInfoDefinitionConverter converter = new CustomUserInfoDefinitionConverter();
+    private final CustomUserInfoConverter converter = new CustomUserInfoConverter();
 
     public CustomUserInfoDefinitionAPI(IdentityService service) {
         this.service = service;
