@@ -27,34 +27,35 @@ import com.bonitasoft.engine.page.SPageBuilderFactory;
  */
 public class SearchPageDescriptor extends SearchEntityDescriptor {
 
-    private final Map<String, FieldDescriptor> reportKeys;
+    private final Map<String, FieldDescriptor> pageKeys;
 
-    private final Map<Class<? extends PersistentObject>, Set<String>> reportAllFields;
+    private final Map<Class<? extends PersistentObject>, Set<String>> pageAllFields;
 
     SearchPageDescriptor() {
         final SPageBuilderFactory keyProvider = BuilderFactory.get(SPageBuilderFactory.class);
-        reportKeys = new HashMap<String, FieldDescriptor>(5);
-        reportKeys.put(PageSearchDescriptor.ID, new FieldDescriptor(SPage.class, keyProvider.getIdKey()));
-        reportKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, keyProvider.getNameKey()));
-        reportKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, keyProvider.getProvidedKey()));
-        reportKeys.put(PageSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getInstallationDateKey()));
-        reportKeys.put(PageSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SPage.class, keyProvider.getInstalledByKey()));
-        reportKeys.put(PageSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SPage.class, keyProvider.getDisplayNameKey()));
+        pageKeys = new HashMap<String, FieldDescriptor>(6);
+        pageKeys.put(PageSearchDescriptor.ID, new FieldDescriptor(SPage.class, keyProvider.getIdKey()));
+        pageKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, keyProvider.getNameKey()));
+        pageKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, keyProvider.getProvidedKey()));
+        pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getInstallationDateKey()));
+        pageKeys.put(PageSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SPage.class, keyProvider.getInstalledByKey()));
+        pageKeys.put(PageSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SPage.class, keyProvider.getDisplayNameKey()));
 
-        reportAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        final Set<String> reportFields = new HashSet<String>(8);
-        reportFields.add(keyProvider.getNameKey());
-        reportAllFields.put(SPage.class, reportFields);
+        pageAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
+        final Set<String> pageFields = new HashSet<String>(8);
+        pageFields.add(keyProvider.getNameKey());
+        pageFields.add(keyProvider.getDisplayNameKey());
+        pageAllFields.put(SPage.class, pageFields);
     }
 
     @Override
     protected Map<String, FieldDescriptor> getEntityKeys() {
-        return reportKeys;
+        return pageKeys;
     }
 
     @Override
     protected Map<Class<? extends PersistentObject>, Set<String>> getAllFields() {
-        return reportAllFields;
+        return pageAllFields;
     }
 
 }

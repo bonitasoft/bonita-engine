@@ -44,6 +44,17 @@ public interface PageAPI {
     Page getPage(final long pageId) throws PageNotFoundException;
 
     /**
+     * Retrieves a page from its name.
+     * 
+     * @param name
+     *            the name of the page to retrieve
+     * @return the found page
+     * @throws PageNotFoundException
+     *             if no page can be found with the provided ID.
+     */
+    Page getPageByName(final String name) throws PageNotFoundException;
+
+    /**
      * Retrieves the binary content of a page.
      * 
      * @param pageId

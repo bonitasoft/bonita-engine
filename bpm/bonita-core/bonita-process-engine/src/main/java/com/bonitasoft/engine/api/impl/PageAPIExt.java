@@ -1,10 +1,5 @@
 package com.bonitasoft.engine.api.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bonitasoft.engine.api.impl.SessionInfos;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -12,26 +7,6 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.search.SearchOptions;
-import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.search.impl.SearchResultImpl;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-
-import com.bonitasoft.engine.api.PageAPI;
-import com.bonitasoft.engine.page.Page;
-import com.bonitasoft.engine.page.PageCreator;
-import com.bonitasoft.engine.page.PageNotFoundException;
-import com.bonitasoft.engine.page.PageService;
-import com.bonitasoft.engine.page.SPage;
-import com.bonitasoft.engine.service.SPModelConvertor;
-import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
-
-public class PageAPIExt implements PageAPI {
-
-    @Override
-    public Page getPage(final long pageId) throws PageNotFoundException {
         final PageService pageService = getTenantAccessor().getPageService();
 
         try {
@@ -60,7 +35,22 @@ public class PageAPIExt implements PageAPI {
 
     @Override
     public SearchResult<Page> searchPages(final SearchOptions searchOptions) throws SearchException {
-        return new SearchResultImpl<Page>(0, new ArrayList<Page>(0));
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final PageService pageService = tenantAccessor.getPageService();
+        final SearchPages searchPages = getSearchPages(searchOptions, searchEntitiesDescriptor, pageService);
+        try {
+            searchPages.execute();
+            return searchPages.getResult();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
+
+    }
+
+    protected SearchPages getSearchPages(final SearchOptions searchOptions, final SearchEntitiesDescriptor searchEntitiesDescriptor,
+            final PageService pageService) {
+        return new SearchPages(pageService, searchEntitiesDescriptor.getSearchPageDescriptor(), searchOptions);
     }
 
     @Override
@@ -136,6 +126,18 @@ public class PageAPIExt implements PageAPI {
             }
         } catch (SBonitaException e) {
             // ignore it
+        }
+    }
+
+    @Override
+    public Page getPageByName(String name) throws PageNotFoundException {
+        final PageService pageService = getTenantAccessor().getPageService();
+
+        try {
+            SPage sPage = pageService.getPageByName(name);
+            return convertToPage(sPage);
+        } catch (SBonitaReadException e) {
+            throw new PageNotFoundException(e);
         }
     }
 

@@ -11,31 +11,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.SPage;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PageAPIExtTest {
 
     @Mock
-    private PageService pageService;
+    PageService pageService;
 
     @Mock
-    private PageAPIExt pageAPIExt;
+    PageAPIExt pageAPIExt;
 
     @Mock
-    private TenantServiceAccessor tenantServiceAccessor;
+    TenantServiceAccessor tenantServiceAccessor;
 
     @Mock
     SPage sPage;
@@ -45,6 +49,12 @@ public class PageAPIExtTest {
 
     @Mock
     SessionAccessor sessionAccessor;
+
+    @Mock
+    QueryOptions queryOptions;
+
+    @Mock
+    SearchPages searchPages;
 
     private final long userId = 1;
 
@@ -79,6 +89,19 @@ public class PageAPIExtTest {
     }
 
     @Test
+    public void testGetPageByName() throws Exception {
+        // given
+        String pageName = "name";
+        doReturn(sPage).when(pageService).getPageByName(pageName);
+
+        // when
+        pageAPIExt.getPageByName(pageName);
+
+        // then
+        verify(pageService, times(1)).getPageByName(pageName);
+    }
+
+    @Test
     public void testGetPageContent() throws Exception {
         // given
         long pageId = 123;
@@ -91,9 +114,15 @@ public class PageAPIExtTest {
     }
 
     @Test
-    @Ignore
     public void testSearchPages() throws Exception {
-        // FIXME when search is implemented
+        doReturn(searchPages).when(pageAPIExt).getSearchPages(any(SearchOptions.class), any(SearchEntitiesDescriptor.class), any(PageService.class));
+
+        // when
+        SearchOptions searchOptions = new SearchOptionsBuilder(0, 5).searchTerm("search").done();
+        pageAPIExt.searchPages(searchOptions);
+
+        // then
+        verify(searchPages, times(1)).execute();
     }
 
     @Test

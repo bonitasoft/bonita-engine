@@ -34,6 +34,8 @@ public class PageAPIIT extends CommonAPISPTest {
     @After
     public void after() throws BonitaException {
         SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 1000).done());
+
+        System.out.println("clean " + searchPages.getCount() + " pages");
         for (Page page : searchPages.getResult()) {
             getPageAPI().deletePage(page.getId());
         }
@@ -48,6 +50,19 @@ public class PageAPIIT extends CommonAPISPTest {
 
         // when
         Page returnedPage = getPageAPI().getPage(page.getId());
+
+        // then
+        assertThat(returnedPage).isEqualTo(page);
+    }
+
+    @Test
+    public void should_getPage_by_name_return_the_page() throws BonitaException {
+        // given
+        Page page = getPageAPI().createPage(new PageCreator("mypage").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+
+        // when
+        Page returnedPage = getPageAPI().getPageByName(page.getName());
 
         // then
         assertThat(returnedPage).isEqualTo(page);
@@ -92,8 +107,8 @@ public class PageAPIIT extends CommonAPISPTest {
         getPageAPI().getPage(page.getId());
     }
 
-    @Test(expected = PageNotFoundException.class)
-    public void should_search_work_on_all_terms() throws BonitaException {
+    @Test
+    public void should_search_with_search_term() throws BonitaException {
         // given
         Page page1 = getPageAPI().createPage(new PageCreator("pagesearch1").setDescription("page description").setDisplayName("My Päge"),
                 "my page content in a zip file".getBytes());
@@ -115,25 +130,97 @@ public class PageAPIIT extends CommonAPISPTest {
         // when
         SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 5).searchTerm("Cool").done());
         // then
+
+        System.out.println("should_search_with_search_term " + searchPages.getCount() + " pages");
         assertThat(searchPages.getCount()).isEqualTo(1);
         assertThat(searchPages.getResult().get(0)).isEqualTo(page8);
 
+    }
+
+    @Test
+    public void should_search_give_5_first_results() throws BonitaException {
+        // given
+        Page page1 = getPageAPI().createPage(new PageCreator("pagesearch1").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page2 = getPageAPI().createPage(new PageCreator("pagesearch2").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page3 = getPageAPI().createPage(new PageCreator("pagesearch3").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page4 = getPageAPI().createPage(new PageCreator("pagesearch4").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page5 = getPageAPI().createPage(new PageCreator("pagesearch5").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page6 = getPageAPI().createPage(new PageCreator("pagesearch6").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page7 = getPageAPI().createPage(new PageCreator("aName").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page8 = getPageAPI().createPage(new PageCreator("anOtherName").setDescription("an awesome page!!!!!!!").setDisplayName("Cool page!"),
+                "my page content idsqdsqsqddsqqsgsdgqn a zip file".getBytes());
+
         // when
-        searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 5).done());
+        SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 5).done());
         // then
+        System.out.println("should_search_give_5_first_results " + searchPages.getCount() + " pages");
         assertThat(searchPages.getCount()).isEqualTo(5);
         assertThat(searchPages.getResult()).isEqualTo(Arrays.asList(page1, page2, page3, page4, page5));
 
-        // when
-        searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 10).filter(PageSearchDescriptor.DISPLAY_NAME, "My Päge").done());
-        // then
-        assertThat(searchPages.getCount()).isEqualTo(7);
-        assertThat(searchPages.getResult()).isEqualTo(Arrays.asList(page1, page2, page3, page4, page5, page6, page7));
+    }
+
+    @Test
+    public void should_search_by_display_name() throws BonitaException {
+        // given
+        Page page1 = getPageAPI().createPage(new PageCreator("pagesearch1").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page2 = getPageAPI().createPage(new PageCreator("pagesearch2").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page3 = getPageAPI().createPage(new PageCreator("pagesearch3").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page4 = getPageAPI().createPage(new PageCreator("pagesearch4").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page5 = getPageAPI().createPage(new PageCreator("pagesearch5").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page6 = getPageAPI().createPage(new PageCreator("pagesearch6").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page7 = getPageAPI().createPage(new PageCreator("aName").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page8 = getPageAPI().createPage(new PageCreator("anOtherName").setDescription("an awesome page!!!!!!!").setDisplayName("Cool page!"),
+                "my page content idsqdsqsqddsqqsgsdgqn a zip file".getBytes());
 
         // when
-        searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 10).sort(PageSearchDescriptor.NAME, Order.DESC).done());
+        SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 10).filter(PageSearchDescriptor.DISPLAY_NAME, "My Päge").done());
         // then
-        assertThat(searchPages.getCount()).isEqualTo(8);
+        System.out.println("should_search_by_display_name " + searchPages.getCount() + " pages");
+        assertThat(searchPages.getCount()).as("should have 7 resulsts").isEqualTo(7);
+        assertThat(searchPages.getResult()).isEqualTo(Arrays.asList(page1, page2, page3, page4, page5, page6, page7));
+
+    }
+
+    @Test
+    public void should_search_work_on_desc_order() throws BonitaException {
+        // given
+        Page page1 = getPageAPI().createPage(new PageCreator("pagesearch1").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page2 = getPageAPI().createPage(new PageCreator("pagesearch2").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page3 = getPageAPI().createPage(new PageCreator("pagesearch3").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page4 = getPageAPI().createPage(new PageCreator("pagesearch4").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page5 = getPageAPI().createPage(new PageCreator("pagesearch5").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page6 = getPageAPI().createPage(new PageCreator("pagesearch6").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page7 = getPageAPI().createPage(new PageCreator("aName").setDescription("page description").setDisplayName("My Päge"),
+                "my page content in a zip file".getBytes());
+        Page page8 = getPageAPI().createPage(new PageCreator("anOtherName").setDescription("an awesome page!!!!!!!").setDisplayName("Cool page!"),
+                "my page content idsqdsqsqddsqqsgsdgqn a zip file".getBytes());
+
+        // when
+        SearchResult<Page> searchPages = getPageAPI().searchPages(new SearchOptionsBuilder(0, 10).sort(PageSearchDescriptor.NAME, Order.DESC).done());
+
+        // then
+        System.out.println("should_search_work_on_desc_order " + searchPages.getCount() + " pages");
+        assertThat(searchPages.getCount()).as("should have 8 results").isEqualTo(8);
         assertThat(searchPages.getResult()).isEqualTo(Arrays.asList(page8, page7, page3, page6, page5, page4, page3, page2, page1));
 
     }
