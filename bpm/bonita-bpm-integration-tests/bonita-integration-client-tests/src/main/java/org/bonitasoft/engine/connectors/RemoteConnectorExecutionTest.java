@@ -1099,7 +1099,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
                 .addOutput(new LeftOperandBuilder().createNewInstance("data").done(), OperatorType.ASSIGNMENT, "=", null,
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         taskDefinitionBuilder.addConnector("wait1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
-                new ExpressionBuilder().createConstantLongExpression(700));
+                new ExpressionBuilder().createConstantLongExpression(1000));
         taskDefinitionBuilder.addConnector("wait2", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH).addInput("timeout",
                 new ExpressionBuilder().createConstantLongExpression(500));
         taskDefinitionBuilder
@@ -1121,7 +1121,6 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         platformAPI.startNode();
         APITestUtil.logoutPlatform(loginPlatform);
         login();
-        waitForUserTask("step2", processInstance.getId());
         // connector restarted
         waitForDataValue(processInstance, "data", "value2");
 
@@ -1159,12 +1158,8 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         platformAPI.startNode();
         APITestUtil.logoutPlatform(loginPlatform);
         login();
-        waitForDataValue(processInstance, "data", "value1");
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
         // connector restarted
         waitForDataValue(processInstance, "data", "value2");
-        assignAndExecuteStep(step1, johnUserId);
-        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition.getId());
     }
 
