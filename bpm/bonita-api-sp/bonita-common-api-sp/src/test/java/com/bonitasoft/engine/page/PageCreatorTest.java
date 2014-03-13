@@ -7,10 +7,11 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageCreator.PageField;
 
-public class PageCreatorImplTest {
+public class PageCreatorTest {
+
+    private static final String DISPLAY_NAME = "display name";
 
     private static final String NAME = "page name";
 
@@ -31,7 +32,7 @@ public class PageCreatorImplTest {
     }
 
     @Test
-    public void pageCreatorWithNameAndDescrition() throws Exception {
+    public void pageCreatorWithDescrition() throws Exception {
         // given
         PageCreator pageCreator = new PageCreator(NAME);
         pageCreator.setDescription(DESCRIPTION);
@@ -45,5 +46,22 @@ public class PageCreatorImplTest {
         assertThat(fields.get(PageField.DESCRIPTION)).as("description entry should be " + DESCRIPTION).isEqualTo(DESCRIPTION);
 
     }
+
+    @Test
+    public void pageCreatorWithDisplayName() throws Exception {
+        // given
+        PageCreator pageCreator = new PageCreator(NAME);
+        pageCreator.setDisplayName(DISPLAY_NAME);
+
+        // when
+        Map<PageField, Serializable> fields = pageCreator.getFields();
+
+        // then
+        assertThat(fields).as("field size should contains name entry").hasSize(2).containsKey(PageField.NAME).containsKey(PageField.DISPLAY_NAME);
+        assertThat(fields.get(PageField.NAME)).as("name file should be " + NAME).isEqualTo(NAME);
+        assertThat(fields.get(PageField.DISPLAY_NAME)).as("display name entry should be " + DISPLAY_NAME).isEqualTo(DISPLAY_NAME);
+
+    }
+
 
 }

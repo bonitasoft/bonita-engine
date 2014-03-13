@@ -29,6 +29,13 @@ public interface Page extends BaseElement {
     String getName();
 
     /**
+     * Gets the display name of this <code>Page</code>.
+     * 
+     * @return the display name of this <code>Page</code>.
+     */
+    String getDisplayName();
+
+    /**
      * Is this page provided by default.
      * 
      * @return true if this page is provided by default, false otherwise.

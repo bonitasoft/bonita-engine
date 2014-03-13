@@ -32,7 +32,6 @@ import com.bonitasoft.engine.page.PageNotFoundException;
  */
 public interface PageAPI {
 
-
     /**
      * Retrieves a page from its ID.
      * 
@@ -42,7 +41,7 @@ public interface PageAPI {
      * @throws PageNotFoundException
      *             if no page can be found with the provided ID.
      */
-    Page getPage(long pageId) throws PageNotFoundException;
+    Page getPage(final long pageId) throws PageNotFoundException;
 
     /**
      * Retrieves the binary content of a page.
@@ -54,7 +53,7 @@ public interface PageAPI {
      * @throws PageNotFoundException
      *             if no page can be found with the provided ID.
      */
-    byte[] getPageContent(long pageId) throws PageNotFoundException;
+    byte[] getPageContent(final long pageId) throws PageNotFoundException;
 
     /**
      * Searches for pages with specific search criteria.
@@ -65,7 +64,7 @@ public interface PageAPI {
      * @throws SearchException
      *             if a problem occurs during the search.
      */
-    SearchResult<Page> searchPages(SearchOptions searchOptions) throws SearchException;
+    SearchResult<Page> searchPages(final SearchOptions searchOptions) throws SearchException;
 
     /**
      * Creates a custom page.
@@ -80,7 +79,7 @@ public interface PageAPI {
      * @throws CreationException
      *             if an error occurs during the creation.
      */
-    Page createPage(PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException;
+    Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException;
 
     /**
      * Deletes a page identified by its ID.
@@ -90,7 +89,7 @@ public interface PageAPI {
      * @throws DeletionException
      *             if a problem occurs during deletion.
      */
-    void deletePage(long pageId) throws DeletionException;
+    void deletePage(final long pageId) throws DeletionException;
 
     /**
      * Deletes a list of pages, given by their IDs.
@@ -100,6 +99,6 @@ public interface PageAPI {
      * @throws DeletionException
      *             if a problem occurs during deletion.
      */
-    void deletePages(List<Long> pageIds) throws DeletionException;
+    void deletePages(final List<Long> pageIds) throws DeletionException;
 
 }

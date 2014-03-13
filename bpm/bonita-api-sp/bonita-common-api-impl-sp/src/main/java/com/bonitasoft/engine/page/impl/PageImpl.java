@@ -35,10 +35,14 @@ public class PageImpl implements Page {
 
     private final Date lastModificationDate;
 
-    public PageImpl(final long pageId, final String name, final boolean provided, final String description, final long installationDate,
+    private final String displayName;
+
+    public PageImpl(final long pageId, final String name, final String displayName, final boolean provided, final String description,
+            final long installationDate,
             final long installedBy, final long lastModificationDate) {
         this.pageId = pageId;
         this.name = name;
+        this.displayName = displayName;
         this.provided = provided;
         this.description = description;
         this.installationDate = new Date(installationDate);
@@ -79,6 +83,11 @@ public class PageImpl implements Page {
     @Override
     public Date getLastModificationDate() {
         return lastModificationDate;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 
 }

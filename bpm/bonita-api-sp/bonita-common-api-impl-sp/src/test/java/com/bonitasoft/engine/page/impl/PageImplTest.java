@@ -19,6 +19,8 @@ public class PageImplTest {
 
     private static final String NAME = "name";
 
+    private static final String DISPLAY_NAME = "display name";
+
     private static final long PAGE_ID = -1l;
 
     private static long installationDate;
@@ -31,7 +33,7 @@ public class PageImplTest {
         installationDate = System.currentTimeMillis();
         modificationDate = installationDate + 10000;
 
-        pageImpl = new PageImpl(PAGE_ID, NAME, PROVIDED, DESCRIPTION, installationDate, USER_ID, modificationDate);
+        pageImpl = new PageImpl(PAGE_ID, NAME, DISPLAY_NAME, PROVIDED, DESCRIPTION, installationDate, USER_ID, modificationDate);
     }
 
     @Test
@@ -69,4 +71,8 @@ public class PageImplTest {
         assertThat(pageImpl.getLastModificationDate()).isEqualTo(new Date(modificationDate));
     }
 
+    @Test
+    public void testGetDisplayName() throws Exception {
+        assertThat(pageImpl.getDisplayName()).isEqualTo(DISPLAY_NAME);
+    }
 }
