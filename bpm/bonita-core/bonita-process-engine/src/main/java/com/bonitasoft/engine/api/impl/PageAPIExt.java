@@ -16,39 +16,38 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.impl.transaction.page.AddPage;
 import com.bonitasoft.engine.api.impl.transaction.reporting.GetReport;
-import com.bonitasoft.engine.core.page.PageService;
-import com.bonitasoft.engine.core.page.SPage;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageNotFoundException;
+import com.bonitasoft.engine.page.PageService;
+import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
-
 public class PageAPIExt implements PageAPI {
 
     @Override
-    public Page getPage(long pageId) throws PageNotFoundException {
+    public Page getPage(final long pageId) throws PageNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public byte[] getPageContent(long pageId) throws PageNotFoundException {
+    public byte[] getPageContent(final long pageId) throws PageNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public SearchResult<Page> searchPages(SearchOptions searchOptions) throws SearchException {
+    public SearchResult<Page> searchPages(final SearchOptions searchOptions) throws SearchException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Page createPage(PageCreator pageCreator, byte[] content) throws AlreadyExistsException, CreationException {
+    public Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final long userId = SessionInfos.getUserIdFromSession();
         PageService pageService = tenantAccessor.getPageService();
@@ -64,13 +63,13 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public void deletePage(long pageId) throws DeletionException {
+    public void deletePage(final long pageId) throws DeletionException {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void deletePages(List<Long> pageIds) throws DeletionException {
+    public void deletePages(final List<Long> pageIds) throws DeletionException {
         // TODO Auto-generated method stub
 
     }

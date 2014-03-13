@@ -11,41 +11,46 @@ package com.bonitasoft.engine.api.impl.transaction.page;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
-import com.bonitasoft.engine.core.reporting.ReportingService;
-import com.bonitasoft.engine.core.reporting.SReport;
-import com.bonitasoft.engine.reporting.Report;
+import com.bonitasoft.engine.page.Page;
+import com.bonitasoft.engine.page.PageService;
+import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.service.SPModelConvertor;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class SearchPages extends AbstractSearchEntity<Report, SReport> {
+public class SearchPages extends AbstractSearchEntity<Page, SPage> {
 
-    private final ReportingService reportingService;
+    private final PageService pageService;
 
-    public SearchPages(final ReportingService reportingService, final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+    public SearchPages(final PageService pageService, final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
-        this.reportingService = reportingService;
+        this.pageService = pageService;
     }
 
     @Override
     public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
-        return reportingService.getNumberOfReports(queryOptions);
+        try {
+            return pageService.getNumberOfPages(queryOptions);
+        } catch (SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
     }
 
     @Override
-    public List<SReport> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
-        return reportingService.searchReports(queryOptions);
+    public List<SPage> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+        return pageService.searchPages(queryOptions);
     }
 
     @Override
-    public List<Report> convertToClientObjects(final List<SReport> reports) {
-        return SPModelConvertor.toReports(reports);
+    public List<Page> convertToClientObjects(final List<SPage> pages) {
+        return SPModelConvertor.toPages(pages);
     }
 
 }

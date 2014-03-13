@@ -32,9 +32,6 @@ import org.bonitasoft.engine.service.ModelConvertor;
 
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.impl.BreakpointImpl;
-import com.bonitasoft.engine.core.page.SPage;
-import com.bonitasoft.engine.core.page.SPageBuilder;
-import com.bonitasoft.engine.core.page.SPageBuilderFactory;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.core.reporting.SReport;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
@@ -51,6 +48,9 @@ import com.bonitasoft.engine.monitoring.impl.MemoryUsageImpl;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageCreator.PageField;
+import com.bonitasoft.engine.page.SPage;
+import com.bonitasoft.engine.page.SPageBuilder;
+import com.bonitasoft.engine.page.SPageBuilderFactory;
 import com.bonitasoft.engine.page.impl.PageImpl;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantCreator;
@@ -238,27 +238,17 @@ public final class SPModelConvertor extends ModelConvertor {
     }
 
     public static Page toPage(final SPage sPage) {
-
-        // public PageImpl(final long pageId, final String name, final boolean provided, final String description, final Date installationDate,
-        // final long installedBy, final Date lastModificationDate) {
-        // this.pageId = pageId;
-        // this.name = name;
-        // this.provided = provided;
-        // this.description = description;
-        // this.installationDate = installationDate;
-        // this.installedBy = installedBy;
-        // this.lastModificationDate = lastModificationDate;
-        // }
-        //
-        //
-        // new PageImpl(PAGE_ID, NAME, PROVIDED, DESCRIPTION, installationDate, USER_ID, modificationDate);
         final PageImpl page = new PageImpl(sPage.getId(), sPage.getName(), sPage.isProvided(), sPage.getDescription(), sPage.getInstallationDate(),
                 sPage.getInstalledBy(), sPage.getLastModificationDate());
-        // page.setDescription(sPage.getDescription());
-        // page.setProvided(sPage.isProvided());
-        // page.setLastModificationDate(new Date(sPage.getLastModificationDate()));
-
         return page;
+    }
+
+    public static List<Page> toPages(final List<SPage> sPages) {
+        final List<Page> pages = new ArrayList<Page>(sPages.size());
+        for (final SPage sPage : sPages) {
+            pages.add(toPage(sPage));
+        }
+        return pages;
     }
 
     public static List<Report> toReports(final List<SReport> sReports) {
@@ -287,14 +277,12 @@ public final class SPModelConvertor extends ModelConvertor {
 
     public static SPage constructSPage(final PageCreator pageCreator, final long creatorUserId) {
         final Map<PageField, Serializable> fields = pageCreator.getFields();
-        final String name = (String) fields.get(ReportField.NAME);
-        final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, System.currentTimeMillis(),
-                creatorUserId, false);
-        final String description = (String) fields.get(ReportField.DESCRIPTION);
-        if (description != null) {
-            newSPageBuilder.setDescription(description);
-        }
-
+        final String name = (String) fields.get(PageField.NAME);
+        final String description = (String) fields.get(PageField.DESCRIPTION);
+        final String displayName = (String) fields.get(PageField.DESCRIPTION);
+        final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
+                System.currentTimeMillis(), creatorUserId,
+                false, null);
         return newSPageBuilder.done();
     }
 

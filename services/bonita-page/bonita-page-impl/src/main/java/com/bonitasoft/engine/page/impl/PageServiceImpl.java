@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.page.impl;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -26,6 +27,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -69,28 +71,6 @@ public class PageServiceImpl implements PageService {
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
     }
-
-    // @Override
-    // public String selectList(final String selectQuery) throws SQLException {
-    // final String lowerSQ = selectQuery.toLowerCase();
-    // if (!lowerSQ.startsWith("select")) {
-    // throw new SQLException("The statement is not a SELECT query");
-    // }
-    // final Connection connection = dataSource.getConnection();
-    // try {
-    // final Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-    // try {
-    // return executeQuery(selectQuery, statement);
-    // } finally {
-    // if (statement != null) {
-    // statement.close();
-    // }
-    // }
-    //
-    // } finally {
-    // connection.close();
-    // }
-    // }
 
     @Override
     public SPage addPage(final SPage page, final byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException {
@@ -143,24 +123,14 @@ public class PageServiceImpl implements PageService {
         return number;
     }
 
-    // @Override
-    // public List<SPage> searchPages(final QueryOptions options) throws SBonitaSearchException {
-    // if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-    // logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "searchPages"));
-    // }
-    // try {
-    // final List<SPage> pages = persistenceService.searchEntity(SPage.class, options, null);
-    // if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-    // logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "searchPages"));
-    // }
-    // return pages;
-    // } catch (final SBonitaReadException bre) {
-    // if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-    // logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "searchPages", bre));
-    // }
-    // throw new SBonitaSearchException(bre);
-    // }
-    // }
+    @Override
+    public List<SPage> searchPages(final QueryOptions options) throws SBonitaSearchException {
+        try {
+            return persistenceService.searchEntity(SPage.class, options, null);
+        } catch (SBonitaReadException e) {
+            throw new SBonitaSearchException(e);
+        }
+    }
 
     @Override
     public void deletePage(final long pageId) throws SObjectModificationException, SObjectNotFoundException {

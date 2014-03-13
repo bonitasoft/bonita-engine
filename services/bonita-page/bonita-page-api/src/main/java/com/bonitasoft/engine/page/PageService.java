@@ -8,12 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.page;
 
+import java.util.List;
+
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 
 /**
  * @author Baptiste Mesta
@@ -30,10 +33,10 @@ public interface PageService {
 
     long getNumberOfPages(QueryOptions options) throws SBonitaReadException;
 
-    // List<SPage> searchPages(QueryOptions options) throws SBonitaSearchException;
-
     void deletePage(long pageId) throws SObjectModificationException, SObjectNotFoundException;
 
     byte[] getPageContent(long pageId) throws SBonitaReadException, SObjectNotFoundException;
+
+    List<SPage> searchPages(QueryOptions options) throws SBonitaSearchException;
 
 }

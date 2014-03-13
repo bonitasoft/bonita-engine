@@ -10,7 +10,6 @@ package com.bonitasoft.engine.bpm.test;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 
-import com.bonitasoft.engine.core.page.PageService;
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringService;
@@ -18,6 +17,7 @@ import com.bonitasoft.engine.monitoring.TenantMonitoringService;
 import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SPlatformServiceMXBean;
 import com.bonitasoft.engine.monitoring.mbean.SServiceMXBean;
+import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchPlatformEntitiesDescriptor;
@@ -30,7 +30,7 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
         super();
     }
 
-    public SPBPMServicesBuilder(Long tenantId) {
+    public SPBPMServicesBuilder(final Long tenantId) {
         super(tenantId);
     }
 

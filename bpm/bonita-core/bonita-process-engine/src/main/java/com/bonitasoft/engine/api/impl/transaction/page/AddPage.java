@@ -11,8 +11,8 @@ package com.bonitasoft.engine.api.impl.transaction.page;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 
-import com.bonitasoft.engine.core.page.PageService;
-import com.bonitasoft.engine.core.page.SPage;
+import com.bonitasoft.engine.page.PageService;
+import com.bonitasoft.engine.page.SPage;
 
 /**
  * @author Matthieu Chaffotte

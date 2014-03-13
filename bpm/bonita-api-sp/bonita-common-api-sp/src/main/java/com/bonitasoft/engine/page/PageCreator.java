@@ -18,7 +18,7 @@ import java.util.Map;
 public class PageCreator implements Serializable {
 
     public enum PageField {
-        NAME, DESCRIPTION;
+        NAME, DESCRIPTION, DISPLAYNAME;
     }
 
     private static final long serialVersionUID = 8174091386958635983L;
@@ -28,6 +28,11 @@ public class PageCreator implements Serializable {
     public PageCreator(final String name) {
         fields = new HashMap<PageField, Serializable>(2);
         fields.put(PageField.NAME, name);
+    }
+
+    public PageCreator setDisplayName(final String displayName) {
+        fields.put(PageField.DISPLAYNAME, displayName);
+        return this;
     }
 
     public PageCreator setDescription(final String description) {
