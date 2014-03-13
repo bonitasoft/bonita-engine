@@ -44,4 +44,10 @@
 		driverClassName="#db.driver.class#" 
 		url="#db.url#" />
 
+	<Resource name="BusinessDataDS" 
+	    auth="Container" 
+	    type="javax.sql.DataSource"
+		factory="bitronix.tm.resource.ResourceObjectFactory"
+		uniqueName="jdbc/BusinessDataDS" />
+
 </Context>
