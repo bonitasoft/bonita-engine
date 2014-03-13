@@ -631,6 +631,17 @@ public interface IdentityService {
      * @throws SIdentityException
      */
     List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(int fromIndex, int numberOfMetadata) throws SIdentityException;
+    
+    
+    /**
+     * Search custom user info values according to specific query options
+     * 
+     * @param options
+     *            The QueryOptions object containing some query conditions
+     * @return a list of SCustomUserInfoValue objects
+     * @throws SBonitaSearchException
+     */
+    List<SCustomUserInfoValue> searchCustomUserInfoValue(QueryOptions options) throws SBonitaSearchException;
 
     /**
      * Get userMemberships in a specific interval for a user, this is used for pagination

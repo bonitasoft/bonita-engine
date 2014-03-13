@@ -1835,4 +1835,9 @@ public class IdentityServiceImpl implements IdentityService {
                     LogUtil.getLogOnExceptionMethod(this.getClass(), methodName, re));
         }
     }
+
+    @Override
+    public List<SCustomUserInfoValue> searchCustomUserInfoValue(QueryOptions options) throws SBonitaSearchException {
+        return Collections.emptyList();
+    }
 }
