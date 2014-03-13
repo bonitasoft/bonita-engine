@@ -48,8 +48,8 @@ public class TestsInitializer {
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {
-        APITestUtil.stopAndCleanPlatformAndTenant(true);
-        APITestUtil.deletePlatformStructure();
+        new APITestUtil().stopAndCleanPlatformAndTenant(true);
+        new APITestUtil().deletePlatformStructure();
     }
 
     protected void before() throws Exception {
@@ -64,8 +64,8 @@ public class TestsInitializer {
     }
 
     protected void initPlatformAndTenant() throws Exception {
-        APITestUtil.createPlatformStructure();
-        APITestUtil.initializeAndStartPlatformWithDefaultTenant(true);
+        new APITestUtil().createPlatformStructure();
+        new APITestUtil().initializeAndStartPlatformWithDefaultTenant(true);
     }
 
     private static void setupBonitaHome() throws IOException {

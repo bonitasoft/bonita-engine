@@ -349,7 +349,7 @@
 		<!-- Platform -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl-hibernate</artifactId>
+			<artifactId>bonita-platform-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -790,7 +790,6 @@
 									<!-- Platform -->
 									<include>org.bonitasoft.engine.platform:bonita-platform-model</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl</include>
-									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-api</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-api-impl</include>
 									<!-- Platform Authentication -->

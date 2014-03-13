@@ -12,6 +12,8 @@ import org.junit.Test;
 
 public class MultiThreadCallsTest extends CommonAPITest {
 
+    private final APITestUtil apiTestUtil = new APITestUtil();
+
     class CallAPIMethodsThread extends Thread {
 
         private Exception exception;
@@ -23,11 +25,11 @@ public class MultiThreadCallsTest extends CommonAPITest {
         public void run() {
             super.run();
             try {
-                final APISession session = APITestUtil.loginDefaultTenant();
+                final APISession session = apiTestUtil.loginDefaultTenant();
                 final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
                 identityAPI.getNumberOfUsers();
                 identityAPI.getNumberOfGroups();
-                APITestUtil.logoutTenant(session);
+                apiTestUtil.logoutTenant(session);
             } catch (final Exception e) {
                 exception = e;
                 e.printStackTrace();

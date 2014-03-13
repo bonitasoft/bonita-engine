@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.bean;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 
-import org.bonitasoft.engine.api.impl.ServerAPIImpl;
+import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 
@@ -56,8 +57,8 @@ public class ServerAPIBean implements SessionBean, ServerAPI {
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
-        final ServerAPIImpl serverAPI = new ServerAPIImpl();
+            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+        final ServerAPI serverAPI = ServerAPIFactory.getServerAPI();
         return serverAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
     }
 

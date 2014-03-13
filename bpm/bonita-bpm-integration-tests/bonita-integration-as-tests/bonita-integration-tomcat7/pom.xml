@@ -47,7 +47,6 @@
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
-			<version>${bitronix.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.transaction</groupId>
@@ -61,7 +60,6 @@
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm-tomcat55-lifecycle</artifactId>
-			<version>${bitronix.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.tomcat</groupId>

@@ -70,6 +70,7 @@ public class SecuredLoginServiceImpl implements LoginService {
                     userId = -1;
                 } else {
                     try {
+                        // wait 3 seconds in case of wrong login to avoid brut force attack
                         Thread.sleep(3000);
                     } catch (final InterruptedException e) {
                         throw new SLoginException("User name or password is not valid!");
@@ -106,7 +107,7 @@ public class SecuredLoginServiceImpl implements LoginService {
         }
     }
 
-    private TechnicalUser getTechnicalUser(final long tenantId) throws SLoginException {
+    protected TechnicalUser getTechnicalUser(final long tenantId) throws SLoginException {
         try {
             final String technicalUserPropertiesPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator
                     + "bonita-server.properties";

@@ -91,4 +91,9 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
     public String getRecoveryProcedure() {
         return "call processApi.executeFlowNode(" + flowNodeInstanceId + ")";
     }
+
+    @Override
+    public String toString() {
+        return "Work[" + getDescription() + "]";
+    }
 }

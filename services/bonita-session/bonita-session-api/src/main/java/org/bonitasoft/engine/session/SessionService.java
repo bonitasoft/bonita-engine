@@ -129,4 +129,11 @@ public interface SessionService {
      */
     void deleteSessionsOfTenant(long tenantId);
 
+    /**
+     * Delete all sessions of a tenant except the one of the technical user
+     * 
+     * @param tenantId
+     */
+    void deleteSessionsOfTenantExceptTechnicalUser(long tenantId);
+
 }

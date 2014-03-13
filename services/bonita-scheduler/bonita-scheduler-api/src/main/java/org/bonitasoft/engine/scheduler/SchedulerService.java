@@ -14,9 +14,8 @@
 package org.bonitasoft.engine.scheduler;
 
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -26,7 +25,7 @@ import org.bonitasoft.engine.scheduler.trigger.Trigger;
  * @author Matthieu Chaffotte
  * @since 6.0
  */
-public interface SchedulerService {
+public interface SchedulerService extends ServiceWithLifecycle {
 
     String JOB_DESCRIPTOR = "JOB_DESCRIPTOR";
 
@@ -146,15 +145,23 @@ public interface SchedulerService {
 
     boolean isStillScheduled(SJobDescriptor jobDescriptor) throws SSchedulerException;
 
-    /**
-     * Start the service
-     * 
-     * @throws SBonitaException
-     */
-    public void start() throws SBonitaException;
-
-    public void stop() throws SBonitaException, TimeoutException;
-
     void rescheduleErroneousTriggers() throws SSchedulerException;
+
+    /**
+     * 
+     * Pause all jobs running on the tenant
+     * 
+     * @param tenantId
+     * @throws SSchedulerException
+     */
+    void pauseJobs(long tenantId) throws SSchedulerException;
+
+    /**
+     * Resume all jobs paused on the tenant
+     * 
+     * @param tenantId
+     * @throws SSchedulerException
+     */
+    void resumeJobs(long tenantId) throws SSchedulerException;
 
 }

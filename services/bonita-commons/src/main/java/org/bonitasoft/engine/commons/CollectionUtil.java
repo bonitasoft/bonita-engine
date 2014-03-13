@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.commons;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,5 +33,9 @@ public class CollectionUtil {
         set.addAll(list);
         return set;
 
+    }
+
+    public static <T> List<T> emptyOrUnmodifiable(final List<T> list) {
+        return list == null ? Collections.<T> emptyList() : Collections.unmodifiableList(list);
     }
 }

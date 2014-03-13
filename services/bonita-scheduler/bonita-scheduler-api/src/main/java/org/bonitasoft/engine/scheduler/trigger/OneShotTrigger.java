@@ -26,16 +26,25 @@ public class OneShotTrigger implements Trigger {
 
     private final int priority;
 
-    public OneShotTrigger(final String name, final Date startDate) {
-        this.name = name;
-        this.startDate = startDate;
-        priority = 5;
-    }
+    private final MisfireRestartPolicy misfireHandlingPolicy;
 
     public OneShotTrigger(final String name, final Date startDate, final int priority) {
+        this(name, startDate, priority, MisfireRestartPolicy.ALL);
+    }
+
+    public OneShotTrigger(final String name, final Date startDate, final int priority, final MisfireRestartPolicy misfireHandlingPolicy) {
         this.name = name;
         this.startDate = startDate;
         this.priority = priority;
+        this.misfireHandlingPolicy = misfireHandlingPolicy;
+    }
+
+    public OneShotTrigger(final String name, final Date startDate, final MisfireRestartPolicy misfireHandlingPolicy) {
+        this(name, startDate, 5, misfireHandlingPolicy);
+    }
+
+    public OneShotTrigger(final String name, final Date startDate) {
+        this(name, startDate, 5, MisfireRestartPolicy.ALL);
     }
 
     @Override
@@ -51,6 +60,11 @@ public class OneShotTrigger implements Trigger {
     @Override
     public int getPriority() {
         return priority;
+    }
+
+    @Override
+    public MisfireRestartPolicy getMisfireHandlingPolicy() {
+        return misfireHandlingPolicy;
     }
 
 }

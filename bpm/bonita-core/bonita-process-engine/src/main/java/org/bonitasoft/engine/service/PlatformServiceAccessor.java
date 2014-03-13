@@ -27,7 +27,6 @@ import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.work.WorkService;
 
 /**
  * Accessor for tenant level engine services.
@@ -68,8 +67,6 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
     PlatformCommandService getPlatformCommandService();
 
     NodeConfiguration getPlaformConfiguration();
-
-    WorkService getWorkService();
 
     PlatformCacheService getPlatformCacheService();
 

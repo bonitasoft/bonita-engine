@@ -13,13 +13,16 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.platform;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -31,10 +34,12 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
+import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
 import org.bonitasoft.engine.work.WorkService;
 
@@ -54,34 +59,64 @@ public final class ActivateTenant implements TransactionContent {
 
     private final SchedulerService schedulerService;
 
-    private final NodeConfiguration plaformConfiguration;
-
     private final TechnicalLoggerService logger;
 
     private final WorkService workService;
 
+    private final TenantConfiguration tenantConfiguration;
+
+    private final NodeConfiguration nodeConfiguration;
+
     public ActivateTenant(final long tenantId, final PlatformService platformService, final SchedulerService schedulerService,
-            final NodeConfiguration plaformConfiguration, final TechnicalLoggerService logger, final WorkService workService) {
+            final TechnicalLoggerService logger, final WorkService workService, final NodeConfiguration plaformConfiguration,
+            final TenantConfiguration tenantConfiguration) {
         this.tenantId = tenantId;
         this.platformService = platformService;
         this.schedulerService = schedulerService;
-        this.plaformConfiguration = plaformConfiguration;
         this.logger = logger;
         this.workService = workService;
+        this.nodeConfiguration = plaformConfiguration;
+        this.tenantConfiguration = tenantConfiguration;
     }
 
     @Override
     public void execute() throws SBonitaException {
-        // pass -1 because the user is the technical user, which is inexistant in DB:
         final boolean tenantWasActivated = platformService.activateTenant(tenantId);
         // we execute that only if the tenant was not already activated
         if (tenantWasActivated) {
-            workService.start(tenantId);
+            workService.start();
             startEventHandling();
             startCleanInvalidSessionsJob();
-            final List<JobRegister> jobsToRegister = plaformConfiguration.getJobsToRegister();
+            final List<JobRegister> jobsToRegister = tenantConfiguration.getJobsToRegister();
             for (final JobRegister jobRegister : jobsToRegister) {
-                jobRegister.registerJobIfNotRegistered();
+                registerJob(jobRegister);
+            }
+        }
+    }
+
+    private void registerJob(final JobRegister jobRegister) {
+        try {
+            final List<String> jobs = schedulerService.getAllJobs();
+            if (!jobs.contains(jobRegister.getJobName())) {
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Register " + jobRegister.getJobDescription());
+                }
+                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                        .createNewInstance(jobRegister.getJobClass().getName(), jobRegister.getJobName(), true).done();
+                final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
+                for (Entry<String, Serializable> entry : jobRegister.getJobParameters().entrySet()) {
+                    jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(entry.getKey(), entry.getValue()).done());
+                }
+                final Trigger trigger = jobRegister.getTrigger();
+                schedulerService.schedule(jobDescriptor, jobParameters, trigger);
+            } else {
+                logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The " + jobRegister.getJobDescription() + " was already started");
+            }
+        } catch (final SSchedulerException e) {
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR,
+                    "Unable to register job " + jobRegister.getJobDescription() + " because " + e.getMessage());
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
             }
         }
     }
@@ -89,12 +124,14 @@ public final class ActivateTenant implements TransactionContent {
     private void startEventHandling() throws SSchedulerException {
         final String jobClassName = BPMEventHandlingJob.class.getName();
         if (schedulerService.isStarted()) {
-            if (plaformConfiguration.shouldStartEventHandlingJob()) {
-                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(jobClassName, BPM_EVENT_HANDLING, true)
+            if (nodeConfiguration.shouldStartEventHandlingJob()) {
+                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                        .createNewInstance(jobClassName, BPM_EVENT_HANDLING, true)
                         .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-                final String cron = plaformConfiguration.getEventHandlingJobCron(); //
-                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
+                final String cron = tenantConfiguration.getEventHandlingJobCron(); //
+                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron,
+                        MisfireRestartPolicy.NONE);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
                     logger.log(ProcessAPI.class, TechnicalLogSeverity.INFO, "Starting event handling job with frequency: " + cron);
                 }
@@ -110,12 +147,14 @@ public final class ActivateTenant implements TransactionContent {
     private void startCleanInvalidSessionsJob() throws SSchedulerException {
         final String jobClassName = CleanInvalidSessionsJob.class.getName();
         if (schedulerService.isStarted()) {
-            final String cron = plaformConfiguration.getCleanInvalidSessionsJobCron();
+            final String cron = tenantConfiguration.getCleanInvalidSessionsJobCron();
             if (!cron.equalsIgnoreCase("none")) {
-                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
+                final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
+                        .createNewInstance(jobClassName, CLEAN_INVALID_SESSIONS, true)
                         .done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron);
+                final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron,
+                        MisfireRestartPolicy.NONE);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
                     logger.log(ProcessAPI.class, TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency: " + cron);
                 }

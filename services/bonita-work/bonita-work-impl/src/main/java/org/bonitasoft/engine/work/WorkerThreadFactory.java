@@ -27,8 +27,11 @@ public class WorkerThreadFactory implements ThreadFactory {
 
     private final int padding;
 
-    public WorkerThreadFactory(final String name, final int maximumPoolSize) {
+    private final long tenantId;
+
+    public WorkerThreadFactory(final String name, final long tenantId, final int maximumPoolSize) {
         this.name = name;
+        this.tenantId = tenantId;
         this.padding = guessPadding(maximumPoolSize);
     }
 
@@ -46,7 +49,19 @@ public class WorkerThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(final Runnable runnable) {
-        return new Thread(runnable, String.format(name + "-" + "%0" + padding + "d", nbThread.getAndIncrement()));
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(name);
+        builder.append("-");
+        builder.append(tenantId);
+        builder.append("-");
+        builder.append("%0");
+        builder.append(padding);
+        builder.append("d");
+
+        String format = String.format(builder.toString()
+                , nbThread.getAndIncrement());
+        return new Thread(runnable, format);
     }
 
 }
