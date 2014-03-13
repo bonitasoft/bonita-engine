@@ -20,7 +20,6 @@
 		<module>bonita-reporting</module>
 		<module>bonita-process-engine</module>
 		<module>bonita-bpm-monitoring</module>
-		<module>bonita-page</module>
 	</modules>
 
 </project>

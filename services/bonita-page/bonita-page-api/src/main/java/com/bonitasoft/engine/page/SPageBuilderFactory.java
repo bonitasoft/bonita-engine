@@ -13,7 +13,7 @@ package com.bonitasoft.engine.page;
  */
 public interface SPageBuilderFactory {
 
-    SPageBuilder createNewInstance(String name, String description, String urlToken, long installationDate, long installedBy, boolean provided,
+    SPageBuilder createNewInstance(String name, String description, String displayName, long installationDate, long installedBy, boolean provided,
             byte[] content);
 
     SPageBuilder createNewInstance(String name, long installationDate, int installedBy, boolean provided);
@@ -21,6 +21,8 @@ public interface SPageBuilderFactory {
     String getIdKey();
 
     String getNameKey();
+
+    String getDisplayNameKey();
 
     String getDescriptionKey();
 

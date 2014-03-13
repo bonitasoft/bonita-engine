@@ -17,10 +17,10 @@ import com.bonitasoft.engine.page.SPageBuilderFactory;
 public class SPageBuilderFactoryImpl implements SPageBuilderFactory {
 
     @Override
-    public SPageBuilder createNewInstance(final String name, final String description, final String urlToken, final long installationDate,
+    public SPageBuilder createNewInstance(final String name, final String description, final String displayName, final long installationDate,
             final long installedBy, final boolean provided,
             final byte[] content) {
-        return new SPageBuilderImpl(new SPageImpl(name, description, urlToken, installationDate, installedBy, provided, installationDate));
+        return new SPageBuilderImpl(new SPageImpl(name, description, displayName, installationDate, installedBy, provided, installationDate));
     }
 
     @Override
@@ -56,6 +56,11 @@ public class SPageBuilderFactoryImpl implements SPageBuilderFactory {
     @Override
     public String getProvidedKey() {
         return "provided";
+    }
+
+    @Override
+    public String getDisplayNameKey() {
+        return "displayName";
     }
 
 }

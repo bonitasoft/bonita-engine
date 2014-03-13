@@ -17,6 +17,8 @@ public interface SPage extends PersistentObject {
 
     String getName();
 
+    String getDisplayName();
+
     String getDescription();
 
     long getInstallationDate();
@@ -29,7 +31,5 @@ public interface SPage extends PersistentObject {
      * @return the date of the last modification of this report.
      */
     long getLastModificationDate();
-
-    String getUrlToken();
 
 }

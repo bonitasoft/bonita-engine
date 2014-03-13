@@ -25,7 +25,7 @@ public class SPageImpl implements SPage {
 
     private String description;
 
-    private String urlToken;
+    private String displayName;
 
     private long installationDate;
 
@@ -39,12 +39,12 @@ public class SPageImpl implements SPage {
 
     }
 
-    public SPageImpl(final String name, final String description, final String urlToken, final long installationDate, final long installedBy,
+    public SPageImpl(final String name, final String description, final String displayName, final long installationDate, final long installedBy,
             final boolean provided, final long lastModificationDate) {
         super();
         this.name = name;
         this.description = description;
-        this.urlToken = urlToken;
+        this.displayName = displayName;
         this.installationDate = installationDate;
         this.installedBy = installedBy;
         this.provided = provided;
@@ -75,7 +75,7 @@ public class SPageImpl implements SPage {
      * @param sPage
      */
     public SPageImpl(final SPage sPage) {
-        this(sPage.getName(), sPage.getDescription(), sPage.getUrlToken(), sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.isProvided(), sPage
+        this(sPage.getName(), sPage.getDescription(), sPage.getDisplayName(), sPage.getInstallationDate(), sPage.getInstalledBy(), sPage.isProvided(), sPage
                 .getLastModificationDate());
     }
 
@@ -130,12 +130,12 @@ public class SPageImpl implements SPage {
     }
 
     @Override
-    public String getUrlToken() {
-        return urlToken;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setUrlToken(final String urlToken) {
-        this.urlToken = urlToken;
+    public void setDisplayName(final String displayName) {
+        this.displayName = displayName;
     }
 
     @Override
@@ -176,7 +176,7 @@ public class SPageImpl implements SPage {
 
     @Override
     public String toString() {
-        return "SPageImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", description=" + description + ", urlToken=" + urlToken
+        return "SPageImpl [tenantId=" + tenantId + ", id=" + id + ", name=" + name + ", description=" + description + ", displayName=" + displayName
                 + ", installationDate=" + installationDate + ", installedBy=" + installedBy + ", provided=" + provided + ", lastModificationDate="
                 + lastModificationDate + "]";
     }
@@ -193,7 +193,7 @@ public class SPageImpl implements SPage {
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (provided ? 1231 : 1237);
         result = prime * result + (int) (tenantId ^ tenantId >>> 32);
-        result = prime * result + (urlToken == null ? 0 : urlToken.hashCode());
+        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         return result;
     }
 
@@ -241,11 +241,11 @@ public class SPageImpl implements SPage {
         if (tenantId != other.tenantId) {
             return false;
         }
-        if (urlToken == null) {
-            if (other.urlToken != null) {
+        if (displayName == null) {
+            if (other.displayName != null) {
                 return false;
             }
-        } else if (!urlToken.equals(other.urlToken)) {
+        } else if (!displayName.equals(other.displayName)) {
             return false;
         }
         return true;

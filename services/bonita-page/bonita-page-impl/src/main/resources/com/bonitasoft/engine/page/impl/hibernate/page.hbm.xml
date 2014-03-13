@@ -12,12 +12,12 @@
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
 		<property name="name" column="name" />
+		<property name="displayName" column="displayName" />
 		<property name="description" column="description" />
 		<property name="installationDate" column="installationDate" />
 		<property name="installedBy" column="installedBy" />
 		<property name="provided" column="provided" />
 		<property name="lastModificationDate" column="lastModificationDate" />
-		<property name="urlToken" column="urlToken" />
 		<filter name="tenantFilter" />
 	</class>
 
@@ -27,12 +27,12 @@
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
 		<property name="name" column="name" />
+		<property name="displayName" column="displayName" />
 		<property name="description" column="description" />
 		<property name="installationDate" column="installationDate" />
 		<property name="installedBy" column="installedBy" />
 		<property name="provided" column="provided" />
 		<property name="lastModificationDate" column="lastModificationDate" />
-		<property name="urlToken" column="urlToken" />
 		<property name="content" column="content" />
 		<filter name="tenantFilter" />
 	</class>

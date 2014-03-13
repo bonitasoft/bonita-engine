@@ -11,6 +11,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>bonita-query-tests</module>
 		<module>bonita-integration-client-tests</module>
 		<module>bonita-integration-local-tests</module>
 	</modules>
