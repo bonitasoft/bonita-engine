@@ -1,5 +1,9 @@
 package org.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.argThat;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -15,10 +19,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.argThat;
 
 /**
  * @author Vincent Elcrin
@@ -65,8 +65,8 @@ public class CustomUserInfoAPITest {
                 new DummySCustomUserInfoDefinition(2L, "definition 2", "", "")));
         given(service.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(1L, Arrays.asList(1L, 2L)))))
                 .willReturn(Arrays.<SCustomUserInfoValue>asList(
-                        new DummySCustomUserInfoValue("definition 1", "value 1", 1L),
-                        new DummySCustomUserInfoValue("definition 2", "value 2", 1L)));
+                        new DummySCustomUserInfoValue(2L, "value 1", 1L),
+                        new DummySCustomUserInfoValue(3L, "value 2", 1L)));
 
         List<CustomUserInfo> result = api.list(1L, 0, 2);
 

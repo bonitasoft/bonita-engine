@@ -22,7 +22,7 @@ public class CustomUserInfoConverter {
 
     public CustomUserInfoValue convert(SCustomUserInfoValue sValue) {
         CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
-        value.setName(sValue.getName());
+        value.setDefinitionId(sValue.getDefinitionId());
         value.setUserId(sValue.getUserId());
         value.setValue(sValue.getValue());
         return value;

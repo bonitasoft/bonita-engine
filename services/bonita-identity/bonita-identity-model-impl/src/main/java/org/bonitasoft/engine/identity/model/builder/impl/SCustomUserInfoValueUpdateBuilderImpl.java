@@ -36,12 +36,12 @@ public class SCustomUserInfoValueUpdateBuilderImpl implements SCustomUserInfoVal
 
     @Override
     public SCustomUserInfoValueUpdateBuilder updateMetadaName(final String metadataName) {
-        this.descriptor.addField(SCustomUserInfoValueBuilderFactoryImpl.METADATA_NAME, metadataName);
+        this.descriptor.addField(SCustomUserInfoValueBuilderFactoryImpl.DEFINITION_ID, metadataName);
         return this;
     }
 
     public SCustomUserInfoValueUpdateBuilder updateUserId(final long userName) {
-        this.descriptor.addField(SCustomUserInfoValueBuilderFactoryImpl.USER_NAME, userName);
+        this.descriptor.addField(SCustomUserInfoValueBuilderFactoryImpl.USER_ID, userName);
         return this;
     }
 

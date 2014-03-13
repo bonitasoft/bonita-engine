@@ -19,12 +19,23 @@ import java.io.Serializable;
  * @author Vincent Elcrin
  */
 public class CustomUserInfoDefinitionCreator implements Serializable {
+    
+    private static final long serialVersionUID = 6929368716340973445L;
 
     private String name;
 
     private String displayName;
 
     private String description;
+
+    public CustomUserInfoDefinitionCreator(String name) {
+        this.name = name;
+    }
+    
+    public CustomUserInfoDefinitionCreator(String name, String description) {
+        this(name);
+        this.description = description;
+    }
 
     public String getName() {
         return name;

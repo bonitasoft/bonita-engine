@@ -366,12 +366,12 @@
 		FROM org.bonitasoft.engine.identity.model.impl.SGroupImpl AS group_
 	</query>
 
-	<query name="searchCustomUserInfoDefinition">
+	<query name="searchSCustomUserInfoDefinition">
         SELECT custom_usr_inf_def
         FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS custom_usr_inf_def
     </query>
 
-	<query name="searchCustomUserInfoValue">
+	<query name="searchSCustomUserInfoValue">
 		SELECT custom_usr_inf_val
 		FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS custom_usr_inf_val
 	</query>

@@ -26,7 +26,7 @@ public interface SCustomUserInfoValueBuilderFactory {
 
     String getUserNameKey();
 
-    String getMetadataNameKey();
+    String getDefinitionIdKey();
 
     String getValueKey();
 
