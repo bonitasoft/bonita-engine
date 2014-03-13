@@ -7,14 +7,18 @@ import java.util.List;
 import org.bonitasoft.engine.identity.CustomUserInfo;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.argThat;
 
 /**
  * @author Vincent Elcrin
@@ -39,7 +43,7 @@ public class CustomUserInfoAPITest {
                         new DummySCustomUserInfoDefinition(1L),
                         new DummySCustomUserInfoDefinition(2L)));
 
-        List<CustomUserInfo> result = api.list(1, 0, 2);
+        List<CustomUserInfo> result = api.list(1L, 0, 2);
 
         assertThat(result.get(0).getDefinition().getId()).isEqualTo(1L);
         assertThat(result.get(1).getDefinition().getId()).isEqualTo(2L);
@@ -49,8 +53,42 @@ public class CustomUserInfoAPITest {
     public void list_should_return_an_empty_when_there_is_no_definitions() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(Collections. <SCustomUserInfoDefinition>emptyList());
 
-        List<CustomUserInfo> result = api.list(1, 0, 2);
+        List<CustomUserInfo> result = api.list(1L, 0, 2);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void list_should_retrieve_values_associated_to_definitions_for_a_given_user() throws Exception {
+        given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(Arrays.<SCustomUserInfoDefinition>asList(
+                new DummySCustomUserInfoDefinition(1L, "definition 1", "", ""),
+                new DummySCustomUserInfoDefinition(2L, "definition 2", "", "")));
+        given(service.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(1L, Arrays.asList(1L, 2L)))))
+                .willReturn(Arrays.<SCustomUserInfoValue>asList(
+                        new DummySCustomUserInfoValue("definition 1", "value 1", 1L),
+                        new DummySCustomUserInfoValue("definition 2", "value 2", 1L)));
+
+        List<CustomUserInfo> result = api.list(1L, 0, 2);
+
+        assertThat(result.get(0).getValue()).isEqualTo("value 1");
+        assertThat(result.get(1).getValue()).isEqualTo("value 2");
+    }
+
+    private class QueryOptionsMatcher extends ArgumentMatcher<QueryOptions> {
+
+        private long userId;
+
+        private List<Long> definitions;
+
+        private QueryOptionsMatcher(long userId, List<Long> definitions) {
+            this.userId = userId;
+            this.definitions = definitions;
+        }
+
+        public boolean matches(Object object) {
+            QueryOptions options = (QueryOptions) object;
+            return options.getFilters().get(0).getValue().equals(userId)
+                    && options.getFilters().get(1).getIn().containsAll(definitions);
+        }
     }
 }
