@@ -25,20 +25,20 @@ public class APISessionImpl extends SessionImpl implements APISession {
 
     private static final long serialVersionUID = 2585081338329254538L;
 
-    private String tenant;
+    private String tenantName;
 
     private long tenantId;
 
-    public APISessionImpl(final long id, final Date creationDate, final long duration, final String userName, final long userId, final String tenant,
+    public APISessionImpl(final long id, final Date creationDate, final long duration, final String userName, final long userId, final String tenantName,
             final long tenantId) {
         super(id, creationDate, duration, userName, userId);
-        this.tenant = tenant;
+        this.tenantName = tenantName;
         this.tenantId = tenantId;
     }
 
     @Override
     public String getTenantName() {
-        return tenant;
+        return tenantName;
     }
 
     @Override
@@ -47,11 +47,11 @@ public class APISessionImpl extends SessionImpl implements APISession {
     }
 
     public String getTenant() {
-        return tenant;
+        return tenantName;
     }
 
     public void setTenant(final String tenant) {
-        this.tenant = tenant;
+        tenantName = tenant;
     }
 
     public void setTenantId(final long tenantId) {
@@ -62,7 +62,7 @@ public class APISessionImpl extends SessionImpl implements APISession {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((tenant == null) ? 0 : tenant.hashCode());
+        result = prime * result + ((tenantName == null) ? 0 : tenantName.hashCode());
         result = prime * result + (int) (tenantId ^ (tenantId >>> 32));
         return result;
     }
@@ -79,11 +79,11 @@ public class APISessionImpl extends SessionImpl implements APISession {
             return false;
         }
         final APISessionImpl other = (APISessionImpl) obj;
-        if (tenant == null) {
-            if (other.tenant != null) {
+        if (tenantName == null) {
+            if (other.tenantName != null) {
                 return false;
             }
-        } else if (!tenant.equals(other.tenant)) {
+        } else if (!tenantName.equals(other.tenantName)) {
             return false;
         }
         if (tenantId != other.tenantId) {
@@ -96,7 +96,7 @@ public class APISessionImpl extends SessionImpl implements APISession {
     public String toString() {
         final StringBuilder builder = new StringBuilder();
         builder.append("APISessionImpl [tenant=");
-        builder.append(tenant);
+        builder.append(tenantName);
         builder.append(", tenantId=");
         builder.append(tenantId);
         builder.append(", getId()=");

@@ -13,14 +13,9 @@
  **/
 package org.bonitasoft.engine.session.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.session.SSessionAlreadyExistsException;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
 import org.bonitasoft.engine.session.model.SSession;
 
@@ -28,84 +23,14 @@ import org.bonitasoft.engine.session.model.SSession;
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
-public final class SessionProviderImpl implements SessionProvider {
+public final class SessionProviderImpl extends
+        AbstractSessionProvider implements SessionProvider {
 
-    private static Map<Long, SSession> sessions = new HashMap<Long, SSession>();
-
-    @Override
-    public synchronized void addSession(final SSession session) throws SSessionAlreadyExistsException {
-        final long id = session.getId();
-        if (sessions.containsKey(id)) {
-            throw new SSessionAlreadyExistsException("A session wih id \"" + id + "\" already exists");
-        }
-        sessions.put(id, session);
-    }
+    static Map<Long, SSession> sessions = new HashMap<Long, SSession>();
 
     @Override
-    public synchronized void removeSession(final long sessionId) throws SSessionNotFoundException {
-        final SSession session = sessions.remove(sessionId);
-        if (session == null) {
-            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
-        }
-    }
-
-    @Override
-    public synchronized SSession getSession(final long sessionId) throws SSessionNotFoundException {
-        final SSession session = sessions.get(sessionId);
-        if (session == null) {
-            throw new SSessionNotFoundException("No session found with id \"" + sessionId + "\"");
-        }
-        return session;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.bonitasoft.engine.session.impl.SessionProvider#updateSession(org.bonitasoft.engine.session.model.SSession)
-     */
-    @Override
-    public synchronized void updateSession(final SSession session) throws SSessionNotFoundException {
-        final long id = session.getId();
-        if (!sessions.containsKey(id)) {
-            throw new SSessionNotFoundException("No session found with id \"" + id + "\"");
-        }
-        sessions.put(id, session);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.bonitasoft.engine.session.impl.SessionProvider#cleanInvalidSessions()
-     */
-    @Override
-    public synchronized void cleanInvalidSessions() {
-        final List<Long> invalidSessionIds = new ArrayList<Long>();
-        for (final SSession session : sessions.values()) {
-            if (!session.isValid()) {
-                invalidSessionIds.add(session.getId());
-            }
-        }
-        for (final Long invalidSessionId : invalidSessionIds) {
-            sessions.remove(invalidSessionId);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.bonitasoft.engine.session.impl.SessionProvider#removeSessions()
-     */
-    @Override
-    public synchronized void removeSessions() {
-        sessions.clear();
-    }
-
-    @Override
-    public synchronized void deleteSessionsOfTenant(long tenantId) {
-        Iterator<SSession> iterator = sessions.values().iterator();
-        while (iterator.hasNext()) {
-            SSession sSession = iterator.next();
-            if (tenantId == sSession.getTenantId()) {
-                iterator.remove();
-            }
-        }
+    protected Map<Long, SSession> getSessions() {
+        return sessions;
     }
 
 }

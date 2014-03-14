@@ -14,6 +14,8 @@ public abstract class ExecutionInSession {
 
     private final String username;
 
+    private final APITestUtil apiTestUtil = new APITestUtil();
+
     public APISession getSession() {
         return session;
     }
@@ -37,13 +39,13 @@ public abstract class ExecutionInSession {
     void executeInSession() throws Exception {
         final APISession session;
         if (username != null) {
-            session = APITestUtil.loginDefaultTenant(username, password);
+            session = apiTestUtil.loginDefaultTenant(username, password);
         } else {
-            session = APITestUtil.loginDefaultTenant();
+            session = apiTestUtil.loginDefaultTenant();
         }
         setSession(session);
         run();
-        APITestUtil.logoutTenant(session);
+        apiTestUtil.logoutTenant(session);
     }
 
 }

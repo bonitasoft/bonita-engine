@@ -22,7 +22,7 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
-import org.bonitasoft.engine.api.impl.ServerAPIImpl;
+import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -92,7 +92,7 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     }
 
     private static ServerAPI getServerAPI() {
-        return new ServerAPIImpl(false);
+        return ServerAPIFactory.getServerAPI(false);
     }
 
     private static <T> T getAPI(final Class<T> clazz, final APISession session) {

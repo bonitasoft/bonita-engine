@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.work;
 
-import java.util.concurrent.TimeoutException;
-
 import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 
 /**
@@ -28,6 +26,7 @@ public interface WorkService extends ServiceWithLifecycle {
 
     /**
      * This operation MUST be called with an active transaction. If no active transaction is found, a WorkRegisterException is thrown
+     * 
      * @param work
      * @throws WorkRegisterException
      * @since 6.0
@@ -42,35 +41,10 @@ public interface WorkService extends ServiceWithLifecycle {
     void executeWork(final BonitaWork work) throws WorkRegisterException;
 
     /**
-     * 
-     * Stop the execution of works for a tenant
-     * 
-     * @param tenantId
+     * @return
+     *         true if the work service is stopped
+     * @since 6.3
      */
-    void stop(Long tenantId);
-
-    /**
-     * 
-     * Allow to start works of this tenant
-     * 
-     * @param tenantId
-     */
-    void start(Long tenantId);
-
-    /**
-     * 
-     * Stop the execution of work for this local work service
-     * 
-     * @throws TimeoutException
-     */
-    void stop() throws TimeoutException;
-
-    /**
-     * 
-     * start the execution of work for this local work service
-     * 
-     * @throws TimeoutException
-     */
-    void start();
+    boolean isStopped();
 
 }
