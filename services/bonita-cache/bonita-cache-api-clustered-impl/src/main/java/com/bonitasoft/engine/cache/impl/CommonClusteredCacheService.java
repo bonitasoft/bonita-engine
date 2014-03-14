@@ -225,4 +225,14 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
         // do nothing, we start/stop hazelcast, not this service
     }
 
+    @Override
+    public void pause() throws SBonitaException, TimeoutException {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        // nothing to do
+    }
+
 }

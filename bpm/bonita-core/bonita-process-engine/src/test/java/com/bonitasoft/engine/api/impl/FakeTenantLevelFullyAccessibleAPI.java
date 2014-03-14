@@ -6,20 +6,19 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine;
+package com.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.BonitaSuiteRunner;
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite.SuiteClasses;
+import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 
-import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
+/**
+ * @author Baptiste Mesta
+ */
+@AvailableWhenTenantIsPaused
+public class FakeTenantLevelFullyAccessibleAPI {
 
-@RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({
-        RemoteConnectorExecutionTestSP.class
-})
-@Initializer(TestsInitializerSP.class)
-public class Temp {
+    @AvailableOnStoppedNode
+    public void aMethod() {
+
+    }
 
 }

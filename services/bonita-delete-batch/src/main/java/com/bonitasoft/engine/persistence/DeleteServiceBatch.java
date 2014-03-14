@@ -36,7 +36,6 @@ public class DeleteServiceBatch implements DeleteService {
         if (entity instanceof PersistentObjectWithFlag) {
             final UpdateDescriptor buildSetField = UpdateDescriptor.buildSetField(entity, DELETED_KEY, true);
             persistenceService.update(buildSetField);
-            DeleteBatchJobRegister.getInstance().registerJobIfNotRegistered();
         } else {
             persistenceService.delete(entity);
         }
