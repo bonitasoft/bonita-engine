@@ -30,7 +30,7 @@ public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
      * @throws LoginException
      *             occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
      * @throws TenantIsPausedException
-     *             occurs when we try to login with an other user than the technical user on a tenant that is in maintenance
+     *             occurs when we try to login with an other user than the technical user on a tenant that is paused.
      * @since 6.0
      */
     @NoSessionRequired

@@ -100,8 +100,9 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     @Override
     public BusinessDataRepository getBusinessDataRepository() {
         return getInstanceOf(BusinessDataRepository.class);
-}
-@Override
+    }
+
+    @Override
     public BroadcastService getBroadcastService() {
         return getInstanceOf(BroadcastService.class);
     }

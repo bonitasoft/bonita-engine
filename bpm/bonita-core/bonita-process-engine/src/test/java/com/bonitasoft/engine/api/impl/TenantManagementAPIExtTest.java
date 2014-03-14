@@ -294,7 +294,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void pauseTenantShouldUpdateTenantState() throws Exception {
+    public void pauseTenantOnActivatedTenantShouldUpdateTenantState() throws Exception {
         STenant tenant = mock(STenant.class);
         final TenantManagementAPIExt tenantManagementAPI = spy(new TenantManagementAPIExt());
         PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);

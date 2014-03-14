@@ -12,7 +12,7 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 
 /**
  * 
- * occurs when we try to login with an other user than the technical user on a tenant that is in maintenance
+ * Occurs when we try to login with an other user than the technical user on a tenant that is paused.
  * 
  * @author Emmanuel Duchastenier
  */

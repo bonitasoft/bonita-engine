@@ -96,7 +96,6 @@ public final class SPModelConvertor extends ModelConvertor {
         tenant.setDescription(sTenant.getDescription());
         tenant.setDefaultTenant(sTenant.isDefaultTenant());
         tenant.setCreationDate(new Date(sTenant.getCreated()));
-        tenant.setInMaintenance(sTenant.isInMaintenance());
         // no createdBy in tenantImpl
         return tenant;
     }

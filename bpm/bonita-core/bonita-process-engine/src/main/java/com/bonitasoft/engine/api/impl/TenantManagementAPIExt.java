@@ -180,7 +180,6 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     protected void updateTenant(final PlatformService platformService, final EntityUpdateDescriptor descriptor, final STenant tenant) throws UpdateException {
         try {
-
             platformService.updateTenant(tenant, descriptor);
         } catch (SBonitaException e) {
             throw new UpdateException("Could not update the tenant maintenance mode", e);

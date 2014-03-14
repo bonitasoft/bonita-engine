@@ -15,7 +15,7 @@ import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
  */
 public class FakeTenantLevelAPI {
 
-    @AvailableOnMaintenanceTenant
+    @AvailableWhenTenantIsPaused
     @AvailableOnStoppedNode
     public void canAlsoBeCalledOnMaintenanceTenant() {
 

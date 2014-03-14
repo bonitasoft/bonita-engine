@@ -73,7 +73,6 @@ import com.bonitasoft.engine.api.impl.reports.DefaultReportList;
 import com.bonitasoft.engine.api.impl.reports.ReportDeployer;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
-import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
@@ -661,9 +660,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                     break;
                 case STATUS:
                     descriptor.addField(tenantBuilderFact.getStatusKey(), field.getValue());
-                    break;
-                case IN_MAINTENANCE:
-                    descriptor.addField(tenantBuilderFact.getInMaintenanceKey(), field.getValue());
                     break;
                 default:
                     break;

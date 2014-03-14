@@ -101,8 +101,7 @@ public class ServerAPIExtTest {
 
         // When:
         serverAPIExtSpy.checkMethodAccessibility(new FakeTenantLevelAPI(), FakeTenantLevelAPI.class.getName(),
-                FakeTenantLevelAPI.class.getMethod("platformAPIMethod", new Class[0]),
-                session);
+                FakeTenantLevelAPI.class.getMethod("platformAPIMethod", new Class[0]), session);
 
         // Then:
         verify(serverAPIExtSpy, never()).isTenantAvailable(anyLong(), any(Session.class));
