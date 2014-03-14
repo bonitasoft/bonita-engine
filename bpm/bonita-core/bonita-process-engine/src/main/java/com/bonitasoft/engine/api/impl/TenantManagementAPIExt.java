@@ -58,7 +58,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     @Override
     public boolean isPaused() {
-        long tenantId = getTenantId();
+        final long tenantId = getTenantId();
         final GetTenantInstance getTenant = new GetTenantInstance(tenantId, getPlatformAccessorNoException().getPlatformService());
         try {
             getTenant.execute();
@@ -79,15 +79,15 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     private void setTenantPaused(final boolean shouldBePaused) throws UpdateException {
-        PlatformServiceAccessor platformServiceAccessor = getPlatformAccessorNoException();
+        final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformServiceAccessor.getPlatformService();
-        BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
+        final BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
 
-        long tenantId = getTenantId();
+        final long tenantId = getTenantId();
         STenant tenant;
         try {
             tenant = platformService.getTenant(tenantId);
-        } catch (STenantNotFoundException e) {
+        } catch (final STenantNotFoundException e) {
             throw new UpdateException("Tenant does not exist", e);
         }
         if (shouldBePaused && !STenant.ACTIVATED.equals(tenant.getStatus()) || !shouldBePaused && !STenant.PAUSED.equals(tenant.getStatus())) {
@@ -110,17 +110,17 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             throws UpdateException {
 
         // clustered services
-        SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
-        SessionService sessionService = platformServiceAccessor.getSessionService();
+        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+        final SessionService sessionService = platformServiceAccessor.getSessionService();
         try {
             schedulerService.pauseJobs(tenantId);
             sessionService.deleteSessionsOfTenantExceptTechnicalUser(tenantId);
-        } catch (SSchedulerException e) {
+        } catch (final SSchedulerException e) {
             throw new UpdateException("Unable to pause the scheduler.", e);
         }
 
         // on all nodes
-        Map<String, TaskResult<Void>> result = broadcastService.execute(createPauseServicesTask(tenantId), tenantId);
+        final Map<String, TaskResult<Void>> result = broadcastService.execute(createPauseServicesTask(tenantId), tenantId);
         handleResult(result);
     }
 
@@ -131,24 +131,24 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     private void resumeServicesForTenant(final PlatformServiceAccessor platformServiceAccessor, final BroadcastService broadcastService, final long tenantId)
             throws UpdateException {
         // clustered services
-        SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         try {
             schedulerService.resumeJobs(tenantId);
-        } catch (SSchedulerException e) {
+        } catch (final SSchedulerException e) {
             throw new UpdateException("Unable to resume the scheduler.", e);
         }
         // on all nodes
-        Map<String, TaskResult<Void>> result = broadcastService.execute(createResumeServicesTask(tenantId), tenantId);
+        final Map<String, TaskResult<Void>> result = broadcastService.execute(createResumeServicesTask(tenantId), tenantId);
         handleResult(result);
 
-        NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
-        TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
+        final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
+        final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
         try {
-            List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
-            for (TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
+            final List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
+            for (final TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
                 tenantRestartHandler.handleRestart(platformServiceAccessor, tenantServiceAccessor);
             }
-        } catch (RestartException e) {
+        } catch (final RestartException e) {
             throw new UpdateException("Unable to resume all elements of the work service.", e);
         }
 
@@ -159,7 +159,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     private void handleResult(final Map<String, TaskResult<Void>> result) throws UpdateException {
-        for (Entry<String, TaskResult<Void>> entry : result.entrySet()) {
+        for (final Entry<String, TaskResult<Void>> entry : result.entrySet()) {
             if (entry.getValue().isError()) {
                 throw new UpdateException("There is at least one exception on the node " + entry.getKey(), entry.getValue().getThrowable());
             }
@@ -181,7 +181,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     protected void updateTenant(final PlatformService platformService, final EntityUpdateDescriptor descriptor, final STenant tenant) throws UpdateException {
         try {
             platformService.updateTenant(tenant, descriptor);
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new UpdateException("Could not update the tenant maintenance mode", e);
         }
     }
@@ -197,7 +197,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     @Override
-    @AvailableWhenTenantIsPaused
+    @AvailableWhenTenantIsPaused(only = true)
     public void installBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
@@ -212,6 +212,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     @Override
+    @AvailableWhenTenantIsPaused(only = true)
     public void uninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {

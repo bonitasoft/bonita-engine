@@ -77,13 +77,18 @@ public class BDRIT extends CommonAPISPTest {
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
+        getTenantManagementAPI().pause();
         getTenantManagementAPI().installBusinessDataRepository(zip);
+        getTenantManagementAPI().resume();
     }
 
     @After
     public void tearDown() throws BonitaException {
+        getTenantManagementAPI().pause();
         getTenantManagementAPI().uninstallBusinessDataRepository();
+        getTenantManagementAPI().resume();
         deleteUser(matti);
+
         logout();
     }
 

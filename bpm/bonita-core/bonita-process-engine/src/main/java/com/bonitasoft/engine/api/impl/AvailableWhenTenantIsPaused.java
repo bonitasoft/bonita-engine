@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,9 +23,12 @@ import java.lang.annotation.Target;
  * Used by the BonitaBPM Engine server interceptor.
  * 
  * @author Emmanuel Duchastenier
+ * @author Matthieu Chaffotte
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AvailableWhenTenantIsPaused {
+
+    boolean only() default false;
 
 }
