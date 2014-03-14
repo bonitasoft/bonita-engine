@@ -1,11 +1,15 @@
 package org.bonitasoft.engine.lock.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.SLockException;
@@ -29,9 +33,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class MemoryLockServiceTest {
@@ -199,7 +201,23 @@ public class MemoryLockServiceTest {
         // now it should be able to have it
         assertTrue(t3.isLockObtained());
         s3.release();
-
     }
 
+    @Test
+    public void getDetailsOnLockShouldReturnLockingTheadOwnerName() throws Exception {
+        // given:
+        MemoryLockService spiedLockService = spy(memoryLockService);
+        long objectToLockId = 151L;
+        String lockKey = "objectType_" + objectToLockId + "_" + tenantId;
+        ReentrantLock lock = spy(new ReentrantLock());
+        lock.lock();
+        doReturn(false).when(lock).isHeldByCurrentThread();
+        doReturn(lock).when(spiedLockService).getLockFromKey(lockKey);
+
+        // when:
+        StringBuilder detailsOnLock = spiedLockService.getDetailsOnLock(objectToLockId, "objectType", tenantId);
+
+        // then:
+        assertThat(detailsOnLock).describedAs("detailsOnLock should contain 'held by thread main'").contains("held by thread main");
+    }
 }
