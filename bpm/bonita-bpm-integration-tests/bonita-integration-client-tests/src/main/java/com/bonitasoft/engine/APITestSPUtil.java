@@ -72,8 +72,6 @@ public class APITestSPUtil extends APITestUtil {
 
     private ReportingAPI reportingAPI;
 
-    private TenantManagementAPI tenantManagementAPI;
-
     private ThemeAPI themeAPI;
 
     private TenantManagementAPI tenantManagementAPI;
