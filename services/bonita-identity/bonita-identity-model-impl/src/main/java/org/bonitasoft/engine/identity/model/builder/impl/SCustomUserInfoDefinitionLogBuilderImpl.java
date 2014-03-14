@@ -25,7 +25,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
  */
 public class SCustomUserInfoDefinitionLogBuilderImpl extends CRUDELogBuilder implements SCustomUserInfoDefinitionLogBuilder {
 
-    private static final String PREFIX = "IDENTITY_SPROFILE_METADATA_DEFINITION";
+    private static final String PREFIX = "IDENTITY_CUSTOM_USER_INFO_DEFINITION";
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {
