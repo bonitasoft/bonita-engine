@@ -49,21 +49,21 @@ public class CustomUserInfoAPI {
         if(definitions.size() == 0) {
             return Collections.emptyList();
         }
-        Map<String, CustomUserInfoValue> values = transform(searchCorrespondingValues(userId, definitions));
+        Map<Long, CustomUserInfoValue> values = transform(searchCorrespondingValues(userId, definitions));
         List<CustomUserInfo> info = new ArrayList<CustomUserInfo>();
         for (SCustomUserInfoDefinition definition : definitions) {
             info.add(new CustomUserInfo(
                     userId,
                     converter.convert(definition),
-                    values.get(definition.getName())));
+                    values.get(definition.getId())));
         }
         return info;
     }
 
-    private Map<String, CustomUserInfoValue> transform(List<SCustomUserInfoValue> values) {
-        Map<String, CustomUserInfoValue> map = new HashMap<String, CustomUserInfoValue>();
+    private Map<Long, CustomUserInfoValue> transform(List<SCustomUserInfoValue> values) {
+        Map<Long, CustomUserInfoValue> map = new HashMap<Long, CustomUserInfoValue>();
         for (SCustomUserInfoValue value : values) {
-            map.put(value.getName(), converter.convert(value));
+            map.put(value.getDefinitionId(), converter.convert(value));
         }
         return map;
     }

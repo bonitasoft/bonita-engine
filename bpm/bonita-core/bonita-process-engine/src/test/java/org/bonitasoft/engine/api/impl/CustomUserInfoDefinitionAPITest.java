@@ -13,6 +13,12 @@
  */
 package org.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,13 +33,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 /**
  * @author Vincent Elcrin
@@ -59,7 +58,7 @@ public class CustomUserInfoDefinitionAPITest {
         given(service.createCustomUserInfoDefinition(any(SCustomUserInfoDefinition.class)))
                 .willReturn(new DummySCustomUserInfoDefinition(1L));
 
-        CustomUserInfoDefinition definition = api.create(factory, new CustomUserInfoDefinitionCreator());
+        CustomUserInfoDefinition definition = api.create(factory, new CustomUserInfoDefinitionCreator("skill"));
 
         assertThat(definition.getId()).isEqualTo(1L);
     }

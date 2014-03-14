@@ -23,8 +23,8 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 public interface SCustomUserInfoValue extends PersistentObject {
 
     long getUserId();
-
-    String getName();
+    
+    long getDefinitionId();
 
     String getValue();
 

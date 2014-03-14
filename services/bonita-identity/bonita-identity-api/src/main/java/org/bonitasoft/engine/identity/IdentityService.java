@@ -573,14 +573,15 @@ public interface IdentityService {
     SCustomUserInfoDefinition getCustomUserInfoDefinition(long customUserInfoDefinitionId) throws SIdentityException;
 
     /**
-     * Get profileMetadataValue by its id
+     * Get custom user info value by its id
      * 
      * @param customUserInfoValueId
-     *            The identifier of profileMetadataValue
+     *            The identifier of the custom user info value
      * @return the profileMetadataValue
-     * @throws SIdentityException
+     * @throws SCustomUserInfoValueNotFoundException if no custom user info value is found for the given id
+     * @throws SCustomUserInfoValueReadException if an exception occurs while trying to get the custom user info value
      */
-    SCustomUserInfoValue getCustomUserInfoValue(long customUserInfoValueId) throws SIdentityException;
+    SCustomUserInfoValue getCustomUserInfoValue(long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException, SCustomUserInfoValueReadException;
 
     /**
      * Get profileMetadataValue by its name

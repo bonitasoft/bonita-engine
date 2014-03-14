@@ -1,11 +1,10 @@
 package org.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
-import org.bonitasoft.engine.identity.impl.CustomUserInfoValueImpl;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Vincent Elcrin
@@ -30,9 +29,9 @@ public class CustomUserInfoConverterTest {
         CustomUserInfoConverter converter = new CustomUserInfoConverter();
 
         CustomUserInfoValue value = converter.convert(
-                new DummySCustomUserInfoValue("name", "value", 1L));
+                new DummySCustomUserInfoValue(2L, "value", 1L));
 
-        assertThat(value.getName()).isEqualTo("name");
+        assertThat(value.getDefinitionId()).isEqualTo(2L);
         assertThat(value.getValue()).isEqualTo("value");
         assertThat(value.getUserId()).isEqualTo(1L);
     }

@@ -23,7 +23,7 @@ public interface SCustomUserInfoValueBuilder {
 
     SCustomUserInfoValueBuilder setUserId(final long userId);
 
-    SCustomUserInfoValueBuilder setMetadataName(final String metadataName);
+    SCustomUserInfoValueBuilder setDefinitionId(final long definitionId);
 
     SCustomUserInfoValueBuilder setValue(final String value);
 

@@ -82,7 +82,7 @@ CREATE INDEX idx_user_contactinfo ON user_contactinfo (userId, tenantid, persona
 CREATE TABLE custom_usr_inf_def (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  name VARCHAR(75) NOT NULL,
   displayName VARCHAR(75),
   description LONGVARCHAR,
   UNIQUE (tenantid, name),
@@ -93,11 +93,13 @@ CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (name);
 
 CREATE TABLE custom_usr_inf_val (
   tenantid BIGINT NOT NULL,
-  metadataName VARCHAR(50) NOT NULL,
-  userName VARCHAR(50) NOT NULL,
-  value VARCHAR(50),
-  PRIMARY KEY (tenantid, metadataName, userName)
+  definitionId BIGINT NOT NULL,
+  userId BIGINT NOT NULL,
+  value VARCHAR(255),
+  PRIMARY KEY (tenantid, definitionId, userId)
 );
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_user_id FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
+ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_definition_id FOREIGN KEY (tenantid, definitionId) REFERENCES custom_usr_inf_def (tenantid, id) ON DELETE CASCADE;
 
 CREATE TABLE user_membership (
   tenantid BIGINT NOT NULL,

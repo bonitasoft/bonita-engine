@@ -24,7 +24,7 @@ public class CustomUserInfoValueImpl implements CustomUserInfoValue {
 
     private long userId;
 
-    private String name;
+    private long definitionId;
 
     private String value;
 
@@ -38,12 +38,12 @@ public class CustomUserInfoValueImpl implements CustomUserInfoValue {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public long getDefinitionId() {
+        return definitionId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDefinitionId(long definitionId) {
+        this.definitionId = definitionId;
     }
 
     @Override

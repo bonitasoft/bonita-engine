@@ -13,19 +13,17 @@
  **/
 package org.bonitasoft.engine.identity;
 
-import org.bonitasoft.engine.bpm.BonitaObject;
-
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public interface CustomUserInfoValue extends BonitaObject {
+public class SCustomUserInfoValueNotFoundException extends SIdentityException {
 
-    long getUserId();
+    private static final long serialVersionUID = 2269304406690155075L;
 
-    long getDefinitionId();
+    public SCustomUserInfoValueNotFoundException(long id) {
+        super("No custom user info value found with id '" + id  + "'");
+    }
 
-    String getValue();
-    
 }
