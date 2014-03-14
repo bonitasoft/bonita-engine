@@ -48,20 +48,22 @@ public interface TenantManagementAPI {
     void resume() throws UpdateException;
 
     /**
-     * Pause the tenant so nothing is executed anymore.
-     * when the tenant is paused:
-     * Only technical user can login when the tenant is paused.
-     * All users connected are disconnected (apart from the technical user).
-     * Only IdentityAPI, ThemeAPI and ProfileAPI are accessible.
+     * Installs a new business data model.
      * 
      * @param zip
-     *            the Business Data Model to install, as a byte[].
+     *            the binary content of the business object model.
      * @throws InvalidBusinessDataModelException
-     *             if the Business Data Model passed as parameter is invalid.
+     *             if the Business Data Model content passed as parameter is invalid.
      * @throws BusinessDataRepositoryDeploymentException
-     *             if the tenant cannot be paused.
+     *             if the deployment cannot be fulfilled completely.
      */
-    public void installBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
+    void installBusinessDataRepository(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
-    public void uninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException;
+    /**
+     * Uninstalls the business data model.
+     * 
+     * @throws BusinessDataRepositoryDeploymentException
+     *             if the deployment cannot be fulfilled completely.
+     */
+    void uninstallBusinessDataRepository() throws BusinessDataRepositoryDeploymentException;
 }

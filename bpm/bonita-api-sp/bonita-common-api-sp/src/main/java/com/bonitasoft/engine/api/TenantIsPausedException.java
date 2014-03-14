@@ -11,7 +11,6 @@ package com.bonitasoft.engine.api;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 
 /**
- * 
  * Occurs when we try to login with an other user than the technical user on a tenant that is paused.
  * 
  * @author Emmanuel Duchastenier

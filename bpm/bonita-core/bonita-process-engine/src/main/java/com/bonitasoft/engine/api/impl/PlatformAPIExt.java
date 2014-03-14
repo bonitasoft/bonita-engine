@@ -319,13 +319,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             @Override
             public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
-            final ReportingService reportingService = tenantAccessor.getReportingService();
+                final ReportingService reportingService = tenantAccessor.getReportingService();
                 final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
                         description, screenShot);
-            final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-            // Here we are already in a transaction, so we can call execute() directly:
-            addReport.execute();
-        }
+                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
+                // Here we are already in a transaction, so we can call execute() directly:
+                addReport.execute();
+            }
         });
     }
 

@@ -76,6 +76,8 @@ public class APITestSPUtil extends APITestUtil {
 
     private ThemeAPI themeAPI;
 
+    private TenantManagementAPI tenantManagementAPI;
+
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
         return PlatformAPIAccessor.getPlatformLoginAPI();
