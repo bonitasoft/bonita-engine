@@ -182,8 +182,6 @@
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
 		<property name="shouldStartScheduler" value="true" />
 		<property name="shouldRestartElements" value="true" />
-		<property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
-		<property name="cleanInvalidSessionsJobCron" value="${org.bonitasoft.engine.clean.invalid.sessions.cron}" />
 		<property name="shouldStartEventHandlingJob" value="true" />
 	</bean>
 

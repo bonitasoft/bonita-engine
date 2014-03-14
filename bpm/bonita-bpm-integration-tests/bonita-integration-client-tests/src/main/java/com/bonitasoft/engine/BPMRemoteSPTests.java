@@ -42,6 +42,7 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         ReportingAPIIT.class,
         PlatformMonitoringAPITest.class,
         TenantTest.class,
+        TenantMaintenanceTestSP.class,
         BDRIT.class
 })
 @Initializer(TestsInitializerSP.class)

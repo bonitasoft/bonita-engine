@@ -320,13 +320,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             @Override
             public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
-                final ReportingService reportingService = tenantAccessor.getReportingService();
+            final ReportingService reportingService = tenantAccessor.getReportingService();
                 final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
                         description, screenShot);
-                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-                // Here we are already in a transaction, so we can call execute() directly:
-                addReport.execute();
-            }
+            final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
+            // Here we are already in a transaction, so we can call execute() directly:
+            addReport.execute();
+        }
         });
     }
 
@@ -393,8 +393,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final WorkService workService = platformAccessor.getWorkService();
-            final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
+            final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 
@@ -402,8 +401,12 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
-                    platformAccessor.getTechnicalLoggerService(), workService);
+            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+
+            final WorkService workService = tenantServiceAccessor.getWorkService();
+
+            final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
+                    platformAccessor.getTechnicalLoggerService(), workService, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
         } catch (final TenantNotFoundException e) {
@@ -442,7 +445,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final WorkService workService = platformAccessor.getWorkService();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 
@@ -450,7 +452,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
             sessionService.deleteSessionsOfTenant(tenantId);
@@ -614,9 +616,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         final PlatformService platformService = getPlatformService();
         // check existence for tenant
-        Tenant tenant;
         try {
-            tenant = getTenantById(tenantId);
+            STenant tenant = platformService.getTenant(tenantId);
             // update user name and password in file system
             final Map<TenantField, Serializable> updatedFields = udpater.getFields();
             final String username = (String) updatedFields.get(TenantField.USERNAME);
@@ -626,11 +627,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
             // update tenant in database
             final EntityUpdateDescriptor changeDescriptor = getTenantUpdateDescriptor(udpater);
-            final UpdateTenant updateTenant = new UpdateTenant(tenant.getId(), changeDescriptor, platformService);
-            updateTenant.execute();
-            return getTenantById(tenantId);
-        } catch (final TenantNotFoundException e) {
-            throw new UpdateException(e);
+            platformService.updateTenant(tenant, changeDescriptor);
+            return SPModelConvertor.toTenant(tenant);
         } catch (final BonitaHomeNotSetException e) {
             throw new UpdateException(e);
         } catch (final IOException e) {

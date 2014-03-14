@@ -107,9 +107,6 @@
 	</bean>
 
 	<bean id="batchLogRegister" class="com.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
-		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="schedulerService" ref="scheduler" />
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
 		<constructor-arg name="cronExpression" value="0/5 * * * * ?" />
 	</bean>
 

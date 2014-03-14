@@ -8,22 +8,27 @@
  *******************************************************************************/
 package com.bonitasoft.engine.work;
 
+import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.work.BonitaExecutorServiceFactory;
 import org.bonitasoft.engine.work.WorkerThreadFactory;
 
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
+import com.hazelcast.core.Cluster;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- *
+ * 
  * Factory that use a hazelcast executor
- *
+ * 
  * @author Baptiste Mesta
  * @author Laurent Vaills
  */
@@ -37,7 +42,11 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
 
     private final long keepAliveTimeSeconds;
 
-    public ClusteredLocalQueueBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
+    private final long tenantId;
+
+    public ClusteredLocalQueueBonitaExecutorServiceFactory(final long tenantId, final int corePoolSize, final int maximumPoolSize,
+            final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
+        this.tenantId = tenantId;
         this.hazelcastInstance = hazelcastInstance;
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
@@ -48,10 +57,18 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
     }
 
     @Override
-    public ThreadPoolExecutor createExecutorService() {
+    public Pair<ExecutorService, Queue<Runnable>> createExecutorService() {
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
-        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", maximumPoolSize);
-        return new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance);
+        final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
+        BlockingQueue<Runnable> queue = createWorkQueue(hazelcastInstance);
+        return Pair.<ExecutorService, Queue<Runnable>> of(new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds,
+                TimeUnit.SECONDS, threadFactory, handler,
+                hazelcastInstance, queue), queue);
+    }
+
+    private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {
+        Cluster cluster = hazelcastInstance.getCluster();
+        return hazelcastInstance.getQueue(ClusteredThreadPoolExecutorLocalQueue.memberWorkQueueName(cluster.getLocalMember()));
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {

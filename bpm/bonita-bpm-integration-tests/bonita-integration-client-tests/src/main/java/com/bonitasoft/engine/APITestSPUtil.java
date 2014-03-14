@@ -139,12 +139,12 @@ public class APITestSPUtil extends APITestUtil {
         return reportingAPI;
     }
 
-    public TenantManagementAPI getTenantManagementAPI() {
-        return tenantManagementAPI;
-    }
-
     public LogAPI getLogAPI() {
         return logAPI;
+    }
+
+    public TenantManagementAPI getTenantManagementAPI() {
+        return tenantManagementAPI;
     }
 
     public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
@@ -256,6 +256,7 @@ public class APITestSPUtil extends APITestUtil {
         parameters.put("startIndex", 0);
         parameters.put("maxResults", 10000);
         parameters.put("sort", BreakpointCriterion.DEFINITION_ID_ASC);
+        @SuppressWarnings("unchecked")
         final List<Breakpoint> breakpoints = (List<Breakpoint>) getCommandAPI().execute("getBreakpoints", parameters);
         if (!breakpoints.isEmpty()) {
             final StringBuilder bpBuilder = new StringBuilder("Breakpoints are still present: ");

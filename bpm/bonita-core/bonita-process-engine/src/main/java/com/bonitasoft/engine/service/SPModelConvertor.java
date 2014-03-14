@@ -104,7 +104,7 @@ public final class SPModelConvertor extends ModelConvertor {
     public static STenant constructTenant(final TenantCreator tCreator) {
         final Map<TenantField, Serializable> fields = tCreator.getFields();
         final STenantBuilder sTenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance((String) fields.get(TenantField.NAME),
-                "defaultUser", System.currentTimeMillis(), TENANT_STATUS_DEACTIVATED, (Boolean) fields.get(TenantField.DEFAULT_TENANT), false);
+                "defaultUser", System.currentTimeMillis(), TENANT_STATUS_DEACTIVATED, (Boolean) fields.get(TenantField.DEFAULT_TENANT));
         sTenantBuilder.setDescription((String) fields.get(TenantField.DESCRIPTION));
         sTenantBuilder.setIconName((String) fields.get(TenantField.ICON_NAME));
         sTenantBuilder.setIconPath((String) fields.get(TenantField.ICON_PATH));
