@@ -36,10 +36,9 @@ public class TenantManagementTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
         final String description = "description";
-        boolean inMaintenance = true;
 
         final STenantBuilder sTenantBuilder = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED,
-                false, inMaintenance);
+                false);
         sTenantBuilder.setDescription(description);
 
         final STenant tenant = sTenantBuilder.done();
@@ -48,7 +47,6 @@ public class TenantManagementTest extends CommonServiceTest {
         assertThat(tenant.getCreatedBy()).isEqualTo(createdBy);
         assertThat(tenant.getCreated()).isEqualTo(created);
         assertThat(tenant.getDescription()).isEqualTo(description);
-        assertThat(tenant.isInMaintenance()).isEqualTo(inMaintenance);
     }
 
     @Test(expected = STenantAlreadyExistException.class)
@@ -71,8 +69,7 @@ public class TenantManagementTest extends CommonServiceTest {
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
 
-        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
-                .createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false, STenantBuilderFactory.IN_MAINTENANCE).done();
+        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
         long tenantId = getPlatformService().createTenant(tenant);
@@ -85,7 +82,6 @@ public class TenantManagementTest extends CommonServiceTest {
         assertThat(readTenant.getName()).isEqualTo(tenant.getName());
         assertThat(readTenant.getCreatedBy()).isEqualTo(tenant.getCreatedBy());
         assertThat(readTenant.getCreated()).isEqualTo(tenant.getCreated());
-        assertThat(readTenant.isInMaintenance()).isEqualTo(STenantBuilderFactory.IN_MAINTENANCE);
 
         deleteTenant(tenant.getId());
     }
@@ -218,10 +214,8 @@ public class TenantManagementTest extends CommonServiceTest {
         final String name = "tenant1";
         final String createdBy = "mycreatedBy";
         final long created = System.currentTimeMillis();
-        boolean inMaintenance = true;
 
-        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class)
-                .createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false, inMaintenance).done();
+        final STenant tenant = BuilderFactory.get(STenantBuilderFactory.class).createNewInstance(name, createdBy, created, STATUS_DEACTIVATED, false).done();
 
         getTransactionService().begin();
         getPlatformService().createTenant(tenant);

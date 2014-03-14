@@ -78,8 +78,7 @@ public class PlatformServiceImpl implements PlatformService {
     private final SPlatformProperties sPlatformProperties;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final List<TenantPersistenceService> tenantPersistenceServices,
-            final TechnicalLoggerService logger, final PlatformCacheService platformCacheService,
-            final SPlatformProperties sPlatformProperties) {
+            final TechnicalLoggerService logger, final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.logger = logger;
@@ -141,16 +140,14 @@ public class PlatformServiceImpl implements PlatformService {
         // check if the tenant already exists. If yes, throws
         // TenantAlreadyExistException
         STenant existingTenant = null;
+        String tenantName = tenant.getName();
         try {
-            existingTenant = getTenantByName(tenant.getName());
+            existingTenant = getTenantByName(tenantName);
         } catch (final STenantNotFoundException e) {
-            if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createTenant", e));
-            }
             // OK
         }
         if (existingTenant != null) {
-            throw new STenantAlreadyExistException("Unable to create the tenant " + tenant.getName() + " : it already exists.");
+            throw new STenantAlreadyExistException("Unable to create the tenant " + tenantName + " : it already exists.");
         }
 
         // create the tenant
@@ -285,7 +282,7 @@ public class PlatformServiceImpl implements PlatformService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteTenant"));
         }
         final STenant tenant = getTenant(tenantId);
-        if (tenant.getStatus().equals(ACTIVATED)) {
+        if (tenant.getStatus().equals(STenant.ACTIVATED)) {
             throw new SDeletingActivatedTenantException();
         }
         try {
@@ -328,7 +325,7 @@ public class PlatformServiceImpl implements PlatformService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteTenantObjects"));
         }
         final STenant tenant = getTenant(tenantId);
-        if (tenant.getStatus().equals(ACTIVATED)) {
+        if (tenant.getStatus().equals(STenant.ACTIVATED)) {
             throw new SDeletingActivatedTenantException();
         }
         try {
@@ -531,11 +528,10 @@ public class PlatformServiceImpl implements PlatformService {
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "updateTenant"));
         }
-        final String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
+        String tenantName = (String) descriptor.getFields().get(BuilderFactory.get(STenantBuilderFactory.class).getNameKey());
         if (tenantName != null) {
             try {
-                final STenant sTenant = getTenantByName(tenantName);
-                if (tenant.getId() != sTenant.getId()) {
+                if (getTenantByName(tenantName).getId() != tenant.getId()) {
                     throw new STenantUpdateException("Unable to update the tenant with new name " + tenantName + " : it already exists.");
                 }
             } catch (final STenantNotFoundException e) {
@@ -567,7 +563,7 @@ public class PlatformServiceImpl implements PlatformService {
             return false;
         } else {
             final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-            desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), ACTIVATED);
+            desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.ACTIVATED);
             try {
                 platformPersistenceService.update(desc);
                 if (trace) {
@@ -593,7 +589,7 @@ public class PlatformServiceImpl implements PlatformService {
         }
         final STenant tenant = getTenant(tenantId);
         final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), DEACTIVATED);
+        desc.addField(BuilderFactory.get(STenantBuilderFactory.class).getStatusKey(), STenant.DEACTIVATED);
         try {
             platformPersistenceService.update(desc);
             if (trace) {
@@ -646,7 +642,8 @@ public class PlatformServiceImpl implements PlatformService {
 
     @Override
     public boolean isTenantActivated(final STenant sTenant) {
-        return ACTIVATED.equals(sTenant.getStatus());
+        // the tenant is activated as soon as it is not deactivated (but it can be paused)
+        return !STenant.DEACTIVATED.equals(sTenant.getStatus());
     }
 
     @Override

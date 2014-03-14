@@ -1,33 +1,45 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
+import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
+import org.bonitasoft.engine.scheduler.ServicesResolver;
+import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilderFactory;
+import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
+import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -48,7 +60,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest(BuilderFactory.class)
 public class SchedulerServiceImplTest {
 
-    private SchedulerServiceImpl schedulerService;
+    SchedulerServiceImpl schedulerService;
 
     @Mock
     private SchedulerExecutor schedulerExecutor;
@@ -58,6 +70,8 @@ public class SchedulerServiceImplTest {
 
     @Mock
     private EventService eventService;
+
+    ServicesResolver servicesResolver;
 
     @Before
     public void setUp() {
@@ -91,8 +105,9 @@ public class SchedulerServiceImplTest {
         when(sLogBuilder.actionStatus(any(int.class))).thenReturn(sLogBuilder);
         when(sLogBuilder.severity(any(SQueriableLogSeverity.class))).thenReturn(sLogBuilder);
         when(sLogBuilder.rawMessage(anyString())).thenReturn(sLogBuilder);
-
-        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor);
+        servicesResolver = mock(ServicesResolver.class);
+        schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService,
+                transactionService, sessionAccessor, servicesResolver);
     }
 
     @Test
@@ -146,25 +161,25 @@ public class SchedulerServiceImplTest {
         verify(schedulerExecutor).shutdown();
         verify(eventService).fireEvent(any(SEvent.class));
     }
-    
+
     @Test
     public void delete_delete_job_and_jobDescription() throws Exception {
         String jobName = "aJobName";
-        
+
         schedulerService.delete(jobName);
-        
+
         verify(schedulerExecutor).delete(jobName);
         verify(jobService).deleteJobDescriptorByJobName(jobName);
     }
-    
+
     @Test
     public void delete_return_schedulerexecutor_deletion_status() throws Exception {
         boolean expectedDeletionStatus = new Random().nextBoolean();
         String jobName = "jobName";
         when(schedulerExecutor.delete(jobName)).thenReturn(expectedDeletionStatus);
-        
+
         boolean deletionStatus = schedulerExecutor.delete(jobName);
-        
+
         assertThat(deletionStatus).isEqualTo(expectedDeletionStatus);
     }
 
@@ -180,7 +195,7 @@ public class SchedulerServiceImplTest {
     public void cannot_schedule_a_null_job() throws Exception {
         Trigger trigger = mock(Trigger.class);
         when(jobService.createJobDescriptor(any(SJobDescriptor.class), any(Long.class))).thenThrow(new SJobDescriptorCreationException(""));
-        
+
         schedulerService.schedule(null, trigger);
     }
 
@@ -191,4 +206,69 @@ public class SchedulerServiceImplTest {
         verify(schedulerExecutor).rescheduleErroneousTriggers();
     }
 
+    @Test
+    public void should_pauseJobs_of_tenant_call_schedulerExecutor() throws Exception {
+        schedulerService.resumeJobs(123l);
+
+        verify(schedulerExecutor, times(1)).resumeJobs(123l);
+    }
+
+    @Test
+    public void should_pauseJobs_of_tenant_call_schedulerExecutor_rethrow_exception() throws Exception {
+        SSchedulerException theException = new SSchedulerException("My exception");
+        doThrow(theException).when(schedulerExecutor).resumeJobs(123l);
+        try {
+            schedulerService.resumeJobs(123l);
+            fail("should have rethrown the exception");
+        } catch (SSchedulerException e) {
+            assertEquals(theException, e);
+        }
+    }
+
+    @Test
+    public void should_injectService_inject_setter_hacing_the_annotation() throws Exception {
+        BeanThatNeedMyService beanThatNeedMyService = new BeanThatNeedMyService();
+
+        Long myService = new Long(1);
+        when(servicesResolver.lookup("myService")).thenReturn(myService);
+
+        schedulerService.injectServices(beanThatNeedMyService);
+
+        assertEquals(myService, beanThatNeedMyService.getMyService());
+
+    }
+
+    private final class BeanThatNeedMyService implements StatelessJob {
+
+        private static final long serialVersionUID = 1L;
+
+        private Object myService;
+
+        @InjectedService
+        public void setMyService(final Object myService) {
+            this.myService = myService;
+        }
+
+        public Object getMyService() {
+            return myService;
+        }
+
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public String getDescription() {
+            return null;
+        }
+
+        @Override
+        public void execute() throws SJobExecutionException, FireEventException {
+        }
+
+        @Override
+        public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+        }
+    }
 }

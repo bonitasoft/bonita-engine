@@ -79,6 +79,11 @@ public class SpringTenantFileSystemBeanAccessor {
         return getContext().getBean(name, serviceClass);
     }
 
+    @SuppressWarnings("unchecked")
+    protected <T> T getService(final String name) {
+        return (T) getContext().getBean(name);
+    }
+
     protected FileSystemXmlApplicationContext getContext() {
         if (context == null) {
             initializeContext(null);
@@ -91,22 +96,29 @@ public class SpringTenantFileSystemBeanAccessor {
             // Inject the tenantId as a resolvable placeholder for the bean definitions.
             Properties properties = new Properties();
             properties.put("tenantId", String.valueOf(tenantId));
-
+            try {
+                properties.putAll(BonitaHomeServer.getInstance().getTenantProperties(tenantId));
+            } catch (BonitaHomeNotSetException e) {
+                throw new IllegalStateException(e);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
             PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
             ppc.setProperties(properties);
-
             SpringPlatformFileSystemBeanAccessor.initializeContext(classLoader);
             final FileSystemXmlApplicationContext platformContext = SpringPlatformFileSystemBeanAccessor.getContext();
             // Delay the refresh so we can set our BeanFactoryPostProcessor to be able to resolve the placeholder.
-            context = new AbsoluteFileSystemXmlApplicationContext(getResources(), false /* refresh */, platformContext);
-            context.addBeanFactoryPostProcessor(ppc);
+            AbsoluteFileSystemXmlApplicationContext localContext = new AbsoluteFileSystemXmlApplicationContext(getResources(), false /* refresh */,
+                    platformContext);
+            localContext.addBeanFactoryPostProcessor(ppc);
 
-            context.refresh();
+            localContext.refresh();
+            this.context = localContext;
         }
     }
 
     public void destroy() {
-        context.destroy();
+        context.close();
         context = null;
     }
 

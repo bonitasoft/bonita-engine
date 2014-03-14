@@ -18,10 +18,12 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Map;
 
+import org.bonitasoft.engine.scheduler.ServicesResolver;
+
 /**
  * @author Matthieu Chaffotte
  */
-public final class ServicesAccessor {
+public final class ServicesAccessor implements ServicesResolver {
 
     private static class ServiceAccessorHolder {
 
@@ -86,6 +88,12 @@ public final class ServicesAccessor {
     public void destroy() {
         context.destroy();
         context = null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T lookup(final String serviceName) {
+        return (T) context.getBean(serviceName);
     }
 
 }

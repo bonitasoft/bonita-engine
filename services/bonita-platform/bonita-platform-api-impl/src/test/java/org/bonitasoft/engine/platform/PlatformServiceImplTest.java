@@ -18,7 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -293,6 +293,14 @@ public class PlatformServiceImplTest {
     }
 
     @Test
+    public final void should_isTenantActivated_return_true_when_tenant_is_paused() {
+        final STenant tenant = mock(STenant.class);
+        when(tenant.getStatus()).thenReturn("PAUSED");
+
+        assertTrue(platformServiceImpl.isTenantActivated(tenant));
+    }
+
+    @Test
     public final void searchTenants() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
         sTenants.add(buildTenant(87, "tenant"));
@@ -338,16 +346,15 @@ public class PlatformServiceImplTest {
     }
 
     private STenant buildTenant(final long id, final String name) {
-        return buildTenant(id, name, "me", 468786l, "ACTIVATED", true, false);
+        return buildTenant(id, name, "me", 468786l, "ACTIVATED", true);
     }
 
     private STenant buildTenant(final String status) {
-        return buildTenant(45, "tenant", "me", 1567l, status, false, false);
+        return buildTenant(45, "tenant", "me", 1567l, status, false);
     }
 
-    private STenant buildTenant(final long id, final String name, final String createdBy, final long created, final String status, final boolean defaultTenant,
-            final boolean inMaintenance) {
-        final STenantImpl tenant = new STenantImpl(name, createdBy, created, status, defaultTenant, inMaintenance);
+    private STenant buildTenant(final long id, final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {
+        final STenantImpl tenant = new STenantImpl(name, createdBy, created, status, defaultTenant);
         tenant.setId(id);
         return tenant;
     }

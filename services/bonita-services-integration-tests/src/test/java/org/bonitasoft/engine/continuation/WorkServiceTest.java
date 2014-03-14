@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.work.WorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
@@ -20,12 +21,12 @@ import org.junit.Test;
 public class WorkServiceTest extends CommonServiceTest {
 
     @Before
-    public void before() {
+    public void before() throws SBonitaException {
         getWorkService().start();
     }
 
     @After
-    public void after() throws TimeoutException {
+    public void after() throws TimeoutException, SBonitaException {
         getWorkService().stop();
     }
 

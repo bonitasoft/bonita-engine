@@ -18,12 +18,6 @@ package org.bonitasoft.engine.platform.model.builder;
  */
 public interface STenantBuilderFactory {
 
-    public static final boolean IN_MAINTENANCE = true;
-
-    public static final boolean AVAILABLE = false;
-
-    STenantBuilder createNewInstance(String name, String createdBy, long created, String status, boolean defaultTenant, boolean inMaintenance);
-
     STenantBuilder createNewInstance(String name, String createdBy, long created, String status, boolean defaultTenant);
 
     String getIdKey();
@@ -43,7 +37,5 @@ public interface STenantBuilderFactory {
     String getStatusKey();
 
     String getDefaultTenantKey();
-
-    String getInMaintenanceKey();
 
 }

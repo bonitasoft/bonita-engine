@@ -19,7 +19,6 @@ CREATE TABLE tenant (
   iconpath NVARCHAR(255),
   name NVARCHAR(50) NOT NULL,
   status NVARCHAR(15) NOT NULL,
-  inMaintenance BIT NOT NULL,
   PRIMARY KEY (id)
 )
 GO

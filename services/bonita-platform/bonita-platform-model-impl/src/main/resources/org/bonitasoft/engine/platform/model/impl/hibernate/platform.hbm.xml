@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping auto-import="false" default-access="field"
-	package="org.bonitasoft.engine.platform.model.impl">
+<hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.platform.model.impl">
 
   <class name="SPlatformImpl" table="platform">
     <id column="id" name="id" type="long" />
@@ -23,7 +22,6 @@
     <property name="iconPath" column="iconpath" type="java.lang.String"/>
     <property name="name" column="name" type="java.lang.String"/>
 	<property name="status" column="status" type="java.lang.String"/>
-    <property name="inMaintenance" column="inMaintenance" type="java.lang.Boolean"/>
   </class>
 
 </hibernate-mapping>

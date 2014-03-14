@@ -18,6 +18,7 @@
 				<prop key="org.quartz.jobStore.dontSetAutoCommitFalse">true</prop>
 				<prop key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">true</prop>
 				<prop key="org.quartz.scheduler.userTransactionURL">${userTransaction}</prop>
+				<prop key="org.quartz.jobStore.misfireThreshold">2000</prop>
 			</props>
 		</constructor-arg>
 	</bean>
@@ -57,6 +58,9 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="servicesResolver" >
+			<bean class="org.bonitasoft.engine.test.util.TestsServicesResolver" />
+		</constructor-arg>
 	</bean>
 
 	<bean id="db-bonita-scheduler-quartz" class="org.bonitasoft.engine.persistence.DBConfiguration">

@@ -17,6 +17,12 @@ public class UnixCronTrigger extends OneExecutionTrigger implements CronTrigger 
         this.endDate = null;
     }
 
+    public UnixCronTrigger(final String name, final Date startDate, final int priority, final String expression, final MisfireRestartPolicy misfireRestartPolicy) {
+        super(name, startDate, priority, misfireRestartPolicy);
+        this.expression = expression;
+        this.endDate = null;
+    }
+
     public UnixCronTrigger(final String name, final Date startDate, final int priority, final String expression, final Date endDate) {
         super(name, startDate, priority);
         this.expression = expression;

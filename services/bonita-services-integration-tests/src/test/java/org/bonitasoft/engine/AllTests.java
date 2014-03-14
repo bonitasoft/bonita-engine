@@ -18,7 +18,7 @@ import org.bonitasoft.engine.platform.command.PlatformCommandServiceIntegrationT
 import org.bonitasoft.engine.profile.ProfileServiceTest;
 import org.bonitasoft.engine.recorder.RecorderTest;
 import org.bonitasoft.engine.scheduler.impl.JobTest;
-import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorTest;
+import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorITest;
 import org.bonitasoft.engine.session.PlatformSessionServiceTest;
 import org.bonitasoft.engine.session.SessionServiceTest;
 import org.bonitasoft.engine.xml.ParserTest;
@@ -47,7 +47,7 @@ import org.junit.runners.Suite.SuiteClasses;
         // -- SqlTest.class,
         // -- Tests using the scheduler
         RecorderTest.class,
-        QuartzSchedulerExecutorTest.class,
+        QuartzSchedulerExecutorITest.class,
         JobTest.class,
         CommandServiceIntegrationTest.class,
         // DocumentServiceTest.class,

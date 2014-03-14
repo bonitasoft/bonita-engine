@@ -38,7 +38,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
     @Override
     public void handleRestart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
         final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
-        final WorkService workService = platformServiceAccessor.getWorkService();
+        final WorkService workService = tenantServiceAccessor.getWorkService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         try {
             QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
@@ -63,22 +63,24 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
     }
 
     private void logInfo(final TechnicalLoggerService logger, final String message) {
-        final boolean info = logger.isLoggable(getClass(), TechnicalLogSeverity.INFO);
-        if (info) {
+        final boolean isInfo = logger.isLoggable(getClass(), TechnicalLogSeverity.INFO);
+        if (isInfo) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, message);
         }
     }
 
     private void createExecuteFlowNodeWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
             throws WorkRegisterException {
-        logInfo(logger, "restarting flow node (Execute..) " + sFlowNodeInstance.getName() + ":" + sFlowNodeInstance.getId());
+        logInfo(logger, "Restarting flow node (Execute ...) with name " + sFlowNodeInstance.getName() + ", and id " + sFlowNodeInstance.getId() + " in state "
+                + sFlowNodeInstance.getStateName());
         // ExecuteFlowNodeWork and ExecuteConnectorOfActivityWork
         workService.registerWork(WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getId(), null, null, sFlowNodeInstance.getParentProcessInstanceId()));
     }
 
     private void createNotifyChildFinishedWork(final WorkService workService, final TechnicalLoggerService logger, final SFlowNodeInstance sFlowNodeInstance)
             throws WorkRegisterException {
-        logInfo(logger, "restarting flow node (Notify...) " + sFlowNodeInstance.getName() + ":" + sFlowNodeInstance.getId());
+        logInfo(logger, "Restarting flow node (Notify finished...) with name " + sFlowNodeInstance.getName() + ", and id " + sFlowNodeInstance.getId()
+                + " in state " + sFlowNodeInstance.getStateName());
         // NotifyChildFinishedWork, if it is terminal it means the notify was not called yet
         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sFlowNodeInstance.getProcessDefinitionId(), sFlowNodeInstance
                 .getParentProcessInstanceId(), sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType()
