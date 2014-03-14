@@ -63,4 +63,9 @@ public class SPageBuilderFactoryImpl implements SPageBuilderFactory {
         return "displayName";
     }
 
+    @Override
+    public String getLastModificationDateKey() {
+        return "lastModificationDate";
+    }
+
 }

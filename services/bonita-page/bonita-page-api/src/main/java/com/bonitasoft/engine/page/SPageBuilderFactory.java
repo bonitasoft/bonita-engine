@@ -30,6 +30,8 @@ public interface SPageBuilderFactory {
 
     String getInstallationDateKey();
 
+    String getLastModificationDateKey();
+
     String getInstalledByKey();
 
 }

@@ -19,10 +19,14 @@ public class PageSearchDescriptor {
 
     public static final String DISPLAY_NAME = "displayName";
 
-    public static final String INSTALLATION_DATE = "installationDate";
-
     public static final String INSTALLED_BY = "installedBy";
 
     public static final String PROVIDED = "provided";
+
+    public static final String INSTALLATION_DATE = "installationDate";
+
+    public static final String LAST_MODIFICATION_DATE = "lastModificationDate";
+
+
 
 }

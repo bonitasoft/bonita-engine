@@ -38,11 +38,13 @@ public class SearchPageDescriptor extends SearchEntityDescriptor {
         pageKeys.put(PageSearchDescriptor.NAME, new FieldDescriptor(SPage.class, keyProvider.getNameKey()));
         pageKeys.put(PageSearchDescriptor.PROVIDED, new FieldDescriptor(SPage.class, keyProvider.getProvidedKey()));
         pageKeys.put(PageSearchDescriptor.INSTALLATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getInstallationDateKey()));
+        pageKeys.put(PageSearchDescriptor.LAST_MODIFICATION_DATE, new FieldDescriptor(SPage.class, keyProvider.getLastModificationDateKey()));
         pageKeys.put(PageSearchDescriptor.INSTALLED_BY, new FieldDescriptor(SPage.class, keyProvider.getInstalledByKey()));
         pageKeys.put(PageSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SPage.class, keyProvider.getDisplayNameKey()));
 
         pageAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
-        final Set<String> pageFields = new HashSet<String>(8);
+
+        final Set<String> pageFields = new HashSet<String>(2);
         pageFields.add(keyProvider.getNameKey());
         pageFields.add(keyProvider.getDisplayNameKey());
         pageAllFields.put(SPage.class, pageFields);
