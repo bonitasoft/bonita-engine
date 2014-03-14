@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.lock.impl;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,13 +74,9 @@ public class MemoryLockService implements LockService {
     }
 
     private static final class MemoryLockServiceMutex {
-        
+
     }
-    
-    private static final class MemoryLockServiceReentrantLock extends ReentrantLock {
-        
-    }
-    
+
     private Object getMutex(final long objectToLockId) {
         final int poolKeyForThisObjectId = Long.valueOf(objectToLockId % lockPoolSize).intValue();
         if (!mutexs.containsKey(poolKeyForThisObjectId)) {
@@ -91,13 +88,13 @@ public class MemoryLockService implements LockService {
     protected ReentrantLock getLock(final String key) {
         if (!locks.containsKey(key)) {
             // use fair mode?
-            locks.put(key, new MemoryLockServiceReentrantLock());
+            locks.put(key, new ReentrantLock());
         }
-        return locks.get(key);
+        return getLockFromKey(key);
     }
 
     protected ReentrantLock removeLockFromMapIfNotUsed(final String key) {
-        final ReentrantLock reentrantLock = locks.get(key);
+        final ReentrantLock reentrantLock = getLockFromKey(key);
         /*
          * The reentrant lock must not have waiting thread that tries to lock it, nor a lockservice.lock that locked it
          */
@@ -158,7 +155,7 @@ public class MemoryLockService implements LockService {
                 // Ensure the lock is still in the map : someone may have called unlock
                 // between the synchronized block and the tryLock call
                 synchronized (getMutex(objectToLockId)) {
-                    ReentrantLock previousLock = locks.get(key);
+                    ReentrantLock previousLock = getLockFromKey(key);
 
                     if (previousLock == null) {
                         // Someone unlocked the lock while we were tryLocking so it was removed from the Map.
@@ -195,27 +192,35 @@ public class MemoryLockService implements LockService {
         return lock;
     }
 
-    private StringBuilder getDetailsOnLock(final long objectToLockId, final String objectType, final long tenantId) {
+    protected StringBuilder getDetailsOnLock(final long objectToLockId, final String objectType, final long tenantId) {
         String key = buildKey(objectToLockId, objectType, tenantId);
-        ReentrantLock reentrantLock = locks.get(key);
+        ReentrantLock reentrantLock = getLockFromKey(key);
         StringBuilder details = new StringBuilder(", Details: ");
         if (reentrantLock == null) {
             details.append("The lock was removed from the locks map in the memory lock service");
-        } else {
-            details.append("The lock is locked ");
-            details.append(reentrantLock.isLocked());
-            details.append(", held by current thread ");
-            details.append(reentrantLock.isHeldByCurrentThread());
-            try {
-                Thread thread = (Thread) reentrantLock.getClass().getDeclaredMethod("getOwner").invoke(reentrantLock);
-                details.append(", held by thread ");
-                details.append(thread.getName());
-            } catch (Exception e) {
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Error while fetching details on lock for an exception", e);
+        } else if (reentrantLock.isLocked()) {
+            details.append("The lock is locked");
+            if (reentrantLock.isHeldByCurrentThread()) {
+                details.append(", held by current thread.");
+            } else {
+                try {
+                    Method getOwnerMethod = reentrantLock.getClass().getDeclaredMethod("getOwner");
+                    getOwnerMethod.setAccessible(true);
+                    Thread thread = (Thread) getOwnerMethod.invoke(reentrantLock);
+                    details.append(", held by thread ");
+                    details.append(thread.getName());
+                } catch (Exception e) {
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Error while fetching exception details on lock.", e);
+                }
             }
-
+        } else {
+            details.append("no additional details could be found (lock exists and is not locked, there should be no problem).");
         }
         return details;
+    }
+
+    protected ReentrantLock getLockFromKey(final String key) {
+        return locks.get(key);
     }
 
     TechnicalLogSeverity selectSeverity(final long time) {
