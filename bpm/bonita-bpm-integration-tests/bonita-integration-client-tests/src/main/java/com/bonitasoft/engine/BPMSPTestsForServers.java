@@ -19,10 +19,11 @@ import org.junit.runners.Suite.SuiteClasses;
 @Initializer(BPMSPTestsForServers.class)
 public class BPMSPTestsForServers {
 
-    static APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+    private static APITestSPUtil apiTestUtil = new APITestSPUtil();
 
     public static void beforeAll() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.beforeClass()");
+        apiTestUtil.createPlatformStructure();
         SPBPMTestUtil.createEnvironmentWithDefaultTenant();
         System.setProperty("delete.job.frequency", "0/30 * * * * ?");
     }
@@ -30,6 +31,7 @@ public class BPMSPTestsForServers {
     public static void afterAll() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.afterClass()");
         SPBPMTestUtil.destroyEnvironmentWithoutTenant();
+        apiTestUtil.deletePlatformStructure();
     }
 
 }
