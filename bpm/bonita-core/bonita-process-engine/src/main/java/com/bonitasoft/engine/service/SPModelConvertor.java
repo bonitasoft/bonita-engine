@@ -278,7 +278,7 @@ public final class SPModelConvertor extends ModelConvertor {
         final Map<PageField, Serializable> fields = pageCreator.getFields();
         final String name = (String) fields.get(PageField.NAME);
         final String description = (String) fields.get(PageField.DESCRIPTION);
-        final String displayName = (String) fields.get(PageField.DESCRIPTION);
+        final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
         final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
                 System.currentTimeMillis(), creatorUserId,
                 false, null);

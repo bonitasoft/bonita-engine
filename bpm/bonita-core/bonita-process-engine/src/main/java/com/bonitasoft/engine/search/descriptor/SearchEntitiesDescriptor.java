@@ -46,4 +46,8 @@ public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search
         return new SearchReportDescriptor();
     }
 
+    public SearchPageDescriptor getSearchPageDescriptor() {
+        return new SearchPageDescriptor();
+    }
+
 }

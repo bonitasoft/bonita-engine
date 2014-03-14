@@ -15,12 +15,14 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.PageAPI;
 import com.bonitasoft.engine.api.impl.transaction.page.AddPage;
+import com.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import com.bonitasoft.engine.api.impl.transaction.reporting.GetReport;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageNotFoundException;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.SPage;
+import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -42,8 +44,16 @@ public class PageAPIExt implements PageAPI {
 
     @Override
     public SearchResult<Page> searchPages(final SearchOptions searchOptions) throws SearchException {
-        // TODO Auto-generated method stub
-        return null;
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final PageService pageService = tenantAccessor.getPageService();
+        final SearchPages searchPages = new SearchPages(pageService, searchEntitiesDescriptor.getSearchPageDescriptor(), searchOptions);
+        try {
+            searchPages.execute();
+            return searchPages.getResult();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
+        }
     }
 
     @Override

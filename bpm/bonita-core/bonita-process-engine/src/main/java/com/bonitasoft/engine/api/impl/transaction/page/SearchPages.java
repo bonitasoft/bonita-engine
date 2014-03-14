@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -23,7 +23,7 @@ import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.service.SPModelConvertor;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
 public class SearchPages extends AbstractSearchEntity<Page, SPage> {
 
