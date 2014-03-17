@@ -1795,6 +1795,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 field = fact.getNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final GetCategories getCategories = new GetCategories(startIndex, maxResults, field, categoryService, order);
@@ -1955,6 +1957,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             case NAME_DESC:
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return order;
     }
@@ -3375,6 +3379,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         try {
             userTransactionService.executeInTransaction(new Callable<Void>() {
+
                 @Override
                 public Void call() throws Exception {
                     processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
@@ -3396,6 +3401,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final UserTransactionService userTxService = tenantAccessor.getUserTransactionService();
         try {
             final List<SProcessInstance> sProcessInstances = userTxService.executeInTransaction(new Callable<List<SProcessInstance>>() {
+
                 @Override
                 public List<SProcessInstance> call() throws SBonitaSearchException {
                     return searchProcessInstancesFromProcessDefinition(processInstanceService, processDefinitionId, startIndex, maxResults);
@@ -3412,6 +3418,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             try {
                 locks = createLockProcessInstances(lockService, objectType, sProcessInstances, tenantAccessor.getTenantId());
                 return userTxService.executeInTransaction(new Callable<Long>() {
+
                     @Override
                     public Long call() throws Exception {
                         return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
@@ -3788,6 +3795,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                     supervisorBuilder.setGroupId(groupId);
                     supervisorBuilder.setRoleId(roleId);
                     break;
+                default:
+                    throw new IllegalStateException();
             }
 
             supervisor = supervisorBuilder.done();

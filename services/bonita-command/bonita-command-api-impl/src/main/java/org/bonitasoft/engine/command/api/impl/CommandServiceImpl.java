@@ -230,6 +230,8 @@ public class CommandServiceImpl implements CommandService {
                 orderByType = OrderByType.DESC;
                 field = "name";
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final SelectListDescriptor<SCommand> descriptor = SelectDescriptorBuilder.getCommands(field, orderByType, startIndex, maxResults);
@@ -294,6 +296,8 @@ public class CommandServiceImpl implements CommandService {
                 orderByType = OrderByType.DESC;
                 field = "name";
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final SelectListDescriptor<SCommand> descriptor = SelectDescriptorBuilder.getUserCommands(field, orderByType, startIndex, maxResults);

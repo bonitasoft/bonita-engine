@@ -80,6 +80,8 @@ public class CMISQueryBuilder {
                             sQuery.append(" cmis:contentStreamLength > 0 ");
                         }
                         break;
+                    default:
+                        throw new IllegalStateException();
                 }
             } else {
                 sQuery.append(" ").append(object).append(" ");

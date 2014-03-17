@@ -112,6 +112,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
                 startDate = new Date();
                 trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), startDate, (String) result);
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return trigger;
     }
@@ -154,9 +156,11 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
             final SCatchEventInstance eventInstance) {
         final List<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
         jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("processDefinitionId", processDefinition.getId()).done());
-        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("containerType", SFlowElementsContainerType.PROCESS.name()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("containerType", SFlowElementsContainerType.PROCESS.name())
+                .done());
         jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("eventType", eventDefinition.getType().name()).done());
-        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("targetSFlowNodeDefinitionId", eventDefinition.getId()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("targetSFlowNodeDefinitionId", eventDefinition.getId())
+                .done());
         if (SFlowNodeType.START_EVENT.equals(eventDefinition.getType())) {
             final SStartEventDefinition startEvent = (SStartEventDefinition) eventDefinition;
             jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("isInterrupting", startEvent.isInterrupting()).done());
@@ -173,7 +177,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         jobParameters.addAll(getJobParameters(processDefinition, eventDefinition, eventInstance));
         jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("subProcessId", subProcessId).done());
         jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("processInstanceId", parentProcessInstance.getId()).done());
-        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("rootProcessInstanceId", parentProcessInstance.getRootProcessInstanceId()).done());
+        jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class)
+                .createNewInstance("rootProcessInstanceId", parentProcessInstance.getRootProcessInstanceId()).done());
         return jobParameters;
     }
 

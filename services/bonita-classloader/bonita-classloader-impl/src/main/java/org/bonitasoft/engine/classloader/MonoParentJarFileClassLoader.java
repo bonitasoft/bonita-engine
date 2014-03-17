@@ -1,5 +1,5 @@
-/**                                                                                                                                                                                                                                            
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+/**
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,19 +34,24 @@ import org.apache.xbean.classloader.UnionEnumeration;
 import org.apache.xbean.classloader.UrlResourceFinder;
 
 /**
- * This class is higlhy inspired form JarFileClassLoader from xbean. The main diffrence is that 
+ * This class is higlhy inspired form JarFileClassLoader from xbean. The main diffrence is that
  * it inherits from NamedClassLoader instead of MultiParentClassLoader.
  */
 public class MonoParentJarFileClassLoader extends NamedClassLoader {
+
     private static final URL[] EMPTY_URLS = new URL[0];
 
     private final UrlResourceFinder resourceFinder = new UrlResourceFinder();
+
     private final AccessControlContext acc;
 
     /**
      * Creates a JarFileClassLoader that is a child of the system class loader.
-     * @param name the name of this class loader
-     * @param urls a list of URLs from which classes and resources should be loaded
+     * 
+     * @param name
+     *            the name of this class loader
+     * @param urls
+     *            a list of URLs from which classes and resources should be loaded
      */
     public MonoParentJarFileClassLoader(String name, URL[] urls) {
         super(name, EMPTY_URLS);
@@ -56,9 +61,13 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
 
     /**
      * Creates a JarFileClassLoader that is a child of the specified class loader.
-     * @param name the name of this class loader
-     * @param urls a list of URLs from which classes and resources should be loaded
-     * @param parent the parent of this class loader
+     * 
+     * @param name
+     *            the name of this class loader
+     * @param urls
+     *            a list of URLs from which classes and resources should be loaded
+     * @param parent
+     *            the parent of this class loader
      */
     public MonoParentJarFileClassLoader(String name, URL[] urls, ClassLoader parent) {
         super(name, EMPTY_URLS, parent);
@@ -80,6 +89,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
     @Override
     public void addURL(final URL url) {
         AccessController.doPrivileged(new PrivilegedAction() {
+
             @Override
             public Object run() {
                 MonoParentJarFileClassLoader.this.resourceFinder.addUrl(url);
@@ -90,10 +100,13 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
 
     /**
      * Adds an array of urls to the end of this class loader.
-     * @param urls the URLs to add
+     * 
+     * @param urls
+     *            the URLs to add
      */
     protected void addURLs(final URL[] urls) {
         AccessController.doPrivileged(new PrivilegedAction() {
+
             @Override
             public Object run() {
                 if (urls != null && urls.length > 0) {
@@ -121,6 +134,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
     @Override
     public URL findResource(final String resourceName) {
         return (URL) AccessController.doPrivileged(new PrivilegedAction() {
+
             @Override
             public Object run() {
                 return MonoParentJarFileClassLoader.this.resourceFinder.findResource(resourceName);
@@ -133,12 +147,13 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
      */
     @Override
     public Enumeration findResources(final String resourceName) throws IOException {
-        // todo this is not right
+        // TODO this is not right
         // first get the resources from the parent classloaders
-        Enumeration parentResources = super.findResources(resourceName);
+        Enumeration<?> parentResources = super.findResources(resourceName);
 
         // get the classes from my urls
         Enumeration myResources = (Enumeration) AccessController.doPrivileged(new PrivilegedAction() {
+
             @Override
             public Object run() {
                 return MonoParentJarFileClassLoader.this.resourceFinder.findResources(resourceName);
@@ -146,8 +161,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
         }, this.acc);
 
         // join the two together
-        Enumeration resources = new UnionEnumeration(parentResources, myResources);
-        return resources;
+        return new UnionEnumeration(parentResources, myResources);
     }
 
     /**
@@ -173,6 +187,7 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
 
         // get a resource handle to the library
         ResourceHandle resourceHandle = (ResourceHandle) AccessController.doPrivileged(new PrivilegedAction() {
+
             @Override
             public Object run() {
                 return MonoParentJarFileClassLoader.this.resourceFinder.getResource(resourceName);
@@ -189,39 +204,23 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
             return null;
         }
 
-        String path = new File(URI.create(url.toString())).getPath();
-        return path;
+        return new File(URI.create(url.toString())).getPath();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Class findClass(final String className) throws ClassNotFoundException {
+    protected Class<?> findClass(final String className) throws ClassNotFoundException {
         try {
-            return (Class) AccessController.doPrivileged(new PrivilegedExceptionAction() {
+            return (Class<?>) AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+
                 @Override
                 public Object run() throws ClassNotFoundException {
-                    // first think check if we are allowed to define the package
-                    SecurityManager securityManager = System.getSecurityManager();
-                    if (securityManager != null) {
-                        String packageName;
-                        int packageEnd = className.lastIndexOf('.');
-                        if (packageEnd >= 0) {
-                            packageName = className.substring(0, packageEnd);
-                            securityManager.checkPackageDefinition(packageName);
-                        }
-                    }
+                    // First think check if we are allowed to define the package
+                    checkPackageDefinition(className);
 
-
-                    // convert the class name to a file name
-                    String resourceName = className.replace('.', '/') + ".class";
-
-                    // find the class file resource
-                    ResourceHandle resourceHandle = MonoParentJarFileClassLoader.this.resourceFinder.getResource(resourceName);
-                    if (resourceHandle == null) {
-                        throw new ClassNotFoundException(className);
-                    }
+                    ResourceHandle resourceHandle = findClassFileResource(className);
 
                     byte[] bytes;
                     Manifest manifest;
@@ -248,11 +247,34 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
                     CodeSource codeSource = new CodeSource(codeSourceUrl, certificates);
 
                     // load the class into the vm
-                    Class clazz = defineClass(className, bytes, 0, bytes.length, codeSource);
-                    return clazz;
+                    return defineClass(className, bytes, 0, bytes.length, codeSource);
+                }
+
+                private ResourceHandle findClassFileResource(final String className) throws ClassNotFoundException {
+                    // convert the class name to a file name
+                    String resourceName = className.replace('.', '/') + ".class";
+
+                    // find the class file resource
+                    ResourceHandle resourceHandle = MonoParentJarFileClassLoader.this.resourceFinder.getResource(resourceName);
+                    if (resourceHandle == null) {
+                        throw new ClassNotFoundException(className);
+                    }
+                    return resourceHandle;
+                }
+
+                private void checkPackageDefinition(final String className) {
+                    SecurityManager securityManager = System.getSecurityManager();
+                    if (securityManager != null) {
+                        String packageName;
+                        int packageEnd = className.lastIndexOf('.');
+                        if (packageEnd >= 0) {
+                            packageName = className.substring(0, packageEnd);
+                            securityManager.checkPackageDefinition(packageName);
+                        }
+                    }
                 }
             }, this.acc);
-        } catch (PrivilegedActionException e) {
+        } catch (final PrivilegedActionException e) {
             throw (ClassNotFoundException) e.getException();
         }
     }
@@ -321,4 +343,3 @@ public class MonoParentJarFileClassLoader extends NamedClassLoader {
         return "true".equalsIgnoreCase(sealed);
     }
 }
-

@@ -64,6 +64,8 @@ public class UpdateSPlatformCommand implements TransactionContent {
                 case DESCRIPTION:
                     platformCommandUpdateBuilder.updateDescription((String) field.getValue());
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         }
         return platformCommandUpdateBuilder.done();

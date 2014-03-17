@@ -196,7 +196,7 @@ public class APITestUtil {
     }
 
     protected void loginWith(final String userName, final String password) throws BonitaException {
-        setSession(APITestUtil.loginDefaultTenant(userName, password));
+        setSession(APITestUtil.loginTenant(userName, password));
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
@@ -482,7 +482,7 @@ public class APITestUtil {
         return getProcessAPI().deployAndEnableProcess(businessArchive);
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final User user)
+    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName, final User user)
             throws BonitaException {
         return deployAndEnableWithActor(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user));
     }
@@ -503,37 +503,32 @@ public class APITestUtil {
         return deployAndEnableWithActorAndParameters(designProcessDefinition, Arrays.asList(actorName), Arrays.asList(user), parameters);
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
+    public ProcessDefinition deployAndEnableWithActor(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
             final List<User> users) throws BonitaException {
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
-        for (int i = 0; i < users.size(); i++) {
-            addMappingOfActorsForUser(actorsName.get(i), users.get(i).getId(), processDefinition);
-        }
-        try {
-            getProcessAPI().enableProcess(processDefinition.getId());
-        } catch (final ProcessEnablementException e) {
-            final List<Problem> problems = getProcessAPI().getProcessResolutionProblems(processDefinition.getId());
-            throw new ProcessEnablementException("not resolved: " + problems);
-        }
-        return processDefinition;
+        return deployAndEnableWithActor(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done(),
+                actorsName, users);
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final List<String> actorsName, final List<User> users)
+    public ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final List<String> actorsName, final List<User> users)
             throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
         for (int i = 0; i < users.size(); i++) {
             addMappingOfActorsForUser(actorsName.get(i), users.get(i).getId(), processDefinition);
         }
-        getProcessAPI().enableProcess(processDefinition.getId());
+        try {
+            processAPI.enableProcess(processDefinition.getId());
+        } catch (final ProcessEnablementException e) {
+            final List<Problem> problems = processAPI.getProcessResolutionProblems(processDefinition.getId());
+            throw new ProcessEnablementException("not resolved: " + problems);
+        }
         return processDefinition;
     }
 
-    protected ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorName, final User user) throws BonitaException {
+    public ProcessDefinition deployAndEnableWithActor(final BusinessArchive businessArchive, final String actorName, final User user) throws BonitaException {
         return deployAndEnableWithActor(businessArchive, Collections.singletonList(actorName), Collections.singletonList(user));
     }
 
-    protected ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
+    public ProcessDefinition deployAndEnableWithActorAndParameters(final DesignProcessDefinition designProcessDefinition, final List<String> actorsName,
             final List<User> users, final Map<String, String> parameters) throws BonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive();
         final BusinessArchive businessArchive = businessArchiveBuilder.setParameters(parameters).setProcessDefinition(designProcessDefinition).done();
@@ -1155,10 +1150,10 @@ public class APITestUtil {
     }
 
     public static APISession loginDefaultTenant() throws BonitaException {
-        return loginDefaultTenant("install", "install");
+        return loginTenant("install", "install");
     }
 
-    public static APISession loginDefaultTenant(final String userName, final String password) throws BonitaException {
+    public static APISession loginTenant(final String userName, final String password) throws BonitaException {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         return loginAPI.login(userName, password);
     }
