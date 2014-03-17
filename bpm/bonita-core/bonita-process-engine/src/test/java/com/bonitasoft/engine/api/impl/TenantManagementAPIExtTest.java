@@ -123,10 +123,10 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void setMaintenanceModeToMAINTENANCEShouldPauseWorkService() throws Exception {
+    public void pauseTenantShouldPauseWorkService() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
 
-        // given a tenant moved to maintenance mode
+        // given a tenant moved to pause mode:
         tenantManagementAPI.pause();
 
         // then his work service should be pause
@@ -134,7 +134,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void setMaintenanceModeToAVAILLABLEShouldResumeWorkService() throws Exception {
+    public void resumeTenantShouldResumeWorkService() throws Exception {
 
         // given a tenant moved to available mode
         tenantManagementAPI.resume();
@@ -144,7 +144,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void should_setMaintenanceMode_to_AVAILLABLE_throw_exception_when_workservice_fail() throws Exception {
+    public void resumeTenant_should_throwExceptionWhenWorkserviceFail() throws Exception {
         doThrow(WorkException.class).when(workService).resume();
 
         // given a tenant moved to available mode
@@ -152,7 +152,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void should_setMaintenanceMode_to_AVAILLABLE_restart_elements() throws Exception {
+    public void resumeTenant_should_restartElements() throws Exception {
 
         // given a tenant moved to available mode
         tenantManagementAPI.resume();
@@ -163,7 +163,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void should_setMaintenanceMode_to_AVAILLABLE__throw_exception_when_RestartHandler_fail() throws Exception {
+    public void resumeTenant_should_throw_exception_when_RestartHandler_fail() throws Exception {
         doThrow(RestartException.class).when(tenantRestartHandler2).handleRestart(platformServiceAccessor, tenantServiceAccessor);
 
         // given a tenant moved to available mode
@@ -171,7 +171,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void should_setMaintenanceMode_to_MAINTENANCE_pause_jobs() throws Exception {
+    public void pauseTenant_should_pause_jobs() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
 
         tenantManagementAPI.pause();
@@ -180,14 +180,14 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void should_setMaintenanceMode_to_AVAILABLE_pause_jobs() throws Exception {
+    public void resumeTenant_should_pause_jobs() throws Exception {
         tenantManagementAPI.resume();
 
         verify(schedulerService).resumeJobs(tenantId);
     }
 
     @Test
-    public void should_setMaintenanceMode_to_MAINTENANCE_delete_sessions() throws Exception {
+    public void pauseTenant_should_delete_sessions() throws Exception {
         whenTenantIsInState(STenant.ACTIVATED);
 
         tenantManagementAPI.pause();
@@ -196,16 +196,30 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void should_setMaintenanceMode_to_AVAILABLE_delete_sessions() throws Exception {
+    public void resumeTenant_should_delete_sessions() throws Exception {
         tenantManagementAPI.resume();
 
         verify(sessionService, times(0)).deleteSessionsOfTenantExceptTechnicalUser(tenantId);
     }
 
     @Test
-    public void setTenantMaintenanceModeShouldHaveAnnotationAvailableOnMaintenanceTenant() throws Exception {
-        assertTrue("Annotation @AvailableWhenTenantIsPaused should be present on API method TenantManagementAPIExt",
-                TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
+    public void resumeTenantShouldHaveAnnotationAvailableWhenTenantIsPaused() throws Exception {
+        final Method method = TenantManagementAPIExt.class.getMethod("resume");
+
+        assertTrue(
+                "Annotation @AvailableWhenTenantIsPaused should be present on API method 'resume' or directly on class TenantManagementAPIExt",
+                method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
+                        || TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
+    }
+
+    @Test
+    public void pauseTenantShouldHaveAnnotationAvailableWhenTenantIsPaused() throws Exception {
+        final Method method = TenantManagementAPIExt.class.getMethod("pause");
+
+        assertTrue(
+                "Annotation @AvailableWhenTenantIsPaused should be present on API method 'pause' or directly on class TenantManagementAPIExt",
+                method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
+                        || TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
     }
 
     @Test
@@ -266,6 +280,24 @@ public class TenantManagementAPIExtTest {
         doThrow(STenantNotFoundException.class).when(platformService).getTenant(tenantId);
 
         tenantManagementAPI.resume();
+    }
+
+    @Test
+    public void installBDRShouldBeAvailableWhenTenantIsPaused_ONLY() throws Exception {
+        final Method method = TenantManagementAPIExt.class.getMethod("installBusinessDataRepository", byte[].class);
+        AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
+        assertTrue("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataRepository(byte[])'",
+                annotation != null && annotation.only());
+
+    }
+
+    @Test
+    public void uninstallBDRShouldBeAvailableWhenTenantIsPaused_ONLY() throws Exception {
+        final Method method = TenantManagementAPIExt.class.getMethod("uninstallBusinessDataRepository");
+        AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
+        assertTrue("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataRepository()'", annotation != null
+                && annotation.only());
+
     }
 
     @Test
