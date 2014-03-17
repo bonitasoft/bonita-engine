@@ -10,6 +10,7 @@ package com.bonitasoft.engine.page;
 
 import java.util.List;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -38,5 +39,9 @@ public interface PageService {
     byte[] getPageContent(long pageId) throws SBonitaReadException, SObjectNotFoundException;
 
     List<SPage> searchPages(QueryOptions options) throws SBonitaSearchException;
+
+    SPage updatePage(long pageId, SPage page) throws SBonitaException;
+
+    void updatePageContent(long pageId, byte[] content) throws SBonitaException;
 
 }

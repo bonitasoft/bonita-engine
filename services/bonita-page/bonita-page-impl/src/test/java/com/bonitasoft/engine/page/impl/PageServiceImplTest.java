@@ -64,36 +64,6 @@ public class PageServiceImplTest {
         serviceImpl.getNumberOfPages(options);
     }
 
-    //
-    // @Test
-    // public void searchPages() throws SBonitaException {
-    // final EventService eventService = mock(EventService.class);
-    // final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-    // final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-    // final PageServiceImpl serviceImpl = new PageServiceImpl(null, persistence, null, eventService, logger, null);
-    // final QueryOptions options = mock(QueryOptions.class);
-    // when(logger.isLoggable(PageServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
-    // final List<SPage> expected = new ArrayList<SPage>();
-    // expected.add(new SPageImpl("page1", 123456, 45, true));
-    // expected.add(new SPageImpl("page2", 12345656, 145, false));
-    // when(persistence.searchEntity(SPage.class, options, null)).thenReturn(expected);
-    //
-    // final List<SPage> pages = serviceImpl.searchPages(options);
-    // Assert.assertEquals(expected, pages);
-    // }
-    //
-    // @Test(expected = SBonitaSearchException.class)
-    // public void searchPagesThrowsException() throws SBonitaException {
-    // final EventService eventService = mock(EventService.class);
-    // final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-    // final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
-    // final PageServiceImpl serviceImpl = new PageServiceImpl(null, persistence, null, eventService, logger, null);
-    // final QueryOptions options = mock(QueryOptions.class);
-    // when(logger.isLoggable(PageServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
-    // when(persistence.searchEntity(SPage.class, options, null)).thenThrow(new SBonitaReadException("ouch!"));
-    // serviceImpl.searchPages(options);
-    // }
-
     @Test
     public void getPage() throws SBonitaException {
         final EventService eventService = mock(EventService.class);
@@ -193,6 +163,53 @@ public class PageServiceImplTest {
         when(loggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
 
         serviceImpl.deletePage(pageId);
+
     }
+
+    // @Test
+    // public void updatePage() {
+    // final EventService eventService = mock(EventService.class);
+    // final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+    // final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
+    // final Recorder recorder = mock(Recorder.class);
+    // final QueriableLoggerService loggerService = mock(QueriableLoggerService.class);
+    // final PageServiceImpl serviceImpl = new PageServiceImpl(persistence, recorder, eventService, logger, loggerService);
+    // when(logger.isLoggable(PageServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
+    // final long pageId = 15;
+    // final SPage expected = new SPageImpl("page1", 123456, 45, true);
+    // expected.setId(pageId);
+    //
+    // // doAnswer(new Answer<Object>() {
+    // //
+    // // @Override
+    // // public Object answer(final InvocationOnMock invocation) throws Throwable {
+    // // throw new SRecorderException("ouch !");
+    // // }
+    // //
+    // // }).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+    // when(persistence.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
+    // when(loggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
+    //
+    // serviceImpl.deletePage(pageId);
+    // }
+
+    // @Test
+    // public void updatePageContent() {
+    // final EventService eventService = mock(EventService.class);
+    // final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+    // final ReadPersistenceService persistence = mock(ReadPersistenceService.class);
+    // final Recorder recorder = mock(Recorder.class);
+    // final QueriableLoggerService loggerService = mock(QueriableLoggerService.class);
+    // final PageServiceImpl serviceImpl = new PageServiceImpl(persistence, recorder, eventService, logger, loggerService);
+    // when(logger.isLoggable(PageServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
+    // final long pageId = 15;
+    // final SPage expected = new SPageImpl("page1", 123456, 45, true);
+    // expected.setId(pageId);
+    //
+    // when(persistence.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId))).thenReturn(expected);
+    // when(loggerService.isLoggable(any(String.class), any(SQueriableLogSeverity.class))).thenReturn(true);
+    //
+    // serviceImpl.updatePage(pageId, sPage)
+    // }
 
 }

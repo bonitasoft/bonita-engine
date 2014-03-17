@@ -48,6 +48,8 @@ import com.bonitasoft.engine.monitoring.impl.MemoryUsageImpl;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageCreator.PageField;
+import com.bonitasoft.engine.page.PageUpdater;
+import com.bonitasoft.engine.page.PageUpdater.PageUpdateField;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.page.SPageBuilder;
 import com.bonitasoft.engine.page.SPageBuilderFactory;
@@ -285,4 +287,14 @@ public final class SPModelConvertor extends ModelConvertor {
         return newSPageBuilder.done();
     }
 
+    public static SPage constructSPage(final PageUpdater pageUpdater, final long creatorUserId) {
+        final Map<PageUpdateField, Serializable> fields = pageUpdater.getFields();
+        final String name = (String) fields.get(PageField.NAME);
+        final String description = (String) fields.get(PageField.DESCRIPTION);
+        final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
+        final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
+                System.currentTimeMillis(), creatorUserId,
+                false, null);
+        return newSPageBuilder.done();
+    }
 }

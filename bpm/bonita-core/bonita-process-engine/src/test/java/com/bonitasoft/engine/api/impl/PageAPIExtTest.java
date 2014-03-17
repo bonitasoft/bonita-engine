@@ -16,6 +16,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -25,6 +26,7 @@ import com.bonitasoft.engine.api.impl.transaction.page.SearchPages;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageService;
+import com.bonitasoft.engine.page.PageUpdater;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -140,6 +142,42 @@ public class PageAPIExtTest {
 
         // then
         verify(pageService, times(1)).addPage(sPage, content);
+    }
+
+    @Test
+    @Ignore
+    public void testUpdatePage() throws Exception {
+        // given
+        final PageUpdater pageUpdater = new PageUpdater();
+        pageUpdater.setName("name");
+        final long pageId = 1;
+
+        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
+        doReturn(sPage).when(pageAPIExt).constructPage(pageUpdater, userId);
+        doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
+
+        // when
+        pageAPIExt.updatePage(pageId, pageUpdater);
+
+        // then
+        verify(pageService, times(1)).updatePage(pageId, sPage);
+    }
+
+    @Test
+    public void testUpdatePageContent() throws Exception {
+        // given
+        // final PageCreator pageCreator = new PageCreator("name");
+        final byte[] content = "content".getBytes();
+        final long pageId = 1;
+
+        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
+        doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
+
+        // when
+        pageAPIExt.updatePageContent(pageId, content);
+
+        // then
+        verify(pageService, times(1)).updatePageContent(pageId, content);
     }
 
     @Test

@@ -21,6 +21,7 @@ import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -39,7 +40,9 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 import com.bonitasoft.engine.page.PageService;
@@ -179,6 +182,14 @@ public class PageServiceImpl implements PageService {
         }
     }
 
+    private SUpdateEvent getUpdateEvent(final Object object, final String type) {
+        if (eventService.hasHandlers(type, EventActionType.UPDATED)) {
+            return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
+        } else {
+            return null;
+        }
+    }
+
     private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
@@ -197,6 +208,63 @@ public class PageServiceImpl implements PageService {
             throw new SObjectNotFoundException("Page with id " + pageId + " not found");
         }
         return pageContent.getContent();
+    }
+
+    @Override
+    public SPage updatePage(long pageId, SPage sPage) throws SObjectModificationException {
+        final String message = "Update a page with name " + sPage.getName();
+        final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, message);
+        try {
+
+            final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+
+            sPage.setId(pageId);
+
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
+                    updateDescriptor);
+
+            final SUpdateEvent updatePageEvent = getUpdateEvent(sPage, PAGE);
+
+            recorder.recordUpdate(updateRecord, updatePageEvent);
+
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, "updatePage");
+            return sPage;
+        } catch (final SRecorderException re) {
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
+            throw new SObjectModificationException(re);
+        }
+
+    }
+
+    @Override
+    public void updatePageContent(long pageId, byte[] content) throws SObjectModificationException {
+        final String message = "Update a page with name " + pageId;
+        final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, message);
+        try {
+            SPage sPage = new SPageImpl();
+            sPage.setId(pageId);
+            SPageWithContent pageContent = new SPageWithContentImpl(sPage, content);
+
+            final InsertRecord insertContentRecord = new InsertRecord(pageContent);
+            final SInsertEvent insertContentEvent = getInsertEvent(insertContentRecord, PAGE);
+            recorder.recordInsert(insertContentRecord, insertContentEvent);
+
+            final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
+                    updateDescriptor);
+
+            final SUpdateEvent updatePageEvent = getUpdateEvent(sPage, PAGE);
+
+            recorder.recordUpdate(updateRecord, updatePageEvent);
+
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, "updatePage");
+
+        } catch (final SRecorderException re) {
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
+            throw new SObjectModificationException(re);
+        }
+
     }
 
 }

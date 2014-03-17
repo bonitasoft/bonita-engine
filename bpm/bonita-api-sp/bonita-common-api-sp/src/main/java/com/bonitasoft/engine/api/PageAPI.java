@@ -14,12 +14,14 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageNotFoundException;
+import com.bonitasoft.engine.page.PageUpdater;
 
 /**
  * This API gives access to all page features. Page is a way to add pages on portal.
@@ -91,6 +93,33 @@ public interface PageAPI {
      *             if an error occurs during the creation.
      */
     Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException;
+
+    /**
+     * Updates a custom page.
+     * 
+     * @param pageId
+     *            the Identifier of the page to update
+     * @param pageUpdater
+     *            the creator object to instantiate the new page.
+     * @param content
+     *            the binary content of the page.
+     * @return the newly created page.
+     * @throws UpdateException
+     *             if an error occurs during the update.
+     */
+    Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException;
+
+    /**
+     * Updates a custom page content.
+     * 
+     * @param pageId
+     *            the Identifier of the page to update
+     * @param content
+     *            the binary content of the page.
+     * @throws UpdateException
+     *             if an error occurs during the update.
+     */
+    void updatePageContent(final long pageId, final byte[] getPageContent) throws UpdateException;
 
     /**
      * Deletes a page identified by its ID.
