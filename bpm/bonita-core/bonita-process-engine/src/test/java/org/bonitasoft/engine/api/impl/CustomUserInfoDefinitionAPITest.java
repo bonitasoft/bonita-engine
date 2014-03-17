@@ -21,6 +21,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -142,6 +143,16 @@ public class CustomUserInfoDefinitionAPITest {
         assertThat(definitions.get(0).getId()).isEqualTo(1L);
         assertThat(definitions.get(1).getId()).isEqualTo(2L);
         assertThat(definitions.get(2).getId()).isEqualTo(3L);
+    }
+
+    @Test
+    public void list_call_service_to_retrieve_items_and_return_empty_list_when_service_returns_empty_list() throws Exception {
+        given(service.getCustomUserInfoDefinitions(0, 3)).willReturn(
+                Collections.<SCustomUserInfoDefinition> emptyList());
+        
+        List<CustomUserInfoDefinition> definitions = api.list(0, 3);
+        
+        assertThat(definitions).isEmpty();;
     }
 
     @Test
