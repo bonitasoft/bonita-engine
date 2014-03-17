@@ -1,6 +1,6 @@
 /**
  * /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
+import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 import com.hazelcast.config.Config;
@@ -27,12 +27,12 @@ import com.hazelcast.config.MaxSizeConfig.MaxSizePolicy;
 import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.LifecycleService;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
-public class BonitaHazelcastInstanceFactory implements ServiceWithLifecycle {
+public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService {
 
     private HazelcastInstance hazelcastInstance;
 
@@ -51,7 +51,7 @@ public class BonitaHazelcastInstanceFactory implements ServiceWithLifecycle {
     }
 
     private void initThreadThatDumpStats(final HazelcastInstance hazelcastInstance, final String statsPath, final long statsPrintInterval) throws IOException {
-        Thread thread = new Thread(new HazelcastStatExtractor(hazelcastInstance, statsPath, statsPrintInterval));
+        final Thread thread = new Thread(new HazelcastStatExtractor(hazelcastInstance, statsPath, statsPrintInterval));
         thread.start();
     }
 
@@ -59,15 +59,11 @@ public class BonitaHazelcastInstanceFactory implements ServiceWithLifecycle {
         initializeCacheConfigurations(config, cacheConfigurations);
         // set classloader to null in order to use the context classloader instead
         config.setClassLoader(null);
-        HazelcastInstance hazelcastInstance2 = Hazelcast.newHazelcastInstance(config);
+        final HazelcastInstance hazelcastInstance2 = Hazelcast.newHazelcastInstance(config);
 
         return hazelcastInstance2;
     }
 
-    /**
-     * @param config
-     * @param cacheConfigurations
-     */
     private void initializeCacheConfigurations(final Config config, final CacheConfigurations cacheConfigurations) {
         final List<CacheConfiguration> configurations = cacheConfigurations.getConfigurations();
         for (final CacheConfiguration cacheConfiguration : configurations) {
@@ -82,7 +78,7 @@ public class BonitaHazelcastInstanceFactory implements ServiceWithLifecycle {
             mapConfig.setMaxSizeConfig(maxSizeConfig);
 
             if (cacheConfiguration.isReadIntensive()) {
-                NearCacheConfig nearCacheConfig = new NearCacheConfig();
+                final NearCacheConfig nearCacheConfig = new NearCacheConfig();
                 nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
                 nearCacheConfig.setName("nearCacheConfig-" + cacheConfiguration.getName());
                 mapConfig.setNearCacheConfig(nearCacheConfig);
@@ -115,7 +111,7 @@ public class BonitaHazelcastInstanceFactory implements ServiceWithLifecycle {
     }
 
     public void destroy() {
-        LifecycleService lifecycleService = hazelcastInstance.getLifecycleService();
+        final com.hazelcast.core.LifecycleService lifecycleService = hazelcastInstance.getLifecycleService();
         lifecycleService.shutdown();
     }
 

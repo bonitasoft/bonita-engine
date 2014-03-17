@@ -1,6 +1,6 @@
 package com.bonitasoft.engine.api.impl;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
@@ -36,7 +36,11 @@ import org.bonitasoft.engine.work.WorkException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
@@ -46,46 +50,50 @@ import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.BroadcastServiceLocal;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TenantManagementAPIExtTest {
 
-    private TenantManagementAPIExt tenantManagementAPI;
+    @Spy
+    private final TenantManagementAPIExt tenantManagementAPI = new TenantManagementAPIExt();
 
+    @Mock
     private PlatformService platformService;
 
+    @Mock
     private SchedulerService schedulerService;
 
+    @Mock
     private PlatformServiceAccessor platformServiceAccessor;
+
+    @Mock
+    private SessionService sessionService;
+
+    @Mock
+    private WorkService workService;
+
+    @Mock
+    private BusinessDataRepository businessDataRepository;
+
+    @Mock
+    private TenantServiceAccessor tenantServiceAccessor;
+
+    @Mock
+    private NodeConfiguration nodeConfiguration;
+
+    @Mock
+    private TenantRestartHandler tenantRestartHandler1;
+
+    @Mock
+    private TenantRestartHandler tenantRestartHandler2;
 
     private long tenantId;
 
     private STenantImpl sTenant;
 
-    private SessionService sessionService;
-
-    private WorkService workService;
-
-    private TenantServiceAccessor tenantServiceAccessor;
-
-    private NodeConfiguration nodeConfiguration;
-
-    private TenantRestartHandler tenantRestartHandler1;
-
-    private TenantRestartHandler tenantRestartHandler2;
-
     private final BroadcastService broadcastService = new BroadcastServiceLocal();
 
     @Before
     public void before() throws Exception {
-        tenantManagementAPI = spy(new TenantManagementAPIExt());
-        platformService = mock(PlatformService.class);
-        schedulerService = mock(SchedulerService.class);
-        sessionService = mock(SessionService.class);
-        platformServiceAccessor = mock(PlatformServiceAccessor.class);
-        tenantServiceAccessor = mock(TenantServiceAccessor.class);
-        nodeConfiguration = mock(NodeConfiguration.class);
-        workService = mock(WorkService.class);
-        tenantRestartHandler1 = mock(TenantRestartHandler.class);
-        tenantRestartHandler2 = mock(TenantRestartHandler.class);
         doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
         doReturn(new PauseServices(tenantId) {
 
@@ -112,12 +120,13 @@ public class TenantManagementAPIExtTest {
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
         doReturn(nodeConfiguration).when(platformServiceAccessor).getPlaformConfiguration();
         doReturn(sessionService).when(platformServiceAccessor).getSessionService();
-        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(Mockito.anyLong());
+        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(Matchers.anyLong());
         doReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)).when(nodeConfiguration).getTenantRestartHandlers();
 
         tenantId = 17;
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
         doReturn(workService).when(tenantServiceAccessor).getWorkService();
+        doReturn(businessDataRepository).when(tenantServiceAccessor).getBusinessDataRepository();
         sTenant = new STenantImpl("myTenant", "john", 123456789, STenant.PAUSED, false);
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
     }
@@ -206,40 +215,42 @@ public class TenantManagementAPIExtTest {
     public void resumeTenantShouldHaveAnnotationAvailableWhenTenantIsPaused() throws Exception {
         final Method method = TenantManagementAPIExt.class.getMethod("resume");
 
-        assertTrue(
-                "Annotation @AvailableWhenTenantIsPaused should be present on API method 'resume' or directly on class TenantManagementAPIExt",
-                method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
-                        || TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
+        final boolean present = method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
+                || TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
+
+        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused should be present on API method 'resume' or directly on class TenantManagementAPIExt")
+                .isTrue();
     }
 
     @Test
     public void pauseTenantShouldHaveAnnotationAvailableWhenTenantIsPaused() throws Exception {
         final Method method = TenantManagementAPIExt.class.getMethod("pause");
 
-        assertTrue(
-                "Annotation @AvailableWhenTenantIsPaused should be present on API method 'pause' or directly on class TenantManagementAPIExt",
-                method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
-                        || TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
+        final boolean present = method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)
+                || TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class);
+
+        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused should be present on API method 'pause' or directly on class TenantManagementAPIExt")
+                .isTrue();
     }
 
     @Test
     public void loginShouldHaveAnnotationAvailableWhenTenantIsPaused() throws Exception {
         // given:
-        Method method = LoginAPIExt.class.getMethod("login", long.class, String.class, String.class);
+        final Method method = LoginAPIExt.class.getMethod("login", long.class, String.class, String.class);
 
         // then:
-        assertTrue("Annotation @AvailableWhenTenantIsPaused should be present on API method LoginAPIExt.login(long, String, String)",
-                method.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
+        assertThat(method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
+                "Annotation @AvailableWhenTenantIsPaused should be present on API method LoginAPIExt.login(long, String, String)").isTrue();
     }
 
     @Test
     public void loginWithTenantIdShouldHaveAnnotationAvailableWhenTenantIsPaused() throws Exception {
         // given:
-        Method method = LoginAPIExt.class.getMethod("login", String.class, String.class);
+        final Method method = LoginAPIExt.class.getMethod("login", String.class, String.class);
 
         // then:
-        assertTrue("Annotation @AvailableWhenTenantIsPaused should be present on API method LoginAPIExt.login(String, String)",
-                method.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
+        assertThat(method.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
+                "Annotation @AvailableWhenTenantIsPaused should be present on API method LoginAPIExt.login(String, String)").isTrue();
     }
 
     @Test(expected = UpdateException.class)
@@ -285,18 +296,21 @@ public class TenantManagementAPIExtTest {
     @Test
     public void installBDRShouldBeAvailableWhenTenantIsPaused_ONLY() throws Exception {
         final Method method = TenantManagementAPIExt.class.getMethod("installBusinessDataRepository", byte[].class);
-        AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
-        assertTrue("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataRepository(byte[])'",
-                annotation != null && annotation.only());
+        final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
 
+        final boolean present = annotation != null && annotation.only();
+        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'installBusinessDataRepository(byte[])'")
+                .isTrue();
     }
 
     @Test
     public void uninstallBDRShouldBeAvailableWhenTenantIsPaused_ONLY() throws Exception {
         final Method method = TenantManagementAPIExt.class.getMethod("uninstallBusinessDataRepository");
-        AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
-        assertTrue("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataRepository()'", annotation != null
-                && annotation.only());
+        final AvailableWhenTenantIsPaused annotation = method.getAnnotation(AvailableWhenTenantIsPaused.class);
+
+        final boolean present = annotation != null && annotation.only();
+        assertThat(present).as("Annotation @AvailableWhenTenantIsPaused(only=true) should be present on API method 'uninstallBusinessDataRepository()'")
+                .isTrue();
 
     }
 
@@ -327,9 +341,9 @@ public class TenantManagementAPIExtTest {
 
     @Test
     public void pauseTenantOnActivatedTenantShouldUpdateTenantState() throws Exception {
-        STenant tenant = mock(STenant.class);
+        final STenant tenant = mock(STenant.class);
         final TenantManagementAPIExt tenantManagementAPI = spy(new TenantManagementAPIExt());
-        PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
+        final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
         final PlatformService platformService = mock(PlatformService.class);
         doReturn(platformService).when(platformServiceAccessor).getPlatformService();
@@ -353,8 +367,8 @@ public class TenantManagementAPIExtTest {
     @Test
     public void tenantManagementAPIShouldHaveClassAnnotation() throws Exception {
         // then:
-        assertTrue("Annotation @AvailableWhenTenantIsPaused should be present on API class TenantManagementAPIExt",
-                TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class));
+        assertThat(TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
+                "Annotation @AvailableWhenTenantIsPaused should be present on API class TenantManagementAPIExt").isTrue();
     }
 
 }

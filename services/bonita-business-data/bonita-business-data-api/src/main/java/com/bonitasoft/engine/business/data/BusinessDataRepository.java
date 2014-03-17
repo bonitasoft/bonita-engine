@@ -12,6 +12,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+import org.bonitasoft.engine.commons.TenantLifecycleService;
+
 import com.bonitasoft.engine.bdm.Entity;
 
 /**
@@ -21,7 +23,7 @@ import com.bonitasoft.engine.bdm.Entity;
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
-public interface BusinessDataRepository {
+public interface BusinessDataRepository extends TenantLifecycleService {
 
     /**
      * Deploys a Business Data Model / repository on the specified tenant.
@@ -36,10 +38,6 @@ public interface BusinessDataRepository {
     void deploy(byte[] bdmArchive, long tenantId) throws SBusinessDataRepositoryDeploymentException;
 
     void undeploy(long tenantId) throws SBusinessDataRepositoryException;
-
-    void start() throws SBusinessDataRepositoryDeploymentException;
-
-    void stop();
 
     /**
      * Finds an Entity that is defined in a deployed Business Data Model.

@@ -312,8 +312,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     public void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws Exception {
 
-        DefaultReportList reports = new DefaultReportList(tenantAccessor.getTechnicalLoggerService(), BonitaHomeServer.getInstance().getTenantReportFolder(
-                tenantId));
+        final DefaultReportList reports = new DefaultReportList(tenantAccessor.getTechnicalLoggerService(), BonitaHomeServer.getInstance()
+                .getTenantReportFolder(tenantId));
 
         reports.deploy(new ReportDeployer() {
 
@@ -400,7 +400,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+            final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
 
             final WorkService workService = tenantServiceAccessor.getWorkService();
 
@@ -616,7 +616,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         final PlatformService platformService = getPlatformService();
         // check existence for tenant
         try {
-            STenant tenant = platformService.getTenant(tenantId);
+            final STenant tenant = platformService.getTenant(tenantId);
             // update user name and password in file system
             final Map<TenantField, Serializable> updatedFields = udpater.getFields();
             final String username = (String) updatedFields.get(TenantField.USERNAME);
@@ -718,7 +718,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     protected PlatformService getPlatformService() {
-        PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
+        final PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
         final PlatformService platformService = platformAccessor.getPlatformService();
         return platformService;
     }

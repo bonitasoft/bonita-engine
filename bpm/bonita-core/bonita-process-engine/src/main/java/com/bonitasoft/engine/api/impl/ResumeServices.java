@@ -18,13 +18,13 @@ import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.work.WorkService;
 
+import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.service.PlatformServiceAccessor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public class ResumeServices implements Callable<Void>, Serializable {
 
@@ -38,12 +38,14 @@ public class ResumeServices implements Callable<Void>, Serializable {
 
     @Override
     public Void call() throws Exception {
-        PlatformServiceAccessor platformServiceAccessor = getPlatformAccessor();
-        TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
-        WorkService workService = tenantServiceAccessor.getWorkService();
+        final PlatformServiceAccessor platformServiceAccessor = getPlatformAccessor();
+        final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
+        final WorkService workService = tenantServiceAccessor.getWorkService();
+        final BusinessDataRepository businessDataRepository = tenantServiceAccessor.getBusinessDataRepository();
         try {
             workService.resume();
-        } catch (SBonitaException e) {
+            businessDataRepository.resume();
+        } catch (final SBonitaException e) {
             throw new UpdateException("Unable to resume the work service.", e);
         }
         return null;

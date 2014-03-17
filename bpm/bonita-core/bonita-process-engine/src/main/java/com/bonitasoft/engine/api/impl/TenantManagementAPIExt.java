@@ -203,7 +203,6 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         try {
             final BusinessDataRepository bdr = tenantAccessor.getBusinessDataRepository();
             bdr.deploy(zip, tenantAccessor.getTenantId());
-            bdr.start();
         } catch (final IllegalStateException e) {
             throw new InvalidBusinessDataModelException(e);
         } catch (final SBusinessDataRepositoryDeploymentException e) {

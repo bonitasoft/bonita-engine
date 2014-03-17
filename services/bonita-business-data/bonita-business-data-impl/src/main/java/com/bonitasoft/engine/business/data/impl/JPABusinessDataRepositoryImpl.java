@@ -8,14 +8,16 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
-import static java.util.Collections.emptySet;
-
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -27,6 +29,7 @@ import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
@@ -34,6 +37,8 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.QueryOptions;
 
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BDMJarBuilder;
@@ -50,6 +55,8 @@ import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
  */
 public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
+    private static final String BDR = "BDR";
+
     private final Map<String, Object> configuration;
 
     private final DependencyService dependencyService;
@@ -59,6 +66,59 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     public JPABusinessDataRepositoryImpl(final DependencyService dependencyService, final Map<String, Object> configuration) {
         this.dependencyService = dependencyService;
         this.configuration = configuration;
+    }
+
+    @Override
+    public void start() throws SBonitaException {
+        if (isDBMDeployed()) {
+            entityManagerFactory = Persistence.createEntityManagerFactory(BDR, configuration);
+            try {
+                executeQueries(new SchemaGenerator(entityManagerFactory.createEntityManager()).generate());
+            } catch (final SQLException e) {
+                throw new SBusinessDataRepositoryDeploymentException(e);
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        if (entityManagerFactory != null) {
+            entityManagerFactory.close();
+            entityManagerFactory = null;
+        }
+    }
+
+    @Override
+    public void pause() throws SBonitaException, TimeoutException {
+        stop();
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+        start();
+    }
+
+    @Override
+    public Set<String> getEntityClassNames() {
+        if (entityManagerFactory == null) {
+            return Collections.emptySet();
+        }
+        final EntityManager em = getEntityManager();
+        final Set<EntityType<?>> entities = em.getMetamodel().getEntities();
+        final Set<String> entityClassNames = new HashSet<String>();
+        for (final EntityType<?> entity : entities) {
+            entityClassNames.add(entity.getJavaType().getName());
+        }
+        return entityClassNames;
+    }
+
+    protected boolean isDBMDeployed() throws SDependencyException {
+        final FilterOption filterOption = new FilterOption(SDependency.class, "name", BDR);
+        final List<FilterOption> filters = new ArrayList<FilterOption>();
+        filters.add(filterOption);
+        final QueryOptions queryOptions = new QueryOptions(filters, null);
+        final List<SDependency> dependencies = dependencyService.getDependencies(queryOptions);
+        return !dependencies.isEmpty();
     }
 
     private EntityManager getEntityManager() {
@@ -75,7 +135,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     protected SDependency createSDependency(final long tenantId, final byte[] transformedBdrArchive) {
-        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance("BDR", tenantId, ScopeType.TENANT, "BDR.jar", transformedBdrArchive)
+        return BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(BDR, tenantId, ScopeType.TENANT, BDR + ".jar", transformedBdrArchive)
                 .done();
     }
 
@@ -108,27 +168,9 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     @Override
     public void undeploy(final long tenantId) throws SBusinessDataRepositoryException {
         try {
-            dependencyService.deleteDependency("BDR");
+            dependencyService.deleteDependency(BDR);
         } catch (final SDependencyException sde) {
             throw new SBusinessDataRepositoryException(sde);
-        }
-    }
-
-    @Override
-    public void start() throws SBusinessDataRepositoryDeploymentException {
-        entityManagerFactory = Persistence.createEntityManagerFactory("BDR", configuration);
-        try {
-            executeQueries(new SchemaGenerator(entityManagerFactory.createEntityManager()).generate());
-        } catch (final SQLException e) {
-            throw new SBusinessDataRepositoryDeploymentException(e);
-        }
-    }
-
-    @Override
-    public void stop() {
-        if (entityManagerFactory != null) {
-            entityManagerFactory.close();
-            entityManagerFactory = null;
         }
     }
 
@@ -177,23 +219,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             return em.merge(entity);
         }
         return null;
-    }
-
-    @Override
-    public Set<String> getEntityClassNames() {
-        EntityManager em;
-        try {
-            em = getEntityManager();
-        } catch (IllegalStateException e) {
-            // bdr not started -> no class names
-            return emptySet();
-        }
-        final Set<EntityType<?>> entities = em.getMetamodel().getEntities();
-        final Set<String> entityClassNames = new HashSet<String>();
-        for (final EntityType<?> entity : entities) {
-            entityClassNames.add(entity.getJavaType().getName());
-        }
-        return entityClassNames;
     }
 
     @Override
