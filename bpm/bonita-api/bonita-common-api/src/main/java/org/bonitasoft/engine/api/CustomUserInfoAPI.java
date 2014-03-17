@@ -21,20 +21,71 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.CustomUserInfo;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
+import org.bonitasoft.engine.identity.CustomUserInfoValue;
+import org.bonitasoft.engine.identity.User;
 
 /**
- * Allow custom user details administration.
- *
+ * CustomUserInfoAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on custom user info: creation,
+ * deletion and retrieve methods
+ * 
  * @author Vincent Elcrin
  */
 public interface CustomUserInfoAPI {
 
+    /**
+     * Create a new CustomUserInfoDefinition that will be available for all {@link User}s in the organization.
+     * 
+     * @param creator
+     *            describes all information for the new object
+     * @return the created CustomUserInfoDefinition
+     * @throws AlreadyExistsException
+     *             if a CustomUserInfoDefinition already exists with the same name.
+     * @throws CreationException
+     *             if an error occurs during the creation
+     * @since 6.3
+     */
     public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws AlreadyExistsException, CreationException;
 
+    /**
+     * Retrieves the list of {@link CustomUserInfoDefinition} according to the given pagination criteria, ordered by name.
+     * 
+     * @param startIndex
+     *            the index for the first element to be retrieved (starts from zero)
+     * @param maxResult
+     *            the maximum number of elements to be retrieved.
+     * @return the list of {@link CustomUserInfoDefinition} according to the given pagination criteria, ordered by name.
+     * @since 6.3
+     */
     public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult);
 
+    /**
+     * Delete the {@link CustomUserInfoDefinition} related to the given id. All {@link CustomUserInfoValue} related to this {@link CustomUserInfoDefinition}
+     * will be deleted as well.
+     * 
+     * @param id
+     *            the identifier of the {@link CustomUserInfoDefinition}
+     * @return
+     * @throws DeletionException
+     *             if an error occurs during deletion
+     * @since 6.3
+     */
     public CustomUserInfoDefinition deleteCustomUserInfoDefinition(long id) throws DeletionException;
 
+    /**
+     * Retrieve the list of {@link CustomUserInfo} for the given user, ordered by custom user info definition name. For {@link CustomUserInfo}s which have
+     * {@link CustomUserInfoDefinition} without a related {@link CustomUserInfoValue}, the field value will be null.
+     * 
+     * @param userId
+     *            the user identifier
+     * @param startIndex
+     *            the index of the first result to be retrieved (it starts from zero)
+     * @param maxResult
+     *            the maximum elements to be retrieved.
+     * @return The list of {@link CustomUserInfo} for the given user, ordered by custom user info definition name.
+     * @see CustomUserInfoDefinition
+     * @see CustomUserInfoValue
+     * @since 6.3
+     */
     public List<CustomUserInfo> getCustomUserInfo(long userId, int startIndex, int maxResult);
 
 }

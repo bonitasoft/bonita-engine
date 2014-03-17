@@ -16,15 +16,29 @@ package org.bonitasoft.engine.identity;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
+ * Describes a custom user info definition that will be available for all {@link User}s in the organization.
+ * 
  * @author Vincent Elcrin
  */
 public interface CustomUserInfoDefinition extends BonitaObject {
 
+    /**
+     * @return the custom user info definition identifier
+     * @since 6.3
+     */
     long getId();
 
+    /**
+     * @return the custom user info name
+     * @since 6.3
+     */
     String getName();
 
     String getDisplayName();
 
+    /**
+     * @return the custom user info description
+     * @since 6.3
+     */
     String getDescription();
 }

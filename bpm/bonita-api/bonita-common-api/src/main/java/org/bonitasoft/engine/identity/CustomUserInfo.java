@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * Aggregate information of {@link CustomUserInfoDefinition} and {@link CustomUserInfoValue} 
  * @author Vincent Elcrin
  */
 public class CustomUserInfo {
@@ -19,14 +20,26 @@ public class CustomUserInfo {
         }
     }
 
+    /**
+     * @return the {@link CustomUserInfoDefinition}
+     * @since 6.3
+     */
     public CustomUserInfoDefinition getDefinition() {
         return definition;
     }
 
+    /**
+     * @return the user identifier
+     * @since 6.3
+     */
     public long getUserId() {
         return userId;
     }
 
+    /**
+     * @return the custom user info value
+     * @since 6.3
+     */
     public String getValue() {
         return value;
     }
