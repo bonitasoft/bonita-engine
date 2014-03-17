@@ -27,6 +27,7 @@ import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.SIdentityException;
+import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -40,6 +41,7 @@ import org.bonitasoft.engine.xml.XMLWriter;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
 public class ExportOrganization implements TransactionContentWithResult<String> {
 
@@ -51,6 +53,8 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
 
     private String organization;
 
+    private static final int NUMBER_PER_PAGE = 20;
+
     public ExportOrganization(final XMLWriter xmlWriter, final IdentityService identityService) {
         this.xmlWriter = xmlWriter;
         this.identityService = identityService;
@@ -59,21 +63,21 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
     @Override
     public void execute() throws SBonitaException {
         userNames = new HashMap<Long, String>(20);
-        final int numberPerPage = 20;
-        final List<ExportedUser> users = getAllUsers(numberPerPage);
-        userNames = new HashMap<Long, String>();
-        for (final ExportedUser user : users) {
-            userNames.put(user.getId(), user.getUserName());
-        }
-        final List<Role> roles = getAllRoles(numberPerPage);
-        final List<SGroup> groups = getAllGroups(numberPerPage);
+        final List<ExportedUser> users = getAllUsers();
+        final List<Role> roles = getAllRoles();
+        final List<SGroup> groups = getAllGroups();
         final Map<Long, String> groupIdParentPath = new HashMap<Long, String>(groups.size());
         for (final SGroup group : groups) {
             groupIdParentPath.put(group.getId(), group.getParentPath());
         }
-        final List<SUserMembership> userMemberships = getAllUserMemberships(numberPerPage);
+        final List<SUserMembership> userMemberships = getAllUserMemberships();
         final List<Group> clientGroups = ModelConvertor.toGroups(groups);
         final List<UserMembership> clientUserMemberships = ModelConvertor.toUserMembership(userMemberships, userNames, groupIdParentPath);
+        buildXmlContent(users, roles, groupIdParentPath, clientGroups, clientUserMemberships);
+    }
+
+    private void buildXmlContent(final List<ExportedUser> users, final List<Role> roles, final Map<Long, String> groupIdParentPath,
+            final List<Group> clientGroups, final List<UserMembership> clientUserMemberships) throws SIdentityException {
         final XMLNode document = OrganizationNodeBuilder.getDocument(users, userNames, clientGroups, groupIdParentPath, roles, clientUserMemberships);
         final StringWriter writer = new StringWriter();
         try {
@@ -90,58 +94,73 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         return organization;
     }
 
-    private List<SUserMembership> getAllUserMemberships(final int numberPerPage) throws SIdentityException {
+    private List<SUserMembership> getAllUserMemberships() throws SIdentityException {
         final long numberOfUserMemberships = identityService.getNumberOfUserMemberships();
         final List<SUserMembership> sUserMemberships = new ArrayList<SUserMembership>();
-        for (int i = 0; i < numberOfUserMemberships; i = i + numberPerPage) {
-            sUserMemberships.addAll(identityService.getUserMemberships(i, numberPerPage));
+        for (int startIndex = 0; startIndex < numberOfUserMemberships; startIndex = startIndex + NUMBER_PER_PAGE) {
+            sUserMemberships.addAll(identityService.getUserMemberships(startIndex, NUMBER_PER_PAGE));
         }
         return sUserMemberships;
     }
 
-    private List<SGroup> getAllGroups(final int numberPerPage) throws SIdentityException {
+    private List<SGroup> getAllGroups() throws SIdentityException {
         List<SGroup> groups;
         final long groupNumber = identityService.getNumberOfGroups();
-        groups = new ArrayList<SGroup>(Long.valueOf(groupNumber).intValue());// FIXME can't put more than long element here
-        for (int i = 0; i < groupNumber; i = i + numberPerPage) {
-            groups.addAll(identityService.getGroups(i, numberPerPage));
+        groups = new ArrayList<SGroup>(getInitialListCapacity(groupNumber));
+        for (int startIndex = 0; startIndex < groupNumber; startIndex = startIndex + NUMBER_PER_PAGE) {
+            groups.addAll(identityService.getGroups(startIndex, NUMBER_PER_PAGE));
         }
         return groups;
     }
 
-    private List<Role> getAllRoles(final int numberPerPage) throws SIdentityException {
+    private List<Role> getAllRoles() throws SIdentityException {
         final long roleNumber = identityService.getNumberOfRoles();
-        final List<Role> roles = new ArrayList<Role>(Long.valueOf(roleNumber).intValue());// FIXME can't put more than long element here
-        for (int i = 0; i < roleNumber; i = i + numberPerPage) {
-            final List<SRole> sRoles = identityService.getRoles(i, numberPerPage);
+        final List<Role> roles = new ArrayList<Role>(getInitialListCapacity(roleNumber));
+        for (int startIndex = 0; startIndex < roleNumber; startIndex = startIndex + NUMBER_PER_PAGE) {
+            final List<SRole> sRoles = identityService.getRoles(startIndex, NUMBER_PER_PAGE);
             roles.addAll(ModelConvertor.toRoles(sRoles));
         }
         return roles;
     }
 
-    private List<ExportedUser> getAllUsers(final int numberPerPage) throws SIdentityException {
+    private List<ExportedUser> getAllUsers() throws SIdentityException {
         final long userNumber = identityService.getNumberOfUsers();
-        final List<ExportedUser> users = new ArrayList<ExportedUser>(Long.valueOf(userNumber).intValue());// FIXME can't put more than long element here
-        for (int i = 0; i <= userNumber; i = i + numberPerPage) {
-            final List<SUser> sUsers = identityService.getUsers(i, numberPerPage);
-            for (final SUser sUser : sUsers) {
-                final SContactInfo persoInfo = identityService.getUserContactInfo(sUser.getId(), true);
-                final SContactInfo proInfo = identityService.getUserContactInfo(sUser.getId(), false);
-                final long managerUserId = sUser.getManagerUserId();
-                String managerUserName = null;
-                if (managerUserId > 0) {
-                    managerUserName = userNames.get(managerUserId);
-                    if (managerUserName == null) {
-                        final SUser manager = identityService.getUser(sUser.getManagerUserId());
-                        userNames.put(manager.getId(), manager.getUserName());
-                        managerUserName = manager.getUserName();
-                    }
-                }
-                userNames.put(sUser.getId(), sUser.getUserName());
-                users.add(ModelConvertor.toExportedUser(sUser, persoInfo, proInfo, managerUserName));
-            }
+        final List<ExportedUser> users = new ArrayList<ExportedUser>(getInitialListCapacity(userNumber));
+        for (int startIndex = 0; startIndex <= userNumber; startIndex = startIndex + NUMBER_PER_PAGE) {
+            users.addAll(getNextUsersPage(startIndex, NUMBER_PER_PAGE));
         }
         return users;
+    }
+
+    private int getInitialListCapacity(final long elementsToRetrive) {
+        return Integer.MAX_VALUE >= elementsToRetrive ? Long.valueOf(elementsToRetrive).intValue() : Integer.MAX_VALUE;
+    }
+
+    private List<ExportedUser> getNextUsersPage(int startIndex, final int numberPerPage) throws SIdentityException, SUserNotFoundException {
+        List<ExportedUser> currentUsersPage = new ArrayList<ExportedUser>(numberPerPage);
+        final List<SUser> sUsers = identityService.getUsers(startIndex, numberPerPage);
+        for (final SUser sUser : sUsers) {
+            final SContactInfo persoInfo = identityService.getUserContactInfo(sUser.getId(), true);
+            final SContactInfo proInfo = identityService.getUserContactInfo(sUser.getId(), false);
+            String managerUserName = getManagerUsername(sUser);
+            userNames.put(sUser.getId(), sUser.getUserName());
+            currentUsersPage.add(ModelConvertor.toExportedUser(sUser, persoInfo, proInfo, managerUserName));
+        }
+        return currentUsersPage;
+    }
+
+    private String getManagerUsername(final SUser sUser) throws SUserNotFoundException {
+        final long managerUserId = sUser.getManagerUserId();
+        String managerUserName = null;
+        if (managerUserId > 0) {
+            managerUserName = userNames.get(managerUserId);
+            if (managerUserName == null) {
+                final SUser manager = identityService.getUser(sUser.getManagerUserId());
+                userNames.put(manager.getId(), manager.getUserName());
+                managerUserName = manager.getUserName();
+            }
+        }
+        return managerUserName;
     }
 
 }
