@@ -245,6 +245,29 @@ public class JPABusinessDataRepositoryImplIT {
     }
 
     @Test
+    public void entityClassNames_is_an_empty_set_if_bdr_is_not_started() throws Exception {
+        
+        Set<String> classNames = businessDataRepository.getEntityClassNames();
+        
+        assertThat(classNames).isEmpty();
+    }
+    
+    @Test
+    public void entityClassNames_contains_all_entities_class_names() throws Exception {
+        UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.start();
+
+            Set<String> classNames = businessDataRepository.getEntityClassNames();
+            
+            assertThat(classNames).containsOnly("com.bonitasoft.pojo.Employee");
+        } finally {
+            ut.commit();
+        }
+    }
+    
+    @Test
     public void updateTwoFieldsInSameTransactionShouldModifySameObject() throws Exception {
         UserTransaction ut = TransactionManagerServices.getTransactionManager();
         try {

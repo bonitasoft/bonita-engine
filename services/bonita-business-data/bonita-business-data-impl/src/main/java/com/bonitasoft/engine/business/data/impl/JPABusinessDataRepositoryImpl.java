@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
+import static java.util.Collections.emptySet;
+
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -179,7 +181,13 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     @Override
     public Set<String> getEntityClassNames() {
-        final EntityManager em = getEntityManager();
+        EntityManager em;
+        try {
+            em = getEntityManager();
+        } catch (IllegalStateException e) {
+            // bdr not started -> no class names
+            return emptySet();
+        }
         final Set<EntityType<?>> entities = em.getMetamodel().getEntities();
         final Set<String> entityClassNames = new HashSet<String>();
         for (final EntityType<?> entity : entities) {
