@@ -27,11 +27,6 @@ public class ProcessDefinitionBARContributionTest {
 
     private static final String ACTOR_NAME = "Actor Name";
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#serializeProcessDefinition(java.io.File, org.bonitasoft.engine.bpm.process.DesignProcessDefinition)}
-     * Test method for {@link org.bonitasoft.engine.bpm.bar.ProcessDefinitionBARContribution#deserializeProcessDefinition(java.io.File)}.
-     */
     @Test
     public final void serializeDeserializeProcessDefinition() throws Exception {
         final DesignProcessDefinition designProcessDefinition = createDesignProcessDefinition();
