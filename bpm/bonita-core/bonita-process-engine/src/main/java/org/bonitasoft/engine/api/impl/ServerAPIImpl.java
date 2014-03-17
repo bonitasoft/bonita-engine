@@ -89,7 +89,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     public ServerAPIImpl(final boolean cleanSession) {
         try {
-        this.cleanSession = cleanSession;
+            this.cleanSession = cleanSession;
             accessResolver = getServiceAccessorFactoryInstance().createAPIAccessResolver();
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
@@ -150,8 +150,8 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private SessionAccessor beforeInvokeMethod(final Map<String, Serializable> options, final String apiInterfaceName) throws BonitaHomeNotSetException,
-    InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException, NoSuchMethodException,
-    InvocationTargetException, SBonitaException {
+            InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException, NoSuchMethodException,
+            InvocationTargetException, SBonitaException {
         SessionAccessor sessionAccessor = null;
 
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
@@ -163,31 +163,31 @@ public class ServerAPIImpl implements ServerAPI {
             final SessionType sessionType = getSessionType(session);
             sessionAccessor = serviceAccessorFactory.createSessionAccessor();
             switch (sessionType) {
-            case PLATFORM:
-                final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
-                final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
+                case PLATFORM:
+                    final PlatformSessionService platformSessionService = platformServiceAccessor.getPlatformSessionService();
+                    final PlatformLoginService loginService = platformServiceAccessor.getPlatformLoginService();
 
-                if (!loginService.isValid(session.getId())) {
-                    throw new InvalidSessionException("Invalid session");
-                }
-                platformSessionService.renewSession(session.getId());
-                sessionAccessor.setSessionInfo(session.getId(), -1);
-                serverClassLoader = getPlatformClassLoader(platformServiceAccessor);
-                setTechnicalLogger(platformServiceAccessor.getTechnicalLoggerService());
-                break;
+                    if (!loginService.isValid(session.getId())) {
+                        throw new InvalidSessionException("Invalid session");
+                    }
+                    platformSessionService.renewSession(session.getId());
+                    sessionAccessor.setSessionInfo(session.getId(), -1);
+                    serverClassLoader = getPlatformClassLoader(platformServiceAccessor);
+                    setTechnicalLogger(platformServiceAccessor.getTechnicalLoggerService());
+                    break;
 
-            case API:
-                final SessionService sessionService = platformServiceAccessor.getSessionService();
+                case API:
+                    final SessionService sessionService = platformServiceAccessor.getSessionService();
 
-                checkTenantSession(platformServiceAccessor, session);
-                sessionService.renewSession(session.getId());
-                sessionAccessor.setSessionInfo(session.getId(), ((APISession) session).getTenantId());
-                serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
-                setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(((APISession) session).getTenantId()).getTechnicalLoggerService());
-                break;
+                    checkTenantSession(platformServiceAccessor, session);
+                    sessionService.renewSession(session.getId());
+                    sessionAccessor.setSessionInfo(session.getId(), ((APISession) session).getTenantId());
+                    serverClassLoader = getTenantClassLoader(platformServiceAccessor, session);
+                    setTechnicalLogger(serviceAccessorFactory.createTenantServiceAccessor(((APISession) session).getTenantId()).getTechnicalLoggerService());
+                    break;
 
-            default:
-                throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
+                default:
+                    throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
             }
         } else if (accessResolver.needSession(apiInterfaceName)) {
             throw new InvalidSessionException("Session is null!");
@@ -260,7 +260,7 @@ public class ServerAPIImpl implements ServerAPI {
             final Object apiImpl = accessResolver.getAPIImplementation(PlatformAPI.class.getName());
             final Method method = ClassReflector.getMethod(apiImpl.getClass(), IS_NODE_STARTED_METHOD_NAME, new Class[0]);
             return (Boolean) invokeAPI(new Object[0], apiImpl, method);
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             return false;
         }
     }
@@ -287,20 +287,20 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     protected UserTransactionService selectUserTransactionService(final Session session, final SessionType sessionType) throws BonitaHomeNotSetException,
-    InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         UserTransactionService transactionService = null;
         final ServiceAccessorFactory serviceAccessorFactory = getServiceAccessorFactoryInstance();
         final PlatformServiceAccessor platformServiceAccessor = serviceAccessorFactory.createPlatformServiceAccessor();
         switch (sessionType) {
-        case PLATFORM:
-            transactionService = platformServiceAccessor.getTransactionService();
-            break;
-        case API:
-            final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
-            transactionService = tenantAccessor.getUserTransactionService();
-            break;
-        default:
-            throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
+            case PLATFORM:
+                transactionService = platformServiceAccessor.getTransactionService();
+                break;
+            case API:
+                final TenantServiceAccessor tenantAccessor = platformServiceAccessor.getTenantServiceAccessor(((APISession) session).getTenantId());
+                transactionService = tenantAccessor.getUserTransactionService();
+                break;
+            default:
+                throw new InvalidSessionException("Unknown session type: " + session.getClass().getName());
         }
         return transactionService;
     }
@@ -371,7 +371,7 @@ public class ServerAPIImpl implements ServerAPI {
                     }
 
                 });
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // do not throw exceptions: it's just in case the platform was not in cache
             }
         }
