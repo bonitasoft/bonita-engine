@@ -16,14 +16,12 @@ package org.bonitasoft.engine.cache;
 import java.io.Serializable;
 import java.util.List;
 
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
+import org.bonitasoft.engine.commons.PlatformLifecycleService;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
-public interface CommonCacheService extends ServiceWithLifecycle {
+public interface CommonCacheService extends PlatformLifecycleService {
 
     /**
      * Store an object in the cache. If the cache don't exists it will be created.

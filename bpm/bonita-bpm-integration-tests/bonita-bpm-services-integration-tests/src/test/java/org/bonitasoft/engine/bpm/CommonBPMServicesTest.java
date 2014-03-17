@@ -197,7 +197,6 @@ public class CommonBPMServicesTest {
         sessionAccessor.setSessionInfo(1l, -1);
         platformAPI.createAndInitializePlatform();
         platformAPI.startNode();
-        TestUtil.startScheduler(bpmServicesBuilder.getSchedulerService());
     }
 
     @AfterClass
@@ -217,7 +216,7 @@ public class CommonBPMServicesTest {
             final Group group = new IdentityAPIImpl().createGroup(groupName, groupPath);
             transactionService.complete();
             return group;
-        } catch (STransactionException e) {
+        } catch (final STransactionException e) {
             throw new CreationException(e);
         }
     }
@@ -359,39 +358,46 @@ public class CommonBPMServicesTest {
         return flowNodeInstance;
     }
 
-    protected SEventInstance createSStartEventInstance(final String eventName,
-            final long flowNodeDefinitionId, final long rootProcessInstanceId, final long processDefinitionId, final long parentProcessInstanceId)
-            throws STransactionCreationException, SEventInstanceCreationException,
+    protected SEventInstance createSStartEventInstance(final String eventName, final long flowNodeDefinitionId, final long rootProcessInstanceId,
+            final long processDefinitionId, final long parentProcessInstanceId) throws STransactionCreationException, SEventInstanceCreationException,
             STransactionCommitException, STransactionRollbackException {
-        final SEventInstance eventInstance = BuilderFactory.get(SStartEventInstanceBuilderFactory.class).createNewStartEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId,
-                rootProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId).done();
+        final SEventInstance eventInstance = BuilderFactory
+                .get(SStartEventInstanceBuilderFactory.class)
+                .createNewStartEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId, rootProcessInstanceId, processDefinitionId,
+                        rootProcessInstanceId, parentProcessInstanceId).done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
 
-    protected SEventInstance createSEndEventInstance(final String eventName,
-            final long flowNodeDefinitionId, final long rootProcessInstanceId, final long processDefinitionId, final long parentProcessInstanceId)
-            throws STransactionCreationException, SEventInstanceCreationException, STransactionCommitException, STransactionRollbackException {
-        final SEventInstance eventInstance = BuilderFactory.get(SEndEventInstanceBuilderFactory.class).createNewEndEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId,
-                rootProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId).done();
+    protected SEventInstance createSEndEventInstance(final String eventName, final long flowNodeDefinitionId, final long rootProcessInstanceId,
+            final long processDefinitionId, final long parentProcessInstanceId) throws STransactionCreationException, SEventInstanceCreationException,
+            STransactionCommitException, STransactionRollbackException {
+        final SEventInstance eventInstance = BuilderFactory
+                .get(SEndEventInstanceBuilderFactory.class)
+                .createNewEndEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId, rootProcessInstanceId, processDefinitionId,
+                        rootProcessInstanceId, parentProcessInstanceId).done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
 
-    protected SEventInstance createSIntermediateCatchEventInstance(final String eventName,
-            final long flowNodeDefinitionId, final long rootProcessInstanceId, final long processDefinitionId, final long parentProcessInstanceId)
-            throws STransactionCreationException, SEventInstanceCreationException, STransactionCommitException, STransactionRollbackException {
-        final SEventInstance eventInstance = BuilderFactory.get(SIntermediateCatchEventInstanceBuilderFactory.class).createNewIntermediateCatchEventInstance(eventName, flowNodeDefinitionId,
-                rootProcessInstanceId, parentProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId).done();
+    protected SEventInstance createSIntermediateCatchEventInstance(final String eventName, final long flowNodeDefinitionId, final long rootProcessInstanceId,
+            final long processDefinitionId, final long parentProcessInstanceId) throws STransactionCreationException, SEventInstanceCreationException,
+            STransactionCommitException, STransactionRollbackException {
+        final SEventInstance eventInstance = BuilderFactory
+                .get(SIntermediateCatchEventInstanceBuilderFactory.class)
+                .createNewIntermediateCatchEventInstance(eventName, flowNodeDefinitionId, rootProcessInstanceId, parentProcessInstanceId, processDefinitionId,
+                        rootProcessInstanceId, parentProcessInstanceId).done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
 
-    protected SEventInstance createSIntermediateThrowEventInstance(final String eventName,
-            final long flowNodeDefinitionId, final long processInstanceId, final long processDefinitionId, final long parentProcessInstanceId)
-            throws STransactionCreationException, SEventInstanceCreationException, STransactionCommitException, STransactionRollbackException {
-        final SEventInstance eventInstance = BuilderFactory.get(SIntermediateThrowEventInstanceBuilderFactory.class).createNewIntermediateThrowEventInstance(eventName, flowNodeDefinitionId, processInstanceId,
-                processInstanceId, processDefinitionId, processInstanceId, parentProcessInstanceId).done();
+    protected SEventInstance createSIntermediateThrowEventInstance(final String eventName, final long flowNodeDefinitionId, final long processInstanceId,
+            final long processDefinitionId, final long parentProcessInstanceId) throws STransactionCreationException, SEventInstanceCreationException,
+            STransactionCommitException, STransactionRollbackException {
+        final SEventInstance eventInstance = BuilderFactory
+                .get(SIntermediateThrowEventInstanceBuilderFactory.class)
+                .createNewIntermediateThrowEventInstance(eventName, flowNodeDefinitionId, processInstanceId, processInstanceId, processDefinitionId,
+                        processInstanceId, parentProcessInstanceId).done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
@@ -409,19 +415,20 @@ public class CommonBPMServicesTest {
         transactionService.complete();
     }
 
-    protected void createSUserTaskInstance(final String name, final long flowNodeDefinitionId,
-            final long parentId, final long processDefinitionId, final long rootProcessInst, final long actorId) throws SBonitaException {
-        final SUserTaskInstance taskInstance = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).createNewUserTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId,
-                actorId, processDefinitionId, rootProcessInst, parentId).done();
+    protected void createSUserTaskInstance(final String name, final long flowNodeDefinitionId, final long parentId, final long processDefinitionId,
+            final long rootProcessInst, final long actorId) throws SBonitaException {
+        final SUserTaskInstance taskInstance = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class)
+                .createNewUserTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId, actorId, processDefinitionId, rootProcessInst, parentId)
+                .done();
         transactionService.begin();
         getServicesBuilder().getActivityInstanceService().createActivityInstance(taskInstance);
         transactionService.complete();
     }
 
-    protected SActivityInstance createSAutomaticTaskInstance(final String name,
-            final long flowNodeDefinitionId, final long parentId, final long processDefinitionId, final long rootProcessInst) throws SBonitaException {
-        final SActivityInstance taskInstance = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).createNewAutomaticTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId,
-                processDefinitionId, rootProcessInst, parentId).done();
+    protected SActivityInstance createSAutomaticTaskInstance(final String name, final long flowNodeDefinitionId, final long parentId,
+            final long processDefinitionId, final long rootProcessInst) throws SBonitaException {
+        final SActivityInstance taskInstance = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class)
+                .createNewAutomaticTaskInstance(name, flowNodeDefinitionId, rootProcessInst, parentId, processDefinitionId, rootProcessInst, parentId).done();
         transactionService.begin();
         getServicesBuilder().getActivityInstanceService().createActivityInstance(taskInstance);
         transactionService.complete();
@@ -640,7 +647,8 @@ public class CommonBPMServicesTest {
 
     public SUserMembership createSUserMembership(final SUser user, final SGroup group, final SRole role) throws SBonitaException {
         transactionService.begin();
-        final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class).createNewInstance(user.getId(), group.getId(), role.getId()).done();
+        final SUserMembership userMembership = BuilderFactory.get(SUserMembershipBuilderFactory.class)
+                .createNewInstance(user.getId(), group.getId(), role.getId()).done();
         identityService.createUserMembership(userMembership);
         transactionService.complete();
         return userMembership;

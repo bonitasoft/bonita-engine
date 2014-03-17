@@ -10,7 +10,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  * @author Baptiste Mesta
  * 
  */
-public interface ServiceWithLifecycle {
+public interface LifecycleService {
 
     /**
      * 
