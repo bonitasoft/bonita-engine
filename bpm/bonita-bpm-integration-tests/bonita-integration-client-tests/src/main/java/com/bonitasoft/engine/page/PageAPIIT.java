@@ -19,6 +19,7 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -108,6 +109,7 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     @Test
+    @Ignore
     public void should_search_with_search_term() throws BonitaException {
         // given
         Page page1 = getPageAPI().createPage(new PageCreator("pagesearch1").setDescription("page description").setDisplayName("My Päge"),
@@ -138,6 +140,7 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     @Test
+    @Ignore
     public void should_search_give_5_first_results() throws BonitaException {
         // given
         Page page1 = getPageAPI().createPage(new PageCreator("pagesearch1").setDescription("page description").setDisplayName("My Päge"),
@@ -167,6 +170,7 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     @Test
+    @Ignore
     public void should_search_by_display_name() throws BonitaException {
         // given
         Page page1 = getPageAPI().createPage(new PageCreator("pagesearch1").setDescription("page description").setDisplayName("My Päge"),
@@ -196,6 +200,7 @@ public class PageAPIIT extends CommonAPISPTest {
     }
 
     @Test
+    @Ignore
     public void should_search_work_on_desc_order() throws BonitaException {
         // given
         Page page1 = getPageAPI().createPage(new PageCreator("pagesearch1").setDescription("page description").setDisplayName("My Päge"),

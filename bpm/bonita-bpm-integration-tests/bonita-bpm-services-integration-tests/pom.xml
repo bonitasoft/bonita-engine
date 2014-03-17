@@ -477,6 +477,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Custom Pages -->
+		<dependency>
+			<groupId>com.bonitasoft.engine.page</groupId>
+			<artifactId>bonita-page-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- Platform -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
@@ -657,7 +664,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Theme -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.theme</groupId>
@@ -841,6 +848,7 @@
 			<artifactId>btm</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 
 
@@ -921,7 +929,7 @@
 				</configuration>
 				<executions>
 					<execution>
-						<phase>integration-test</phase>  
+						<phase>integration-test</phase>
 						<goals>
 							<goal>integration-test</goal>
 							<goal>verify</goal>

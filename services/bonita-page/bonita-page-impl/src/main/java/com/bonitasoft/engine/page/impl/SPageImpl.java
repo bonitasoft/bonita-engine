@@ -48,28 +48,8 @@ public class SPageImpl implements SPage {
         this.installationDate = installationDate;
         this.installedBy = installedBy;
         this.provided = provided;
+        this.lastModificationDate = lastModificationDate;
     }
-
-    // public SPageImpl(final SPReport report) {
-    // this(report.getName(), report.getInstallationDate(), report.getInstalledBy(), report.isProvided(), report.getDescription(), report
-    // .getLastModificationDate(), report.getScreenshot());
-    // }
-
-    // public SReportImpl(final String name, final long installationDate, final long installedBy, final boolean provided, final String description,
-    // final long lastModificationDate, final byte[] screenshot) {
-    // this(name, installationDate, installedBy, provided);
-    // setDescription(description);
-    // setLastModificationDate(lastModificationDate);
-    // setScreenshot(screenshot);
-    // }
-    //
-    // public SReportImpl(final String name, final long installationDate, final long installedBy, final boolean provided) {
-    // super();
-    // this.name = name;
-    // this.installationDate = installationDate;
-    // this.installedBy = installedBy;
-    // this.provided = provided;
-    // }
 
     /**
      * @param sPage
