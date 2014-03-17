@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -22,9 +23,12 @@ import static org.mockito.Mockito.verify;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 import org.junit.Before;
@@ -62,6 +66,68 @@ public class CustomUserInfoDefinitionAPITest {
 
         assertThat(definition.getId()).isEqualTo(1L);
     }
+    
+
+    @Test
+    public void create_should_throws_AlreadyExistException_when_service_throws_SCustomUserInfoDefinitionAlreadyExistsException() throws Exception {
+        //given
+        String name = "skill";
+        SCustomUserInfoDefinitionAlreadyExistsException serverException = new SCustomUserInfoDefinitionAlreadyExistsException(name);
+        given(service.createCustomUserInfoDefinition(any(SCustomUserInfoDefinition.class))).willThrow(serverException);
+        
+        try {
+        //when
+            api.create(factory, new CustomUserInfoDefinitionCreator(name));
+            fail("Expected AlreadyExistsException");
+        } catch (AlreadyExistsException e) {
+            //then
+            assertThat(e.getMessage()).isEqualTo("A custom user info definition already exists with name '" + name + "'");
+        }
+    }
+
+    @Test
+    public void create_should_throws_CreationException_if_name_is_null() throws Exception {
+        //given
+        String name = null;
+        
+        try {
+            //when
+            api.create(factory, new CustomUserInfoDefinitionCreator(name));
+            fail("Expected CreationException");
+        } catch (CreationException e) {
+            //then
+            assertThat(e.getMessage()).isEqualTo("The definition name cannot be null or empty.");
+        }
+    }
+
+    @Test
+    public void create_should_throws_CreationException_if_name_is_empty() throws Exception {
+        //given
+        String name = "";
+        
+        try {
+            //when
+            api.create(factory, new CustomUserInfoDefinitionCreator(name));
+            fail("Expected CreationException");
+        } catch (CreationException e) {
+            //then
+            assertThat(e.getMessage()).isEqualTo("The definition name cannot be null or empty.");
+        }
+    }
+
+    @Test
+    public void create_should_throws_CreationException_if_name_is_longer_then_75() throws Exception {
+        //given
+        String name = "123456789:123456789:123456789:123456789:123456789:123456789:123456789:123456";
+        try {
+            //when
+            api.create(factory, new CustomUserInfoDefinitionCreator(name));
+            fail("Expected CreationException");
+        } catch (CreationException e) {
+            //then
+            assertThat(e.getMessage()).isEqualTo("The definition name cannot be longer then 75 characters.");
+        }
+    }
 
     @Test
     public void list_call_service_to_retrieve_items_and_return_result_as_a_list_of_CustomUserDefinition() throws Exception {
@@ -89,6 +155,7 @@ public class CustomUserInfoDefinitionAPITest {
         verify(service, atLeastOnce()).deleteCustomUserInfoDefinition(definition);
     }
 
+    @Test
     public void delete_should_return_deleted_item_with_an_invalid_id() throws Exception {
         given(service.getCustomUserInfoDefinition(1L))
                 .willReturn(new DummySCustomUserInfoDefinition(1L, "name", "", ""));
@@ -98,4 +165,6 @@ public class CustomUserInfoDefinitionAPITest {
         assertThat(definition.getId()).isEqualTo(-1L);
         assertThat(definition.getName()).isEqualTo("name");
     }
+    
+    
 }

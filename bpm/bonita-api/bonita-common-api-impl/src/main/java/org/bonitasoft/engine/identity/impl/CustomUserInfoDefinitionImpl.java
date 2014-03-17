@@ -20,6 +20,8 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
  */
 public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
 
+    private static final long serialVersionUID = -4247282588605708614L;
+
     private long id = -1L;
 
     private String name;
@@ -63,4 +65,50 @@ public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    @Override
+    public String toString() {
+        return "CustomUserInfoDefinitionImpl [id=" + id + ", name=" + name + ", displayName=" + displayName + ", description=" + description + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
+        result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CustomUserInfoDefinitionImpl other = (CustomUserInfoDefinitionImpl) obj;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
+        if (displayName == null) {
+            if (other.displayName != null)
+                return false;
+        } else if (!displayName.equals(other.displayName))
+            return false;
+        if (id != other.id)
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
+    
 }

@@ -15,6 +15,7 @@ package org.bonitasoft.engine.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.identity.CustomUserInfo;
@@ -28,7 +29,7 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
  */
 public interface CustomUserInfoAPI {
 
-    public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException;
+    public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws AlreadyExistsException, CreationException;
 
     public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult);
 

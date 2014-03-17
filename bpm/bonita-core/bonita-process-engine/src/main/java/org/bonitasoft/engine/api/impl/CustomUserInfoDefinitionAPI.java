@@ -16,10 +16,12 @@ package org.bonitasoft.engine.api.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
@@ -27,8 +29,11 @@ import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBui
 
 /**
  * @author Vincent Elcrin
+ * @author Elias Ricken de Medeiros
  */
 public class CustomUserInfoDefinitionAPI {
+
+    private static final int MAX_NAME_LENGHT = 75;
 
     private IdentityService service;
 
@@ -39,9 +44,7 @@ public class CustomUserInfoDefinitionAPI {
     }
 
     public CustomUserInfoDefinition create(SCustomUserInfoDefinitionBuilderFactory factory, CustomUserInfoDefinitionCreator creator) throws CreationException {
-        if (creator == null) {
-            throw new CreationException("Can not create null custom user details.");
-        }
+        checkParameter(creator);
 
         final SCustomUserInfoDefinitionBuilder builder = factory.createNewInstance();
         builder.setName(creator.getName());
@@ -49,9 +52,24 @@ public class CustomUserInfoDefinitionAPI {
         builder.setDescription(creator.getDescription());
         try {
             return converter.convert(service.createCustomUserInfoDefinition(builder.done()));
+        } catch (SCustomUserInfoDefinitionAlreadyExistsException e) {
+            throw new AlreadyExistsException(e.getMessage());
         } catch (SIdentityException e) {
             throw new CreationException(e);
         }
+    }
+
+    private void checkParameter(CustomUserInfoDefinitionCreator creator) throws CreationException {
+        if (creator == null) {
+            throw new CreationException("Can not create null custom user details.");
+        }
+        if (creator.getName() == null || creator.getName().trim().isEmpty()) {
+            throw new CreationException("The definition name cannot be null or empty.");
+        }
+        if (creator.getName().length() > MAX_NAME_LENGHT) {
+            throw new CreationException("The definition name cannot be longer then 75 characters.");
+        }
+        
     }
 
     public CustomUserInfoDefinition delete(long id) throws SIdentityException {

@@ -135,7 +135,6 @@ import org.bonitasoft.engine.identity.xml.ImportOrganization;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -1475,7 +1474,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException {
+    public CustomUserInfoDefinition createCustomUserInfoDefinition(CustomUserInfoDefinitionCreator creator) throws CreationException, AlreadyExistsException {
         return createCustomUserInfoDefinitionAPI().create(
                 BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class),
                 creator);
