@@ -89,7 +89,6 @@ public class SecuredLoginServiceImpl implements LoginService {
         long userId = 0;
         boolean isTechnicalUser = false;
         String userName = null;
-        AuthenticationException authenticationException = null;
         try {
             final TechnicalUser technicalUser = getTechnicalUser(tenantId);
 

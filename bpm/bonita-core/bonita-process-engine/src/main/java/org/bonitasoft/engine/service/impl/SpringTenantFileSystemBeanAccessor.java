@@ -89,7 +89,7 @@ public class SpringTenantFileSystemBeanAccessor {
     public synchronized void initializeContext(final ClassLoader classLoader) {
         if (context == null) {// synchronized null check
             // Inject the tenantId as a resolvable placeholder for the bean definitions.
-            Properties properties = new Properties();
+            Properties properties = findBonitaServerTenantProperties(tenantId);
             properties.put("tenantId", String.valueOf(tenantId));
 
             PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
@@ -102,6 +102,17 @@ public class SpringTenantFileSystemBeanAccessor {
             context.addBeanFactoryPostProcessor(ppc);
 
             context.refresh();
+        }
+    }
+
+    private Properties findBonitaServerTenantProperties(long tenantId) {
+        final BonitaHomeServer homeServer = BonitaHomeServer.getInstance();
+        try {
+            return homeServer.getTenantProperties(tenantId);
+        } catch (final BonitaHomeNotSetException e) {
+            throw new RuntimeException("Bonita home not set");
+        } catch (IOException e) {
+            throw new RuntimeException("Tenant Properties not Found!");
         }
     }
 
