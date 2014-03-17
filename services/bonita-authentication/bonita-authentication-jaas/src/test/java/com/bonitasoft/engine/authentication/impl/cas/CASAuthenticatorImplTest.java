@@ -88,7 +88,7 @@ public class CASAuthenticatorImplTest {
     @Before
     public void before() {
         casAuthenticatorImpl.setCasService(casService);
-        casAuthenticatorImpl.setCasURLPRefix(casURLPRefix);
+        casAuthenticatorImpl.setCasServerUrlPrefix(casURLPRefix);
         casAuthenticatorImpl = spy(casAuthenticatorImpl);
         credentials = new HashMap<String, Serializable>();
     }

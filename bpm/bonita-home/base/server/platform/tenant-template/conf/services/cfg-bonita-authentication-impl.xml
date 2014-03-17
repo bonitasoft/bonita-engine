@@ -5,9 +5,9 @@
 	<bean id="authenticatorDelegate"
 		class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
-		<property name="casURLPRefix"
-			value="${authentication.delegate.cas.server.url.prefix}" /> <!--http://127.0.1.1:8180 -->
-		<property name="casService" value="${authentication.delegate.cas.service.url}" /> <!--http://127.0.1.1:8888/loginservice?redirectUrl=portal%2Fhomepage%3Fgwt.codesvr%3D127.0.0.1%3A9997&amp;gwt.codesvr=127.0.1.1:9997"/ -->
+		<property name="casServerUrlPrefix"
+			value="${authentication.delegate.cas.server.url.prefix:http://cas.internal.bonitasoft.com/}" /> 
+		<property name="casService" value="${authentication.delegate.cas.service.url:http://internal.bonitasoft.com/bonita/loginservice}" />
 	</bean>
 
 	<bean id="genericAuthenticationService"
@@ -22,5 +22,6 @@
 		<constructor-arg name="identityService" ref="identityService" />
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
+
 
 </beans>

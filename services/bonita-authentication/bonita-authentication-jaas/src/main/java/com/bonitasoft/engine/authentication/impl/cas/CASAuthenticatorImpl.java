@@ -74,7 +74,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
 
     protected final TechnicalLoggerService logger;
 
-    protected String casURLPRefix;
+    protected String casServerUrlPrefix;
 
     protected String casService;
 
@@ -228,7 +228,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("service", casService));
         String params = URLEncodedUtils.format(nvps, "UTF8");
-        HttpGet getRequest = new HttpGet(casURLPRefix + action + "?" + params);
+        HttpGet getRequest = new HttpGet(casServerUrlPrefix + action + "?" + params);
 
         for (Header header : headers) {
             getRequest.addHeader("Cookie", header.getValue());
@@ -305,7 +305,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
     protected HttpPost createCasAuthenticationHttpRequest(String lt, String action, String login, String password) throws UnsupportedEncodingException {
         List<NameValuePair> nvps = createEntityContent(lt, login, password);
 
-        HttpPost postRequest = new HttpPost(casURLPRefix + action);
+        HttpPost postRequest = new HttpPost(casServerUrlPrefix + action);
         postRequest.setEntity(new UrlEncodedFormEntity(nvps, "utf8"));
         return postRequest;
     }
@@ -380,23 +380,23 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
     /**
      * @return the casURLPRefix
      */
-    public String getCasURLPRefix() {
-        return casURLPRefix;
+    public String getCasServerUrlPrefix() {
+        return casServerUrlPrefix;
     }
 
     /**
      * @param casURLPRefix
      *            the casURLPRefix to set
      */
-    public void setCasURLPRefix(String casURLPRefix) {
-        this.casURLPRefix = casURLPRefix;
+    public void setCasServerUrlPrefix(String casURLPRefix) {
+        this.casServerUrlPrefix = casURLPRefix;
     }
 
     /**
      * @return the casServerUrl
      */
     public String getCasServerUrl() {
-        return casURLPRefix + "/cas";
+        return casServerUrlPrefix + "/cas";
     }
 
     /**
