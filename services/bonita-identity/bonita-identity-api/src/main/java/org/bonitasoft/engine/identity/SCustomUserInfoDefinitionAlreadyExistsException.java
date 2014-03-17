@@ -13,18 +13,22 @@
  **/
 package org.bonitasoft.engine.identity;
 
-
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
-public class SCustomUserInfoValueReadException extends SIdentityException {
-    
-    private static final long serialVersionUID = -9066126826360443609L;
+public class SCustomUserInfoDefinitionAlreadyExistsException extends SIdentityException {
 
-    public SCustomUserInfoValueReadException(final Throwable cause) {
-        super(cause);
+    private static final long serialVersionUID = 1061806810101480038L;
+
+    private String definitionName;
+
+    public SCustomUserInfoDefinitionAlreadyExistsException(String definitionName) {
+        super("A custom user info definition already exists with name '" + definitionName + "'");
+        this.definitionName = definitionName;
+    }
+
+    public String getDefinitionName() {
+        return definitionName;
     }
 
 }

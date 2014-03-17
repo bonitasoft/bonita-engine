@@ -14,17 +14,23 @@
 package org.bonitasoft.engine.identity;
 
 
-
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class SCustomUserInfoValueReadException extends SIdentityException {
-    
-    private static final long serialVersionUID = -9066126826360443609L;
+public class SCustomUserInfoDefinitionNotFoundException extends SIdentityException {
 
-    public SCustomUserInfoValueReadException(final Throwable cause) {
-        super(cause);
+    private static final long serialVersionUID = 1410274244862871978L;
+   
+    private String definitionName;
+
+    public SCustomUserInfoDefinitionNotFoundException(String definitionName) {
+        super("No custom user info value found with name '" + definitionName  + "'");
+        this.definitionName = definitionName;
+    }
+    
+    public String getDefinitionName() {
+        return definitionName;
     }
 
 }

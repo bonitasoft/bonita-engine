@@ -584,14 +584,15 @@ public interface IdentityService {
     SCustomUserInfoValue getCustomUserInfoValue(long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException, SCustomUserInfoValueReadException;
 
     /**
-     * Get profileMetadataValue by its name
+     * Get a custom user info definition by its name
      * 
      * @param name
-     *            The name of profileMetadataValue
-     * @return the profileMetadataValue
-     * @throws SIdentityException
+     *            The name custom user info definition name
+     * @return the custom user info definition identified by the given name
+     * @throws SCustomUserInfoDefinitionNotFoundException if there is no custom user info definition for the given name 
+     * @throws SCustomUserInfoDefinitionReadException if an exception occurs when trying to retrieve the custom user info definition
      */
-    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SIdentityException;
+    SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException, SCustomUserInfoDefinitionReadException;
 
     /**
      * Get total number of custom user info
@@ -760,9 +761,10 @@ public interface IdentityService {
      * 
      * @param customUserInfo
      *            SCustomUserInfoDefinition object
-     * @throws SIdentityException
+     * @throws SCustomUserInfoDefinitionAlreadyExistsException TODO
+     * @throws SCustomUserInfoDefinitionCreationException TODO
      */
-    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SIdentityException;
+    SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException, SCustomUserInfoDefinitionCreationException;
 
     /**
      * Update customUserInfoDefinition according to the descriptor

@@ -31,6 +31,10 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionAlreadyExistsException;
+import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionCreationException;
+import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionNotFoundException;
+import org.bonitasoft.engine.identity.SCustomUserInfoDefinitionReadException;
 import org.bonitasoft.engine.identity.SCustomUserInfoValueNotFoundException;
 import org.bonitasoft.engine.identity.SCustomUserInfoValueReadException;
 import org.bonitasoft.engine.identity.SGroupCreationException;
@@ -166,12 +170,13 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SCustomUserInfoDefinition createCustomUserInfoDefinition(final SCustomUserInfoDefinition customUserInfo) throws SIdentityException {
+    public SCustomUserInfoDefinition createCustomUserInfoDefinition(final SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException, SCustomUserInfoDefinitionCreationException {
         final String methodName = "createCustomUserInfoDefinition";
         logBeforeMethod(methodName);
         final SCustomUserInfoDefinitionLogBuilder logBuilder = getSCustomUserInfoDefinitionLog(ActionType.CREATED, "Adding a custom user info with name "
                 + customUserInfo.getName());
         try {
+            throwExceptionIfAlreadyExists(customUserInfo);
             final InsertRecord insertRecord = new InsertRecord(customUserInfo);
             final SInsertEvent insertEvent = getInsertEvent(customUserInfo, CUSTOM_USER_INFO_DEFINITION);
             recorder.recordInsert(insertRecord, insertEvent);
@@ -179,10 +184,25 @@ public class IdentityServiceImpl implements IdentityService {
             logAfterMethod(methodName);
             return customUserInfo;
         } catch (final SRecorderException e) {
-            logOnExceptionMethod(methodName, e);
-            initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw new SIdentityException("Can't add custom user info definition " + customUserInfo, e);
+            throw handleCustomUserInfoDefinitionCreationFailure(customUserInfo, methodName, logBuilder, e);
+        } catch (SBonitaReadException e) {
+            throw handleCustomUserInfoDefinitionCreationFailure(customUserInfo, methodName, logBuilder, e);
         }
+    }
+
+    private void throwExceptionIfAlreadyExists(final SCustomUserInfoDefinition customUserInfo) throws SBonitaReadException,
+            SCustomUserInfoDefinitionAlreadyExistsException {
+        SCustomUserInfoDefinition storedDef = getCustomUserInfoDefinitionWithoutCheck(customUserInfo.getName());
+        if(storedDef != null) {
+            throw new SCustomUserInfoDefinitionAlreadyExistsException(customUserInfo.getName());
+        }
+    }
+
+    private SCustomUserInfoDefinitionCreationException handleCustomUserInfoDefinitionCreationFailure(final SCustomUserInfoDefinition customUserInfo, final String methodName,
+            final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception) throws SCustomUserInfoDefinitionCreationException {
+        logOnExceptionMethod(methodName, exception);
+        initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+        return new SCustomUserInfoDefinitionCreationException(customUserInfo.getName(), exception);
     }
 
     @Override
@@ -892,17 +912,27 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String name) throws SIdentityException {
+    public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String name) throws SCustomUserInfoDefinitionNotFoundException, SCustomUserInfoDefinitionReadException {
         final String methodName = "getCustomUserInfoDefinitionByName";
-        logBeforeMethod(methodName);
+        SCustomUserInfoDefinition definition = null;
         try {
-            final SCustomUserInfoDefinition sCustomUserInfoDefinition = persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(name));
-            logAfterMethod(methodName);
-            return sCustomUserInfoDefinition;
+            logBeforeMethod(methodName);
+            definition =getCustomUserInfoDefinitionWithoutCheck(name);
         } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(methodName, e);
-            throw new SIdentityException("Can't get the custom user info definition with name " + name, e);
+            throw new SCustomUserInfoDefinitionReadException(name, e);
         }
+        if(definition == null) {
+            SCustomUserInfoDefinitionNotFoundException notFoundException = new SCustomUserInfoDefinitionNotFoundException(name);
+            logOnExceptionMethod(methodName, notFoundException);
+            throw notFoundException;
+        }
+        logAfterMethod(methodName);
+        return definition;
+    }
+
+    private SCustomUserInfoDefinition getCustomUserInfoDefinitionWithoutCheck(final String name)
+            throws SBonitaReadException {
+        return persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(name));
     }
 
     @Override

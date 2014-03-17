@@ -13,18 +13,22 @@
  **/
 package org.bonitasoft.engine.identity;
 
-
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
-public class SCustomUserInfoValueReadException extends SIdentityException {
-    
-    private static final long serialVersionUID = -9066126826360443609L;
+public class SCustomUserInfoDefinitionCreationException extends SIdentityException {
 
-    public SCustomUserInfoValueReadException(final Throwable cause) {
-        super(cause);
+    private static final long serialVersionUID = -429177983510812485L;
+
+    private String definitionName;
+
+    public SCustomUserInfoDefinitionCreationException(String definitionName, Throwable cause) {
+        super("Unable to create cutom user info definition with name '" + definitionName + "'", cause);
+        this.definitionName = definitionName;
+    }
+
+    public String getDefinitionName() {
+        return definitionName;
     }
 
 }
