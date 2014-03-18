@@ -61,6 +61,7 @@ import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
+import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
@@ -123,7 +124,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                 Long primaryKey = null;
                 if (expression != null) {
                     Object businessData = expressionResolverService.evaluate(expression);
-                    businessData = businessDataRepository.merge(businessData);
+                    businessData = businessDataRepository.merge((Entity) businessData);
                     primaryKey = ClassReflector.invokeGetter(businessData, PERSISTENCE_ID_GETTER);
                 }
                 final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);

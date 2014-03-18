@@ -1,8 +1,15 @@
 package com.bonitasoft.engine.operation;
 
-public class Employee {
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import com.bonitasoft.engine.bdm.Entity;
+
+public class Employee implements Entity {
 
     private Long persistenceId;
+
+    private Long persistenceVersion;
 
     private String firstName;
 
@@ -12,15 +19,22 @@ public class Employee {
         super();
     }
 
-    public Employee(final Long id, final String firstName, final String lastName) {
+    public Employee(final Long id, final Long persistenceVersion, final String firstName, final String lastName) {
         super();
-        this.persistenceId = id;
+        persistenceId = id;
+        this.persistenceVersion = persistenceVersion;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
+    @Override
     public Long getPersistenceId() {
         return persistenceId;
+    }
+
+    @Override
+    public Long getPersistenceVersion() {
+        return persistenceVersion;
     }
 
     public String getFirstName() {
@@ -41,12 +55,7 @@ public class Employee {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (firstName == null ? 0 : firstName.hashCode());
-        result = prime * result + (persistenceId == null ? 0 : persistenceId.hashCode());
-        result = prime * result + (lastName == null ? 0 : lastName.hashCode());
-        return result;
+        return new HashCodeBuilder().append(persistenceId).append(persistenceVersion).append(firstName).append(lastName).build();
     }
 
     @Override
@@ -61,33 +70,13 @@ public class Employee {
             return false;
         }
         final Employee other = (Employee) obj;
-        if (firstName == null) {
-            if (other.firstName != null) {
-                return false;
-            }
-        } else if (!firstName.equals(other.firstName)) {
-            return false;
-        }
-        if (persistenceId == null) {
-            if (other.persistenceId != null) {
-                return false;
-            }
-        } else if (!persistenceId.equals(other.persistenceId)) {
-            return false;
-        }
-        if (lastName == null) {
-            if (other.lastName != null) {
-                return false;
-            }
-        } else if (!lastName.equals(other.lastName)) {
-            return false;
-        }
-        return true;
+        return new EqualsBuilder().append(persistenceId, other.persistenceId).append(persistenceVersion, other.persistenceVersion)
+                .append(firstName, other.firstName).append(lastName, other.lastName).build();
     }
 
     @Override
     public String toString() {
-        return "Employee [id=" + persistenceId + ", firstName=" + firstName + ", lastName=" + lastName + "]";
+        return "Employee [id=" + persistenceId + ", version=" + persistenceVersion + ", firstName=" + firstName + ", lastName=" + lastName + "]";
     }
 
 }

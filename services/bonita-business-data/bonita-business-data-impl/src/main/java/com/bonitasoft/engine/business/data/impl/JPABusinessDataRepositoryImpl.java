@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +31,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
+import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.ScopeType;
@@ -43,9 +43,9 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BDMJarBuilder;
 import com.bonitasoft.engine.bdm.Entity;
-import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
+import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
@@ -169,27 +169,50 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     public void undeploy(final long tenantId) throws SBusinessDataRepositoryException {
         try {
             dependencyService.deleteDependency(BDR);
+        } catch (final SDependencyNotFoundException sde) {
+            // do nothing
         } catch (final SDependencyException sde) {
             throw new SBusinessDataRepositoryException(sde);
         }
     }
 
     @Override
-    public <T> T find(final Class<T> entityClass, final Serializable primaryKey) throws BusinessDataNotFoundException {
+    public <T extends Entity> T findById(final Class<T> entityClass, final Long primaryKey) throws SBusinessDataNotFoundException {
         if (primaryKey == null) {
-            throw new BusinessDataNotFoundException("Impossible to get data with a null identifier");
+            throw new SBusinessDataNotFoundException("Impossible to get data with a null identifier");
         }
         final EntityManager em = getEntityManager();
         final T entity = em.find(entityClass, primaryKey);
         if (entity == null) {
-            throw new BusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
+            throw new SBusinessDataNotFoundException("Impossible to get data with id: " + primaryKey);
         }
         em.detach(entity);
         return entity;
     }
 
     @Override
-    public <T> T find(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) throws BusinessDataNotFoundException,
+    public <T extends Entity> T find(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters)
+            throws SBusinessDataNotFoundException, NonUniqueResultException {
+        final EntityManager em = getEntityManager();
+        final TypedQuery<T> query = em.createQuery(qlString, resultClass);
+        if (parameters != null) {
+            for (final Entry<String, Object> parameter : parameters.entrySet()) {
+                query.setParameter(parameter.getKey(), parameter.getValue());
+            }
+        }
+        try {
+            final T entity = query.getSingleResult();
+            em.detach(entity);
+            return entity;
+        } catch (final javax.persistence.NonUniqueResultException nure) {
+            throw new NonUniqueResultException(nure);
+        } catch (final NoResultException nre) {
+            throw new SBusinessDataNotFoundException("Impossible to get data using query: " + qlString + " and parameters: " + parameters, nre);
+        }
+    }
+
+    @Override
+    public <T> T select(final Class<T> resultClass, final String qlString, final Map<String, Object> parameters) throws SBusinessDataNotFoundException,
             NonUniqueResultException {
         final EntityManager em = getEntityManager();
         final TypedQuery<T> query = em.createQuery(qlString, resultClass);
@@ -208,12 +231,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         } catch (final javax.persistence.NonUniqueResultException nure) {
             throw new NonUniqueResultException(nure);
         } catch (final NoResultException nre) {
-            throw new BusinessDataNotFoundException("Impossible to get data using query: " + qlString + " and parameters: " + parameters, nre);
+            throw new SBusinessDataNotFoundException("Impossible to get data using query: " + qlString + " and parameters: " + parameters, nre);
         }
     }
 
     @Override
-    public <T> T merge(final T entity) {
+    public <T extends Entity> T merge(final T entity) {
         if (entity != null) {
             final EntityManager em = getEntityManager();
             return em.merge(entity);

@@ -21,6 +21,7 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
+import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
@@ -60,8 +61,8 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
             long processInstanceId = flowNodeInstanceService.getProcessInstanceId((Long) context.get(SExpressionContext.containerIdKey),
                     (String) context.get(SExpressionContext.containerTypeKey));
             SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
-            Class<?> bizClass = Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
-            return businessDataRepository.find(bizClass, refBusinessDataInstance.getDataId());
+            Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
+            return businessDataRepository.findById(bizClass, refBusinessDataInstance.getDataId());
         } catch (SBonitaReadException e) {
             throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + bizDataName);
         } catch (Exception e) {

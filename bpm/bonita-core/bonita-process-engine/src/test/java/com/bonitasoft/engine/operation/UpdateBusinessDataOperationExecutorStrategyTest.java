@@ -96,12 +96,10 @@ public class UpdateBusinessDataOperationExecutorStrategyTest {
         final InvalidTravel myTravel = new InvalidTravel();
 
         final UpdateBusinessDataOperationExecutorStrategy spy = spy(updateBizDataStrategy);
-        when(businessDataRepository.merge(any())).thenReturn(myTravel);
         doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong());
         final SLeftOperand leftOp = mock(SLeftOperand.class);
         when(leftOp.getName()).thenReturn("bizData");
         updateBizDataStrategy.update(leftOp, new Object(), 1L, "");
-
     }
 
     public class InvalidTravel implements Serializable {

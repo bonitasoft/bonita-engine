@@ -21,6 +21,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadE
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
+import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
@@ -65,7 +66,7 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
                     flowNodeInstanceService.getProcessInstanceId(containerId, containerType));
             final Long dataId = refBusinessDataInstance.getDataId();
             if (dataId == null) {
-                newValue = repository.merge(newValue);
+                newValue = repository.merge((Entity) newValue);
                 final Long id = ClassReflector.invokeGetter(newValue, PERSISTENCE_ID_GETTER);
                 refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
             }

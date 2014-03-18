@@ -120,6 +120,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.impl.transaction.UpdateProcessInstance;
 import com.bonitasoft.engine.api.impl.transaction.task.CreateManualUserTask;
+import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator.ManualTaskField;
 import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
@@ -129,8 +130,8 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
-import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
+import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
@@ -1054,11 +1055,12 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (refBusinessDataInstance.getDataId() == null) {
                 return null;
             }
-            final Class<?> businessDataClass = Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
-            return (Serializable) businessDataRepository.find(businessDataClass, refBusinessDataInstance.getDataId());
+            final Class<Entity> businessDataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader()
+                    .loadClass(refBusinessDataInstance.getDataClassName());
+            return businessDataRepository.findById(businessDataClass, refBusinessDataInstance.getDataId());
         } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {
             throw new DataNotFoundException(srbdnfe);
-        } catch (final BusinessDataNotFoundException bdnfe) {
+        } catch (final SBusinessDataNotFoundException bdnfe) {
             throw new DataNotFoundException(bdnfe);
         } catch (final SBonitaReadException sbe) {
             throw new RetrieveException(sbe);

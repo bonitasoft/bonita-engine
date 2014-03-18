@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,9 +16,10 @@ import org.bonitasoft.engine.commons.TenantLifecycleService;
 import com.bonitasoft.engine.bdm.Entity;
 
 /**
- * The BusinessDataRepository service allows to manage Business Data operations. It includes deploy / undeploy of a Business Data Model, search / find of
- * Business Data entity objects. Start / stop operations as well. Do we keep that?
+ * The BusinessDataRepository service allows to manage Business Data operations. It includes deploy / undeploy of a Business Data Model, search / find / create
+ * / update of Business Data entity objects.
  * 
+ * @see Entity
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
@@ -47,10 +47,10 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @param primaryKey
      *            the primary key to search by.
      * @return the found entity, if any.
-     * @throws BusinessDataNotFoundException
+     * @throws SBusinessDataNotFoundException
      *             if the Business Data could not be found with the provided primary key.
      */
-    <T> T find(Class<T> entityClass, Serializable primaryKey) throws BusinessDataNotFoundException;
+    <T extends Entity> T findById(Class<T> entityClass, Long primaryKey) throws SBusinessDataNotFoundException;
 
     /**
      * Finds an Entity that is defined in a deployed Business Data Model, through JPQL query.
@@ -62,17 +62,53 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @param parameters
      *            the parameters needed to execute the query.
      * @return the found entity, if any.
-     * @throws BusinessDataNotFoundException
+     * @throws SBusinessDataNotFoundException
      *             if the Business Data could not be found with the provided primary key.
      * @throws NonUniqueResultException
      *             if more than one result was found.
      */
-    <T> T find(Class<T> entityClass, String qlString, Map<String, Object> parameters) throws BusinessDataNotFoundException, NonUniqueResultException;
+    <T extends Entity> T find(Class<T> entityClass, String qlString, Map<String, Object> parameters) throws SBusinessDataNotFoundException,
+            NonUniqueResultException;
 
-    <T> T merge(T entity);
+    /**
+     * Executes a JPQL query returning a single result.
+     * 
+     * @param resultClass
+     *            the type of the result of the JPQL query.
+     * @param qlString
+     *            the JPQL query.
+     * @param parameters
+     *            the JPQL query parameters, needed to execute the JPQL query.
+     * @return the typed result.
+     * @throws SBusinessDataNotFoundException
+     *             if no result could be found.
+     * @throws NonUniqueResultException
+     *             if non unique result is returned by the JPQL query.
+     */
+    <T> T select(Class<T> resultClass, String qlString, Map<String, Object> parameters) throws SBusinessDataNotFoundException, NonUniqueResultException;
 
+    /**
+     * Saves or updates an entity in the Business Data Repository.
+     * 
+     * @param entity
+     *            the entity to save / update.
+     * @return the freshly persisted entity.
+     */
+    <T extends Entity> T merge(T entity);
+
+    /**
+     * Removes an entity from the Business Data Repository.
+     * 
+     * @param entity
+     *            the entity to remove.
+     */
     void remove(final Entity entity);
 
+    /**
+     * Retrieves the <code>Set</code> of known Entity class names in this Business Data Repository.
+     * 
+     * @return the <code>Set</code> of known Entity class names, as qualified class names.
+     */
     Set<String> getEntityClassNames();
 
 }

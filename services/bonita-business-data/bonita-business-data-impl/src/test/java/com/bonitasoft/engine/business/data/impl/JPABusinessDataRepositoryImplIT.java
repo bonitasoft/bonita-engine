@@ -35,8 +35,8 @@ import org.junit.Test;
 import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 
-import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
+import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.pojo.Employee;
 
 public class JPABusinessDataRepositoryImplIT {
@@ -119,7 +119,7 @@ public class JPABusinessDataRepositoryImplIT {
             @Override
             public void run() {
                 try {
-                    final Employee employee = businessDataRepository.find(Employee.class, 45l);
+                    final Employee employee = businessDataRepository.findById(Employee.class, 45l);
                     assertThat(employee).isNotNull();
                     assertThat(employee.getPersistenceId()).isEqualTo(45l);
                     assertThat(employee.getFirstName()).isEqualTo("Hannu");
@@ -132,14 +132,14 @@ public class JPABusinessDataRepositoryImplIT {
         });
     }
 
-    @Test(expected = BusinessDataNotFoundException.class)
+    @Test(expected = SBusinessDataNotFoundException.class)
     public void throwExceptionWhenEmployeeNotFound() throws Exception {
         executeInTransaction(new RunnableInTransaction(false) {
 
             @Override
             public void run() {
                 try {
-                    businessDataRepository.find(Employee.class, -145l);
+                    businessDataRepository.findById(Employee.class, -145l);
                 } catch (final Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -173,7 +173,7 @@ public class JPABusinessDataRepositoryImplIT {
             public void run() {
                 try {
                     businessDataRepository.merge(null);
-                    final Long count = businessDataRepository.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
+                    final Long count = businessDataRepository.select(Long.class, "SELECT COUNT(*) FROM Employee e", null);
                     assertThat(count).isEqualTo(0);
                 } catch (final Exception e) {
                     throw new RuntimeException(e);
@@ -217,7 +217,7 @@ public class JPABusinessDataRepositoryImplIT {
         });
     }
 
-    @Test(expected = BusinessDataNotFoundException.class)
+    @Test(expected = SBusinessDataNotFoundException.class)
     public void throwExceptionWhenFindingAnUnknownEmployee() throws Exception {
         executeInTransaction(new RunnableInTransaction(true) {
 
@@ -247,12 +247,12 @@ public class JPABusinessDataRepositoryImplIT {
 
     @Test
     public void entityClassNames_is_an_empty_set_if_bdr_is_not_started() throws Exception {
-        
+
         Set<String> classNames = businessDataRepository.getEntityClassNames();
-        
+
         assertThat(classNames).isEmpty();
     }
-    
+
     @Test
     public void entityClassNames_contains_all_entities_class_names() throws Exception {
         UserTransaction ut = TransactionManagerServices.getTransactionManager();
@@ -261,13 +261,13 @@ public class JPABusinessDataRepositoryImplIT {
             businessDataRepository.start();
 
             Set<String> classNames = businessDataRepository.getEntityClassNames();
-            
+
             assertThat(classNames).containsOnly("com.bonitasoft.pojo.Employee");
         } finally {
             ut.commit();
         }
     }
-    
+
     @Test
     public void updateTwoFieldsInSameTransactionShouldModifySameObject() throws Exception {
         UserTransaction ut = TransactionManagerServices.getTransactionManager();
@@ -376,7 +376,7 @@ public class JPABusinessDataRepositoryImplIT {
         });
     }
 
-    @Test(expected = BusinessDataNotFoundException.class)
+    @Test(expected = SBusinessDataNotFoundException.class)
     public void removeAnEntity() throws Exception {
         UserTransaction ut = TransactionManagerServices.getTransactionManager();
         try {

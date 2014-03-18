@@ -41,7 +41,7 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
 
     @Test
     public void returnTheGivenValue() throws SBonitaException {
-        final Employee employee = new Employee(48578l, "firstName", "lastName");
+        final Employee employee = new Employee(48578l, 52L, "firstName", "lastName");
 
         final Object value = strategy.getValue(null, employee, -56, null, null);
         assertThat(value).isEqualTo(employee);
@@ -55,7 +55,7 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
     @Test
     public void insertBusinessData() throws SBonitaException {
         final long dataId = 789l;
-        final Employee employee = new Employee(dataId, "firstName", "lastName");
+        final Employee employee = new Employee(dataId, 52L, "firstName", "lastName");
         final long processInstanceId = 76846321l;
 
         final SLeftOperand leftOperand = mock(SLeftOperand.class);
@@ -80,10 +80,10 @@ public class InsertBusinessDataOperationExecutorStrategyTest {
         verify(refBusinessDataService).getRefBusinessDataInstance("unused", processInstanceId);
         verify(refBusinessDataService).updateRefBusinessDataInstance(refBizDataInstance, dataId);
     }
-    
+
     @Test
-	public void shouldGetOperatorType_Return_CREATE_BUSINESS_DATA() throws Exception {
-    	assertThat(strategy.getOperationType()).isEqualTo(OperatorType.CREATE_BUSINESS_DATA.name());
-	}
+    public void shouldGetOperatorType_Return_CREATE_BUSINESS_DATA() throws Exception {
+        assertThat(strategy.getOperationType()).isEqualTo(OperatorType.CREATE_BUSINESS_DATA.name());
+    }
 
 }

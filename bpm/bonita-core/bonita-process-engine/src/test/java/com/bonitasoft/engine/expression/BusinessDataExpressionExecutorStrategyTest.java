@@ -71,7 +71,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
 
     private SimpleBizData createAbizDataInRepository(final long bizDataId) throws Exception {
         final SimpleBizData bizData = new SimpleBizData(bizDataId);
-        when(businessDataRepository.find(SimpleBizData.class, bizData.getId())).thenReturn(bizData);
+        when(businessDataRepository.findById(SimpleBizData.class, bizData.getId())).thenReturn(bizData);
         return bizData;
     }
 

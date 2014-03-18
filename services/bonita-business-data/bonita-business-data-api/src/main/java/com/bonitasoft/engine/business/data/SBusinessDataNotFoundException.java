@@ -13,15 +13,15 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 /**
  * @author Matthieu Chaffotte
  */
-public class BusinessDataNotFoundException extends SBonitaException {
+public class SBusinessDataNotFoundException extends SBonitaException {
 
     private static final long serialVersionUID = -4470717601583219790L;
 
-    public BusinessDataNotFoundException(final String message) {
+    public SBusinessDataNotFoundException(final String message) {
         super(message);
     }
 
-    public BusinessDataNotFoundException(final String message, final Throwable cause) {
+    public SBusinessDataNotFoundException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

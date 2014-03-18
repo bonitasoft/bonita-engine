@@ -13,8 +13,9 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
 
-import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
+import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
+import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
@@ -31,14 +32,14 @@ public class ProcessAPIExtTest {
         final RefBusinessDataService refBusinessDataService = mock(RefBusinessDataService.class);
         final BusinessDataRepository businessDataRespository = mock(BusinessDataRepository.class);
         final SRefBusinessDataInstance refBusinessDataInstance = mock(SRefBusinessDataInstance.class);
-        final String myLeaveRequest = "leaveRequest #45";
+        final MyBusinessData myLeaveRequest = new MyBusinessData();
         doReturn(tenantAccessor).when(spiAPI).getTenantAccessor();
         when(tenantAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);
         when(refBusinessDataService.getRefBusinessDataInstance("myLeaveRequest", processInstanceId)).thenReturn(refBusinessDataInstance);
         when(tenantAccessor.getBusinessDataRepository()).thenReturn(businessDataRespository);
-        when(refBusinessDataInstance.getDataClassName()).thenReturn(String.class.getName());
+        when(refBusinessDataInstance.getDataClassName()).thenReturn(MyBusinessData.class.getName());
         when(refBusinessDataInstance.getDataId()).thenReturn(78l);
-        when(businessDataRespository.find(String.class, 78l)).thenReturn(myLeaveRequest);
+        when(businessDataRespository.findById(MyBusinessData.class, 78l)).thenReturn(myLeaveRequest);
 
         final Serializable actual = spiAPI.getBusinessDataInstance("myLeaveRequest", processInstanceId);
 
@@ -87,9 +88,9 @@ public class ProcessAPIExtTest {
         when(tenantAccessor.getRefBusinessDataService()).thenReturn(refBusinessDataService);
         when(refBusinessDataService.getRefBusinessDataInstance("myLeaveRequest", processInstanceId)).thenReturn(refBusinessDataInstance);
         when(tenantAccessor.getBusinessDataRepository()).thenReturn(businessDataRespository);
-        when(refBusinessDataInstance.getDataClassName()).thenReturn(String.class.getName());
+        when(refBusinessDataInstance.getDataClassName()).thenReturn(MyBusinessData.class.getName());
         when(refBusinessDataInstance.getDataId()).thenReturn(78l);
-        when(businessDataRespository.find(String.class, 78l)).thenThrow(new BusinessDataNotFoundException("ouch!"));
+        when(businessDataRespository.findById(MyBusinessData.class, 78l)).thenThrow(new SBusinessDataNotFoundException("ouch!"));
 
         spiAPI.getBusinessDataInstance("myLeaveRequest", processInstanceId);
     }
@@ -133,4 +134,48 @@ public class ProcessAPIExtTest {
         assertThat(businessDataInstance).isNull();
     }
 
+    class MyBusinessData implements Entity {
+
+        private final int age = 35;
+
+        @Override
+        public Long getPersistenceId() {
+            return null;
+        }
+
+        @Override
+        public Long getPersistenceVersion() {
+            return null;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getOuterType().hashCode();
+            result = prime * result + age;
+            return result;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            MyBusinessData other = (MyBusinessData) obj;
+            if (!getOuterType().equals(other.getOuterType()))
+                return false;
+            if (age != other.age)
+                return false;
+            return true;
+        }
+
+        private ProcessAPIExtTest getOuterType() {
+            return ProcessAPIExtTest.this;
+        }
+
+    }
 }

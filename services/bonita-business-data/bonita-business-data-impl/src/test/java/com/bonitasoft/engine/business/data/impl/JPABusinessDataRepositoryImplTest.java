@@ -18,7 +18,8 @@ import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.business.data.BusinessDataNotFoundException;
+import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 
 public class JPABusinessDataRepositoryImplTest {
@@ -51,9 +52,9 @@ public class JPABusinessDataRepositoryImplTest {
         verify(dependencyService).createDependencyMapping(dependencyMapping);
     }
 
-    @Test(expected = BusinessDataNotFoundException.class)
+    @Test(expected = SBusinessDataNotFoundException.class)
     public void throwAnExceptionIfTheIdentifierIsNull() throws Exception {
-        repository.find(String.class, null);
+        repository.findById(MyEntity.class, null);
     }
 
     @Test
@@ -63,8 +64,8 @@ public class JPABusinessDataRepositoryImplTest {
         verify(dependencyService).deleteDependency("BDR");
     }
 
-    @Test(expected = SBusinessDataRepositoryException.class)
-    public void uninstall_should_throw_an_exception_if_the_dependency_does_not_exist() throws Exception {
+    @Test
+    public void uninstall_should_ignore_exception_if_the_dependency_does_not_exist() throws Exception {
         doThrow(new SDependencyNotFoundException("error")).when(dependencyService).deleteDependency("BDR");
 
         repository.undeploy(45l);
@@ -75,6 +76,22 @@ public class JPABusinessDataRepositoryImplTest {
         doThrow(new SDependencyDeletionException("error")).when(dependencyService).deleteDependency("BDR");
 
         repository.undeploy(45l);
+    }
+
+    class MyEntity implements Entity {
+
+        @Override
+        public Long getPersistenceId() {
+            // TODO Implement me!
+            return null;
+        }
+
+        @Override
+        public Long getPersistenceVersion() {
+            // TODO Implement me!
+            return null;
+        }
+
     }
 
 }

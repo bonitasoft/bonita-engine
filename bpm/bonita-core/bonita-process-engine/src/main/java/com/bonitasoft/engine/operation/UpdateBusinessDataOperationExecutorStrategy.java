@@ -93,10 +93,11 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     protected Object getBusinessData(final String bizDataName, final long processInstanceId) throws SOperationExecutionException {
         try {
             final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(bizDataName, processInstanceId);
-            final Class<?> dataClass = Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
+            final Class<Entity> dataClass = (Class<Entity>) Thread.currentThread().getContextClassLoader()
+                    .loadClass(refBusinessDataInstance.getDataClassName());
             final Long dataId = refBusinessDataInstance.getDataId();
             if (dataId != null) {
-                return businessDataRepository.find(dataClass, dataId);
+                return businessDataRepository.findById(dataClass, dataId);
             } else {
                 return dataClass.newInstance();
             }
@@ -112,11 +113,12 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
             throws SOperationExecutionException {
         try {
             final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(), processInstanceId);
-            newValue = businessDataRepository.merge(newValue);
+            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
+                    processInstanceId);
             if (!(newValue instanceof Entity)) {
                 throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() + " must implements " + Entity.class.getName()));
             }
+            newValue = businessDataRepository.merge((Entity) newValue);
             if (refBusinessDataInstance != null) {
                 refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, ((Entity) newValue).getPersistenceId());
             }
