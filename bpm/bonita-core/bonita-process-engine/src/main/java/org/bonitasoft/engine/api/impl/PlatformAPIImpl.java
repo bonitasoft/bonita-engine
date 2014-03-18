@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -27,6 +27,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
+import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
+import org.bonitasoft.engine.api.impl.transaction.StartServiceStrategy;
+import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
 import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.CleanPlatformTableContent;
@@ -48,7 +51,6 @@ import org.bonitasoft.engine.command.SCommandAlreadyExistsException;
 import org.bonitasoft.engine.command.SCommandCreationException;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandBuilderFactory;
-import org.bonitasoft.engine.commons.LifecycleService;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -56,7 +58,6 @@ import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
-import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.data.DataService;
 import org.bonitasoft.engine.data.SDataException;
 import org.bonitasoft.engine.data.SDataSourceAlreadyExistException;
@@ -280,22 +281,8 @@ public class PlatformAPIImpl implements PlatformAPI {
                             platformSessionId = sessionAccessor.getSessionId();
                             sessionAccessor.deleteSessionId();
                             sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
-                            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-                            final TenantConfiguration tenantConfiguration = tenantServiceAccessor.getTenantConfiguration();
-                            for (final LifecycleService tenantService : tenantConfiguration.getLifecycleServices()) {
-
-                                final Callable<Void> callable = new Callable<Void>() {
-
-                                    @Override
-                                    public Void call() throws Exception {
-                                        logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of tenant: " + tenantService.getClass().getName());
-                                        tenantService.start();
-                                        return null;
-                                    }
-                                };
-                                platformAccessor.getTransactionService().executeInTransaction(callable);
-
-                            }
+                            final SetServiceState startService = new SetServiceState(tenantId, new StartServiceStrategy());
+                            platformAccessor.getTransactionService().executeInTransaction(startService);
                         } finally {
                             sessionService.deleteSession(sessionId);
                             cleanSessionAccessor(sessionAccessor, platformSessionId);
@@ -429,19 +416,15 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (plaformConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
-            for (final LifecycleService serviceWithLifecycle : otherServicesToStart) {
+            for (final PlatformLifecycleService serviceWithLifecycle : otherServicesToStart) {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
                 serviceWithLifecycle.stop();
             }
             final List<STenant> tenantIds = getTenants(platformService, transactionService);
             for (final STenant tenant : tenantIds) {
                 // stop the connector executor thread pool
-                final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
-                final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": " + connectorExecutor.getClass().getName());
-                final WorkService workService = tenantServiceAccessor.getWorkService();
-                logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": " + workService.getClass().getName());
-                workService.stop();
+                final SetServiceState stopService = new SetServiceState(tenant.getId(), new StopServiceStrategy());
+                platformAccessor.getTransactionService().executeInTransaction(stopService);
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
