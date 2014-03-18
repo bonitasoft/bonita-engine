@@ -103,10 +103,10 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         try {
             parser.setSchema(this.getClass().getResourceAsStream("/bos-organization.xsd"));
             parser.validate(new StringReader(organizationContent));
-            final Organization organization = (Organization) parser.getObjectFromXML(new StringReader(organizationContent));
+            final OrganizationCreator organization = (OrganizationCreator) parser.getObjectFromXML(new StringReader(organizationContent));
             final List<ExportedUser> users = organization.getUsers();
-            final List<RoleCreator> roles = organization.getRoles();
-            final List<GroupCreator> groups = organization.getGroups();
+            final List<RoleCreator> roles = organization.getRoleCreators();
+            final List<GroupCreator> groups = organization.getGroupCreators();
             final List<UserMembership> memberships = organization.getMemberships();
 
             // Users

@@ -1464,7 +1464,8 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public String exportOrganization() throws OrganizationExportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService());
+        int maxResults = 100;
+        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService(), maxResults );
         try {
             exportOrganization.execute();
             return exportOrganization.getResult();

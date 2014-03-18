@@ -21,13 +21,17 @@ import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.UserMembership;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
+ * @author Elias Ricken de Medeiros
  */
 public class OrganizationBinding extends ElementBinding {
+    
+    private final List<SCustomUserInfoDefinition> customUserInfoDefinitions = new ArrayList<SCustomUserInfoDefinition>();
 
     private final List<ExportedUser> users = new ArrayList<ExportedUser>();
 
@@ -47,7 +51,9 @@ public class OrganizationBinding extends ElementBinding {
 
     @Override
     public void setChildObject(final String name, final Object value) {
-        if (OrganizationMappingConstants.USER.equals(name)) {
+        if (OrganizationMappingConstants.CUSTOM_USER_INFO_DEFINITION.equals(name)) {
+            customUserInfoDefinitions.add((SCustomUserInfoDefinition) value);
+        } else if (OrganizationMappingConstants.USER.equals(name)) {
             users.add((ExportedUser) value);
         } else if (OrganizationMappingConstants.ROLE.equals(name)) {
             roles.add((RoleCreator) value);
@@ -60,7 +66,7 @@ public class OrganizationBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        return new Organization(users, roles, groups, memberships);
+        return new OrganizationCreator(users, roles, groups, memberships, customUserInfoDefinitions);
     }
 
     @Override

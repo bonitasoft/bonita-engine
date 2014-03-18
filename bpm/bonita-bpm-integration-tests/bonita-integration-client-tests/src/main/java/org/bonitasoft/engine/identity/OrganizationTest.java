@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.matchers.BonitaMatcher.match;
 import static org.bonitasoft.engine.matchers.ListElementMatcher.managersAre;
 import static org.bonitasoft.engine.matchers.ListElementMatcher.usernamesAre;
@@ -978,12 +979,14 @@ public class OrganizationTest extends CommonAPITest {
     @Test
     public void exportOrganization() throws Exception {
         // create records for user role, group and membership
+        //users
         final User persistedUser1 = getIdentityAPI().createUser("liuyanyan", "bpm");
 
         final UserCreator creator = new UserCreator("anthony.birembault", "bpm");
         creator.setJobTitle("Web Team Manager");
         final User persistedUser2 = getIdentityAPI().createUser(creator);
 
+        //roles
         final RoleCreator rc1 = new RoleCreator("Developer");
         rc1.setDisplayName("Bonita developer");
         final Role persistedRole1 = getIdentityAPI().createRole(rc1);
@@ -991,6 +994,7 @@ public class OrganizationTest extends CommonAPITest {
         rc2.setDisplayName("Bonita Manager");
         final Role persistedRole2 = getIdentityAPI().createRole(rc2);
 
+        //groups
         final GroupCreator groupCreator1 = new GroupCreator("Engine");
         groupCreator1.setDisplayName("engine team");
         final Group persistedGroup1 = getIdentityAPI().createGroup(groupCreator1);
@@ -999,20 +1003,35 @@ public class OrganizationTest extends CommonAPITest {
         groupCreator2.setDisplayName("web team");
         final Group persistedGroup2 = getIdentityAPI().createGroup(groupCreator2);
 
+        //membership
         final UserMembership membership1 = getIdentityAPI().addUserMembership(persistedUser1.getId(), persistedGroup1.getId(), persistedRole1.getId());
         final UserMembership membership2 = getIdentityAPI().addUserMembership(persistedUser2.getId(), persistedGroup2.getId(), persistedRole2.getId());
-
+        
+        //custom user info definition
+        String skillsDescr = "The user skills";
+        String skillsName = "Skills";
+        CustomUserInfoDefinitionCreator skillsCreator = new CustomUserInfoDefinitionCreator(skillsName, skillsDescr);
+        CustomUserInfoDefinition skills = getIdentityAPI().createCustomUserInfoDefinition(skillsCreator);
+        
+        String officeLocationName = "Office location";
+        CustomUserInfoDefinition officeLocation = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator(officeLocationName));
+        
         // export and check
         final String organizationContent = getIdentityAPI().exportOrganization();
 
-        assertTrue(organizationContent.indexOf("Developer") != -1);
-        assertTrue(organizationContent.indexOf("Bonita developer") != -1);
-        assertTrue(organizationContent.indexOf("Engine") != -1);
-        assertTrue(organizationContent.indexOf("engine team") != -1);
-        assertTrue(organizationContent.indexOf(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName()) != -1);
-        assertTrue(organizationContent.indexOf(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName()) != -1);
+        assertThat(organizationContent).contains("Developer");
+        assertThat(organizationContent).contains("Bonita developer");
+        assertThat(organizationContent).contains("Engine");
+        assertThat(organizationContent).contains("engine team");
+        assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName());
+        assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName());
+        assertThat(organizationContent).contains(skillsName);
+        assertThat(organizationContent).contains(skillsDescr);
+        assertThat(organizationContent).contains(officeLocationName);
 
         // clean-up
+        getIdentityAPI().deleteCustomUserInfoDefinition(skills.getId());
+        getIdentityAPI().deleteCustomUserInfoDefinition(officeLocation.getId());
         getIdentityAPI().deleteUser(persistedUser1.getId());
         getIdentityAPI().deleteUser(persistedUser2.getId());
         getIdentityAPI().deleteRole(persistedRole1.getId());
