@@ -44,4 +44,5 @@ public final class ArchivedHumanTaskInstanceSearchDescriptor {
 
     public static final String TERMINAL = "terminal";
 
+    public static final String ARCHIVE_DATE = "archiveDate";
 }
