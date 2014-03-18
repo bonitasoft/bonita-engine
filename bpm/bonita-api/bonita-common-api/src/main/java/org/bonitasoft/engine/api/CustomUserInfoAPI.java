@@ -64,14 +64,15 @@ public interface CustomUserInfoAPI {
      * Delete the {@link CustomUserInfoDefinition} related to the given id. All {@link CustomUserInfoValue} related to this {@link CustomUserInfoDefinition}
      * will be deleted as well.
      * 
+     *
      * @param id
-     *            the identifier of the {@link CustomUserInfoDefinition}
+     *            the identifier of the {@link org.bonitasoft.engine.identity.CustomUserInfoDefinition}
      * @return
      * @throws DeletionException
      *             if an error occurs during deletion
      * @since 6.3
      */
-    public CustomUserInfoDefinition deleteCustomUserInfoDefinition(long id) throws DeletionException;
+    public void deleteCustomUserInfoDefinition(long id) throws DeletionException;
 
     /**
      * Retrieve the list of {@link CustomUserInfo} for the given user, ordered by custom user info definition name. For {@link CustomUserInfo}s which have

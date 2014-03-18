@@ -157,25 +157,8 @@ public class CustomUserInfoDefinitionAPITest {
 
     @Test
     public void delete_should_call_server_to_delete_the_item() throws Exception {
-        SCustomUserInfoDefinition definition = new DummySCustomUserInfoDefinition(1L);
-        given(service.getCustomUserInfoDefinition(1L))
-                .willReturn(definition);
+        api.delete(1L);
 
-        api.delete(1);
-
-        verify(service, atLeastOnce()).deleteCustomUserInfoDefinition(definition);
+        verify(service, atLeastOnce()).deleteCustomUserInfoDefinition(1L);
     }
-
-    @Test
-    public void delete_should_return_deleted_item_with_an_invalid_id() throws Exception {
-        given(service.getCustomUserInfoDefinition(1L))
-                .willReturn(new DummySCustomUserInfoDefinition(1L, "name", "", ""));
-
-        CustomUserInfoDefinition definition = api.delete(1);
-
-        assertThat(definition.getId()).isEqualTo(-1L);
-        assertThat(definition.getName()).isEqualTo("name");
-    }
-    
-    
 }

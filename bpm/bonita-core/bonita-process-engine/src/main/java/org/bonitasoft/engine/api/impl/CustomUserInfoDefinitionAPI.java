@@ -72,11 +72,8 @@ public class CustomUserInfoDefinitionAPI {
         
     }
 
-    public CustomUserInfoDefinition delete(long id) throws SIdentityException {
-        SCustomUserInfoDefinition definition = service.getCustomUserInfoDefinition(id);
-        service.deleteCustomUserInfoDefinition(definition);
-        definition.setId(-1L);
-        return converter.convert(definition);
+    public void delete(long id) throws SIdentityException {
+        service.deleteCustomUserInfoDefinition(id);
     }
 
     public List<CustomUserInfoDefinition> list(int startIndex, int maxResult) throws SIdentityException {

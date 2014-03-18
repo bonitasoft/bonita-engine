@@ -1492,9 +1492,9 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     @Override
-    public CustomUserInfoDefinition deleteCustomUserInfoDefinition(long id) throws DeletionException {
+    public void deleteCustomUserInfoDefinition(long id) throws DeletionException {
         try {
-            return createCustomUserInfoDefinitionAPI().delete(id);
+            createCustomUserInfoDefinitionAPI().delete(id);
         } catch (SIdentityException e) {
             throw new DeletionException(e);
         }
