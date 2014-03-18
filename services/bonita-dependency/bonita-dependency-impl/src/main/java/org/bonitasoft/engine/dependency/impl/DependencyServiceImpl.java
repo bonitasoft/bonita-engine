@@ -277,7 +277,7 @@ public class DependencyServiceImpl implements DependencyService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependency", e));
             }
-            throw new SDependencyNotFoundException("Can't get dependency with name: " + name, e);
+            throw new SDependencyDeletionException("Can't delete dependency with name: " + name, e);
         }
     }
 

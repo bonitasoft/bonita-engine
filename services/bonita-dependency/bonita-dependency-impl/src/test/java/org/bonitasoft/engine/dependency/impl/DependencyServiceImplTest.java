@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.dependency.impl;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +24,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.ArtifactAccessor;
+import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
@@ -288,6 +290,12 @@ public class DependencyServiceImplTest {
     @Test(expected = SDependencyNotFoundException.class)
     public void deleteDependencyByNonExistingNameShouldThrowSDependencyNotFoundException() throws Exception {
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+        dependencyServiceImpl.deleteDependency("notFound");
+    }
+
+    @Test(expected = SDependencyDeletionException.class)
+    public void deleteDependencyWithReadExceptionShouldThrowSDependencyDeletionException() throws Exception {
+        doThrow(SBonitaReadException.class).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
         dependencyServiceImpl.deleteDependency("notFound");
     }
 }
