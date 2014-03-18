@@ -68,7 +68,8 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
 
     protected SExternalIdentityMapping addExternalIdentityMapping(final String externalId, final long userId, final long roleId, final long groupId,
             final String kind, final MemberType memberType) throws SBonitaException {
-        final SExternalIdentityMappingBuilder builder = BuilderFactory.get(SExternalIdentityMappingBuilderFactory.class).createNewInstance(externalId).setGroupId(groupId);
+        final SExternalIdentityMappingBuilder builder = BuilderFactory.get(SExternalIdentityMappingBuilderFactory.class).createNewInstance(externalId)
+                .setGroupId(groupId);
         builder.setKind(kind).setRoleId(roleId).setUserId(userId);
         final CreateExternalIdentityMapping transactionContent = new CreateExternalIdentityMapping(builder, memberType, userId, groupId, roleId);
         try {
@@ -244,6 +245,8 @@ public abstract class ExternalIdentityMappingCommand extends MemberCommand {
                 builder.setDisplayNamePart2(group.getName());
                 builder.setDisplayNamePart3(group.getParentPath());
                 break;
+            default:
+                throw new IllegalStateException();
         }
     }
 

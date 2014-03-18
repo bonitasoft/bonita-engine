@@ -61,7 +61,7 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
     }
 
     @Override
-    protected void resumeStableChildExecution(final long childId, final long processInstanceId, final long userId) throws SBonitaException {
+    protected void resumeChildExecution(final long childId, final long processInstanceId, final long userId) throws SBonitaException {
         final SFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(childId);
         final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 

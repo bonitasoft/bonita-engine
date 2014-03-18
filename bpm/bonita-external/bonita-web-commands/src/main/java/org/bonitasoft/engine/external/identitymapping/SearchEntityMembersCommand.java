@@ -77,7 +77,8 @@ public class SearchEntityMembersCommand extends EntityMemberCommand {
             case MEMBERSHIP:
                 searchDescriptor = new SearchEntityMemberRoleAndGroupDescriptor();
                 break;
-
+            default:
+                throw new IllegalStateException();
         }
         return searchDescriptor;
     }

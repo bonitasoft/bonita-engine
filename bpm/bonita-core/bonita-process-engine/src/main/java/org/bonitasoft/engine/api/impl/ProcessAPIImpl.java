@@ -1795,6 +1795,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                 field = fact.getNameKey();
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         try {
             final GetCategories getCategories = new GetCategories(startIndex, maxResults, field, categoryService, order);
@@ -1955,6 +1957,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             case NAME_DESC:
                 order = OrderByType.DESC;
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return order;
     }
@@ -3790,6 +3794,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                     supervisorBuilder.setGroupId(groupId);
                     supervisorBuilder.setRoleId(roleId);
                     break;
+                default:
+                    throw new IllegalStateException();
             }
 
             supervisor = supervisorBuilder.done();

@@ -416,16 +416,16 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
-            final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
+            final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final TransactionService transactionService = platformAccessor.getTransactionService();
-            final List<ServiceWithLifecycle> otherServicesToStart = plaformConfiguration.getServicesToStart();
+            final List<ServiceWithLifecycle> otherServicesToStart = nodeConfiguration.getServicesToStart();
             final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
-            if (plaformConfiguration.shouldStartScheduler()) {
+            if (nodeConfiguration.shouldStartScheduler()) {
                 // we shutdown the scheduler only if we are also responsible of starting it
                 shutdownScheduler(schedulerService);
             }
-            if (plaformConfiguration.shouldClearSessions()) {
+            if (nodeConfiguration.shouldClearSessions()) {
                 platformAccessor.getSessionService().deleteSessions();
             }
             for (final ServiceWithLifecycle serviceWithLifecycle : otherServicesToStart) {

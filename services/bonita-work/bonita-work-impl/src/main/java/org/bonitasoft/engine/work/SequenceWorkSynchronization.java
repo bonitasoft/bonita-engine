@@ -27,12 +27,9 @@ public class SequenceWorkSynchronization extends AbstractWorkSynchronization {
 
     private final TechnicalLoggerService loggerService;
 
-    // private final RunnableListener runnableListener;
-
     public SequenceWorkSynchronization(final ExecutorWorkService runnableListener, final ExecutorService executorService,
             final TechnicalLoggerService loggerService, final SessionAccessor sessionAccessor) {
         super(runnableListener, executorService, sessionAccessor);
-        // this.runnableListener = runnableListener;
         this.loggerService = loggerService;
     }
 

@@ -18,6 +18,7 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.execution.SIllegalStateTransition;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -72,10 +73,9 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             getWrappedWork().work(context);
         } catch (final Throwable e) {
             Throwable cause = e.getCause();
-            if (e instanceof SFlowNodeNotFoundException || e instanceof SProcessInstanceNotFoundException || e instanceof SProcessDefinitionNotFoundException) {
+            if (mustNotPutInFailedState(e)) {
                 logFailureCause(e);
-            } else if (cause instanceof SFlowNodeNotFoundException || cause instanceof SProcessInstanceNotFoundException
-                    || cause instanceof SProcessDefinitionNotFoundException) {
+            } else if (mustNotPutInFailedState(cause)) {
                 logFailureCause(cause);
             } else {
                 // final Edge case we cannot manage
@@ -94,6 +94,21 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         } finally {
             sessionAccessor.deleteTenantId();
         }
+    }
+
+    private boolean mustNotPutInFailedState(final Throwable e) {
+        return e instanceof SFlowNodeNotFoundException 
+                || e instanceof SProcessInstanceNotFoundException 
+                || e instanceof SProcessDefinitionNotFoundException
+                || isTransitionFromTerminalState(e);
+    }
+    
+    boolean isTransitionFromTerminalState(Throwable t) {
+        if(!(t instanceof SIllegalStateTransition)) {
+            return false;
+        }
+        SIllegalStateTransition e = (SIllegalStateTransition) t;
+        return e.isTransitionFromTerminalState();
     }
 
     protected void logFailureCause(final Throwable e) {

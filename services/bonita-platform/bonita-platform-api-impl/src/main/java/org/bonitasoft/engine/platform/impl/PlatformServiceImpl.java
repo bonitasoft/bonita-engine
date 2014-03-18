@@ -212,7 +212,7 @@ public class PlatformServiceImpl implements PlatformService {
         } catch (final SPersistenceException e) {
             throw new SPlatformCreationException("unable to initialize platform structure", e);
         } catch (final IOException e) {
-            throw new SPlatformCreationException("unable to initialize platform structure", e);
+            throw new SPlatformCreationException("Unable to initialize platform structure.", e);
         }
     }
 
@@ -230,7 +230,7 @@ public class PlatformServiceImpl implements PlatformService {
         }
 
         if (existingTenants.size() > 0) {
-            throw new SPlatformDeletionException("Some tenants still are in the system. Can not delete platform");
+            throw new SPlatformDeletionException("Some tenants still are in the system. Can not delete platform !!");
         }
 
         try {
@@ -243,9 +243,9 @@ public class PlatformServiceImpl implements PlatformService {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deletePlatform", e));
             }
-            throw new SPlatformDeletionException("Unable to delete the platform row: " + e.getMessage(), e);
+            throw new SPlatformDeletionException("Unable to delete the platform row : " + e.getMessage(), e);
         } catch (CacheException e) {
-            throw new SPlatformDeletionException("Unable to delete the platform from cache: " + e.getMessage(), e);
+            throw new SPlatformDeletionException("Unable to delete the platform from cache : " + e.getMessage(), e);
         }
     }
 

@@ -114,6 +114,8 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
                 trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), startDate, (String) result,
                         MisfireRestartPolicy.ALL);
                 break;
+            default:
+                throw new IllegalStateException();
         }
         return trigger;
     }

@@ -43,7 +43,7 @@ public class SequenceRunnableExecutor extends BonitaRunnable {
             if (!cancelled) {
                 try {
                     work.run();
-                } catch (final Throwable t) {
+                } catch (final Exception t) {
                     if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
                         loggerService.log(getClass(), TechnicalLogSeverity.ERROR,
                                 "Error while executing one work in the list of works: " + work.getDescription(), t);

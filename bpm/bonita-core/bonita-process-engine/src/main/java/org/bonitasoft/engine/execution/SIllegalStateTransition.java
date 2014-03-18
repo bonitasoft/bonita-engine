@@ -13,30 +13,36 @@
  **/
 package org.bonitasoft.engine.execution;
 
-import java.util.Map;
-
-import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class ExceptionalStateTransitionsManager extends NormalStateTransitionsManager {
+public class SIllegalStateTransition extends SActivityExecutionException {
     
-    public ExceptionalStateTransitionsManager(Map<Integer, FlowNodeState> stateTransitions, SFlowNodeInstance flowNodeInstance) {
-        super(stateTransitions, flowNodeInstance);
+    private static final long serialVersionUID = 6940283544247417112L;
+    
+    private final boolean fromTerminalState;
+    
+    public SIllegalStateTransition(String message, Throwable cause, boolean terminalState) {
+        super(message, cause);
+        this.fromTerminalState = terminalState;
+    }
+
+    public SIllegalStateTransition(String message, boolean fromTerminalState) {
+        super(message);
+        this.fromTerminalState = fromTerminalState;
+    }
+
+    public SIllegalStateTransition(Throwable cause, boolean terminalState) {
+        super(cause);
+        this.fromTerminalState = terminalState;
     }
     
-    @Override
-    protected FlowNodeState getNextStateFromMap(FlowNodeState currentState) {
-        if(SStateCategory.NORMAL.equals(currentState.getStateCategory()) && !currentState.isTerminal()) {
-            // is the first state in the category aborting or canceling
-            return stateTransitions.get(-1);
-        }
-        return stateTransitions.get(currentState.getId());
+    public boolean isTransitionFromTerminalState() {
+        return fromTerminalState;
     }
 
 }
