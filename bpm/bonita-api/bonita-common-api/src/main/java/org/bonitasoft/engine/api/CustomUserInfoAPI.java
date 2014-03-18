@@ -23,6 +23,8 @@ import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchResult;
 
 /**
  * CustomUserInfoAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on custom user info: creation,
@@ -87,5 +89,15 @@ public interface CustomUserInfoAPI {
      * @since 6.3
      */
     public List<CustomUserInfo> getCustomUserInfo(long userId, int startIndex, int maxResult);
+
+    /**
+     * Searches custom user info values according to the criteria containing in the options.
+     *
+     * @param options
+     *            The search criteria
+     * @return The search result
+     * @since 6.3
+     */
+    public SearchResult<CustomUserInfoValue> searchCustomUserInfoValues(SearchOptions options);
 
 }

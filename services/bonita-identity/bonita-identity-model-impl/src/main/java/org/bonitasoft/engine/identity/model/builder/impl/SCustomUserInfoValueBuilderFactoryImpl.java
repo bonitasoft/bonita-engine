@@ -43,7 +43,7 @@ public class SCustomUserInfoValueBuilderFactoryImpl implements SCustomUserInfoVa
     }
 
     @Override
-    public String getUserNameKey() {
+    public String getUserIdKey() {
         return USER_ID;
     }
 

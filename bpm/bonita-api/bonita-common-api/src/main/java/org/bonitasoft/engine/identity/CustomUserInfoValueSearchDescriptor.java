@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,23 +11,17 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.identity.model.builder;
-
+package org.bonitasoft.engine.identity;
 
 /**
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
+ * @author Vincent Elcrin
  */
-public interface SCustomUserInfoValueBuilderFactory {
+public final class CustomUserInfoValueSearchDescriptor {
 
-    SCustomUserInfoValueBuilder createNewInstance();
+    public static final String USER_ID = "userName";
 
-    String getIdKey();
+    public static final String DEFINITION_ID = "firstName";
 
-    String getUserIdKey();
-
-    String getDefinitionIdKey();
-
-    String getValueKey();
+    public static final String VALUE = "lastName";
 
 }

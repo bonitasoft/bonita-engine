@@ -80,6 +80,7 @@ import org.bonitasoft.engine.identity.ContactDataUpdater.ContactDataField;
 import org.bonitasoft.engine.identity.CustomUserInfo;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
+import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCriterion;
@@ -1508,11 +1509,22 @@ public class IdentityAPIImpl implements IdentityAPI {
         }
     }
 
+    @Override
+    public SearchResult<CustomUserInfoValue> searchCustomUserInfoValues(SearchOptions options) {
+        return createCustomUserInfoValueAPI().search(
+                getTenantAccessor().getSearchEntitiesDescriptor().getSearchCustomUserInfoValueDescriptor(),
+                options);
+    }
+
     private CustomUserInfoAPI createCustomUserInfoAPI() {
         return new CustomUserInfoAPI(getTenantAccessor().getIdentityService());
     }
 
     private CustomUserInfoDefinitionAPI createCustomUserInfoDefinitionAPI() {
         return new CustomUserInfoDefinitionAPI(getTenantAccessor().getIdentityService());
+    }
+
+    private CustomUserInfoValueAPI createCustomUserInfoValueAPI() {
+        return new CustomUserInfoValueAPI(getTenantAccessor().getIdentityService());
     }
 }
