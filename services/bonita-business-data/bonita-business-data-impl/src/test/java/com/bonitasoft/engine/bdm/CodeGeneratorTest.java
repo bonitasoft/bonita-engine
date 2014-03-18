@@ -12,7 +12,6 @@ import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,19 +29,9 @@ public class CodeGeneratorTest {
 
     private CodeGenerator codeGenerator;
 
-    /**
-     * @throws java.lang.Exception
-     */
     @Before
     public void setUp() throws Exception {
         codeGenerator = new CodeGenerator();
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test
@@ -214,7 +203,8 @@ public class CodeGeneratorTest {
 
     @Test
     public void shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields() throws Exception {
-
+        System.err
+                .println("Implement test com.bonitasoft.engine.bdm.CodeGeneratorTest.shouldAddEqualsMethod_GenerateAnEqualsMethod_BasedOnDefinedClassFields()");
     }
 
 }

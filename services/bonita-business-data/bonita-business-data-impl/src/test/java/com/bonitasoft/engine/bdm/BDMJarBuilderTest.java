@@ -1,6 +1,6 @@
 package com.bonitasoft.engine.bdm;
 
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -26,7 +26,7 @@ public class BDMJarBuilderTest {
         final byte[] jar = "jar".getBytes();
         doReturn(model).when(spyBuilder).getBOM(bomZip);
         doReturn(tmpDir).when(spyBuilder).createBDMTmpDir();
-        doAnswer(new VoidAnswer()).when(spyBuilder).generateJavaFiles(model, tmpDir);
+        doNothing().when(spyBuilder).generateJavaFiles(model, tmpDir);
         doReturn(jar).when(spyBuilder).generateJar(tmpDir);
 
         // when

@@ -25,9 +25,6 @@ public class EqualsBuilderTest extends CompilableCode {
 
     private File destDir;
 
-    /**
-     * @throws java.lang.Exception
-     */
     @Before
     public void setUp() throws Exception {
         codeGenerator = new CodeGenerator();
@@ -36,9 +33,6 @@ public class EqualsBuilderTest extends CompilableCode {
         destDir.mkdirs();
     }
 
-    /**
-     * @throws java.lang.Exception
-     */
     @After
     public void tearDown() throws Exception {
         destDir.delete();
