@@ -23,21 +23,27 @@ public abstract class CompilableCode {
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
         final Iterable<? extends JavaFileObject> compUnits = fileManager.getJavaFileObjects(sourceFileToCompile);
         final List<String> optionList = new ArrayList<String>();
-      
+
         String javaxPersistencefilePath = findJarPath(javax.persistence.Basic.class);
         String bdmEntityfilePath = findJarPath(Entity.class);
-        optionList.addAll(Arrays.asList("-classpath", javaxPersistencefilePath+":"+bdmEntityfilePath));
+        optionList.addAll(Arrays.asList("-classpath", javaxPersistencefilePath + File.pathSeparator + bdmEntityfilePath));
         final Boolean compiled = compiler.getTask(null, fileManager, null, optionList, null, compUnits).call();
         assertThat(compiled).isTrue();
     }
 
-	private String findJarPath(Class<?> clazzToFind) {
-		URL jarURL = clazzToFind.getResource(clazzToFind.getSimpleName()+".class");
+    private String findJarPath(final Class<?> clazzToFind) {
+        URL jarURL = clazzToFind.getResource(clazzToFind.getSimpleName() + ".class");
         String jarPath = jarURL.getFile();
-        if(jarPath.indexOf("!") != -1){
-        	jarPath = jarPath.split("!")[0];
+        if (jarPath.indexOf("!") == -1) {
+            jarPath = getDotClassParentPath(jarPath);
+        } else {
+            jarPath = jarPath.split("!")[0];
         }
-		return jarPath;
-	}
+        return jarPath;
+    }
+
+    private String getDotClassParentPath(final String completeClassUrl) {
+        return completeClassUrl.substring(0, completeClassUrl.indexOf(Entity.class.getName().replace('.', File.separatorChar)));
+    }
 
 }
