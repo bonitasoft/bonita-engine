@@ -30,8 +30,6 @@
 		<tomcat2.home>${project.build.directory}/node2</tomcat2.home>
 		<tomcat2.conf.dir>${tomcat2.home}/conf</tomcat2.conf.dir>
 
-
-		<bonita.home>${project.build.directory}/bonita</bonita.home>
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
 		<test.class>com.bonitasoft.engine.ClusteredTestSuite</test.class>
 	</properties>
@@ -178,8 +176,6 @@
 
 										<copy file="${basedir}/client/bonita-client.properties"
 											todir="${bonita.home}/client/conf" overwrite="true" />
-
-
 									</target>
 								</configuration>
 							</execution>
@@ -403,7 +399,6 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.0.11</version>
 		</dependency>
 	</dependencies>
 
