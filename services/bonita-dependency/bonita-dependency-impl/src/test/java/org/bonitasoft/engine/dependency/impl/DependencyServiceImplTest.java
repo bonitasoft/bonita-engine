@@ -36,6 +36,7 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
@@ -69,8 +70,7 @@ public class DependencyServiceImplTest {
         queriableLoggerService = mock(QueriableLoggerService.class);
         logger = mock(TechnicalLoggerService.class);
         classLoaderService = mock(ClassLoaderService.class);
-        dependencyServiceImpl = new DependencyServiceImpl(persistenceService, recorder, eventService, logger, queriableLoggerService,
-                classLoaderService);
+        dependencyServiceImpl = new DependencyServiceImpl(persistenceService, recorder, eventService, logger, queriableLoggerService, classLoaderService);
     }
 
     /**
@@ -285,4 +285,9 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDisconnectedDependencyMappings(artifactAccessor, options);
     }
 
+    @Test(expected = SDependencyNotFoundException.class)
+    public void deleteDependencyByNonExistingNameShouldThrowSDependencyNotFoundException() throws Exception {
+        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+        dependencyServiceImpl.deleteDependency("notFound");
+    }
 }

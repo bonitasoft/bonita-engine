@@ -90,9 +90,8 @@ public class DependencyServiceImpl implements DependencyService {
 
     private final Map<String, Long> lastUpdates = Collections.synchronizedMap(new HashMap<String, Long>());
 
-    public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
-            final ClassLoaderService classLoaderService) {
+    public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
@@ -267,6 +266,9 @@ public class DependencyServiceImpl implements DependencyService {
         final SelectOneDescriptor<SDependency> desc = new SelectOneDescriptor<SDependency>("getDependencyByName", parameters, SDependency.class);
         try {
             final SDependency sDependency = persistenceService.selectOne(desc);
+            if (sDependency == null) {
+                throw new SDependencyNotFoundException("Dependency with name " + name + " does not exist.");
+            }
             deleteDependency(sDependency);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependency"));
@@ -330,8 +332,7 @@ public class DependencyServiceImpl implements DependencyService {
         NullCheckingUtil.checkArgsNotNull(queryOptions);
         try {
             final List<SDependency> listSDependency = persistenceService.selectList(new SelectListDescriptor<SDependency>("getDependencies", null,
-                    SDependency.class,
-                    queryOptions));
+                    SDependency.class, queryOptions));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencies"));
             }
