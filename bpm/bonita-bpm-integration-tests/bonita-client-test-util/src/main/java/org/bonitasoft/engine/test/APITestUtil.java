@@ -727,8 +727,14 @@ public class APITestUtil {
         return getHumanTaskInstance;
     }
 
-    protected HumanTaskInstance waitForUserTask(final String taskName) throws Exception {
+    public HumanTaskInstance waitForUserTask(final String taskName) throws Exception {
         return waitForUserTask(taskName, -1, DEFAULT_TIMEOUT);
+    }
+
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final User user) throws Exception {
+        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName);
+        assignAndExecuteStep(humanTaskInstance, user.getId());
+        return humanTaskInstance;
     }
 
     private HumanTaskInstance getHumanTaskInstance(final Long id) throws ActivityInstanceNotFoundException, RetrieveException {

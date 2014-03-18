@@ -64,32 +64,14 @@ public class ArchiveServiceImpl implements ArchiveService {
     public void recordInsert(final long time, final ArchiveInsertRecord record) throws SRecorderException {
         if (isArchivable(record.getEntity().getPersistentObjectInterface())) {
             recordInserts(time, record);
-            //            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            //                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "recordInsert"));
-            //            }
-            //            final ArchivedPersistentObject entity = record.getEntity();
-            //            setArchiveDate(entity, time);
-            //
-            //            final BatchArchiveCallable callable = new BatchArchiveCallable(definitiveArchivePersistenceService, entity);
-            //            try {
-            //                transactionService.registerBonitaSynchronization(new BatchArchiveSynchronization(definitiveArchivePersistenceService, callable));
-            //                transactionService.registerBeforeCommitCallable(callable);
-            //            } catch (final STransactionNotFoundException e) {
-            //                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-            //                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization for the archives : transaction not found", e);
-            //                }
-            //            }
-            //
-            //            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            //                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "recordInsert"));
-            //            }
         }
     }
 
     @Override
     public void recordInserts(final long time, final ArchiveInsertRecord... records) throws SRecorderException {
+        final String methodName = "recordInserts";
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "recordInsert"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), methodName));
         }
         if (records != null) {
             final List<ArchivedPersistentObject> archivedObjects = new ArrayList<ArchivedPersistentObject>();
@@ -106,13 +88,14 @@ public class ArchiveServiceImpl implements ArchiveService {
                 transactionService.registerBeforeCommitCallable(callable);
             } catch (final STransactionNotFoundException e) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found", e);
+                    logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found",
+                            e);
                 }
             }
         }
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "recordInsert"));
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
         }
     }
 
