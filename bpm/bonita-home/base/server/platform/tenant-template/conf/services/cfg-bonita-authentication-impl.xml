@@ -6,15 +6,20 @@
 		class="com.bonitasoft.engine.authentication.impl.cas.CASAuthenticatorImpl">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<property name="casServerUrlPrefix"
-			value="${authentication.delegate.cas.server.url.prefix:http://cas.internal.bonitasoft.com/}" /> 
-		<property name="casService" value="${authentication.delegate.cas.service.url:http://internal.bonitasoft.com/bonita/loginservice}" />
+			value="${authentication.delegate.cas.server.url.prefix:http://cas.internal.bonitasoft.com/}" />
+		<property name="casService"
+			value="${authentication.delegate.cas.service.url:http://internal.bonitasoft.com/bonita/loginservice}" />
 	</bean>
+
+	<bean id="nullAuthenticationDelegate"
+		class="com.bonitasoft.engine.authentication.impl.NullAuthenticationDelegate" />
 
 	<bean id="genericAuthenticationService"
 		class="com.bonitasoft.engine.authentication.impl.JAASGenericAuthenticationServiceImpl">
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<property name="authenticatorDelegate" ref="authenticatorDelegate" />
+		<property name="authenticatorDelegate"
+			ref="${authenticator.delegate:nullAuthenticationDelegate}" />
 	</bean>
 
 	<bean id="authenticationService"
