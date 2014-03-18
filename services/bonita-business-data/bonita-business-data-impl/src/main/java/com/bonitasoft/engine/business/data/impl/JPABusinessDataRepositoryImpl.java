@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -89,7 +88,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public void pause() throws SBonitaException, TimeoutException {
+    public void pause() throws SBonitaException {
         stop();
     }
 
