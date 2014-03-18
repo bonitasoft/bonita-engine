@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -41,6 +41,8 @@ import org.hibernate.exception.LockAcquisitionException;
  */
 public class TenantHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
+    private static final String TENANT_ID = "tenantId";
+
     private static final String TENANT_FILTER = "tenantFilter";
 
     private final ReadSessionAccessor sessionAccessor;
@@ -56,7 +58,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     protected void updateTenantFilter(final Session session, final boolean useTenant) throws SPersistenceException {
         if (useTenant) {
             try {
-                session.enableFilter(TENANT_FILTER).setParameter("tenantId", getTenantId());
+                session.enableFilter(TENANT_FILTER).setParameter(TENANT_ID, getTenantId());
             } catch (final TenantIdNotSetException e) {
                 throw new SPersistenceException(e);
             }
@@ -77,14 +79,18 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             // this is a new object to save
         }
         if (tenantId == null || tenantId == -1 || tenantId == 0) {
-            try {
-                tenantId = getTenantId();
-                ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
-            } catch (final ReflectException e) {
-                throw new SPersistenceException("Can't set tenantId " + tenantId + " on entity " + entity, e);
-            } catch (final TenantIdNotSetException e) {
-                throw new SPersistenceException("Can't set tenantId on entity " + entity, e);
-            }
+            setTenantByClassReflector(entity, tenantId);
+        }
+    }
+
+    private void setTenantByClassReflector(final PersistentObject entity, Long tenantId) throws SPersistenceException {
+        try {
+            tenantId = getTenantId();
+            ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
+        } catch (final ReflectException e) {
+            throw new SPersistenceException("Can't set tenantId " + tenantId + " on entity " + entity, e);
+        } catch (final TenantIdNotSetException e) {
+            throw new SPersistenceException("Can't set tenantId on entity " + entity, e);
         }
     }
 
@@ -111,8 +117,6 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             final Session session = getSession(true);
             final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), getTenantId()));
             session.delete(pe);
-            // Object o2 = session.get(entity.getClass(), new PersistentObjectId(entity.getId(), getTenantId()));
-            // assert(o2 == null);
         } catch (final TenantIdNotSetException e) {
             throw new SPersistenceException(e);
         } catch (final AssertionFailure af) {
@@ -151,17 +155,10 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         try {
             final PersistentObjectId id = new PersistentObjectId(selectDescriptor.getId(), getTenantId());
             Class<? extends PersistentObject> mappedClass = null;
-            try {
-                mappedClass = getMappedClass(selectDescriptor.getEntityType());
-            } catch (final SPersistenceException e) {
-                throw new SBonitaReadException(e);
-            }
-            /*
-             * if (mappedClass.getName().equals("org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl")) {
-             * return (T) session.get("SEventInstanceImpl", id);
-             * }
-             */
+            mappedClass = getMappedClass(selectDescriptor.getEntityType());
             return (T) session.get(mappedClass, id);
+        } catch (final SPersistenceException e) {
+            throw new SBonitaReadException(e);
         } catch (final TenantIdNotSetException e) {
             return super.selectById(session, selectDescriptor);
         } catch (final AssertionFailure af) {
@@ -177,21 +174,12 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
 
     @Override
     public void deleteByTenant(final Class<? extends PersistentObject> entityClass, final List<FilterOption> filters) throws SPersistenceException {
-        // try {
-        // final Query query = getSession(true).createQuery("DELETE FROM " + entityClass.getCanonicalName() + " WHERE tenantId= :tenantId");
-        // query.setLong("tenantId", getTenantId());
-        // query.executeUpdate();
-        // logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
-        // } catch (TenantIdNotSetException e) {
-        // throw new SPersistenceException(e);
-        // }
-
         try {
             final Session session = getSession(true);
             final String entityClassName = entityClass.getCanonicalName();
             final Query query = session.createQuery(getQueryWithFilters("DELETE FROM " + entityClassName + " " + getClassAliasMappings().get(entityClassName)
                     + " WHERE tenantId= :tenantId", filters, null));
-            query.setLong("tenantId", getTenantId());
+            query.setLong(TENANT_ID, getTenantId());
             query.executeUpdate();
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
