@@ -8,15 +8,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -27,7 +30,10 @@ import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.PageUpdater;
+import com.bonitasoft.engine.page.PageUpdater.PageUpdateField;
 import com.bonitasoft.engine.page.SPage;
+import com.bonitasoft.engine.page.SPageUpdateBuilder;
+import com.bonitasoft.engine.page.SPageUpdateContentBuilder;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -58,10 +64,20 @@ public class PageAPIExtTest {
     @Mock
     SearchPages searchPages;
 
+    @Mock
+    private PageUpdater pageUpdater;
+
     private final long userId = 1;
+
+    @Mock
+    private SPageUpdateBuilder sPageUpdateBuilder;
+
+    @Mock
+    private SPageUpdateContentBuilder sPageUpdateContentBuilder;
 
     @Before
     public void before() throws Exception {
+
         pageAPIExt = spy(new PageAPIExt());
 
         doReturn(tenantServiceAccessor).when(pageAPIExt).getTenantAccessor();
@@ -145,39 +161,56 @@ public class PageAPIExtTest {
     }
 
     @Test
-    @Ignore
     public void testUpdatePage() throws Exception {
-        // given
-        final PageUpdater pageUpdater = new PageUpdater();
-        pageUpdater.setName("name");
-        final long pageId = 1;
-
         doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
-        doReturn(sPage).when(pageAPIExt).constructPage(pageUpdater, userId);
+        doReturn(sPage).when(pageAPIExt).constructPage(any(PageUpdater.class), anyLong());
         doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
+        doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
+
+        // given
+        Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
+        map.put(PageUpdateField.DISPLAY_NAME, "displayname");
+        doReturn(map).when(pageUpdater).getFields();
 
         // when
-        pageAPIExt.updatePage(pageId, pageUpdater);
+        pageAPIExt.updatePage(1, pageUpdater);
 
         // then
-        verify(pageService, times(1)).updatePage(pageId, sPage);
+        verify(pageService, times(1)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test(expected = UpdateException.class)
+    public void testUpdatePageWithEmplyUpdateFileShouldThrowExceptions() throws Exception {
+        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
+        doReturn(sPage).when(pageAPIExt).constructPage(any(PageUpdater.class), anyLong());
+        doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
+
+        // given
+        Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
+        doReturn(map).when(pageUpdater).getFields();
+
+        // when
+        pageAPIExt.updatePage(1, pageUpdater);
+
+        // then
+        verify(pageService, times(1)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
     }
 
     @Test
     public void testUpdatePageContent() throws Exception {
-        // given
-        // final PageCreator pageCreator = new PageCreator("name");
-        final byte[] content = "content".getBytes();
-        final long pageId = 1;
 
-        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
-        doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
+        doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
+        doReturn(sPageUpdateContentBuilder).when(pageAPIExt).getPageUpdateContentBuilder();
+
+        // given
+        final byte[] content = "content".getBytes();
+        long pageId = 1;
 
         // when
         pageAPIExt.updatePageContent(pageId, content);
 
         // then
-        verify(pageService, times(1)).updatePageContent(pageId, content);
+        verify(pageService, times(1)).updatePageContent(anyLong(), any(EntityUpdateDescriptor.class));
     }
 
     @Test

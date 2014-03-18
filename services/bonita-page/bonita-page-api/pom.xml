@@ -15,5 +15,10 @@
 			<artifactId>bonita-log-model</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+			<dependency>
+			<groupId>org.bonitasoft.engine.recorder</groupId>
+			<artifactId>bonita-recorder-model</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

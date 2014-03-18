@@ -18,6 +18,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Baptiste Mesta
@@ -40,8 +41,8 @@ public interface PageService {
 
     List<SPage> searchPages(QueryOptions options) throws SBonitaSearchException;
 
-    SPage updatePage(long pageId, SPage page) throws SBonitaException;
+    SPage updatePage(long pageId, EntityUpdateDescriptor updateDescriptor) throws SBonitaException;
 
-    void updatePageContent(long pageId, byte[] content) throws SBonitaException;
+    void updatePageContent(long pageId, EntityUpdateDescriptor entityUpdateDescriptor) throws SBonitaException;
 
 }

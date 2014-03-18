@@ -19,6 +19,7 @@ import com.bonitasoft.engine.external.ExternalCommandsTestSP;
 import com.bonitasoft.engine.log.LogTest;
 import com.bonitasoft.engine.monitoring.MonitoringAPITest;
 import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
+import com.bonitasoft.engine.page.PageAPIIT;
 import com.bonitasoft.engine.platform.NodeAPITest;
 import com.bonitasoft.engine.process.ProcessTests;
 import com.bonitasoft.engine.profile.ProfileTests;
@@ -41,7 +42,8 @@ import com.bonitasoft.engine.search.SearchEntitiesTests;
         ReportingAPIIT.class,
         PlatformMonitoringAPITest.class,
         TenantTest.class,
-        TenantMaintenanceTestSP.class
+        TenantMaintenanceTestSP.class,
+        PageAPIIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class BPMRemoteSPTests {

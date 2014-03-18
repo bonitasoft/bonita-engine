@@ -211,20 +211,18 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public SPage updatePage(long pageId, SPage sPage) throws SObjectModificationException {
-        final String message = "Update a page with name " + sPage.getName();
-        final SPageLogBuilder logBuilder = getPageLog(ActionType.CREATED, message);
+    public SPage updatePage(long pageId, EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
+        // EntityUpdateDescriptor updateDescriptor;
+        final String message = "Update a page with id " + pageId;
+
+        final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, message);
         try {
 
-            final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-
-            sPage.setId(pageId);
-
+            SPage sPage = persistenceService.selectById(new SelectByIdDescriptor<SPage>("getPageById", SPage.class, pageId));
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
-                    updateDescriptor);
+                    entityUpdateDescriptor);
 
             final SUpdateEvent updatePageEvent = getUpdateEvent(sPage, PAGE);
-
             recorder.recordUpdate(updateRecord, updatePageEvent);
 
             initiateLogBuilder(pageId, SQueriableLog.STATUS_OK, logBuilder, "updatePage");
@@ -232,29 +230,23 @@ public class PageServiceImpl implements PageService {
         } catch (final SRecorderException re) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
             throw new SObjectModificationException(re);
+        } catch (SBonitaReadException e) {
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
+            throw new SObjectModificationException(e);
         }
 
     }
 
     @Override
-    public void updatePageContent(long pageId, byte[] content) throws SObjectModificationException {
+    public void updatePageContent(long pageId, EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
         final String message = "Update a page with name " + pageId;
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, message);
         try {
-            SPage sPage = new SPageImpl();
-            sPage.setId(pageId);
-            SPageWithContent pageContent = new SPageWithContentImpl(sPage, content);
-
-            final InsertRecord insertContentRecord = new InsertRecord(pageContent);
-            final SInsertEvent insertContentEvent = getInsertEvent(insertContentRecord, PAGE);
-            recorder.recordInsert(insertContentRecord, insertContentEvent);
-
-            final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPage,
-                    updateDescriptor);
-
-            final SUpdateEvent updatePageEvent = getUpdateEvent(sPage, PAGE);
+            final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>("getPageContent",
+                    SPageContent.class, pageId));
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPageContent,
+                    entityUpdateDescriptor);
+            final SUpdateEvent updatePageEvent = getUpdateEvent(sPageContent, PAGE);
 
             recorder.recordUpdate(updateRecord, updatePageEvent);
 
@@ -263,6 +255,9 @@ public class PageServiceImpl implements PageService {
         } catch (final SRecorderException re) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
             throw new SObjectModificationException(re);
+        } catch (SBonitaReadException e) {
+            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, "updatePage");
+            throw new SObjectModificationException(e);
         }
 
     }

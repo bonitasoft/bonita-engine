@@ -30,7 +30,10 @@ import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.page.PageUpdater;
 import com.bonitasoft.engine.page.PageUpdater.PageUpdateField;
 import com.bonitasoft.engine.page.SPage;
-import com.bonitasoft.engine.page.SPageBuilderFactory;
+import com.bonitasoft.engine.page.SPageUpdateBuilder;
+import com.bonitasoft.engine.page.SPageUpdateBuilderFactory;
+import com.bonitasoft.engine.page.SPageUpdateContentBuilder;
+import com.bonitasoft.engine.page.SPageUpdateContentBuilderFactory;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -162,28 +165,6 @@ public class PageAPIExt implements PageAPI {
         }
     }
 
-    private EntityUpdateDescriptor getPageUpdateDescriptor(final PageUpdater udpateDescriptor) {
-        final SPageBuilderFactory pageBuilderFactory = BuilderFactory.get(SPageBuilderFactory.class);
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        final Map<PageUpdateField, Serializable> fields = udpateDescriptor.getFields();
-        for (final Entry<PageUpdateField, Serializable> field : fields.entrySet()) {
-            switch (field.getKey()) {
-                case NAME:
-                    descriptor.addField(pageBuilderFactory.getNameKey(), field.getValue());
-                    break;
-                case DESCRIPTION:
-                    descriptor.addField(pageBuilderFactory.getDescriptionKey(), field.getValue());
-                    break;
-                case DISPLAY_NAME:
-                    descriptor.addField(pageBuilderFactory.getDisplayNameKey(), field.getValue());
-                    break;
-                default:
-                    break;
-            }
-        }
-        return descriptor;
-    }
-
     @Override
     public Page getPageByName(String name) throws PageNotFoundException {
         final PageService pageService = getTenantAccessor().getPageService();
@@ -198,33 +179,71 @@ public class PageAPIExt implements PageAPI {
 
     @Override
     public Page updatePage(long pageId, final PageUpdater pageUpdater) throws UpdateException {
+        if (pageUpdater == null || pageUpdater.getFields().isEmpty()) {
+            throw new UpdateException("The pageUpdater descriptor does not contain field updates");
+        }
         final PageService pageService = getTenantAccessor().getPageService();
-        final long userId = getUserIdFromSessionInfos();
-        final SPage sPage = SPModelConvertor.constructSPage(pageUpdater, userId);
+
+        final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
+        final Map<PageUpdateField, Serializable> fields = pageUpdater.getFields();
+        for (final Entry<PageUpdateField, Serializable> field : fields.entrySet()) {
+            switch (field.getKey()) {
+                case NAME:
+                    pageUpdateBuilder.updateName((String) field.getValue());
+                    break;
+                case DISPLAY_NAME:
+                    pageUpdateBuilder.updateDisplayName((String) field.getValue());
+                    break;
+                case DESCRIPTION:
+                    pageUpdateBuilder.updateDescription((String) field.getValue());
+                    break;
+                default:
+                    break;
+            }
+        }
+        pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
 
         try {
-            SPage updatedPage = pageService.updatePage(pageId, sPage);
+            SPage updatedPage = pageService.updatePage(pageId, pageUpdateBuilder.done());
             return convertToPage(updatedPage);
         } catch (final SBonitaException sBonitaException) {
             throw new UpdateException(sBonitaException);
         }
+
+    }
+
+    protected SPageUpdateBuilder getPageUpdateBuilder() {
+        return BuilderFactory.get(SPageUpdateBuilderFactory.class)
+                .createNewInstance(new EntityUpdateDescriptor());
     }
 
     @Override
     public void updatePageContent(long pageId, byte[] content) throws UpdateException {
         final PageService pageService = getTenantAccessor().getPageService();
 
+        final SPageUpdateBuilder pageUpdateBuilder = getPageUpdateBuilder();
+
+        final SPageUpdateContentBuilder pageUpdateContentBuilder = getPageUpdateContentBuilder();
+
+        pageUpdateBuilder.updateLastModificationDate(System.currentTimeMillis());
+        pageUpdateContentBuilder.updateContent(content);
+
         try {
-            pageService.updatePageContent(pageId, content);
+            pageService.updatePage(pageId, pageUpdateBuilder.done());
+            pageService.updatePageContent(pageId, pageUpdateContentBuilder.done());
 
         } catch (final SBonitaException sBonitaException) {
             throw new UpdateException(sBonitaException);
         }
     }
 
+    protected SPageUpdateContentBuilder getPageUpdateContentBuilder() {
+        return BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
+                .createNewInstance(new EntityUpdateDescriptor());
+    }
+
     protected SPage constructPage(PageUpdater pageUpdater, long userId) {
         return SPModelConvertor.constructSPage(pageUpdater, userId);
-
     }
 
 }
