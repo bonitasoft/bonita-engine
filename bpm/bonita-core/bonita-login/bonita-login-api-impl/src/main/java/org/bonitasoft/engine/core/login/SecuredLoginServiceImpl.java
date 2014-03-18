@@ -112,8 +112,6 @@ public class SecuredLoginServiceImpl implements LoginService {
 
                     }
                 } catch (final AuthenticationException ae) {
-                    // even if authentication fails, we need to check if credentials are not the platform ones
-                    // thus, we keep the exception for a later process
                     authenticationFailed(ae);
                 }
             }
