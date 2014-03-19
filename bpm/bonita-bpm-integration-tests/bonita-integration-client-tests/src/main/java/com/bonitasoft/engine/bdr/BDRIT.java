@@ -117,6 +117,7 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
+    @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateABusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -143,6 +144,7 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
+    @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
     public void deployABDRAndCreateADefaultBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);

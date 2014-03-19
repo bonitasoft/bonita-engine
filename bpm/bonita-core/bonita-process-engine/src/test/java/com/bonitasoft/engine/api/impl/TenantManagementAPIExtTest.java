@@ -13,17 +13,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.api.impl.TenantConfiguration;
-import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -37,12 +37,11 @@ import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
-import com.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
@@ -79,12 +78,6 @@ public class TenantManagementAPIExtTest {
     private TenantServiceAccessor tenantServiceAccessor;
 
     @Mock
-    private TenantConfiguration tenantConfiguration;
-
-    @Mock
-    private TechnicalLoggerService tenantLogger;
-
-    @Mock
     private NodeConfiguration nodeConfiguration;
 
     @Mock
@@ -101,29 +94,39 @@ public class TenantManagementAPIExtTest {
 
     @Before
     public void before() throws Exception {
-        tenantId = 17;
-
         doReturn(platformServiceAccessor).when(tenantManagementAPI).getPlatformAccessorNoException();
-        final SetServiceState spyPause = spy(new SetServiceState(tenantId, new PauseServiceStrategy()));
-        doReturn(spyPause).when(tenantManagementAPI).getPauseService(tenantId);
-        doReturn(platformServiceAccessor).when(spyPause).getPlatformAccessor();
-        final SetServiceState resumePause = spy(new SetServiceState(tenantId, new ResumeServiceStrategy()));
-        doReturn(resumePause).when(tenantManagementAPI).getResumeService(tenantId);
-        doReturn(platformServiceAccessor).when(resumePause).getPlatformAccessor();
+        doReturn(new PauseServices(tenantId) {
 
-        when(platformServiceAccessor.getBroadcastService()).thenReturn(broadcastService);
-        when(platformServiceAccessor.getSchedulerService()).thenReturn(schedulerService);
-        when(platformServiceAccessor.getPlatformService()).thenReturn(platformService);
-        when(platformServiceAccessor.getPlaformConfiguration()).thenReturn(nodeConfiguration);
-        when(platformServiceAccessor.getSessionService()).thenReturn(sessionService);
-        when(platformServiceAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantServiceAccessor);
-        when(tenantServiceAccessor.getTenantConfiguration()).thenReturn(tenantConfiguration);
-        when(tenantConfiguration.getLifecycleServices()).thenReturn(Arrays.asList(workService, businessDataRepository));
-        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(tenantLogger);
+            private static final long serialVersionUID = 1L;
 
-        when(nodeConfiguration.getTenantRestartHandlers()).thenReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2));
+            @Override
+            PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+                    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+                return platformServiceAccessor;
+            }
+        }).when(tenantManagementAPI).createPauseServicesTask(anyLong());
+        doReturn(new ResumeServices(tenantId) {
 
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
+                    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+                return platformServiceAccessor;
+            }
+        }).when(tenantManagementAPI).createResumeServicesTask(anyLong());
+        doReturn(broadcastService).when(platformServiceAccessor).getBroadcastService();
+        doReturn(schedulerService).when(platformServiceAccessor).getSchedulerService();
+        doReturn(platformService).when(platformServiceAccessor).getPlatformService();
+        doReturn(nodeConfiguration).when(platformServiceAccessor).getPlaformConfiguration();
+        doReturn(sessionService).when(platformServiceAccessor).getSessionService();
+        doReturn(tenantServiceAccessor).when(platformServiceAccessor).getTenantServiceAccessor(Matchers.anyLong());
+        doReturn(Arrays.asList(tenantRestartHandler1, tenantRestartHandler2)).when(nodeConfiguration).getTenantRestartHandlers();
+
+        tenantId = 17;
         doReturn(tenantId).when(tenantManagementAPI).getTenantId();
+        doReturn(workService).when(tenantServiceAccessor).getWorkService();
+        doReturn(businessDataRepository).when(tenantServiceAccessor).getBusinessDataRepository();
         sTenant = new STenantImpl("myTenant", "john", 123456789, STenant.PAUSED, false);
         when(platformService.getTenant(tenantId)).thenReturn(sTenant);
     }

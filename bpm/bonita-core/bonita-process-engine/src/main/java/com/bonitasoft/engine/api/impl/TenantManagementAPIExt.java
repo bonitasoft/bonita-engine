@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
-import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetTenantInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -33,8 +32,6 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
-import com.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
-import com.bonitasoft.engine.api.impl.transaction.ResumeServiceStrategy;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
@@ -47,9 +44,6 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
-/**
- * @author Matthieu Chaffotte
- */
 @AvailableWhenTenantIsPaused
 public class TenantManagementAPIExt implements TenantManagementAPI {
 
@@ -126,17 +120,12 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         }
 
         // on all nodes
-        final SetServiceState pauseService = getPauseService(tenantId);
-        final Map<String, TaskResult<Void>> result = broadcastService.execute(pauseService, tenantId);
+        final Map<String, TaskResult<Void>> result = broadcastService.execute(createPauseServicesTask(tenantId), tenantId);
         handleResult(result);
     }
 
-    protected SetServiceState getPauseService(final long tenantId) {
-        return new SetServiceState(tenantId, new PauseServiceStrategy());
-    }
-
-    protected SetServiceState getResumeService(final long tenantId) {
-        return new SetServiceState(tenantId, new ResumeServiceStrategy());
+    PauseServices createPauseServicesTask(final long tenantId) {
+        return new PauseServices(tenantId);
     }
 
     private void resumeServicesForTenant(final PlatformServiceAccessor platformServiceAccessor, final BroadcastService broadcastService, final long tenantId)
@@ -149,8 +138,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             throw new UpdateException("Unable to resume the scheduler.", e);
         }
         // on all nodes
-        final SetServiceState resumeService = getResumeService(tenantId);
-        final Map<String, TaskResult<Void>> result = broadcastService.execute(resumeService, tenantId);
+        final Map<String, TaskResult<Void>> result = broadcastService.execute(createResumeServicesTask(tenantId), tenantId);
         handleResult(result);
 
         final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
@@ -164,6 +152,10 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             throw new UpdateException("Unable to resume all elements of the work service.", e);
         }
 
+    }
+
+    ResumeServices createResumeServicesTask(final long tenantId) {
+        return new ResumeServices(tenantId);
     }
 
     private void handleResult(final Map<String, TaskResult<Void>> result) throws UpdateException {

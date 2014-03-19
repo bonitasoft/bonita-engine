@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CommonCacheService;
@@ -39,7 +40,8 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
         this(Manager.getInstance(), logger, hazelcastInstance);
     }
 
-    public CommonClusteredCacheService(final Manager manager, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance) {
+    public CommonClusteredCacheService(final Manager manager, final TechnicalLoggerService logger,
+            final HazelcastInstance hazelcastInstance) {
         if (!manager.isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
@@ -219,12 +221,12 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
     }
 
     @Override
-    public void stop() throws SBonitaException {
+    public void stop() throws SBonitaException, TimeoutException {
         // do nothing, we start/stop hazelcast, not this service
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() throws SBonitaException, TimeoutException {
         // nothing to do
     }
 

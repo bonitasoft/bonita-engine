@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
@@ -100,12 +101,12 @@ public class DelegatingCacheService implements CacheService {
     }
 
     @Override
-    public void stop() throws SBonitaException {
+    public void stop() throws SBonitaException, TimeoutException {
         // do nothing it's done on on each instance using the NodeConfiguration that have all ServiceWithLifeCycle autowired using spring
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() throws SBonitaException, TimeoutException {
         // nothing to do
     }
 

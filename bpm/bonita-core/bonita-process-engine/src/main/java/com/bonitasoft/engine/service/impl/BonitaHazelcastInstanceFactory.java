@@ -11,6 +11,7 @@ package com.bonitasoft.engine.service.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
@@ -105,7 +106,7 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
     }
 
     @Override
-    public void stop() throws SBonitaException {
+    public void stop() throws SBonitaException, TimeoutException {
         // Do nothing it's spring that shutdown hazelcast...
     }
 
