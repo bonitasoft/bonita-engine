@@ -20,6 +20,10 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+
 /**
  * Use ThreadPoolExecutor as ExecutorService
  * The handling of threads relies on the JVM
@@ -42,7 +46,12 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
 
     private final long keepAliveTimeSeconds;
 
-    public DefaultBonitaExecutorServiceFactory(final int corePoolSize, final int queueCapacity, final int maximumPoolSize, final long keepAliveTimeSeconds) {
+    private final TechnicalLoggerService logger;
+
+    public DefaultBonitaExecutorServiceFactory(final TechnicalLoggerService logger, final int corePoolSize, final int queueCapacity,
+            final int maximumPoolSize,
+            final long keepAliveTimeSeconds) {
+        this.logger = logger;
         this.corePoolSize = corePoolSize;
         this.queueCapacity = queueCapacity;
         this.maximumPoolSize = maximumPoolSize;
@@ -64,8 +73,15 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
 
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
-            throw new RejectedExecutionException("Unable to run the task " + task
+            if (executor.isShutdown()) {
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to run work " + task
+                        + " but the work service is shutdown. work will be restarted with the node");
+            } else {
+                throw new RejectedExecutionException(
+                        "Unable to run the task "
+                                + task
                     + "\n your work queue is full you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
+        }
         }
 
     }

@@ -11,7 +11,9 @@
 		<constructor-arg name="bonitaExecutorServiceFactory" ref="bonitaExecutorServiceFactory" />
 	</bean>
 
-	<bean id="bonitaExecutorServiceFactory" class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
+	<bean id="bonitaExecutorServiceFactory"
+		class="org.bonitasoft.engine.work.DefaultBonitaExecutorServiceFactory">
+		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="corePoolSize" value="20" />
 		<constructor-arg name="maximumPoolSize" value="20" />
 		<constructor-arg name="keepAliveTimeSeconds" value="60" />
