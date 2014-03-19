@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.dependency.ArtifactAccessor;
-import org.bonitasoft.engine.dependency.SDependencyDeletionException;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
@@ -293,9 +292,10 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.deleteDependency("notFound");
     }
 
-    @Test(expected = SDependencyDeletionException.class)
-    public void deleteDependencyWithReadExceptionShouldThrowSDependencyDeletionException() throws Exception {
+    @Test(expected = SDependencyNotFoundException.class)
+    public void deleteDependencyWithReadExceptionShouldThrowSDependencyNotFoundException() throws Exception {
         doThrow(SBonitaReadException.class).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
         dependencyServiceImpl.deleteDependency("notFound");
     }
+
 }

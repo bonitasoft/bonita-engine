@@ -26,7 +26,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.ArtifactAccessor;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyCreationException;
@@ -263,6 +262,21 @@ public class DependencyServiceImpl implements DependencyService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "deleteDependency"));
         }
+        final SDependency dependency = getDependencyByName(name);
+        try {
+            delete(dependency);
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependency"));
+            }
+        } catch (final SDependencyException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependency", e));
+            }
+            throw new SDependencyDeletionException("Can't delete dependency with name: " + name, e);
+        }
+    }
+
+    private SDependency getDependencyByName(final String name) throws SDependencyNotFoundException {
         final Map<String, Object> parameters = Collections.singletonMap("name", (Object) name);
         final SelectOneDescriptor<SDependency> desc = new SelectOneDescriptor<SDependency>("getDependencyByName", parameters, SDependency.class);
         try {
@@ -270,15 +284,9 @@ public class DependencyServiceImpl implements DependencyService {
             if (sDependency == null) {
                 throw new SDependencyNotFoundException("Dependency with name " + name + " does not exist.");
             }
-            delete(sDependency);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependency"));
-            }
-        } catch (final SBonitaException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependency", e));
-            }
-            throw new SDependencyDeletionException("Can't delete dependency with name: " + name, e);
+            return sDependency;
+        } catch (final SBonitaReadException sbre) {
+            throw new SDependencyNotFoundException(sbre);
         }
     }
 
