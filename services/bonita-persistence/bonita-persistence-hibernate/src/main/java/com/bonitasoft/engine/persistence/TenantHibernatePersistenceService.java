@@ -39,7 +39,6 @@ public class TenantHibernatePersistenceService extends org.bonitasoft.engine.per
         if (entity instanceof PersistentObjectWithFlag) {
             final UpdateDescriptor buildSetField = UpdateDescriptor.buildSetField(entity, DELETED_KEY, true);
             super.update(buildSetField);
-            DeleteBatchJobRegister.getInstance().registerJobIfNotRegistered();
         } else {
             super.delete(entity);
         }

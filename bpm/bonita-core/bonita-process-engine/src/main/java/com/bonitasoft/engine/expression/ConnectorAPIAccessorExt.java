@@ -12,7 +12,7 @@ import java.lang.reflect.Proxy;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
-import org.bonitasoft.engine.api.impl.ServerAPIImpl;
+import org.bonitasoft.engine.api.impl.ServerAPIFactory;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.connector.ConnectorAPIAccessorImpl;
 import org.bonitasoft.engine.session.APISession;
@@ -60,7 +60,7 @@ public class ConnectorAPIAccessorExt extends ConnectorAPIAccessorImpl implements
     }
 
     private static ServerAPI getServerAPI() {
-        return new ServerAPIImpl(false);
+        return ServerAPIFactory.getServerAPI(false);
     }
 
     private static <T> T getAPI(final Class<T> clazz, final APISession session) {

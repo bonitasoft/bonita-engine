@@ -27,12 +27,13 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
 
     private final ReadSessionAccessor sessionAccessor;
 
-    public ClusteredCacheService(Manager manager, TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, HazelcastInstance hazelcastInstance) {
+    public ClusteredCacheService(final Manager manager, final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor,
+            final HazelcastInstance hazelcastInstance) {
         super(manager, logger, hazelcastInstance);
         this.sessionAccessor = sessionAccessor;
     }
 
-    public ClusteredCacheService(TechnicalLoggerService logger, ReadSessionAccessor sessionAccessor, HazelcastInstance hazelcastInstance) {
+    public ClusteredCacheService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final HazelcastInstance hazelcastInstance) {
         super(logger, hazelcastInstance);
         this.sessionAccessor = sessionAccessor;
     }
@@ -78,4 +79,5 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
     private String getCacheNameFromKey(final String cacheNameKey) {
         return cacheNameKey.substring(cacheNameKey.indexOf('_') + 1);
     }
+
 }

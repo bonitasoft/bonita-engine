@@ -224,4 +224,14 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
         // do nothing, we start/stop hazelcast, not this service
     }
 
+    @Override
+    public void pause() {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do
+    }
+
 }

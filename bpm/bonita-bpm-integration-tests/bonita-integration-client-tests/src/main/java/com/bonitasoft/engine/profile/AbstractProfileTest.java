@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.profile;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -29,8 +31,6 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.bonitasoft.engine.CommonAPISPTest;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Baptiste Mesta

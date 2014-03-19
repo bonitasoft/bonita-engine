@@ -14,7 +14,10 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
+import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.BonitaTestRunner;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -36,9 +39,13 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.WaitUntil;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.theme.ThemeType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LoginAPI;
@@ -46,6 +53,8 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.api.TenantIsPausedException;
+import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.TenantActivationException;
@@ -57,6 +66,8 @@ import com.bonitasoft.engine.platform.TenantNotFoundException;
  * @author Yanyan Liu
  * @author Celine Souchet
  */
+@RunWith(BonitaTestRunner.class)
+@Initializer(TestsInitializerSP.class)
 public class TenantTest {
 
     private final static String userName = "tenant_name";
@@ -132,6 +143,80 @@ public class TenantTest {
             platformAPI.activateTenant(tenantId);
         }
 
+    }
+
+    @Test(expected = TenantIsPausedException.class)
+    @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "TenantIsPausedException, tenant paused" }, concept = BPMNConcept.NONE)
+    public void cannotAccessTenantAPIsOnMaintenanceTenant() throws Exception {
+        APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+        apiTestSPUtil.loginWith(userName, password, tenantId);
+        TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        tenantManagementAPI.pause();
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+        apiSession = loginAPI.login(tenantId, userName, password);
+        try {
+            apiTestSPUtil.getProcessAPI().getNumberOfProcessInstances();
+        } finally {
+            tenantManagementAPI.resume();
+            loginAPI.logout(apiSession);
+        }
+    }
+
+    @Test
+    @Cover(classes = { ServerAPI.class }, jira = "BS-7101", keywords = { "tenant maintenance" }, concept = BPMNConcept.NONE)
+    public void should_be_able_to_login_only_with_technical_user_in_maintenance() throws Exception {
+        APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+        apiTestSPUtil.loginWith(userName, password, tenantId);
+        IdentityAPI identityAPI = apiTestSPUtil.getIdentityAPI();
+        User john = identityAPI.createUser("john", "bpm");
+        TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        tenantManagementAPI.pause();
+        loginAPI.logout(apiTestSPUtil.getSession());
+        // login with normal user: not working
+        try {
+            loginAPI.login(tenantId, "john", "bpm");
+            fail("Should not be able to login using other user than technical");
+        } catch (final TenantIsPausedException e) {
+            // ok, can't login with user that is not technical
+        }
+        // login with normal user: not working
+        APISession loginWithTechnical = loginAPI.login(tenantId, userName, password);
+        // ok to login with technical user
+        TenantAPIAccessor.getTenantManagementAPI(loginWithTechnical).resume();
+        loginAPI.logout(loginWithTechnical);
+        // can now login with normal user
+        APISession login = loginAPI.login(tenantId, "john", "bpm");
+        loginAPI.logout(login);
+
+        // delete the user
+        loginWithTechnical = loginAPI.login(tenantId, userName, password);
+        TenantAPIAccessor.getIdentityAPI(loginWithTechnical).deleteUser(john.getId());
+        loginAPI.logout(loginWithTechnical);
+    }
+
+    @Test
+    @Cover(classes = { ServerAPI.class }, jira = "BS-2242", keywords = { "tenant maintenance" }, concept = BPMNConcept.NONE)
+    public void maintenanceAnnotatedAPIMethodShouldBePossibleOnMaintenanceTenant() throws Exception {
+        APITestSPUtil apiTestSPUtil = new APITestSPUtil();
+        apiTestSPUtil.loginWith(userName, password, tenantId);
+        apiTestSPUtil.getThemeAPI().setCustomTheme("zipFile".getBytes(), "cssContent".getBytes(), ThemeType.PORTAL);
+        TenantManagementAPI tenantManagementAPI = apiTestSPUtil.getTenantManagementAPI();
+        tenantManagementAPI.pause();
+        try {
+            tenantManagementAPI.isPaused();
+            // test with sp accessor
+            apiTestSPUtil.getThemeAPI().getLastUpdateDate(ThemeType.PORTAL);
+            apiTestSPUtil.getIdentityAPI().getNumberOfUsers();
+            apiTestSPUtil.getProfileAPI().searchProfiles(new SearchOptionsBuilder(0, 1).done());
+            // test with bos accessor
+            org.bonitasoft.engine.api.TenantAPIAccessor.getThemeAPI(apiTestSPUtil.getSession()).getLastUpdateDate(ThemeType.PORTAL);
+            org.bonitasoft.engine.api.TenantAPIAccessor.getIdentityAPI(apiTestSPUtil.getSession()).getNumberOfUsers();
+            org.bonitasoft.engine.api.TenantAPIAccessor.getProfileAPI(apiTestSPUtil.getSession()).searchProfiles(new SearchOptionsBuilder(0, 1).done());
+        } finally {
+            tenantManagementAPI.resume();
+            apiTestSPUtil.logoutTenant(apiTestSPUtil.getSession());
+        }
     }
 
     @Test

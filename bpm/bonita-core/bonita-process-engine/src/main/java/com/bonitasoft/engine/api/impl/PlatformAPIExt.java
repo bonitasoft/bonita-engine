@@ -72,7 +72,6 @@ import com.bonitasoft.engine.api.impl.reports.DefaultReportList;
 import com.bonitasoft.engine.api.impl.reports.ReportDeployer;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
-import com.bonitasoft.engine.api.impl.transaction.UpdateTenant;
 import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
@@ -319,7 +318,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         reports.deploy(new ReportDeployer() {
 
             @Override
-            public void deploy(String name, String description, byte[] screenShot, byte[] content) throws SBonitaException {
+            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
                 final ReportingService reportingService = tenantAccessor.getReportingService();
                 final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
                         description, screenShot);
@@ -393,8 +392,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final WorkService workService = platformAccessor.getWorkService();
-            final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
+
+            final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 
@@ -402,8 +401,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
-                    platformAccessor.getTechnicalLoggerService(), workService);
+            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+            final WorkService workService = tenantServiceAccessor.getWorkService();
+
+            final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
+                    platformAccessor.getTechnicalLoggerService(), workService, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
         } catch (final TenantNotFoundException e) {
@@ -442,7 +444,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final WorkService workService = platformAccessor.getWorkService();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 
@@ -450,7 +451,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
             sessionService.deleteSessionsOfTenant(tenantId);
@@ -612,17 +613,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         if (udpater == null || udpater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
+        final PlatformService platformService = getPlatformService();
         // check existence for tenant
-        Tenant tenant;
         try {
-            tenant = getTenantById(tenantId);
+            STenant tenant = platformService.getTenant(tenantId);
             // update user name and password in file system
             final Map<TenantField, Serializable> updatedFields = udpater.getFields();
             final String username = (String) updatedFields.get(TenantField.USERNAME);
@@ -632,11 +626,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
             // update tenant in database
             final EntityUpdateDescriptor changeDescriptor = getTenantUpdateDescriptor(udpater);
-            final UpdateTenant updateTenant = new UpdateTenant(tenant.getId(), changeDescriptor, platformService);
-            updateTenant.execute();
-            return getTenantById(tenantId);
-        } catch (final TenantNotFoundException e) {
-            throw new UpdateException(e);
+            platformService.updateTenant(tenant, changeDescriptor);
+            return SPModelConvertor.toTenant(tenant);
         } catch (final BonitaHomeNotSetException e) {
             throw new UpdateException(e);
         } catch (final IOException e) {
@@ -679,14 +670,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     @Override
     public SearchResult<Tenant> searchTenants(final SearchOptions searchOptions) {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        final PlatformService platformService = platformAccessor.getPlatformService();
-        final SearchPlatformEntitiesDescriptor searchPlatformEntitiesDescriptor = platformAccessor.getSearchPlatformEntitiesDescriptor();
+        final PlatformService platformService = getPlatformService();
+        final SearchPlatformEntitiesDescriptor searchPlatformEntitiesDescriptor = getPlatformAccessorNoException().getSearchPlatformEntitiesDescriptor();
         final SearchTenants searchTenants = new SearchTenants(platformService, searchPlatformEntitiesDescriptor.getSearchTenantDescriptor(), searchOptions);
         try {
             searchTenants.execute();
@@ -730,6 +715,22 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     @Override
     protected String getProfileFileName() {
         return PROFILES_FILE_SP;
+    }
+
+    protected PlatformService getPlatformService() {
+        PlatformServiceAccessor platformAccessor = getPlatformAccessorNoException();
+        final PlatformService platformService = platformAccessor.getPlatformService();
+        return platformService;
+    }
+
+    protected PlatformServiceAccessor getPlatformAccessorNoException() {
+        PlatformServiceAccessor platformAccessor;
+        try {
+            platformAccessor = getPlatformAccessor();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+        return platformAccessor;
     }
 
 }

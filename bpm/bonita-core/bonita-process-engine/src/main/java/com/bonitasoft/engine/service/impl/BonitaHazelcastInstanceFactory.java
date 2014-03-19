@@ -116,4 +116,14 @@ public class BonitaHazelcastInstanceFactory implements ServiceWithLifecycle {
         LifecycleService lifecycleService = hazelcastInstance.getLifecycleService();
         lifecycleService.shutdown();
     }
+
+    @Override
+    public void pause() {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do
+    }
 }

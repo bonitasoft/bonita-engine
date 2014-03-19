@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.identity;
 
+import static org.junit.Assert.assertEquals;
+
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Role;
@@ -19,8 +21,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.SPBPMTestUtil;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-
-import static org.junit.Assert.assertEquals;
 
 public class SPRoleTest extends CommonAPISPTest {
 

@@ -436,12 +436,6 @@
 		<!-- Logs -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
 			<artifactId>bonita-log-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -486,7 +480,7 @@
 		<!-- Platform -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl-hibernate</artifactId>
+			<artifactId>bonita-platform-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -616,12 +610,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
 			<artifactId>bonita-scheduler-quartz</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -851,7 +839,6 @@
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
-			<version>2.1.3</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

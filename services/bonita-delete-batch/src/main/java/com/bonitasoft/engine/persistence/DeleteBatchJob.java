@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.PersistenceService;
@@ -25,12 +26,15 @@ public class DeleteBatchJob implements StatelessJob {
 
     private static final long serialVersionUID = 1L;
 
-    private static PersistenceService persistenceService;
+    private PersistenceService persistenceService;
 
-    private static List<String> classesToPurge;
+    public static final String ATTR_CLASSES_TO_PURE = "classesToPurge";
 
-    public static void setPersistenceService(final PersistenceService persistenceService) {
-        DeleteBatchJob.persistenceService = persistenceService;
+    private List<String> classesToPurge;
+
+    @InjectedService
+    public void setPersistenceService(final PersistenceService persistenceService) {
+        this.persistenceService = persistenceService;
     }
 
     @Override
@@ -54,13 +58,9 @@ public class DeleteBatchJob implements StatelessJob {
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unchecked")
     @Override
     public void setAttributes(final Map<String, Serializable> attributes) {
+        classesToPurge = (List<String>) attributes.get(ATTR_CLASSES_TO_PURE);
     }
-
-    public static void setClassesToPurge(final List<String> classesToPurge) {
-        DeleteBatchJob.classesToPurge = classesToPurge;
-    }
-
 }

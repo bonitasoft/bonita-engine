@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.PersistenceService;
@@ -28,10 +29,11 @@ public class InsertBatchLogsJob implements StatelessJob {
 
     private static final long serialVersionUID = -4356390646702427686L;
 
-    private static PersistenceService persistenceService;
+    private PersistenceService persistenceService;
 
-    public static void setPersistenceService(final PersistenceService persistenceService) {
-        InsertBatchLogsJob.persistenceService = persistenceService;
+    @InjectedService
+    public void setPersistenceService(final PersistenceService persistenceService) {
+        this.persistenceService = persistenceService;
     }
 
     @Override

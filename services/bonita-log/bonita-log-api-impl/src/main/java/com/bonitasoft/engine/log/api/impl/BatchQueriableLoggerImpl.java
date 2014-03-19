@@ -8,23 +8,18 @@
  *******************************************************************************/
 package com.bonitasoft.engine.log.api.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerStrategy;
-import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.impl.AbstractQueriableLoggerImpl;
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Baptiste Mesta
@@ -41,7 +36,7 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     private final boolean delayable;
 
     private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<BatchLogSynchronization>();
-    
+
     public BatchQueriableLoggerImpl(final PersistenceService persistenceService, final TransactionService transactionService,
             final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider,
             final TechnicalLoggerService logger, final PlatformService platformService, final Boolean delayable) {
@@ -52,10 +47,10 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
         this.delayable = delayable;
     }
 
-    private synchronized BatchLogSynchronization getBatchLogSynchronization() throws STransactionNotFoundException {
+    protected synchronized BatchLogSynchronization getBatchLogSynchronization() throws STransactionNotFoundException {
         BatchLogSynchronization synchro = synchronizations.get();
         if (synchro == null) {
-            synchro = new BatchLogSynchronization();
+            synchro = new BatchLogSynchronization(persistenceService, BatchLogBuffer.getInstance(), delayable, this);
             synchronizations.set(synchro);
             this.transactionService.registerBonitaSynchronization(synchro);
         }
@@ -74,49 +69,9 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
             this.logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found");
         }
     }
-    
-    class BatchLogSynchronization implements BonitaTransactionSynchronization {
 
-        private final List<SQueriableLog> logs = new ArrayList<SQueriableLog>();
-
-        private Exception exception;
-
-        @Override
-        public void afterCompletion(final TransactionState transactionState) {
-            if (delayable && TransactionState.COMMITTED == transactionState) {
-                BatchLogBuffer.getInstance().addLogs(this.logs);
-                final InsertBatchLogsJobRegister register = InsertBatchLogsJobRegister.getInstance();
-                register.registerJobIfNotRegistered();
-            }
-            synchronizations.remove();
-        }
-
-        @Override
-        public void beforeCommit() {
-            if (!delayable) {
-                if (this.logs != null && !this.logs.isEmpty()) {
-                    try {
-                        persistenceService.insertInBatch(new ArrayList<PersistentObject>(this.logs));
-                        persistenceService.flushStatements();
-                    } catch (final SPersistenceException e) {
-                        this.exception = e;
-                        // FIXME what to do?
-                    } finally {
-                        this.logs.clear();
-                    }
-                }
-            }
-        }
-
-        public Exception getException() {
-            return this.exception;
-        }
-
-        public void addLog(final SQueriableLog sQueriableLog) {
-            // no synchronized required as we are working on a threadLocal
-            this.logs.add(sQueriableLog);
-        }
-
+    protected void cleanSynchronization() {
+        synchronizations.remove();
     }
 
 }
