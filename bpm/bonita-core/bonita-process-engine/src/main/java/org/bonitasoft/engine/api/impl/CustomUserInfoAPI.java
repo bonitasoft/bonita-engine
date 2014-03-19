@@ -74,8 +74,8 @@ public class CustomUserInfoAPI {
                 definitions.size(),
                 Collections.<OrderByOption> emptyList(),
                 Arrays.asList(
-                        new FilterOption(SCustomUserInfoDefinition.class, "userId", userId),
-                        new FilterOption(SCustomUserInfoDefinition.class, "definitionId", "")
+                        new FilterOption(SCustomUserInfoValue.class, "userId", userId),
+                        new FilterOption(SCustomUserInfoValue.class, "definitionId", "")
                                 .in(getIds(definitions))),
                 null));
     }

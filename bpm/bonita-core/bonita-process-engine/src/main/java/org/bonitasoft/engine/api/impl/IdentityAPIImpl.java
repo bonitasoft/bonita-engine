@@ -96,6 +96,7 @@ import org.bonitasoft.engine.identity.RoleCriterion;
 import org.bonitasoft.engine.identity.RoleNotFoundException;
 import org.bonitasoft.engine.identity.RoleUpdater;
 import org.bonitasoft.engine.identity.RoleUpdater.RoleField;
+import org.bonitasoft.engine.identity.SCustomUserInfoValueNotFoundException;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SRoleNotFoundException;
@@ -120,6 +121,7 @@ import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
@@ -136,6 +138,7 @@ import org.bonitasoft.engine.identity.xml.ImportOrganization;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -1479,10 +1482,22 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public CustomUserInfoValue setCustomUserInfoValue(long definitionId, long userId, String value) throws UpdateException {
-        return createCustomUserInfoValueAPI().update(BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class),
-                definitionId,
-                userId,
-                new CustomUserInfoValueUpdater(value));
+        CustomUserInfoValueAPI api = createCustomUserInfoValueAPI();
+        try {
+            SCustomUserInfoValue customUserInfoValue = api.searchValue(definitionId, userId);
+            if (customUserInfoValue != null) {
+                return api.update(BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class),
+                        customUserInfoValue,
+                        new CustomUserInfoValueUpdater(value));
+            } else {
+                return api.create(BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class),
+                        definitionId,
+                        userId,
+                        value);
+            }
+        } catch (SBonitaException e) {
+            throw new UpdateException(e);
+        }
     }
 
     private CustomUserInfoAPI createCustomUserInfoAPI() {

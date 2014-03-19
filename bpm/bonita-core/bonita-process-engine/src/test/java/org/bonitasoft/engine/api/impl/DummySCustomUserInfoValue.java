@@ -11,14 +11,17 @@ public class DummySCustomUserInfoValue implements SCustomUserInfoValue {
 
     public static final String MESSAGE = "This is a dummy object!";
 
+    private long id = 1L;
+
     private long userId = -1L;
 
     private long definitionId;
 
     private String value = "";
 
-    public DummySCustomUserInfoValue(long definitionId) {
-        this(definitionId, "", 1L);
+    public DummySCustomUserInfoValue(long id) {
+        this(1L, "", 1L);
+        this.id = id;
     }
 
     public DummySCustomUserInfoValue(long definitionId, String value, long userId) {
@@ -44,7 +47,7 @@ public class DummySCustomUserInfoValue implements SCustomUserInfoValue {
 
     @Override
     public long getId() {
-        throw new UnsupportedOperationException(MESSAGE);
+        return id;
     }
 
     @Override
