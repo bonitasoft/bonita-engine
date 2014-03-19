@@ -93,12 +93,13 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore
     public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException, IOException {
 
-        final Expression stringExpression = new ExpressionBuilder().createGroovyScriptExpression("alive",
-                "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e.toString(); ",
-                String.class.getName());
+        final Expression stringExpression = new ExpressionBuilder()
+                .createGroovyScriptExpression(
+                        "alive",
+                        "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return \"Employee [firstName=\" + e.firstName + \", lastName=\" + e.lastName + \"]\"",
+                        String.class.getName());
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
         expressions.put(stringExpression, new HashMap<String, Serializable>());
 
@@ -111,7 +112,7 @@ public class BDRIT extends CommonAPISPTest {
 
         final Set<Entry<String, Serializable>> entrySet = result.entrySet();
         final Entry<String, Serializable> entry = entrySet.iterator().next();
-        assertEquals("Employee [id=null, firstName=John, lastName=Doe]", entry.getValue());
+        assertEquals("Employee [firstName=John, lastName=Doe]", entry.getValue());
 
         disableAndDeleteProcess(processDefinition.getId());
     }

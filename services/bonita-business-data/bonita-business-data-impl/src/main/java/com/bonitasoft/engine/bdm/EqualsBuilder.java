@@ -22,6 +22,7 @@ import com.sun.codemodel.JVar;
 
 /**
  * @author Romain Bioteau
+ * @author Matthieu Chaffotte
  */
 public class EqualsBuilder {
 
@@ -38,7 +39,7 @@ public class EqualsBuilder {
         for (final Entry<String, JFieldVar> field : definedClass.fields().entrySet()) {
             final JFieldVar fieldVar = field.getValue();
             final JType type = fieldVar.type();
-            if (type.unboxify().isPrimitive()) {
+            if (type.isPrimitive()) {
                 body._if(JExpr.ref(fieldVar.name()).ne(other.ref(fieldVar.name())))._then()._return(JExpr.FALSE);
             } else {
                 final JConditional ifRefIsNull = body._if(JExpr.ref(fieldVar.name()).eq(JExpr._null()));
