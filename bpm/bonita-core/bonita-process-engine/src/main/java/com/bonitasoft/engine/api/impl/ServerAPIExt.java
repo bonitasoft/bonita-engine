@@ -60,7 +60,7 @@ public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
 
     protected void logTenantInMaintenanceMessage(final Object apiImpl, final String apiInterfaceName, final String methodName) {
         logTechnicalErrorMessage("Tenant in Maintenance. Method '" + apiInterfaceName + "." + methodName + "' of '" + apiImpl
-                + "' cannot be called until the tenant mode is RUNNING again (TenantManagementAPI.setTenantPaused())");
+                + "' cannot be called until the tenant mode is RUNNING again (TenantManagementAPI.resume())");
     }
 
     private boolean isTenantInAValidModeFor(final Object apiImpl, final Method method, final long tenantId, final Session session) {

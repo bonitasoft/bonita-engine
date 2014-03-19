@@ -85,7 +85,6 @@ public class BusinessDataProcessDependencyResolverTest {
                 buildBusinessDataDefinition("bizData2", Long.class.getName()));
 
         final List<Problem> problems = resolver.checkResolution(tenantAccessor, processDefinition);
-        System.out.println(problems);
 
         assertThat(problems).areExactly(2, new ProblemCondition());
     }
