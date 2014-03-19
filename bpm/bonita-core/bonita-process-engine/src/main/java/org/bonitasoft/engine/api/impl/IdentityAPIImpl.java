@@ -78,6 +78,7 @@ import org.bonitasoft.engine.identity.CustomUserInfo;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
+import org.bonitasoft.engine.identity.CustomUserInfoValueUpdater;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCriterion;
@@ -110,6 +111,7 @@ import org.bonitasoft.engine.identity.UserUpdater.UserField;
 import org.bonitasoft.engine.identity.UserWithContactData;
 import org.bonitasoft.engine.identity.impl.UserWithContactDataImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -117,6 +119,7 @@ import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
@@ -1472,6 +1475,14 @@ public class IdentityAPIImpl implements IdentityAPI {
         return createCustomUserInfoValueAPI().search(
                 getTenantAccessor().getSearchEntitiesDescriptor().getSearchCustomUserInfoValueDescriptor(),
                 options);
+    }
+
+    @Override
+    public CustomUserInfoValue setCustomUserInfoValue(long definitionId, long userId, String value) throws UpdateException {
+        return createCustomUserInfoValueAPI().update(BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class),
+                definitionId,
+                userId,
+                new CustomUserInfoValueUpdater(value));
     }
 
     private CustomUserInfoAPI createCustomUserInfoAPI() {

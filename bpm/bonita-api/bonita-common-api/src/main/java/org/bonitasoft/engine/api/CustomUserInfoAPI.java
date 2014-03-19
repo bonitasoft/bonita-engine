@@ -18,10 +18,12 @@ import java.util.List;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.CustomUserInfo;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
+import org.bonitasoft.engine.identity.CustomUserInfoValueUpdater;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -100,5 +102,15 @@ public interface CustomUserInfoAPI {
      * @since 6.3
      */
     public SearchResult<CustomUserInfoValue> searchCustomUserInfoValues(SearchOptions options);
+
+    /**
+     * Set value of a custom user info described by definitionId/userId.
+     *
+     * @param value
+     *            Custom user info new value
+     * @return custom user info value
+     * @since 6.3
+     */
+    public CustomUserInfoValue setCustomUserInfoValue(long definitionId, long userId, String value) throws UpdateException;
 
 }
