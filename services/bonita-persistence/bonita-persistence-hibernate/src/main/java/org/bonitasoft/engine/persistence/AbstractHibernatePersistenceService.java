@@ -769,4 +769,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             throw new SPersistenceException(he);
         }
     }
+
+    public void destroy() {
+        logger.log(getClass(), TechnicalLogSeverity.INFO, "Closing Hibernate session factory of " + getClass().getName());
+        sessionFactory.close();
+    }
 }

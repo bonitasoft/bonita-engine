@@ -1,7 +1,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" depends-on="dbProperties">
+	<bean id="platformPersistenceService" class="org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService" depends-on="dbProperties" destroy-method="destroy">
 		<constructor-arg name="name" value="platform" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
 		<constructor-arg name="dbConfigurationsProvider" ref="dbConfigurationsProvider" />
@@ -12,7 +12,7 @@
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
 	</bean>
 
-	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties">
+	<bean id="persistenceService" class="org.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties" destroy-method="destroy">
 		<constructor-arg name="name" value="journal" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
