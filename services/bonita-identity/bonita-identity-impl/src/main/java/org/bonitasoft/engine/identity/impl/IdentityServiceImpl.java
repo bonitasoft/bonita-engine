@@ -919,6 +919,7 @@ public class IdentityServiceImpl implements IdentityService {
             logBeforeMethod(methodName);
             definition =getCustomUserInfoDefinitionWithoutCheck(name);
         } catch (final SBonitaReadException e) {
+            logOnExceptionMethod(methodName, e);
             throw new SCustomUserInfoDefinitionReadException(name, e);
         }
         if(definition == null) {
@@ -928,6 +929,21 @@ public class IdentityServiceImpl implements IdentityService {
         }
         logAfterMethod(methodName);
         return definition;
+    }
+
+    @Override
+    public boolean hasCustomUserInfoDefinition(final String name) throws SCustomUserInfoDefinitionReadException {
+        final String methodName = "hasCustomUserInfoDefinition";
+        SCustomUserInfoDefinition definition = null;
+        try {
+            logBeforeMethod(methodName);
+            definition =getCustomUserInfoDefinitionWithoutCheck(name);
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod(methodName, e);
+            throw new SCustomUserInfoDefinitionReadException(name, e);
+        }
+        logAfterMethod(methodName);
+        return definition != null;
     }
 
     private SCustomUserInfoDefinition getCustomUserInfoDefinitionWithoutCheck(final String name)

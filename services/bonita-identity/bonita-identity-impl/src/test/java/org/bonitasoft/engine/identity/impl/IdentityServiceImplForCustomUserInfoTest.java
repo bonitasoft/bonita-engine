@@ -179,7 +179,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
         // given
         SBonitaReadException persistenceException = new SBonitaReadException("");
         given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willThrow(persistenceException);
-
+        
         try {
             // when
             identityServiceImpl.getCustomUserInfoDefinitionByName(DEFAULT_NAME);
@@ -191,6 +191,36 @@ public class IdentityServiceImplForCustomUserInfoTest {
         }
     }
 
+    @Test
+    public void hasCustomUserInfoDefinition_should_return_true_if_persistence_service_finds_an_element() throws Exception {
+        // given
+        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willReturn(userInfoDef);
+        
+        // when
+        boolean hasDef = identityServiceImpl.hasCustomUserInfoDefinition(DEFAULT_NAME);
+        
+        // then
+        assertThat(hasDef).isTrue();
+    }
+    
+    @Test
+    public void hasCustomUserInfoDefinition_should_throw_SCustomUserInfoDefinitionReadException_when_persistence_service_throws_SBonitaReadException()
+            throws Exception {
+        // given
+        SBonitaReadException persistenceException = new SBonitaReadException("");
+        given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willThrow(persistenceException);
+        
+        try {
+            // when
+            identityServiceImpl.hasCustomUserInfoDefinition(DEFAULT_NAME);
+            fail("Read exception expected");
+        } catch (SCustomUserInfoDefinitionReadException e) {
+            // then
+            assertThat(e.getDefinitionName()).isEqualTo(DEFAULT_NAME);
+            assertThat(e.getCause()).isEqualTo(persistenceException);
+        }
+    }
+    
     @Test
     public void searchCustomUserInfoValues_should_return_values_from_persistence_service() throws Exception {
         // given

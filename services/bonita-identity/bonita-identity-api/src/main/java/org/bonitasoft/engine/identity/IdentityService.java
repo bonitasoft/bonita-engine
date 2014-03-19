@@ -595,6 +595,17 @@ public interface IdentityService {
     SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException, SCustomUserInfoDefinitionReadException;
 
     /**
+     * Verify if there is a custom user info for the given name
+     * 
+     * @param name
+     *            The name custom user info definition name
+     * @return the custom user info definition identified by the given name
+     * @throws SCustomUserInfoDefinitionNotFoundException if there is no custom user info definition for the given name 
+     * @throws SCustomUserInfoDefinitionReadException if an exception occurs when trying to retrieve the custom user info definition
+     */
+    boolean hasCustomUserInfoDefinition(String name) throws SCustomUserInfoDefinitionReadException;
+
+    /**
      * Get total number of custom user info
      * 
      * @return the total number of custom user info
@@ -627,12 +638,12 @@ public interface IdentityService {
      * 
      * @param fromIndex
      *            Index of the record to be retrieved from. First record has index 0
-     * @param numberOfMetadata
+     * @param maxResults
      *            Number of result we want to get. Maximum number of result returned
      * @return a list of SCustomUserInfo object
      * @throws SIdentityException
      */
-    List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(int fromIndex, int numberOfMetadata) throws SIdentityException;
+    List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(int fromIndex, int maxResults) throws SIdentityException;
     
     
     /**
@@ -895,11 +906,11 @@ public interface IdentityService {
     /**
      * Delete the id specified custom user info
      * 
-     * @param metadataDefinitionId
+     * @param customUserInfoDefinitionId
      *            The identifier of custom user info
      * @throws SIdentityException
      */
-    void deleteCustomUserInfoDefinition(long metadataDefinitionId) throws SIdentityException;
+    void deleteCustomUserInfoDefinition(long customUserInfoDefinitionId) throws SIdentityException;
 
     /**
      * Delete the specific profileMetadataValue
