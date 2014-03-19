@@ -16,6 +16,7 @@ package org.bonitasoft.engine.work;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -63,7 +64,8 @@ public class ExecutorWorkService implements WorkService {
     @Override
     public void registerWork(final BonitaWork work) throws WorkRegisterException {
         if (isStopped()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription() + " but the work service is stopped");
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
+                    + " but the work service is stopped");
             return;
         }
         final AbstractWorkSynchronization synchro = getContinuationSynchronization(work);
@@ -73,16 +75,17 @@ public class ExecutorWorkService implements WorkService {
     @Override
     public void executeWork(final BonitaWork work) throws WorkRegisterException {
         if (isStopped()) {
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription() + " but the work service is stopped");
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to register work " + work.getDescription()
+                    + " but the work service is stopped");
             return;
         }
 
         try {
             work.setTenantId(sessionAccessor.getTenantId());
-        } catch (final TenantIdNotSetException e) {
+        } catch (TenantIdNotSetException e) {
             throw new WorkRegisterException("Unable to read tenant id from session", e);
         }
-        executor.submit(work);
+        this.executor.submit(work);
     }
 
     private AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws WorkRegisterException {
@@ -106,10 +109,12 @@ public class ExecutorWorkService implements WorkService {
 
     @Override
     public void stop() {
-        // we don't throw exception just stop it and log if something happens
+        // we don't throw exception just stop it and log if something happend
         try {
             stopWithException();
-        } catch (final WorkException e) {
+        } catch (WorkException e) {
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
+        } catch (TimeoutException e) {
             loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
         }
     }
@@ -117,18 +122,18 @@ public class ExecutorWorkService implements WorkService {
     @Override
     public void start() {
         if (isStopped()) {
-            final Pair<ExecutorService, Queue<Runnable>> createExecutorService = bonitaExecutorServiceFactory.createExecutorService();
+            Pair<ExecutorService, Queue<Runnable>> createExecutorService = bonitaExecutorServiceFactory.createExecutorService();
             executor = createExecutorService.getLeft();
             queue = createExecutorService.getRight();
         }
     }
 
     @Override
-    public void pause() throws WorkException {
+    public void pause() throws TimeoutException, WorkException {
         stopWithException();
     }
 
-    private void stopWithException() throws WorkException {
+    private void stopWithException() throws TimeoutException, WorkException {
         if (isStopped()) {
             return;
         }
@@ -136,9 +141,9 @@ public class ExecutorWorkService implements WorkService {
         queue.clear();
         try {
             if (!executor.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
-                throw new WorkException("Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
+                throw new TimeoutException("Waited termination of all work " + TIMEOUT + "s but all tasks were not finished");
             }
-        } catch (final InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new WorkException("Interrupted while pausing the work service", e);
         }
         executor = null;

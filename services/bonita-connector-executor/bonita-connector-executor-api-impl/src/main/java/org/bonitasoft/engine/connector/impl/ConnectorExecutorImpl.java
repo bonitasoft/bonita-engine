@@ -126,9 +126,9 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     public void disconnect(final SConnector sConnector) throws SConnectorException {
         try {
             sConnector.disconnect();
-        } catch (final SConnectorException e) {
+        } catch (SConnectorException e) {
             throw e;
-        } catch (final Throwable t) {
+        } catch (Throwable t) {
             throw new SConnectorException(t);
         }
     }
@@ -162,7 +162,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
                     final long sessionId = sessionAccessor.getSessionId();
                     sessionAccessor.deleteSessionId();
                     sessionService.deleteSession(sessionId);
-                } catch (final SessionIdNotSetException e) {
+                } catch (SessionIdNotSetException e) {
                     // nothing, no session has been created
                 }
             }
@@ -207,14 +207,14 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
                 if (!threadPoolExecutor.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
                     loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Timeout  (5s) trying to stop the connector executor thread pool");
                 }
-            } catch (final InterruptedException e) {
+            } catch (InterruptedException e) {
                 loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "Error while stopping the connector executor thread pool", e);
             }
         }
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() throws SBonitaException, TimeoutException {
         // nothing to do
     }
 

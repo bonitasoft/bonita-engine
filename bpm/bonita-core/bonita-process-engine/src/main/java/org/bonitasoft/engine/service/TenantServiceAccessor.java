@@ -100,6 +100,8 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     TechnicalLoggerService getTechnicalLoggerService();
 
+//    TransactionService getTransactionService();
+
     UserTransactionService getUserTransactionService();
 
     ProcessDefinitionService getProcessDefinitionService();

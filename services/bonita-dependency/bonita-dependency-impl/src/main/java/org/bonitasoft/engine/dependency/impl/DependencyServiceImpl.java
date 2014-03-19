@@ -26,7 +26,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.dependency.ArtifactAccessor;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyCreationException;
@@ -270,11 +269,11 @@ public class DependencyServiceImpl implements DependencyService {
             if (sDependency == null) {
                 throw new SDependencyNotFoundException("Dependency with name " + name + " does not exist.");
             }
-            delete(sDependency);
+            deleteDependency(sDependency);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependency"));
             }
-        } catch (final SBonitaException e) {
+        } catch (final SBonitaReadException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "deleteDependency", e));
             }
@@ -727,15 +726,15 @@ public class DependencyServiceImpl implements DependencyService {
 
     @Override
     public void updateDependenciesOfArtifact(final long id, final ScopeType type, final ArrayList<SDependency> dependencies) throws SDependencyException {
-        final Map<String, SDependency> newDependenciesByName = getMapOfNames(dependencies);
-        final List<Long> dependencyIds = getDependencyIds(id, type, QueryOptions.allResultsQueryOptions());
+        Map<String, SDependency> newDependenciesByName = getMapOfNames(dependencies);
+        List<Long> dependencyIds = getDependencyIds(id, type, QueryOptions.allResultsQueryOptions());
         if (!dependencyIds.isEmpty()) {
-            final List<SDependency> currentDependencies = getDependencies(dependencyIds);
-            for (final SDependency currentDependency : currentDependencies) {
+            List<SDependency> currentDependencies = getDependencies(dependencyIds);
+            for (SDependency currentDependency : currentDependencies) {
                 if (!newDependenciesByName.containsKey(currentDependency.getName())) {
                     delete(currentDependency);
                 } else {
-                    final SDependency newDependency = newDependenciesByName.get(currentDependency.getName());
+                    SDependency newDependency = newDependenciesByName.get(currentDependency.getName());
                     update(currentDependency, newDependency);
                 }
                 // remove from list
@@ -743,7 +742,7 @@ public class DependencyServiceImpl implements DependencyService {
             }
         }
         // all artifact that are still here must be created
-        for (final SDependency sDependency : newDependenciesByName.values()) {
+        for (SDependency sDependency : newDependenciesByName.values()) {
             createForArtifact(id, type, sDependency);
         }
     }
@@ -765,14 +764,18 @@ public class DependencyServiceImpl implements DependencyService {
     }
 
     private void delete(final SDependency dependency) throws SDependencyException, SDependencyDeletionException {
-        final SDependencyMapping sDependencyMapping = getDependencyMappings(dependency.getId(), QueryOptions.defaultQueryOptions()).get(0);
+        SDependencyMapping sDependencyMapping = getDependencyMappings(dependency.getId(), QueryOptions.defaultQueryOptions()).get(0);
         deleteDependencyMapping(sDependencyMapping);
         deleteDependency(dependency);
     }
 
+    /**
+     * @param dependencies
+     * @return
+     */
     private Map<String, SDependency> getMapOfNames(final ArrayList<SDependency> dependencies) {
-        final HashMap<String, SDependency> hashMap = new HashMap<String, SDependency>(dependencies.size());
-        for (final SDependency sDependency : dependencies) {
+        HashMap<String, SDependency> hashMap = new HashMap<String, SDependency>(dependencies.size());
+        for (SDependency sDependency : dependencies) {
             hashMap.put(sDependency.getName(), sDependency);
         }
         return hashMap;

@@ -298,19 +298,19 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
 
     @Override
     public synchronized void start() throws SBonitaException {
-        cacheManager = configFile != null ? CacheManager.create(configFile) : CacheManager.create();
+        this.cacheManager = configFile != null ? CacheManager.create(configFile) : CacheManager.create();
     }
 
     @Override
-    public synchronized void stop() throws SBonitaException {
+    public synchronized void stop() throws SBonitaException, TimeoutException {
         if (cacheManager != null) {
-            cacheManager.shutdown();
-            cacheManager = null;
+            this.cacheManager.shutdown();
+            this.cacheManager = null;
         }
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() throws SBonitaException, TimeoutException {
         // nothing to do
     }
 
