@@ -29,6 +29,9 @@ import org.bonitasoft.engine.work.WorkService;
 /**
  * Transactional work that lock the process instance
  * 
+ * This work try to lock a process instance, if it can't be locked before the end of the timeout, we reschedule the fill stack of work on the work service.
+ * 
+ * 
  * @author Charles Souillard
  * @author Baptiste Mesta
  */

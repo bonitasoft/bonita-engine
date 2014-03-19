@@ -61,20 +61,19 @@ public class XpathUpdateQueryOperationExecutorStrategy extends UpdateOperationEx
     private String getStringValue(final Object variableValue) {
         if (variableValue instanceof String) {
             return (String) variableValue;
-        } else {
-            return String.valueOf(variableValue);
         }
+        return String.valueOf(variableValue);
     }
 
     private boolean isSetAttribute(final String xpathExpression, final Object variableValue) {
         if (variableValue instanceof Attr) {
             return true;
-        } else {
-            final String[] segments = xpathExpression.split("/");
-            return segments[segments.length - 1].startsWith("@");
         }
+        final String[] segments = xpathExpression.split("/");
+        return segments[segments.length - 1].startsWith("@");
     }
 
+    @SuppressWarnings("unused")
     @Override
     public Object getValue(final SOperation operation, final Object value, final long containerId, final String containerType,
             final SExpressionContext expressionContext) throws SOperationExecutionException {

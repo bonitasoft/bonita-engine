@@ -210,4 +210,14 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
             }
         }
     }
+
+    @Override
+    public void pause() {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do
+    }
 }

@@ -157,16 +157,15 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 List<SFlowNodeInstance> createInnerInstances = null;
                 if (shouldCreateANewInstance(loopCharacteristics, numberOfInstances, miActivity)) {
                     createInnerInstances = InitializingMultiInstanceActivityStateImpl.createInnerInstances(bpmInstancesCreator, activityInstanceService,
-                            processDefinition.getId(), activityDefinition, flowNodeInstance, loopCharacteristics, numberOfInstances, 1);
+                            processDefinition.getId(), activityDefinition, flowNodeInstance, 1);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
                         containerRegistry.executeFlowNode(processDefinition.getId(), sFlowNodeInstance.getLogicalGroup(3), sFlowNodeInstance.getId(), null,
                                 null);
                     }
                 }
                 return numberOfActiveInstances == 0 && (createInnerInstances == null || createInnerInstances.size() == 0);
-            } else {
-                return numberOfActiveInstances == 0 || numberOfInstances == numberOfCompletedInstances + numberOfTerminatedInstances;
             }
+            return numberOfActiveInstances == 0 || numberOfInstances == numberOfCompletedInstances + numberOfTerminatedInstances;
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }
@@ -206,17 +205,17 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
             final SMultiInstanceActivityInstance miActivityInstance) throws SDataInstanceException {
         if (loopCharacteristics.getLoopCardinality() != null) {
             return miActivityInstance.getLoopCardinality() > numberOfInstances;
-        } else {
-            final SDataInstance dataInstance = dataInstanceService.getDataInstance(loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getId(),
-                    DataInstanceContainer.ACTIVITY_INSTANCE.name());
-            if (dataInstance != null) {
-                final List<?> loopDataInputCollection = (List<?>) dataInstance.getValue();
-                return numberOfInstances < loopDataInputCollection.size();
-            }
+        }
+        final SDataInstance dataInstance = dataInstanceService.getDataInstance(loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getId(),
+                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+        if (dataInstance != null) {
+            final List<?> loopDataInputCollection = (List<?>) dataInstance.getValue();
+            return numberOfInstances < loopDataInputCollection.size();
         }
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         final int numberOfActiveInstances = ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfActiveInstances();
@@ -227,6 +226,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         return numberOfActiveInstances > 0;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public final StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return StateCode.DONE;
@@ -237,11 +237,13 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         return SStateCategory.NORMAL;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "";

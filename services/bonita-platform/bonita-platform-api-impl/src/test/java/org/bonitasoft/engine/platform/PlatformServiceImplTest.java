@@ -317,9 +317,17 @@ public class PlatformServiceImplTest {
     @Test
     public final void isNotTenantActivated() {
         final STenant tenant = mock(STenant.class);
-        when(tenant.getStatus()).thenReturn("DESACTIVATED");
+        when(tenant.getStatus()).thenReturn("DEACTIVATED");
 
         Assert.assertFalse(platformServiceImpl.isTenantActivated(tenant));
+    }
+
+    @Test
+    public final void should_isTenantActivated_return_true_when_tenant_is_paused() {
+        final STenant tenant = mock(STenant.class);
+        when(tenant.getStatus()).thenReturn("PAUSED");
+
+        Assert.assertTrue(platformServiceImpl.isTenantActivated(tenant));
     }
 
     /**

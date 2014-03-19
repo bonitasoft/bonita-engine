@@ -17,7 +17,6 @@
 	<modules>
 		<module>bonita-platform-model</module>
 		<module>bonita-platform-model-impl</module>
-		<module>bonita-platform-model-impl-hibernate</module>
 		<module>bonita-platform-api</module>
 		<module>bonita-platform-api-impl</module>
 	</modules>

@@ -31,7 +31,7 @@ public class FlowNodeNameFilter implements Filter<SFlowNodeDefinition>{
     }
 
     @Override
-    public boolean select(SFlowNodeDefinition element) {
+    public boolean mustSelect(SFlowNodeDefinition element) {
         return flowNodeNames.contains(element.getName());
     }
 

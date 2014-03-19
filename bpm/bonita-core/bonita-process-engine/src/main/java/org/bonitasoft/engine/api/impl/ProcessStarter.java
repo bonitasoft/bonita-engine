@@ -34,9 +34,9 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.FlowNodeNameFilter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
+import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -51,7 +51,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * @author Elias Ricken de Medeiros
  * @author Vincent Elcrin
- * 
  */
 public class ProcessStarter {
 
@@ -65,8 +64,8 @@ public class ProcessStarter {
 
     private final Filter<SFlowNodeDefinition> filter;
 
-    private ProcessStarter(long userId, long processDefinitionId, List<Operation> operations,
-            Map<String, Serializable> context, Filter<SFlowNodeDefinition> filter) {
+    private ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
+           final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter) {
         this.userId = userId;
         this.processDefinitionId = processDefinitionId;
         this.operations = operations;
@@ -74,11 +73,12 @@ public class ProcessStarter {
         this.filter = filter;
     }
 
-    public ProcessStarter(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context) {
+    public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context) {
         this(userId, processDefinitionId, operations, context, new StartFlowNodeFilter());
     }
 
-    public ProcessStarter(long userId, long processDefinitionId, List<Operation> operations, Map<String, Serializable> context, List<String> activityNames) {
+    public ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context,
+            final List<String> activityNames) {
         this(userId, processDefinitionId, operations, context, new FlowNodeNameFilter(activityNames));
     }
 
@@ -86,19 +86,7 @@ public class ProcessStarter {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        // Retrieval of the process definition:
-        final SProcessDefinition sProcessDefinition;
-        try {
-            final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
-            if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
-                throw new ProcessActivationException("Process disabled");
-            }
-            sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
+        final SProcessDefinition sProcessDefinition = retrieveProcessDefinition(processDefinitionService);
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final long starterId;
         final long userIdFromSession = SessionInfos.getUserIdFromSession();
@@ -116,19 +104,37 @@ public class ProcessStarter {
             } else {
                 operationContext = Collections.emptyMap();
             }
-            startedInstance = processExecutor.start(
-                    starterId,
-                    userIdFromSession,
-                    sOperations,
-                    operationContext,
-                    null,
-                    new FlowNodeSelector(sProcessDefinition, filter));
+            startedInstance = processExecutor.start(starterId, userIdFromSession, sOperations, operationContext, null, new FlowNodeSelector(sProcessDefinition,
+                    filter));
         } catch (final SBonitaException e) {
             throw new ProcessExecutionException(e);
-        }// FIXME in case process instance creation exception -> put it in failed
+        }
 
         final ProcessInstance processInstance = ModelConvertor.toProcessInstance(sProcessDefinition, startedInstance);
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        logInstanceStarted(sProcessDefinition, starterId, userIdFromSession, processInstance, logger);
+        return processInstance;
+    }
+
+    private SProcessDefinition retrieveProcessDefinition(final ProcessDefinitionService processDefinitionService) throws ProcessActivationException,
+            ProcessDefinitionNotFoundException {
+        final SProcessDefinition sProcessDefinition;
+        try {
+            final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
+            if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
+                throw new ProcessActivationException("Process disabled");
+            }
+            sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+        } catch (final SProcessDefinitionNotFoundException e) {
+            throw new ProcessDefinitionNotFoundException(e);
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        }
+        return sProcessDefinition;
+    }
+
+    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long userIdFromSession, final ProcessInstance processInstance,
+            final TechnicalLoggerService logger) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             final StringBuilder stb = new StringBuilder();
             stb.append("The user <");
@@ -148,7 +154,6 @@ public class ProcessStarter {
             stb.append(">");
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());
         }
-        return processInstance;
     }
 
     protected TenantServiceAccessor getTenantAccessor() {

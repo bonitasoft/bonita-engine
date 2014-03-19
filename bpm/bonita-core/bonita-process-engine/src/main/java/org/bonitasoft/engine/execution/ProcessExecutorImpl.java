@@ -411,8 +411,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         final Long connectorInstanceId = nextConnectorInstance.getId();
                         final String connectorDefinitionName = sConnectorDefinition.getName();
                         workService.registerWork(WorkFactory.createExecuteConnectorOfProcess(processDefinitionId, sProcessInstance.getId(),
-                                sProcessInstance.getRootProcessInstanceId(),
-                                connectorInstanceId, connectorDefinitionName, activationEvent));
+                                sProcessInstance.getRootProcessInstanceId(),   connectorInstanceId, connectorDefinitionName, activationEvent));
                         return true;
                     }
                 }

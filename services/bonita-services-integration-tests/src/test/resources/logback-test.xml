@@ -10,7 +10,7 @@
 
  <logger name="org.bonitasoft" level="INFO"/>
 
-  <root level="INFO">
+  <root level="WARN">
     <appender-ref ref="STDOUT" />
   </root>
 

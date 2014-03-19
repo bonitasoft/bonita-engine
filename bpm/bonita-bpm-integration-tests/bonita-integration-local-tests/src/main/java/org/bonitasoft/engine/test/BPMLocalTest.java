@@ -55,8 +55,6 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -93,7 +91,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
     @Test(expected = InvalidSessionException.class)
     public void useAFakeSessionId() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final FakeSession fakeSession = new FakeSession(session);
         fakeSession.setId(fakeSession.getId() + 1);
 
@@ -434,15 +432,8 @@ public class BPMLocalTest extends CommonAPILocalTest {
         waitForUserTaskAndExecuteIt("step1", pi3, john);
         System.out.println("executed step1");
         logout();
-        final PlatformSession loginPlatform = APITestUtil.loginPlatform();
+        final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        new WaitUntil(10, 15000) {
-
-            @Override
-            protected boolean check() {
-                return BlockingConnector.semaphore.hasQueuedThreads() && semaphore1.hasQueuedThreads() && semaphore2.hasQueuedThreads();
-            }
-        };
         // stop node and in the same time release the semaphores to unlock works
         final Thread thread = new Thread(new Runnable() {
 
@@ -470,7 +461,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         System.out.println("start node");
         platformAPI.startNode();
         System.out.println("node started");
-        APITestUtil.logoutPlatform(loginPlatform);
+        logoutPlatform(loginPlatform);
         login();
         // check we have all task ready
         waitForPendingTasks(john.getId(), 3);

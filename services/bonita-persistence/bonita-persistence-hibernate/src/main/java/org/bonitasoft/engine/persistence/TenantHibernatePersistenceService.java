@@ -81,9 +81,9 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
                 tenantId = getTenantId();
                 ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
             } catch (final SReflectException e) {
-                throw new SPersistenceException("Can't set tenant on entity " + entity, e);
+                throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
             } catch (final STenantIdNotSetException e) {
-                throw new SPersistenceException("Can't set tenant on entity " + entity, e);
+                throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
             }
         }
     }

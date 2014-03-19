@@ -85,4 +85,9 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
         userTransactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
     }
 
+    @Override
+    public String toString() {
+        return "Work[" + getDescription() + "]";
+    }
+
 }

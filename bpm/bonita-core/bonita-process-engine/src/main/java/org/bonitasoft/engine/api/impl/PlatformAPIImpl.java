@@ -36,10 +36,8 @@ import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformContent
 import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
-import org.bonitasoft.engine.api.impl.transaction.platform.GetDefaultTenantInstance;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.IsPlatformCreated;
-import org.bonitasoft.engine.api.impl.transaction.platform.RefreshPlatformClassLoader;
 import org.bonitasoft.engine.api.impl.transaction.platform.RefreshTenantClassLoaders;
 import org.bonitasoft.engine.api.impl.transaction.profile.ImportProfiles;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -266,35 +264,31 @@ public class PlatformAPIImpl implements PlatformAPI {
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
                         logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of platform : " + serviceWithLifecycle.getClass().getName());
                     }
-                    serviceWithLifecycle.start();
+                    // scheduler my be already running
+                    // skip service start
+                    if (!serviceWithLifecycle.getClass().isInstance(schedulerService) || !schedulerService.isStarted()) {
+                        serviceWithLifecycle.start();
+                    }
                 }
-
-                transactionService.executeInTransaction(new RefreshPlatformClassLoader(platformAccessor));
 
                 // set tenant classloader
                 final SessionService sessionService = platformAccessor.getSessionService();
-                final List<Long> tenantIds = getTenantIds(platformService, transactionService);
-                for (final Long tenantId : tenantIds) {
-                    long sessionId = -1;
-                    long platformSessionId = -1;
-                    try {
-                        platformSessionId = sessionAccessor.getSessionId();
-                        sessionAccessor.deleteSessionId();
-                        sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
-                        final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-                        final TransactionExecutor tenantExecutor = tenantServiceAccessor.getTransactionExecutor();
-                        tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
-                        // start the connector executor thread pool
-                        // TODO should be like the platform services to start...
-                        final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
-                        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                            logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of tenant " + tenantId + " : "
-                                    + connectorExecutor.getClass().getName());
+                final List<STenant> tenants = getTenants(platformService, transactionService);
+                for (final STenant tenant : tenants) {
+                    if (!tenant.isPaused()) {
+                        long tenantId = tenant.getId();
+                        long sessionId = -1;
+                        long platformSessionId = -1;
+                        try {
+                            platformSessionId = sessionAccessor.getSessionId();
+                            sessionAccessor.deleteSessionId();
+                            sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
+                            final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+                            startServices(logger, tenantId, tenantServiceAccessor);
+                        } finally {
+                            sessionService.deleteSession(sessionId);
+                            cleanSessionAccessor(sessionAccessor, platformSessionId);
                         }
-                        connectorExecutor.start();
-                    } finally {
-                        sessionService.deleteSession(sessionId);
-                        cleanSessionAccessor(sessionAccessor, platformSessionId);
                     }
                 }
                 if (!isNodeStarted()) {
@@ -308,25 +302,24 @@ public class PlatformAPIImpl implements PlatformAPI {
                         // * transitions that are in state created: call execute on them
                         // * flow node that are completed and not deleted : call execute to make it create transitions and so on
                         // * all element that are in not stable state
-
-                        final GetDefaultTenantInstance getDefaultTenantInstance = new GetDefaultTenantInstance(platformService);
-                        platformAccessor.getTransactionExecutor().execute(getDefaultTenantInstance);
-                        final STenant defaultTenant = getDefaultTenantInstance.getResult();
-                        final long tenantId = defaultTenant.getId();
-                        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
-                        final long sessionId = createSessionAndMakeItActive(defaultTenant.getId(), sessionAccessor, sessionService);
-                        for (final TenantRestartHandler restartHandler : platformConfiguration.getTenantRestartHandlers()) {
-                            final Callable<Void> callable = new Callable<Void>() {
-
-                                @Override
-                                public Void call() throws Exception {
-                                    restartHandler.handleRestart(platformAccessor, tenantServiceAccessor);
-                                    return null;
+                        for (final STenant tenant : tenants) {
+                            if (!tenant.isPaused()) {
+                                long tenantId = tenant.getId();
+                                long sessionId = -1;
+                                long platformSessionId = -1;
+                                try {
+                                    platformSessionId = sessionAccessor.getSessionId();
+                                    sessionAccessor.deleteSessionId();
+                                    sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
+                                    final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+                                    executeRestartHandlersOfTenant(platformAccessor, platformConfiguration, tenantServiceAccessor);
+                                } finally {
+                                    sessionService.deleteSession(sessionId);
+                                    cleanSessionAccessor(sessionAccessor, platformSessionId);
                                 }
-                            };
-                            tenantServiceAccessor.getUserTransactionService().executeInTransaction(callable);
+                            }
                         }
-                        sessionService.deleteSession(sessionId);
+
                     }
                     for (final RestartHandler restartHandler : platformConfiguration.getRestartHandlers()) {
 
@@ -366,20 +359,50 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private List<Long> getTenantIds(final PlatformService platformService, final TransactionService transactionService) throws Exception {
-        final List<Long> tenantIds = transactionService.executeInTransaction(new Callable<List<Long>>() {
+    private void startServices(final TechnicalLoggerService logger, final long tenantId, final TenantServiceAccessor tenantServiceAccessor)
+            throws SBonitaException {
+        tenantServiceAccessor.getWorkService().start();
+        final TransactionExecutor tenantExecutor = tenantServiceAccessor.getTransactionExecutor();
+        tenantExecutor.execute(new RefreshTenantClassLoaders(tenantServiceAccessor, tenantId));
+        // start the connector executor thread pool
+        // TODO should be like the platform services to start...
+        final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+            logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of tenant " + tenantId + " : "
+                    + connectorExecutor.getClass().getName());
+        }
+        connectorExecutor.start();
+    }
+
+    private void executeRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final NodeConfiguration platformConfiguration,
+            final TenantServiceAccessor tenantServiceAccessor) throws Exception {
+        for (final TenantRestartHandler restartHandler : platformConfiguration.getTenantRestartHandlers()) {
+            final Callable<Void> callable = new Callable<Void>() {
+
+                @Override
+                public Void call() throws Exception {
+                    restartHandler.handleRestart(platformAccessor, tenantServiceAccessor);
+                    return null;
+                }
+            };
+            tenantServiceAccessor.getUserTransactionService().executeInTransaction(callable);
+        }
+    }
+
+    private List<STenant> getTenants(final PlatformService platformService, final TransactionService transactionService) throws Exception {
+        final List<STenant> tenantIds = transactionService.executeInTransaction(new Callable<List<STenant>>() {
 
             @Override
-            public List<Long> call() throws Exception {
+            public List<STenant> call() throws Exception {
                 List<STenant> tenants;
                 final int maxResults = 100;
                 int i = 0;
-                final List<Long> tenantIds = new ArrayList<Long>();
+                final List<STenant> tenantIds = new ArrayList<STenant>();
                 do {
                     tenants = platformService.getTenants(new QueryOptions(i, maxResults));
                     i += maxResults;
                     for (final STenant sTenant : tenants) {
-                        tenantIds.add(sTenant.getId());
+                        tenantIds.add(sTenant);
                     }
                 } while (tenants.size() == maxResults);
                 return tenantIds;
@@ -416,16 +439,22 @@ public class PlatformAPIImpl implements PlatformAPI {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of platform: " + serviceWithLifecycle.getClass().getName());
                 serviceWithLifecycle.stop();
             }
-            final List<Long> tenantIds = getTenantIds(platformService, transactionService);
-            for (final Long tenantId : tenantIds) {
+            final List<STenant> tenantIds = getTenants(platformService, transactionService);
+            for (final STenant tenant : tenantIds) {
                 // stop the connector executor thread pool
-                // TODO should be like the platform services to stop...
-                final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
+                final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenant.getId());
                 final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenantId + " : " + connectorExecutor.getClass().getName());
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + ": "
+                            + connectorExecutor.getClass().getName());
                 }
-                connectorExecutor.stop();
+                WorkService workService = tenantServiceAccessor.getWorkService();
+
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, "Stop service of tenant " + tenant.getId() + " : "
+                            + connectorExecutor.getClass().getName());
+                }
+                workService.stop();
             }
             isNodeStarted = false;
         } catch (final SBonitaException e) {
@@ -749,7 +778,6 @@ public class PlatformAPIImpl implements PlatformAPI {
         // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor = null;
         SessionAccessor sessionAccessor = null;
-        // final boolean schedulerStarted = false;
         long platformSessionId = -1;
         try {
             platformAccessor = getPlatformAccessor();
@@ -760,7 +788,6 @@ public class PlatformAPIImpl implements PlatformAPI {
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
             final NodeConfiguration plaformConfiguration = platformAccessor.getPlaformConfiguration();
-            final WorkService workService = platformAccessor.getWorkService();
 
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
@@ -773,8 +800,14 @@ public class PlatformAPIImpl implements PlatformAPI {
             sessionAccessor.deleteSessionId();
 
             final long sessionId = createSessionAndMakeItActive(tenantId, sessionAccessor, sessionService);
-            final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, plaformConfiguration,
-                    platformAccessor.getTechnicalLoggerService(), workService);
+
+            TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
+
+            // final WorkService workService = platformAccessor.getWorkService();
+            final WorkService workService = tenantServiceAccessor.getWorkService();
+
+            final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService,
+                    platformAccessor.getTechnicalLoggerService(), workService, plaformConfiguration, tenantServiceAccessor.getTenantConfiguration());
             activateTenant.execute();
             sessionService.deleteSession(sessionId);
         } catch (final STenantActivationException stae) {
@@ -817,13 +850,13 @@ public class PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
-            final WorkService workService = platformAccessor.getWorkService();
+            // final WorkService workService = platformAccessor.getWorkService();
             final long sessionId = createSession(tenantId, sessionService);
 
             platformSessionId = sessionAccessor.getSessionId();
             sessionAccessor.deleteSessionId();
 
-            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService, workService, sessionService);
+            final TransactionContent transactionContent = new DeactivateTenant(tenantId, platformService, schedulerService);
             transactionContent.execute();
             sessionService.deleteSession(sessionId);
             sessionService.deleteSessionsOfTenant(tenantId);

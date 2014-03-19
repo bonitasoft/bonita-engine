@@ -32,7 +32,7 @@ public class SWorkException extends SBonitaException {
         super(t);
     }
 
-    public SWorkException(String message) {
+    public SWorkException(final String message) {
         super(message);
     }
 }

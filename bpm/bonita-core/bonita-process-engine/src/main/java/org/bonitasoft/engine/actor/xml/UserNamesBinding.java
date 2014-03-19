@@ -30,10 +30,12 @@ public class UserNamesBinding extends ElementBinding {
         userNames = new ArrayList<String>();
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("user".equals(name)) {
@@ -41,6 +43,7 @@ public class UserNamesBinding extends ElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

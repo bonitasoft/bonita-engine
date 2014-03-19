@@ -24,6 +24,7 @@ import org.bonitasoft.engine.actor.xml.GroupPathsBinding;
 import org.bonitasoft.engine.actor.xml.RoleNamesBinding;
 import org.bonitasoft.engine.actor.xml.UserNamesBinding;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.AuthenticationService;
@@ -542,6 +543,16 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public void destroy() {
         accessor.destroy();
+    }
+
+    @Override
+    public TenantConfiguration getTenantConfiguration() {
+        return getInstanceOf(TenantConfiguration.class);
+    }
+
+    @Override
+    public <T> T lookup(final String serviceName) {
+        throw new UnsupportedOperationException();
     }
 
 }

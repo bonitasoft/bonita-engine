@@ -168,19 +168,41 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    private org.quartz.Trigger getQuartzTrigger(final Trigger trigger, final String jobName, final String tenantId) {
+    org.quartz.Trigger getQuartzTrigger(final Trigger trigger, final String jobName, final String tenantId) {
         final TriggerBuilder<? extends org.quartz.Trigger> triggerBuilder;
         final TriggerBuilder<org.quartz.Trigger> base = TriggerBuilder.newTrigger().forJob(jobName, tenantId).withIdentity(trigger.getName(), tenantId)
                 .startNow();
         if (trigger instanceof CronTrigger) {
             final CronTrigger cronTrigger = (CronTrigger) trigger;
             final CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronTrigger.getExpression());
+            switch (cronTrigger.getMisfireHandlingPolicy()) {
+                case NONE:
+                    cronScheduleBuilder.withMisfireHandlingInstructionDoNothing();
+                    break;
+                case ALL:
+                    cronScheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
+                    break;
+                case ONE:
+                    cronScheduleBuilder.withMisfireHandlingInstructionFireAndProceed();
+                    break;
+            }
             triggerBuilder = base.withSchedule(cronScheduleBuilder).endAt(cronTrigger.getEndDate());
         } else if (trigger instanceof RepeatTrigger) {
             final RepeatTrigger repeatTrigger = (RepeatTrigger) trigger;
             final SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(repeatTrigger.getInterval())
-                    .withRepeatCount(repeatTrigger.getCount());
+                    .withRepeatCount(repeatTrigger.getCount()).withMisfireHandlingInstructionIgnoreMisfires();
             triggerBuilder = base.withSchedule(scheduleBuilder).startAt(repeatTrigger.getStartDate());
+            switch (repeatTrigger.getMisfireHandlingPolicy()) {
+                case NONE:
+                    scheduleBuilder.withMisfireHandlingInstructionNextWithRemainingCount();
+                    break;
+                case ALL:
+                    scheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
+                    break;
+                case ONE:
+                    scheduleBuilder.withMisfireHandlingInstructionNowWithRemainingCount();
+                    break;
+            }
         } else {
             triggerBuilder = base.startAt(trigger.getStartDate());
         }
@@ -271,59 +293,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             }
             scheduler.rescheduleJob(trigger.getKey(), quartzTrigger);
         } catch (final Exception e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void resume(final String jobName) throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final String tenantId = String.valueOf(getTenantIdFromSession());
-            scheduler.resumeJob(jobKey(jobName, tenantId));
-        } catch (final SchedulerException e) {
-            throw new SSchedulerException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void resumeJobs() throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final String tenantId = String.valueOf(getTenantIdFromSession());
-            final GroupMatcher<JobKey> jobGroupEquals = jobGroupEquals(tenantId);
-            scheduler.resumeJobs(jobGroupEquals);
-        } catch (final SchedulerException e) {
-            throw new SSchedulerException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void pause(final String jobName) throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final String tenantId = String.valueOf(getTenantIdFromSession());
-            scheduler.pauseJob(jobKey(jobName, tenantId));
-        } catch (final SchedulerException e) {
-            throw new SSchedulerException(e);
-        } catch (final STenantIdNotSetException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void pauseJobs() throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final String tenantId = String.valueOf(getTenantIdFromSession());
-            scheduler.pauseJobs(jobGroupEquals(tenantId));
-        } catch (final SchedulerException e) {
-            throw new SSchedulerException(e);
-        } catch (final STenantIdNotSetException e) {
             throw new SSchedulerException(e);
         }
     }
@@ -441,4 +410,23 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
+    public void pauseJobs(final long tenantId) throws SSchedulerException {
+        GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(tenantId));
+        try {
+            scheduler.pauseTriggers(groupEquals);
+        } catch (SchedulerException e) {
+            throw new SSchedulerException("Unable to put jobs of tenant " + tenantId + " in pause", e);
+        }
+    }
+
+    @Override
+    public void resumeJobs(final long tenantId) throws SSchedulerException {
+        GroupMatcher<TriggerKey> groupEquals = GroupMatcher.triggerGroupEquals(String.valueOf(tenantId));
+        try {
+            scheduler.resumeTriggers(groupEquals);
+        } catch (SchedulerException e) {
+            throw new SSchedulerException("Unable to put jobs of tenant " + tenantId + " in pause", e);
+        }
+    }
+    
 }
