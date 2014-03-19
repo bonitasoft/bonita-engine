@@ -17,6 +17,10 @@ public class DummySCustomUserInfoValue implements SCustomUserInfoValue {
 
     private String value = "";
 
+    public DummySCustomUserInfoValue(long definitionId) {
+        this(definitionId, "", 1L);
+    }
+
     public DummySCustomUserInfoValue(long definitionId, String value, long userId) {
         this.definitionId = definitionId;
         this.value = value;
