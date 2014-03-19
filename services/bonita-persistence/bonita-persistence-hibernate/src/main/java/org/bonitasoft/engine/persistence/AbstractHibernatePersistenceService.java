@@ -497,7 +497,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 clause.append(completeField).append(" != ").append(fieldValue);
                 break;
             case IN:
-                // TODO:write IN
+                clause.append(getInClause(completeField, filterOption));
                 break;
             case BETWEEN:
                 final Object from = filterOption.getFrom() instanceof String ? "'" + filterOption.getFrom() + "'" : filterOption.getFrom();
@@ -526,6 +526,23 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 break;
         }
         return completeField;
+    }
+    
+    private String getInClause(StringBuilder completeField, FilterOption filterOption) {
+        StringBuilder stb = new StringBuilder(completeField);
+        stb.append(" in (");
+        stb.append(getInValues(filterOption));
+        stb.append(")");
+        return stb.toString();
+    }
+
+    private String getInValues(FilterOption filterOption) {
+        StringBuilder stb = new StringBuilder();
+        for (Object element : filterOption.getIn()) {
+            stb.append(element + ",");
+        }
+        String inValues = stb.toString();
+        return inValues.substring(0, inValues.length() -1);
     }
 
     private <T> void appendOrderByClause(final StringBuilder builder, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
