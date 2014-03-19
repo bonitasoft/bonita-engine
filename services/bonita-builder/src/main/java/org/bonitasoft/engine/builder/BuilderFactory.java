@@ -59,7 +59,7 @@ public class BuilderFactory {
 
     private synchronized void cacheFactory(final String interfaceName, final String className) {
         try {
-            if (className.equals("null")) {
+            if (className == null || className.equals("null")) {
                 throw new Exception("Factory implementation of " + interfaceName + " is required.");
             }
             final Class<?> clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
