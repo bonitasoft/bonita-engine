@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -100,7 +100,10 @@ public class BDMCodeGenerator extends CodeGenerator {
 
     protected JFieldVar addBasicField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
         final JFieldVar fieldVar = addField(entityClass, field.getName(), toJavaType(field.getType()));
-        addAnnotation(fieldVar, Basic.class);
+        final JAnnotationUse columnAnnotation = addAnnotation(fieldVar, Column.class);
+        columnAnnotation.param("name", field.getName().toUpperCase());
+        final Boolean nullable = field.isNullable();
+        columnAnnotation.param("nullable", nullable == null || nullable);
         if (field.getType() == FieldType.DATE) {
             final JAnnotationUse temporalAnnotation = addAnnotation(fieldVar, Temporal.class);
             temporalAnnotation.param("value", TemporalType.TIMESTAMP);

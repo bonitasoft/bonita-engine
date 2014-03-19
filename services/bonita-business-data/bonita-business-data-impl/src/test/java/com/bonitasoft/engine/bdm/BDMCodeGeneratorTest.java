@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Map;
 
-import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -19,9 +21,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.sun.codemodel.JAnnotationUse;
+import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JFormatter;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 
@@ -79,7 +83,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
                 + "Employee.java");
         sourceFileToCompile.delete();
-        bdmCodeGenerator.getModel().build(destDir);
+        bdmCodeGenerator.generate(destDir);
         assertCompilationSuccessful(sourceFileToCompile);
     }
 
@@ -91,7 +95,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     }
 
     @Test
-    public void shouldAddBasicField_CreatePrimitiveAttribute_InDefinedClass() throws Exception {
+    public void shouldAddColumnField_CreatePrimitiveAttribute_InDefinedClass() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
         employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
         final Field nameField = new Field();
@@ -105,13 +109,26 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(nameFieldVar.type()).isEqualTo(bdmCodeGenerator.getModel().ref(String.class.getName()));
         assertThat(nameFieldVar.annotations()).hasSize(1);
         final JAnnotationUse annotationUse = nameFieldVar.annotations().iterator().next();
-        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Basic.class.getName());
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
+
+        final String name = getAnnotationParamValue(annotationUse, "name");
+        assertThat(name).isNotNull().isEqualTo("NAME");
+        final String nullable = getAnnotationParamValue(annotationUse, "nullable");
+        assertThat(nullable).isNotNull().isEqualTo("true");
 
         final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
                 + "Employee.java");
         sourceFileToCompile.delete();
-        bdmCodeGenerator.getModel().build(destDir);
+        bdmCodeGenerator.generate(destDir);
         assertCompilationSuccessful(sourceFileToCompile);
+    }
+
+    private String getAnnotationParamValue(final JAnnotationUse annotationUse, final String paramName) {
+        final Map<String, JAnnotationValue> annotationParams = annotationUse.getAnnotationMembers();
+        final JAnnotationValue nullableValue = annotationParams.get(paramName);
+        final StringWriter writer = new StringWriter();
+        nullableValue.generate(new JFormatter(writer));
+        return writer.toString().replace("\"", "");
     }
 
     @Test
@@ -121,6 +138,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final Field nameField = new Field();
         nameField.setName("name");
         nameField.setType(FieldType.DATE);
+        nameField.setNullable(Boolean.FALSE);
         final JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
         bdmCodeGenerator.addBasicField(definedClass, nameField);
 
@@ -130,16 +148,23 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(nameFieldVar.annotations()).hasSize(2);
         final Iterator<JAnnotationUse> iterator = nameFieldVar.annotations().iterator();
         JAnnotationUse annotationUse = iterator.next();
-        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Basic.class.getName());
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
+
+        final String name = getAnnotationParamValue(annotationUse, "name");
+        assertThat(name).isNotNull().isEqualTo("NAME");
+        final String nullable = getAnnotationParamValue(annotationUse, "nullable");
+        assertThat(nullable).isNotNull().isEqualTo("false");
+
         annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Temporal.class.getName());
         assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
-        assertThat(annotationUse.getAnnotationMembers().get("value")).isNotNull();
+        final String value = getAnnotationParamValue(annotationUse, "value");
+        assertThat(value).isNotNull().isEqualTo("javax.persistence.TemporalType.TIMESTAMP");
 
         final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
                 + "Employee.java");
         sourceFileToCompile.delete();
-        bdmCodeGenerator.getModel().build(destDir);
+        bdmCodeGenerator.generate(destDir);
         assertCompilationSuccessful(sourceFileToCompile);
     }
 
@@ -165,7 +190,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
                 + "Employee.java");
         sourceFileToCompile.delete();
-        bdmCodeGenerator.getModel().build(destDir);
+        bdmCodeGenerator.generate(destDir);
         assertCompilationSuccessful(sourceFileToCompile);
     }
 
@@ -224,7 +249,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
                 + "Employee.java");
         sourceFileToCompile.delete();
-        bdmCodeGenerator.getModel().build(destDir);
+        bdmCodeGenerator.generate(destDir);
         assertCompilationSuccessful(sourceFileToCompile);
     }
 
@@ -246,7 +271,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
                 + "Employee.java");
         sourceFileToCompile.delete();
-        bdmCodeGenerator.getModel().build(destDir);
+        bdmCodeGenerator.generate(destDir);
         assertCompilationSuccessful(sourceFileToCompile);
     }
 

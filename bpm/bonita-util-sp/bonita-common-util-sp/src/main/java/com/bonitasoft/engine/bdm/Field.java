@@ -11,25 +11,26 @@ package com.bonitasoft.engine.bdm;
 import javax.lang.model.SourceVersion;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "name", "type" })
 public class Field {
 
     public static final String PERSISTENCE_ID = "persistenceId";
 
     public static final String PERSISTENCE_VERSION = "persistenceVersion";
 
-    @XmlElement(required = true)
+    @XmlAttribute(required = true)
     private String name;
 
-    @XmlElement(required = true)
+    @XmlAttribute(required = true)
     private FieldType type;
+
+    @XmlAttribute
+    private Boolean nullable;
 
     public String getName() {
         return name;
@@ -54,11 +55,20 @@ public class Field {
         this.type = type;
     }
 
+    public Boolean isNullable() {
+        return nullable;
+    }
+
+    public void setNullable(final Boolean nullable) {
+        this.nullable = nullable;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (nullable ? 1231 : 1237);
         result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
@@ -80,6 +90,9 @@ public class Field {
                 return false;
             }
         } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (nullable != other.nullable) {
             return false;
         }
         if (type != other.type) {

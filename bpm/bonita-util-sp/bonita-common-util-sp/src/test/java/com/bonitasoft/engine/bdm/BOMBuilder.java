@@ -11,8 +11,10 @@ public class BOMBuilder {
 
     private BusinessObject buildMyBusinessObject() {
         final Field stringField = buildField("stringField", FieldType.STRING);
+        stringField.setNullable(Boolean.TRUE);
         final Field booleanField = buildField("booleanField", FieldType.BOOLEAN);
         final Field dateField = buildField("dateField", FieldType.DATE);
+        dateField.setNullable(Boolean.FALSE);
         final Field doubleField = buildField("doubleField", FieldType.DOUBLE);
         final Field integerField = buildField("integerField", FieldType.INTEGER);
 

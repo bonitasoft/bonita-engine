@@ -29,10 +29,10 @@
   </xs:complexType>
 
   <xs:complexType name="field">
-    <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
-      <xs:element name="type" type="fieldType"/>
-    </xs:sequence>
+    <xs:sequence/>
+    <xs:attribute name="nullable" type="xs:boolean" />
+    <xs:attribute name="type" type="fieldType" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
 
   <xs:simpleType name="fieldType">

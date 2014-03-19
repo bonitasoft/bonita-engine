@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
@@ -59,6 +60,7 @@ public class BDRIT extends CommonAPISPTest {
         final Field lastName = new Field();
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);
+        lastName.setNullable(Boolean.FALSE);
 
         final BusinessObject employee = new BusinessObject();
         employee.setQualifiedName(EMPLOYEE_QUALIF_CLASSNAME);
@@ -319,6 +321,24 @@ public class BDRIT extends CommonAPISPTest {
         } finally {
             disableAndDeleteProcess(processDefinition);
             deleteUser(user);
+        }
+    }
+
+    @Test(expected = BonitaRuntimeException.class)
+    public void createAnEmployeeWithArequiredFieldAtNullThrowsAnException() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
+                "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        try {
+            getProcessAPI().startProcess(definition.getId());
+        } finally {
+            disableAndDeleteProcess(definition.getId());
         }
     }
 

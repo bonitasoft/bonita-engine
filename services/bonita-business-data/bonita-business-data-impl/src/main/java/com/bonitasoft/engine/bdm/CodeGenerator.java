@@ -10,6 +10,7 @@ package com.bonitasoft.engine.bdm;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -32,6 +33,7 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
+import com.sun.tools.xjc.util.NullStream;
 
 /**
  * @author Romain Bioteau
@@ -51,7 +53,12 @@ public class CodeGenerator {
     }
 
     public void generate(final File destDir) throws IOException, JClassAlreadyExistsException {
-        model.build(destDir);
+        final PrintStream stream = new PrintStream(new NullStream());
+        try {
+            model.build(destDir, stream);
+        } finally {
+            stream.close();
+        }
     }
 
     public JDefinedClass addClass(final String fullyqualifiedName) throws JClassAlreadyExistsException {
