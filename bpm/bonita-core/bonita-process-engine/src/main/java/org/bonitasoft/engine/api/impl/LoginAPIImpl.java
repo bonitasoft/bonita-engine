@@ -26,6 +26,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
@@ -61,6 +62,8 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         try {
             return login(userName, password, null);
         } catch (final LoginException e) {
+            throw e;
+        } catch (final BonitaRuntimeException e) {
             throw e;
         } catch (final Exception e) {
             throw new LoginException(e);
