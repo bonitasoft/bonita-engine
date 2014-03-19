@@ -18,8 +18,6 @@ package org.bonitasoft.engine.identity.model.builder;
  */
 public interface SCustomUserInfoValueUpdateBuilder extends SIdentityUpdateBuilder {
 
-    SCustomUserInfoValueUpdateBuilder updateMetadaName(final String metadataName);
-
     SCustomUserInfoValueUpdateBuilder updateValue(final String value);
 
 }

@@ -26,4 +26,7 @@ public class SCustomUserInfoValueNotFoundException extends SIdentityException {
         super("No custom user info value found with id '" + id  + "'");
     }
 
+    public SCustomUserInfoValueNotFoundException(long definitionId, long userId) {
+        super("No custom user info value found with definition id '" + definitionId + "' and user id '" + userId +"'");
+    }
 }

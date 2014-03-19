@@ -206,7 +206,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void createCustomUserInfoValue(final SCustomUserInfoValue customUserInfo) throws SIdentityException {
+    public SCustomUserInfoValue createCustomUserInfoValue(final SCustomUserInfoValue customUserInfo) throws SIdentityException {
         final String methodName = "createCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {
@@ -214,6 +214,7 @@ public class IdentityServiceImpl implements IdentityService {
             final SInsertEvent insertEvent = getInsertEvent(customUserInfo, CUSTOM_USER_INFO_VALUE);
             recorder.recordInsert(insertRecord, insertEvent);
             logAfterMethod(methodName);
+            return customUserInfo;
         } catch (final SRecorderException e) {
             logOnExceptionMethod(methodName, e);
             throw new SIdentityException("Can't add custom user info value " + customUserInfo, e);

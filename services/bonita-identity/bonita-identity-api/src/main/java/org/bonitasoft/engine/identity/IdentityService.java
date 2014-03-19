@@ -791,11 +791,12 @@ public interface IdentityService {
     /**
      * Create profileMetadataValue in DB for give profileMetadataValue object
      * 
+     *
      * @param customUserInfo
      *            A profileMetadataValue object
      * @throws SIdentityException
      */
-    void createCustomUserInfoValue(SCustomUserInfoValue customUserInfo) throws SIdentityException;
+    SCustomUserInfoValue createCustomUserInfoValue(SCustomUserInfoValue customUserInfo) throws SIdentityException;
 
     /**
      * Update profileMetadataValue according to the descriptor
