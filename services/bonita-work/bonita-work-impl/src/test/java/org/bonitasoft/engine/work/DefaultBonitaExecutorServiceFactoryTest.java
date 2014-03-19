@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.work;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
@@ -14,8 +14,7 @@ public class DefaultBonitaExecutorServiceFactoryTest {
     @Test
     public void ThreadNameInExecutorServiceShouldContainsTenantId() throws Exception {
         long tenantId = 999;
-        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(tenantId, 1,
-                20, 15, 10);
+        DefaultBonitaExecutorServiceFactory defaultBonitaExecutorServiceFactory = new DefaultBonitaExecutorServiceFactory(tenantId, 1, 20, 15, 10);
 
         Pair<ExecutorService, Queue<Runnable>> createExecutorService = defaultBonitaExecutorServiceFactory.createExecutorService();
         Runnable r = new Runnable() {
