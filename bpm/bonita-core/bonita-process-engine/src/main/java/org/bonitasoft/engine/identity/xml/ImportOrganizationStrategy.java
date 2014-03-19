@@ -39,6 +39,6 @@ public interface ImportOrganizationStrategy {
 
     void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) throws ImportDuplicateInOrganizationException, SIdentityException;
 
-    void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition, CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException;
+    void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition, CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException, SIdentityException;
 
 }

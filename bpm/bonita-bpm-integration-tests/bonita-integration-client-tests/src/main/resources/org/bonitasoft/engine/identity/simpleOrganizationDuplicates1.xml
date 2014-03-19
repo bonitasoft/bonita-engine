@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <organization:Organization xmlns:organization="http://www.bonitasoft.org/ns/organization/6.0.0-beta-016">
+	<customUserInfoDefinitions>
+		<customUserInfoDefinition>
+			<name>Office location</name>
+		</customUserInfoDefinition>
+		<customUserInfoDefinition>
+			<name>Skills</name>
+			<description>The user skills</description>
+		</customUserInfoDefinition>
+	</customUserInfoDefinitions>
   <users>
     <user userName="anthony.birembault">
       <password encrypted="false">bpm</password>

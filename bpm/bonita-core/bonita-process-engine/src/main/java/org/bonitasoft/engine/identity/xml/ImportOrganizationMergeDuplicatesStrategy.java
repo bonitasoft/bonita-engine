@@ -34,6 +34,8 @@ import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoUpdateBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilder;
+import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SGroupUpdateBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SRoleUpdateBuilder;
@@ -203,9 +205,17 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
 
     @Override
     public void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition,
-            CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException {
-        // TODO Auto-generated method stub
-        
+            CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException, SIdentityException {
+        //only description is updated as it only matches if they have the same name
+        EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(newUserInfoDefinition.getDescription());
+        identityService.updateCustomUserInfoDefinition(existingUserInfoDefinition, updateDescriptor);
+    }
+    
+    private EntityUpdateDescriptor getUpdateDescriptor(String newDescription) {
+        SCustomUserInfoDefinitionUpdateBuilder builder = BuilderFactory.get(SCustomUserInfoDefinitionUpdateBuilderFactory.class).createNewInstance();
+        builder.updateDescription(newDescription);
+        EntityUpdateDescriptor updateDescriptor = builder.done();
+        return updateDescriptor;
     }
 
 }
