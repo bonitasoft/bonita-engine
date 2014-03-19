@@ -99,12 +99,12 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SCustomUserInfoValueImpl" table="c_user_info_val">
+	<class name="SCustomUserInfoValueImpl" table="custom_usr_inf_val">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
 			<key-property name="tenantId" column="tenantid" type="long" />
 			<key-property name="id" column="ID" type="long" />
 		</composite-id>
-		<property name="definitionId" type="long" column="name" />
+		<property name="definitionId" type="long" column="definitionId" />
 		<property name="userId" type="long" column="userId" />
 		<property name="value" type="java.lang.String" column="value" />
 		<filter name="tenantFilter" />

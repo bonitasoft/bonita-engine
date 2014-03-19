@@ -102,11 +102,13 @@ CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (name)
 GO
 
 CREATE TABLE custom_usr_inf_val (
+  id NUMERIC(19, 0) NOT NULL,
   tenantid NUMERIC(19, 0) NOT NULL,
   definitionId NUMERIC(19, 0) NOT NULL,
   userId NUMERIC(19, 0) NOT NULL,
   value NVARCHAR(255),
-  PRIMARY KEY (tenantid, definitionId, userId)
+  UNIQUE (tenantid, definitionId, userId),
+  PRIMARY KEY (tenantid, id)
 )
 GO
 ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_user_id FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE

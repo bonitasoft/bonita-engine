@@ -92,11 +92,13 @@ CREATE TABLE custom_usr_inf_def (
 CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (name);
 
 CREATE TABLE custom_usr_inf_val (
+  id BIGINT NOT NULL,
   tenantid BIGINT NOT NULL,
   definitionId BIGINT NOT NULL,
   userId BIGINT NOT NULL,
   value VARCHAR(255),
-  PRIMARY KEY (tenantid, definitionId, userId)
+  UNIQUE (tenantid, definitionId, userId),
+  PRIMARY KEY (tenantid, id)
 );
 ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_user_id FOREIGN KEY (tenantid, userId) REFERENCES user_ (tenantid, id) ON DELETE CASCADE;
 ALTER TABLE custom_usr_inf_val ADD CONSTRAINT fk_definition_id FOREIGN KEY (tenantid, definitionId) REFERENCES custom_usr_inf_def (tenantid, id) ON DELETE CASCADE;
