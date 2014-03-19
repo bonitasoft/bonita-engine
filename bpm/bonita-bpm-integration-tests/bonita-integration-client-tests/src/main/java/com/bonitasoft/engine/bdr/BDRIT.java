@@ -93,7 +93,7 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
+    @Ignore
     public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException, IOException {
 
         final Expression stringExpression = new ExpressionBuilder().createGroovyScriptExpression("alive",
@@ -163,20 +163,18 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
+    @Ignore
     public void deployABDRAndCreateAndUdpateABusinessData() throws Exception {
-        final Expression employeeExpression = new ExpressionBuilder()
-                .createGroovyScriptExpression("createNewEmployee",
-                        "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;",
-                        "org.bonita.pojo.Employee");
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
-        final Expression getEmployeeExpression = new ExpressionBuilder().createBusinessDataExpression("myEmployee", "org.bonita.pojo.Employee");
+        final Expression getEmployeeExpression = new ExpressionBuilder().createBusinessDataExpression("myEmployee", EMPLOYEE_QUALIF_CLASSNAME);
 
         final Expression scriptExpression = new ExpressionBuilder().createGroovyScriptExpression("updateBizData", "myEmployee.lastName = 'BPM'; return 'BPM'",
                 String.class.getName(), getEmployeeExpression);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
-        processDefinitionBuilder.addBusinessData("myEmployee", "org.bonita.pojo.Employee", employeeExpression);
+        processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addDisplayDescription(scriptExpression);
 
@@ -282,7 +280,7 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore("Disabled until we support undeploy of a bdr, otherwise the following tests fail")
+    @Ignore
     public void updateBusinessDataOutsideATransaction() throws Exception {
         final String taskName = "step";
 
@@ -305,7 +303,6 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test(expected = ProcessEnablementException.class)
-    @Ignore("the deployment is not valid due to the new check of business data")
     public void deployProcessWithBusinessDataShouldBeRetrievable() throws Exception {
         final User user = createUser("login1", "password");
         ProcessDefinition processDefinition = null;
@@ -314,7 +311,9 @@ public class BDRIT extends CommonAPISPTest {
             processBuilder.addActor("myActor");
             processBuilder.addBusinessData("myBizData", Long.class.getName(), new ExpressionBuilder().createConstantLongExpression(12L));
             processBuilder.addUserTask("Request", "myActor");
-            processDefinition = deployAndEnableWithActor(processBuilder.done(), "myActor", user);
+            processDefinition = getProcessAPI().deploy(processBuilder.done());
+            addUserToFirstActorOfProcess(user.getId(), processDefinition);
+            getProcessAPI().enableProcess(processDefinition.getId());
             // Should not fail here, if the Server process model is valid:
         } finally {
             disableAndDeleteProcess(processDefinition);
