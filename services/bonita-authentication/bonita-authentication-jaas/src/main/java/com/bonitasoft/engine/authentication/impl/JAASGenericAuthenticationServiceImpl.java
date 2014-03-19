@@ -100,6 +100,9 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
         try {
             return new LoginContext(getLoginContext(), authenticationCallbackHandler);
         } catch (final Exception e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(JAASGenericAuthenticationServiceImpl.class, TechnicalLogSeverity.WARNING, "error on context creation :" + e);
+            }
             throw new AuthenticationException(e);
         }
     }

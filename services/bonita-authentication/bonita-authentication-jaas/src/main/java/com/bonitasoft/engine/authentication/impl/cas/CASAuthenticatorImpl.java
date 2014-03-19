@@ -5,12 +5,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -63,7 +63,6 @@ import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.authentication.impl.AuthenticatorDelegate;
 
-
 /**
  * delegate the CAS authentication to a CAS Server
  * 
@@ -97,9 +96,18 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * login to a service with a CAS authentication
      */
     protected Map<String, Serializable> loginToServiceViaCAS(Map<String, Serializable> credentials) {
+        String username;
+        String password;
         try {
-            String username = retrieveUsernameFromCredentials(credentials);
-            String password = retrievePasswordFromCredentials(credentials);
+            username = retrieveUsernameFromCredentials(credentials);
+            password = retrievePasswordFromCredentials(credentials);
+        } catch (LoginException e) {
+            logger.log(CASAuthenticatorImpl.class, TechnicalLogSeverity.WARNING,
+                    "impossible to attempt to login to {casServerUrlPrefix:" + this.getCasServerUrl() + " | casServiceUrl:" + this.getCasService()
+                            + "} due to following exception : " + e);
+            return credentials;
+        }
+        try {
             DefaultHttpClient hc = createDefaultHttpClient();
             String content = retrieveCASLoginPage(hc);
             Document document = createDOMDocumentFromResponse(content);
@@ -117,10 +125,13 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
                 credentialResult.put(AuthenticationConstants.BASIC_TENANT_ID, credentials.get(AuthenticationConstants.BASIC_TENANT_ID));
                 return credentialResult;
             } else {
-                logger.log(CASAuthenticatorImpl.class, TechnicalLogSeverity.WARNING, "impossible to login");
+                logger.log(CASAuthenticatorImpl.class, TechnicalLogSeverity.WARNING,
+                        "impossible to login to {casServerUrlPrefix:" + this.getCasServerUrl() + " | casServiceUrl:" + this.getCasService() + "}");
             }
         } catch (Exception e) {
-            logger.log(CASAuthenticatorImpl.class, TechnicalLogSeverity.WARNING, "impossible to login due to following exception : ", e);
+            logger.log(CASAuthenticatorImpl.class, TechnicalLogSeverity.WARNING,
+                    "impossible to login to {casServerUrlPrefix:" + this.getCasServerUrl() + " | casServiceUrl:" + this.getCasService()
+                            + "} due to following exception : ", e);
         }
         return credentials;
 
