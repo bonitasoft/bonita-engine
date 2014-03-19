@@ -13,6 +13,8 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.work.BonitaExecutorServiceFactory;
 import org.bonitasoft.engine.work.WorkerThreadFactory;
 
@@ -37,7 +39,12 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
 
     private final long keepAliveTimeSeconds;
 
-    public ClusteredLocalQueueBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
+    private final TechnicalLoggerService logger;
+
+    public ClusteredLocalQueueBonitaExecutorServiceFactory(final TechnicalLoggerService logger, final int corePoolSize,
+            final int maximumPoolSize,
+            final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
+        this.logger = logger;
         this.hazelcastInstance = hazelcastInstance;
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
@@ -61,8 +68,15 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
 
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
-            throw new RejectedExecutionException("Unable to run the task " + task
-                    + ".\n Your work queue is full, you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
+            if (executor.isShutdown()) {
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to run work " + task
+                        + " but the work service is shutdown. work will be restarted with the node");
+            } else {
+                throw new RejectedExecutionException(
+                        "Unable to run the task "
+                                + task
+                                + ".\n Your work queue is full, you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
+            }
         }
 
     }
