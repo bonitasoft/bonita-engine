@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
@@ -25,6 +26,7 @@ import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.RoleCreator.RoleField;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SContactInfo;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -197,6 +199,13 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
         userUpdateBuilder.updateUserName(user.getUserName());
         userUpdateBuilder.updateEnabled(user.isEnabled());
         return userUpdateBuilder.done();
+    }
+
+    @Override
+    public void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition,
+            CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException {
+        // TODO Auto-generated method stub
+        
     }
 
 }

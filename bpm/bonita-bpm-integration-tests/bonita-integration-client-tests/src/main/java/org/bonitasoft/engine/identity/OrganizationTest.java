@@ -57,7 +57,6 @@ public class OrganizationTest extends CommonAPITest {
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "Number of users" }, jira = "")
     @Test
     public void importOrganization() throws Exception {
-        // create XML file
         final String userName = "anthony.birembault";
         final String jobTitle = "Web Team Manager";
         final String roleName = "Manager";
@@ -70,6 +69,8 @@ public class OrganizationTest extends CommonAPITest {
         final String groupName1 = "Engine";
 
         importOrganization("simpleOrganization.xml");
+        checkCustomUserInfoDefinitons();
+        
         final User persistedUser = getIdentityAPI().getUserByUserName(userName);
         assertEquals(jobTitle, persistedUser.getJobTitle());
         // check createdBy for user
@@ -101,6 +102,18 @@ public class OrganizationTest extends CommonAPITest {
 
         // clean-up
         getIdentityAPI().deleteOrganization();
+    }
+
+    private void checkCustomUserInfoDefinitons() {
+        List<CustomUserInfoDefinition> customUserInfoDefinitions = getIdentityAPI().getCustomUserInfoDefinitions(0, 10);
+        assertThat(customUserInfoDefinitions.size()).isEqualTo(2);
+        checkCustomUserInfoDefinition("Office location", null, customUserInfoDefinitions.get(0));
+        checkCustomUserInfoDefinition("Skills", "The user skills", customUserInfoDefinitions.get(1));
+    }
+
+    private void checkCustomUserInfoDefinition(String expectedName, String expectedDescription, CustomUserInfoDefinition customUserInfoDefinition) {
+        assertThat(customUserInfoDefinition.getName()).isEqualTo(expectedName);
+        assertThat(customUserInfoDefinition.getDescription()).isEqualTo(expectedDescription);
     }
 
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Import", "UserMembership", "Deleted" }, jira = "ENGINE-1363")
@@ -408,9 +421,12 @@ public class OrganizationTest extends CommonAPITest {
         final GroupCreator groupCreator2 = new GroupCreator("Web");
         groupCreator2.setDisplayName("web team");
         final Group persistedGroup2 = getIdentityAPI().createGroup(groupCreator2);
+        
 
         getIdentityAPI().addUserMembership(persistedUser1.getId(), persistedGroup1.getId(), persistedRole1.getId());
         getIdentityAPI().addUserMembership(persistedUser2.getId(), persistedGroup2.getId(), persistedRole2.getId());
+
+        CustomUserInfoDefinition userInfoDefinition = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator("ToDelete"));
 
         assertEquals(1, getIdentityAPI().getNumberOfUserMemberships(persistedUser1.getId()));
         assertEquals(2, getIdentityAPI().getNumberOfGroups());
@@ -431,6 +447,7 @@ public class OrganizationTest extends CommonAPITest {
         assertEquals(0, getIdentityAPI().getNumberOfUsers());
         assertEquals(0, getIdentityAPI().getNumberOfRoles());
         assertEquals(0, getIdentityAPI().getNumberOfUserMemberships(persistedUser1.getId()));
+        assertThat(getIdentityAPI().getCustomUserInfoDefinitions(0, 10)).isEmpty();
 
         // reload the process deploy info:
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());

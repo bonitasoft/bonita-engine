@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.engine.identity.xml;
 
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.RoleCreator;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -44,6 +46,11 @@ public class ImportOrganizationIgnoreDuplicatesStrategy implements ImportOrganiz
 
     @Override
     public void foundExistingMembership(final SUserMembership existingMembership) {
+    }
+
+    @Override
+    public void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition,
+            CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException {
     }
 
 }

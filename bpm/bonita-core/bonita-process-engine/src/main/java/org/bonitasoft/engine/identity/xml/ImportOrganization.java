@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
@@ -71,8 +72,11 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
 
     private final ImportOrganizationStrategy strategy;
 
+    private TenantServiceAccessor serviceAccessor;
+
     public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent, final ImportPolicy policy)
             throws OrganizationImportException {
+        this.serviceAccessor = serviceAccessor;
         identityService = serviceAccessor.getIdentityService();
         this.organizationContent = organizationContent;
         parser = serviceAccessor.getParserFactgory().createParser(OrganizationNodeBuilder.BINDINGS);
@@ -108,6 +112,9 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             final List<RoleCreator> roles = organization.getRoleCreators();
             final List<GroupCreator> groups = organization.getGroupCreators();
             final List<UserMembership> memberships = organization.getMemberships();
+            
+            //custom user info definitions
+            importCustomUserInfoDefinition(organization.getCustomUserInfoDefinitionCreators());
 
             // Users
             final Map<String, SUser> userNameToSUsers = importUsers(users);
@@ -126,6 +133,11 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         } catch (final Exception e) {
             throw new ImportDuplicateInOrganizationException(e);
         }
+    }
+
+    private void importCustomUserInfoDefinition(List<CustomUserInfoDefinitionCreator> customUserInfoDefinitionCreators) throws SIdentityException, ImportDuplicateInOrganizationException {
+        CustomUserInfoDefinitionImporter importer = new CustomUserInfoDefinitionImporter(serviceAccessor, strategy);
+        importer.importCustomUserInfoDefinitions(customUserInfoDefinitionCreators);
     }
 
     private void importMemberships(final List<UserMembership> memberships, final Map<String, SUser> userNameToSUsers, final Map<String, Long> roleNameToIdMap,

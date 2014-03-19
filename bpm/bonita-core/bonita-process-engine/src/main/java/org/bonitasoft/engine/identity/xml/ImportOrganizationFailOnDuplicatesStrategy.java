@@ -13,9 +13,11 @@
  **/
 package org.bonitasoft.engine.identity.xml;
 
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.RoleCreator;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -50,6 +52,12 @@ public class ImportOrganizationFailOnDuplicatesStrategy implements ImportOrganiz
     public void foundExistingMembership(final SUserMembership existingMembership) throws ImportDuplicateInOrganizationException {
         throw new ImportDuplicateInOrganizationException("There's already a user membership with the name : " + existingMembership.getUsername()
                 + ", the role : " + existingMembership.getRoleName() + "and the group : " + existingMembership.getGroupName());
+    }
+
+    @Override
+    public void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition,
+            CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException {
+        throw new ImportDuplicateInOrganizationException("There's already a custom user info definition with the name : '" + newUserInfoDefinition.getName() + "'");
     }
 
 }

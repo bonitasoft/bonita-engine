@@ -31,7 +31,7 @@ public interface OrganizationAPI {
     /**
      * Deletes the organization.
      * <b>
-     * It deletes all user memberships, roles, groups and users.
+     * It deletes all user memberships, roles, groups, users and custom user info.
      * </b>
      * 
      * @throws DeletionException

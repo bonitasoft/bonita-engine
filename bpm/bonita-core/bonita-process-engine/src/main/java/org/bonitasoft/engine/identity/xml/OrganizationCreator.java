@@ -15,11 +15,11 @@ package org.bonitasoft.engine.identity.xml;
 
 import java.util.List;
 
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 
 /**
  * @author Baptiste Mesta
@@ -28,7 +28,7 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
  */
 public class OrganizationCreator {
 
-    private final List<SCustomUserInfoDefinition> customUserInfoDefinitions;
+    private final List<CustomUserInfoDefinitionCreator> customUserInfoDefinitionCreators;
     
     private final List<ExportedUser> users;
 
@@ -39,16 +39,16 @@ public class OrganizationCreator {
     private final List<UserMembership> memberships;
 
     public OrganizationCreator(final List<ExportedUser> users, final List<RoleCreator> roles, final List<GroupCreator> groups, final List<UserMembership> memberships,
-            List<SCustomUserInfoDefinition> customUserInfoDefinitions) {
+            List<CustomUserInfoDefinitionCreator> customUserInfoDefinitionCreators) {
         this.users = users;
         this.roles = roles;
         this.groups = groups;
         this.memberships = memberships;
-        this.customUserInfoDefinitions = customUserInfoDefinitions;
+        this.customUserInfoDefinitionCreators = customUserInfoDefinitionCreators;
     }
     
-    public List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions() {
-        return customUserInfoDefinitions;
+    public List<CustomUserInfoDefinitionCreator> getCustomUserInfoDefinitionCreators() {
+        return customUserInfoDefinitionCreators;
     }
 
     public List<ExportedUser> getUsers() {

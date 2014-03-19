@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.UserMembership;
-import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
@@ -31,13 +31,13 @@ import org.bonitasoft.engine.xml.ElementBinding;
  */
 public class OrganizationBinding extends ElementBinding {
     
-    private final List<SCustomUserInfoDefinition> customUserInfoDefinitions = new ArrayList<SCustomUserInfoDefinition>();
+    private final List<CustomUserInfoDefinitionCreator> customUserInfoDefinitionCreators = new ArrayList<CustomUserInfoDefinitionCreator>();
 
     private final List<ExportedUser> users = new ArrayList<ExportedUser>();
 
-    private final List<RoleCreator> roles = new ArrayList<RoleCreator>();
+    private final List<RoleCreator> roleCreators = new ArrayList<RoleCreator>();
 
-    private final List<GroupCreator> groups = new ArrayList<GroupCreator>();
+    private final List<GroupCreator> groupCreators = new ArrayList<GroupCreator>();
 
     private final List<UserMembership> memberships = new ArrayList<UserMembership>();
 
@@ -52,13 +52,13 @@ public class OrganizationBinding extends ElementBinding {
     @Override
     public void setChildObject(final String name, final Object value) {
         if (OrganizationMappingConstants.CUSTOM_USER_INFO_DEFINITION.equals(name)) {
-            customUserInfoDefinitions.add((SCustomUserInfoDefinition) value);
+            customUserInfoDefinitionCreators.add((CustomUserInfoDefinitionCreator) value);
         } else if (OrganizationMappingConstants.USER.equals(name)) {
             users.add((ExportedUser) value);
         } else if (OrganizationMappingConstants.ROLE.equals(name)) {
-            roles.add((RoleCreator) value);
+            roleCreators.add((RoleCreator) value);
         } else if (OrganizationMappingConstants.GROUP.equals(name)) {
-            groups.add((GroupCreator) value);
+            groupCreators.add((GroupCreator) value);
         } else if (OrganizationMappingConstants.MEMBERSHIP.equals(name)) {
             memberships.add((UserMembership) value);
         }
@@ -66,7 +66,7 @@ public class OrganizationBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        return new OrganizationCreator(users, roles, groups, memberships, customUserInfoDefinitions);
+        return new OrganizationCreator(users, roleCreators, groupCreators, memberships, customUserInfoDefinitionCreators);
     }
 
     @Override
