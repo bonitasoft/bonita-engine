@@ -108,7 +108,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             if (message == null || message.isEmpty()) {
                 message = "No message";
             }
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getClass().getName() + " : " + message);
+            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getClass().getName() + " : \"" + message + "\"");
         }
     }
 
