@@ -12,16 +12,15 @@ public class BonitaClassLoaderTest {
 
     @Test
     public void releaseShouldRemoveAllScopeFolderAndItsContent() throws Exception {
-        Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
+        final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("myJar.jar", "Salut le monde".getBytes());
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "BonitaClassLoaderTest");
-        BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.getPath(), BonitaClassLoader.class.getClassLoader());
+        final File tempDir = new File(System.getProperty("java.io.tmpdir"), "BonitaClassLoaderTest");
+        final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.getPath(), BonitaClassLoader.class.getClassLoader());
 
         bonitaClassLoader.release();
 
         assertThat(tempDir).doesNotExist();
 
-        bonitaClassLoader.close();
     }
 
 }
