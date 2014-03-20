@@ -20,14 +20,14 @@ public class DummySCustomUserInfoValue implements SCustomUserInfoValue {
     private String value = "";
 
     public DummySCustomUserInfoValue(long id) {
-        this(1L, "", 1L);
-        this.id = id;
+        this(id, 1L, 1L, "");
     }
 
-    public DummySCustomUserInfoValue(long definitionId, String value, long userId) {
+    public DummySCustomUserInfoValue(long id, long definitionId, long userId, String value) {
+        this.id = id;
         this.definitionId = definitionId;
-        this.value = value;
         this.userId = userId;
+        this.value = value;
     }
 
     @Override

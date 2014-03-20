@@ -65,8 +65,8 @@ public class CustomUserInfoAPITest {
                 new DummySCustomUserInfoDefinition(2L, "definition 2", "", "")));
         given(service.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(1L, Arrays.asList(1L, 2L)))))
                 .willReturn(Arrays.<SCustomUserInfoValue>asList(
-                        new DummySCustomUserInfoValue(1L, "value 1", 1L),
-                        new DummySCustomUserInfoValue(2L, "value 2", 1L)));
+                        new DummySCustomUserInfoValue(1L, 1L, 1L, "value 1"),
+                        new DummySCustomUserInfoValue(2L, 2L, 1L, "value 2")));
 
         List<CustomUserInfo> result = api.list(1L, 0, 2);
 

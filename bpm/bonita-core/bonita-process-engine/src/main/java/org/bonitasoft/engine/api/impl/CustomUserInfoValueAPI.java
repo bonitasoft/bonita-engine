@@ -62,9 +62,7 @@ public class CustomUserInfoValueAPI {
 
     public CustomUserInfoValue update(SCustomUserInfoValueUpdateBuilderFactory factory,
             SCustomUserInfoValue value, CustomUserInfoValueUpdater updater) throws UpdateException, SCustomUserInfoValueNotFoundException {
-        if (updater == null) {
-            throw new UpdateException("The update descriptor does not contains field updates");
-        }
+        assertNoNull("Cannot update a value based on null parameters", factory, value, updater);
         try {
             service.updateCustomUserInfoValue(value, factory.createNewInstance()
                     .updateValue(updater.getValue())
@@ -74,6 +72,14 @@ public class CustomUserInfoValueAPI {
             throw nfe;
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
+        }
+    }
+
+    private void assertNoNull(String message, Object... objects) throws UpdateException {
+        for (Object object : objects) {
+            if (object == null) {
+                throw new UpdateException(message);
+            }
         }
     }
 

@@ -29,7 +29,7 @@ public class CustomUserInfoConverterTest {
         CustomUserInfoConverter converter = new CustomUserInfoConverter();
 
         CustomUserInfoValue value = converter.convert(
-                new DummySCustomUserInfoValue(2L, "value", 1L));
+                new DummySCustomUserInfoValue(2L, 2L, 1L, "value"));
 
         assertThat(value.getDefinitionId()).isEqualTo(2L);
         assertThat(value.getValue()).isEqualTo("value");
