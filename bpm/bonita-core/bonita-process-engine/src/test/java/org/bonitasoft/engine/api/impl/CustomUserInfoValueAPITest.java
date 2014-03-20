@@ -93,7 +93,7 @@ public class CustomUserInfoValueAPITest {
     }
 
     @Test
-    public void searchValue_should_return_null_when_service_seach_method_return_an_empty_list() throws Exception {
+    public void searchValue_should_return_null_when_service_search_method_return_an_empty_list() throws Exception {
         given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Collections.<SCustomUserInfoValue> emptyList());
 
         SCustomUserInfoValue value = api.searchValue(1L, 2L);
