@@ -513,7 +513,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             transactionExecutor.execute(deleteTenantTables);
             final TransactionContent deletePlatformTableContent = new DeletePlatformTableContent(platformService);
             transactionExecutor.execute(deletePlatformTableContent);
-            platformAccessor.destroy();
+            ServiceAccessorFactory.getInstance().destroyAccessors();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }
