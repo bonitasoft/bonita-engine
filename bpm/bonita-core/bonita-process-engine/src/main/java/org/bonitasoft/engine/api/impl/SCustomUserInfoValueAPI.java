@@ -75,7 +75,9 @@ public class SCustomUserInfoValueAPI {
 
         SCustomUserInfoValue customUserInfoValue = searchValue(definitionId, userId);
         if(value == null || value.isEmpty()) {
-            return delete(customUserInfoValue);
+            delete(customUserInfoValue);
+//            customUserInfoValue.setValue(value);
+            return customUserInfoValue;
         }
         if (customUserInfoValue != null) {
             return update(customUserInfoValue, new CustomUserInfoValueUpdater(value));
@@ -91,7 +93,11 @@ public class SCustomUserInfoValueAPI {
                 .done());
     }
 
-    public SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaSearchException {
+    public void delete(SCustomUserInfoValue value) throws SIdentityException {
+        service.deleteCustomUserInfoValue(value);
+    }
+
+    private SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaSearchException {
         List<SCustomUserInfoValue> result = service.searchCustomUserInfoValue(new QueryOptions(
                 0,
                 1,
@@ -104,11 +110,6 @@ public class SCustomUserInfoValueAPI {
             return null;
         }
         return result.get(0);
-    }
-
-    public SCustomUserInfoValue delete(SCustomUserInfoValue value) throws SIdentityException {
-        service.deleteCustomUserInfoValue(value);
-        return null;
     }
 
     private void assertNoNull(String message, Object... objects) {
