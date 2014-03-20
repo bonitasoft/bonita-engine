@@ -27,7 +27,7 @@ public class FlowNodeIdFilterTest {
     public void select_should_return_false_if_flow_node_id_is_not_the_expected_one() throws Exception {
         doReturn(5L).when(flownode).getId();
 
-        boolean result = filter.select(flownode);
+        boolean result = filter.mustSelect(flownode);
 
         assertFalse(result);
     }
@@ -36,7 +36,7 @@ public class FlowNodeIdFilterTest {
     public void select_should_return_true_if_flow_node_id_is_the_expected_one() throws Exception {
         doReturn(3L).when(flownode).getId();
 
-        boolean result = filter.select(flownode);
+        boolean result = filter.mustSelect(flownode);
 
         assertTrue(result);
     }

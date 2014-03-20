@@ -10,12 +10,14 @@
 				<prop key="org.quartz.jobStore.class">org.quartz.impl.jdbcjobstore.JobStoreCMT</prop>
 				<prop key="org.quartz.jobStore.driverDelegateClass">${quartz.connection.jobstoredriver:org.quartz.impl.jdbcjobstore.StdJDBCDelegate}</prop>
 				<prop key="org.quartz.jobStore.dataSource">managedDS</prop>
+				<prop key="org.quartz.jobStore.useProperties">true</prop>
 				<prop key="org.quartz.jobStore.nonManagedTXDataSource">notManagedDS</prop>
 
 				<prop key="org.quartz.dataSource.managedDS.jndiURL">${database.journal.datasource.name}</prop>
 				<prop key="org.quartz.dataSource.notManagedDS.jndiURL">${database.sequence.manager.datasource.name}</prop>
 				<prop key="org.quartz.jobStore.dontSetAutoCommitFalse">true</prop>
 				<prop key="org.quartz.scheduler.wrapJobExecutionInUserTransaction">true</prop>
+				<prop key="org.quartz.jobStore.misfireThreshold">2000</prop>
 			</props>
 		</constructor-arg>
 	</bean>
@@ -55,6 +57,9 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="servicesResolver" >
+			<bean class="org.bonitasoft.engine.test.util.TestsServicesResolver" />
+		</constructor-arg>
 	</bean>
 
 	<bean id="db-bonita-scheduler-quartz" class="org.bonitasoft.engine.persistence.DBConfiguration">

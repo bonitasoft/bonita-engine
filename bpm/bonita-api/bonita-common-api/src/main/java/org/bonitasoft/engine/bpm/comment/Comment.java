@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,24 +18,43 @@ import org.bonitasoft.engine.bpm.BonitaObject;
 import org.bonitasoft.engine.session.APISession;
 
 /**
+ * The comment associated to a process instance
+ * 
  * @author Hongwen Zang
+ * @author Celine Souchet
  */
 public interface Comment extends BonitaObject {
 
-	/**
-	 * @deprecated As of 6.1 use {@link APISession#getTenantId()} instead
-	 */
+    /**
+     * @return The identifier of the tenant
+     * @deprecated As of 6.1 use {@link APISession#getTenantId()} instead
+     */
     @Deprecated
     long getTenantId();
 
+    /**
+     * @return The identifier of the comment
+     */
     long getId();
 
+    /**
+     * @return The identifier of the user that posted the comment
+     */
     Long getUserId();
 
+    /**
+     * @return The identifier of the process instance associated to the comment
+     */
     long getProcessInstanceId();
 
+    /**
+     * @return The date to which the comment was posted.
+     */
     long getPostDate();
 
+    /**
+     * @return The content of the comment
+     */
     String getContent();
 
 }

@@ -16,8 +16,6 @@ package org.bonitasoft.engine;
 import javax.naming.Context;
 
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.util.TestUtil;
@@ -61,6 +59,9 @@ public class CommonServiceTest {
     private static void setupSpringContext() {
         setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
 
+        /** set bonita.services.folder to target/test-classes/conf as it is done in pom.xml -> no need to edit test configuration */
+        setSystemPropertyIfNotSet("bonita.services.folder", "target/test-classes/conf");
+
         // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
         System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
@@ -87,13 +88,14 @@ public class CommonServiceTest {
         @Override
         public void failed(final Throwable e, final Description d) {
             LOGGER.info("Failed test: " + d.getTestClass().getName() + "." + d.getMethodName());
+            LOGGER.info("-----------------------------------------------------------------------------------------------");
         }
 
         @Override
         public void succeeded(final Description d) {
             LOGGER.info("Succeeded test: " + d.getTestClass().getName() + "." + d.getMethodName());
+            LOGGER.info("-----------------------------------------------------------------------------------------------");
         }
-
     };
 
     static {

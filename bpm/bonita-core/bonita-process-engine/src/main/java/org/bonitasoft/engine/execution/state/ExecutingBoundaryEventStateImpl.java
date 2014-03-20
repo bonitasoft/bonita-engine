@@ -17,7 +17,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
@@ -25,7 +24,6 @@ import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.SToken;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
@@ -40,13 +38,9 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
 
     private final ContainerRegistry containerRegistry;
 
-    private final TokenService tokenService;
-
-    public ExecutingBoundaryEventStateImpl(final ActivityInstanceService activityInstanceService, final ContainerRegistry containerRegistry,
-            final TokenService tokenService) {
+    public ExecutingBoundaryEventStateImpl(final ActivityInstanceService activityInstanceService, final ContainerRegistry containerRegistry) {
         this.activityInstanceService = activityInstanceService;
         this.containerRegistry = containerRegistry;
-        this.tokenService = tokenService;
     }
 
     @Override
@@ -70,32 +64,8 @@ public class ExecutingBoundaryEventStateImpl implements FlowNodeState {
         if (boundaryEventInstance.isInterrupting()) {
             aborteRelatedActivity(boundaryEventInstance);
         }
-        // we create token here to be sure the token is put synchronously
-        createToken(boundaryEventInstance);
 
         return StateCode.DONE;
-    }
-
-    private void createToken(final SBoundaryEventInstance boundaryEventInstance) throws SActivityStateExecutionException {
-        // we have always 1 outgoing transition with no condition so we create one token
-        Long outputTokenRefId;
-        Long outputParentTokenRefId;
-        try {
-            if (boundaryEventInstance.isInterrupting()) {
-                // we create the same token that activated the activity
-                // the activity is canceled so a token will be consumed by the aborted activity
-                final SToken token = tokenService.getToken(boundaryEventInstance.getParentProcessInstanceId(), boundaryEventInstance.getTokenRefId());
-                outputTokenRefId = token.getRefId();
-                outputParentTokenRefId = token.getParentRefId();
-            } else {
-                // a token with no parent is produced -> not the same "execution" than activity
-                outputTokenRefId = boundaryEventInstance.getId();
-                outputParentTokenRefId = null;
-            }
-            tokenService.createTokens(boundaryEventInstance.getParentProcessInstanceId(), outputTokenRefId, outputParentTokenRefId, 1);
-        } catch (SBonitaException e) {
-            throw new SActivityStateExecutionException(e);
-        }
     }
 
     private void aborteRelatedActivity(final SBoundaryEventInstance boundaryEventInstance) throws SActivityStateExecutionException {

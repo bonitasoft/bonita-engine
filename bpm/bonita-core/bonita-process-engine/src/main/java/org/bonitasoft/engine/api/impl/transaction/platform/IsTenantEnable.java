@@ -38,7 +38,7 @@ public class IsTenantEnable implements TransactionContentWithResult<Boolean> {
     @Override
     public void execute() throws SBonitaException {
         final STenant tenant = platformService.getTenant(tenantId);
-        enable = PlatformService.ACTIVATED.equals(tenant.getStatus());
+        enable = STenant.ACTIVATED.equals(tenant.getStatus());
     }
 
     @Override

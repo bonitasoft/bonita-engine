@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -42,6 +42,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * @author Zhao Na
  * @author Emmanuel Duchastenier
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ExpressionResolverServiceImpl implements ExpressionResolverService {
 
@@ -85,7 +86,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             }
             final Long processDefinitionId = evaluationContext.getProcessDefinitionId();
             if (processDefinitionId != null) {
-                Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader("process", processDefinitionId));
+                Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId));
             }
             final HashMap<ExpressionKind, List<SExpression>> expressionMapByKind = new HashMap<ExpressionKind, List<SExpression>>();
             final int totalSize = flattenDependencies(expressionMapByKind, expressions);

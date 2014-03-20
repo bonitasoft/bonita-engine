@@ -109,7 +109,6 @@ public class SecuredLoginServiceImpl implements LoginService {
                     } else {
                         // now we are sure authentication Failed
                         authenticationFailed(null);
-
                     }
                 } catch (final AuthenticationException ae) {
                     authenticationFailed(ae);
@@ -226,7 +225,7 @@ public class SecuredLoginServiceImpl implements LoginService {
         }
     }
 
-    private TechnicalUser getTechnicalUser(final long tenantId) throws SLoginException {
+    protected TechnicalUser getTechnicalUser(final long tenantId) throws SLoginException {
         try {
             final String technicalUserPropertiesPath = BonitaHomeServer.getInstance().getTenantConfFolder(tenantId) + File.separator
                     + "bonita-server.properties";

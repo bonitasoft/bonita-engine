@@ -20,6 +20,12 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public interface STenant extends PersistentObject {
 
+    public static final String PAUSED = "PAUSED";
+
+    public static final String DEACTIVATED = "DEACTIVATED";
+
+    public static final String ACTIVATED = "ACTIVATED";
+
     String getName();
 
     String getDescription();
@@ -35,5 +41,7 @@ public interface STenant extends PersistentObject {
     String getStatus();
 
     boolean isDefaultTenant();
+
+    boolean isPaused();
 
 }

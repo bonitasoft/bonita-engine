@@ -406,12 +406,6 @@
 		<!-- Logs -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
 			<artifactId>bonita-log-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -448,7 +442,7 @@
 		<!-- Platform -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl-hibernate</artifactId>
+			<artifactId>bonita-platform-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -544,12 +538,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Recorder -->
 		<dependency>
@@ -566,15 +554,8 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Sequence -->
-
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-sequence-api</artifactId>
@@ -804,7 +785,6 @@
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
-			<version>2.1.3</version>
 			<scope>test</scope>
 		</dependency>
 

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
@@ -21,7 +22,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Test;
 
 /**
@@ -29,7 +30,7 @@ import org.junit.Test;
  */
 public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
 
-    private final TransactionService transactionService;
+    private final UserTransactionService userTransactionService;
 
     private final ActivityInstanceService activityInstanceService;
 
@@ -37,16 +38,17 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
 
     public FlowNodeInstanceServiceTest() {
         servicesBuilder = getServicesBuilder();
-        transactionService = servicesBuilder.getTransactionService();
+        userTransactionService = servicesBuilder.getUserTransactionService();
         activityInstanceService = servicesBuilder.getActivityInstanceService();
     }
 
-    private long getNbFlowNodeInstances(final QueryOptions countOptions) throws SBonitaException {
-        transactionService.begin();
-        final long nbOfFlowNodeInst = activityInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions);
-        transactionService.complete();
-
-        return nbOfFlowNodeInst;
+    private long getNbFlowNodeInstances(final QueryOptions countOptions) throws Exception {
+        return userTransactionService.executeInTransaction(new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                return activityInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions);
+            }
+        });
     }
 
     @Test

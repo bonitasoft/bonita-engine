@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.service;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
+import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
@@ -66,7 +67,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.theme.ThemeService;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -99,7 +100,9 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     TechnicalLoggerService getTechnicalLoggerService();
 
-    TransactionService getTransactionService();
+//    TransactionService getTransactionService();
+
+    UserTransactionService getUserTransactionService();
 
     ProcessDefinitionService getProcessDefinitionService();
 
@@ -204,6 +207,10 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     JobService getJobService();
 
     ThemeService getThemeService();
+
+    TenantConfiguration getTenantConfiguration();
+
+    <T> T lookup(String serviceName);
 
     void destroy();
 

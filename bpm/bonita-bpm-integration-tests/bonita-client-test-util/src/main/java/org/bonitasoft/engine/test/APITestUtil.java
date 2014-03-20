@@ -74,10 +74,13 @@ import org.bonitasoft.engine.command.CommandSearchDescriptor;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -173,7 +176,17 @@ public class APITestUtil {
 
     public static final int DEFAULT_REPEAT_EACH = 500;
 
-    public static final int DEFAULT_TIMEOUT = 7 * 60 * 1000;
+    public static final int DEFAULT_TIMEOUT;
+    
+    static {
+        String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
+        if(strTimeout != null) {
+            DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
+        } else {
+            DEFAULT_TIMEOUT = 7 * 60 * 1000;
+        }
+    }
+
 
     @After
     public void clearSynchroRepository() {
@@ -187,7 +200,7 @@ public class APITestUtil {
     }
 
     protected void loginWith(final String userName, final String password) throws BonitaException {
-        setSession(APITestUtil.loginDefaultTenant(userName, password));
+        setSession(loginDefaultTenant(userName, password));
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
@@ -196,7 +209,7 @@ public class APITestUtil {
     }
 
     protected void login() throws BonitaException {
-        setSession(APITestUtil.loginDefaultTenant());
+        setSession(loginDefaultTenant());
         setIdentityAPI(TenantAPIAccessor.getIdentityAPI(getSession()));
         setProcessAPI(TenantAPIAccessor.getProcessAPI(getSession()));
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
@@ -205,7 +218,7 @@ public class APITestUtil {
     }
 
     protected void logout() throws BonitaException {
-        APITestUtil.logoutTenant(getSession());
+        logoutTenant(getSession());
         setSession(null);
         setIdentityAPI(null);
         setProcessAPI(null);
@@ -742,7 +755,7 @@ public class APITestUtil {
         try {
             return getProcessAPI().getFlowNodeInstance(id);
         } catch (final FlowNodeInstanceNotFoundException e) {
-            throw new RuntimeException("no id returned for flownode instance ");
+            throw new RuntimeException("no id returned for flow node instance ");
         }
     }
 
@@ -1026,31 +1039,35 @@ public class APITestUtil {
         return waitForEvent;
     }
 
-    public static void deletePlatformStructure() throws BonitaException {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+    public void deletePlatformStructure() throws BonitaException {
+        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final PlatformAPI platformAPI = getPlatformAPI(session);
         platformAPI.deletePlatform();
         platformLoginAPI.logout(session);
     }
 
-    public static void deleteStopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
+    public void deleteStopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
         final PlatformSession session = loginPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final PlatformAPI platformAPI = getPlatformAPI(session);
         stopAndCleanPlatformAndTenant(platformAPI, undeployCommands);
         platformAPI.deletePlatform();
         logoutPlatform(session);
     }
 
-    public static void createPlatformStructure() throws BonitaException {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+    public void createPlatformStructure() throws BonitaException {
+        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
         final PlatformSession session = platformLoginAPI.login("platformAdmin", "platform");
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final PlatformAPI platformAPI = getPlatformAPI(session);
         createPlatformStructure(platformAPI, false);
         platformLoginAPI.logout(session);
     }
 
-    private static void createPlatformStructure(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
+    protected PlatformAPI getPlatformAPI(final PlatformSession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return PlatformAPIAccessor.getPlatformAPI(session);
+    }
+
+    private void createPlatformStructure(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
         if (platformAPI.isPlatformCreated()) {
             if (PlatformState.STARTED.equals(platformAPI.getPlatformState())) {
                 stopPlatformAndTenant(platformAPI, deployCommands);
@@ -1061,22 +1078,22 @@ public class APITestUtil {
         platformAPI.createPlatform();
     }
 
-    public static void createInitializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
+    public void createInitializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
         final PlatformSession session = loginPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final PlatformAPI platformAPI = getPlatformAPI(session);
         createPlatformStructure(platformAPI, deployCommands);
         initializeAndStartPlatformWithDefaultTenant(platformAPI, deployCommands);
         logoutPlatform(session);
     }
 
-    public static void initializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
+    public void initializeAndStartPlatformWithDefaultTenant(final boolean deployCommands) throws BonitaException {
         final PlatformSession session = loginPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final PlatformAPI platformAPI = getPlatformAPI(session);
         initializeAndStartPlatformWithDefaultTenant(platformAPI, deployCommands);
         logoutPlatform(session);
     }
 
-    public static void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
+    public void initializeAndStartPlatformWithDefaultTenant(final PlatformAPI platformAPI, final boolean deployCommands) throws BonitaException {
         platformAPI.initializePlatform();
         platformAPI.startNode();
 
@@ -1087,21 +1104,21 @@ public class APITestUtil {
         }
     }
 
-    public static void stopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
+    public void stopAndCleanPlatformAndTenant(final boolean undeployCommands) throws BonitaException {
         final PlatformSession session = loginPlatform();
-        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
+        final PlatformAPI platformAPI = getPlatformAPI(session);
         stopAndCleanPlatformAndTenant(platformAPI, undeployCommands);
         logoutPlatform(session);
     }
 
-    public static void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
+    public void stopAndCleanPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
         if (platformAPI.isNodeStarted()) {
             stopPlatformAndTenant(platformAPI, undeployCommands);
             cleanPlatform(platformAPI);
         }
     }
 
-    public static void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
+    public void stopPlatformAndTenant(final PlatformAPI platformAPI, final boolean undeployCommands) throws BonitaException {
         if (undeployCommands) {
             final APISession loginDefaultTenant = loginDefaultTenant();
             ClientEventUtil.undeployCommand(loginDefaultTenant);
@@ -1115,31 +1132,35 @@ public class APITestUtil {
         platformAPI.cleanPlatform();
     }
 
-    public static PlatformSession loginPlatform() throws BonitaException {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+    public PlatformSession loginPlatform() throws BonitaException {
+        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
         return platformLoginAPI.login("platformAdmin", "platform");
     }
 
-    public static PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
+    public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
         return PlatformAPIAccessor.getPlatformLoginAPI();
     }
 
-    public static void logoutPlatform(final PlatformSession session) throws BonitaException {
-        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+    public void logoutPlatform(final PlatformSession session) throws BonitaException {
+        final PlatformLoginAPI platformLoginAPI = getPlatformLoginAPI();
         platformLoginAPI.logout(session);
     }
 
-    public static APISession loginDefaultTenant() throws BonitaException {
+    public APISession loginDefaultTenant() throws BonitaException {
         return loginDefaultTenant("install", "install");
     }
 
-    public static APISession loginDefaultTenant(final String userName, final String password) throws BonitaException {
-        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+    public APISession loginDefaultTenant(final String userName, final String password) throws BonitaException {
+        final LoginAPI loginAPI = getLoginAPI();
         return loginAPI.login(userName, password);
     }
 
-    public static void logoutTenant(final APISession session) throws BonitaException {
-        final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
+    protected LoginAPI getLoginAPI() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return TenantAPIAccessor.getLoginAPI();
+    }
+
+    public void logoutTenant(final APISession session) throws BonitaException {
+        final LoginAPI loginAPI = getLoginAPI();
         loginAPI.logout(session);
     }
 
@@ -1236,12 +1257,12 @@ public class APITestUtil {
         return processDefinitions;
     }
 
-    public static User createUserOnDefaultTenant(final String userName, final String password) throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+    public User createUserOnDefaultTenant(final String userName, final String password) throws BonitaException {
+        final APISession session = loginDefaultTenant();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         final User user = identityAPI.createUser(userName, password);
         assertNull(user.getLastConnection());
-        APITestUtil.logoutTenant(session);
+        logoutTenant(session);
         return user;
     }
 

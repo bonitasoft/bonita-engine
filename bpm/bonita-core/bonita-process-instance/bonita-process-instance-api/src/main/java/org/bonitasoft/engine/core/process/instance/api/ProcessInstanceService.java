@@ -487,6 +487,20 @@ public interface ProcessInstanceService {
     List<SProcessInstance> getProcessInstancesInState(QueryOptions queryOptions, ProcessInstanceState state) throws SProcessInstanceReadException;
 
     /**
+     * Returns the list of <code>SProcessInstance</code>s in a given list of states.
+     * 
+     * @param queryOptions
+     *            the search criteria containing a map of specific parameters of a query
+     * @param states
+     *            the list of valid states to retrieve.
+     * @return the list of matching <code>SProcessInstance</code>s
+     * @throws SProcessInstanceReadException
+     *             if a read error occurs
+     */
+    public List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions, final ProcessInstanceState... states)
+            throws SProcessInstanceReadException;
+
+    /**
      * @param processInstanceId
      * @throws SBonitaException
      * @since 6.1

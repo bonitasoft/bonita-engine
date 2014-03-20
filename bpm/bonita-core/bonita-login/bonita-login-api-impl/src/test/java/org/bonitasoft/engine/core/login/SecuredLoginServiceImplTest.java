@@ -411,4 +411,14 @@ public class SecuredLoginServiceImplTest {
 
     }
 
+    @Test
+    public void should_login_with_technical_user__return_technical_session() throws Exception {
+        securedLoginServiceImpl = spy(new SecuredLoginServiceImpl(authenticationService, sessionService, sessionAccessor, identityService));
+        doReturn(new TechnicalUser("john", "bpm")).when(securedLoginServiceImpl).getTechnicalUser(1);
+
+        securedLoginServiceImpl.login(1, "john", "bpm");
+
+        verify(sessionService).createSession(1, -1, "john", true);
+    }
+
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,13 +14,22 @@
 package org.bonitasoft.engine.session;
 
 /**
+ * Informations concerning the connected tenant to the APIs
+ * 
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface APISession extends Session {
 
+    /**
+     * @return The name of the connected tenant
+     */
     String getTenantName();
 
+    /**
+     * @return The identifier of the connected tenant
+     */
     long getTenantId();
 
 }

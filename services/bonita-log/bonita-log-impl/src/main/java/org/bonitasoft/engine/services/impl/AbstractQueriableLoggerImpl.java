@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.log.recorder.QueriableLogSelectDescriptorBuilder;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -32,7 +31,6 @@ import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilderFactory;
-import org.bonitasoft.engine.services.IllegalIndexPositionException;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -50,7 +48,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
 
     private final PersistenceService persistenceService;
 
-    private final QueriableLoggerStrategy loggerConfiguration;
+    private final QueriableLoggerStrategy loggerStrategy;
 
     private final QueriableLogSessionProvider sessionProvider;
 
@@ -60,7 +58,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
             final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final PlatformService platformService) {
         NullCheckingUtil.checkArgsNotNull(persistenceService, loggerStrategy, sessionProvider);
         this.persistenceService = persistenceService;
-        loggerConfiguration = loggerStrategy;
+        this.loggerStrategy = loggerStrategy;
         this.sessionProvider = sessionProvider;
         this.platformService = platformService;
     }
@@ -133,60 +131,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
     @Override
     public boolean isLoggable(final String actionType, final SQueriableLogSeverity severity) {
         NullCheckingUtil.checkArgsNotNull(actionType, severity);
-        return loggerConfiguration.isLoggable(actionType, severity);
-    }
-
-    @Override
-    public List<SQueriableLog> getLogsFromLongIndex(final int pos, final long value, final int fromIndex, final int numberOfResults)
-            throws IllegalIndexPositionException, SQueriableLogException {
-        return getLogsFromLongIndex(pos, value, fromIndex, numberOfResults, null, null);
-    }
-
-    @Override
-    public List<SQueriableLog> getLogsFromLongIndex(final int pos, final long value, final int fromIndex, final int numberOfResults, final String fieldName,
-            final OrderByType orderByType) throws IllegalIndexPositionException, SQueriableLogException {
-        NullCheckingUtil.checkArgsNotNull(value);
-        if (fromIndex < 0 || numberOfResults < 0) {
-            throw new IllegalArgumentException("fromIndex and maxSize must be greater than zero");
-        }
-        String indexName = null;
-        switch (pos) {
-            case 0:
-                indexName = "numericIndex1";
-                break;
-            case 1:
-                indexName = "numericIndex2";
-                break;
-            case 2:
-                indexName = "numericIndex3";
-                break;
-            case 3:
-                indexName = "numericIndex4";
-                break;
-            case 4:
-                indexName = "numericIndex5";
-                break;
-        }
-
-        if (indexName == null) {
-            throw new IllegalIndexPositionException(pos + "is not a legal position for a LongIndex. It must be between 0 and 4");
-        }
-        try {
-            if (fieldName == null || orderByType == null) {
-                return persistenceService.selectList(QueriableLogSelectDescriptorBuilder.getLogsFromLongIndex(indexName, value, new QueryOptions(fromIndex,
-                        numberOfResults)));
-            } else {
-                return persistenceService.selectList(QueriableLogSelectDescriptorBuilder.getLogsFromLongIndex(indexName, value, new QueryOptions(fromIndex,
-                        numberOfResults, SQueriableLog.class, fieldName, orderByType)));
-            }
-        } catch (final SBonitaReadException e) {
-            final StringBuilder stb = new StringBuilder("Error while reading logs from long indexes. Index position: ");
-            stb.append(pos);
-            stb.append(", value: ");
-            stb.append(value);
-            stb.append('.');
-            throw new SQueriableLogException(stb.toString(), e);
-        }
+        return loggerStrategy.isLoggable(actionType, severity);
     }
 
     protected PersistenceService getPersitenceService() {
@@ -194,7 +139,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
     }
 
     protected QueriableLoggerStrategy getQueriableLogConfiguration() {
-        return loggerConfiguration;
+        return loggerStrategy;
     }
 
     @Override

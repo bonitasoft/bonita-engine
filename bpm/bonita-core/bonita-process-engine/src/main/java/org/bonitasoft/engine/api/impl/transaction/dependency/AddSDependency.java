@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,11 +19,13 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.SDependencyException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class AddSDependency implements TransactionContent {
 
@@ -35,10 +37,9 @@ public class AddSDependency implements TransactionContent {
 
     private final long artifactId;
 
-    private final String artifactType;
+    private final ScopeType artifactType;
 
-    public AddSDependency(final DependencyService dependencyService, final String name,
-            final byte[] jar, final long artifactId, final String artifactType) {
+    public AddSDependency(final DependencyService dependencyService, final String name, final byte[] jar, final long artifactId, final ScopeType artifactType) {
         this.dependencyService = dependencyService;
         this.name = name;
         this.jar = jar;
@@ -48,9 +49,14 @@ public class AddSDependency implements TransactionContent {
 
     @Override
     public void execute() throws SDependencyException {
-        final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class).createNewInstance(name, "1.0", name + ".jar", jar).done();
-        dependencyService.createDependency(sDependency);;
-        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), artifactId, artifactType).done();
+        final SDependency sDependency = BuilderFactory.get(SDependencyBuilderFactory.class)
+                // add a .jar here because we need to add a new method in command API to have name and filename
+                // see BS-7393
+                .createNewInstance(name, artifactId, artifactType, name + ".jar", jar)
+                .done();
+        dependencyService.createDependency(sDependency);
+        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SDependencyMappingBuilderFactory.class)
+                .createNewInstance(sDependency.getId(), artifactId, artifactType).done();
         dependencyService.createDependencyMapping(sDependencyMapping);
     }
 

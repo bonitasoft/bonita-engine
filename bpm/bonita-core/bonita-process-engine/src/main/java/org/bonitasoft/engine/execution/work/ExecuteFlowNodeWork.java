@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * 
@@ -82,8 +82,13 @@ public class ExecuteFlowNodeWork extends TenantAwareBonitaWork {
         final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = getTenantAccessor(context).getFlowNodeStateManager();
         final FlowNodeExecutor flowNodeExecutor = getTenantAccessor(context).getFlowNodeExecutor();
-        TransactionService transactionService = getTenantAccessor(context).getTransactionService();
-        transactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
+        UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
+        userTransactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
+    }
+
+    @Override
+    public String toString() {
+        return "Work[" + getDescription() + "]";
     }
 
 }

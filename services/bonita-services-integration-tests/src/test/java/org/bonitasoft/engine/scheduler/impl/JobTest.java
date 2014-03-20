@@ -20,6 +20,7 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.job.ThrowsExceptionJob;
+import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;

@@ -74,7 +74,7 @@ public class JDBCJobListener extends AbstractJobListener {
     @Override
     public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
         final JobDetail jobDetail = context.getJobDetail();
-        final Long jobDescriptorId = (Long) jobDetail.getJobDataMap().getWrappedMap().get("jobId");
+        final Long jobDescriptorId = Long.valueOf((String) jobDetail.getJobDataMap().getWrappedMap().get("jobId"));
         try {
             if (jobException != null) {
                 final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId);
@@ -88,7 +88,7 @@ public class JDBCJobListener extends AbstractJobListener {
                 deleteJobIfNotScheduledAnyMore(jobDescriptorId);
             }
         } catch (final SBonitaException sbe) {
-            final Long tenantId = (Long) jobDetail.getJobDataMap().getWrappedMap().get("tenantId");
+            final Long tenantId = Long.valueOf((String) jobDetail.getJobDataMap().getWrappedMap().get("tenantId"));
             final Incident incident = new Incident("An exception occurs during the job execution of the job descriptor" + jobDescriptorId, "", jobException,
                     sbe);
             incidentService.report(tenantId, incident);

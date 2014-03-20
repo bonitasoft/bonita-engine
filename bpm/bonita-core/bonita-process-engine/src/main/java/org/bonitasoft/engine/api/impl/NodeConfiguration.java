@@ -16,11 +16,13 @@ package org.bonitasoft.engine.api.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.RestartHandler;
+import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
-import org.bonitasoft.engine.scheduler.JobRegister;
 
 /**
- * This class allow to provide a configuration for the platform
+ * This class allow to provide a configuration for the current node
+ * 
+ * We should be able to have one different per node
  * 
  * @author Baptiste Mesta
  */
@@ -49,11 +51,6 @@ public interface NodeConfiguration {
     /**
      * @return
      */
-    String getEventHandlingJobCron();
-
-    /**
-     * @return
-     */
     boolean shouldStartEventHandlingJob();
 
     /**
@@ -62,22 +59,15 @@ public interface NodeConfiguration {
     List<TenantRestartHandler> getTenantRestartHandlers();
 
     /**
-     * @return
-     */
-    List<JobRegister> getJobsToRegister();
-
-    /**
-     * Specify how often invalid sessions will be cleaned
-     * 
-     * @return a String representing a Unix Cron
-     */
-    String getCleanInvalidSessionsJobCron();
-
-    /**
      * 
      * @return
      *         true if the sessions should be cleaned when the node is stopped
      */
     boolean shouldClearSessions();
+
+    /**
+     * @return
+     */
+    List<ServiceWithLifecycle> getServicesToStart();
 
 }

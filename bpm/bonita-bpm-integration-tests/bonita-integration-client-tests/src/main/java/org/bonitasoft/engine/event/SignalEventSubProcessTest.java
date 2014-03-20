@@ -149,7 +149,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
     }
 
     @Test
-    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "expression context", "flownode container hierarchy" }, jira = "ENGINE-1848")
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "expression context", "flow node container hierarchy" }, jira = "ENGINE-1848")
     public void evaluateExpressionsOnLoopUserTaskInSupProcess() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,9 +14,11 @@
 package org.bonitasoft.engine.dependency.model.impl;
 
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SPlatformDependencyMapping implements SDependencyMapping {
 
@@ -28,7 +30,7 @@ public class SPlatformDependencyMapping implements SDependencyMapping {
 
     private long artifactId;
 
-    private String artifactType;
+    private ScopeType artifactType;
 
     private long dependencyId;
 
@@ -36,21 +38,22 @@ public class SPlatformDependencyMapping implements SDependencyMapping {
         // default constructor for hibernate
     }
 
-    public SPlatformDependencyMapping(final long artifactId, final String artifactType, final long dependencyId) {
+    public SPlatformDependencyMapping(final long artifactId, final ScopeType artifactType, final long dependencyId) {
         super();
         this.artifactId = artifactId;
         this.artifactType = artifactType;
         this.dependencyId = dependencyId;
     }
 
+    @Override
     public void setId(final long id) {
         this.id = id;
     }
 
+    @Override
     public void setTenantId(final long id) {
         this.tenantId = id;
     }
-
 
     @Override
     public long getId() {
@@ -61,7 +64,7 @@ public class SPlatformDependencyMapping implements SDependencyMapping {
         this.artifactId = artifactId;
     }
 
-    public void setArtifactType(final String artifactType) {
+    public void setArtifactType(final ScopeType artifactType) {
         this.artifactType = artifactType;
     }
 
@@ -75,7 +78,7 @@ public class SPlatformDependencyMapping implements SDependencyMapping {
     }
 
     @Override
-    public String getArtifactType() {
+    public ScopeType getArtifactType() {
         return artifactType;
     }
 

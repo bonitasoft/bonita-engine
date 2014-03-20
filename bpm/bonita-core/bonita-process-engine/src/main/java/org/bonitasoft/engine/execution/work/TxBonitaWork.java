@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.BonitaWork;
 
 /**
@@ -39,7 +39,7 @@ public class TxBonitaWork extends WrappingBonitaWork {
     @Override
     public void work(final Map<String, Object> context) throws Exception {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final TransactionService transactionService = tenantAccessor.getTransactionService();
+        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
 
         final Callable<Void> runWork = new Callable<Void>() {
 
@@ -50,7 +50,7 @@ public class TxBonitaWork extends WrappingBonitaWork {
             }
         };
         // Call the method work() wrapped in a transaction.
-        transactionService.executeInTransaction(runWork);
+        userTransactionService.executeInTransaction(runWork);
     }
 
 }

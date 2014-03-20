@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
-import org.bonitasoft.engine.scheduler.impl.VariableStorage;
 
 /**
  * @author Matthieu Chaffotte

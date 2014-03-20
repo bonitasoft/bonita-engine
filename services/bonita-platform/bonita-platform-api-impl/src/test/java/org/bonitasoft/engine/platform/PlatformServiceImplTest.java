@@ -47,7 +47,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -84,7 +83,7 @@ public class PlatformServiceImplTest {
         when(sTenantFactory.getNameKey()).thenReturn("name");
         when(sTenantFactory.getStatusKey()).thenReturn("status");
     }
-    
+
     /**
      * Test method for {@link org.bonitasoft.engine.platform.impl.PlatformServiceImpl#getDefaultTenant()}.
      */
@@ -318,9 +317,17 @@ public class PlatformServiceImplTest {
     @Test
     public final void isNotTenantActivated() {
         final STenant tenant = mock(STenant.class);
-        when(tenant.getStatus()).thenReturn("DESACTIVATED");
+        when(tenant.getStatus()).thenReturn("DEACTIVATED");
 
         Assert.assertFalse(platformServiceImpl.isTenantActivated(tenant));
+    }
+
+    @Test
+    public final void should_isTenantActivated_return_true_when_tenant_is_paused() {
+        final STenant tenant = mock(STenant.class);
+        when(tenant.getStatus()).thenReturn("PAUSED");
+
+        Assert.assertTrue(platformServiceImpl.isTenantActivated(tenant));
     }
 
     /**

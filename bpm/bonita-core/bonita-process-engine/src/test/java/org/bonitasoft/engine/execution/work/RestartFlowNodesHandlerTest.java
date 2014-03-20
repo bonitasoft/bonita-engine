@@ -60,12 +60,12 @@ public class RestartFlowNodesHandlerTest {
     public final void create_execute_flowNode_work_when_flownode_isnt_terminal() throws Exception {
         final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         final WorkService workService = mock(WorkService.class);
-        doReturn(workService).when(platformServiceAccessor).getWorkService();
 
         final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         doReturn(false).when(logger).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
         doReturn(logger).when(tenantServiceAccessor).getTechnicalLoggerService();
+        doReturn(workService).when(tenantServiceAccessor).getWorkService();
 
         final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
         doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
@@ -88,12 +88,12 @@ public class RestartFlowNodesHandlerTest {
     public final void create_notify_child_finished_work_when_flownode_is_terminal() throws Exception {
         final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         final WorkService workService = mock(WorkService.class);
-        doReturn(workService).when(platformServiceAccessor).getWorkService();
 
         final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         doReturn(false).when(logger).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
         doReturn(logger).when(tenantServiceAccessor).getTechnicalLoggerService();
+        doReturn(workService).when(tenantServiceAccessor).getWorkService();
 
         final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
         doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
@@ -122,12 +122,12 @@ public class RestartFlowNodesHandlerTest {
     public final void do_noting_if_no_flownode() throws Exception {
         final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         final WorkService workService = mock(WorkService.class);
-        doReturn(workService).when(platformServiceAccessor).getWorkService();
 
         final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         doReturn(false).when(logger).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
         doReturn(logger).when(tenantServiceAccessor).getTechnicalLoggerService();
+        doReturn(workService).when(tenantServiceAccessor).getWorkService();
 
         final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
         doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
@@ -145,12 +145,12 @@ public class RestartFlowNodesHandlerTest {
         final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         final WorkService workService = mock(WorkService.class);
         doThrow(new WorkRegisterException("plop")).when(workService).registerWork(any(BonitaWork.class));
-        doReturn(workService).when(platformServiceAccessor).getWorkService();
 
         final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         doReturn(false).when(logger).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
         doReturn(logger).when(tenantServiceAccessor).getTechnicalLoggerService();
+        doReturn(workService).when(tenantServiceAccessor).getWorkService();
 
         final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
         doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
@@ -170,12 +170,12 @@ public class RestartFlowNodesHandlerTest {
     public final void throw_exception_if_error_when_get_flownode() throws Exception {
         final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         final WorkService workService = mock(WorkService.class);
-        doReturn(workService).when(platformServiceAccessor).getWorkService();
 
         final TenantServiceAccessor tenantServiceAccessor = mock(TenantServiceAccessor.class);
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         doReturn(false).when(logger).isLoggable(any(Class.class), any(TechnicalLogSeverity.class));
         doReturn(logger).when(tenantServiceAccessor).getTechnicalLoggerService();
+        doReturn(workService).when(tenantServiceAccessor).getWorkService();
 
         final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
         doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();

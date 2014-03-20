@@ -315,11 +315,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
 			<artifactId>bonita-log-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -346,7 +341,7 @@
 		<!-- Platform -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl-hibernate</artifactId>
+			<artifactId>bonita-platform-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -472,11 +467,6 @@
 			<artifactId>bonita-process-instance-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- Recorder -->
 		<dependency>
@@ -496,11 +486,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
 			<artifactId>bonita-scheduler-quartz</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -780,7 +765,6 @@
 									<!-- Logs -->
 									<include>org.bonitasoft.engine.log:bonita-log-model</include>
 									<include>org.bonitasoft.engine.log:bonita-log-model-impl</include>
-									<include>org.bonitasoft.engine.log:bonita-log-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.log:bonita-log-api</include>
 									<include>org.bonitasoft.engine.log:bonita-log-impl</include>
 									<!-- Operation -->
@@ -796,7 +780,6 @@
 									<!-- Platform -->
 									<include>org.bonitasoft.engine.platform:bonita-platform-model</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl</include>
-									<include>org.bonitasoft.engine.platform:bonita-platform-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-api</include>
 									<include>org.bonitasoft.engine.platform:bonita-platform-api-impl</include>
 									<!-- Platform Authentication -->
@@ -841,7 +824,6 @@
 									<!-- Process Instance -->
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
-									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl-hibernate</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
 									<!-- Recorder -->
@@ -853,7 +835,6 @@
 									<!-- Scheduler -->
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-api</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl</include>
-									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-impl-hibernate</include>
 									<include>org.bonitasoft.engine.scheduler:bonita-scheduler-quartz</include>
 									<!-- Service Commons -->
 									<include>org.bonitasoft.engine:bonita-commons</include>

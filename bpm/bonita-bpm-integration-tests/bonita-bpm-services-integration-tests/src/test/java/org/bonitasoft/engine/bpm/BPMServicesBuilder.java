@@ -17,7 +17,6 @@ package org.bonitasoft.engine.bpm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
@@ -25,6 +24,7 @@ import org.bonitasoft.engine.actor.xml.GroupPathsBinding;
 import org.bonitasoft.engine.actor.xml.RoleNamesBinding;
 import org.bonitasoft.engine.actor.xml.UserNamesBinding;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
+import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.authentication.AuthenticationService;
@@ -34,7 +34,6 @@ import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.DefaultCommandProvider;
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.core.category.CategoryService;
@@ -104,13 +103,13 @@ import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.test.util.ServicesAccessor;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
 import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.XMLWriter;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * @author Baptiste Mesta
@@ -154,6 +153,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public TransactionService getTransactionService() {
         return getInstanceOf(TransactionService.class);
+    }
+
+    @Override
+    public UserTransactionService getUserTransactionService() {
+        return getTransactionService();
     }
 
     @Override
@@ -536,19 +540,19 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(ThemeService.class);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ServiceWithLifecycle> getServicesToStart() {
-        try {
-            return getInstanceOf("servicesToStart", List.class);
-        } catch (NoSuchBeanDefinitionException e) {
-            return Collections.emptyList();
-        }
-    }
-
     @Override
     public void destroy() {
         accessor.destroy();
+    }
+
+    @Override
+    public TenantConfiguration getTenantConfiguration() {
+        return getInstanceOf(TenantConfiguration.class);
+    }
+
+    @Override
+    public <T> T lookup(final String serviceName) {
+        throw new UnsupportedOperationException();
     }
 
 }
