@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
-import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -32,8 +30,6 @@ import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstanc
  * @author Matthieu Chaffotte
  */
 public class InsertBusinessDataOperationExecutorStrategy implements OperationExecutorStrategy {
-
-    private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
 
     private final BusinessDataRepository repository;
 
@@ -66,16 +62,13 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
                     flowNodeInstanceService.getProcessInstanceId(containerId, containerType));
             final Long dataId = refBusinessDataInstance.getDataId();
             if (dataId == null) {
-                newValue = repository.merge((Entity) newValue);
-                final Long id = ClassReflector.invokeGetter(newValue, PERSISTENCE_ID_GETTER);
-                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, id);
+                Entity businessData = repository.merge((Entity) newValue);
+                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
             }
         } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
             throw new SOperationExecutionException(srbdinfe);
         } catch (final SBonitaReadException sbre) {
             throw new SOperationExecutionException(sbre);
-        } catch (final ReflectException re) {
-            throw new SOperationExecutionException(re);
         } catch (final SRefBusinessDataInstanceModificationException srbsme) {
             throw new SOperationExecutionException(srbsme);
         } catch (SFlowNodeNotFoundException e) {
