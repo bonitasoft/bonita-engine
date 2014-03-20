@@ -24,8 +24,8 @@ public class TestShadesSP extends TestShades {
     @Override
     protected String removedIgnoredBonitaDeps(final String outputOfMaven) {
         String outputOfMaven2 = outputOfMaven.replaceAll(COM_BONITASOFT_ENGINE + ":bonita-server-sp", "");
-        outputOfMaven2 = outputOfMaven.replaceAll(COM_BONITASOFT_ENGINE + ":bonita-client-sp", "");
-        outputOfMaven2 = outputOfMaven.replaceAll(COM_BONITASOFT_ENGINE + ":bonita-common-sp", "");
+        outputOfMaven2 = outputOfMaven2.replaceAll(COM_BONITASOFT_ENGINE + ":bonita-client-sp", "");
+        outputOfMaven2 = outputOfMaven2.replaceAll(COM_BONITASOFT_ENGINE + ":bonita-common-sp", "");
         return outputOfMaven2;
     }
 
