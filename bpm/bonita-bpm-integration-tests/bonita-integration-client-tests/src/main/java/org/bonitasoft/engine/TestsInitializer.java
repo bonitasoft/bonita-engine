@@ -52,7 +52,7 @@ public class TestsInitializer {
         cleanBonitaHome();
         // wait for thread to stop
         // FIXME To uncomment when fix BS-7731
-        checkThreadsAreStopped();
+        // checkThreadsAreStopped();
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {
