@@ -91,7 +91,7 @@ public class CustomUserInfoValueAPI {
                 .done()));
     }
 
-    public SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaSearchException, SCustomUserInfoValueNotFoundException {
+    public SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaSearchException {
         List<SCustomUserInfoValue> result = service.searchCustomUserInfoValue(new QueryOptions(
                 0,
                 1,
@@ -101,7 +101,7 @@ public class CustomUserInfoValueAPI {
                         new FilterOption(SCustomUserInfoValue.class, "userId", userId)),
                 null));
         if(result.size() == 0) {
-            throw new SCustomUserInfoValueNotFoundException(definitionId, userId);
+            return null;
         }
         return result.get(0);
     }
