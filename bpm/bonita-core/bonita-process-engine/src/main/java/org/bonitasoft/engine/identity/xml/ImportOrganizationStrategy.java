@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.xml;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
@@ -35,7 +36,7 @@ public interface ImportOrganizationStrategy {
 
     void foundExistingRole(final SRole existingRole, final RoleCreator newRole) throws ImportDuplicateInOrganizationException, SIdentityException;
 
-    void foundExistingUser(final SUser existingUser, final ExportedUser user) throws ImportDuplicateInOrganizationException, SIdentityException;
+    void foundExistingUser(final SUser existingUser, final ExportedUser user) throws SBonitaException;
 
     void foundExistingGroup(final SGroup existingGroup, final GroupCreator newGroup) throws ImportDuplicateInOrganizationException, SIdentityException;
 

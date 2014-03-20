@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.identity.xml;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
@@ -38,7 +39,7 @@ public class ImportOrganizationFailOnDuplicatesStrategy implements ImportOrganiz
     }
 
     @Override
-    public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws ImportDuplicateInOrganizationException {
+    public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws SBonitaException {
         throw new ImportDuplicateInOrganizationException("There's already a user with the name : " + existingUser.getUserName());
     }
 

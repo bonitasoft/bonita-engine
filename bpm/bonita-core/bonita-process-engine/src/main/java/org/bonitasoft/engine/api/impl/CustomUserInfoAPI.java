@@ -75,7 +75,7 @@ public class CustomUserInfoAPI {
                 Collections.<OrderByOption> emptyList(),
                 Arrays.asList(
                         new FilterOption(SCustomUserInfoValue.class, "userId", userId),
-                        new FilterOption(SCustomUserInfoValue.class, "definitionId", "")
+                        new FilterOption(SCustomUserInfoValue.class, "definitionId")
                                 .in(getIds(definitions))),
                 null));
     }

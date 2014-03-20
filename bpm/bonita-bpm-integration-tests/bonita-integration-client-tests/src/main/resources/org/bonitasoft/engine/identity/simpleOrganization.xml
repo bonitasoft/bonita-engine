@@ -16,12 +16,28 @@
       <enabled>false</enabled>
       <personalData/>
       <professionalData/>
+      <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Office location</name>
+	      <value>Engineering</value>
+	    </customUserInfoValue>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
     </user>
     <user userName="liuyanyan">
       <password encrypted="false">bpm</password>
       <enabled>true</enabled>
       <personalData/>
       <professionalData/>
+      <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
     </user>
   </users>
   <roles>

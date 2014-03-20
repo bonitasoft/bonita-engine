@@ -1377,27 +1377,6 @@ public class ModelConvertor {
         }
     }
 
-    public static SUser constructSUser(final ExportedUser newUser) {
-        final SUserBuilder userBuilder = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance();
-        final long now = System.currentTimeMillis();
-        userBuilder.setCreationDate(now);
-        userBuilder.setLastUpdate(now);
-        userBuilder.setLastConnection(null);
-
-        userBuilder.setUserName(newUser.getUserName());
-        userBuilder.setPassword(newUser.getPassword());
-        userBuilder.setFirstName(newUser.getFirstName());
-        userBuilder.setLastName(newUser.getLastName());
-        userBuilder.setIconName(newUser.getIconName());
-        userBuilder.setIconPath(newUser.getIconPath());
-        userBuilder.setJobTitle(newUser.getJobTitle());
-        userBuilder.setTitle(newUser.getTitle());
-        userBuilder.setCreatedBy(newUser.getCreatedBy() == 0 ? SessionInfos.getUserIdFromSession() : newUser.getCreatedBy());
-        userBuilder.setManagerUserId(newUser.getManagerUserId());
-        userBuilder.setEnabled(newUser.isEnabled());
-        return userBuilder.done();
-    }
-
     public static SContactInfo constructSUserContactInfo(final ExportedUser user, final boolean isPersonal, final long userId) {
         final SContactInfoBuilder contactInfoBuilder = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, isPersonal);
         if (isPersonal) {

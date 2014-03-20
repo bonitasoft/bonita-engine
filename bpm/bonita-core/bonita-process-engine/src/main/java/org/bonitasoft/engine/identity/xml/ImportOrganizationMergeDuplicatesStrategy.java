@@ -16,8 +16,11 @@ package org.bonitasoft.engine.identity.xml;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.impl.SCustomUserInfoValueAPI;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
+import org.bonitasoft.engine.identity.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
 import org.bonitasoft.engine.identity.GroupCreator.GroupField;
@@ -25,6 +28,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.RoleCreator;
 import org.bonitasoft.engine.identity.RoleCreator.RoleField;
 import org.bonitasoft.engine.identity.SIdentityException;
+import org.bonitasoft.engine.identity.SUserCreationException;
 import org.bonitasoft.engine.identity.model.SContactInfo;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -51,9 +55,11 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganizationStrategy {
 
     private final IdentityService identityService;
+    private SCustomUserInfoValueAPI userInfoValueAPI;
 
-    public ImportOrganizationMergeDuplicatesStrategy(final IdentityService identityService) {
+    public ImportOrganizationMergeDuplicatesStrategy(final IdentityService identityService, SCustomUserInfoValueAPI userInfoValueAPI) {
         this.identityService = identityService;
+        this.userInfoValueAPI = userInfoValueAPI;
     }
 
     @Override
@@ -65,19 +71,25 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
     }
 
     @Override
-    public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws SIdentityException {
-        final long userId = existingUser.getId();
-        final EntityUpdateDescriptor descriptor = getUserDescriptor(user);
-        identityService.updateUser(existingUser, descriptor, user.isPasswordEncrypted());
+    public void foundExistingUser(final SUser existingUser, final ExportedUser userToImport) throws SBonitaException {
+        final long existingUserId = existingUser.getId();
+        final EntityUpdateDescriptor descriptor = getUserDescriptor(userToImport);
+        identityService.updateUser(existingUser, descriptor, userToImport.isPasswordEncrypted());
 
-        SContactInfo persoContactInfo = identityService.getUserContactInfo(userId, true);
-        if (persoContactInfo == null) {
-            persoContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, true).done();
-            identityService.createUserContactInfo(persoContactInfo);
+        createOrUpdatePersonalContactInfo(userToImport, existingUserId);
+        createOrUpdateProfessionalContactInfo(userToImport, existingUserId);
+        updateCustomUserInfoValues(userToImport, existingUserId);
+    }
+
+    private void updateCustomUserInfoValues(final ExportedUser userToImport,
+            final long existingUserId) throws SBonitaException {
+        for (ExportedCustomUserInfoValue infoValue : userToImport.getCustomUserInfoValues()) {
+            SCustomUserInfoDefinition customUserInfoDefinition = identityService.getCustomUserInfoDefinitionByName(infoValue.getName());
+            userInfoValueAPI.set(customUserInfoDefinition.getId(), existingUserId, infoValue.getValue());
         }
-        final EntityUpdateDescriptor personalDataDesc = getUserContactInfoDescriptor(user, true);
-        identityService.updateUserContactInfo(persoContactInfo, personalDataDesc);
+    }
 
+    private void createOrUpdateProfessionalContactInfo(final ExportedUser user, final long userId) throws SIdentityException, SUserCreationException {
         SContactInfo professContactInfo = identityService.getUserContactInfo(userId, false);
         if (professContactInfo == null) {
             professContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, false).done();
@@ -85,6 +97,16 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
         }
         final EntityUpdateDescriptor professionalDataDesc = getUserContactInfoDescriptor(user, false);
         identityService.updateUserContactInfo(professContactInfo, professionalDataDesc);
+    }
+
+    private void createOrUpdatePersonalContactInfo(final ExportedUser user, final long userId) throws SIdentityException, SUserCreationException {
+        SContactInfo persoContactInfo = identityService.getUserContactInfo(userId, true);
+        if (persoContactInfo == null) {
+            persoContactInfo = BuilderFactory.get(SContactInfoBuilderFactory.class).createNewInstance(userId, true).done();
+            identityService.createUserContactInfo(persoContactInfo);
+        }
+        final EntityUpdateDescriptor personalDataDesc = getUserContactInfoDescriptor(user, true);
+        identityService.updateUserContactInfo(persoContactInfo, personalDataDesc);
     }
 
     @Override

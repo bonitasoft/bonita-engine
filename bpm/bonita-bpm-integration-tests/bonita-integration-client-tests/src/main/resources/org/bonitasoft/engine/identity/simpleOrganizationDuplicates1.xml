@@ -15,11 +15,27 @@
       <jobTitle>Web Team Manager</jobTitle>
       <personalData/>
       <professionalData/>
+      <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Office location</name>
+	      <value>Engineering</value>
+	    </customUserInfoValue>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
     </user>
     <user userName="liuyanyan">
       <password encrypted="false">bpm</password>
       <personalData/>
       <professionalData/>
+      <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
     </user>
   </users>
   <roles>

@@ -44,6 +44,7 @@ public class OrganizationNodeBuilder {
         BINDINGS.add(UserBinding.class);
         BINDINGS.add(PersonalContactDataBinding.class);
         BINDINGS.add(ProfessionalContactDataBinding.class);
+        BINDINGS.add(CustomUserInfoValueBinding.class);
         BINDINGS.add(RoleBinding.class);
         BINDINGS.add(GroupBinding.class);
         BINDINGS.add(MembershipBinding.class);

@@ -54,13 +54,11 @@ public class CustomUserInfoDefinitionImporterTest {
     
     @Test
     public void importCustomUserInfoDefinitions_call_service_to_create_elements_if_doesnt_exists() throws Exception {
-        //given
-        ArgumentCaptor<SCustomUserInfoDefinition> userInfoCaptor = ArgumentCaptor.forClass(SCustomUserInfoDefinition.class);
-        
         //when
         importer.importCustomUserInfoDefinitions(Arrays.asList(skillsCreator, locationCreator));
 
         //then
+        ArgumentCaptor<SCustomUserInfoDefinition> userInfoCaptor = ArgumentCaptor.forClass(SCustomUserInfoDefinition.class);
         verify(identityService, times(2)).createCustomUserInfoDefinition(userInfoCaptor.capture());
         SCustomUserInfoDefinition skills = userInfoCaptor.getAllValues().get(0);
         SCustomUserInfoDefinition location = userInfoCaptor.getAllValues().get(1);

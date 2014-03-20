@@ -15,18 +15,18 @@ package org.bonitasoft.engine.identity.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
+import org.bonitasoft.engine.identity.ExportedCustomUserInfoValue;
 import org.bonitasoft.engine.xml.ElementBinding;
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class CustomUserInfoDefinitionBinding extends ElementBinding {
+public class CustomUserInfoValueBinding extends ElementBinding {
 
-    private CustomUserInfoDefinitionCreator userInfoDefCreator;
+    private ExportedCustomUserInfoValue userInfoValue;
 
-    public CustomUserInfoDefinitionBinding() {
+    public CustomUserInfoValueBinding() {
         super();
     }
 
@@ -37,9 +37,9 @@ public class CustomUserInfoDefinitionBinding extends ElementBinding {
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if (OrganizationMappingConstants.NAME.equals(name)) {
-            userInfoDefCreator = new CustomUserInfoDefinitionCreator(value);
-        } else if (OrganizationMappingConstants.DESCRIPTION.equals(name)) {
-            userInfoDefCreator.setDescription(value);
+            userInfoValue = new ExportedCustomUserInfoValue(value);
+        } else if (OrganizationMappingConstants.VALUE.equals(name)) {
+            userInfoValue.setValue(value);
         } 
     }
 
@@ -49,12 +49,12 @@ public class CustomUserInfoDefinitionBinding extends ElementBinding {
 
     @Override
     public Object getObject() {
-        return userInfoDefCreator;
+        return userInfoValue;
     }
 
     @Override
     public String getElementTag() {
-        return OrganizationMappingConstants.CUSTOM_USER_INFO_DEFINITION;
+        return OrganizationMappingConstants.CUSTOM_USER_INFO_VALUE;
     }
 
 }

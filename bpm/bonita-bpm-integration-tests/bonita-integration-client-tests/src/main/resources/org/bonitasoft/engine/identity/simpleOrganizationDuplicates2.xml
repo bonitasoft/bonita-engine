@@ -23,6 +23,16 @@
       <enabled>true</enabled>
       <personalData/>
       <professionalData/>
+      <customUserInfoValues>
+	    <customUserInfoValue>
+	      <name>Office location</name>
+	      <value>Engineering</value>
+	    </customUserInfoValue>
+	    <customUserInfoValue>
+	      <name>Skills</name>
+	      <value>Java, Groovy</value>
+	    </customUserInfoValue>
+	  </customUserInfoValues>
     </user>
   </users>
   <roles>
