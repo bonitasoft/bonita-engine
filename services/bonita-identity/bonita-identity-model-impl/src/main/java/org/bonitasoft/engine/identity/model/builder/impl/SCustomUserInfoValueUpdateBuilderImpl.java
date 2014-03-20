@@ -39,6 +39,4 @@ public class SCustomUserInfoValueUpdateBuilderImpl implements SCustomUserInfoVal
         this.descriptor.addField(SCustomUserInfoValueBuilderFactoryImpl.VALUE, value);
         return this;
     }
-
-
 }

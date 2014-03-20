@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.junit.Test;
 
 /**
@@ -34,5 +35,14 @@ public class CustomUserInfoConverterTest {
         assertThat(value.getDefinitionId()).isEqualTo(2L);
         assertThat(value.getValue()).isEqualTo("value");
         assertThat(value.getUserId()).isEqualTo(1L);
+    }
+
+    @Test
+    public void should_return_null_when_trying_to_convert_a_null_value() throws Exception {
+        CustomUserInfoConverter converter = new CustomUserInfoConverter();
+
+        CustomUserInfoValue value = converter.convert((SCustomUserInfoValue) null);
+
+        assertThat(value).isNull();
     }
 }

@@ -18,12 +18,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.CustomUserInfoValueUpdater;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.SCustomUserInfoValueNotFoundException;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
@@ -40,55 +38,57 @@ import org.bonitasoft.engine.search.identity.SearchCustomUserInfoValues;
 /**
  * @author Vincent Elcrin
  */
-public class CustomUserInfoValueAPI {
+public class SCustomUserInfoValueAPI {
+
+    private SCustomUserInfoValueBuilderFactory creatorFactory;
+
+    private SCustomUserInfoValueUpdateBuilderFactory updaterFactory;
 
     private final IdentityService service;
 
-    private final CustomUserInfoConverter converter = new CustomUserInfoConverter();
-
-    public CustomUserInfoValueAPI(IdentityService service) {
+    public SCustomUserInfoValueAPI(IdentityService service,
+            SCustomUserInfoValueBuilderFactory creatorFactory,
+            SCustomUserInfoValueUpdateBuilderFactory updaterFactory) {
+        this.creatorFactory = creatorFactory;
+        this.updaterFactory = updaterFactory;
         this.service = service;
     }
 
-    public SearchResult<CustomUserInfoValue> search(SearchEntityDescriptor descriptor, final SearchOptions options) {
+    public SearchResult<CustomUserInfoValue> search(SearchEntityDescriptor descriptor, final SearchOptions options) throws SBonitaException {
         SearchCustomUserInfoValues search = new SearchCustomUserInfoValues(service, descriptor, options);
-        try {
-            search.execute();
-            return search.getResult();
-        } catch (SBonitaException e) {
-            throw new RetrieveException(e);
-        }
+        search.execute();
+        return search.getResult();
     }
 
-    public CustomUserInfoValue update(SCustomUserInfoValueUpdateBuilderFactory factory,
-            SCustomUserInfoValue value, CustomUserInfoValueUpdater updater) throws UpdateException, SCustomUserInfoValueNotFoundException {
-        assertNoNull("Cannot update a value based on null parameters", factory, value, updater);
-        try {
-            service.updateCustomUserInfoValue(value, factory.createNewInstance()
-                    .updateValue(updater.getValue())
-                    .done());
-            return converter.convert(service.getCustomUserInfoValue(value.getId()));
-        } catch (SCustomUserInfoValueNotFoundException nfe) {
-            throw nfe;
-        } catch (final SBonitaException e) {
-            throw new UpdateException(e);
-        }
+    public SCustomUserInfoValue update(SCustomUserInfoValue value, CustomUserInfoValueUpdater updater) throws SIdentityException {
+        assertNoNull("Cannot update a value based on null parameters", value, updater);
+        service.updateCustomUserInfoValue(value, updaterFactory.createNewInstance()
+                .updateValue(updater.getValue())
+                .done());
+        return service.getCustomUserInfoValue(value.getId());
     }
 
-    private void assertNoNull(String message, Object... objects) throws UpdateException {
-        for (Object object : objects) {
-            if (object == null) {
-                throw new UpdateException(message);
-            }
+    public SCustomUserInfoValue set(long definitionId, long userId, String value) throws
+            SIdentityException,
+            UpdateException,
+            SBonitaSearchException {
+
+        SCustomUserInfoValue customUserInfoValue = searchValue(definitionId, userId);
+        if(value == null || value.isEmpty()) {
+            return delete(customUserInfoValue);
         }
+        if (customUserInfoValue != null) {
+            return update(customUserInfoValue, new CustomUserInfoValueUpdater(value));
+        }
+        return create(definitionId, userId, value);
     }
 
-    public CustomUserInfoValue create(SCustomUserInfoValueBuilderFactory factory, long definitionId, long userId, String value) throws SIdentityException {
-        return converter.convert(service.createCustomUserInfoValue(factory.createNewInstance()
+    public SCustomUserInfoValue create(long definitionId, long userId, String value) throws SIdentityException {
+        return service.createCustomUserInfoValue(creatorFactory.createNewInstance()
                 .setDefinitionId(definitionId)
                 .setUserId(userId)
                 .setValue(value)
-                .done()));
+                .done());
     }
 
     public SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaSearchException {
@@ -106,4 +106,16 @@ public class CustomUserInfoValueAPI {
         return result.get(0);
     }
 
+    public SCustomUserInfoValue delete(SCustomUserInfoValue value) throws SIdentityException {
+        service.deleteCustomUserInfoValue(value);
+        return null;
+    }
+
+    private void assertNoNull(String message, Object... objects) {
+        for (Object object : objects) {
+            if (object == null) {
+                throw new IllegalArgumentException(message);
+            }
+        }
+    }
 }

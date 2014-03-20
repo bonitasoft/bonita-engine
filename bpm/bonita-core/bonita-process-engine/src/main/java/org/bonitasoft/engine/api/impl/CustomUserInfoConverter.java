@@ -1,6 +1,5 @@
 package org.bonitasoft.engine.api.impl;
 
-import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoValueImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
@@ -20,7 +19,10 @@ public class CustomUserInfoConverter {
         return definition;
     }
 
-    public CustomUserInfoValue convert(SCustomUserInfoValue sValue) {
+    public CustomUserInfoValueImpl convert(SCustomUserInfoValue sValue) {
+        if(sValue == null) {
+            return null;
+        }
         CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
         value.setDefinitionId(sValue.getDefinitionId());
         value.setUserId(sValue.getUserId());

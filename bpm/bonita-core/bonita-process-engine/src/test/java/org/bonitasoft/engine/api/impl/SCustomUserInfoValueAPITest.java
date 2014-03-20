@@ -16,8 +16,6 @@ package org.bonitasoft.engine.api.impl;
 import java.util.Collections;
 import java.util.Map;
 
-import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.CustomUserInfoValueUpdater;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
@@ -42,10 +40,7 @@ import static org.mockito.Mockito.verify;
  * @author Vincent Elcrin
  */
 @RunWith(MockitoJUnitRunner.class)
-public class CustomUserInfoValueAPITest {
-
-    @Mock(answer = Answers.RETURNS_MOCKS)
-    private IdentityService service;
+public class SCustomUserInfoValueAPITest {
 
     @Mock
     private SCustomUserInfoValueBuilderFactory createFactory;
@@ -53,8 +48,11 @@ public class CustomUserInfoValueAPITest {
     @Mock(answer = Answers.RETURNS_MOCKS)
     private SCustomUserInfoValueUpdateBuilderFactory updateFactory;
 
+    @Mock(answer = Answers.RETURNS_MOCKS)
+    private IdentityService service;
+
     @InjectMocks
-    private CustomUserInfoValueAPI api;
+    private SCustomUserInfoValueAPI api;
 
     @Test
     public void update_should_call_service_to_update_custom_user_info_when_exist() throws Exception {
@@ -62,7 +60,7 @@ public class CustomUserInfoValueAPITest {
         SCustomUserInfoValueUpdateBuilder builder = createDummySCustomUserInfoValueUpdateBuilder(Collections.singletonMap("key", "value"));
         given(updateFactory.createNewInstance()).willReturn(builder);
 
-        api.update(updateFactory, value, new CustomUserInfoValueUpdater("value"));
+        api.update(value, new CustomUserInfoValueUpdater("value"));
 
         verify(service).updateCustomUserInfoValue(value, builder.done());
     }
@@ -72,24 +70,20 @@ public class CustomUserInfoValueAPITest {
         DummySCustomUserInfoValue updatedValue = new DummySCustomUserInfoValue(2L, 1L, 1L, "updated");
         given(service.getCustomUserInfoValue(2L)).willReturn(updatedValue);
 
-        CustomUserInfoValue result = api.update(updateFactory, new DummySCustomUserInfoValue(2L), new CustomUserInfoValueUpdater("value"));
+        SCustomUserInfoValue result = api.update(new DummySCustomUserInfoValue(2L),
+                new CustomUserInfoValueUpdater("value"));
 
         assertThat(result.getValue()).isEqualTo("updated");
     }
 
-    @Test(expected = UpdateException.class)
-    public void update_should_throw_update_exception_when_factory_is_null() throws Exception {
-        api.update(null, new DummySCustomUserInfoValue(1L), new CustomUserInfoValueUpdater("value"));
-    }
-
-    @Test(expected = UpdateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void update_should_throw_update_exception_when_value_is_null() throws Exception {
-        api.update(updateFactory, null, new CustomUserInfoValueUpdater("value"));
+        api.update(null, new CustomUserInfoValueUpdater("value"));
     }
 
-    @Test(expected = UpdateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void update_should_throw_update_exception_when_updater_is_null() throws Exception {
-        api.update(updateFactory, new DummySCustomUserInfoValue(1L), null);
+        api.update(new DummySCustomUserInfoValue(1L), null);
     }
 
     @Test
