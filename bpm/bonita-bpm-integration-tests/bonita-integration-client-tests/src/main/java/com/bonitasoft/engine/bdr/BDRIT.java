@@ -35,7 +35,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -102,7 +101,9 @@ public class BDRIT extends CommonAPISPTest {
         final Expression stringExpression = new ExpressionBuilder()
                 .createGroovyScriptExpression(
                         "alive",
-                        "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return \"Employee [firstName=\" + e.firstName + \", lastName=\" + e.lastName + \"]\"",
+                        "import "
+                                + EMPLOYEE_QUALIF_CLASSNAME
+                                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return \"Employee [firstName=\" + e.firstName + \", lastName=\" + e.lastName + \"]\"",
                         String.class.getName());
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
         expressions.put(stringExpression, new HashMap<String, Serializable>());
@@ -123,8 +124,8 @@ public class BDRIT extends CommonAPISPTest {
 
     @Test
     public void deployABDRAndCreateABusinessData() throws Exception {
-        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
-                "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addActor(ACTOR_NAME);
@@ -149,8 +150,8 @@ public class BDRIT extends CommonAPISPTest {
 
     @Test
     public void deployABDRAndCreateADefaultBusinessData() throws Exception {
-        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
-                "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
@@ -168,7 +169,6 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore
     public void deployABDRAndCreateAndUdpateABusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -239,25 +239,23 @@ public class BDRIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    private ProcessDefinition buildProcess(final String taskName) throws BonitaException, IOException {
+    private ProcessDefinition buildProcessThatUpdateBizDataInsideConnector(final String taskName) throws BonitaException, IOException {
+        final Expression getEmployeeExpression = new ExpressionBuilder().createBusinessDataExpression("myEmployee", EMPLOYEE_QUALIF_CLASSNAME);
 
-        final Expression getEmployeeExpression = new ExpressionBuilder().createBusinessDataExpression("myEmployee", "org.bonita.pojo.Employee");
-
-        final Expression employeeExpression = new ExpressionBuilder()
-                .createGroovyScriptExpression("createNewEmployee",
-                        "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;",
-                        "org.bonita.pojo.Employee");
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("BizDataAndConnector", "1.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addBusinessData("myEmployee", "org.bonita.pojo.Employee", employeeExpression);
+        processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
         processDefinitionBuilder
                 .addUserTask(taskName, ACTOR_NAME)
                 .addConnector("updateBusinessData", "com.bonitasoft.connector.BusinessDataUpdateConnector", "1.0", ConnectorEvent.ON_ENTER)
                 .addInput("bizData", getEmployeeExpression)
                 .addOutput(
-                        new OperationBuilder().createBusinessDataSetAttributeOperation("output1", "setFirstName", String.class.getName(),
-                                new ExpressionBuilder().createConstantStringExpression("Dana")));
+                        new OperationBuilder().createBusinessDataSetAttributeOperation("myEmployee", "setLastName", String.class.getName(),
+                                new ExpressionBuilder().createGroovyScriptExpression("retrieve modified lastname from connector", "output1.getLastName()",
+                                        String.class.getName(), new ExpressionBuilder().createBusinessDataExpression("output1", EMPLOYEE_QUALIF_CLASSNAME))));
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 processDefinitionBuilder.done());
@@ -285,22 +283,17 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test
-    @Ignore
-    public void updateBusinessDataOutsideATransaction() throws Exception {
+    public void updateBusinessDataShouldWorkOutsideATransaction() throws Exception {
         final String taskName = "step";
 
-        final ProcessDefinition definition = buildProcess(taskName);
+        final ProcessDefinition definition = buildProcessThatUpdateBizDataInsideConnector(taskName);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask(taskName, instance.getId());
 
         final Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
         assertNotNull(businessDataInstance);
 
-        Method method = businessDataInstance.getClass().getMethod("getFirstName", null);
-        final String firstName = (String) method.invoke(businessDataInstance, null);
-        assertThat(firstName).isEqualTo("Dana");
-
-        method = businessDataInstance.getClass().getMethod("getLastName", null);
+        Method method = businessDataInstance.getClass().getMethod("getLastName", null);
         final String lastName = (String) method.invoke(businessDataInstance, null);
         assertThat(lastName).isEqualTo("Hakkinen");
 
