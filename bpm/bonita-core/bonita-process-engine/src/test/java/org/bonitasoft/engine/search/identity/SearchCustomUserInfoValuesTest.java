@@ -49,10 +49,10 @@ public class SearchCustomUserInfoValuesTest {
         SearchCustomUserInfoValues search = new SearchCustomUserInfoValues(service, descriptor, options);
 
         List<CustomUserInfoValue> result = search.convertToClientObjects(Arrays.<SCustomUserInfoValue>asList(
-                new DummySCustomUserInfoValue(1L),
-                new DummySCustomUserInfoValue(2L)));
+                new DummySCustomUserInfoValue(1L, 3L, 1L, ""),
+                new DummySCustomUserInfoValue(2L, 4L, 1L, "")));
 
-        assertThat(result.get(0).getDefinitionId()).isEqualTo(1L);
-        assertThat(result.get(1).getDefinitionId()).isEqualTo(2L);
+        assertThat(result.get(0).getDefinitionId()).isEqualTo(3L);
+        assertThat(result.get(1).getDefinitionId()).isEqualTo(4L);
     }
 }
