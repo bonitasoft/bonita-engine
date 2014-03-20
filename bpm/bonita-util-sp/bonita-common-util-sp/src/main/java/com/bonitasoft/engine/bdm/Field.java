@@ -62,14 +62,14 @@ public class Field {
     public void setNullable(final Boolean nullable) {
         this.nullable = nullable;
     }
-
+    
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (nullable ? 1231 : 1237);
-        result = prime * result + (type == null ? 0 : type.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((nullable == null) ? 0 : nullable.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
         return result;
     }
 

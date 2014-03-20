@@ -1,5 +1,7 @@
 package com.bonitasoft.engine.bdm;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 public class FieldTest {
@@ -52,4 +54,11 @@ public class FieldTest {
         field.setName("PersIstenCeVersiOn");
     }
 
+    @Test
+    public void hashCodeIsBasedOnFieldClassAttributes() throws Exception {
+        Field field = new Field();
+        Field other = new Field();
+
+        assertThat(field.hashCode()).isEqualTo(other.hashCode());
+    }
 }
