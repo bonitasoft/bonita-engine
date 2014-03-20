@@ -56,6 +56,7 @@ public class BDRIT extends CommonAPISPTest {
         final Field firstName = new Field();
         firstName.setName("firstName");
         firstName.setType(FieldType.STRING);
+        firstName.setLength(Integer.valueOf(10));
 
         final Field lastName = new Field();
         lastName.setName("lastName");
@@ -66,6 +67,7 @@ public class BDRIT extends CommonAPISPTest {
         employee.setQualifiedName(EMPLOYEE_QUALIF_CLASSNAME);
         employee.addField(firstName);
         employee.addField(lastName);
+        employee.setDescription("Describe a simple employee");
 
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
@@ -325,9 +327,28 @@ public class BDRIT extends CommonAPISPTest {
     }
 
     @Test(expected = BonitaRuntimeException.class)
-    public void createAnEmployeeWithArequiredFieldAtNullThrowsAnException() throws Exception {
+    public void createAnEmployeeWithARequiredFieldAtNullThrowsAnException() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
+
+        final ProcessDefinition definition = deployAndEnableWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        try {
+            getProcessAPI().startProcess(definition.getId());
+        } finally {
+            disableAndDeleteProcess(definition.getId());
+        }
+    }
+
+    @Test(expected = BonitaRuntimeException.class)
+    public void createAnEmployeeWithATooSmallFieldAtNullThrowsAnException() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
+                "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John124578/'; e.lastName = 'Doe'; return e;",
+                EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);

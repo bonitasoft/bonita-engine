@@ -17,6 +17,7 @@
 
   <xs:complexType name="businessObject">
     <xs:sequence>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
       <xs:element name="fields">
         <xs:complexType>
           <xs:sequence>
@@ -24,13 +25,15 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="qualifiedName" type="xs:string" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="field">
     <xs:sequence/>
-    <xs:attribute name="nullable" type="xs:boolean" />
+    <xs:attribute name="length" type="xs:int"/>
+    <xs:attribute name="nullable" type="xs:boolean"/>
     <xs:attribute name="type" type="fieldType" use="required"/>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
@@ -38,6 +41,7 @@
   <xs:simpleType name="fieldType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="STRING"/>
+      <xs:enumeration value="TEXT"/>
       <xs:enumeration value="INTEGER"/>
       <xs:enumeration value="DOUBLE"/>
       <xs:enumeration value="LONG"/>

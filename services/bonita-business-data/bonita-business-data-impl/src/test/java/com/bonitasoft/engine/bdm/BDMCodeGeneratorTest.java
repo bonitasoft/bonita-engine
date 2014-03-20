@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,6 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Temporal;
 import javax.persistence.Version;
 
@@ -30,6 +32,8 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 
 public class BDMCodeGeneratorTest extends CompilableCode {
+
+    private static final String EMPLOYEE_QUALIFIED_NAME = "org.bonitasoft.hr.Employee";
 
     private BDMCodeGenerator bdmCodeGenerator;
 
@@ -59,9 +63,9 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     }
 
     @Test
-    public void shouldAddEntity_CreateAValidEnityFromBusinessObject() throws Exception {
+    public void shouldAddEntity_CreateAValidEntityFromBusinessObject() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addEntity(employeeBO);
         final JDefinedClass definedClass = bdmCodeGenerator.getModel()._getClass(employeeBO.getQualifiedName());
         assertThat(definedClass).isNotNull();
@@ -97,11 +101,12 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     @Test
     public void shouldAddColumnField_CreatePrimitiveAttribute_InDefinedClass() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         final Field nameField = new Field();
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
-        final JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
+        nameField.setLength(Integer.valueOf(45));
+        final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addBasicField(definedClass, nameField);
 
         final JFieldVar nameFieldVar = definedClass.fields().get("name");
@@ -115,6 +120,8 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(name).isNotNull().isEqualTo("NAME");
         final String nullable = getAnnotationParamValue(annotationUse, "nullable");
         assertThat(nullable).isNotNull().isEqualTo("true");
+        final String length = getAnnotationParamValue(annotationUse, "length");
+        assertThat(length).isNotNull().isEqualTo("45");
 
         final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
                 + "Employee.java");
@@ -134,12 +141,12 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     @Test
     public void shouldAddBasicField_AddAFieldWithTemporalAnnotation_InDefinedClass() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         final Field nameField = new Field();
         nameField.setName("name");
         nameField.setType(FieldType.DATE);
         nameField.setNullable(Boolean.FALSE);
-        final JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
+        final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addBasicField(definedClass, nameField);
 
         final JFieldVar nameFieldVar = definedClass.fields().get("name");
@@ -171,11 +178,11 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     @Test
     public void shouldAddAccessors_AddAccessorMethods_InDefinedClass() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
         final Field nameField = new Field();
         nameField.setName("name");
         nameField.setType(FieldType.STRING);
-        final JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
+        final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
         final JFieldVar basicField = bdmCodeGenerator.addBasicField(definedClass, nameField);
 
         bdmCodeGenerator.addAccessors(definedClass, basicField);
@@ -230,10 +237,15 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     }
 
     @Test
+    public void shouldToJavaType_ReturnStringTextClass() throws Exception {
+        assertThat(bdmCodeGenerator.toJavaType(FieldType.TEXT).name()).isEqualTo(String.class.getSimpleName());
+    }
+
+    @Test
     public void shouldAddPersistenceIdFieldAndAccessors_AddPersistenceId() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
-        final JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addPersistenceIdFieldAndAccessors(definedClass);
 
         final JFieldVar idFieldVar = definedClass.fields().get(Field.PERSISTENCE_ID);
@@ -256,8 +268,8 @@ public class BDMCodeGeneratorTest extends CompilableCode {
     @Test
     public void shouldAddPersistenceVersionFieldAndAccessors_AddPersistenceVersion() throws Exception {
         final BusinessObject employeeBO = new BusinessObject();
-        employeeBO.setQualifiedName("org.bonitasoft.hr.Employee");
-        final JDefinedClass definedClass = bdmCodeGenerator.addClass("org.bonitasoft.hr.Employee");
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
         bdmCodeGenerator.addPersistenceVersionFieldAndAccessors(definedClass);
 
         final JFieldVar versionFieldVar = definedClass.fields().get(Field.PERSISTENCE_VERSION);
@@ -267,6 +279,33 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final Iterator<JAnnotationUse> iterator = versionFieldVar.annotations().iterator();
         final JAnnotationUse annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Version.class.getName());
+
+        final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
+                + "Employee.java");
+        sourceFileToCompile.delete();
+        bdmCodeGenerator.generate(destDir);
+        assertCompilationSuccessful(sourceFileToCompile);
+    }
+
+    @Test
+    public void shouldAddColumnField() throws Exception {
+        final BusinessObject employeeBO = new BusinessObject();
+        employeeBO.setQualifiedName(EMPLOYEE_QUALIFIED_NAME);
+        final Field nameField = new Field();
+        nameField.setName("description");
+        nameField.setType(FieldType.TEXT);
+        final JDefinedClass definedClass = bdmCodeGenerator.addClass(EMPLOYEE_QUALIFIED_NAME);
+        bdmCodeGenerator.addBasicField(definedClass, nameField);
+
+        final JFieldVar nameFieldVar = definedClass.fields().get("description");
+        final Collection<JAnnotationUse> annotations = nameFieldVar.annotations();
+        assertThat(annotations).hasSize(2);
+        final Iterator<JAnnotationUse> iterator = annotations.iterator();
+        JAnnotationUse annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
+
+        annotationUse = iterator.next();
+        assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Lob.class.getName());
 
         final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
                 + "Employee.java");

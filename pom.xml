@@ -58,17 +58,24 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-	            <groupId>org.hibernate.javax.persistence</groupId>
-	            <artifactId>hibernate-jpa-2.0-api</artifactId>
-	            <version>1.0.1.Final</version>
-            </dependency>
-			<dependency>
-				<groupId>org.assertj</groupId>
-				<artifactId>assertj-core</artifactId>
-				<version>1.5.0</version>
+				<groupId>org.hibernate.javax.persistence</groupId>
+				<artifactId>hibernate-jpa-2.0-api</artifactId>
+				<version>1.0.1.Final</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>jaxb2-maven-plugin</artifactId>
+					<version>1.5</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
 	<profiles>
 		<profile>
@@ -106,7 +113,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -116,7 +123,7 @@
 				</plugins>
 			</build>
 		</profile>
-		
+
 		<profile>
 			<id>package-all</id>
 			<modules>
@@ -133,7 +140,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -143,7 +150,7 @@
 				</plugins>
 			</build>
 		</profile>
-		
+
 		<profile>
 			<id>javadoc</id>
 			<properties>
@@ -167,7 +174,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>

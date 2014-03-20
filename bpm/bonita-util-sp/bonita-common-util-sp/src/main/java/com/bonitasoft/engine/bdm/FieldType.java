@@ -15,8 +15,8 @@ import java.util.Date;
  */
 public enum FieldType {
 
-	
     STRING(String.class),
+    TEXT(String.class),
     INTEGER(Integer.class),
     DOUBLE(Double.class),
     LONG(Long.class),
@@ -26,17 +26,15 @@ public enum FieldType {
     BYTE(Byte.class),
     SHORT(Short.class),
     CHAR(Character.class);
-    
 
-	private Class<?> clazz;
+    private Class<?> clazz;
 
-	FieldType(Class<?> clazz){
-		this.clazz = clazz;
-	}
+    private FieldType(final Class<?> clazz) {
+        this.clazz = clazz;
+    }
 
-	public Class<?> getClazz() {
-		return clazz;
-	}
-
+    public Class<?> getClazz() {
+        return clazz;
+    }
 
 }

@@ -16,6 +16,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
@@ -54,6 +55,7 @@ public class BDMCodeGenerator extends CodeGenerator {
         JDefinedClass entityClass = addClass(qualifiedName);
         entityClass = addInterface(entityClass, Serializable.class.getName());
         entityClass = addInterface(entityClass, com.bonitasoft.engine.bdm.Entity.class.getName());
+        entityClass.javadoc().add(bo.getDescription());
 
         final JAnnotationUse entityAnnotation = addAnnotation(entityClass, Entity.class);
         entityAnnotation.param("name", entityClass.name());
@@ -107,6 +109,10 @@ public class BDMCodeGenerator extends CodeGenerator {
         if (field.getType() == FieldType.DATE) {
             final JAnnotationUse temporalAnnotation = addAnnotation(fieldVar, Temporal.class);
             temporalAnnotation.param("value", TemporalType.TIMESTAMP);
+        } else if (FieldType.TEXT.equals(field.getType())) {
+            addAnnotation(fieldVar, Lob.class);
+        } else if (FieldType.STRING.equals(field.getType()) && field.getLength() != null && field.getLength() > 0) {
+            columnAnnotation.param("length", field.getLength());
         }
         return fieldVar;
     }

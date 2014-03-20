@@ -200,7 +200,7 @@
 				</configuration>
 				<executions>
 					<execution>
-						<phase>integration-test</phase>  
+						<phase>integration-test</phase>
 						<goals>
 							<goal>integration-test</goal>
 							<goal>verify</goal>

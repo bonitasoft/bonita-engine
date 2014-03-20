@@ -32,6 +32,9 @@ public class Field {
     @XmlAttribute
     private Boolean nullable;
 
+    @XmlAttribute
+    private Integer length;
+
     public String getName() {
         return name;
     }
@@ -62,14 +65,23 @@ public class Field {
     public void setNullable(final Boolean nullable) {
         this.nullable = nullable;
     }
-    
+
+    public Integer getLength() {
+        return length;
+    }
+
+    public void setLength(final Integer length) {
+        this.length = length;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((nullable == null) ? 0 : nullable.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + (length == null ? 0 : length.hashCode());
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (nullable == null ? 0 : nullable.hashCode());
+        result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
 
@@ -85,6 +97,13 @@ public class Field {
             return false;
         }
         final Field other = (Field) obj;
+        if (length == null) {
+            if (other.length != null) {
+                return false;
+            }
+        } else if (!length.equals(other.length)) {
+            return false;
+        }
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -92,7 +111,11 @@ public class Field {
         } else if (!name.equals(other.name)) {
             return false;
         }
-        if (nullable != other.nullable) {
+        if (nullable == null) {
+            if (other.nullable != null) {
+                return false;
+            }
+        } else if (!nullable.equals(other.nullable)) {
             return false;
         }
         if (type != other.type) {

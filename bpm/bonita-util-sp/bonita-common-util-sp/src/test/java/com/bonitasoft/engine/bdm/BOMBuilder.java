@@ -17,6 +17,7 @@ public class BOMBuilder {
         dateField.setNullable(Boolean.FALSE);
         final Field doubleField = buildField("doubleField", FieldType.DOUBLE);
         final Field integerField = buildField("integerField", FieldType.INTEGER);
+        final Field textField = buildField("textField", FieldType.TEXT);
 
         final BusinessObject employee = new BusinessObject();
         employee.setQualifiedName("BusinessObject");
@@ -25,6 +26,7 @@ public class BOMBuilder {
         employee.addField(dateField);
         employee.addField(doubleField);
         employee.addField(integerField);
+        employee.addField(textField);
 
         return employee;
     }

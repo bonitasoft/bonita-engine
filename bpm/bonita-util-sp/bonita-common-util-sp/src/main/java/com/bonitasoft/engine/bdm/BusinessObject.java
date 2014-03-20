@@ -17,15 +17,20 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = { "description", "fields" })
 public class BusinessObject {
 
     @XmlAttribute(required = true)
     private String qualifiedName;
+
+    @XmlElement
+    private String description;
 
     @XmlElementWrapper(name = "fields", required = true)
     @XmlElement(name = "field", required = true)
@@ -54,12 +59,21 @@ public class BusinessObject {
         fields.add(field);
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (qualifiedName == null ? 0 : qualifiedName.hashCode());
+        result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (fields == null ? 0 : fields.hashCode());
+        result = prime * result + (qualifiedName == null ? 0 : qualifiedName.hashCode());
         return result;
     }
 
@@ -75,11 +89,11 @@ public class BusinessObject {
             return false;
         }
         final BusinessObject other = (BusinessObject) obj;
-        if (qualifiedName == null) {
-            if (other.qualifiedName != null) {
+        if (description == null) {
+            if (other.description != null) {
                 return false;
             }
-        } else if (!qualifiedName.equals(other.qualifiedName)) {
+        } else if (!description.equals(other.description)) {
             return false;
         }
         if (fields == null) {
@@ -87,6 +101,13 @@ public class BusinessObject {
                 return false;
             }
         } else if (!fields.equals(other.fields)) {
+            return false;
+        }
+        if (qualifiedName == null) {
+            if (other.qualifiedName != null) {
+                return false;
+            }
+        } else if (!qualifiedName.equals(other.qualifiedName)) {
             return false;
         }
         return true;
