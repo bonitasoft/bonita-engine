@@ -53,6 +53,8 @@ public class SearchFlowNodeInstanceDescriptor extends SearchEntityDescriptor {
                 new FieldDescriptor(SFlowNodeInstance.class, keyProvider.getDisplayNameKey()));
         flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.STATE_CATEGORY,
                 new FieldDescriptor(SFlowNodeInstance.class, keyProvider.getStateCategoryKey()));
+        flowNodeInstanceDescriptorKeys.put(FlowNodeInstanceSearchDescriptor.LAST_UPDATE_DATE,
+                new FieldDescriptor(SFlowNodeInstance.class, keyProvider.getLastUpdateDateKey()));
 
         final Set<String> tasksInstanceFields = new HashSet<String>(2);
         tasksInstanceFields.add(keyProvider.getNameKey());
