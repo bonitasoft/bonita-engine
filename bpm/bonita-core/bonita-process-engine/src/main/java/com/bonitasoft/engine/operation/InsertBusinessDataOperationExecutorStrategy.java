@@ -8,22 +8,18 @@
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.operation.OperatorType;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
-import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
 /**
@@ -58,22 +54,15 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
     public void update(final SLeftOperand sLeftOperand, Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         try {
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
-                    flowNodeInstanceService.getProcessInstanceId(containerId, containerType));
+            long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+            final SRefBusinessDataInstance refBusinessDataInstance = 
+                    refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(), processInstanceId);
             final Long dataId = refBusinessDataInstance.getDataId();
             if (dataId == null) {
                 Entity businessData = repository.merge((Entity) newValue);
                 refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
             }
-        } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
-            throw new SOperationExecutionException(srbdinfe);
-        } catch (final SBonitaReadException sbre) {
-            throw new SOperationExecutionException(sbre);
-        } catch (final SRefBusinessDataInstanceModificationException srbsme) {
-            throw new SOperationExecutionException(srbsme);
-        } catch (SFlowNodeNotFoundException e) {
-            throw new SOperationExecutionException(e);
-        } catch (SFlowNodeReadException e) {
+        } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
     }
