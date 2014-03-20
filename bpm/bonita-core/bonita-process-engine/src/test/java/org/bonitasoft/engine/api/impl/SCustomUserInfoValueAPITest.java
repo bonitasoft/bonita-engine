@@ -13,6 +13,7 @@
  */
 package org.bonitasoft.engine.api.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
@@ -34,6 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -42,7 +44,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class SCustomUserInfoValueAPITest {
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_MOCKS)
     private SCustomUserInfoValueBuilderFactory createFactory;
 
     @Mock(answer = Answers.RETURNS_MOCKS)
@@ -67,13 +69,13 @@ public class SCustomUserInfoValueAPITest {
 
     @Test
     public void update_should_return_updated_value() throws Exception {
-        DummySCustomUserInfoValue updatedValue = new DummySCustomUserInfoValue(2L, 1L, 1L, "updated");
+        DummySCustomUserInfoValue updatedValue = new DummySCustomUserInfoValue(2L, 1L, 1L, "update");
         given(service.getCustomUserInfoValue(2L)).willReturn(updatedValue);
 
         SCustomUserInfoValue result = api.update(new DummySCustomUserInfoValue(2L),
                 new CustomUserInfoValueUpdater("value"));
 
-        assertThat(result.getValue()).isEqualTo("updated");
+        assertThat(result.getValue()).isEqualTo("update");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -87,12 +89,51 @@ public class SCustomUserInfoValueAPITest {
     }
 
     @Test
-    public void searchValue_should_return_null_when_service_search_method_return_an_empty_list() throws Exception {
-        given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Collections.<SCustomUserInfoValue> emptyList());
+    public void set_should_delete_CustomUserInfoValue_when_value_is_null() throws Exception {
+        SCustomUserInfoValue value = new DummySCustomUserInfoValue(254L);
+        given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
 
-        SCustomUserInfoValue value = api.searchValue(1L, 2L);
+        api.set(1L, 2L, null);
 
-        assertThat(value).isNull();
+        verify(service).deleteCustomUserInfoValue(value);
+    }
+
+    @Test
+    public void set_should_delete_SCustomUserInfoValue_when_value_is_empty() throws Exception {
+        SCustomUserInfoValue value = new DummySCustomUserInfoValue(254L);
+        given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
+
+        api.set(1L, 2L, "");
+
+        verify(service).deleteCustomUserInfoValue(value);
+    }
+
+    @Test
+    public void set_should_return_null_when_value_is_deleted() throws Exception {
+
+        SCustomUserInfoValue deletedValue = api.set(1L, 2L, "");
+
+        assertThat(deletedValue).isNull();
+    }
+
+    @Test
+    public void set_should_update_SCustomUserInfoValue_when_value_exist() throws Exception {
+        SCustomUserInfoValue value = new DummySCustomUserInfoValue(642L);
+        given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(Arrays.asList(value));
+
+        api.set(1L, 2L, "update");
+
+        verify(service).updateCustomUserInfoValue(eq(value), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test
+    public void set_should_create_SCustomUserInfoValue_when_value_doesnt_exist() throws Exception {
+        given(service.searchCustomUserInfoValue(any(QueryOptions.class))).willReturn(
+                Collections.<SCustomUserInfoValue> emptyList());
+
+        api.set(5L, 3L, "update");
+
+        verify(service).createCustomUserInfoValue(any(SCustomUserInfoValue.class));
     }
 
     private SCustomUserInfoValueUpdateBuilder createDummySCustomUserInfoValueUpdateBuilder(final Map<String, String> fields) {

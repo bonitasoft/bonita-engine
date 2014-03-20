@@ -40,9 +40,9 @@ import org.bonitasoft.engine.search.identity.SearchCustomUserInfoValues;
  */
 public class SCustomUserInfoValueAPI {
 
-    private SCustomUserInfoValueBuilderFactory creatorFactory;
+    private final SCustomUserInfoValueBuilderFactory creatorFactory;
 
-    private SCustomUserInfoValueUpdateBuilderFactory updaterFactory;
+    private final SCustomUserInfoValueUpdateBuilderFactory updaterFactory;
 
     private final IdentityService service;
 
@@ -70,14 +70,15 @@ public class SCustomUserInfoValueAPI {
 
     public SCustomUserInfoValue set(long definitionId, long userId, String value) throws
             SIdentityException,
-            UpdateException,
             SBonitaSearchException {
 
         SCustomUserInfoValue customUserInfoValue = searchValue(definitionId, userId);
         if(value == null || value.isEmpty()) {
             delete(customUserInfoValue);
-//            customUserInfoValue.setValue(value);
-            return customUserInfoValue;
+            // we should return an updated value or null
+            // customUserInfoValue.setValue(value);
+            // return customUserInfoValue;
+            return null;
         }
         if (customUserInfoValue != null) {
             return update(customUserInfoValue, new CustomUserInfoValueUpdater(value));
@@ -94,7 +95,9 @@ public class SCustomUserInfoValueAPI {
     }
 
     public void delete(SCustomUserInfoValue value) throws SIdentityException {
-        service.deleteCustomUserInfoValue(value);
+        if(value != null) {
+            service.deleteCustomUserInfoValue(value);
+        }
     }
 
     private SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaSearchException {
