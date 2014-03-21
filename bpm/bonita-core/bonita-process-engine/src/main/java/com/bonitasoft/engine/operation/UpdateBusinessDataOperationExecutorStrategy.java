@@ -141,8 +141,7 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     }
 
     @Override
-    public boolean doUpdateData() {
+    public boolean shouldPerformUpdateAtEnd() {
         return true;
     }
-
 }

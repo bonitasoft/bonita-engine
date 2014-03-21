@@ -73,7 +73,7 @@ public class InsertBusinessDataOperationExecutorStrategy implements OperationExe
     }
 
     @Override
-    public boolean doUpdateData() {
+    public boolean shouldPerformUpdateAtEnd() {
         return false;
     }
 
