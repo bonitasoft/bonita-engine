@@ -18,6 +18,8 @@ import java.util.List;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -68,18 +70,34 @@ public class CustomUserInfoDefinitionAPI {
         if (creator.getName().length() > MAX_NAME_LENGHT) {
             throw new CreationException("The definition name cannot be longer then 75 characters.");
         }
-        
+
     }
 
-    public void delete(long id) throws SIdentityException {
-        service.deleteCustomUserInfoDefinition(id);
-    }
-
-    public List<CustomUserInfoDefinition> list(int startIndex, int maxResult) throws SIdentityException {
-        List<CustomUserInfoDefinition> definitions = new ArrayList<CustomUserInfoDefinition>();
-        for (SCustomUserInfoDefinition sDefinition : service.getCustomUserInfoDefinitions(startIndex, maxResult)) {
-            definitions.add(converter.convert(sDefinition));
+    public void delete(long id) throws DeletionException {
+        try {
+            service.deleteCustomUserInfoDefinition(id);
+        } catch (SIdentityException e) {
+            throw new DeletionException(e);
         }
-        return definitions;
+    }
+
+    public List<CustomUserInfoDefinition> list(int startIndex, int maxResult) {
+        try {
+            List<CustomUserInfoDefinition> definitions = new ArrayList<CustomUserInfoDefinition>();
+            for (SCustomUserInfoDefinition sDefinition : service.getCustomUserInfoDefinitions(startIndex, maxResult)) {
+                definitions.add(converter.convert(sDefinition));
+            }
+            return definitions;
+        } catch (SIdentityException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    public long count() {
+        try {
+            return service.getNumberOfCustomUserInfoDefinition();
+        } catch (SIdentityException e) {
+            throw new RetrieveException(e);
+        }
     }
 }

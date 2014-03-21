@@ -62,6 +62,14 @@ public interface CustomUserInfoAPI {
     public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult);
 
     /**
+     * Count the number of existing definitions.
+     *
+     * @return the number of existing definitions.
+     * @since 6.3
+     */
+    public long getNumberOfCustomInfoDefinitions();
+
+    /**
      * Delete the {@link CustomUserInfoDefinition} related to the given id. All {@link CustomUserInfoValue} related to this {@link CustomUserInfoDefinition}
      * will be deleted as well.
      * 

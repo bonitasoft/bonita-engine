@@ -1394,7 +1394,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         try {
             SCustomUserInfoValueBuilderFactory creatorFactory = BuilderFactory.get(SCustomUserInfoValueBuilderFactory.class);
             SCustomUserInfoValueUpdateBuilderFactory updaterFactor = BuilderFactory.get(SCustomUserInfoValueUpdateBuilderFactory.class);
-            SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(tenantAccessor.getIdentityService(), creatorFactory , updaterFactor);
+            SCustomUserInfoValueAPI customUserInfoValueAPI = new SCustomUserInfoValueAPI(tenantAccessor.getIdentityService(), creatorFactory, updaterFactor);
             new ImportOrganization(tenantAccessor, organizationContent, policy, customUserInfoValueAPI).execute();
         } catch (final SBonitaException e) {
             throw new OrganizationImportException(e);
@@ -1405,7 +1405,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     public String exportOrganization() throws OrganizationExportException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         int maxResults = 100;
-        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService(), maxResults );
+        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService(), maxResults);
         try {
             exportOrganization.execute();
             return exportOrganization.getResult();
@@ -1423,20 +1423,17 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public List<CustomUserInfoDefinition> getCustomUserInfoDefinitions(int startIndex, int maxResult) throws RetrieveException {
-        try {
-            return createCustomUserInfoDefinitionAPI().list(startIndex, maxResult);
-        } catch (SIdentityException e) {
-            throw new RetrieveException(e);
-        }
+        return createCustomUserInfoDefinitionAPI().list(startIndex, maxResult);
+    }
+
+    @Override
+    public long getNumberOfCustomInfoDefinitions() {
+        return createCustomUserInfoDefinitionAPI().count();
     }
 
     @Override
     public void deleteCustomUserInfoDefinition(long id) throws DeletionException {
-        try {
-            createCustomUserInfoDefinitionAPI().delete(id);
-        } catch (SIdentityException e) {
-            throw new DeletionException(e);
-        }
+        createCustomUserInfoDefinitionAPI().delete(id);
     }
 
     @Override

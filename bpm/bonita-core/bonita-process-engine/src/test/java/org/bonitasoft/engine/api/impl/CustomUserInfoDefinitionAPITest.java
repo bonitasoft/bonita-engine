@@ -68,7 +68,6 @@ public class CustomUserInfoDefinitionAPITest {
         assertThat(definition.getId()).isEqualTo(1L);
     }
     
-
     @Test
     public void create_should_throws_AlreadyExistException_when_service_throws_SCustomUserInfoDefinitionAlreadyExistsException() throws Exception {
         //given
@@ -86,19 +85,10 @@ public class CustomUserInfoDefinitionAPITest {
         }
     }
 
-    @Test
+    @Test(expected = CreationException.class)
     public void create_should_throws_CreationException_if_name_is_null() throws Exception {
-        //given
-        String name = null;
-        
-        try {
-            //when
-            api.create(factory, new CustomUserInfoDefinitionCreator(name));
-            fail("Expected CreationException");
-        } catch (CreationException e) {
-            //then
-            assertThat(e.getMessage()).isEqualTo("The definition name cannot be null or empty.");
-        }
+
+        api.create(factory, new CustomUserInfoDefinitionCreator(null));
     }
 
     @Test
