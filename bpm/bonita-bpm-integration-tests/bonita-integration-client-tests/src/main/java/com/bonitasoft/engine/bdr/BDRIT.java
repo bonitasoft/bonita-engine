@@ -67,7 +67,7 @@ public class BDRIT extends CommonAPISPTest {
         employee.addField(firstName);
         employee.addField(lastName);
         employee.setDescription("Describe a simple employee");
-        employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
+        // employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
