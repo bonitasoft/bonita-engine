@@ -51,6 +51,7 @@ public class APIAccessorImpl implements APIAccessor {
     @Override
     public ThemeAPI getThemeAPI() {
         return new ThemeAPIImpl();
+
     }
 
 }

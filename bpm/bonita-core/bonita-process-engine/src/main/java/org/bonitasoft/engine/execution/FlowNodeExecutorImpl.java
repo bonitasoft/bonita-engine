@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -45,6 +45,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstan
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.WorkFactory;
@@ -94,10 +95,9 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
-            final TechnicalLoggerService logger, final ContainerRegistry containerRegistry,
-            final ProcessDefinitionService processDefinitionService, final SCommentService commentService, final ProcessInstanceService processInstanceService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
-            final WorkService workService, final TransactionService transactionService) {
+            final TechnicalLoggerService logger, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
+            final SCommentService commentService, final ProcessInstanceService processInstanceService, final ConnectorInstanceService connectorInstanceService,
+            final ClassLoaderService classLoaderService, final WorkService workService, final TransactionService transactionService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -147,7 +147,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             try {
                 sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
                 processDefinitionId = sFlowNodeInstance.getLogicalGroup(BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).getProcessDefinitionIndex());
-                final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+                final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
                 Thread.currentThread().setContextClassLoader(localClassLoader);
 
                 if (!sFlowNodeInstance.isStateExecuting()) {
@@ -186,8 +186,8 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     try {
                         // we notify in a work: transitions and so on will be executed
                         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(processDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
-                                sFlowNodeInstance.getId(), sFlowNodeInstance
-                                        .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), state.getId()));
+                                sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(),
+                                state.getId()));
                     } catch (final WorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
@@ -232,8 +232,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                 try {
                     // reschedule this work but without the operations
                     workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
-                            sFlowNodeInstance.getId(), sFlowNodeInstance
-                                    .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
+                            sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name(), stateId));
                 } catch (final WorkRegisterException e) {
                     throw new SFlowNodeExecutionException(e);
                 }
@@ -267,13 +266,13 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             throws SBonitaException {
         final long callerId = childProcInst.getCallerId();
         if (isTerminalState(childState) && callerId > 0) {
-            final SActivityInstance activityInstance;
-            activityInstance = activityInstanceService.getActivityInstance(childProcInst.getCallerId());
-            final int tokenCount = activityInstance.getTokenCount() - 1;
-            activityInstanceService.setTokenCount(activityInstance, tokenCount);
+            final SActivityInstance callActivityInstance;
+            callActivityInstance = activityInstanceService.getActivityInstance(childProcInst.getCallerId());
+            final int tokenCount = callActivityInstance.getTokenCount() - 1;
+            activityInstanceService.setTokenCount(callActivityInstance, tokenCount);
             if (!hasActionsToExecute) {
-                containerRegistry.executeFlowNode(activityInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
-                        activityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
+                containerRegistry.executeFlowNode(callActivityInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
+                        callActivityInstance.getLogicalGroup(BuilderFactory.get(SAAutomaticTaskInstanceBuilderFactory.class).getParentProcessInstanceIndex()));
             }
         }
 

@@ -163,7 +163,12 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public void deleteSessionsOfTenant(final long tenantId) {
-        sessionProvider.deleteSessionsOfTenant(tenantId);
+        sessionProvider.deleteSessionsOfTenant(tenantId, false/* don't keep technical user */);
+    }
+
+    @Override
+    public void deleteSessionsOfTenantExceptTechnicalUser(final long tenantId) {
+        sessionProvider.deleteSessionsOfTenant(tenantId, true/* keep technical user */);
     }
 
     @Override

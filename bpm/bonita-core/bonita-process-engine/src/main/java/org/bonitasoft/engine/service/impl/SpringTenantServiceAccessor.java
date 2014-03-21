@@ -25,6 +25,7 @@ import org.bonitasoft.engine.actor.xml.ActorMembershipBinding;
 import org.bonitasoft.engine.actor.xml.GroupPathsBinding;
 import org.bonitasoft.engine.actor.xml.RoleNamesBinding;
 import org.bonitasoft.engine.actor.xml.UserNamesBinding;
+import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.api.impl.resolver.DependencyResolver;
 import org.bonitasoft.engine.api.impl.transaction.actor.ImportActorMapping;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -91,6 +92,7 @@ import org.bonitasoft.engine.supervisor.mapping.SupervisorMappingService;
 import org.bonitasoft.engine.synchro.SynchroService;
 import org.bonitasoft.engine.theme.ThemeService;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
@@ -222,6 +224,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private ThemeService themeService;
 
+    private TenantConfiguration tenantConfiguration;
+
     private TransientDataService transientDataService;
 
     public SpringTenantServiceAccessor(final Long tenantId) {
@@ -285,12 +289,16 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
         return technicalLoggerService;
     }
 
-    @Override
-    public TransactionService getTransactionService() {
+    private TransactionService getTransactionService() {
         if (transactionService == null) {
             transactionService = beanAccessor.getService(TransactionService.class);
         }
         return transactionService;
+    }
+
+    @Override
+    public UserTransactionService getUserTransactionService() {
+        return getTransactionService();
     }
 
     @Override
@@ -649,7 +657,9 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             throw new BonitaRuntimeException(ise);
         } finally {
             try {
-                resource.close();
+                if (resource != null) {
+                    resource.close();
+                }
             } catch (final IOException ioe) {
                 throw new BonitaRuntimeException(ioe);
             }
@@ -765,4 +775,17 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     public void destroy() {
         beanAccessor.destroy();
     }
+    @Override
+    public TenantConfiguration getTenantConfiguration() {
+        if (tenantConfiguration == null) {
+            tenantConfiguration = beanAccessor.getService(TenantConfiguration.class);
+        }
+        return tenantConfiguration;
+    }
+
+    @Override
+    public <T> T lookup(final String serviceName) {
+        return beanAccessor.getService(serviceName);
+    }
+
 }

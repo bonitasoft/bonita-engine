@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -35,13 +35,7 @@ public interface SchedulerExecutor {
 
     void reschedule(String triggerName, Trigger newTrigger) throws SSchedulerException;
 
-    void resume(String jobName) throws SSchedulerException;
-
-    void resumeJobs() throws SSchedulerException;
-
-    void pause(String jobName) throws SSchedulerException;
-
-    void pauseJobs() throws SSchedulerException;
+    void rescheduleErroneousTriggers() throws SSchedulerException;
 
     boolean delete(String jobName) throws SSchedulerException;
 
@@ -60,5 +54,9 @@ public interface SchedulerExecutor {
     boolean isStillScheduled(long tenantId, String jobName) throws SSchedulerException;
 
     void executeAgain(long jobId, long tenantId, String jobName, boolean disallowConcurrentExecution) throws SSchedulerException;
+
+    void pauseJobs(long tenantId) throws SSchedulerException;
+
+    void resumeJobs(long tenantId) throws SSchedulerException;
 
 }

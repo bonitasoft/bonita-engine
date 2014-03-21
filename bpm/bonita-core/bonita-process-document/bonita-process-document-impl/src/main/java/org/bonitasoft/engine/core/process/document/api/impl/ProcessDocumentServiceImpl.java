@@ -110,10 +110,9 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
 
     @Override
     public void deleteDocumentsFromProcessInstance(final Long processInstanceId) throws SDocumentException, SProcessDocumentDeletionException {
-        final SDocumentMappingBuilderFactory fact = BuilderFactory.get(SDocumentMappingBuilderFactory.class);
         List<SProcessDocument> sProcessDocuments;
         do {
-            sProcessDocuments = getDocumentsOfProcessInstance(processInstanceId, 0, 100, fact.getDocumentNameKey(), OrderByType.ASC);
+            sProcessDocuments = getDocumentsOfProcessInstanceOrderedById(processInstanceId, 0, 100);
             removeDocuments(sProcessDocuments);
         } while (!sProcessDocuments.isEmpty());
     }
@@ -128,9 +127,23 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         builder.setId(docMapping.getId());
         builder.setName(docMapping.getDocumentName());
         builder.setProcessInstanceId(docMapping.getProcessInstanceId());
-        builder.setURL(docMapping.getDocumentURL());
+        builder.setURL(getDocumentUrl(docMapping));
         builder.setContentStorageId(docMapping.getContentStorageId());
         return builder.done();
+    }
+
+    private String getDocumentUrl(SDocumentMapping docMapping) {
+        if(docMapping.documentHasContent()) {
+            return generateDocumentURL(docMapping.getDocumentName(), docMapping.getContentStorageId());
+        }
+        return docMapping.getDocumentURL();
+    }
+
+    private String getDocumentUrl(SADocumentMapping docMapping) {
+        if(docMapping.documentHasContent()) {
+            return generateDocumentURL(docMapping.getDocumentName(), docMapping.getContentStorageId());
+        }
+        return docMapping.getDocumentURL();
     }
 
     private SProcessDocument toProcessDocument(final SADocumentMapping docMapping) {
@@ -143,7 +156,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         builder.setId(docMapping.getSourceObjectId());
         builder.setName(docMapping.getDocumentName());
         builder.setProcessInstanceId(docMapping.getProcessInstanceId());
-        builder.setURL(docMapping.getDocumentURL());
+        builder.setURL(getDocumentUrl(docMapping));
         builder.setContentStorageId(docMapping.getContentStorageId());
         return builder.done();
     }
@@ -158,7 +171,7 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         builder.setId(docMapping.getId());
         builder.setName(docMapping.getDocumentName());
         builder.setProcessInstanceId(docMapping.getProcessInstanceId());
-        builder.setURL(docMapping.getDocumentURL());
+        builder.setURL(getDocumentUrl(docMapping));
         builder.setContentStorageId(docMapping.getContentStorageId());
         builder.setArchiveDate(docMapping.getArchiveDate());
         builder.setSourceObjectId(docMapping.getSourceObjectId());
@@ -201,13 +214,12 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
     private SDocumentMapping buildDocumentMapping(final SProcessDocument document, final SDocument sDocument) {
         final SDocumentMappingBuilder builder = initDocumentMappingBuilder(document);
         builder.setDocumentStorageId(sDocument.getStorageId());
-        builder.setDocumentURL(generateURL(document, sDocument));
         builder.setHasContent(true);
         return builder.done();
     }
 
-    private String generateURL(final SProcessDocument document, final SDocument sDocument) {
-        return urlProvider.generateURL(document, sDocument);
+    private String generateDocumentURL(String name, String contentStorageId) {
+        return urlProvider.generateURL(name, contentStorageId);
     }
 
     private SDocument toSDocument(final SProcessDocument document) {
@@ -280,6 +292,24 @@ public class ProcessDocumentServiceImpl implements ProcessDocumentService {
         try {
             final List<SDocumentMapping> docMappings = documentMappingService.getDocumentMappingsForProcessInstance(processInstanceId, fromIndex,
                     numberPerPage, field, order);
+            if (docMappings != null && !docMappings.isEmpty()) {
+                final List<SProcessDocument> result = new ArrayList<SProcessDocument>(docMappings.size());
+                for (final SDocumentMapping docMapping : docMappings) {
+                    result.add(toProcessDocument(docMapping));
+                }
+                return result;
+            } else {
+                return Collections.emptyList();
+            }
+
+        } catch (final SBonitaException e) {
+            throw new SDocumentException("Unable to list documents of process instance: " + processInstanceId, e);
+        }
+    }
+    
+    private List<SProcessDocument> getDocumentsOfProcessInstanceOrderedById(final long processInstanceId, final int fromIndex, final int numberPerPage) throws SDocumentException {
+        try {
+            final List<SDocumentMapping> docMappings = documentMappingService.getDocumentMappingsForProcessInstanceOrderedById(processInstanceId, fromIndex, numberPerPage);
             if (docMappings != null && !docMappings.isEmpty()) {
                 final List<SProcessDocument> result = new ArrayList<SProcessDocument>(docMappings.size());
                 for (final SDocumentMapping docMapping : docMappings) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,17 +13,19 @@
  **/
 package org.bonitasoft.engine.dependency.model.builder.impl;
 
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMapping;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SPlatformDependencyMappingBuilderFactoryImpl implements SPlatformDependencyMappingBuilderFactory {
 
     @Override
-    public SPlatformDependencyMappingBuilder createNewInstance(final long dependencyId, final long artifactId, final String artifactType) {
+    public SPlatformDependencyMappingBuilder createNewInstance(final long dependencyId, final long artifactId, final ScopeType artifactType) {
         final SPlatformDependencyMapping object = new SPlatformDependencyMapping(artifactId, artifactType, dependencyId);
         return new SPlatformDependencyMappingBuilderImpl(object);
     }
@@ -47,5 +49,5 @@ public class SPlatformDependencyMappingBuilderFactoryImpl implements SPlatformDe
     public String getIdKey() {
         return "id";
     }
-    
+
 }

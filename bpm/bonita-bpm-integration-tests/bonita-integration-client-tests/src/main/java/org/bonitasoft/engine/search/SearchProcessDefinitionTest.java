@@ -261,12 +261,6 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         searchProcessDefinitions(PROCESS_NAME, "process'VERSION");
     }
 
-    @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks", "case" }, jira = "ENGINE-366")
-    @Test
-    public void searchProcessDefinitionsCaseSensitive() throws Exception {
-        searchProcessDefinitions(PROCESS_NAME, "PROCESS'VERSION");
-    }
-
     private void searchProcessDefinitions(final String processName, final String processVersion) throws Exception {
         // create user
         final User user = createUser(USERNAME, PASSWORD);
@@ -577,8 +571,8 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
         final ProcessDefinition processDefinition3 = deployAndEnableWithActor(designProcessDefinition3, ACTOR_NAME, bole);
 
         // create supervisor
-        final ProcessSupervisor supervisor1 = createSupervisor(processDefinition1.getId(), bole.getId());
-        final ProcessSupervisor supervisor2 = createSupervisor(processDefinition2.getId(), bole.getId());
+        final ProcessSupervisor supervisor1 = getProcessAPI().createProcessSupervisorForUser(processDefinition1.getId(), bole.getId());
+        final ProcessSupervisor supervisor2 = getProcessAPI().createProcessSupervisorForUser(processDefinition2.getId(), bole.getId());
 
         // add categories to processDefinition1
         final ArrayList<Long> categoryIds = new ArrayList<Long>();

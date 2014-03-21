@@ -10,7 +10,7 @@
 			<business-remote>org.bonitasoft.engine.api.internal.ServerAPI</business-remote>
 			<ejb-class>org.bonitasoft.engine.api.bean.ServerAPIBean</ejb-class>
 			<session-type>Stateless</session-type>
-      <transaction-type>Bean</transaction-type>
+      		<transaction-type>Bean</transaction-type>
 		</session>
 	</enterprise-beans>
 

@@ -26,7 +26,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
  * @author Baptiste Mesta
@@ -55,8 +55,8 @@ public abstract class AbstractUpdateHandler implements SHandler<SEvent> {
             final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
             final BonitaTransactionSynchronization synchronization = new WaitForEventSynchronization(event, id, tenantServiceAccessor.getSynchroService());
 
-            TransactionService transactionService = tenantServiceAccessor.getTransactionService();
-            transactionService.registerBonitaSynchronization(synchronization);
+            UserTransactionService userTransactionService = tenantServiceAccessor.getUserTransactionService();
+            userTransactionService.registerBonitaSynchronization(synchronization);
             // System.out.println("++++++++++++++++++++ " + this.getClass().getSimpleName() + " executing for event " + event + " +++++++++++++++++++++");
         } catch (final STransactionNotFoundException e) {
             e.printStackTrace();

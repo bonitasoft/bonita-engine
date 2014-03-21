@@ -42,4 +42,8 @@ public class SStartEventDefinitionImpl extends SCatchEventDefinitionImpl impleme
         return SFlowNodeType.START_EVENT;
     }
 
+    @Override
+    public boolean isStartable() {
+        return getEventTriggers().isEmpty() && super.isStartable();
+    }
 }

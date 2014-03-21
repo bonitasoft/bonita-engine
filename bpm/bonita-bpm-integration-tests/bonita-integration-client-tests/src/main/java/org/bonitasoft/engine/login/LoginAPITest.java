@@ -48,7 +48,6 @@ import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.session.SessionNotFoundException;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -70,13 +69,13 @@ public class LoginAPITest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        session = APITestUtil.loginPlatform();
+        session = loginPlatform();
         platformCommandAPI = PlatformAPIAccessor.getPlatformCommandAPI(session);
     }
 
     @After
     public void after() throws BonitaException {
-        APITestUtil.logoutPlatform(session);
+        logoutPlatform(session);
     }
 
     @Test(expected = SessionNotFoundException.class)
@@ -130,13 +129,13 @@ public class LoginAPITest extends CommonAPITest {
     @Test(expected = LoginException.class)
     public void loginFailsWithWrongPassword() throws BonitaException {
         final String userName = "Truc";
-        APITestUtil.createUserOnDefaultTenant(userName, "goodPassword");
+        createUserOnDefaultTenant(userName, "goodPassword");
         try {
             final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
             loginTenant.login(userName, "WrongPassword");
             fail("Should not be reached");
         } finally {
-            final APISession session = APITestUtil.loginDefaultTenant();
+            final APISession session = loginDefaultTenant();
             final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
             identityAPI.deleteUser(userName);
         }
@@ -153,7 +152,7 @@ public class LoginAPITest extends CommonAPITest {
     public void userLoginDefaultTenant() throws BonitaException, InterruptedException {
         final String userName = "matti";
         final String password = "tervetuloa";
-        APITestUtil.createUserOnDefaultTenant(userName, password);
+        createUserOnDefaultTenant(userName, password);
 
         final Date now = new Date();
         Thread.sleep(300);
@@ -170,18 +169,18 @@ public class LoginAPITest extends CommonAPITest {
 
     @Test
     public void loginWithExistingUserAndCheckId() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         final String userName = "corvinus";
         final String password = "underworld";
-        final User user = APITestUtil.createUserOnDefaultTenant(userName, password);
+        final User user = createUserOnDefaultTenant(userName, password);
         final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
         final APISession login = loginTenant.login(userName, password);
         assertTrue("userId should be valuated", user.getId() != -1);
         assertEquals(user.getId(), login.getUserId());
 
         identityAPI.deleteUser(user.getId());
-        APITestUtil.logoutTenant(session);
+        logoutTenant(session);
     }
 
     @Test
@@ -191,7 +190,7 @@ public class LoginAPITest extends CommonAPITest {
         final LoginAPI loginTenant = TenantAPIAccessor.getLoginAPI();
         APISession session = loginTenant.login(username, pwd);
         IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
-        final User user = APITestUtil.createUserOnDefaultTenant("matti", "kieli");
+        final User user = createUserOnDefaultTenant("matti", "kieli");
         loginTenant.logout(session);
 
         session = loginTenant.login("matti", "kieli");
@@ -217,7 +216,7 @@ public class LoginAPITest extends CommonAPITest {
     @Cover(jira = "ENGINE-1653", classes = { User.class, LoginAPI.class }, concept = BPMNConcept.NONE, keywords = { "disable user", "login" })
     @Test(expected = LoginException.class)
     public void unableToLoginWhenTheUserIsDisable() throws BonitaException {
-        final APISession session = APITestUtil.loginDefaultTenant();
+        final APISession session = loginDefaultTenant();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         final String userName = "matti";
         final String password = "bpm";
@@ -231,7 +230,7 @@ public class LoginAPITest extends CommonAPITest {
             fail("It is not possible to login when the user is disable.");
         } finally {
             identityAPI.deleteUser(user.getId());
-            APITestUtil.logoutTenant(session);
+            logoutTenant(session);
         }
     }
 

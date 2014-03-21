@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,12 +19,13 @@ import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
 
 /**
  * @author Zhang Bole
+ * @author Celine Souchet
  */
 public class AddSPlatformCommandDependency implements TransactionContent {
 
@@ -36,10 +37,10 @@ public class AddSPlatformCommandDependency implements TransactionContent {
 
     private final long artifactId;
 
-    private final String artifactType;
+    private final ScopeType artifactType;
 
-    public AddSPlatformCommandDependency(final DependencyService dependencyService,
-            final String name, final byte[] jar, final long artifactId, final String artifactType) {
+    public AddSPlatformCommandDependency(final DependencyService dependencyService, final String name, final byte[] jar, final long artifactId,
+            final ScopeType artifactType) {
         this.dependencyService = dependencyService;
         this.name = name;
         this.jar = jar;
@@ -49,9 +50,10 @@ public class AddSPlatformCommandDependency implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        final SDependency sDependency = BuilderFactory.get(SPlatformDependencyBuilderFactory.class).createNewInstance(name, "1.0", name + ".jar", jar).done();
+        final SDependency sDependency = BuilderFactory.get(SPlatformDependencyBuilderFactory.class).createNewInstance(name, name + ".jar", jar).done();
         this.dependencyService.createDependency(sDependency);
-        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SPlatformDependencyMappingBuilderFactory.class).createNewInstance(sDependency.getId(), artifactId, artifactType).done();
+        final SDependencyMapping sDependencyMapping = BuilderFactory.get(SPlatformDependencyMappingBuilderFactory.class)
+                .createNewInstance(sDependency.getId(), artifactId, artifactType).done();
         this.dependencyService.createDependencyMapping(sDependencyMapping);
     }
 

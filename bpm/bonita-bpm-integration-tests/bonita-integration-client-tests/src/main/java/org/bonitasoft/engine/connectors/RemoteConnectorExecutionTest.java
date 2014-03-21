@@ -83,10 +83,8 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.PlatformSession;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.wait.WaitForVariableValue;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -106,11 +104,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
     @Test
     public void executeConnectorWithJNDILookupAndAPICall() throws Exception {
         final Expression localDataExpression = new ExpressionBuilder().createConstantLongExpression(0L);
-        final Expression processNameExpression = new ExpressionBuilder().createConstantStringExpression("process");
+        final Expression processNameExpression = new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME);
         final Expression processVersionExpression = new ExpressionBuilder().createConstantStringExpression("1.0");
         final Expression outputExpression = new ExpressionBuilder().createInputExpression("processId", Long.class.getName());
 
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("process", "1.0");
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         designProcessDefinition.addLongData("processId", localDataExpression);
         designProcessDefinition.addAutomaticTask("start");
         designProcessDefinition.addAutomaticTask("step1")
@@ -804,7 +802,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private SearchOptionsBuilder getFirst100ConnectorInstanceSearchOptions(long containerId, String containerType) {
+    private SearchOptionsBuilder getFirst100ConnectorInstanceSearchOptions(final long containerId, final String containerType) {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_ID, containerId);
         searchOptionsBuilder.filter(ConnectorInstancesSearchDescriptor.CONTAINER_TYPE, containerType);
@@ -1114,19 +1112,18 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, johnUser);
-        final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
-        assertTrue(waitForConnector.waitUntil());
+        waitForDataValue(processInstance, "data", "value1");
         logout();
-        final PlatformSession loginPlatform = APITestUtil.loginPlatform();
+        final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
         platformAPI.stopNode();
         platformAPI.startNode();
-        APITestUtil.logoutPlatform(loginPlatform);
+        logoutPlatform(loginPlatform);
         login();
-        assertEquals("value1", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         waitForUserTask("step2", processInstance.getId());
         // connector restarted
-        assertEquals("value2", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
+        waitForDataValue(processInstance, "data", "value2");
+
         disableAndDeleteProcess(processDefinition.getId());
     }
 
@@ -1152,24 +1149,19 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         // start check value1,stop, check still value1, start, check value 2, check step2 is active
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, builder, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForVariableValue waitForConnector = new WaitForVariableValue(getProcessAPI(), processInstance.getId(), "data", "value1");
-        assertTrue(waitForConnector.waitUntil());
+        waitForDataValue(processInstance, "data", "value1");
         logout();
-        final PlatformSession loginPlatform = APITestUtil.loginPlatform();
+        final PlatformSession loginPlatform = loginPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(loginPlatform);
-        System.out.println("stopping node");
         platformAPI.stopNode();
-        System.out.println("node stopped");
         Thread.sleep(300);
-        System.out.println("starting node");
         platformAPI.startNode();
-        System.out.println("node started");
-        APITestUtil.logoutPlatform(loginPlatform);
+        logoutPlatform(loginPlatform);
         login();
-        assertEquals("value1", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
+        waitForDataValue(processInstance, "data", "value1");
         final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
         // connector restarted
-        assertEquals("value2", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
+        waitForDataValue(processInstance, "data", "value2");
         assignAndExecuteStep(step1, johnUserId);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition.getId());
@@ -1449,12 +1441,12 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         script += "return apiAccessor.getIdentityAPI().getNumberOfUsers();";
 
         connector.addInput(
-                "input1",
-                new ExpressionBuilder().createGroovyScriptExpression("script", script,
-                        Long.class.getName(), new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
+                CONNECTOR_INPUT_NAME,
+                new ExpressionBuilder().createGroovyScriptExpression("script", script, Long.class.getName(),
+                        new ExpressionBuilder().createEngineConstant(ExpressionConstants.API_ACCESSOR),
                         new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID)));
         connector.addOutput(new OperationBuilder().createSetDataOperation("numberOfUser",
-                new ExpressionBuilder().createInputExpression("output1", Long.class.getName())));
+                new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, Long.class.getName())));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
 

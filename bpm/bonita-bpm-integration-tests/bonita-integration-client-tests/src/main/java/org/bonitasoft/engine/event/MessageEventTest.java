@@ -289,12 +289,6 @@ public class MessageEventTest extends CommonAPITest {
         final BusinessArchiveBuilder archiveBuilder = new BusinessArchiveBuilder();
         archiveBuilder.createNewBusinessArchive().setProcessDefinition(designProcessDefinition);
         final BusinessArchive receiveMessaceArchive = archiveBuilder.done();
-        // final ProcessDefinition receiveMessageProcess = getProcessAPI().deploy(receiveMessaceArchive);
-        //
-        // final List<ActorInstance> actors = getProcessAPI().getActors(receiveMessageProcess.getId(), 0, 1, ActorCriterion.NAME_ASC);
-        // getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());
-        //
-        // getProcessAPI().enableProcess(receiveMessageProcess.getId());
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableWithActor(receiveMessaceArchive, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(receiveMessageProcess.getId());
@@ -326,13 +320,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
-        assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
+        waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -352,13 +340,7 @@ public class MessageEventTest extends CommonAPITest {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
-        assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
+        waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -377,18 +359,10 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
-
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
+        waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
-
     }
 
     /*
@@ -408,14 +382,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
-
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 10000, true, 1, user);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(CATCH_MESSAGE_STEP1_NAME, taskInstance.getName());
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -681,14 +648,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
-
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 9 * 1000, true, 1, user);
-        assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
+        waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -754,15 +714,9 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         // at the first test some time the cron job time some time before executing
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 9 * 1000, true, 1, user);
-        assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
+        final HumanTaskInstance userTask = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
-
-        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", taskInstance.getRootContainerId());
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", userTask.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -802,7 +756,6 @@ public class MessageEventTest extends CommonAPITest {
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance));
 
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
-        // waitForStep( "step1", receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());
@@ -829,7 +782,6 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
-
         waitForStep(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -925,14 +877,7 @@ public class MessageEventTest extends CommonAPITest {
 
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
         assertTrue(waitProcessToFinishAndBeArchived(sendMessageProcessInstance1));
-
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(CATCH_MESSAGE_STEP1_NAME, taskInstance.getName());
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess1);
         disableAndDeleteProcess(sendMessageProcess2);
@@ -965,13 +910,7 @@ public class MessageEventTest extends CommonAPITest {
         // send message
         sendMessage(MESSAGE, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", null);
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 6000, true, 1, user);
-        assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(START_WITH_MESSAGE_STEP1_NAME, taskInstance.getName());
+        waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(receiveMessageProcess);
     }
@@ -1004,13 +943,7 @@ public class MessageEventTest extends CommonAPITest {
         // send message
         sendMessage(MESSAGE, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, null);
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 10000, true, 1, user);
-        assertTrue("there was no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals(CATCH_MESSAGE_STEP1_NAME, taskInstance.getName());
+        waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(receiveMessageProcess);
     }
@@ -1043,6 +976,7 @@ public class MessageEventTest extends CommonAPITest {
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", taskInstance.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());
 
+        // Clean up
         disableAndDeleteProcess(receiveMessageProcess);
     }
 
@@ -1056,7 +990,7 @@ public class MessageEventTest extends CommonAPITest {
         ActivityInstance taskSecondProcInst = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
         assertNotEquals(taskFirstProcInst.getId(), taskSecondProcInst.getId());
         assertNotEquals(taskFirstProcInst.getParentProcessInstanceId(), taskSecondProcInst.getParentProcessInstanceId());
-        
+
         disableAndDeleteProcess(receiveMessageProcess);
     }
 

@@ -13,6 +13,7 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnector;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -21,7 +22,6 @@ import org.bonitasoft.engine.filter.user.TestFilter;
 import org.bonitasoft.engine.filter.user.TestFilterThatThrowException;
 import org.bonitasoft.engine.filter.user.TestFilterUsingActorName;
 import org.bonitasoft.engine.filter.user.TestFilterWithAutoAssign;
-import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.junit.Rule;
@@ -60,6 +60,7 @@ public abstract class CommonAPITest extends APITestUtil {
 
         @Override
         public void succeeded(final Description d) {
+            try {
             List<String> clean = null;
             try {
                 clean = clean();
@@ -67,10 +68,12 @@ public abstract class CommonAPITest extends APITestUtil {
                 throw new BonitaRuntimeException(e);
             }
             LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-            LOGGER.info("-----------------------------------------------------------------------------------------------");
             if (!clean.isEmpty()) {
                 throw new BonitaRuntimeException(clean.toString());
             }
+            } finally {
+                LOGGER.info("-----------------------------------------------------------------------------------------------");
+        }
         }
     };
 
@@ -84,18 +87,18 @@ public abstract class CommonAPITest extends APITestUtil {
         login();
 
         final List<String> messages = new ArrayList<String>();
-        messages.addAll(checkExistenceOfCommands());
-        messages.addAll(checkExistenceOfUsers());
-        messages.addAll(checkExistenceOfGroups());
-        messages.addAll(checkExistenceOfRoles());
-        messages.addAll(checkExistenceOfProcessDefinitions());
-        messages.addAll(checkExistenceOfProcessIntances());
-        messages.addAll(checkExistenceOfArchivedProcessIntances());
-        messages.addAll(checkExistenceOfFlowNodes());
-        messages.addAll(checkExistenceOfArchivedFlowNodes());
-        messages.addAll(checkExistenceOfCategories());
-        messages.addAll(checkExistenceOfComments());
-        messages.addAll(checkExistenceOfArchivedComments());
+        messages.addAll(checkNoCommands());
+        messages.addAll(checkNoUsers());
+        messages.addAll(checkNoGroups());
+        messages.addAll(checkNoRoles());
+        messages.addAll(checkNoProcessDefinitions());
+        messages.addAll(checkNoProcessIntances());
+        messages.addAll(checkNoArchivedProcessIntances());
+        messages.addAll(checkNoFlowNodes());
+        messages.addAll(checkNoArchivedFlowNodes());
+        messages.addAll(checkNoCategories());
+        messages.addAll(checkNoComments());
+        messages.addAll(checkNoArchivedComments());
 
         logout();
         return messages;

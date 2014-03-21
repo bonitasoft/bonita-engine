@@ -13,12 +13,9 @@
  **/
 package org.bonitasoft.engine.service;
 
-import java.util.List;
-
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.commons.ServiceWithLifecycle;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -30,7 +27,6 @@ import org.bonitasoft.engine.platform.session.PlatformSessionService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.work.WorkService;
 
 /**
  * Accessor for tenant level engine services.
@@ -72,11 +68,7 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
 
     NodeConfiguration getPlaformConfiguration();
 
-    WorkService getWorkService();
-
     PlatformCacheService getPlatformCacheService();
-
-    List<ServiceWithLifecycle> getServicesToStart();
 
     void destroy();
 

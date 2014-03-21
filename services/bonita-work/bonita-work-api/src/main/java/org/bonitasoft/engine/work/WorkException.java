@@ -13,11 +13,13 @@
  **/
 package org.bonitasoft.engine.work;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+
 /**
  * @author Charles Souillard
  * @author Baptiste Mesta
  */
-public class WorkException extends Exception {
+public class WorkException extends SBonitaException {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,7 +27,7 @@ public class WorkException extends Exception {
         super(message, t);
     }
 
-    public WorkException(String message) {
+    public WorkException(final String message) {
         super(message);
     }
 }

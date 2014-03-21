@@ -89,10 +89,14 @@ public final class MemoryLockConditionService implements LockService {
         //this a sharding approach
         final Map<Integer, ReentrantLock> tmpLocks = new HashMap<Integer, ReentrantLock>();
         for (int i = 0 ; i < lockPoolSize ; i++) {
-            tmpLocks.put(i, new ReentrantLock());
+            tmpLocks.put(i, new MemoryLockConditionServiceReentrantLock());
         }
         this.locks = Collections.unmodifiableMap(tmpLocks);
 
+    }
+    
+    private static final class MemoryLockConditionServiceReentrantLock extends ReentrantLock {
+        
     }
 
     private Lock getLock(final long objectToLockId) {

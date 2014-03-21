@@ -62,7 +62,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 
 /**
- * General mechanism for lookup is to look in specific flownode to search a data instance. When refering to "local" data instance, it means the lookup is
+ * General mechanism for lookup is to look in specific flow node to search a data instance. When refering to "local" data instance, it means the lookup is
  * performed only on the specific element, and not on inherited data for parent containers.
  * 
  * @author Zhao Na

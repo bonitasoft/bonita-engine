@@ -67,11 +67,19 @@ public class MemoryLockService implements LockService {
         // this a sharding approach
         final Map<Integer, Object> tmpMutexs = new HashMap<Integer, Object>();
         for (int i = 0; i < lockPoolSize; i++) {
-            tmpMutexs.put(i, new Object());
+            tmpMutexs.put(i, new MemoryLockServiceMutex());
         }
         mutexs = Collections.unmodifiableMap(tmpMutexs);
     }
 
+    private static final class MemoryLockServiceMutex {
+        
+    }
+    
+    private static final class MemoryLockServiceReentrantLock extends ReentrantLock {
+        
+    }
+    
     private Object getMutex(final long objectToLockId) {
         final int poolKeyForThisObjectId = Long.valueOf(objectToLockId % lockPoolSize).intValue();
         if (!mutexs.containsKey(poolKeyForThisObjectId)) {
@@ -83,7 +91,7 @@ public class MemoryLockService implements LockService {
     protected ReentrantLock getLock(final String key) {
         if (!locks.containsKey(key)) {
             // use fair mode?
-            locks.put(key, new ReentrantLock());
+            locks.put(key, new MemoryLockServiceReentrantLock());
         }
         return locks.get(key);
     }
@@ -180,11 +188,34 @@ public class MemoryLockService implements LockService {
     @Override
     public BonitaLock lock(final long objectToLockId, final String objectType, final long tenantId) throws SLockException {
         BonitaLock lock = tryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS, tenantId);
-
         if (lock == null) {
-            throw new SLockException("Unable (default timeout) to acquire the lock for " + objectToLockId + ":" + objectType);
+            throw new SLockException("Unable (default timeout) to acquire the lock for " + objectToLockId + ":" + objectType
+                    + getDetailsOnLock(objectToLockId, objectType, tenantId));
         }
         return lock;
+    }
+
+    private StringBuilder getDetailsOnLock(final long objectToLockId, final String objectType, final long tenantId) {
+        String key = buildKey(objectToLockId, objectType, tenantId);
+        ReentrantLock reentrantLock = locks.get(key);
+        StringBuilder details = new StringBuilder(", Details: ");
+        if (reentrantLock == null) {
+            details.append("The lock was removed from the locks map in the memory lock service");
+        } else {
+            details.append("The lock is locked ");
+            details.append(reentrantLock.isLocked());
+            details.append(", held by current thread ");
+            details.append(reentrantLock.isHeldByCurrentThread());
+            try {
+                Thread thread = (Thread) reentrantLock.getClass().getDeclaredMethod("getOwner").invoke(reentrantLock);
+                details.append(", held by thread ");
+                details.append(thread.getName());
+            } catch (Exception e) {
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Error while fetching details on lock for an exception", e);
+            }
+
+        }
+        return details;
     }
 
     TechnicalLogSeverity selectSeverity(final long time) {

@@ -93,6 +93,21 @@ public interface DocumentMappingService {
      */
     List<SDocumentMapping> getDocumentMappingsForProcessInstance(long processInstanceId, int fromIndex, int maxResults, String sortFieldName, OrderByType order)
             throws SDocumentMappingException;
+    
+    /**
+     * Get document mappings for given process instance ordered by id
+     * 
+     * @param processInstanceId
+     *            identifier of process instance
+     * @param fromIndex
+     *            Index of the record to be retrieved from. First record has index 0
+     * @param maxResults
+     *            Number of result we want to get. Maximum number of result returned
+     * @return a list of SDocumentMapping objects
+     * @throws SDocumentMappingException
+     */
+    List<SDocumentMapping> getDocumentMappingsForProcessInstanceOrderedById(long processInstanceId, int fromIndex, int maxResults)
+            throws SDocumentMappingException;
 
     /**
      * Get document mapping by its name in a process instance

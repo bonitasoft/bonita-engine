@@ -26,12 +26,12 @@ public class SimpleMemoryContext implements Context {
     }
 
     @Override
-    public Object lookup(Name name) throws NamingException {
+    public Object lookup(final Name name) throws NamingException {
         return lookup(name.toString());
     }
 
     @Override
-    public Object lookup(String name) throws NamingException {
+    public Object lookup(final String name) throws NamingException {
         // System.out.println(toString() + " ~~~~ lookup " + name + " contains ? " + dictionary.containsKey(name));
         if (dictionary.containsKey(name)) {
             return dictionary.get(name);
@@ -40,12 +40,12 @@ public class SimpleMemoryContext implements Context {
     }
 
     @Override
-    public void bind(Name name, Object o) throws NamingException {
+    public void bind(final Name name, final Object o) throws NamingException {
         bind(name.toString(), o);
     }
 
     @Override
-    public void bind(String name, Object o) throws NamingException {
+    public void bind(final String name, final Object o) throws NamingException {
         // System.out.println(toString() + " ~~~~ binding " + name + " with " + o + " already bound ? " + dictionary.containsKey(name));
         if (dictionary.containsKey(name)) {
             throw new NameAlreadyBoundException("Name " + name + " already bound!");
@@ -54,22 +54,22 @@ public class SimpleMemoryContext implements Context {
     }
 
     @Override
-    public void rebind(Name name, Object o) {
+    public void rebind(final Name name, final Object o) {
         rebind(name.toString(), o);
     }
 
     @Override
-    public void rebind(String name, Object o) {
+    public void rebind(final String name, final Object o) {
         dictionary.put(name, o);
     }
 
     @Override
-    public void unbind(Name name) throws NamingException {
+    public void unbind(final Name name) throws NamingException {
         unbind(name.toString());
     }
 
     @Override
-    public void unbind(String name) throws NamingException {
+    public void unbind(final String name) throws NamingException {
         if (!dictionary.containsKey(name)) {
             throw new NameNotFoundException("No such name " + name + " is bound!");
         }
@@ -77,96 +77,96 @@ public class SimpleMemoryContext implements Context {
     }
 
     @Override
-    public void rename(Name oldName, Name newName) throws NamingException {
+    public void rename(final Name oldName, final Name newName) throws NamingException {
         rename(oldName.toString(), newName.toString());
     }
 
     @Override
-    public void rename(String oldName, String newName) throws NamingException {
-        Object object = lookup(oldName);
+    public void rename(final String oldName, final String newName) throws NamingException {
+        final Object object = lookup(oldName);
         bind(newName, object);
         unbind(oldName);
     }
 
     @Override
-    public NamingEnumeration<NameClassPair> list(Name name) {
+    public NamingEnumeration<NameClassPair> list(final Name name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NamingEnumeration<NameClassPair> list(String string) {
+    public NamingEnumeration<NameClassPair> list(final String string) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NamingEnumeration<Binding> listBindings(Name name) {
+    public NamingEnumeration<Binding> listBindings(final Name name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NamingEnumeration<Binding> listBindings(String string) {
+    public NamingEnumeration<Binding> listBindings(final String string) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void destroySubcontext(Name name) {
+    public void destroySubcontext(final Name name) {
         destroySubcontext(name.toString());
     }
 
     @Override
-    public void destroySubcontext(String name) {
+    public void destroySubcontext(final String name) {
         dictionary.remove(name);
     }
 
     @Override
-    public Context createSubcontext(Name name) throws NamingException {
+    public Context createSubcontext(final Name name) throws NamingException {
         return createSubcontext(name.toString());
     }
 
     @Override
-    public Context createSubcontext(String name) throws NamingException {
-        Context subContext = new SimpleMemoryContext();
+    public Context createSubcontext(final String name) throws NamingException {
+        final Context subContext = new SimpleMemoryContext();
         bind(name, subContext);
         return subContext;
     }
 
     @Override
-    public Object lookupLink(Name name) {
+    public Object lookupLink(final Name name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Object lookupLink(String string) {
+    public Object lookupLink(final String string) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NameParser getNameParser(Name name) {
+    public NameParser getNameParser(final Name name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public NameParser getNameParser(String string) {
+    public NameParser getNameParser(final String name) {
+        return new SimpleNameParser(name);
+    }
+
+    @Override
+    public Name composeName(final Name name, final Name name1) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Name composeName(Name name, Name name1) {
+    public String composeName(final String string, final String string1) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public String composeName(String string, String string1) {
+    public Object addToEnvironment(final String string, final Object o) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Object addToEnvironment(String string, Object o) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Object removeFromEnvironment(String string) {
+    public Object removeFromEnvironment(final String string) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

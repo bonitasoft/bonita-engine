@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 import org.bonitasoft.engine.bpm.CommonBPMServicesTest;
@@ -45,7 +46,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.transaction.TransactionService;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Test;
 
 /**
@@ -53,7 +54,7 @@ import org.junit.Test;
  */
 public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
-    private final TransactionService transactionService;
+    private final UserTransactionService userTransactionService;
 
     private final EventInstanceService eventInstanceService;
 
@@ -61,7 +62,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     public EventInstanceServiceTest() {
         servicesBuilder = getServicesBuilder();
-        transactionService = servicesBuilder.getTransactionService();
+        userTransactionService = servicesBuilder.getUserTransactionService();
         eventInstanceService = servicesBuilder.getEventInstanceService();
     }
 
@@ -107,31 +108,36 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     private List<SEventInstance> getEventInstances(final long processInstanceId, final int fromIndex,
-            final int maxResult) throws SBonitaException {
-        return getEventInstances(processInstanceId, fromIndex, maxResult, BuilderFactory.get(SStartEventInstanceBuilderFactory.class).getNameKey(),
-                OrderByType.ASC);
+            final int maxResult) throws Exception {
+        return getEventInstances(processInstanceId, fromIndex, maxResult, BuilderFactory.get(SStartEventInstanceBuilderFactory.class).getNameKey(), OrderByType.ASC);
     }
 
     private List<SEventInstance> getEventInstances(final long processInstanceId, final int fromIndex, final int maxResult, final String fieldName,
-            final OrderByType orderByType) throws SBonitaException {
-        transactionService.begin();
-        final List<SEventInstance> eventInstances = eventInstanceService.getEventInstances(processInstanceId, fromIndex, maxResult, fieldName, orderByType);
-        transactionService.complete();
-        return eventInstances;
+            final OrderByType orderByType) throws Exception {
+        return userTransactionService.executeInTransaction(new Callable<List<SEventInstance>>() {
+            @Override
+            public List<SEventInstance> call() throws Exception {
+                return eventInstanceService.getEventInstances(processInstanceId, fromIndex, maxResult, fieldName, orderByType);
+            }
+        });
     }
 
-    private SEventInstance getEventInstance(final long eventId) throws SBonitaException {
-        transactionService.begin();
-        final SEventInstance eventInstance = eventInstanceService.getEventInstance(eventId);
-        transactionService.complete();
-        return eventInstance;
+    private SEventInstance getEventInstance(final long eventId) throws Exception {
+        return userTransactionService.executeInTransaction(new Callable<SEventInstance>() {
+            @Override
+            public SEventInstance call() throws Exception {
+                return eventInstanceService.getEventInstance(eventId);
+            }
+        });
     }
 
-    private List<SBoundaryEventInstance> getActiviyBoundaryEventInstances(final long activityId) throws SBonitaException {
-        transactionService.begin();
-        final List<SBoundaryEventInstance> boundaryEvents = eventInstanceService.getActivityBoundaryEventInstances(activityId);
-        transactionService.complete();
-        return boundaryEvents;
+    private List<SBoundaryEventInstance> getActiviyBoundaryEventInstances(final long activityId) throws Exception {
+        return userTransactionService.executeInTransaction(new Callable<List<SBoundaryEventInstance>>() {
+            @Override
+            public List<SBoundaryEventInstance> call() throws Exception {
+                return eventInstanceService.getActivityBoundaryEventInstances(activityId);
+            }
+        });
     }
 
     private void checkTimerEventTriggerInstance(final STimerEventTriggerInstance expectedTriggerInstance,
@@ -148,58 +154,57 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         assertEquals(expectedTriggerInstance.getEventInstanceId(), retrievedEventTriggerInstance.getEventInstanceId());
     }
 
-    private STimerEventTriggerInstance createTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue)
-            throws SBonitaException {
-        final STimerEventTriggerInstance triggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
-                .createNewTimerEventTriggerInstance(eventInstanceId, timerType,
-                        timerValue).done();
+    private STimerEventTriggerInstance createTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue) throws Exception {
+        final STimerEventTriggerInstance triggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class).createNewTimerEventTriggerInstance(eventInstanceId, timerType,
+                timerValue).done();
         createEventTriggerInstance(triggerInstance);
         return triggerInstance;
     }
 
-    private SThrowMessageEventTriggerInstance createThrowMessageEventTriggerInstance(final long eventInstanceId, final String messageName,
-            final String targetProcess, final String targetFlowNode) throws SBonitaException {
-        final SThrowMessageEventTriggerInstance messageTrigger = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class)
-                .createNewInstance(eventInstanceId, messageName, targetProcess,
-                        targetFlowNode).done();
+    private SThrowMessageEventTriggerInstance createThrowMessageEventTriggerInstance(final long eventInstanceId, final String messageName, final String targetProcess, final String targetFlowNode) throws Exception {
+        final SThrowMessageEventTriggerInstance messageTrigger = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, messageName, targetProcess,
+                targetFlowNode).done();
         createEventTriggerInstance(messageTrigger);
         return messageTrigger;
     }
 
-    private SThrowSignalEventTriggerInstance createThrowSignalEventTriggerInstance(final long eventInstanceId, final String signalName) throws SBonitaException {
-        final SThrowSignalEventTriggerInstance signalTrigger = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class)
-                .createNewInstance(eventInstanceId, signalName).done();
+    private SThrowSignalEventTriggerInstance createThrowSignalEventTriggerInstance(final long eventInstanceId, final String signalName) throws Exception {
+        final SThrowSignalEventTriggerInstance signalTrigger = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, signalName).done();
         createEventTriggerInstance(signalTrigger);
         return signalTrigger;
     }
 
-    private SThrowErrorEventTriggerInstance createThrowErrorEventTriggerInstance(final long eventInstanceId, final String errorCode) throws SBonitaException {
-        final SThrowErrorEventTriggerInstance errorTriggerInstance = BuilderFactory.get(SThrowErrorEventTriggerInstanceBuilderFactory.class)
-                .createNewInstance(eventInstanceId, errorCode).done();
+    private SThrowErrorEventTriggerInstance createThrowErrorEventTriggerInstance(final long eventInstanceId, final String errorCode) throws Exception {
+        final SThrowErrorEventTriggerInstance errorTriggerInstance = BuilderFactory.get(SThrowErrorEventTriggerInstanceBuilderFactory.class).createNewInstance(eventInstanceId, errorCode).done();
         createEventTriggerInstance(errorTriggerInstance);
         return errorTriggerInstance;
     }
 
-    private void createEventTriggerInstance(final SEventTriggerInstance triggerInstance) throws SBonitaException {
-        transactionService.begin();
-        eventInstanceService.createEventTriggerInstance(triggerInstance);
-        transactionService.complete();
+    private void createEventTriggerInstance(final SEventTriggerInstance triggerInstance) throws Exception {
+        userTransactionService.executeInTransaction(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                eventInstanceService.createEventTriggerInstance(triggerInstance);
+                return null;
+            }
+        });
     }
 
-    private void createWaitingEvent(final SWaitingEvent waitingEvent) throws SBonitaException {
-        transactionService.begin();
-        eventInstanceService.createWaitingEvent(waitingEvent);
-        transactionService.complete();
+    private void createWaitingEvent(final SWaitingEvent waitingEvent) throws Exception {
+        userTransactionService.executeInTransaction(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                eventInstanceService.createWaitingEvent(waitingEvent);
+                return null;
+            }
+        });
     }
 
     private SEventInstance createBoundaryEventInstance(final String eventName,
             final long flowNodeDefinitionId, final long rootProcessInstanceId, final long processDefinitionId, final long parentProcessInstanceId,
             final long activityInstanceId, final boolean isInterrupting) throws SBonitaException {
-        final SEventInstance eventInstance = BuilderFactory
-                .get(SBoundaryEventInstanceBuilderFactory.class)
-                .createNewBoundaryEventInstance(eventName, isInterrupting, flowNodeDefinitionId,
-                        rootProcessInstanceId, parentProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, activityInstanceId)
-                .done();
+        final SEventInstance eventInstance = BuilderFactory.get(SBoundaryEventInstanceBuilderFactory.class).createNewBoundaryEventInstance(eventName, isInterrupting, flowNodeDefinitionId,
+                rootProcessInstanceId, parentProcessInstanceId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, activityInstanceId).done();
         createSEventInstance(eventInstance);
         return eventInstance;
     }
@@ -336,7 +341,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testGetEventInstanceById() throws SBonitaException {
+    public void testGetEventInstanceById() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
         final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
@@ -349,12 +354,12 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     @Test(expected = SEventInstanceNotFoundException.class)
-    public void testCannotRetrieveEventUsingInvalidId() throws SBonitaException {
+    public void testCannotRetrieveEventUsingInvalidId() throws Exception {
         getEventInstance(100000L);
     }
 
     @Test
-    public void testGetEventInstancesOrderByNameAsc() throws SBonitaException {
+    public void testGetEventInstancesOrderByNameAsc() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
 
         final SEventInstance eventInstance1 = createSEndEventInstance("EndEvent1", 1, processInstance.getId(), 5, processInstance.getId());
@@ -370,7 +375,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testGetEventInstancesOrderByNameDesc() throws SBonitaException {
+    public void testGetEventInstancesOrderByNameDesc() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
 
         final SEventInstance eventInstance1 = createSEndEventInstance("EndEvent1", 1, processInstance.getId(), 5, processInstance.getId());
@@ -386,7 +391,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     @Test(expected = SEventInstanceNotFoundException.class)
-    public void testDeleteProcessInstanceAlsoDeleteEventInstance() throws SBonitaException {
+    public void testDeleteProcessInstanceAlsoDeleteEventInstance() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
         final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
@@ -401,7 +406,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testCreateAndRetrieveEventTriggerInstance() throws SBonitaException {
+    public void testCreateAndRetrieveEventTriggerInstance() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
         final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
@@ -419,73 +424,86 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
 
     }
 
-    private List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final int fromIndex, final int maxResults) throws SBonitaException {
-        transactionService.begin();
-        final List<SEventTriggerInstance> eventTriggerInstances = eventInstanceService.getEventTriggerInstances(eventInstanceId, fromIndex, maxResults,
-                BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
-        transactionService.complete();
-        return eventTriggerInstances;
+    private List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final int fromIndex, final int maxResults) throws Exception {
+        return userTransactionService.executeInTransaction(new Callable<List<SEventTriggerInstance>>() {
+            @Override
+            public List<SEventTriggerInstance> call() throws Exception {
+                return eventInstanceService.getEventTriggerInstances(eventInstanceId, fromIndex, maxResults,
+                        BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
+            };
+        });
     }
 
-    private <T extends SWaitingEvent> List<T> searchWaitingEvents(final Class<T> clazz, final QueryOptions searchOptions) throws SBonitaException {
-        transactionService.begin();
-        final List<T> waitingEvents = eventInstanceService.searchWaitingEvents(clazz, searchOptions);
-        transactionService.complete();
-        return waitingEvents;
+    private <T extends SWaitingEvent> List<T> searchWaitingEvents(final Class<T> clazz, final QueryOptions searchOptions) throws Exception {
+        return transactionService.executeInTransaction(new Callable<List<T>>() {
+            @Override
+            public List<T> call() throws Exception {
+                return eventInstanceService.searchWaitingEvents(clazz, searchOptions);
+            }
+        });
     }
 
-    private long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> clazz, final QueryOptions countOptions) throws SBonitaException {
-        transactionService.begin();
-        final long nbOfwaitingEvents = eventInstanceService.getNumberOfWaitingEvents(clazz, countOptions);
-        transactionService.complete();
-        return nbOfwaitingEvents;
+    private long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> clazz, final QueryOptions countOptions) throws Exception {
+        return transactionService.executeInTransaction(new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                return eventInstanceService.getNumberOfWaitingEvents(clazz, countOptions);
+            }
+        });
     }
 
-    private <T extends SEventTriggerInstance> List<T> searchEventTrigger(final Class<T> clazz, final QueryOptions searchOptions) throws SBonitaException {
-        transactionService.begin();
-        final List<T> eventTriggerInstances = eventInstanceService.searchEventTriggerInstances(clazz, searchOptions);
-        transactionService.complete();
-        return eventTriggerInstances;
+    private <T extends SEventTriggerInstance> List<T> searchEventTrigger(final Class<T> clazz, final QueryOptions searchOptions) throws Exception {
+        return transactionService.executeInTransaction(new Callable<List<T>>() {
+            @Override
+            public List<T> call() throws Exception {
+                return eventInstanceService.searchEventTriggerInstances(clazz, searchOptions);
+            }
+        });
     }
 
-    private long getNumberOfEventTriggerInstances(final Class<? extends SEventTriggerInstance> clazz, final QueryOptions countOptions) throws SBonitaException {
-        transactionService.begin();
-        final long nbOfEventTriggerInstances = eventInstanceService.getNumberOfEventTriggerInstances(clazz, countOptions);
-        transactionService.complete();
-        return nbOfEventTriggerInstances;
+    private long getNumberOfEventTriggerInstances(final Class<? extends SEventTriggerInstance> clazz, final QueryOptions countOptions) throws Exception {
+        return transactionService.executeInTransaction(new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                return eventInstanceService.getNumberOfEventTriggerInstances(clazz, countOptions);
+            }
+        });
     }
 
     @Test
-    public void testRetrieveEventTriggerInstanceById() throws SBonitaException {
+    public void testRetrieveEventTriggerInstanceById() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
         final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
 
-        final STimerEventTriggerInstance triggerInstance = createTimerEventTriggerInstance(startEventInstance.getId(),
-                STimerType.DURATION, 1000);
+        final STimerEventTriggerInstance triggerInstance = createTimerEventTriggerInstance(startEventInstance.getId(), STimerType.DURATION, 1000);
         final SEventTriggerInstance retrievedEventTrigger = getEventTrigger(triggerInstance.getId());
         checkTimerEventTriggerInstance(triggerInstance, retrievedEventTrigger);
 
         deleteSProcessInstance(processInstance);
     }
 
-    private SEventTriggerInstance getEventTrigger(final long triggerEventInstanceId) throws SBonitaException {
-        transactionService.begin();
-        final SEventTriggerInstance eventTriggerInstance = eventInstanceService.getEventTriggerInstance(triggerEventInstanceId);
-        transactionService.complete();
-        return eventTriggerInstance;
+    private SEventTriggerInstance getEventTrigger(final long triggerEventInstanceId) throws Exception {
+        return transactionService.executeInTransaction(new Callable<SEventTriggerInstance>() {
+            @Override
+            public SEventTriggerInstance call() throws Exception {
+                return eventInstanceService.getEventTriggerInstance(triggerEventInstanceId);
+            }
+        });
     }
 
     private List<SEventTriggerInstance> getEventTriggers(final long eventInstanceId, final int fromIndex, final int maxResults, final String fieldName,
-            final OrderByType orderByType) throws SBonitaException {
-        transactionService.begin();
-        final List<SEventTriggerInstance> eventTriggerInstances = eventInstanceService.getEventTriggerInstances(eventInstanceId, fromIndex, maxResults,
-                fieldName, orderByType);
-        transactionService.complete();
-        return eventTriggerInstances;
+            final OrderByType orderByType) throws Exception {
+        return transactionService.executeInTransaction(new Callable<List<SEventTriggerInstance>>() {
+            @Override
+            public List<SEventTriggerInstance> call() throws Exception {
+                return eventInstanceService.getEventTriggerInstances(eventInstanceId, fromIndex, maxResults,
+                        fieldName, orderByType);
+            }
+        });
     }
 
-    public void testDeleteEventInstanceAlsoDeleteEventTriggerInstance() throws SBonitaException {
+    public void testDeleteEventInstanceAlsoDeleteEventTriggerInstance() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
         final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
                 processInstance.getId());
@@ -505,7 +523,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testSearchWaitingEvents() throws SBonitaException {
+    public void testSearchWaitingEvents() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
         final SWaitingErrorEventBuilderFactory waitingErrorEventBuilder = BuilderFactory.get(SWaitingErrorEventBuilderFactory.class);
 
@@ -540,7 +558,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     private void checkWaitingEvents(final int expectedNbOfWaitingEvents, final Class<? extends SWaitingEvent> clazz, final String processDefinitionIdKey,
-            final String flowNodeInstanceIdKey, final long eventInstanceId) throws SBonitaException {
+            final String flowNodeInstanceIdKey, final long eventInstanceId) throws Exception {
         final int maxResults = Math.max(expectedNbOfWaitingEvents + 1, 10);
         final QueryOptions queryOptions = getQueryOptions(clazz, 0, maxResults, processDefinitionIdKey, OrderByType.ASC, flowNodeInstanceIdKey, eventInstanceId);
         final QueryOptions countOptions = getCountOptions(clazz, flowNodeInstanceIdKey, eventInstanceId);
@@ -567,7 +585,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     private void checkEventTriggerInstances(final int exptectedNbOfTrigger, final Class<? extends SEventTriggerInstance> clazz,
-            final String eventInstanceIdKey, final long eventInstanceId) throws SBonitaException {
+            final String eventInstanceIdKey, final long eventInstanceId) throws Exception {
         final int maxResults = Math.max(10, exptectedNbOfTrigger + 1);
         final QueryOptions queryOptions = getQueryOptions(clazz, 0, maxResults, eventInstanceIdKey, OrderByType.ASC, eventInstanceIdKey, eventInstanceId);
         final QueryOptions countOptions = getCountOptions(clazz, eventInstanceIdKey, eventInstanceId);
@@ -578,7 +596,7 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testSearchEventTriggerInstances() throws SBonitaException {
+    public void testSearchEventTriggerInstances() throws Exception {
         final SProcessInstance processInstance = createSProcessInstance();
 
         final SEventInstance eventInstance = createSEndEventInstance("end", 1, processInstance.getId(), 5,

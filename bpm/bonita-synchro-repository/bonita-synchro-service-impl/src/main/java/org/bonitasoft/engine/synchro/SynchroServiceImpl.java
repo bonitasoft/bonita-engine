@@ -39,7 +39,7 @@ public class SynchroServiceImpl extends AbstractSynchroService {
 
 	private final Map<String, Semaphore> eventSemaphores;
 
-	private final Lock lock = new ReentrantLock();
+	private final Lock lock = new SynchroServiceImplReentrantLock();
 
 	/**
 	 * @param initialCapacity
@@ -52,6 +52,10 @@ public class SynchroServiceImpl extends AbstractSynchroService {
 		waiters = new HashMap<Map<String, Serializable>, String>(initialCapacity);
 		eventKeyAndIdMap = new HashMap<String, Serializable>(initialCapacity);
 		eventSemaphores = new HashMap<String, Semaphore>();
+	}
+	
+	private static final class SynchroServiceImplReentrantLock extends ReentrantLock {
+	    
 	}
 
 	@Override

@@ -276,7 +276,7 @@ public class ProcessArchiver {
                 }
                 dataInstanceService.removeContainer(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
             }
-            // then archive the flownode instance:
+            // then archive the flow node instance:
             SAFlowNodeInstance saFlowNodeInstance = null;
             switch (flowNodeInstance.getType()) {// TODO archive other flow node
                 case AUTOMATIC_TASK:

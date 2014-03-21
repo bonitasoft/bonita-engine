@@ -47,7 +47,7 @@ public interface SAFlowNodeInstance extends SAFlowElementInstance {
     long getExecutedBy();
 
     /**
-     * @return id of the user (delegate) who executed the flownode for the original executer
+     * @return id of the user (delegate) who executed the flow node for the original executer
      * @since 6.0.1
      */
     long getExecutedByDelegate();

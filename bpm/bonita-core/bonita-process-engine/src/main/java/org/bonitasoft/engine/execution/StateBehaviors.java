@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -29,6 +29,10 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceModificationException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
@@ -62,11 +66,13 @@ import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefi
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SThrowEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -77,7 +83,6 @@ import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
@@ -95,8 +100,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.event.OperationsWithContext;
+import org.bonitasoft.engine.execution.flowmerger.TokenInfo;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.EndingIntermediateCatchEventExceptionStateImpl;
 import org.bonitasoft.engine.execution.work.WorkFactory;
@@ -180,13 +187,15 @@ public class StateBehaviors {
 
     private final IdentityService identityService;
 
+    private TokenService tokenService;
+
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
             final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger) {
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, TokenService tokenService) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -206,6 +215,7 @@ public class StateBehaviors {
         this.commentService = commentService;
         this.identityService = identityService;
         this.logger = logger;
+        this.tokenService = tokenService;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -297,7 +307,7 @@ public class StateBehaviors {
             final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition) throws ClassLoaderException, SUserFilterExecutionException,
             SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException,
             SCommentAddException, SUserNotFoundException {
-        final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+        final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
         final SExpressionContext expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 flowNodeInstance.getLogicalGroup(0));
         final FilterResult result = userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, sUserFilterDefinition.getInputs(),
@@ -372,7 +382,7 @@ public class StateBehaviors {
      * @param processDefinition
      *            the process where the connectors are defined.
      * @param flowNodeInstance
-     *            the instance of the flownode to execute possible connectors on.
+     *            the instance of the flow node to execute possible connectors on.
      * @param executeConnectorsOnEnter
      *            do we want to consider the connectors ON_ENTER or ignore them?
      * @param executeConnectorsOnFinish
@@ -721,45 +731,69 @@ public class StateBehaviors {
             throws SActivityStateExecutionException {
         final SActivityDefinition activityDefinition = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
                 activityInstance.getFlowNodeDefinitionId());
-        if (activityDefinition != null) {
-            boolean mustAddBoundaries = true;
-            // avoid to add boundary events in children of multi instance
-            if (activityDefinition.getLoopCharacteristics() != null
-                    && !(SFlowNodeType.MULTI_INSTANCE_ACTIVITY.equals(activityInstance.getType()) || SFlowNodeType.LOOP_ACTIVITY.equals(activityInstance
-                            .getType()))) {
-                mustAddBoundaries = false;
-            }
-            if (mustAddBoundaries) {
-                final List<SBoundaryEventDefinition> boundaryEventDefinitions = activityDefinition.getBoundaryEventDefinitions();
-                if (!boundaryEventDefinitions.isEmpty()) {
-                    try {
-
-                        final SBoundaryEventInstanceBuilderFactory boundaryEventInstanceBuilder = BuilderFactory
-                                .get(SBoundaryEventInstanceBuilderFactory.class);
-                        final long rootProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getRootProcessInstanceIndex());
-                        final long parentProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getParentProcessInstanceIndex());
-
-                        SFlowElementsContainerType containerType = SFlowElementsContainerType.PROCESS;
-                        final long parentActivityInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getParentActivityInstanceIndex());
-                        if (parentActivityInstanceId > 0) {
-                            containerType = SFlowElementsContainerType.FLOWNODE;
-                        }
-
-                        for (final SBoundaryEventDefinition boundaryEventDefinition : boundaryEventDefinitions) {
-                            final SFlowNodeInstance boundaryEventInstance = bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
-                                    rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
-                                    rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId(),
-                                    activityInstance.getTokenRefId());
-                            // no need to handle failed state, creation is in the same tx
-                            containerRegistry.executeFlowNodeInSameThread(boundaryEventInstance.getId(), null, null, containerType.name(),
-                                    parentProcessInstanceId);
-                        }
-                    } catch (final SBonitaException e) {
-                        throw new SActivityStateExecutionException("Unable to create boundary events attached to activity " + activityInstance.getName(), e);
-                    }
-                }
-            }
+        if (mustAddBoundaryEvents(activityInstance, activityDefinition)) {
+            createAttachedBoundaryEvents(processDefinition, activityInstance, activityDefinition);
         }
+    }
+
+    private void createAttachedBoundaryEvents(final SProcessDefinition processDefinition, final SActivityInstance activityInstance,
+            final SActivityDefinition activityDefinition) throws SActivityStateExecutionException {
+        final List<SBoundaryEventDefinition> boundaryEventDefinitions = activityDefinition.getBoundaryEventDefinitions();
+            try {
+                final SBoundaryEventInstanceBuilderFactory boundaryEventInstanceBuilder = BuilderFactory
+                        .get(SBoundaryEventInstanceBuilderFactory.class);
+                final long rootProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getRootProcessInstanceIndex());
+                final long parentProcessInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getParentProcessInstanceIndex());
+                SFlowElementsContainerType containerType = getContainerType(activityInstance, boundaryEventInstanceBuilder);
+
+                for (final SBoundaryEventDefinition boundaryEventDefinition : boundaryEventDefinitions) {
+                    createBoundaryEvent(processDefinition, activityInstance, rootProcessInstanceId, parentProcessInstanceId, containerType,
+                            boundaryEventDefinition);
+                }
+            } catch (final SBonitaException e) {
+                throw new SActivityStateExecutionException("Unable to create boundary events attached to activity " + activityInstance.getName(), e);
+            }
+    }
+
+    private void createBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance, final long rootProcessInstanceId,
+            final long parentProcessInstanceId, SFlowElementsContainerType containerType, final SBoundaryEventDefinition boundaryEventDefinition)
+            throws SObjectReadException, SObjectNotFoundException, SObjectCreationException, SBonitaException, SObjectModificationException,
+            SFlowNodeReadException, SFlowNodeExecutionException {
+        TokenInfo tokenInfo = new BoundaryCreationTokenProvider(activityInstance, boundaryEventDefinition, tokenService).getOutputTokenInfo();
+        final SBoundaryEventInstance boundaryEventInstance = (SBoundaryEventInstance) bpmInstancesCreator.createFlowNodeInstance(processDefinition.getId(),
+                rootProcessInstanceId, activityInstance.getParentContainerId(), containerType, boundaryEventDefinition,
+                rootProcessInstanceId, parentProcessInstanceId, false, -1, SStateCategory.NORMAL, activityInstance.getId(),
+                tokenInfo.outputTokenRefId);
+        
+        // we create token here to be sure the token is put synchronously
+        tokenService.createTokens(activityInstance.getParentProcessInstanceId(), tokenInfo.outputTokenRefId, tokenInfo.outputParentTokenRefId, 1);
+        // no need to handle failed state, creation is in the same tx
+        containerRegistry.executeFlowNodeInSameThread(boundaryEventInstance.getId(), null, null, containerType.name(),
+                parentProcessInstanceId);
+    }
+    
+    private SFlowElementsContainerType getContainerType(final SActivityInstance activityInstance,
+            final SBoundaryEventInstanceBuilderFactory boundaryEventInstanceBuilder) {
+        SFlowElementsContainerType containerType = SFlowElementsContainerType.PROCESS;
+        final long parentActivityInstanceId = activityInstance.getLogicalGroup(boundaryEventInstanceBuilder.getParentActivityInstanceIndex());
+        if (parentActivityInstanceId > 0) {
+            containerType = SFlowElementsContainerType.FLOWNODE;
+        }
+        return containerType;
+    }
+
+    private boolean mustAddBoundaryEvents(final SActivityInstance activityInstance, final SActivityDefinition activityDefinition) {
+        // avoid to add boundary events in children of multi instance
+        boolean mustAddBoundaries = activityDefinition != null 
+                && !activityDefinition.getBoundaryEventDefinitions().isEmpty()
+                && !isChildOfLoopOrMultiInstance(activityInstance, activityDefinition);
+        return mustAddBoundaries;
+    }
+
+    private boolean isChildOfLoopOrMultiInstance(final SActivityInstance activityInstance, final SActivityDefinition activityDefinition) {
+        return activityDefinition.getLoopCharacteristics() != null
+                && !(SFlowNodeType.MULTI_INSTANCE_ACTIVITY.equals(activityInstance.getType()) || SFlowNodeType.LOOP_ACTIVITY.equals(activityInstance
+                        .getType()));
     }
 
     public void interruptAttachedBoundaryEvent(final SProcessDefinition processDefinition, final SActivityInstance activityInstance,

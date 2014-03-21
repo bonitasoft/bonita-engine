@@ -21,6 +21,27 @@ import java.util.Date;
 public interface Trigger {
 
     /**
+     * Specify what to do when some job were not triggered in time.
+     * 
+     */
+    public enum MisfireRestartPolicy {
+        /**
+         * Restart now all instances that were missed
+         */
+        ALL,
+
+        /**
+         * Restart now only one instance that was not trigger and continue normally
+         */
+        ONE,
+
+        /**
+         * No instance that were not trigger in time are restarted
+         */
+        NONE
+    }
+
+    /**
      * Gets the name of the trigger
      * 
      * @return the name of the trigger
@@ -43,5 +64,13 @@ public interface Trigger {
      * @since 6.0
      */
     int getPriority();
+
+    /**
+     * 
+     * Tell the scheduler how to handle jobs that were not executed in time.
+     * 
+     * @return the MisfireHandlingPolicy for this trigger
+     */
+    MisfireRestartPolicy getMisfireHandlingPolicy();
 
 }

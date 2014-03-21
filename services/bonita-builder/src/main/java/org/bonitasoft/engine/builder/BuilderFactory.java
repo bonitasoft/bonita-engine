@@ -16,13 +16,17 @@ public class BuilderFactory {
     private final Map<String, Object> factoryCache;
     private final Properties properties;
 
-    private static final Object mutex = new Object();
+    private static final Object mutex = new BuilderFactoryMutex();
 
     private static BuilderFactory INSTANCE = null;
 
     private BuilderFactory(final Properties properties) {
         this.properties = properties;
         this.factoryCache = new HashMap<String, Object>();
+    }
+    
+    private static final class BuilderFactoryMutex {
+        
     }
 
     public static BuilderFactory getInstance() {
@@ -77,7 +81,7 @@ public class BuilderFactory {
     @SuppressWarnings("unchecked")
     private <T extends Object> T getInternalBuilderFactory(final Class<T> clazz) {
         //System.err.println("Looking for class: " + clazz.getName());
-        if (!this.factoryCache.containsKey(clazz)) {
+        if (!this.factoryCache.containsKey(clazz.getName())) {
             cacheFactory(clazz.getName(), properties.getProperty(clazz.getName()));
         }
         return (T) this.factoryCache.get(clazz.getName());

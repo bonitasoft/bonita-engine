@@ -73,11 +73,16 @@
 			<artifactId>bonita-client-test-util</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
 			<version>1.5.0</version>
-		</dependency>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -151,7 +156,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
+				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
 					<properties>
 						<property>
@@ -163,7 +168,17 @@
 						<bonita.home>${bonita.home}</bonita.home>
 					</systemPropertyVariables>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
+	
 </project>

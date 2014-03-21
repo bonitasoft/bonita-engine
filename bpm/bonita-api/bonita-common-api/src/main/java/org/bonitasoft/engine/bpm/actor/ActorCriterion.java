@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,10 +14,21 @@
 package org.bonitasoft.engine.bpm.actor;
 
 /**
+ * Criterion to sort actors
+ * 
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public enum ActorCriterion {
 
-    NAME_DESC, NAME_ASC;
+    /**
+     * By ascending name
+     */
+    NAME_ASC,
+
+    /**
+     * By descending name
+     */
+    NAME_DESC;
 
 }

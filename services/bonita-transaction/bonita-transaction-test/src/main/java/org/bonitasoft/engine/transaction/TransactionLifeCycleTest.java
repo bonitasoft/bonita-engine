@@ -4,31 +4,39 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public abstract class TransactionLifeCycleTest {
 
+    TransactionService txService;
+
     protected abstract TransactionService getTxService() throws Exception;
+
+
+    @Before
+    public void before() throws Exception {
+        txService = getTxService();
+    }
 
     @After
     public void closeTransactions() throws Exception {
-        TestUtil.closeTransactionIfOpen(getTxService());
+        // Do not forget to close the transaction
+        if (txService.isTransactionActive()) {
+            txService.complete();
+        }
+
     }
 
     @Test
     public void testActiveTransactionState() throws Exception {
-        final TransactionService txService = getTxService();
-
         txService.begin();
         assertEquals(TransactionState.ACTIVE, txService.getState());
     }
 
     @Test
     public void testCommitedTransactionState() throws Exception {
-        final TransactionService txService = getTxService();
-
         TxSync sync = new TxSync();
         txService.begin();
         txService.registerBonitaSynchronization(sync);
@@ -40,18 +48,15 @@ public abstract class TransactionLifeCycleTest {
 
     @Test
     public void testRollbackOnlyTransactionState() throws Exception {
-        final TransactionService txService = getTxService();
-
         txService.begin();
         txService.setRollbackOnly();
 
         assertEquals(TransactionState.ROLLBACKONLY, txService.getState());
+        txService.complete();
     }
 
     @Test
     public void testRolledbackTransactionState() throws Exception {
-        final TransactionService txService = getTxService();
-
         TxSync sync = new TxSync();
         txService.begin();
         txService.registerBonitaSynchronization(sync);
@@ -64,8 +69,6 @@ public abstract class TransactionLifeCycleTest {
 
     @Test
     public void testGetState1() throws Exception {
-        final TransactionService txService = getTxService();
-
         TxSync sync = new TxSync();
         txService.begin();
         txService.registerBonitaSynchronization(sync);
@@ -81,8 +84,6 @@ public abstract class TransactionLifeCycleTest {
 
     @Test
     public void testGetState2() throws Exception {
-        final TransactionService txService = getTxService();
-
         TxSync sync = new TxSync();
         txService.begin();
         txService.registerBonitaSynchronization(sync);
@@ -95,26 +96,22 @@ public abstract class TransactionLifeCycleTest {
 
     @Test
     public void testTransactionIsRollbackOnly() throws Exception {
-        final TransactionService txService = getTxService();
-
         txService.begin();
         txService.setRollbackOnly();
         assertTrue(txService.isRollbackOnly());
+        txService.complete();
     }
 
     @Test
     public void testSetRollbackOnlyOnActiveTx() throws Exception {
-        final TransactionService txService = getTxService();
-
         txService.begin();
         txService.setRollbackOnly();
         assertEquals(TransactionState.ROLLBACKONLY, txService.getState());
+        txService.complete();
     }
 
     @Test
     public void testSetRollbackOnlyOnCommitedTx() throws Exception {
-        final TransactionService txService = getTxService();
-
         TxSync sync = new TxSync();
         txService.begin();
         txService.registerBonitaSynchronization(sync);
@@ -130,8 +127,6 @@ public abstract class TransactionLifeCycleTest {
 
     @Test
     public void testBeginActiveTx() throws Exception {
-        final TransactionService txService = getTxService();
-
         txService.begin();
         try {
             txService.begin();
@@ -143,15 +138,16 @@ public abstract class TransactionLifeCycleTest {
 
     @Test
     public void testBeginRollebackOnlyTx() throws Exception {
-        final TransactionService txService = getTxService();
-
         txService.begin();
         txService.setRollbackOnly();
         try {
             txService.begin();
+            System.out.println("++++" + txService.getNumberOfActiveTransactions());
             fail("Impossible to begin a tx with state " + TransactionState.ROLLBACKONLY);
         } catch (final STransactionCreationException e) {
             assertEquals(TransactionState.ROLLBACKONLY, txService.getState());
+        } finally {
+            txService.complete();
         }
     }
 
@@ -174,7 +170,7 @@ public abstract class TransactionLifeCycleTest {
         }
 
         @Override
-        public void afterCompletion(TransactionState txState) {
+        public void afterCompletion(final TransactionState txState) {
             this.txCompletionState = txState;
         }
     }

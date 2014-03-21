@@ -36,7 +36,7 @@ public interface ExpressionExecutorStrategy {
 
     String DEFINITION_ID = "processDefinitionId";// hum should not be process here
 
-    String DEFINITION_TYPE = "process";
+    String DEFINITION_TYPE = "PROCESS";
 
     String CONTAINER_ID_KEY = "containerId";
 

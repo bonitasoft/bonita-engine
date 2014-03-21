@@ -12,15 +12,17 @@ import org.junit.runners.Suite.SuiteClasses;
 @Initializer(BPMRemoteTestsForServers.class)
 public class BPMRemoteTestsForServers {
 
+    private static APITestUtil apiTestUtil = new APITestUtil();
+
     public static void beforeAll() throws Exception {
         System.err.println("=================== BPMRemoteTestsForServers.beforeClass()");
-        APITestUtil.createPlatformStructure();
-        APITestUtil.initializeAndStartPlatformWithDefaultTenant(true);
+        apiTestUtil.createPlatformStructure();
+        apiTestUtil.initializeAndStartPlatformWithDefaultTenant(true);
     }
 
     public static void afterAll() throws Exception {
         System.err.println("=================== BPMRemoteTestsForServers.afterClass()");
-        APITestUtil.stopAndCleanPlatformAndTenant(true);
-        APITestUtil.deletePlatformStructure();
+        apiTestUtil.stopAndCleanPlatformAndTenant(true);
+        apiTestUtil.deletePlatformStructure();
     }
 }

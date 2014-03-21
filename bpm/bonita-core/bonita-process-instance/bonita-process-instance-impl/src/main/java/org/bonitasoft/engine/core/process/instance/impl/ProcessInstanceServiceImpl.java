@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -32,6 +33,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletionException;
+import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -309,7 +311,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             throws SProcessInstanceModificationException {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId);
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteArchivedFlowNodeInstances(processInstanceId);
             dataInstanceService.deleteLocalArchivedDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString());
@@ -391,7 +393,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final long processDefinitionId = sProcessInstance.getProcessDefinitionId();
-            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("process", processDefinitionId);
+            final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId);
             Thread.currentThread().setContextClassLoader(localClassLoader);
             deleteProcessInstanceElements(sProcessInstance);
             final DeleteRecord deleteRecord = new DeleteRecord(sProcessInstance);
@@ -442,14 +444,14 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteConnectorInstancesIfNecessary(final SProcessInstance processInstance, final SProcessDefinition processDefinition)
-            throws SBonitaSearchException, SConnectorInstanceDeletionException {
+            throws SConnectorInstanceReadException, SConnectorInstanceDeletionException {
         if (processDefinition != null && processDefinition.hasConnectors()) {
             connectorInstanceService.deleteConnectors(processInstance.getId(), SConnectorInstance.PROCESS_TYPE);
         }
     }
 
     private void deleteConnectorInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
-            throws SBonitaSearchException, SConnectorInstanceDeletionException {
+            throws SConnectorInstanceReadException, SConnectorInstanceDeletionException {
         if (hasConnectors(flowNodeInstance, processDefinition)) {
             connectorInstanceService.deleteConnectors(flowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
         }
@@ -573,10 +575,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void setState(final SProcessInstance processInstance, final ProcessInstanceState state) throws SProcessInstanceModificationException {
         // Let's archive the process instance before changing the state (to keep a track of state change):
         archiveProcessInstance(processInstance);
+        int previousStateId = processInstance.getStateId();
         setProcessState(processInstance, state);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("[{0} with id {1}]{2}->{3}(new={4})", processInstance.getClass()
-                    .getSimpleName(), processInstance.getId(), processInstance.getStateId(), state.getId(), state.getClass().getSimpleName()));
+                    .getSimpleName(), processInstance.getId(), previousStateId, state.getId(), state.name()));
         }
     }
 
@@ -882,6 +885,32 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);
         }
+    }
+
+    @Override
+    public List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions, final ProcessInstanceState... states)
+            throws SProcessInstanceReadException {
+        Set<Integer> stateIds = getStateIdsFromStates(states);
+        final Map<String, Object> inputParameters = new HashMap<String, Object>(1);
+        inputParameters.put("stateIds", stateIds);
+        final SelectListDescriptor<SProcessInstance> selectProcessInstancesInStates = new SelectListDescriptor<SProcessInstance>("getProcessInstancesInStates",
+                inputParameters, SProcessInstance.class, queryOptions);
+        try {
+            return persistenceRead.selectList(selectProcessInstancesInStates);
+        } catch (final SBonitaReadException e) {
+            throw new SProcessInstanceReadException(e);
+        }
+    }
+
+    protected Set<Integer> getStateIdsFromStates(final ProcessInstanceState... states) {
+        if (states.length < 1) {
+            throw new IllegalArgumentException("ProcessInstanceServiceImpl.getProcessInstancesInStates() must have at least one state as parameter");
+        }
+        Set<Integer> stateIds = new HashSet<Integer>(states.length);
+        for (int i = 0; i < states.length; i++) {
+            stateIds.add(states[i].getId());
+        }
+        return stateIds;
     }
 
     @Override

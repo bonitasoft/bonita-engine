@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2013 BonitaSoft S.A.
+ * Copyright (C) 2011, 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,23 +21,46 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
+ * The connector definition associated to a process definition or a flow node definition
+ * 
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
 public interface ConnectorDefinition extends NamedElement {
 
+    /**
+     * @return The identifier of the connector definition
+     */
     String getConnectorId();
 
+    /**
+     * @return The version of the connector
+     */
     String getVersion();
 
+    /**
+     * @return The event to activate the connector
+     */
     ConnectorEvent getActivationEvent();
 
+    /**
+     * @return The inputs of the connector
+     */
     Map<String, Expression> getInputs();
 
+    /**
+     * @return The outputs of the connector
+     */
     List<Operation> getOutputs();
 
+    /**
+     * @return The fail action of the connector
+     */
     FailAction getFailAction();
 
+    /**
+     * @return The error code of the connector
+     */
     String getErrorCode();
 
 }

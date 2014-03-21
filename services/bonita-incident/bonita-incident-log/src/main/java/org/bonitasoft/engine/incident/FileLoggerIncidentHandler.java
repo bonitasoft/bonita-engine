@@ -58,7 +58,7 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
         }
     }
 
-    private Logger getLogger(final long tenantId) throws SecurityException, IOException {
+    protected Logger getLogger(final long tenantId) throws SecurityException, IOException {
         Logger logger = loggers.get(tenantId);
         if (logger == null) {
             logger = Logger.getLogger("INCIDENT" + tenantId);
@@ -70,5 +70,5 @@ public class FileLoggerIncidentHandler implements IncidentHandler {
         }
         return logger;
     }
-
+    
 }

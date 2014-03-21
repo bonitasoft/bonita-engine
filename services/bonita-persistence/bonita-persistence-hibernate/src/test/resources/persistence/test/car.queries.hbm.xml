@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+  
+  <query name="getCarById">
+    SELECT car
+    FROM org.bonitasoft.engine.persistence.model.Car AS car
+    WHERE car.id = :id
+  </query>
+  <query name="getCarsByBrand">
+    SELECT car
+    FROM org.bonitasoft.engine.persistence.model.Car AS car
+    WHERE car.brand = :brand
+  </query>
+  
+  <query name="getAllCars">
+    SELECT car
+    FROM org.bonitasoft.engine.persistence.model.Car AS car
+  </query>
+  
+</hibernate-mapping>

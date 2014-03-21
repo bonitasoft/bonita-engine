@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,51 +14,66 @@
 package org.bonitasoft.engine.bpm.connector;
 
 /**
+ * Criterion to sort connectors
+ * 
  * @author Yanyan Liu
+ * @author Celine Souchet
  */
 public enum ConnectorCriterion {
-    /*
-     * connector definition id ascending order
+    /**
+     * By ascending identifier of connector definition
      */
     DEFINITION_ID_ASC,
-    /*
-     * connector definition id descending order
+
+    /**
+     * By descending identifier of connector definition
      */
     DEFINITION_ID_DESC,
-    /*
-     * connector definition version ascending order
+
+    /**
+     * By ascending version of connector definition
+     * 
      */
     DEFINITION_VERSION_ASC,
-    /*
-     * connector definition version descending order
+
+    /**
+     * By descending version of connector definition
      */
     DEFINITION_VERSION_DESC,
-    /*
-     * connector implementation id ascending order
+
+    /**
+     * By ascending identifier of connector implementation
      */
+    
     IMPLEMENTATION_ID_ASC,
-    /*
-     * connector implementation id descending order
+    
+    /**
+     * By descending identifier of connector implementation
      */
     IMPLEMENTATION_ID_DESC,
-    /*
-     * connector implementation version ascending order
+    
+    /**
+     * By ascending version of connector implementation
      */
     IMPLEMENTATION_VERSION_ASC,
-    /*
-     * connector implementation version descending order
+    
+    /**
+     * By descending version of connector implementation
      */
     IMPLEMENTATIONN_VERSION_DESC,
-    /*
-     * connector implementation class name ascending order
+    
+    /**
+     * By ascending class name of connector implementation
      */
     IMPLEMENTATIONN_CLASS_NAME_ACS,
-    /*
-     * connector implementation class name descending order
+    
+    /**
+     * By descending class name of connector implementation
      */
     IMPLEMENTATIONN_CLASS_NAME_DESC,
-    /*
-     * connector implementation id ascending order
+    
+    /**
+     * By descending identifier of connector implementation
      */
     DEFAULT
 }

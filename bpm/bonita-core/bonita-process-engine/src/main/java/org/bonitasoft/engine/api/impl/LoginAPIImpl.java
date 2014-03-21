@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
+import java.io.IOException;
+import java.util.concurrent.Callable;
+
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateUser;
@@ -24,7 +27,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
@@ -44,6 +47,7 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * @author Matthieu Chaffotte
@@ -55,12 +59,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     @CustomTransactions
     public APISession login(final String userName, final String password) throws LoginException {
         checkUsernameAndPassword(userName, password);
-
-        try {
-            return login(userName, password, null);
-        } catch (final Throwable e) {
-            throw new LoginException(e);
-        }
+        return login(userName, password, null);
     }
 
     protected void checkUsernameAndPassword(final String userName, final String password) throws LoginException {
@@ -72,41 +71,51 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         }
     }
 
-    protected APISession login(final String userName, final String password, final Long tenantId) throws Throwable {
-        final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        final PlatformService platformService = platformServiceAccessor.getPlatformService();
-        final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
-        // first call before create session: put the platform in cache if necessary
-        putPlatformInCacheIfNecessary(platformServiceAccessor, platformService);
-        TransactionContentWithResult<STenant> getTenant;
-        if (tenantId == null) {
-            getTenant = new GetDefaultTenantInstance(platformService);
-        } else {
-            getTenant = new GetTenantInstance(tenantId, platformService);
+    protected APISession login(final String userName, final String password, final Long tenantId) throws LoginException {
+        try {
+            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            final PlatformService platformService = platformServiceAccessor.getPlatformService();
+            final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
+            // first call before create session: put the platform in cache if necessary
+            // putPlatformInCacheIfNecessary(platformServiceAccessor, platformService);
+            TransactionContentWithResult<STenant> getTenant;
+            if (tenantId == null) {
+                getTenant = new GetDefaultTenantInstance(platformService);
+            } else {
+                getTenant = new GetTenantInstance(tenantId, platformService);
+            }
+            platformTransactionExecutor.execute(getTenant);
+            final STenant sTenant = getTenant.getResult();
+            final long resolvedTenantId = sTenant.getId();
+            checkThatWeCanLogin(userName, tenantId, platformService, sTenant, resolvedTenantId);
+
+            final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(resolvedTenantId);
+            final LoginService loginService = serviceAccessor.getLoginService();
+            final IdentityService identityService = serviceAccessor.getIdentityService();
+            final TransactionService transactionService = platformServiceAccessor.getTransactionService();
+
+            SSession sSession = transactionService.executeInTransaction(new LoginAndRetrieveUser(loginService, identityService, resolvedTenantId, userName,
+                    password));
+
+            return ModelConvertor.toAPISession(sSession, sTenant.getName());
+        } catch (final LoginException e) {
+            throw e;
+        } catch (final RuntimeException e) {
+            throw e;
+        } catch (final Throwable e) {
+            throw new LoginException(e);
         }
-        platformTransactionExecutor.execute(getTenant);
-        final STenant sTenant = getTenant.getResult();
+    }
+
+    protected void checkThatWeCanLogin(final String userName, final Long tenantId, final PlatformService platformService, final STenant sTenant,
+            final long resolvedTenantId)
+            throws LoginException, BonitaHomeNotSetException, IOException {
         if (!platformService.isTenantActivated(sTenant)) {
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated");
         }
-
-        final long localTenantId = sTenant.getId();
-        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(localTenantId);
-        final LoginService loginService = serviceAccessor.getLoginService();
-        final IdentityService identityService = serviceAccessor.getIdentityService();
-        final TransactionExecutor tenantTransactionExecutor = serviceAccessor.getTransactionExecutor();
-
-        final LoginAndRetrieveUser txContent = new LoginAndRetrieveUser(loginService, identityService, localTenantId, userName, password);
-        try {
-            tenantTransactionExecutor.execute(txContent);
-        } catch (final BonitaRuntimeException e) {
-            throw e.getCause();
-        }
-
-        return ModelConvertor.toAPISession(txContent.getResult(), sTenant.getName());
     }
 
-    private class LoginAndRetrieveUser implements TransactionContentWithResult<SSession> {
+    private class LoginAndRetrieveUser implements Callable<SSession> {
 
         private final LoginService loginService;
 
@@ -117,8 +126,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         private final String userName;
 
         private final String password;
-
-        private SSession session;
 
         public LoginAndRetrieveUser(final LoginService loginService, final IdentityService identityService,
                 final long tenantId, final String userName, final String password) {
@@ -131,13 +138,9 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         }
 
         @Override
-        public SSession getResult() {
-            return session;
-        }
-
-        @Override
-        public void execute() {
+        public SSession call() throws Exception {
             SessionAccessor sessionAccessor = null;
+            SSession session;
             try {
                 session = loginService.login(tenantId, userName, password);
                 if (!session.isTechnicalUser()) {
@@ -153,13 +156,12 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                     final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null);
                     updateUser.execute();
                 }
-            } catch (final Exception e) {
-                throw new BonitaRuntimeException(e);
             } finally {
                 if (sessionAccessor != null) {
                     sessionAccessor.deleteSessionId();
                 }
             }
+            return session;
         }
 
     }
