@@ -24,8 +24,6 @@ public class CustomUserInfoDefinitionCreator implements Serializable {
 
     private String name;
 
-    private String displayName;
-
     private String description;
 
     public CustomUserInfoDefinitionCreator(String name) {
@@ -41,20 +39,12 @@ public class CustomUserInfoDefinitionCreator implements Serializable {
         return name;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     public void setDescription(String description) {

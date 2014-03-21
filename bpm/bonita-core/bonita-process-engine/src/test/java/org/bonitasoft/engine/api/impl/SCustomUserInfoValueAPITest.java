@@ -15,14 +15,15 @@ package org.bonitasoft.engine.api.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 
 import org.bonitasoft.engine.identity.CustomUserInfoValueUpdater;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilder;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.impl.SCustomUserInfoValueBuilderImpl;
+import org.bonitasoft.engine.identity.model.builder.impl.SCustomUserInfoValueUpdateBuilderImpl;
+import org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
@@ -59,7 +60,7 @@ public class SCustomUserInfoValueAPITest {
     @Test
     public void update_should_call_service_to_update_custom_user_info_when_exist() throws Exception {
         DummySCustomUserInfoValue value = new DummySCustomUserInfoValue(1L);
-        SCustomUserInfoValueUpdateBuilder builder = createDummySCustomUserInfoValueUpdateBuilder(Collections.singletonMap("key", "value"));
+        SCustomUserInfoValueUpdateBuilderImpl builder = new SCustomUserInfoValueUpdateBuilderImpl(new EntityUpdateDescriptor());
         given(updateFactory.createNewInstance()).willReturn(builder);
 
         api.update(value, new CustomUserInfoValueUpdater("value"));
@@ -109,11 +110,14 @@ public class SCustomUserInfoValueAPITest {
     }
 
     @Test
-    public void set_should_return_null_when_value_is_deleted() throws Exception {
+    public void set_should_return_updated_value_when_value_is_deleted() throws Exception {
+        given(createFactory.createNewInstance()).willReturn(new SCustomUserInfoValueBuilderImpl(new SCustomUserInfoValueImpl()));
 
-        SCustomUserInfoValue deletedValue = api.set(1L, 2L, "");
+        SCustomUserInfoValue value = api.set(1L, 2L, "");
 
-        assertThat(deletedValue).isNull();
+        assertThat(value.getDefinitionId()).isEqualTo(1L);
+        assertThat(value.getUserId()).isEqualTo(2L);
+        assertThat(value.getValue()).isEqualTo("");
     }
 
     @Test
@@ -134,22 +138,5 @@ public class SCustomUserInfoValueAPITest {
         api.set(5L, 3L, "update");
 
         verify(service).createCustomUserInfoValue(any(SCustomUserInfoValue.class));
-    }
-
-    private SCustomUserInfoValueUpdateBuilder createDummySCustomUserInfoValueUpdateBuilder(final Map<String, String> fields) {
-
-        return new SCustomUserInfoValueUpdateBuilder() {
-            @Override
-            public SCustomUserInfoValueUpdateBuilder updateValue(String value) {
-                return this;
-            }
-
-            @Override
-            public EntityUpdateDescriptor done() {
-                EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-                descriptor.getFields().putAll(fields);
-                return descriptor;
-            }
-        };
     }
 }

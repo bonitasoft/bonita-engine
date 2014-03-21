@@ -74,10 +74,7 @@ public class SCustomUserInfoValueAPI {
         SCustomUserInfoValue customUserInfoValue = searchValue(definitionId, userId);
         if(value == null || value.isEmpty()) {
             delete(customUserInfoValue);
-            // we should return an updated value or null
-            // customUserInfoValue.setValue(value);
-            // return customUserInfoValue;
-            return null;
+            return createValue(definitionId, userId, value);
         }
         if (customUserInfoValue != null) {
             return update(customUserInfoValue, new CustomUserInfoValueUpdater(value));
@@ -86,11 +83,7 @@ public class SCustomUserInfoValueAPI {
     }
 
     public SCustomUserInfoValue create(long definitionId, long userId, String value) throws SIdentityException {
-        return service.createCustomUserInfoValue(creatorFactory.createNewInstance()
-                .setDefinitionId(definitionId)
-                .setUserId(userId)
-                .setValue(value)
-                .done());
+        return service.createCustomUserInfoValue(createValue(definitionId, userId, value));
     }
 
     public void delete(SCustomUserInfoValue value) throws SIdentityException {
@@ -99,14 +92,21 @@ public class SCustomUserInfoValueAPI {
         }
     }
 
+    private SCustomUserInfoValue createValue(long definitionId, long userId, String value) {
+        return creatorFactory.createNewInstance()
+                .setDefinitionId(definitionId)
+                .setUserId(userId)
+                .setValue(value).done();
+    }
+
     private SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaSearchException {
         List<SCustomUserInfoValue> result = service.searchCustomUserInfoValue(new QueryOptions(
                 0,
                 1,
                 Collections.<OrderByOption>emptyList(),
                 Arrays.asList(
-                        new FilterOption(SCustomUserInfoValue.class, "definitionId", definitionId),
-                        new FilterOption(SCustomUserInfoValue.class, "userId", userId)),
+                        new FilterOption(SCustomUserInfoValue.class, creatorFactory.getDefinitionIdKey(), definitionId),
+                        new FilterOption(SCustomUserInfoValue.class, creatorFactory.getUserIdKey(), userId)),
                 null));
         if(result.size() == 0) {
             return null;
