@@ -833,7 +833,7 @@ public class XMLProcessDefinition {
 
     private void fillLeftOperandNode(final XMLNode rightOperandNode, final LeftOperand leftOperand) {
         rightOperandNode.addAttribute(LEFT_OPERAND_NAME, leftOperand.getName());
-        rightOperandNode.addAttribute(LEFT_OPERAND_TYPE, leftOperand.getType().name());
+        rightOperandNode.addAttribute(LEFT_OPERAND_TYPE, leftOperand.getType());
     }
 
     private void fillUserFilterNode(final XMLNode userFilterNode, final UserFilterDefinition userFilter) {

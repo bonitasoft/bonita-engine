@@ -162,7 +162,7 @@ public class OperationServiceImpl implements OperationService {
     }
 
     private LeftOperandHandler getLeftOperandHandler(final SLeftOperand leftOperand) throws SOperationExecutionException {
-        LeftOperandHandler leftOperandHandler = leftOperandHandlersMap.get(leftOperand.getType().name());
+        LeftOperandHandler leftOperandHandler = leftOperandHandlersMap.get(leftOperand.getType());
         if (leftOperandHandler == null) {
             throw new SOperationExecutionException("Left operand type not found: " + leftOperand.getType());
         }

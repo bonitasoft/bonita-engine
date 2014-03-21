@@ -16,8 +16,15 @@ package org.bonitasoft.engine.operation;
 /**
  * Type of the left operand.
  * 
- * @author Emmanuel Duchastenier
+ * @author Baptiste Mesta
  */
-public enum LeftOperandType {
-    DATA, SEARCH_INDEX, DOCUMENT, EXTERNAL_DATA
+public class LeftOperandType {
+
+    public static String DATA = "DATA";
+
+    public static String SEARCH_INDEX = "SEARCH_INDEX";
+
+    public static String DOCUMENT = "DOCUMENT";
+
+    public static String EXTERNAL_DATA = "EXTERNAL_DATA";
 }

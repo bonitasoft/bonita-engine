@@ -58,7 +58,7 @@ public class LeftOperandBuilder {
         return this;
     }
 
-    public LeftOperandBuilder setType(final LeftOperandType type) {
+    public LeftOperandBuilder setType(final String type) {
         leftOperand.setType(type);
         return this;
     }
@@ -71,7 +71,8 @@ public class LeftOperandBuilder {
      */
     @Deprecated
     public LeftOperandBuilder setExternal(final boolean external) {
-        if (leftOperand.getType() != null && !LeftOperandType.DATA.equals(leftOperand.getType()) && !LeftOperandType.EXTERNAL_DATA.equals(leftOperand.getType())) {
+        if (leftOperand.getType() != null && !LeftOperandType.DATA.equals(leftOperand.getType())
+                && !LeftOperandType.EXTERNAL_DATA.equals(leftOperand.getType())) {
             throw new IllegalStateException(
                     "Can't set left operand to external when the type is not input or data this method is deprecated, it's not usefull to use it anymore");
         }

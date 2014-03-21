@@ -26,18 +26,18 @@ public class SLeftOperandImpl implements SLeftOperand {
 
     private String name;
 
-    private SLeftOperandType type;
+    private String type;
 
     public SLeftOperandImpl() {
         type = SLeftOperandType.DATA;
     }
 
     @Override
-    public SLeftOperandType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(final SLeftOperandType type) {
+    public void setType(final String type) {
         this.type = type;
     }
 

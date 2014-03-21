@@ -21,7 +21,6 @@ import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
@@ -69,7 +68,7 @@ public class ServerModelConvertor {
                 .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
                 .setLeftOperand(BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance()
                         .setName(operation.getLeftOperand().getName())
-                        .setType(SLeftOperandType.valueOf(operation.getLeftOperand().getType().name()))
+                        .setType(operation.getLeftOperand().getType())
                         .done())
                 .done();
     }

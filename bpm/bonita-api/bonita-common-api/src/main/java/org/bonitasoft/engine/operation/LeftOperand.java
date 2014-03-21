@@ -39,7 +39,7 @@ public interface LeftOperand extends Serializable {
      * @return
      *         the type of the left operand
      */
-    LeftOperandType getType();
+    String getType();
 
     @Deprecated
     boolean isExternal();

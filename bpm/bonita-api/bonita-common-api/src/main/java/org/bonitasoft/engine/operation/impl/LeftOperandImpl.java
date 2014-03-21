@@ -28,7 +28,7 @@ public class LeftOperandImpl implements LeftOperand {
 
     private String name;
 
-    private LeftOperandType type;
+    private String type;
 
     public LeftOperandImpl() {
         // default when not set
@@ -67,11 +67,11 @@ public class LeftOperandImpl implements LeftOperand {
     }
 
     @Override
-    public LeftOperandType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(final LeftOperandType type) {
+    public void setType(final String type) {
         this.type = type;
     }
 

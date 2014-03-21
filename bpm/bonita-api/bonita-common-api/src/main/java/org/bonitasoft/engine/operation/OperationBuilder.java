@@ -74,7 +74,7 @@ public class OperationBuilder {
      * @param external
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
-    public OperationBuilder setLeftOperand(final String name, final LeftOperandType type, final boolean external) {
+    public OperationBuilder setLeftOperand(final String name, final String type, final boolean external) {
         operation.setLeftOperand(new LeftOperandBuilder().createNewInstance(name).setType(type).setExternal(external).done());
         return this;
     }

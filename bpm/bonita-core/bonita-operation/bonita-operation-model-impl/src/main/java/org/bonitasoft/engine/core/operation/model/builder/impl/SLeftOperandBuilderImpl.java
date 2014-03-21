@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.operation.model.builder.impl;
 
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilder;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 
@@ -43,7 +42,7 @@ public class SLeftOperandBuilderImpl implements SLeftOperandBuilder {
     }
 
     @Override
-    public SLeftOperandBuilder setType(final SLeftOperandType type) {
+    public SLeftOperandBuilder setType(final String type) {
         leftOperand.setType(type);
         return this;
     }

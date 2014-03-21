@@ -23,5 +23,5 @@ public interface SLeftOperand extends Serializable {
 
     String getName();
 
-    SLeftOperandType getType();
+    String getType();
 }

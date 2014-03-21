@@ -19,6 +19,13 @@ package org.bonitasoft.engine.core.operation.model;
  * @author Baptiste Mesta
  * 
  */
-public enum SLeftOperandType {
-    DATA, SEARCH_INDEX, DOCUMENT, EXTERNAL_DATA
+public class SLeftOperandType {
+
+    public static String DATA = "DATA";
+
+    public static String SEARCH_INDEX = "SEARCH_INDEX";
+
+    public static String DOCUMENT = "DOCUMENT";
+
+    public static String EXTERNAL_DATA = "EXTERNAL_DATA";
 }

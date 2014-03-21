@@ -14,16 +14,16 @@
 package org.bonitasoft.engine.core.operation.model.builder;
 
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 
 /**
  * @author Zhang Bole
+ * @author Baptiste Mesta
  */
 public interface SLeftOperandBuilder {
 
     SLeftOperandBuilder setName(final String dataName);
 
-    SLeftOperandBuilder setType(final SLeftOperandType type);
+    SLeftOperandBuilder setType(final String type);
 
     SLeftOperand done();
 

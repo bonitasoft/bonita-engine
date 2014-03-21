@@ -16,7 +16,6 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
 import org.bonitasoft.engine.xml.ElementBinding;
 
@@ -27,7 +26,7 @@ public class SLeftOperandBinding extends ElementBinding {
 
     private String name;
 
-    private SLeftOperandType type;
+    private String type;
 
     @Override
     public String getElementTag() {
@@ -37,7 +36,7 @@ public class SLeftOperandBinding extends ElementBinding {
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         name = attributes.get(XMLSProcessDefinition.LEFT_OPERAND_NAME);
-        type = SLeftOperandType.valueOf(attributes.get(XMLSProcessDefinition.LEFT_OPERAND_TYPE));
+        type = attributes.get(XMLSProcessDefinition.LEFT_OPERAND_TYPE);
     }
 
     @Override

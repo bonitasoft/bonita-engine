@@ -809,7 +809,7 @@ public class XMLSProcessDefinition {
 
     private void fillLeftOperandNode(final XMLNode rightOperandNode, final SLeftOperand sLeftOperand) {
         rightOperandNode.addAttribute(LEFT_OPERAND_NAME, sLeftOperand.getName());
-        rightOperandNode.addAttribute(LEFT_OPERAND_TYPE, sLeftOperand.getType().name());
+        rightOperandNode.addAttribute(LEFT_OPERAND_TYPE, sLeftOperand.getType());
     }
 
     private void createAndfillCorrelations(final XMLNode messageEventTriggerNode, final List<SCorrelationDefinition> correlations) {
