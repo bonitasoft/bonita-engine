@@ -61,17 +61,6 @@ public interface OperationService {
             throws SOperationExecutionException;
 
     /**
-     * Execute given operation in the given context
-     * 
-     * @param operation
-     *            the operation to execute
-     * @param expressionContext
-     *            the context in which execute the operation
-     * @throws SOperationExecutionException
-     */
-    void execute(SOperation operation, SExpressionContext expressionContext) throws SOperationExecutionException;
-
-    /**
      * Execute the given operation in the given context and update data that are in the same context
      * 
      * @param operations
