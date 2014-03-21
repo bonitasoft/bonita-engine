@@ -17,7 +17,7 @@
 		<jboss5.version>jboss-5.1.0.GA-jdk6</jboss5.version>
 		<jboss.name>jboss-5.1.0.GA</jboss.name>
 		<jboss.web.port>7080</jboss.web.port>
-		<jboss.ajp.port>8009</jboss.ajp.port>
+		<jboss.ajp.port>8011</jboss.ajp.port>
 		<provider.port>7099</provider.port>
 		<invokerLocatorPort>3873</invokerLocatorPort>
 		<jboss.url>http://sourceforge.net/projects/jboss/files/JBoss/JBoss-5.1.0.GA/jboss-5.1.0.GA-jdk6.zip/download</jboss.url>
