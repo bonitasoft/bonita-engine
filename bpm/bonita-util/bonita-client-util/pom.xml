@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-util</artifactId>
 		<groupId>org.bonitasoft.engine.util</groupId>
-		<version>6.2.4</version>
+		<version>6.2.5-TestTag</version>
 		<relativePath>..</relativePath>
 	</parent>
 
