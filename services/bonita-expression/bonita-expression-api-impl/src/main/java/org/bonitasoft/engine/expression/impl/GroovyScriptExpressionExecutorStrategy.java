@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -32,14 +32,17 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * @author Zhao na
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
+    @SuppressWarnings("unused")
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
         final ClassLoader scriptClassLoader = Thread.currentThread().getContextClassLoader();
+        final String expressionName = expression.getName();
         try {
             final GroovyShell shell = new GroovyShell(scriptClassLoader);
             final Script script = shell.parse(expressionContent);// can put the name here
@@ -49,13 +52,13 @@ public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpre
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             final StringBuilder builder = new StringBuilder("Expression ");
-            builder.append(expression.getName()).append(" with content: ").append(expressionContent).append(" depends on ").append(property)
+            builder.append(expressionName).append(" with content: ").append(expressionContent).append(" depends on ").append(property)
                     .append(" is neither defined in the script nor in dependencies");
-            throw new SExpressionEvaluationException(builder.toString(), e);
+            throw new SExpressionEvaluationException(builder.toString(), e, expressionName);
         } catch (final GroovyRuntimeException e) {
-            throw new SExpressionEvaluationException(e);
-        } catch (final Throwable e) {
-            throw new SExpressionEvaluationException("Script throws an exception" + expression, e);
+            throw new SExpressionEvaluationException(e, expressionName);
+        } catch (final Exception e) {
+            throw new SExpressionEvaluationException("Script throws an exception" + expression, e, expressionName);
         }
     }
 

@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.work.WorkRegisterException;
+import org.bonitasoft.engine.work.SWorkRegisterException;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class WorkServiceTest extends CommonServiceTest {
         assertTrue(works.contains("1"));
     }
 
-    @Test(expected = WorkRegisterException.class)
+    @Test(expected = SWorkRegisterException.class)
     public void testWorkOnNotActiveTransaction() throws Exception {
         final List<String> works = new ArrayList<String>();
         getWorkService().registerWork(new ListAdder(works, "1", 0));

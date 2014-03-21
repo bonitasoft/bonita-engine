@@ -36,14 +36,14 @@ public class SLeftOperandBinding extends ElementBinding {
         dataName = attributes.get(XMLSMigrationPlan.LEFT_OPERAND_NAME);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
-
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
-
     }
 
     @Override

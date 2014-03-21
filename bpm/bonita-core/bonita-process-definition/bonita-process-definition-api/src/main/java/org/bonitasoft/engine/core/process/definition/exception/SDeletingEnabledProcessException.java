@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,16 +14,22 @@
 package org.bonitasoft.engine.core.process.definition.exception;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class SDeletingEnabledProcessException extends SBonitaException {
 
     private static final long serialVersionUID = -8265428109141653941L;
 
-    public SDeletingEnabledProcessException(final String message) {
+    public SDeletingEnabledProcessException(final String message, final SProcessDefinitionDeployInfo processDefinitionDeployInfo) {
         super(message);
+
+        setProcessDefinitionIdOnContext(processDefinitionDeployInfo.getId());
+        setProcessDefinitionNameOnContext(processDefinitionDeployInfo.getName());
+        setProcessDefinitionVersionOnContext(processDefinitionDeployInfo.getVersion());
     }
 
 }

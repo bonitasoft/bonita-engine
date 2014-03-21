@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,33 @@
 package org.bonitasoft.engine.core.connector.exception;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 
 /**
  * @author Feng Hui
+ * @author Celine Souchet
  */
 public class SInvalidConnectorImplementationException extends SBonitaException {
 
     private static final long serialVersionUID = -3113075377405323282L;
 
-    public SInvalidConnectorImplementationException(String message) {
+    public SInvalidConnectorImplementationException(final String message, final SConnectorImplementationDescriptor connectorImplementationDescriptor) {
+        this(message);
+        setConnectorDefinitionImplementationClassNameOnContext(connectorImplementationDescriptor.getImplementationClassName());
+        setConnectorDefinitionIdOnContext(connectorImplementationDescriptor.getDefinitionId());
+        setConnectorDefinitionVersionOnContext(connectorImplementationDescriptor.getDefinitionVersion());
+    }
+
+    public SInvalidConnectorImplementationException(final String message) {
         super(message);
     }
 
-    public SInvalidConnectorImplementationException(Throwable t) {
-        super(t);
+    public SInvalidConnectorImplementationException(final Throwable cause) {
+        super(cause);
     }
 
-    public SInvalidConnectorImplementationException(String message, Exception e) {
-        super(message, e);
+    public SInvalidConnectorImplementationException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
 }

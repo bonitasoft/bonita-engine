@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
- * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012-2014 Bonitasoft S.A.
+ * Bonitasoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
@@ -75,12 +75,16 @@ public class ImportProfilesCommand extends TenantCommand {
         final DeleteAllExistingProfiles deleteAll = new DeleteAllExistingProfiles(profileService);
         try {
             deleteAll.execute();
+        } catch (final SCommandExecutionException e) {
+            throw e;
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);
         }
         final ImportProfiles importProfiles = new ImportProfiles(profileService, identityService, profiles, SessionInfos.getUserIdFromSession());
         try {
             importProfiles.execute();
+        } catch (final SCommandExecutionException e) {
+            throw e;
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);
         }

@@ -22,7 +22,6 @@ import java.util.Random;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
@@ -264,11 +263,12 @@ public class SchedulerServiceImplTest {
         }
 
         @Override
-        public void execute() throws SJobExecutionException, FireEventException {
+        public void execute() {
         }
 
+        @SuppressWarnings("unused")
         @Override
-        public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+        public void setAttributes(final Map<String, Serializable> attributes) {
         }
     }
 }

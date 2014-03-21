@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -29,6 +29,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.expression.ExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -56,21 +57,25 @@ import org.xml.sax.SAXException;
  * 
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
+    @SuppressWarnings("unused")
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException, SExpressionDependencyMissingException {
-        try {
-            if (expression.getDependencies().size() != 1 || expression.getDependencies().get(0) == null) {
-                throw new SExpressionDependencyMissingException("XPathReadExpressionExecutorStrategy must have exactly one dependency");
-            }
+        if (expression.getDependencies().size() != 1 || expression.getDependencies().get(0) == null) {
+            throw new SExpressionDependencyMissingException("XPathReadExpressionExecutorStrategy must have exactly one dependency");
+        }
 
-            final String returnType = expression.getReturnType();
+        final String expressionName = expression.getName();
+        final String returnType = expression.getReturnType();
+        try {
             final QName qname = getXPathConstants(returnType);
             if (qname == null) {
-                throw new SExpressionEvaluationException("XPathReadExpressionExecutorStrategy return type not supported: " + expression.getReturnType());
+                throw new SExpressionEvaluationException("XPathReadExpressionExecutorStrategy return type not supported: " + expression.getReturnType(),
+                        expressionName);
             }
             final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             final DocumentBuilder builder = factory.newDocumentBuilder();
@@ -78,7 +83,7 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
             final SExpression dep = expression.getDependencies().get(0);
             final String xmlContent = (String) resolvedExpressions.get(dep.getDiscriminant());
             if (xmlContent == null || xmlContent.isEmpty()) {
-                throw new SExpressionEvaluationException("The content of the xml is nul or empty: " + expression);
+                throw new SExpressionEvaluationException("The content of the xml is nul or empty: " + expression, expressionName);
             }
             final Document document = builder.parse(new InputSource(new StringReader(xmlContent)));
             final XPathFactory xpFactory = XPathFactory.newInstance();
@@ -86,24 +91,29 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
             final XPathExpression exp = xpath.compile(expression.getContent());
             return transType(exp.evaluate(document, qname), returnType);
         } catch (final XPathExpressionException e) {
-            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e);
+            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
+                    expressionName);
         } catch (final ParserConfigurationException e) {
-            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e);
+            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
+                    expressionName);
         } catch (final SAXException e) {
-            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e);
+            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
+                    expressionName);
         } catch (final IOException e) {
-            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e);
+            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
+                    expressionName);
+        } catch (final SBonitaRuntimeException e) {
+            throw new SExpressionEvaluationException("Error evaluating expression " + expression + " with strategy XPathReadExpressionExecutorStrategy", e,
+                    expressionName);
         }
     }
 
     /**
      * @param evaluate
      * @return
-     * @throws SExpressionEvaluationException
      */
-    private Object transType(final Object result, final String returnType) throws SExpressionEvaluationException {
+    private Object transType(final Object result, final String returnType) {
         try {
-
             if (Boolean.class.getName().equals(returnType)) {
                 return result != null && (((String) result).equalsIgnoreCase("true") || result.equals("1"));
             }
@@ -123,7 +133,7 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
                 return result;
             }
         } catch (final NumberFormatException e) {
-            throw new SExpressionEvaluationException("Wrong format for " + returnType + " value was " + result);
+            throw new SBonitaRuntimeException("Wrong format for " + returnType + " value was " + result, e);
         }
         return result;
     }
@@ -147,11 +157,11 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if (expression == null) {
-            throw new SInvalidExpressionException("The expression cannot be null.");
+            throw new SInvalidExpressionException("The expression cannot be null.", null);
         }
         final String expressionContent = expression.getContent();
         if (expressionContent == null) {
-            throw new SInvalidExpressionException("The expression content cannot be null: " + expression);
+            throw new SInvalidExpressionException("The expression content cannot be null : " + expression, expression.getName());
         }
     }
 

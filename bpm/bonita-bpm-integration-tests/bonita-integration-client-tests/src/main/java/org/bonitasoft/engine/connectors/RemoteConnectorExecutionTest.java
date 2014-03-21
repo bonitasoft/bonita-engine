@@ -1158,7 +1158,6 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         platformAPI.startNode();
         logoutPlatform(loginPlatform);
         login();
-        waitForDataValue(processInstance, "data", "value1");
         final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
         // connector restarted
         waitForDataValue(processInstance, "data", "value2");

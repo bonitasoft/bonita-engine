@@ -27,12 +27,14 @@ import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.ReflectException;
+import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.core.process.definition.exception.SDeletingEnabledProcessException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeletionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDeploymentInfoUpdateException;
@@ -151,11 +153,18 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     @Override
     public void delete(final long processId) throws SProcessDefinitionNotFoundException, SProcessDeletionException, SDeletingEnabledProcessException {
         final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a Process definition");
+        final SProcessDefinitionDeployInfo processDefinitionDeployInfo;
         try {
-            final SProcessDefinitionDeployInfo processDefinitionDeployInfo = getProcessDeploymentInfo(processId);
+            processDefinitionDeployInfo = getProcessDeploymentInfo(processId);
             if (ActivationState.ENABLED.name().equals(processDefinitionDeployInfo.getActivationState())) {
-                throw new SDeletingEnabledProcessException("Process with id " + processId + " is enabled");
+                throw new SDeletingEnabledProcessException("Process is enabled.", processDefinitionDeployInfo);
             }
+        } catch (final SProcessDefinitionReadException e) {
+            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
+            throw new SProcessDeletionException(e, processId);
+        }
+
+        try {
             cacheService.remove(PROCESS_CACHE_NAME, processId);
             SDeleteEvent deleteEvent = null;
             if (eventService.hasHandlers(PROCESSDEFINITION, EventActionType.DELETED)) {
@@ -166,24 +175,21 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             recorder.recordDelete(deleteRecord, deleteEvent);
             initiateLogBuilder(processId, SQueriableLog.STATUS_OK, logBuilder, "delete");
             dependencyService.deleteDependencies(processId, ScopeType.PROCESS);
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDefinitionNotFoundException(e);
-        } catch (final SProcessDefinitionReadException e) {
-            initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDeletionException(e);
+            throw new SProcessDefinitionNotFoundException(e, processDefinitionDeployInfo);
         } catch (final SRecorderException e) {
             initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDeletionException(e);
+            throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         } catch (final SDependencyNotFoundException e) {
             initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDeletionException(e);
+            throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         } catch (final SDependencyDeletionException e) {
             initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDeletionException(e);
+            throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         } catch (final SDependencyException e) {
             initiateLogBuilder(processId, SQueriableLog.STATUS_FAIL, logBuilder, "delete");
-            throw new SProcessDeletionException(e);
+            throw new SProcessDeletionException(e, processDefinitionDeployInfo);
         }
     }
 
@@ -322,8 +328,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 storeProcessDefinition(processId, sProcessDefinition);
             }
             return sProcessDefinition;
-        } catch (final CacheException e) {
-            throw new SProcessDefinitionNotFoundException(e);
+        } catch (final SCacheException e) {
+            throw new SProcessDefinitionNotFoundException(e, processId);
         } catch (final SProcessDefinitionNotFoundException e) {
             throw e;
         } catch (final Exception e) {
@@ -331,7 +337,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
     }
 
-    private long setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition) throws ReflectException {
+    private long setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition) throws SReflectException {
         final long id = generateId();
         ClassReflector.invokeSetter(sProcessDefinition, "setId", Long.class, id);
         return id;
@@ -341,7 +347,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return Math.abs(UUID.randomUUID().getLeastSignificantBits());
     }
 
-    private void storeProcessDefinition(final Long id, final SProcessDefinition sProcessDefinition) throws CacheException {
+    private void storeProcessDefinition(final Long id, final SProcessDefinition sProcessDefinition) throws SCacheException {
         cacheService.store(PROCESS_CACHE_NAME, id, sProcessDefinition);
     }
 
@@ -354,7 +360,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                     "getDeployInfoByProcessDefId", parameters, SProcessDefinitionDeployInfo.class);
             final SProcessDefinitionDeployInfo processDefinitionDeployInfo = persistenceService.selectOne(descriptor);
             if (processDefinitionDeployInfo == null) {
-                throw new SProcessDefinitionNotFoundException("Unable to find the process definition deployment info with process id " + processId);
+                throw new SProcessDefinitionNotFoundException("Unable to find the process definition deployment info.", processId);
             }
             return processDefinitionDeployInfo;
         } catch (final SBonitaReadException e) {
@@ -566,9 +572,10 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             final List<SProcessDefinitionDeployInfo> processDefinitionDeployInfos = persistenceService.selectList(selectDescriptor);
             if (processDefinitionDeployInfos != null && processDefinitionDeployInfos.size() > 0) {
                 return processDefinitionDeployInfos;
-            } else {
-                throw new SProcessDefinitionReadException("Unable to find the process definition deployment info with process name " + processName);
             }
+            final SProcessDefinitionReadException exception = new SProcessDefinitionReadException("Unable to find the process definition deployment info.");
+            exception.setProcessDefinitionNameOnContext(processName);
+            throw exception;
         } catch (final SBonitaReadException e) {
             throw new SProcessDefinitionReadException(e);
         }
@@ -584,9 +591,11 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                     SProcessDefinitionDeployInfo.class, Long.class));
             if (processDefId != null) {
                 return processDefId;
-            } else {
-                throw new SProcessDefinitionReadException("process definition id not found with name " + name + " and version " + version);
             }
+            final SProcessDefinitionReadException exception = new SProcessDefinitionReadException("Process definition id not found.");
+            exception.setProcessDefinitionNameOnContext(name);
+            exception.setProcessDefinitionVersionOnContext(version);
+            throw exception;
         } catch (final SBonitaReadException e) {
             throw new SProcessDefinitionReadException(e);
         }
@@ -599,7 +608,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         try {
             processDefinitionDeployInfo = getProcessDeploymentInfo(processId);
         } catch (final SProcessDefinitionReadException e) {
-            throw new SProcessDefinitionNotFoundException(e);
+            throw new SProcessDefinitionNotFoundException(e, processId);
         }
         final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating a processDefinitionDeployInfo");
         final UpdateRecord updateRecord = getUpdateRecord(descriptor, processDefinitionDeployInfo);

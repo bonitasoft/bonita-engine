@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,25 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.definition;
+package org.bonitasoft.engine.work;
+
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Charles Souillard
+ * @author Baptiste Mesta
+ * @author Celine Souchet
  */
-public class SProcessDefinitionNotFoundException extends SProcessDefinitionException {
+public class SWorkRegisterException extends SBonitaException {
 
-    private static final long serialVersionUID = 1702422492322010491L;
+    private static final long serialVersionUID = 1L;
 
-    public SProcessDefinitionNotFoundException(final String message) {
+    public SWorkRegisterException(final String message, final Throwable t) {
+        super(message, t);
+    }
+
+    /**
+     * @param string
+     */
+    public SWorkRegisterException(final String message) {
         super(message);
     }
-
-    public SProcessDefinitionNotFoundException(final Throwable e) {
-        super(e);
-    }
-
-    public SProcessDefinitionNotFoundException(final String message, final Throwable e) {
-        super(message, e);
-    }
-
 }

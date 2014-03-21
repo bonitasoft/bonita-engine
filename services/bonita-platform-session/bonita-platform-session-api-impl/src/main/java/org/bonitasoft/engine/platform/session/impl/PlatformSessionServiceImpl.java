@@ -18,7 +18,7 @@ import java.util.Date;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.commons.ReflectException;
+import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.session.PlatformSessionProvider;
@@ -135,7 +135,7 @@ public class PlatformSessionServiceImpl implements PlatformSessionService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "renewSession"));
             }
-        } catch (final ReflectException e) {
+        } catch (final SReflectException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "renewSession", e));
             }

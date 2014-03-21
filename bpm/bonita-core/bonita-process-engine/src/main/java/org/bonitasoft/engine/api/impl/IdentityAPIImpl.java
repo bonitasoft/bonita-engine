@@ -278,9 +278,8 @@ public class IdentityAPIImpl implements IdentityAPI {
             }
             userUpdateBuilder.updateLastUpdate(System.currentTimeMillis());
             return userUpdateBuilder.done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private EntityUpdateDescriptor getUserContactInfoUpdateDescriptor(final ContactDataUpdater updater) {
@@ -328,9 +327,8 @@ public class IdentityAPIImpl implements IdentityAPI {
                 }
             }
             return updateBuilder.done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -463,7 +461,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final IdentityService identityService = tenantAccessor.getIdentityService();
-            return getUsersWithOrder(startIndex, maxResults, criterion, tenantAccessor, identityService);
+            return getUsersWithOrder(startIndex, maxResults, criterion, identityService);
         } catch (final SBonitaException sbe) {
             throw new RetrieveException(sbe);
         }
@@ -1128,14 +1126,13 @@ public class IdentityAPIImpl implements IdentityAPI {
     }
 
     private List<User> getUsersWithOrder(final int startIndex, final int maxResults, final UserCriterion pagingCriterion,
-            final TenantServiceAccessor tenantAccessor, final IdentityService identityService) throws SIdentityException {
-        final String field = getUserFieldKey(pagingCriterion, tenantAccessor);
+            final IdentityService identityService) throws SIdentityException {
+        final String field = getUserFieldKey(pagingCriterion);
         final OrderByType order = getUserOrderByType(pagingCriterion);
         if (field == null) {
             return ModelConvertor.toUsers(identityService.getUsers(startIndex, maxResults));
-        } else {
-            return ModelConvertor.toUsers(identityService.getUsers(startIndex, maxResults, field, order));
         }
+        return ModelConvertor.toUsers(identityService.getUsers(startIndex, maxResults, field, order));
     }
 
     private OrderByType getUserOrderByType(final UserCriterion pagingCriterion) {
@@ -1163,7 +1160,7 @@ public class IdentityAPIImpl implements IdentityAPI {
         return order;
     }
 
-    private String getUserFieldKey(final UserCriterion pagingCriterion, final TenantServiceAccessor tenantAccessor) {
+    private String getUserFieldKey(final UserCriterion pagingCriterion) {
         final SUserBuilderFactory sUserFact = BuilderFactory.get(SUserBuilderFactory.class);
         String field = null;
         switch (pagingCriterion) {

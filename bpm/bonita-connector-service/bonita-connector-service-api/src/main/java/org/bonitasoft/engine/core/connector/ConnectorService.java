@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
@@ -169,9 +168,9 @@ public interface ConnectorService {
      * @param outputs
      * @param expressionContext
      * @param result
-     * @throws SBonitaException
+     * @throws SConnectorException
      */
-    void executeOutputOperation(List<SOperation> outputs, SExpressionContext expressionContext, ConnectorResult result) throws SBonitaException;
+    void executeOutputOperation(List<SOperation> outputs, SExpressionContext expressionContext, ConnectorResult result) throws SConnectorException;
 
     /**
      * @param rootDefinitionId

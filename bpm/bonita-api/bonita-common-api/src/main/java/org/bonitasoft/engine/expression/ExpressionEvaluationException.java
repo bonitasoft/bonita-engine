@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,16 +17,31 @@ import org.bonitasoft.engine.exception.BonitaException;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class ExpressionEvaluationException extends BonitaException {
 
     private static final long serialVersionUID = 7295745453567432910L;
 
+    private final String expressionName;
+
     /**
      * @param cause
+     * @param expressionName
+     *            The expression's name that failed on the evaluation.
      */
-    public ExpressionEvaluationException(final Throwable cause) {
+    public ExpressionEvaluationException(final Throwable cause, final String expressionName) {
         super(cause);
+        this.expressionName = expressionName;
+    }
+
+    /**
+     * Return empty or null, when the context of evaluation is wrong.
+     * 
+     * @return The expression's name that failed on the evaluation.
+     */
+    public String getExpressionName() {
+        return expressionName;
     }
 
 }

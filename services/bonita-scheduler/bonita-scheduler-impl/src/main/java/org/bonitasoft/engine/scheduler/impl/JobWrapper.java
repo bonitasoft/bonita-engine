@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,9 +17,10 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.events.model.SEvent;
+import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -34,6 +35,7 @@ import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class JobWrapper implements StatelessJob {
 
@@ -44,6 +46,7 @@ public class JobWrapper implements StatelessJob {
             // Nothing to do
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void afterCompletion(final TransactionState txState) {
             sessionAccessor.deleteTenantId();
@@ -95,7 +98,7 @@ public class JobWrapper implements StatelessJob {
     }
 
     @Override
-    public void execute() throws SJobExecutionException, FireEventException {
+    public void execute() throws SJobExecutionException, SFireEventException {
         try {
             sessionAccessor.setTenantId(tenantId);
             if (eventService.hasHandlers(JOB_EXECUTING, null)) {
@@ -103,17 +106,18 @@ public class JobWrapper implements StatelessJob {
                 eventService.fireEvent(jobExecuting);
             }
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "start execution of " + statelessJob.getName());
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Start execution of " + statelessJob.getName());
             }
             statelessJob.execute();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "finished execution of " + statelessJob.getName());
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Finished execution of " + statelessJob.getName());
             }
-        } catch (final Exception e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error while executing job " + name + ":" + e.getMessage(), e);
-            }
-            throw new SJobExecutionException(e);
+        } catch (final SFireEventException e) {
+            logFailedJob(e);
+            throw e;
+        } catch (final SJobExecutionException e) {
+            logFailedJob(e);
+            throw e;
         } finally {
             if (eventService.hasHandlers(JOB_COMPLETED, null)) {
                 jobCompleted.setObject(this);
@@ -124,6 +128,12 @@ public class JobWrapper implements StatelessJob {
             } catch (STransactionNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void logFailedJob(final SBonitaException e) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Error while executing job " + name + " : " + e.getMessage(), e);
         }
     }
 

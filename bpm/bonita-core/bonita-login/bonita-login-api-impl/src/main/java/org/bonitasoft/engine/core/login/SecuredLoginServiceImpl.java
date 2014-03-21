@@ -101,19 +101,17 @@ public class SecuredLoginServiceImpl implements LoginService {
                 isTechnicalUser = true;
                 userId = -1;
             } else {
-                try {
                     userName = loginChoosingAppropriateAuthenticationService(credentials);
                     if (StringUtils.isNotBlank(userName)) {
                         final SUser user = identityService.getUserByUserName(userName);
                         userId = user.getId();
                     } else {
                         // now we are sure authentication Failed
-                        authenticationFailed(null);
+                        authenticationFailed();
                     }
-                } catch (final AuthenticationException ae) {
-                    authenticationFailed(ae);
-                }
             }
+        } catch (final AuthenticationException ae) {
+            throw new SLoginException(ae);
         } catch (final SUserNotFoundException e) {
             throw new SLoginException("Unable to found user " + userName);
         } finally {
@@ -135,17 +133,13 @@ public class SecuredLoginServiceImpl implements LoginService {
      * @throws SLoginException
      *             the appropriate exception
      */
-    protected void authenticationFailed(AuthenticationException authenticationException) throws SLoginException {
-        if (authenticationException != null) {
-            throw new SLoginException(authenticationException);
-        } else {
+    protected void authenticationFailed() throws SLoginException {
             try {
                 Thread.sleep(3000);
             } catch (final InterruptedException e) {
                 throw new SLoginException("User name or password is not valid!");
             }
             throw new SLoginException("User name or password is not valid!");
-        }
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -35,7 +35,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityState
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -53,11 +52,10 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 
-;
-
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
 
@@ -159,16 +157,15 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
                 List<SFlowNodeInstance> createInnerInstances = null;
                 if (shouldCreateANewInstance(loopCharacteristics, numberOfInstances, miActivity)) {
                     createInnerInstances = InitializingMultiInstanceActivityStateImpl.createInnerInstances(bpmInstancesCreator, activityInstanceService,
-                            processDefinition.getId(), activityDefinition, flowNodeInstance, loopCharacteristics, numberOfInstances, 1);
+                            processDefinition.getId(), activityDefinition, flowNodeInstance, 1);
                     for (final SFlowNodeInstance sFlowNodeInstance : createInnerInstances) {
-                        containerRegistry.executeFlowNode(sFlowNodeInstance.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(),
-                                sFlowNodeInstance.getLogicalGroup(3));
+                        containerRegistry.executeFlowNode(processDefinition.getId(), sFlowNodeInstance.getLogicalGroup(3), sFlowNodeInstance.getId(), null,
+                                null);
                     }
                 }
                 return numberOfActiveInstances == 0 && (createInnerInstances == null || createInnerInstances.size() == 0);
-            } else {
-                return numberOfActiveInstances == 0 || numberOfInstances == numberOfCompletedInstances + numberOfTerminatedInstances;
             }
+            return numberOfActiveInstances == 0 || numberOfInstances == numberOfCompletedInstances + numberOfTerminatedInstances;
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }
@@ -196,7 +193,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
             for (final SActivityInstance child : children) {
                 activityInstanceService.setStateCategory(child, SStateCategory.ABORTING);
                 if (child.isStable()) {
-                    containerRegistry.executeFlowNode(child.getId(), null, null, SFlowElementsContainerType.FLOWNODE.name(), child.getLogicalGroup(3));
+                    containerRegistry.executeFlowNode(flowNodeInstance.getProcessDefinitionId(), child.getLogicalGroup(3), child.getId(), null, null);
                 }
             }
 
@@ -208,17 +205,17 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
             final SMultiInstanceActivityInstance miActivityInstance) throws SDataInstanceException {
         if (loopCharacteristics.getLoopCardinality() != null) {
             return miActivityInstance.getLoopCardinality() > numberOfInstances;
-        } else {
-            final SDataInstance dataInstance = dataInstanceService.getDataInstance(loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getId(),
-                    DataInstanceContainer.ACTIVITY_INSTANCE.name());
-            if (dataInstance != null) {
-                final List<?> loopDataInputCollection = (List<?>) dataInstance.getValue();
-                return numberOfInstances < loopDataInputCollection.size();
-            }
+        }
+        final SDataInstance dataInstance = dataInstanceService.getDataInstance(loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getId(),
+                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+        if (dataInstance != null) {
+            final List<?> loopDataInputCollection = (List<?>) dataInstance.getValue();
+            return numberOfInstances < loopDataInputCollection.size();
         }
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         final int numberOfActiveInstances = ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfActiveInstances();
@@ -229,6 +226,7 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         return numberOfActiveInstances > 0;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public final StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return StateCode.DONE;
@@ -239,11 +237,13 @@ public class ExecutingMultiInstanceActivityStateImpl implements FlowNodeState {
         return SStateCategory.NORMAL;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "";

@@ -46,6 +46,7 @@ public abstract class CommonAPITest extends APITestUtil {
             LOGGER.info("Starting test: " + d.getClassName() + "." + d.getMethodName());
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void failed(final Throwable cause, final Description d) {
             try {
@@ -61,19 +62,19 @@ public abstract class CommonAPITest extends APITestUtil {
         @Override
         public void succeeded(final Description d) {
             try {
-            List<String> clean = null;
-            try {
-                clean = clean();
-            } catch (final BonitaException e) {
-                throw new BonitaRuntimeException(e);
-            }
-            LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
-            if (!clean.isEmpty()) {
-                throw new BonitaRuntimeException(clean.toString());
-            }
+                List<String> clean = null;
+                try {
+                    clean = clean();
+                } catch (final BonitaException e) {
+                    throw new BonitaRuntimeException(e);
+                }
+                LOGGER.info("Succeeded test: " + d.getClassName() + "." + d.getMethodName());
+                if (!clean.isEmpty()) {
+                    throw new BonitaRuntimeException(clean.toString());
+                }
             } finally {
                 LOGGER.info("-----------------------------------------------------------------------------------------------");
-        }
+            }
         }
     };
 
@@ -122,7 +123,7 @@ public abstract class CommonAPITest extends APITestUtil {
         bizArchive.addConnectorImplementation(new BarResource(implemName, IOUtils.toByteArray(BPMRemoteTests.class.getResourceAsStream(implemPath))));
         bizArchive.addClasspathResource(new BarResource(dependencyJarName, IOUtil.generateJar(dependencyClassName)));
     }
-    
+
     protected ProcessDefinition deployProcessWithTestFilter(final String actorName, final long userId, final ProcessDefinitionBuilder designProcessDefinition,
             final String filterName) throws BonitaException, IOException {
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(

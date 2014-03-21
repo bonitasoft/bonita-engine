@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.core.migration.MigrationPlanService;
 import org.bonitasoft.engine.core.migration.exceptions.SInvalidMigrationPlanException;
@@ -142,7 +142,7 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
         } catch (final SRecorderException e) {
             initiateLogBuilder(insertRecord.getEntity().getId(), SQueriableLog.STATUS_FAIL, logBuilder, "importMigrationPlan");
             throw new SMigrationPlanCreationException(e);
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SMigrationPlanCreationException(e);
         }
     }
@@ -192,7 +192,7 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
         SMigrationPlan migrationPlan = null;
         try {
             migrationPlan = (SMigrationPlan) cacheService.get(MIGRATION_PLAN_CACHE_NAME, String.valueOf(id));
-        } catch (final CacheException e1) {
+        } catch (final SCacheException e1) {
             // do nothing parse from content in db
         }
         if (migrationPlan != null) {
@@ -214,7 +214,7 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
                 throw new SInvalidMigrationPlanException(e);
             } catch (final SXMLParseException e) {
                 throw new SInvalidMigrationPlanException(e);
-            } catch (final CacheException e) {
+            } catch (final SCacheException e) {
                 throw new SInvalidMigrationPlanException(e);
             }
         }

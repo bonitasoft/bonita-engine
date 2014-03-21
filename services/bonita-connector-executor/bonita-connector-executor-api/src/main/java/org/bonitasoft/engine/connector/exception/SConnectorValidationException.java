@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
  */
 package org.bonitasoft.engine.connector.exception;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Feng Hui
+ * @author Celine Souchet
  */
-public class SConnectorValidationException extends SBonitaException {
+public class SConnectorValidationException extends SConnectorException {
 
     private static final long serialVersionUID = -7025831546419799447L;
 

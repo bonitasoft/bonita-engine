@@ -1,24 +1,13 @@
 package org.bonitasoft.engine.core.login;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bonitasoft.engine.authentication.AuthenticationConstants;
-import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.AuthenticationService;
-import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.identity.IdentityService;
-import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,24 +17,24 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class SecuredLoginServiceImplTest {
 
-    SecuredLoginServiceImpl securedLoginServiceImpl;
+    private SecuredLoginServiceImpl securedLoginServiceImpl;
 
     @Mock
-    AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
     @Mock
-    GenericAuthenticationService genericAuthenticationService;
+   private GenericAuthenticationService genericAuthenticationService;
 
     @Mock
-    SessionService sessionService;
+    private SessionService sessionService;
 
     @Mock
-    SessionAccessor sessionAccessor;
+    private SessionAccessor sessionAccessor;
 
     @Mock
-    IdentityService identityService;
+    private IdentityService identityService;
 
-    String formerBonitaHome = null;
+  private  String formerBonitaHome = null;
 
     @Before
     public void setUp() {
