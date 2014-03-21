@@ -35,7 +35,7 @@ public class OrganizationNodeBuilder {
 
     static final List<Class<? extends ElementBinding>> BINDINGS = new ArrayList<Class<? extends ElementBinding>>();
 
-    private static final String NAMESPACE = "http://www.bonitasoft.org/ns/organization/6.0.0-beta-016";
+    private static final String NAMESPACE = "http://www.bonitasoft.org/ns/organization/6.3";
 
     private static final String NS_PREFIX = "organization";
 
