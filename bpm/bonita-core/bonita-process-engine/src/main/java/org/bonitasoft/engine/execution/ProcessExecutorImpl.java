@@ -19,7 +19,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -552,16 +551,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     protected void executeOperations(final List<SOperation> operations, Map<String, Object> context, final SExpressionContext expressionContext,
             final SProcessInstance sProcessInstance) throws SBonitaException {
         if (operations != null && !operations.isEmpty()) {
-            // Execute operation
-            final long processInstanceId = sProcessInstance.getId();
-            for (final SOperation operation : operations) {
-                // TODO operations can be evaluated in batch here
-                if (context != null) {
-                    context = new HashMap<String, Object>(context);
-                }
-                expressionContext.setInputValues(context);
-                operationService.execute(operation, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(), expressionContext);
-            }
+            expressionContext.setInputValues(context);
+            operationService.execute(operations, sProcessInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), expressionContext);
         }
     }
 
