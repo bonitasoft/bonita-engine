@@ -42,8 +42,7 @@ public class SearchCustomUserInfoValues extends AbstractSearchEntity<CustomUserI
 
     @Override
     public long executeCount(QueryOptions options) throws SBonitaSearchException {
-        // TODO service#getNumberOfCustomUserInfoValues once BS-7909 has been addressed
-        return service.searchCustomUserInfoValue(options).size();
+        return service.getNumberOfCustomUserInfoValue(options);
     }
 
     @Override

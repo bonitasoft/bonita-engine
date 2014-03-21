@@ -341,6 +341,11 @@
         SELECT COUNT(custom_usr_inf_def)
         FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl AS custom_usr_inf_def
     </query>
+
+    <query name="getNumberOfSCustomUserInfoValue">
+        SELECT COUNT(custom_usr_inf_val)
+        FROM org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl AS custom_usr_inf_val
+    </query>
 	
 	<query name="searchSUser">
 		SELECT user

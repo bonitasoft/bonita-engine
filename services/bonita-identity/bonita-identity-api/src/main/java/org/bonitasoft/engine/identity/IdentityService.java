@@ -614,6 +614,16 @@ public interface IdentityService {
     long getNumberOfCustomUserInfoDefinition() throws SIdentityException;
 
     /**
+     * Get total number of custom user info value
+     *
+     * @param options
+     *            The QueryOptions object containing some query conditions
+     * @return the total number of custom user info value
+     * @throws SIdentityException
+     */
+    long getNumberOfCustomUserInfoValue(QueryOptions options) throws SBonitaSearchException;
+
+    /**
      * Get customUserInfoDefinition by their ids
      * 
      * @param customUserInfoDefinitionIds

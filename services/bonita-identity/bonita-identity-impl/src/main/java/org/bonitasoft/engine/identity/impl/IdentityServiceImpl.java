@@ -828,6 +828,19 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
+    public long getNumberOfCustomUserInfoValue(final QueryOptions options) throws SBonitaSearchException {
+        final String methodName = "getNumberOfCustomUserInfoValue";
+        logBeforeMethod(methodName);
+        try {
+            final long number = persistenceService.getNumberOfEntities(SCustomUserInfoValue.class, options, null);
+            logAfterMethod(methodName);
+            return number;
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod(methodName, e);
+            throw new SBonitaSearchException(e);
+        }
+    }
+
     @Override
     public long getNumberOfRoles() throws SIdentityException {
         final String methodName = "getNumberOfRoles";
