@@ -29,10 +29,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
+import com.bonitasoft.engine.operation.pojo.Employee;
+import com.bonitasoft.engine.operation.pojo.InvalidTravel;
+import com.bonitasoft.engine.operation.pojo.Travel;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateBusinessDataOperationExecutorStrategyTest {
@@ -100,46 +102,6 @@ public class UpdateBusinessDataOperationExecutorStrategyTest {
         final SLeftOperand leftOp = mock(SLeftOperand.class);
         when(leftOp.getName()).thenReturn("bizData");
         updateBizDataStrategy.update(leftOp, new Object(), 1L, "");
-    }
-
-    public class InvalidTravel implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        private int nbDays;
-
-        public int getNbDays() {
-            return nbDays;
-        }
-
-        public void setNbDays(final int nbDays) {
-            this.nbDays = nbDays;
-        }
-    }
-
-    public class Travel implements Entity {
-
-        private static final long serialVersionUID = 1L;
-
-        private int nbDays;
-
-        public int getNbDays() {
-            return nbDays;
-        }
-
-        public void setNbDays(final int nbDays) {
-            this.nbDays = nbDays;
-        }
-
-        @Override
-        public Long getPersistenceId() {
-            return 1L;
-        }
-
-        @Override
-        public Long getPersistenceVersion() {
-            return 1L;
-        }
     }
 
     @Test

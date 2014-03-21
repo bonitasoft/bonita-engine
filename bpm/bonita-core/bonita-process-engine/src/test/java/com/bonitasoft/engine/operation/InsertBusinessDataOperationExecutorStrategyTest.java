@@ -23,6 +23,7 @@ import org.mockito.stubbing.Answer;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
+import com.bonitasoft.engine.operation.pojo.Employee;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InsertBusinessDataOperationExecutorStrategyTest {

@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.operation;
+package com.bonitasoft.engine.operation.pojo;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -6,6 +6,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.bonitasoft.engine.bdm.Entity;
 
 public class Employee implements Entity {
+
+    private static final long serialVersionUID = 4877386043381866907L;
 
     private Long persistenceId;
 
@@ -15,7 +17,7 @@ public class Employee implements Entity {
 
     private String lastName;
 
-    protected Employee() {
+    public Employee() {
         super();
     }
 
