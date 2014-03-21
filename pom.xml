@@ -9,20 +9,14 @@
 
 	<groupId>com.bonitasoft.engine</groupId>
 	<artifactId>bonita-engine-sp</artifactId>
-	<version>6.3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Bonita Engine SP</name>
+	<name>Bonita BPM Engine SP</name>
 
 	<properties>
-		<jacoco.file>${user.home}/jacoco-engine.exec</jacoco.file>
-		<!-- Sonar -->
-		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<!-- The destination file for the code coverage report has to be set to the same value in the parent pom and in each module pom. Then JaCoCo will add up information 
-			in the same report, so that, it will give the cross-module code coverage. -->
-		<sonar.jacoco.reportPath>${jacoco.file}</sonar.jacoco.reportPath>
-        <hazelcast.version>3.0.3</hazelcast.version>
+		<hazelcast.version>3.0.3</hazelcast.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<dependencyManagement>
@@ -30,7 +24,7 @@
 			<dependency>
 				<groupId>com.bonitasoft.manager</groupId>
 				<artifactId>manager</artifactId>
-				<version>1.2.0</version>
+				<version>1.3.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
@@ -39,7 +33,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.hazelcast</groupId>
-				<artifactId>hazelcast-hibernate3</artifactId>
+				<artifactId>hazelcast-hibernate4</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
 			<dependency>
@@ -47,21 +41,8 @@
 				<artifactId>hazelcast-spring</artifactId>
 				<version>${hazelcast.version}</version>
 			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.6.0.201210061924</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 
 	<profiles>
 		<profile>
@@ -74,7 +55,7 @@
 		<profile>
 			<id>fast</id>
 			<properties>
-				<maven.test.skip>true</maven.test.skip>
+				<skipTests>true</skipTests>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
 			</properties>
 			<modules>
@@ -85,6 +66,9 @@
 
 		<profile>
 			<id>package</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
@@ -96,7 +80,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -106,12 +90,16 @@
 				</plugins>
 			</build>
 		</profile>
+
 		<profile>
 			<id>package-all</id>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
 			</modules>
+			<properties>
+				<skipTests>true</skipTests>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -119,7 +107,7 @@
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-							<id>attach-sources</id>
+								<id>attach-sources</id>
 								<goals>
 									<goal>jar-no-fork</goal>
 								</goals>
@@ -129,37 +117,19 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>tests</id>
-			<modules>
-				<module>services</module>
-				<module>bpm</module>
-			</modules>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-							<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+
 		<profile>
 			<id>javadoc</id>
 			<properties>
 				<maven.javadoc.skip>false</maven.javadoc.skip>
 			</properties>
 		</profile>
+
 		<profile>
-			<id>sonar</id>
+			<id>tests</id>
+			<properties>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+			</properties>
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
@@ -167,24 +137,33 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>org.bonitasoft.engine.*</include>
-								<include>com.bonitasoft.engine.*</include>
-							</includes>
-							<destFile>${jacoco.file}</destFile>
-							<append>true</append>
-						</configuration>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>pre-test</id>
+								<id>attach-sources</id>
 								<goals>
-									<goal>prepare-agent</goal>
+									<goal>jar-no-fork</goal>
 								</goals>
 							</execution>
 						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>sonar</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacoco.version}</version>
+						<configuration>
+							<includes>
+								<include>com.bonitasoft.engine.*</include>
+							</includes>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>

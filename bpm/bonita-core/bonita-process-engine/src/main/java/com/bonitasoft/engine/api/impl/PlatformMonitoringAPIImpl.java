@@ -32,7 +32,7 @@ import com.bonitasoft.manager.Features;
  */
 public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
 
-    private PlatformMonitoringService getPlatformMonitoring() throws MonitoringException {
+    protected PlatformMonitoringService getPlatformMonitoringService() throws MonitoringException {
         PlatformServiceAccessor platformServiceAccessor = null;
         try {
             platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
@@ -46,144 +46,144 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     @Override
     @CustomTransactions
     public long getCurrentMemoryUsage() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getCurrentMemoryUsage();
     }
 
     @Override
     @CustomTransactions
     public float getMemoryUsagePercentage() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getMemoryUsagePercentage();
     }
 
     @Override
     @CustomTransactions
     public double getSystemLoadAverage() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getSystemLoadAverage();
     }
 
     @Override
     @CustomTransactions
     public long getUpTime() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getUpTime();
     }
 
     @Override
     @CustomTransactions
     public long getStartTime() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getStartTime();
     }
 
     @Override
     @CustomTransactions
     public long getTotalThreadsCpuTime() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getTotalThreadsCpuTime();
     }
 
     @Override
     @CustomTransactions
     public int getThreadCount() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getThreadCount();
     }
 
     @Override
     @CustomTransactions
     public int getAvailableProcessors() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getAvailableProcessors();
     }
 
     @Override
     @CustomTransactions
     public String getOSArch() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getOSArch();
     }
 
     @Override
     @CustomTransactions
     public String getOSName() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getOSName();
     }
 
     @Override
     @CustomTransactions
     public String getOSVersion() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getOSVersion();
     }
 
     @Override
     @CustomTransactions
     public String getJvmName() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getJvmName();
     }
 
     @Override
     @CustomTransactions
     public String getJvmVendor() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getJvmVendor();
     }
 
     @Override
     @CustomTransactions
     public String getJvmVersion() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getJvmVersion();
     }
 
     @Override
     @CustomTransactions
     public Map<String, String> getJvmSystemProperties() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getJvmSystemProperties();
     }
 
     @Override
     @CustomTransactions
     public boolean isSchedulerStarted() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         try {
             return platformMonitoringService.isSchedulerStarted();
         } catch (SBonitaException e) {
@@ -194,18 +194,22 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     @Override
     @CustomTransactions
     public long getNumberOfActiveTransactions() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.SERVICE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.SERVICE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.getNumberOfActiveTransactions();
+    }
+
+    protected LicenseChecker getLicenseChecker() {
+        return LicenseChecker.getInstance();
     }
 
     @Override
     @CustomTransactions
     public long getProcessCpuTime() throws MonitoringException, UnavailableInformationException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Process Cpu Time.");
         }
@@ -215,9 +219,9 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     @Override
     @CustomTransactions
     public long getCommittedVirtualMemorySize() throws MonitoringException, UnavailableInformationException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Committed Virtual Memory Size.");
         }
@@ -227,9 +231,9 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     @Override
     @CustomTransactions
     public long getTotalSwapSpaceSize() throws MonitoringException, UnavailableInformationException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Total Swap Space Size.");
         }
@@ -239,9 +243,9 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     @Override
     @CustomTransactions
     public long getFreeSwapSpaceSize() throws MonitoringException, UnavailableInformationException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Free Swap Space Size.");
         }
@@ -251,9 +255,9 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     @Override
     @CustomTransactions
     public long getFreePhysicalMemorySize() throws MonitoringException, UnavailableInformationException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Free Physical Memory Size.");
         }
@@ -263,9 +267,9 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     @Override
     @CustomTransactions
     public long getTotalPhysicalMemorySize() throws MonitoringException, UnavailableInformationException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get Total Physical Memory Size.");
         }
@@ -275,18 +279,18 @@ public class PlatformMonitoringAPIImpl implements PlatformMonitoringAPI {
     @Override
     @CustomTransactions
     public boolean isOptionalMonitoringInformationAvailable() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         return platformMonitoringService.isOptionalMonitoringInformationAvailable();
     }
 
     @Override
     @CustomTransactions
     public Map<String, GcInfo> getLastGcInfo() throws MonitoringException, UnavailableInformationException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
+        getLicenseChecker().checkLicenceAndFeature(Features.RESOURCE_MONITORING);
 
-        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoring();
+        final PlatformMonitoringService platformMonitoringService = getPlatformMonitoringService();
         if (!platformMonitoringService.isOptionalMonitoringInformationAvailable()) {
             throw new UnavailableInformationException("Impossible to get the last GC info.");
         }

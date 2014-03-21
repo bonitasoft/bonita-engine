@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.execution;
 
-import java.util.Map;
-
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
@@ -68,55 +66,22 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
     }
 
     @Override
-    public FlowNodeState getNextNormalState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, final int currentState)
+    public FlowNodeState getNextNormalState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, final int currentStateId)
             throws SActivityExecutionException {
-        FlowNodeState flowNodeState;
-        final Map<Integer, FlowNodeState> normalTransition = normalTransitions.get(flowNodeInstance.getType());
-        final Map<Integer, FlowNodeState> flowNodeAbortTransitions = abortTransitions.get(flowNodeInstance.getType());
-        final Map<Integer, FlowNodeState> flowNodeCancelTransitions = cancelTransitions.get(flowNodeInstance.getType());
-        final FlowNodeState current = getState(currentState);
-        int nextState;
-        if (current.isInterrupting()) {
-            final int previousStateId = flowNodeInstance.getPreviousStateId();
-            nextState = states.get(previousStateId).getId();
-        } else {
-            nextState = currentState;
-        }
-        do {
-            switch (flowNodeInstance.getStateCategory()) {
-                case ABORTING:
-                    flowNodeState = flowNodeAbortTransitions.get(nextState);
-                    // next state should be aborting
-                    if (flowNodeState == null) {
-                        flowNodeState = flowNodeAbortTransitions.get(-1);
-                    }
+        FlowNodeState flowNodeState = super.getNextNormalState(processDefinition, flowNodeInstance, currentStateId);
+        flowNodeState = handleBreakPoints(processDefinition, flowNodeInstance, flowNodeState, getState(currentStateId), flowNodeState.getId());
+        return flowNodeState;
+    }
 
-                    break;
-                case CANCELLING:
-                    flowNodeState = flowNodeCancelTransitions.get(nextState);
-                    // next state should be canceling
-                    if (flowNodeState == null) {
-                        flowNodeState = flowNodeCancelTransitions.get(-1);
-                    }
-                    break;
-
-                default:
-                    flowNodeState = normalTransition.get(nextState);
-                    break;
-            }
-            if (flowNodeState == null) {
-                throw new SActivityExecutionException("no state found after " + states.get(currentState).getClass() + " for " + flowNodeInstance.getClass()
-                        + " in state category " + flowNodeInstance.getStateCategory() + " activity id=" + flowNodeInstance.getId());
-            }
-            nextState = flowNodeState.getId();
-        } while (!flowNodeState.shouldExecuteState(processDefinition, flowNodeInstance));
+    private FlowNodeState handleBreakPoints(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, FlowNodeState flowNodeState,
+            final FlowNodeState current, int nextState) throws SActivityExecutionException {
         try {
             if (!current.isInterrupting() && breakpointService.isBreakpointActive()) {
                 final SBreakpoint breakPointFor = breakpointService.getBreakPointFor(processDefinition.getId(), flowNodeInstance.getRootContainerId(),
                         flowNodeInstance.getName(), nextState);
                 if (breakPointFor != null) {
                     final int interruptedStateId = breakPointFor.getInterruptedStateId();
-                    return getState(interruptedStateId);
+                    flowNodeState = getState(interruptedStateId);
                 }
             }
         } catch (final SBonitaReadException e) {

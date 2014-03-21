@@ -26,17 +26,18 @@ import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.util.APITypeManager;
 
 /**
- * <b>Accessor class that retrieve APIs</b>
- * <p>
+ * Accessor class that retrieve APIs in Bonita BPM <b>Subscription</b> Edition.<br/>
+ * Be aware that if you accidently use {@link org.bonitasoft.engine.api.TenantAPIAccessor} instead, you will have only access to <b>Community</b> Edition
+ * APIs, which give access to less functionalities.
  * <ul>
- * <li>{@link ProcessAPI}</li>
- * <li>{@link CommandAPI}</li>
- * <li>{@link IdentityAPI}</li>
- * <li>{@link MonitoringAPI}</li>
- * <li>{@link LoginAPI}</li>
- * <li>{@link ProfileAPI}</li>
- * <li>{@link ReportingAPI}</li>
- * <li>{@link LogAPI}</li>
+ * <li>{@link ProcessAPI},</li>
+ * <li>{@link CommandAPI},</li>
+ * <li>{@link IdentityAPI},</li>
+ * <li>{@link MonitoringAPI},</li>
+ * <li>{@link LoginAPI},</li>
+ * <li>{@link ProfileAPI},</li>
+ * <li>{@link ReportingAPI},</li>
+ * <li>{@link LogAPI},</li>
  * <li>{@link ThemeAPI}</li>
  * </ul>
  * 
@@ -65,6 +66,12 @@ public final class TenantAPIAccessor {
         }
     }
 
+    /**
+     * Refreshes the way the engine client communicates to the engine server.
+     * 
+     * @see APITypeManager
+     * @see ApiAccessType
+     */
     public static void refresh() {
         APITypeManager.refresh();
     }
@@ -116,6 +123,11 @@ public final class TenantAPIAccessor {
 
     public static ReportingAPI getReportingAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(ReportingAPI.class, session);
+    }
+
+    public static TenantManagementAPI getTenantManagementAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
+            UnknownAPITypeException {
+        return getAPI(TenantManagementAPI.class, session);
     }
 
 }

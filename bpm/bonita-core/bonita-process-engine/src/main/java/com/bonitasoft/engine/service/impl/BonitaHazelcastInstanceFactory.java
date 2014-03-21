@@ -106,15 +106,26 @@ public class BonitaHazelcastInstanceFactory implements ServiceWithLifecycle {
 
     @Override
     public void start() throws SBonitaException {
-        // // Do nothing, spring start hazelcast...
+        // Do nothing, spring start hazelcast...
     }
 
     @Override
     public void stop() throws SBonitaException, TimeoutException {
+        // Do nothing it's spring that shutdown hazelcast...
     }
 
     public void destroy() {
         LifecycleService lifecycleService = hazelcastInstance.getLifecycleService();
         lifecycleService.shutdown();
+    }
+
+    @Override
+    public void pause() {
+        // nothing to do
+    }
+
+    @Override
+    public void resume() {
+        // nothing to do
     }
 }

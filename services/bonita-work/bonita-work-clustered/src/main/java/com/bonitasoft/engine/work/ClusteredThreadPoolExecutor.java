@@ -24,30 +24,34 @@ import com.hazelcast.core.MembershipListener;
 import com.hazelcast.core.MultiMap;
 
 /**
+ * A work factory that use a clustered Queue and a clustered executing work map
+ * <p>
+ * the queue of works is shared between all the nodes.<br/>
+ * If a node crash during the execution of a work, other members are notified and the first to be notified get all executing works of the failing node and
+ * requeue them
+ * 
+ * 
  * @author Baptiste Mesta
  */
 public class ClusteredThreadPoolExecutor extends ThreadPoolExecutor implements MembershipListener {
 
-    private static BlockingQueue<Runnable> workQueue;
+    private final BlockingQueue<Runnable> workQueue;
 
     private final MultiMap<String, Runnable> executingWorks;
 
     private final String localMemberUUID;
 
     public ClusteredThreadPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
-            final ThreadFactory threadFactory, final RejectedExecutionHandler handler, final HazelcastInstance hazelcastInstance) {
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, createWorkQueue(hazelcastInstance), threadFactory, handler);
+            final ThreadFactory threadFactory, final RejectedExecutionHandler handler, final HazelcastInstance hazelcastInstance,
+            final BlockingQueue<Runnable> workQueue) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+        this.workQueue = workQueue;
         if (!Manager.getInstance().isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
         executingWorks = hazelcastInstance.getMultiMap("WORK_EXECUTING");
         hazelcastInstance.getCluster().addMembershipListener(this);
         localMemberUUID = hazelcastInstance.getCluster().getLocalMember().getUuid();
-    }
-
-    private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {
-        workQueue = hazelcastInstance.getQueue("WorkQueue");
-        return workQueue;
     }
 
     @Override

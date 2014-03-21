@@ -11,6 +11,10 @@ package com.bonitasoft.engine.api.impl.reports;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import java.util.ArrayList;
 import java.util.List;
 

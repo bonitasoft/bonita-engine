@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +14,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-integration-tests</artifactId>
+			<artifactId>bonita-services-integration-tests</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
@@ -215,14 +216,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Exception -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.exceptions</groupId>
-			<artifactId>bonita-exceptions-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Expression -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
@@ -269,7 +262,7 @@
 		<!-- Logs -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model-impl-hibernate</artifactId>
+			<artifactId>bonita-log-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -325,12 +318,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.platform</groupId>
 			<artifactId>bonita-platform-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-model-impl-hibernate</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -426,12 +413,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.scheduler</groupId>
-			<artifactId>bonita-scheduler-impl-hibernate</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Session -->
 		<dependency>
@@ -458,7 +439,7 @@
 			<artifactId>bonita-sequence-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 
 		<!-- Session Accessor -->
 		<dependency>
@@ -475,7 +456,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Theme -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.theme</groupId>
@@ -497,13 +478,13 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
+
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- Work -->
 		<dependency>
@@ -533,14 +514,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Test suite -->
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-integration-tests</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Misc -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -550,6 +523,11 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.easytesting</groupId>
+			<artifactId>fest-assert</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -609,31 +587,30 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <!-- Local JNDI implementation -->
-        <dependency>
+		<!-- Local JNDI implementation -->
+		<dependency>
 			<groupId>org.bonitasoft.engine.jndi</groupId>
 			<artifactId>bonita-jndi-memory</artifactId>
 			<version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.jolbox</groupId>
 			<artifactId>bonecp</artifactId>
 			<version>0.7.1.RELEASE</version>
 		</dependency>
-		
+
 		<!-- Transaction -->
-    <dependency>
-      <groupId>org.codehaus.btm</groupId>
-      <artifactId>btm</artifactId>
-      <version>2.1.3</version>
-      <scope>test</scope>
-    </dependency>
-    
+		<dependency>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-      		<scope>test</scope>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -641,8 +618,17 @@
 	<build>
 		<plugins>
 			<plugin>
+				<!-- don't execute tests in test phase -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
 					<properties>
 						<property>
@@ -657,7 +643,17 @@
 						<include>com/bonitasoft/services/AllTestsSPWithJNDI.java</include>
 					</includes>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
+
 </project>

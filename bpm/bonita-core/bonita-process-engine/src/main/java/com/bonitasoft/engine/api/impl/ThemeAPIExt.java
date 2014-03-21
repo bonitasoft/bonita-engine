@@ -40,6 +40,7 @@ import com.bonitasoft.engine.theme.exception.SetThemeException;
 /**
  * @author Celine Souchet
  */
+@AvailableWhenTenantIsPaused
 public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
 
     @Override
@@ -76,7 +77,6 @@ public class ThemeAPIExt extends ThemeAPIImpl implements ThemeAPI {
     }
 
     private void validateSetCustomThemeInput(final byte[] content, final byte[] cssContent, final ThemeType type) throws SetThemeException {
-
         if (type == null) {
             throw new SetThemeException("Type is required.");
         }
