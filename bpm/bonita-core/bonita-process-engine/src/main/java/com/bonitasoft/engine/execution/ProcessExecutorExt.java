@@ -18,7 +18,6 @@ import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionEx
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
-import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -79,8 +78,6 @@ import com.bonitasoft.engine.core.process.instance.model.builder.SRefBusinessDat
  */
 public class ProcessExecutorExt extends ProcessExecutorImpl {
 
-    private static final String PERSISTENCE_ID_GETTER = "getPersistenceId";
-
     private final BusinessDataRepository businessDataRepository;
 
     private final RefBusinessDataService refBusinessDataService;
@@ -109,6 +106,10 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors)
             throws SProcessInstanceCreationException {
+        if (expressionContext == null) {
+            expressionContext = new SExpressionContext();
+        }
+        expressionContext.setProcessDefinitionId(sDefinition.getId());
         try {
             // Create SDataInstances
             bpmInstancesCreator.createDataInstances(sInstance, processContainer, sDefinition, expressionContext, operations, context);
@@ -123,9 +124,9 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                 final SExpression expression = bdd.getDefaultValueExpression();
                 Long primaryKey = null;
                 if (expression != null) {
-                    Object businessData = expressionResolverService.evaluate(expression);
-                    businessData = businessDataRepository.merge((Entity) businessData);
-                    primaryKey = ClassReflector.invokeGetter(businessData, PERSISTENCE_ID_GETTER);
+                    Entity businessData = (Entity) expressionResolverService.evaluate(expression, expressionContext);
+                    businessData = businessDataRepository.merge(businessData);
+                    primaryKey = businessData.getPersistenceId();
                 }
                 final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
                 final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey, bdd.getClassName())
@@ -135,9 +136,6 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             createDocuments(sDefinition, sInstance, userId);
             if (connectors != null) {
                 executeConnectors(sDefinition, sInstance, connectors);
-            }
-            if (expressionContext == null) {
-                expressionContext = new SExpressionContext();
             }
             executeOperations(operations, context, expressionContext, sInstance);
 
