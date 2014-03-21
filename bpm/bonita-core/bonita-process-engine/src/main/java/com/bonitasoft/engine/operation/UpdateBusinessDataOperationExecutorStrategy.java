@@ -11,6 +11,7 @@ package com.bonitasoft.engine.operation;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.JavaMethodInvoker;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -25,7 +26,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
-import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
@@ -111,27 +111,27 @@ public class UpdateBusinessDataOperationExecutorStrategy implements OperationExe
     @Override
     public void update(final SLeftOperand sLeftOperand, Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
+        checkIsBusinessData(newValue);
         try {
-            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(sLeftOperand.getName(),
-                    processInstanceId);
-            if (!(newValue instanceof Entity)) {
-                throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() + " must implements " + Entity.class.getName()));
-            }
-            newValue = businessDataRepository.merge((Entity) newValue);
+            Entity businessData = businessDataRepository.merge((Entity) newValue);
+            SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
             if (refBusinessDataInstance != null) {
-                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, ((Entity) newValue).getPersistenceId());
+                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
             }
-        } catch (final SRefBusinessDataInstanceNotFoundException srbdinfe) {
-            throw new SOperationExecutionException(srbdinfe);
-        } catch (final SBonitaReadException sbre) {
-            throw new SOperationExecutionException(sbre);
-        } catch (final SRefBusinessDataInstanceModificationException srbsme) {
-            throw new SOperationExecutionException(srbsme);
-        } catch (final SFlowNodeNotFoundException e) {
+        } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
-        } catch (final SFlowNodeReadException e) {
-            throw new SOperationExecutionException(e);
+        }
+    }
+
+    private SRefBusinessDataInstance getRefBusinessDataInstance(final String businessDataName, final long containerId, final String containerType)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException, SRefBusinessDataInstanceNotFoundException, SBonitaReadException {
+        long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+        return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
+    }
+
+    private void checkIsBusinessData(Object newValue) throws SOperationExecutionException {
+        if (!(newValue instanceof Entity)) {
+            throw new SOperationExecutionException(new IllegalStateException(newValue.getClass().getName() + " must implements " + Entity.class.getName()));
         }
     }
 
