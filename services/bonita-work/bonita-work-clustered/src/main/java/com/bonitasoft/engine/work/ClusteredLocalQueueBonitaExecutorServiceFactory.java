@@ -23,9 +23,9 @@ import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- *
+ * 
  * Factory that use a hazelcast executor
- *
+ * 
  * @author Baptiste Mesta
  * @author Laurent Vaills
  */
@@ -58,7 +58,8 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
     public ThreadPoolExecutor createExecutorService() {
         final RejectedExecutionHandler handler = new QueueRejectedExecutionHandler();
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", maximumPoolSize);
-        return new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance);
+        return new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS, threadFactory, handler,
+                hazelcastInstance);
     }
 
     private final class QueueRejectedExecutionHandler implements RejectedExecutionHandler {
@@ -69,7 +70,7 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             if (executor.isShutdown()) {
-                logger.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to run work " + task
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Tried to run work " + task
                         + " but the work service is shutdown. work will be restarted with the node");
             } else {
                 throw new RejectedExecutionException(

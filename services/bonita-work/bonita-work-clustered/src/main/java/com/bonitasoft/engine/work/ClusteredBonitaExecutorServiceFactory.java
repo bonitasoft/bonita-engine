@@ -21,9 +21,9 @@ import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
- *
+ * 
  * Factory that use a hazelcast executor
- *
+ * 
  * @author Baptiste Mesta
  */
 public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServiceFactory {
@@ -36,7 +36,8 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
 
     private final long keepAliveTimeSeconds;
 
-    public ClusteredBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds, final HazelcastInstance hazelcastInstance) {
+    public ClusteredBonitaExecutorServiceFactory(final int corePoolSize, final int maximumPoolSize, final long keepAliveTimeSeconds,
+            final HazelcastInstance hazelcastInstance) {
         this.hazelcastInstance = hazelcastInstance;
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
@@ -60,8 +61,10 @@ public class ClusteredBonitaExecutorServiceFactory implements BonitaExecutorServ
 
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
-            throw new RejectedExecutionException("Unable to run the task " + task
-                    + "\n your work queue is full you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
+            throw new RejectedExecutionException(
+                    "Unable to run the task "
+                            + task
+                            + "\n your work queue is full you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
         }
 
     }
