@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
+ * Copyright (C) 2009, 2013 BonitaSoft S.A.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
@@ -32,10 +32,12 @@ public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
      * @return the session to use with other tenant API methods
      * @throws LoginException
      *             occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
-     *             since 6.0
+     * @throws TenantIsPausedException
+     *             occurs when we try to login with an other user than the technical user on a tenant that is in maintenance
+     * @since 6.0
      */
     @NoSessionRequired
-    APISession login(long tenantId, String userName, String password) throws LoginException;
+    APISession login(long tenantId, String userName, String password) throws LoginException, TenantIsPausedException;
 
     /**
      * Connects the user in order to use API methods of a tenant.

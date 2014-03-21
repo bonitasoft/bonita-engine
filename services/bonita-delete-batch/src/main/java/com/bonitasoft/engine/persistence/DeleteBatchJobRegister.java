@@ -8,23 +8,17 @@
  *******************************************************************************/
 package com.bonitasoft.engine.persistence;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.JobRegister;
-import org.bonitasoft.engine.scheduler.SchedulerService;
-import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
-import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
-import org.bonitasoft.engine.services.PersistenceService;
 
 /**
  * @author Baptiste Mesta
@@ -32,80 +26,51 @@ import org.bonitasoft.engine.services.PersistenceService;
  */
 public class DeleteBatchJobRegister implements JobRegister {
 
-    private volatile boolean mustStartJob = false;
-
     private static final String DELETE_BATCH_JOB = "DeleteBatchJob";
-
-    private static DeleteBatchJobRegister INSTANCE;
-
-    private final SchedulerService schedulerService;
-
-    private final TechnicalLoggerService loggerService;
 
     private final String repeat;
 
+    private final List<String> classesToPurge;
+
     /**
-     * @param persistenceService
-     * @param schedulerService
-     * @param loggerService
-     * @param transactionService
      * @param classesToPurge
      * @param repeat
      *            cron expression to tell when the job must be run
      *            e.g. * *\/2 * * * ? to run it every 2 minutes
      */
-    public DeleteBatchJobRegister(final PersistenceService persistenceService, final SchedulerService schedulerService,
-            final TechnicalLoggerService loggerService, final List<String> classesToPurge, final String repeat) {
-        this.schedulerService = schedulerService;
-        this.loggerService = loggerService;
+    public DeleteBatchJobRegister(final List<String> classesToPurge, final String repeat) {
+        this.classesToPurge = classesToPurge;
         this.repeat = repeat;
-        DeleteBatchJob.setPersistenceService(persistenceService);
-        DeleteBatchJob.setClassesToPurge(classesToPurge);
-        mustStartJob = true;
-        INSTANCE = this;
-    }
-
-    public static DeleteBatchJobRegister getInstance() {
-        return INSTANCE;
     }
 
     @Override
-    public void registerJobIfNotRegistered() {
-        if (mustStartJob) {
-            synchronizedRegister();
-        }
+    public String getJobName() {
+        return DELETE_BATCH_JOB;
     }
 
-    private synchronized void synchronizedRegister() {
-        if (mustStartJob) {
-            try {
-                List<String> jobs;
-                jobs = schedulerService.getAllJobs();
-                if (!jobs.contains(DELETE_BATCH_JOB)) {
-                    scheduleDeleteJob();
-                } else {
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "The delete job was already started");
-                }
-            } catch (final SSchedulerException e) {
-                loggerService.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register job because " + e.getMessage());
-                if (loggerService.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                    loggerService.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
-                }
-            } finally {
-                mustStartJob = false;
-            }
-        }
+    @Override
+    public boolean canBeExecutedConcurrently() {
+        return true;
     }
 
-    /**
-     * @throws SSchedulerException
-     */
-    private void scheduleDeleteJob() throws SSchedulerException {
-        loggerService.log(this.getClass(), TechnicalLogSeverity.INFO, "Register delete batch job with repeat cron: " + repeat);
-        final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class).createNewInstance(DeleteBatchJob.class.getName(), DELETE_BATCH_JOB, true).done();
-        final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-        final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), repeat);
-        schedulerService.schedule(jobDescriptor, jobParameters, trigger);
+    @Override
+    public Trigger getTrigger() {
+        return new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), repeat, MisfireRestartPolicy.NONE);
+    }
+
+    @Override
+    public Class<?> getJobClass() {
+        return DeleteBatchJob.class;
+    }
+
+    @Override
+    public Map<String, Serializable> getJobParameters() {
+        return Collections.singletonMap(DeleteBatchJob.ATTR_CLASSES_TO_PURE, (Serializable) classesToPurge);
+    }
+
+    @Override
+    public String getJobDescription() {
+        return "delete batch job with repeat cron: " + repeat;
     }
 
 }

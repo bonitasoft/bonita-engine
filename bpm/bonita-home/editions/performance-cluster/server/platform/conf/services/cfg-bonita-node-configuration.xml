@@ -4,9 +4,7 @@
 	<bean id="nodeConfiguration" class="com.bonitasoft.engine.api.impl.NodeConfigurationExt" autowire="byType">
 		<constructor-arg name="hazelcastInstance" ref="hazelcastInstance"/>
 		<property name="shouldStartScheduler" value="true" />
-        <property name="eventHandlingJobCron" value="${org.bonitasoft.engine.cron}" />
-        <property name="cleanInvalidSessionsJobCron" value="${org.bonitasoft.engine.clean.invalid.sessions.cron}" />
-        <property name="shouldStartEventHandlingJob" value="true" />
+        <property name="shouldRestartElements" value="true" />
         <property name="TenantRestartHandlers" >
         	<list>
         		<bean class="org.bonitasoft.engine.execution.work.RestartFlowNodesHandler" />

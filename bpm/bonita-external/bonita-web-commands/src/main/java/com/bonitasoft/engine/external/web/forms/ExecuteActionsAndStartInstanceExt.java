@@ -30,6 +30,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -68,7 +69,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
         try {
             final TechnicalLoggerService logger = serviceAccessor.getTechnicalLoggerService();
             final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
-            final ClassLoader processClassloader = classLoaderService.getLocalClassLoader("process", sProcessDefinitionID);
+            final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), sProcessDefinitionID);
             final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(processClassloader);

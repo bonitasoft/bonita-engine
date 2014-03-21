@@ -9,10 +9,10 @@
 
 	<logger name="org.bonitasoft" level="INFO" />
 	<logger name="com.bonitasoft" level="INFO" />
-	<logger name="org.bonitasoft.engine.execution.ProcessExecutorImpl" level="DEBUG" />
-	<logger name="org.bonitasoft.engine.execution.FlowNodeExecutorImpl" level="DEBUG" />
-	<logger name="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl" level="DEBUG" /> 
-	<logger name="org.bonitasoft.engine.core.process.instance.impl.TokenServiceImpl" level="DEBUG" />
+	<logger name="org.bonitasoft.engine.execution.ProcessExecutorImpl" level="INFO" />
+	<logger name="org.bonitasoft.engine.execution.FlowNodeExecutorImpl" level="INFO" />
+	<logger name="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl" level="INFO" /> 
+	<logger name="org.bonitasoft.engine.core.process.instance.impl.TokenServiceImpl" level="INFO" />
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />
@@ -26,5 +26,6 @@
 <!-- 	<logger name="org.bonitasoft.engine.work.BonitaWork" level="DEBUG" /> -->
 <!-- 	<logger name="org.bonitasoft.engine.synchro.SynchroServiceImpl" level="DEBUG" /> -->
 <!-- 	<logger name="com.bonitasoft.engine.synchro.ClusteredSynchroService" level="DEBUG" /> -->
+<!-- 	<logger name="org.bonitasoft.engine.dependency.impl.DependencyServiceImpl" level="DEBUG" /> -->
   
 </configuration>

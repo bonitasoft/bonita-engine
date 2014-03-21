@@ -26,6 +26,7 @@
         		<entry key="DATA_INSTANCE_UPDATED:INTERNAL" value="true" />
         		<entry key="DEPENDENCY_CREATED:INTERNAL" value="true" />
         		<entry key="DEPENDENCY_DELETED:INTERNAL" value="true" />
+        		<entry key="DEPENDENCY_UPDATED:INTERNAL" value="true" />
         		<entry key="DEPENDENCY_MAPPING_CREATED:INTERNAL" value="true" />
         		<entry key="DEPENDENCY_MAPPING_DELETED:INTERNAL" value="true" />
         		<entry key="DOCUMENT_CREATED:INTERNAL" value="true" />
@@ -104,9 +105,6 @@
 	</bean>
 
 	<bean id="batchLogRegister" class="com.bonitasoft.engine.log.api.impl.InsertBatchLogsJobRegister">
-		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="schedulerService" ref="scheduler" />
-		<constructor-arg name="loggerService" ref="technicalLoggerService" />
 		<constructor-arg name="cronExpression" value="0/5 * * * * ?" />
 	</bean>
 
