@@ -56,6 +56,6 @@ public interface OperationExecutorStrategy {
      */
     String getOperationType();
 
-    boolean doUpdateData();
+    boolean shouldPerformUpdateAtEnd();
 
 }

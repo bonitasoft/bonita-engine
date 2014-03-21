@@ -56,7 +56,7 @@ public abstract class UpdateDataOperationExecutorStrategy implements OperationEx
     }
 
     @Override
-    public boolean doUpdateData() {
+    public boolean shouldPerformUpdateAtEnd() {
         return true;
     }
 

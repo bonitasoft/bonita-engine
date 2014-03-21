@@ -154,7 +154,7 @@ public class DocumentOperationExecutorStrategy implements OperationExecutorStrat
     }
 
     @Override
-    public boolean doUpdateData() {
+    public boolean shouldPerformUpdateAtEnd() {
         return false;
     }
 
