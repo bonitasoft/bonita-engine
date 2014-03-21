@@ -10,9 +10,8 @@
 		<constructor-arg name="logger" ref="technicalLoggerService" />
 	</bean>
 
-	<bean id="operationExecutorStrategyProvider"
-		class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider">
-		<property name="expressionExecutors">
+	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider">
+		<constructor-arg>
 			<list>
 				<ref bean="assignmentOperationExecutorStrategy" />
 				<ref bean="javaMethodOperationExecutorStrategy" />
@@ -20,7 +19,7 @@
 				<ref bean="stringIndexOperationExecutorStrategy" />
 				<ref bean="documentOperationExecutorStrategy" />
 			</list>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="assignmentOperationExecutorStrategy"
