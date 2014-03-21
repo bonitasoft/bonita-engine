@@ -58,6 +58,7 @@ import com.bonitasoft.engine.platform.SPProcessManagementTest;
         SPPlatformTest.class,
         SPTimerBoundaryEventTest.class,
         SPIdentityTests.class,
+        TenantMaintenanceTestSP.class,
         SPProcessManagementTest.class
 })
 @Initializer(TestsInitializerSP.class)
