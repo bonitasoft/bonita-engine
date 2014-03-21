@@ -20,5 +20,5 @@ package org.bonitasoft.engine.core.operation.model;
  * 
  */
 public enum SLeftOperandType {
-    DATA, SEARCH_INDEX, DOCUMENT
+    DATA, SEARCH_INDEX, DOCUMENT, EXTERNAL_DATA
 }

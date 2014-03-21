@@ -60,6 +60,7 @@ import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
@@ -963,11 +964,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ConnectorResult result = connectorService.executeMutipleEvaluation(processDefinition.getId(), connectorId, version, connectorsExps,
                     contextInputValues, Thread.currentThread().getContextClassLoader(), expcontext);
             final List<Operation> outputs = connectorDefinition.getOutputs();
-            final List<SOperation> sOperations = new ArrayList<SOperation>(outputs.size());
-            for (final Operation operation : outputs) {
-                sOperations.add(ModelConvertor.constructSOperation(operation));
-            }
-            connectorService.executeOutputOperation(sOperations, expcontext, result);
+            connectorService.executeOutputOperation(ServerModelConvertor.convertOperations(outputs), expcontext, result);
         }
     }
 

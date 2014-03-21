@@ -28,8 +28,6 @@ public class LeftOperandImpl implements LeftOperand {
 
     private String name;
 
-    private boolean external;
-
     private LeftOperandType type;
 
     public LeftOperandImpl() {
@@ -65,11 +63,7 @@ public class LeftOperandImpl implements LeftOperand {
 
     @Override
     public boolean isExternal() {
-        return external;
-    }
-
-    public void setExternal(final boolean external) {
-        this.external = external;
+        return LeftOperandType.EXTERNAL_DATA.equals(type);
     }
 
     @Override
@@ -85,7 +79,6 @@ public class LeftOperandImpl implements LeftOperand {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (external ? 1231 : 1237);
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
@@ -103,9 +96,6 @@ public class LeftOperandImpl implements LeftOperand {
             return false;
         }
         LeftOperandImpl other = (LeftOperandImpl) obj;
-        if (external != other.external) {
-            return false;
-        }
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -122,9 +112,10 @@ public class LeftOperandImpl implements LeftOperand {
     /**
      * @deprecated As of 6.0 use {@link Operation#getType()} instead
      */
+    @Deprecated
     @Override
     public String toString() {
-        return "LeftOperandImpl [name=" + name + ", external=" + external + ", type=" + type + "]";
+        return "LeftOperandImpl [name=" + name + ", type=" + type + "]";
     }
 
 }

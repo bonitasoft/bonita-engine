@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
+import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -41,7 +42,7 @@ public class JavaMethodOperationExecutorStrategyTest {
 
         when(operation.getLeftOperand()).thenReturn(leftOperand);
         when(leftOperand.getName()).thenReturn("unknownData");
-        when(leftOperand.isExternal()).thenReturn(true);
+        when(leftOperand.getType()).thenReturn(SLeftOperandType.EXTERNAL_DATA);
         when(operation.getRightOperand()).thenReturn(rightOperand);
         when(operation.getOperator()).thenReturn("=");
         when(rightOperand.getReturnType()).thenReturn(Object.class.getName());

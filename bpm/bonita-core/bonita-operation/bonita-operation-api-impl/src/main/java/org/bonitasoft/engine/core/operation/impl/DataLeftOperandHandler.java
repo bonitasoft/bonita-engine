@@ -47,9 +47,7 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     @Override
     public void update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        if (!leftOperand.isExternal()) {
-            updateDataInstance(leftOperand, containerId, containerType, newValue);
-        }
+        updateDataInstance(leftOperand, containerId, containerType, newValue);
     }
 
     protected void update(final SDataInstance sDataInstance, final Object content) throws SDataInstanceException {

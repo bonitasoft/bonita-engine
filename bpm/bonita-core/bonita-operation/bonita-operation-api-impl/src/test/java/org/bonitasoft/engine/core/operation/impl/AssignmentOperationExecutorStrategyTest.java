@@ -9,6 +9,7 @@ import java.util.Collections;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
+import org.bonitasoft.engine.core.operation.model.SLeftOperandType;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class AssignmentOperationExecutorStrategyTest {
     public void testGetValue() throws Exception {
         initMocks();
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", "value"));
-        when(leftOperand.isExternal()).thenReturn(false);
+        when(leftOperand.getType()).thenReturn(SLeftOperandType.DATA);
         Object returnedValue = assignmentOperationExecutorStrategy.getValue(operation, value, 1, "type", expressionContext);
         assertEquals("value", returnedValue);
     }
@@ -48,7 +49,7 @@ public class AssignmentOperationExecutorStrategyTest {
         initMocks();
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
-        when(leftOperand.isExternal()).thenReturn(true);
+        when(leftOperand.getType()).thenReturn(SLeftOperandType.EXTERNAL_DATA);
         Object returnedValue = assignmentOperationExecutorStrategy.getValue(operation, value, 1, "type", expressionContext);
         assertEquals("value", returnedValue);
     }
@@ -58,7 +59,7 @@ public class AssignmentOperationExecutorStrategyTest {
         initMocks();
         // return type is not compatible
         when(expressionContext.getInputValues()).thenReturn(Collections.<String, Object> singletonMap("var", new java.util.TreeMap<String, Object>()));
-        when(leftOperand.isExternal()).thenReturn(false);
+        when(leftOperand.getType()).thenReturn(SLeftOperandType.DATA);
         assignmentOperationExecutorStrategy.getValue(operation, value, 1, "type", expressionContext);
     }
 

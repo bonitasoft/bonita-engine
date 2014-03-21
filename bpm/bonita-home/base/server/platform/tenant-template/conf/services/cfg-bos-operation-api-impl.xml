@@ -22,6 +22,7 @@
 		<property name="leftOperandHandlers">
 			<list>
 				<ref bean="dataLeftOperandHandler" />
+				<ref bean="externalDataLeftOperandHandler" />
 				<ref bean="documentLeftOperandHandler" />
 			</list>
 		</property>
@@ -32,6 +33,8 @@
 	<bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.DataLeftOperandHandler">
 		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
 	</bean>
+
+	<bean id="externalDataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
 
 	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy" />
 

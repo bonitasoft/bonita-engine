@@ -23,7 +23,5 @@ public interface SLeftOperand extends Serializable {
 
     String getName();
 
-    boolean isExternal();
-
     SLeftOperandType getType();
 }

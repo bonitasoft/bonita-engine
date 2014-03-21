@@ -31,12 +31,13 @@ import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundE
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.FlowNodeNameFilter;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
-import org.bonitasoft.engine.execution.Filter;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartFlowNodeFilter;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -83,10 +84,10 @@ public class ProcessStarter {
     }
 
     public ProcessInstance start() throws ProcessDefinitionNotFoundException, ProcessActivationException, ProcessExecutionException {
+
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SProcessDefinition sProcessDefinition = retrieveProcessDefinition(processDefinitionService);
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final long starterId;
         final long userIdFromSession = SessionInfos.getUserIdFromSession();
@@ -95,9 +96,12 @@ public class ProcessStarter {
         } else {
             starterId = userId;
         }
+        // Retrieval of the process definition:
+        final SProcessDefinition sProcessDefinition = retrieveProcessDefinition(processDefinitionService);
+
         final SProcessInstance startedInstance;
         try {
-            final List<SOperation> sOperations = ModelConvertor.toSOperation(operations);
+            final List<SOperation> sOperations = ServerModelConvertor.convertOperations(operations);
             Map<String, Object> operationContext;
             if (context != null) {
                 operationContext = new HashMap<String, Object>(context);
@@ -133,7 +137,8 @@ public class ProcessStarter {
         return sProcessDefinition;
     }
 
-    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long userIdFromSession, final ProcessInstance processInstance,
+    private void logInstanceStarted(final SProcessDefinition sProcessDefinition, final long starterId, final long userIdFromSession,
+            final ProcessInstance processInstance,
             final TechnicalLoggerService logger) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             final StringBuilder stb = new StringBuilder();

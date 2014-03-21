@@ -26,6 +26,7 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -37,7 +38,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationExecutionException;
-import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 
@@ -115,7 +115,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         try {
             while (iterator.hasNext()) {
                 final Operation entry = iterator.next();
-                operationService.execute(ModelConvertor.constructSOperation(entry), activityInstanceId,
+                operationService.execute(ServerModelConvertor.convertOperation(entry), activityInstanceId,
                         DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
             }
         } catch (final SBonitaException e) {

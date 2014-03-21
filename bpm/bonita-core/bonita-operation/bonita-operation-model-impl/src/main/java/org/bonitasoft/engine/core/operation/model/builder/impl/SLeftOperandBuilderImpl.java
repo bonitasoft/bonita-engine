@@ -32,12 +32,6 @@ public class SLeftOperandBuilderImpl implements SLeftOperandBuilder {
     }
 
     @Override
-    public SLeftOperandBuilder setExternal(final boolean external) {
-        leftOperand.setExternal(external);
-        return this;
-    }
-
-    @Override
     public SLeftOperandBuilder setName(final String name) {
         leftOperand.setName(name);
         return this;

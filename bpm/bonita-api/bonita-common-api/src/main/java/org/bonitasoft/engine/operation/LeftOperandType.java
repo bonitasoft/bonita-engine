@@ -19,5 +19,5 @@ package org.bonitasoft.engine.operation;
  * @author Emmanuel Duchastenier
  */
 public enum LeftOperandType {
-    DATA, SEARCH_INDEX, DOCUMENT
+    DATA, SEARCH_INDEX, DOCUMENT, EXTERNAL_DATA
 }

@@ -41,5 +41,6 @@ public interface LeftOperand extends Serializable {
      */
     LeftOperandType getType();
 
+    @Deprecated
     boolean isExternal();
 }

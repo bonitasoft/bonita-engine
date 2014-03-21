@@ -41,8 +41,6 @@ public class SLeftOperandImpl implements SLeftOperand {
         this.type = type;
     }
 
-    private boolean external;
-
     public void setName(final String name) {
         this.name = name;
     }
@@ -52,20 +50,10 @@ public class SLeftOperandImpl implements SLeftOperand {
         return name;
     }
 
-    public void setExternal(final boolean external) {
-        this.external = external;
-    }
-
-    @Override
-    public boolean isExternal() {
-        return external;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (external ? 1231 : 1237);
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
@@ -83,9 +71,6 @@ public class SLeftOperandImpl implements SLeftOperand {
             return false;
         }
         SLeftOperandImpl other = (SLeftOperandImpl) obj;
-        if (external != other.external) {
-            return false;
-        }
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -105,7 +90,7 @@ public class SLeftOperandImpl implements SLeftOperand {
 
     @Override
     public String toString() {
-        return "SLeftOperandImpl [name=" + name + ", type=" + type + ", external=" + external + "]";
+        return "SLeftOperandImpl [name=" + name + ", type=" + type + "]";
     }
 
 }

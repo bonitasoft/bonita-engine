@@ -64,11 +64,18 @@ public class LeftOperandBuilder {
     }
 
     /**
+     * @deprecated use setType(LeftOperandType.INPUT) instead
+     * 
      * @param external
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
+    @Deprecated
     public LeftOperandBuilder setExternal(final boolean external) {
-        leftOperand.setExternal(external);
+        if (leftOperand.getType() != null && !LeftOperandType.DATA.equals(leftOperand.getType()) && !LeftOperandType.EXTERNAL_DATA.equals(leftOperand.getType())) {
+            throw new IllegalStateException(
+                    "Can't set left operand to external when the type is not input or data this method is deprecated, it's not usefull to use it anymore");
+        }
+        leftOperand.setType(external ? LeftOperandType.EXTERNAL_DATA : LeftOperandType.DATA);
         return this;
     }
 
@@ -80,8 +87,19 @@ public class LeftOperandBuilder {
         return new LeftOperandBuilder().createNewInstance(String.valueOf(index)).setType(LeftOperandType.SEARCH_INDEX).done();
     }
 
+    /**
+     * @deprecated use createDataLeftOperand or createExternalDataLeftOperand instead
+     * @param dataName
+     * @param external
+     * @return
+     */
+    @Deprecated
     public LeftOperand createDataLeftOperand(final String dataName, final boolean external) {
-        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.DATA).setExternal(external).done();
+        if (external) {
+            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.EXTERNAL_DATA).done();
+        } else {
+            return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.DATA).done();
+        }
     }
 
     /**
@@ -92,7 +110,7 @@ public class LeftOperandBuilder {
      * @return the newly created <code>LeftOperand</code> object
      */
     public LeftOperand createDataLeftOperand(final String dataName) {
-        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.DATA).setExternal(false).done();
+        return new LeftOperandBuilder().createNewInstance(dataName).setType(LeftOperandType.DATA).done();
     }
 
 }

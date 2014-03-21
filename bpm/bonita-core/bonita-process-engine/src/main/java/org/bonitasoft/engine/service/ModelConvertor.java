@@ -147,7 +147,6 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
-import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -1674,19 +1673,6 @@ public class ModelConvertor {
         }
     }
 
-    public static SOperation constructSOperation(final Operation operation) {
-        final SExpression rightOperand = constructSExpression(operation.getRightOperand());
-        final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = constructSLeftOperand(operation.getLeftOperand());
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
-                .setType(operatorType).setLeftOperand(sLeftOperand).done();
-    }
-
-    private static SLeftOperand constructSLeftOperand(final LeftOperand variableToSet) {
-        return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName())
-                .setExternal(variableToSet.isExternal()).done();
-    }
-
     public static List<ConnectorImplementationDescriptor> toConnectorImplementationDescriptors(
             final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors) {
         if (sConnectorImplementationDescriptors != null) {
@@ -1737,7 +1723,6 @@ public class ModelConvertor {
         final LeftOperandImpl leftOperand = new LeftOperandImpl();
         final SLeftOperand sLeftOperand = operation.getLeftOperand();
         leftOperand.setName(sLeftOperand.getName());
-        leftOperand.setExternal(sLeftOperand.isExternal());
         leftOperand.setType(LeftOperandType.valueOf(sLeftOperand.getType().name()));
         operationImpl.setLeftOperand(leftOperand);
         return operationImpl;
@@ -1998,30 +1983,6 @@ public class ModelConvertor {
         final ThemeImpl themeImpl = new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
         return themeImpl;
     }
-    
-    public static List<SOperation> toSOperation(final List<Operation> operations) {
-        if (operations == null) {
-            return null;
-        }
-        if (operations.isEmpty()) {
-            return Collections.emptyList();
-        }
-        final List<SOperation> sOperations = new ArrayList<SOperation>(operations.size());
-        for (final Operation operation : operations) {
-            final SOperation sOperation = toSOperation(operation);
-            sOperations.add(sOperation);
-        }
-        return sOperations;
-    }
-
-    public static SOperation toSOperation(final Operation operation) {
-        final SExpression rightOperand = ModelConvertor.constructSExpression(operation.getRightOperand());
-        final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
-        final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
-        return BuilderFactory.get(SOperationBuilderFactory.class).createNewInstance().setOperator(operation.getOperator()).setRightOperand(rightOperand)
-                .setType(operatorType).setLeftOperand(sLeftOperand).done();
-    }
-    
 
     private static SLeftOperand toSLeftOperand(final LeftOperand variableToSet) {
         return BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(variableToSet.getName()).done();

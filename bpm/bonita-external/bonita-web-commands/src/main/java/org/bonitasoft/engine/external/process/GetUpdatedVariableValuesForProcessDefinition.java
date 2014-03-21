@@ -27,8 +27,8 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -92,7 +92,7 @@ public class GetUpdatedVariableValuesForProcessDefinition extends UpdateVariable
     protected void executeOperation(final Operation operation, final Map<String, Serializable> operationsInputValues,
             final Map<String, Serializable> currentVariableValues, final long processDefinitionId) throws SBonitaException {
         if (currentVariableValues != null) {
-            final SOperation sOperation = ModelConvertor.constructSOperation(operation);
+            final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
             final Map<String, Serializable> inputValues = operationsInputValues;
             inputValues.putAll(currentVariableValues);
             final SExpressionContext sec = new SExpressionContext();

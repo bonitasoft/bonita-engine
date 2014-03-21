@@ -351,6 +351,7 @@ import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
+import org.bonitasoft.engine.operation.LeftOperandType;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -2516,9 +2517,9 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<SDataInstance> sDataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(dataNameValues.keySet()), processInstanceId,
                     DataInstanceContainer.PROCESS_INSTANCE.toString());
             for (SDataInstance sDataInstance : sDataInstances) {
-            final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+                final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
                 entityUpdateDescriptor.addField("value", dataNameValues.get(sDataInstance.getName()));
-            dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
+                dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
             }
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -2616,11 +2617,11 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void updateData(final String dataName, final long activityInstanceId, final Serializable dataValue, final DataInstanceService dataInstanceService)
             throws SDataInstanceException {
-            final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, activityInstanceId,
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-            final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-            entityUpdateDescriptor.addField("value", dataValue);
-            dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
+        final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, activityInstanceId,
+                DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        entityUpdateDescriptor.addField("value", dataValue);
+        dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
     }
 
     @Override
@@ -2853,10 +2854,10 @@ public class ProcessAPIImpl implements ProcessAPI {
                     final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
                     final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
                             DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
-                        activityInstance.getLogicalGroup(processDefinitionIndex));
-                sExpressionContext.setSerializableInputValues(expressionContexts);
-                operationService.execute(sOperation, dataInstance.getContainerId(), dataInstance.getContainerType(), sExpressionContext);
-            }
+                            activityInstance.getLogicalGroup(processDefinitionIndex));
+                    sExpressionContext.setSerializableInputValues(expressionContexts);
+                    operationService.execute(sOperation, dataInstance.getContainerId(), dataInstance.getContainerType(), sExpressionContext);
+                }
             }
         } catch (final SDataInstanceException e) {
             throw new UpdateException(e);
@@ -2871,13 +2872,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int assignedUserTaskInstanceNumber = (int) getNumberOfAssignedHumanTaskInstances(userId);
         final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
                 ActivityInstanceCriterion.DEFAULT);
-            for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
+        for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
             String stateName = userTaskInstance.getState();
-                final long userTaskInstanceId = userTaskInstance.getId();
-                if (stateName.equals(ActivityStates.READY_STATE) && userTaskInstance.getParentContainerId() == processInstanceId) {
-                    return userTaskInstanceId;
-                }
+            final long userTaskInstanceId = userTaskInstance.getId();
+            if (stateName.equals(ActivityStates.READY_STATE) && userTaskInstance.getParentContainerId() == processInstanceId) {
+                return userTaskInstanceId;
             }
+        }
         return -1;
     }
 
@@ -2894,21 +2895,21 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int assignedUserTaskInstanceNumber = (int) getNumberOfAssignedHumanTaskInstances(userId);
         final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
                 ActivityInstanceCriterion.DEFAULT);
-            for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
+        for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
             String stateName = userTaskInstance.getState();
-                ProcessInstance processInstance;
-                try {
-                    final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService,
-                            searchProcessInstanceDescriptor, userTaskInstance.getRootContainerId());
-                    getProcessInstance.execute();
-                    processInstance = getProcessInstance.getResult();
-                } catch (final SBonitaException e) {
-                    throw new RetrieveException(e);
-                }
-                if (stateName.equals(ActivityStates.READY_STATE) && processInstance.getProcessDefinitionId() == processDefinitionId) {
-                    return userTaskInstance.getId();
-                }
+            ProcessInstance processInstance;
+            try {
+                final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService,
+                        searchProcessInstanceDescriptor, userTaskInstance.getRootContainerId());
+                getProcessInstance.execute();
+                processInstance = getProcessInstance.getResult();
+            } catch (final SBonitaException e) {
+                throw new RetrieveException(e);
             }
+            if (stateName.equals(ActivityStates.READY_STATE) && processInstance.getProcessDefinitionId() == processDefinitionId) {
+                return userTaskInstance.getId();
+            }
+        }
         return -1;
     }
 
@@ -3246,7 +3247,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Map<String, Serializable> externalDataValue = new HashMap<String, Serializable>(operations.size());
             for (final Operation operation : operations) {
                 // convert the client operation to server operation
-                final SOperation sOperation = ModelConvertor.constructSOperation(operation);
+                final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
                 // set input values of expression with connector result + provided input for this operation
                 final HashMap<String, Object> inputValues = new HashMap<String, Object>(operationInputValues);
                 inputValues.putAll(connectorResult.getResult());
@@ -3256,7 +3257,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 operationService.execute(sOperation, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
                 // return the value of the data if it's an external data
                 final LeftOperand leftOperand = operation.getLeftOperand();
-                if (leftOperand.isExternal()) {
+                if (LeftOperandType.EXTERNAL_DATA.equals(leftOperand.getType())) {
                     externalDataValue.put(leftOperand.getName(), (Serializable) expressionContext.getInputValues().get(leftOperand.getName()));
                 }
             }
@@ -3406,9 +3407,10 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         try {
             userTransactionService.executeInTransaction(new Callable<Void>() {
+
                 @Override
                 public Void call() throws Exception {
-            processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
+                    processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
                     return null;
                 };
             });
@@ -3427,10 +3429,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         final UserTransactionService userTxService = tenantAccessor.getUserTransactionService();
         try {
             final List<SProcessInstance> sProcessInstances = userTxService.executeInTransaction(new Callable<List<SProcessInstance>>() {
+
                 @Override
                 public List<SProcessInstance> call() throws SBonitaSearchException {
                     return searchProcessInstancesFromProcessDefinition(processInstanceService, processDefinitionId, startIndex, maxResults);
-            }
+                }
             });
 
             if (sProcessInstances.isEmpty()) {
@@ -3443,10 +3446,11 @@ public class ProcessAPIImpl implements ProcessAPI {
             try {
                 locks = createLockProcessInstances(lockService, objectType, sProcessInstances, tenantAccessor.getTenantId());
                 return userTxService.executeInTransaction(new Callable<Long>() {
+
                     @Override
                     public Long call() throws Exception {
-                    return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
-                }
+                        return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
+                    }
                 });
             } finally {
                 releaseLocks(tenantAccessor, lockService, locks, tenantAccessor.getTenantId());

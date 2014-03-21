@@ -25,8 +25,6 @@ public interface SLeftOperandBuilder {
 
     SLeftOperandBuilder setType(final SLeftOperandType type);
 
-    SLeftOperandBuilder setExternal(final boolean external);
-
     SLeftOperand done();
 
 }
