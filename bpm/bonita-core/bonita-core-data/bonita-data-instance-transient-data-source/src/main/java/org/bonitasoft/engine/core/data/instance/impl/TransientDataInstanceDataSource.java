@@ -19,17 +19,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.ReflectException;
 import org.bonitasoft.engine.commons.StringUtil;
+import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.data.DataSourceConfiguration;
 import org.bonitasoft.engine.data.SDataSourceInitializationException;
 import org.bonitasoft.engine.data.instance.DataInstanceDataSource;
 import org.bonitasoft.engine.data.instance.exception.SCreateDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -79,7 +80,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
     }
 
     @Override
-    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
+    public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException {
         try {
             final String dataInstanceKey = getKey(dataInstance);
             if (checkDataAlreadyExists(dataInstanceKey)) {
@@ -88,11 +89,11 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
             setId(dataInstance);
             cacheService.store(TRANSIENT_DATA_CACHE_NAME, dataInstanceKey, dataInstance);
         } catch (final Exception e) {
-            throw new SDataInstanceException("Impossible to store transient data", e);
+            throw new SDataInstanceReadException("Impossible to store transient data", e);
         }
     }
 
-    private void setId(final SDataInstance dataInstance) throws SecurityException, IllegalArgumentException, ReflectException {
+    private void setId(final SDataInstance dataInstance) throws SecurityException, IllegalArgumentException, SReflectException {
         // FIXME: probably the id will be be used, so not necessary to be set
         final long id = Math.abs(UUID.randomUUID().getMostSignificantBits());
         ClassReflector.invokeSetter(dataInstance, "setId", long.class, id);
@@ -108,7 +109,7 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
         throw new SCreateDataInstanceException(stb.toString());
     }
 
-    private boolean checkDataAlreadyExists(final String dataInstanceKey) throws CacheException {
+    private boolean checkDataAlreadyExists(final String dataInstanceKey) throws SCacheException {
         final List<?> keys = getCacheKeys(TRANSIENT_DATA_CACHE_NAME);
         return keys.contains(dataInstanceKey);
     }
@@ -129,18 +130,18 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
             }
 
             cacheService.store(TRANSIENT_DATA_CACHE_NAME, key, dataInstance);
-        } catch (final CacheException e) {
-            throw new SDataInstanceException("Impossible to update transient data", e);
+        } catch (final SCacheException e) {
+            throw new SDataInstanceReadException("Impossible to update transient data", e);
         }
     }
 
     @Override
-    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
+    public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceReadException {
         try {
             final String key = getKey(dataInstance);
             cacheService.remove(TRANSIENT_DATA_CACHE_NAME, key);
-        } catch (final CacheException e) {
-            throw new SDataInstanceException("Impossible to delete transient data", e);
+        } catch (final SCacheException e) {
+            throw new SDataInstanceReadException("Impossible to delete transient data", e);
         }
     }
 
@@ -154,8 +155,8 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
                     return dataInstance;
                 }
             }
-        } catch (final CacheException e) {
-            throw new SDataInstanceException("Impossible to get transient data: ", e);
+        } catch (final SCacheException e) {
+            throw new SDataInstanceReadException("Impossible to get transient data: ", e);
         }
         throw new SDataInstanceNotFoundException("No data found. Id: " + dataInstanceId);
     }
@@ -171,12 +172,12 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
             }
 
             return (SDataInstance) cacheService.get(TRANSIENT_DATA_CACHE_NAME, key);
-        } catch (final CacheException e) {
-            throw new SDataInstanceException("Impossible to get transient data: ", e);
+        } catch (final SCacheException e) {
+            throw new SDataInstanceReadException("Impossible to get transient data: ", e);
         }
     }
 
-    private List<?> getCacheKeys(final String cacheName) throws CacheException {
+    private List<?> getCacheKeys(final String cacheName) throws SCacheException {
         List<?> cacheKeys = Collections.emptyList();
         if (cacheService.getCachesNames().contains(cacheName)) {
             cacheKeys = cacheService.getKeys(cacheName);
@@ -215,10 +216,10 @@ public class TransientDataInstanceDataSource implements DataInstanceDataSource {
                 return dataInstances;
             } else {
                 return Collections.emptyList();
-                // throw new SDataInstanceException("No data instance found for container type " + containerType + " and container id " + containerId);
+                // throw new SDataInstanceReadException("No data instance found for container type " + containerType + " and container id " + containerId);
             }
-        } catch (final CacheException e) {
-            throw new SDataInstanceException("Impossible to get transient data: ", e);
+        } catch (final SCacheException e) {
+            throw new SDataInstanceReadException("Impossible to get transient data: ", e);
         }
     }
 

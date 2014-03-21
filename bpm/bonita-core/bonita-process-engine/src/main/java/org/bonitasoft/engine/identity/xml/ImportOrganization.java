@@ -255,7 +255,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
                 } else {
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
                         logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "The user " + user.getUserName() + " has a manager with username "
-                                + managerUserName + " but this one does not exist, Please set it manually");
+                                + managerUserName + ", but this one does not exist. Please set it manually.");
                     }
                 }
             }

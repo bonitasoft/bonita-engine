@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -225,7 +225,7 @@ public class IdentityServiceImplForUserTest {
     @Test(expected = SUserNotFoundException.class)
     public void getUsersByIdsThrowException() throws Exception {
         when(persistenceService.selectList(SelectDescriptorBuilder.getElementsByIds(SUser.class, "User", any(Collection.class)))).thenThrow(
-                SBonitaReadException.class);
+                new SBonitaReadException("plop"));
 
         identityServiceImpl.getUsers(Arrays.asList(1l));
     }
@@ -254,7 +254,7 @@ public class IdentityServiceImplForUserTest {
     @SuppressWarnings("unchecked")
     @Test(expected = SIdentityException.class)
     public void getUsersByNamesThrowException() throws Exception {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(SBonitaReadException.class);
+        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException("plop"));
         identityServiceImpl.getUsersByUsername(Arrays.asList("hannu"));
     }
 

@@ -28,7 +28,7 @@ import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Charles Souillard
@@ -53,7 +53,7 @@ public abstract class AbstractSetInFailedThread extends Thread {
 
     private boolean finished = false;
 
-    public AbstractSetInFailedThread() throws TenantIdNotSetException, BonitaHomeNotSetException, BonitaHomeConfigurationException, InstantiationException,
+    public AbstractSetInFailedThread() throws STenantIdNotSetException, BonitaHomeNotSetException, BonitaHomeConfigurationException, InstantiationException,
             IllegalAccessException, ClassNotFoundException, IOException {
         super();
         final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();

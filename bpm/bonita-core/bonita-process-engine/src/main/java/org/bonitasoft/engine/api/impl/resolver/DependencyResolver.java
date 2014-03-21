@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.transaction.dependency.AddSDependency;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
@@ -65,13 +64,12 @@ public class DependencyResolver {
         this.dependencyResolvers = dependencyResolvers;
     }
 
-    public boolean resolveDependencies(final ProcessAPI processAPI, final BusinessArchive businessArchive, final TenantServiceAccessor tenantAccessor,
-            final SProcessDefinition sDefinition) {
+    public boolean resolveDependencies(final BusinessArchive businessArchive, final TenantServiceAccessor tenantAccessor, final SProcessDefinition sDefinition) {
         final List<ProcessDependencyResolver> resolvers = getResolvers();
         boolean resolved = true;
         for (final ProcessDependencyResolver resolver : resolvers) {
             try {
-                resolved &= resolver.resolve(processAPI, tenantAccessor, businessArchive, sDefinition);
+                resolved &= resolver.resolve(tenantAccessor, businessArchive, sDefinition);
             } catch (final BonitaException e) {
                 // not logged, we will check later why the process is not resolved
                 resolved = false;

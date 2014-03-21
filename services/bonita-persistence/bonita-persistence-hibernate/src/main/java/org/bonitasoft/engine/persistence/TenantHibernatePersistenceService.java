@@ -18,13 +18,13 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.bonitasoft.engine.commons.ClassReflector;
-import org.bonitasoft.engine.commons.ReflectException;
+import org.bonitasoft.engine.commons.exceptions.SReflectException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -57,7 +57,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         if (useTenant) {
             try {
                 session.enableFilter(TENANT_FILTER).setParameter("tenantId", getTenantId());
-            } catch (final TenantIdNotSetException e) {
+            } catch (final STenantIdNotSetException e) {
                 throw new SPersistenceException(e);
             }
         } else {
@@ -80,10 +80,10 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             try {
                 tenantId = getTenantId();
                 ClassReflector.invokeSetter(entity, "setTenantId", long.class, tenantId);
-            } catch (final ReflectException e) {
-                throw new SPersistenceException("Can't set tenantId " + tenantId + " on entity " + entity, e);
-            } catch (final TenantIdNotSetException e) {
-                throw new SPersistenceException("Can't set tenantId on entity " + entity, e);
+            } catch (final SReflectException e) {
+                throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
+            } catch (final STenantIdNotSetException e) {
+                throw new SPersistenceException("Can't set tenantId = <" + tenantId + "> on entity." + entity, e);
             }
         }
     }
@@ -113,7 +113,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             session.delete(pe);
             // Object o2 = session.get(entity.getClass(), new PersistentObjectId(entity.getId(), getTenantId()));
             // assert(o2 == null);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SPersistenceException(e);
         } catch (final AssertionFailure af) {
             throw new SRetryableException(af);
@@ -141,7 +141,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
     }
 
     @Override
-    protected long getTenantId() throws TenantIdNotSetException {
+    protected long getTenantId() throws STenantIdNotSetException {
         return sessionAccessor.getTenantId();
     }
 
@@ -162,7 +162,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
              * }
              */
             return (T) session.get(mappedClass, id);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             return super.selectById(session, selectDescriptor);
         } catch (final AssertionFailure af) {
             throw new SRetryableException(af);
@@ -182,7 +182,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
         // query.setLong("tenantId", getTenantId());
         // query.executeUpdate();
         // logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
-        // } catch (TenantIdNotSetException e) {
+        // } catch (STenantIdNotSetException e) {
         // throw new SPersistenceException(e);
         // }
 
@@ -196,7 +196,7 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "[Tenant] Deleting all instance of class " + entityClass.getClass().getSimpleName());
             }
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SPersistenceException(e);
         }
     }

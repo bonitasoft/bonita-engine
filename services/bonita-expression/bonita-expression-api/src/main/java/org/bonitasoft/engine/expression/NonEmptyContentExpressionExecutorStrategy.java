@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,18 +18,19 @@ import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public abstract class NonEmptyContentExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if (expression == null) {
-            throw new SInvalidExpressionException("The expression cannot be null.");
+            throw new SInvalidExpressionException("The expression cannot be null.", null);
         }
         final String expressionContent = expression.getContent();
 
         if (expressionContent == null || expressionContent.trim().isEmpty()) {
-            throw new SInvalidExpressionException("The expression content cannot be null or empty. Expression: " + expression);
+            throw new SInvalidExpressionException("The expression content cannot be null or empty. Expression : " + expression, expression.getName());
         }
     }
 

@@ -15,7 +15,7 @@ package org.bonitasoft.engine.events;
 
 import java.util.Set;
 
-import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -37,7 +37,7 @@ public interface EventService {
      * @param event
      *            A specific Event
      */
-    void fireEvent(final SEvent event) throws FireEventException;
+    void fireEvent(final SEvent event) throws SFireEventException;
 
     /**
      * Allows to check if an handler is listening to this event type

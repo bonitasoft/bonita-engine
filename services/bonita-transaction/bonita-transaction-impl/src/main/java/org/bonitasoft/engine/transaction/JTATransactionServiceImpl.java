@@ -70,7 +70,8 @@ public class JTATransactionServiceImpl implements TransactionService {
 
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
                         final Transaction tx = txManager.getTransaction();
-                        logger.log(getClass(), TechnicalLogSeverity.TRACE, "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
+                        logger.log(getClass(), TechnicalLogSeverity.TRACE,
+                                "Beginning transaction in thread " + Thread.currentThread().getId() + " " + tx.toString());
                     }
 
                     numberOfActiveTransactions.getAndIncrement();
@@ -182,24 +183,25 @@ public class JTATransactionServiceImpl implements TransactionService {
             final int status = txManager.getStatus();
 
             switch (status) {
-            case Status.STATUS_ACTIVE:
-                return TransactionState.ACTIVE;
-            case Status.STATUS_COMMITTED:
-                return TransactionState.COMMITTED;
-            case Status.STATUS_MARKED_ROLLBACK:
-                return TransactionState.ROLLBACKONLY;
-            case Status.STATUS_ROLLEDBACK:
-                return TransactionState.ROLLEDBACK;
-            case Status.STATUS_NO_TRANSACTION:
-                return TransactionState.NO_TRANSACTION;
-            default:
-                throw new STransactionException("Can't map the JTA status : " + status);
+                case Status.STATUS_ACTIVE:
+                    return TransactionState.ACTIVE;
+                case Status.STATUS_COMMITTED:
+                    return TransactionState.COMMITTED;
+                case Status.STATUS_MARKED_ROLLBACK:
+                    return TransactionState.ROLLBACKONLY;
+                case Status.STATUS_ROLLEDBACK:
+                    return TransactionState.ROLLEDBACK;
+                case Status.STATUS_NO_TRANSACTION:
+                    return TransactionState.NO_TRANSACTION;
+                default:
+                    throw new STransactionException("Can't map the JTA status : " + status);
             }
         } catch (final SystemException e) {
             throw new STransactionException("", e);
         }
     }
 
+    @Deprecated
     @Override
     public boolean isTransactionActive() throws STransactionException {
         try {
@@ -245,7 +247,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             throw new STransactionNotFoundException(e.getMessage());
         }
     }
-    
+
     @Override
     public void registerBeforeCommitCallable(final Callable<Void> callable) throws STransactionNotFoundException {
         try {
@@ -265,7 +267,6 @@ public class JTATransactionServiceImpl implements TransactionService {
             throw new STransactionNotFoundException(e.getMessage());
         }
     }
-
 
     @Override
     public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
@@ -288,7 +289,6 @@ public class JTATransactionServiceImpl implements TransactionService {
         return numberOfActiveTransactions.get();
     }
 
-
     private static class ResetCounterSynchronization implements Synchronization {
 
         private final JTATransactionServiceImpl txService;
@@ -302,6 +302,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             // Nothing to do
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void afterCompletion(final int status) {
             // Whatever the tx status, reset the context
@@ -322,6 +323,7 @@ public class JTATransactionServiceImpl implements TransactionService {
             // Nothing to do
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void afterCompletion(final int status) {
             // Whatever the status, decrement the number of active transactions
@@ -332,6 +334,7 @@ public class JTATransactionServiceImpl implements TransactionService {
     private static class TransactionServiceContext {
 
         private final AtomicLong reentrantCounter = new AtomicLong();
+
         private final boolean boundaryManagedOutside;
 
         public TransactionServiceContext(final boolean boundaryManagedOutside) {

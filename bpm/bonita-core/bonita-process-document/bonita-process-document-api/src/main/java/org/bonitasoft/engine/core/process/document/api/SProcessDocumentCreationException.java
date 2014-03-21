@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class SProcessDocumentCreationException extends SProcessDocumentException {
 
@@ -29,6 +30,10 @@ public class SProcessDocumentCreationException extends SProcessDocumentException
 
     public SProcessDocumentCreationException(final String message, final SBonitaException e) {
         super(message, e);
+    }
+
+    public SProcessDocumentCreationException(final String message) {
+        super(message);
     }
 
 }

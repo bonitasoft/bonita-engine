@@ -76,7 +76,6 @@ public class EvaluateExpressionsInstanceLevelAndArchived extends AbstractEvaluat
                 results.put(buildName(exp), res);// MAYBE instead of exp.getNAME
             }
         }
-
     }
 
     @Override

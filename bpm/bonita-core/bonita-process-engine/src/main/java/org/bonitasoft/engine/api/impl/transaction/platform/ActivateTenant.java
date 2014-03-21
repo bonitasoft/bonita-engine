@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -133,7 +132,7 @@ public final class ActivateTenant implements TransactionContent {
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron,
                         MisfireRestartPolicy.NONE);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(ProcessAPI.class, TechnicalLogSeverity.INFO, "Starting event handling job with frequency: " + cron);
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting event handling job with frequency : " + cron);
                 }
                 schedulerService.schedule(jobDescriptor, jobParameters, trigger);
             }
@@ -156,7 +155,7 @@ public final class ActivateTenant implements TransactionContent {
                 final Trigger trigger = new UnixCronTrigger("UnixCronTrigger" + UUID.randomUUID().getLeastSignificantBits(), new Date(), cron,
                         MisfireRestartPolicy.NONE);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
-                    logger.log(ProcessAPI.class, TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency: " + cron);
+                    logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Starting clean invalid sessions job with frequency : " + cron);
                 }
                 schedulerService.schedule(jobDescriptor, jobParameters, trigger);
             }

@@ -81,9 +81,9 @@ public class CustomListener extends RunListener {
 
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void testRunStarted(final Description description) throws Exception {
-
         try {
             String current = new java.io.File(".").getCanonicalPath();
             System.out.println("Current dir: " + current);
@@ -108,9 +108,9 @@ public class CustomListener extends RunListener {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void testRunFinished(final Result result) throws Exception {
-
         finishXML();
 
         String path = new File(".").getCanonicalPath();
@@ -200,21 +200,25 @@ public class CustomListener extends RunListener {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void testStarted(final Description description) {
         testState = OK;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void testFailure(final Failure failure) {
         testState = KO;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void testIgnored(final Description description) {
         testState = IGNORE;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void testAssumptionFailure(final Failure failure) {
         testState = KO;

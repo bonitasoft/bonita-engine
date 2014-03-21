@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -26,9 +26,11 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * @author Zhao na
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class InputExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
+    @SuppressWarnings("unused")
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
@@ -38,7 +40,8 @@ public class InputExpressionExecutorStrategy extends NonEmptyContentExpressionEx
                 return dependencyValues.get(key);
             }
         }
-        throw new SExpressionEvaluationException("No value found for mandatory expression '" + expression.getContent() + "' of type Input Expression");
+        throw new SExpressionEvaluationException("No value found for mandatory expression '" + expression.getContent() + "' of type Input Expression",
+                expression.getName());
     }
 
     @Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,6 +34,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
  * @author Zhao Na
+ * @author Celine Souchet
  */
 public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
@@ -56,7 +57,7 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
         // $ can be part of variable name
         super.validate(expression);
         if (!SourceVersion.isIdentifier(expression.getContent())) {
-            throw new SInvalidExpressionException(expression.getContent() + " is not a valid data name in expression: " + expression);
+            throw new SInvalidExpressionException(expression.getContent() + " is not a valid data name in expression : " + expression, expression.getName());
         }
     }
 
@@ -65,11 +66,10 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
         return KIND_VARIABLE;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionDependencyMissingException, SExpressionEvaluationException {
-        long containerId;
-        String containerType;
         final int maxExpressionSize = expressions.size();
         final ArrayList<String> dataNames = new ArrayList<String>(maxExpressionSize);
         final HashMap<String, Serializable> results = new HashMap<String, Serializable>(maxExpressionSize);
@@ -86,32 +86,31 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
         if (dataNames.isEmpty()) {
             return buildExpressionResultSameOrderAsInputList(expressions, results);
         }
-        if (dependencyValues != null && dependencyValues.containsKey(CONTAINER_ID_KEY) && dependencyValues.containsKey(CONTAINER_TYPE_KEY)) {
-            try {
-                containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
-                containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
-                final Long time;
-                if ((time = (Long) dependencyValues.get(TIME)) != null) {
-                    final List<SADataInstance> dataInstances = dataService.getSADataInstances(containerId, containerType, dataNames, time);
-                    for (final SADataInstance dataInstance : dataInstances) {
-                        dataNames.remove(dataInstance.getName());
-                        results.put(dataInstance.getName(), dataInstance.getValue());
-                    }
-                }
-                final List<SDataInstance> dataInstances = dataService.getDataInstances(dataNames, containerId, containerType);
-                for (final SDataInstance dataInstance : dataInstances) {
+        if (dependencyValues == null || !dependencyValues.containsKey(CONTAINER_ID_KEY) || !dependencyValues.containsKey(CONTAINER_TYPE_KEY)) {
+            throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");
+        }
+        try {
+            final long containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
+            final String containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
+            final Long time = (Long) dependencyValues.get(TIME);
+            if (time != null) {
+                final List<SADataInstance> dataInstances = dataService.getSADataInstances(containerId, containerType, dataNames, time);
+                for (final SADataInstance dataInstance : dataInstances) {
                     dataNames.remove(dataInstance.getName());
                     results.put(dataInstance.getName(), dataInstance.getValue());
                 }
-                if (!dataNames.isEmpty()) {
-                    throw new SExpressionEvaluationException("some data were not found " + dataNames);
-                }
-                return buildExpressionResultSameOrderAsInputList(expressions, results);
-            } catch (final SDataInstanceException e) {
-                throw new SExpressionEvaluationException(e);
             }
-        } else {
-            throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");
+            final List<SDataInstance> dataInstances = dataService.getDataInstances(dataNames, containerId, containerType);
+            for (final SDataInstance dataInstance : dataInstances) {
+                dataNames.remove(dataInstance.getName());
+                results.put(dataInstance.getName(), dataInstance.getValue());
+            }
+            if (!dataNames.isEmpty()) {
+                throw new SExpressionEvaluationException("Some data were not found " + dataNames, dataNames.get(0));
+            }
+            return buildExpressionResultSameOrderAsInputList(expressions, results);
+        } catch (final SDataInstanceException e) {
+            throw new SExpressionEvaluationException(e, null);
         }
     }
 

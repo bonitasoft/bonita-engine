@@ -31,7 +31,7 @@ import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.junit.Before;
@@ -86,12 +86,12 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         doReturn(archivedDocument).when(processDocumentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString(), eq(A_LONG_TIME_AGO));
     }
 
-    @Test(expected = SExpressionEvaluationException.class)
+    @Test(expected = SExpressionDependencyMissingException.class)
     public void evaluate_should_throw_an_exception_when_container_id_is_null() throws Exception {
         strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> emptyMap(), null);
     }
 
-    @Test(expected = SExpressionEvaluationException.class)
+    @Test(expected = SExpressionDependencyMissingException.class)
     public void evaluate_should_throw_an_exception_when_container_type_is_null() throws Exception {
         strategy.evaluate(Collections.<SExpression> emptyList(), Collections.<String, Object> singletonMap("containerId", PROCESS_INSTANCE_ID), null);
     }

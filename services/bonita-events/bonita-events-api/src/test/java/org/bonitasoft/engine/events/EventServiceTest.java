@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.junit.Before;
@@ -33,7 +33,7 @@ public abstract class EventServiceTest {
      */
     protected abstract EventService instantiateEventServiceImplementation();
 
-    @Test(expected = FireEventException.class)
+    @Test(expected = SFireEventException.class)
     public void fireNullEvent() throws Exception {
         eventSvc.fireEvent(null);
     }
@@ -87,7 +87,7 @@ public abstract class EventServiceTest {
     }
 
     @Test
-    public void isEventFiltered() throws HandlerRegistrationException, FireEventException, HandlerUnregistrationException {
+    public void isEventFiltered() throws HandlerRegistrationException, SFireEventException, HandlerUnregistrationException {
         // Register handler on a given event type.
         final TestHandlerCallback h = new TestHandlerCallback();
         eventSvc.addHandler(EVT_INTERESTING, h);
@@ -106,7 +106,7 @@ public abstract class EventServiceTest {
     }
 
     @Test
-    public void isEventReceivedByHandler() throws FireEventException, HandlerRegistrationException, HandlerUnregistrationException {
+    public void isEventReceivedByHandler() throws SFireEventException, HandlerRegistrationException, HandlerUnregistrationException {
         final TestHandlerCallback h = new TestHandlerCallback();
         final TestEvent interesting = new TestEvent(EVT_INTERESTING);
 

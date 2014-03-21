@@ -3,7 +3,6 @@
 
 	<bean id="platformDependencyService" class="org.bonitasoft.engine.dependency.impl.PlatformDependencyServiceImpl">
 		<constructor-arg name="platformPersistenceService" ref="platformPersistenceService" />
-		<constructor-arg name="logger" ref="technicalLoggerService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 	</bean>
 
