@@ -477,7 +477,7 @@ public class ActorMappingServiceImplTest {
      * @throws SRecorderException
      */
     @Test
-    public final void updateActor() throws SActorNotFoundException, SActorUpdateException, SBonitaReadException, SRecorderException {
+    public final void updateActor() throws SActorNotFoundException, SActorUpdateException, SBonitaReadException {
         final SActor sActor = mock(SActor.class);
         doReturn(3L).when(sActor).getId();
 

@@ -13,9 +13,7 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -40,8 +38,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.BonitaContextException;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -51,7 +47,6 @@ import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

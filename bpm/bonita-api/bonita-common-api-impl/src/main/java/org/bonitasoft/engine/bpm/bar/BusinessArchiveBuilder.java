@@ -16,14 +16,8 @@ package org.bonitasoft.engine.bpm.bar;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.ProcessAPI;
-import org.bonitasoft.engine.bpm.actor.ActorDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.filter.UserFilter;
 
 /**
  * <b>Creates {@link BusinessArchive}</b>

@@ -1,13 +1,29 @@
 package org.bonitasoft.engine.core.login;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bonitasoft.engine.authentication.AuthenticationConstants;
+import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.AuthenticationService;
+import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +39,7 @@ public class SecuredLoginServiceImplTest {
     private AuthenticationService authenticationService;
 
     @Mock
-   private GenericAuthenticationService genericAuthenticationService;
+    private GenericAuthenticationService genericAuthenticationService;
 
     @Mock
     private SessionService sessionService;
@@ -34,7 +50,7 @@ public class SecuredLoginServiceImplTest {
     @Mock
     private IdentityService identityService;
 
-  private  String formerBonitaHome = null;
+    private String formerBonitaHome = null;
 
     @Before
     public void setUp() {
@@ -52,7 +68,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithNullCredentials() throws Exception {
+    public void testSecuredLoginServiceWithNullCredentials() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(authenticationService, sessionService, sessionAccessor, identityService);
         try {
             this.securedLoginServiceImpl.login(null);
@@ -63,7 +79,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithNullLogin() throws Exception {
+    public void testSecuredLoginServiceWithNullLogin() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(authenticationService, sessionService, sessionAccessor, identityService);
         try {
             Map<String, Serializable> credentials = new HashMap<String, Serializable>();
@@ -77,7 +93,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testSecuredLoginServiceWithWrongCredentials() throws Exception {
+    public void testSecuredLoginServiceWithWrongCredentials() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(authenticationService, sessionService, sessionAccessor, identityService);
         try {
             Map<String, Serializable> credentials = new HashMap<String, Serializable>();
@@ -132,10 +148,8 @@ public class SecuredLoginServiceImplTest {
         SSession sSession = mock(SSession.class);
         when(sessionService.createSession(tenantId, userId, login, true)).thenReturn(sSession);
 
-        SSession sSessionResult;
         try {
-            sSessionResult = this.securedLoginServiceImpl.login(credentials);
-
+            this.securedLoginServiceImpl.login(credentials);
         } catch (SLoginException e) {
             verify(genericAuthenticationService, times(1)).checkUserCredentials(any(Map.class));
             verify(sessionAccessor, times(1)).deleteSessionId();
@@ -233,7 +247,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testRetrievePasswordFromEmptyCredentials() throws Exception {
+    public void testRetrievePasswordFromEmptyCredentials() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService);
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         try {
@@ -245,7 +259,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testRetrievePasswordFromNullPassword() throws Exception {
+    public void testRetrievePasswordFromNullPassword() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService);
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         String password = null;
@@ -259,7 +273,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testRetrievePasswordFromNullCredentials() throws Exception {
+    public void testRetrievePasswordFromNullCredentials() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService);
         try {
             this.securedLoginServiceImpl.retrievePasswordFromCredentials(null);
@@ -280,7 +294,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testRetrieveUserNameFromEmptyCredentials() throws Exception {
+    public void testRetrieveUserNameFromEmptyCredentials() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService);
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         try {
@@ -292,7 +306,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testRetrieveUserNameFromBlankPassword() throws Exception {
+    public void testRetrieveUserNameFromBlankPassword() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService);
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         String username = "   ";
@@ -306,7 +320,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testRetrieveUserNameFromNullPassword() throws Exception {
+    public void testRetrieveUserNameFromNullPassword() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService);
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         String username = null;
@@ -320,7 +334,7 @@ public class SecuredLoginServiceImplTest {
     }
 
     @Test
-    public void testRetrieveUserNameFromNullCredentials() throws Exception {
+    public void testRetrieveUserNameFromNullCredentials() {
         this.securedLoginServiceImpl = new SecuredLoginServiceImpl(genericAuthenticationService, sessionService, sessionAccessor, identityService);
         try {
             this.securedLoginServiceImpl.retrieveUsernameFromCredentials(null);

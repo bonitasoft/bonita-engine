@@ -37,8 +37,6 @@ import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SJobQueriableLogBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilder;
 import org.bonitasoft.engine.scheduler.builder.SSchedulerQueriableLogBuilderFactory;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
-import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;

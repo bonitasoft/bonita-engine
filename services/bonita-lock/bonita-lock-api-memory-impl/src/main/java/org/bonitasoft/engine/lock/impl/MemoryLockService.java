@@ -73,13 +73,15 @@ public class MemoryLockService implements LockService {
     }
 
     private static final class MemoryLockServiceMutex {
-        
+
     }
-    
+
     private static final class MemoryLockServiceReentrantLock extends ReentrantLock {
-        
+
+        private static final long serialVersionUID = -4360812005753126401L;
+
     }
-    
+
     private Object getMutex(final long objectToLockId) {
         final int poolKeyForThisObjectId = Long.valueOf(objectToLockId % lockPoolSize).intValue();
         if (!mutexs.containsKey(poolKeyForThisObjectId)) {
@@ -115,7 +117,7 @@ public class MemoryLockService implements LockService {
     }
 
     @Override
-    public void unlock(final BonitaLock lock, final long tenantId) throws SLockException {
+    public void unlock(final BonitaLock lock, final long tenantId) {
         final String key = buildKey(lock.getObjectToLockId(), lock.getObjectType(), tenantId);
         if (traceEnable) {
             logger.log(getClass(), TechnicalLogSeverity.TRACE, "will unlock " + lock.getLock().hashCode() + " id=" + key);

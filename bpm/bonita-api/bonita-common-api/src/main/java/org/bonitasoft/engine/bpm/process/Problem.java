@@ -15,8 +15,6 @@ package org.bonitasoft.engine.bpm.process;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.api.ProcessAPI;
-
 /**
  * When ConfigurationState of a process is {@link ConfigurationState#UNRESOLVED}, a list of <code>Problem</code>s can be retrieved using
  * {@link ProcessAPI#getProcessResolutionProblems(long)} to identify what must be fixed.

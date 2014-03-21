@@ -16,5 +16,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.bonitasoft.engine.LocalIntegrationTests"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="bonita-integration-local-tests"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dbonita.home=${project_loc:/bonita-home}/target/home -Dsysprop.bonita.db.vendor=h2"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dbonita.home=${project_loc:/bonita-home}/target/home &#13;&#10;-Dsysprop.bonita.db.vendor=h2"/>
 </launchConfiguration>

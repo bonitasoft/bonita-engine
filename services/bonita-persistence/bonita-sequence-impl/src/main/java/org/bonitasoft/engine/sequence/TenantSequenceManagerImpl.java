@@ -22,7 +22,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
@@ -44,16 +43,16 @@ public class TenantSequenceManagerImpl {
     static final String UPDATE_SEQUENCE = "UPDATE sequence SET nextId = ? WHERE tenantid = ? AND id = ?";
 
     private final Long tenantId;
-    
+
     private final Map<Long, Integer> rangeSizes;
 
     // Map of available IDs: key=sequenceId, value = nextAvailableId to be assigned to a new entity of the given sequence
-    private Map<Long, Long> nextAvailableIds = new HashMap<Long, Long>();
+    private final Map<Long, Long> nextAvailableIds = new HashMap<Long, Long>();
 
     // Map of lastId that can be consumed for a given sequence
-    private Map<Long, Long> lastIdInRanges = new HashMap<Long, Long>();
+    private final Map<Long, Long> lastIdInRanges = new HashMap<Long, Long>();
 
-    //Map of sequenceId, mutex 
+    // Map of sequenceId, mutex
     private static final Map<Long, Object> sequenceMutexs = new HashMap<Long, Object>();
 
     private final int defaultRangeSize;
@@ -82,7 +81,7 @@ public class TenantSequenceManagerImpl {
         this.delay = delay;
         this.delayFactor = delayFactor;
         this.datasource = datasource;
-        
+
         for (final Long sequenceId : sequencesMappings.values()) {
             sequenceMutexs.put(sequenceId, new TenantSequenceManagerImplMutex());
             nextAvailableIds.put(sequenceId, 0L);
@@ -91,10 +90,10 @@ public class TenantSequenceManagerImpl {
     }
 
     private static final class TenantSequenceManagerImplMutex {
-        
+
     }
-    
-    public long getNextId(final String entityName) throws SObjectNotFoundException, SObjectModificationException {
+
+    public long getNextId(final String entityName) throws SObjectNotFoundException {
         final Long sequenceId = sequencesMappings.get(entityName);
         if (sequenceId == null) {
             throw new SObjectNotFoundException("No sequence id found for " + entityName);

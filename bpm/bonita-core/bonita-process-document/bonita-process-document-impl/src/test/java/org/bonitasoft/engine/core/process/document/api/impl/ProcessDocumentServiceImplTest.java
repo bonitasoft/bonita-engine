@@ -13,7 +13,7 @@
  */
 package org.bonitasoft.engine.core.process.document.api.impl;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
 import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
@@ -39,7 +39,7 @@ public class ProcessDocumentServiceImplTest {
     @Mock
     private DocumentMappingService documentServiceMapping;
 
-    private SDocumentDownloadURLProvider urlProvider = new SDocumentDownloadURLProviderImpl("url");
+    private final SDocumentDownloadURLProvider urlProvider = new SDocumentDownloadURLProviderImpl("url");
 
     @Mock
     private SDocumentMapping documentMapping;

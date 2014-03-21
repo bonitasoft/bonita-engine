@@ -55,17 +55,11 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.UserTransactionService;
-import org.bonitasoft.engine.work.BonitaWork;
-import org.bonitasoft.engine.work.WorkService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class BPMLocalTest extends CommonAPILocalTest {
-
-    protected static final String JOHN_USERNAME = "john";
-
-    protected static final String JOHN_PASSWORD = "bpm";
 
     public static Semaphore semaphore1 = new Semaphore(1);
 
@@ -76,7 +70,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
     @After
     public void afterTest() throws Exception {
         VariableStorage.clearAll();
-        deleteUser(JOHN_USERNAME);
+        deleteUser(USERNAME);
         logout();
         cleanSession();
 
@@ -85,9 +79,9 @@ public class BPMLocalTest extends CommonAPILocalTest {
     @Before
     public void beforeTest() throws Exception {
         login();
-        john = createUser(JOHN_USERNAME, JOHN_PASSWORD);
+        john = createUser(USERNAME, PASSWORD);
         logout();
-        loginWith(JOHN_USERNAME, JOHN_PASSWORD);
+        loginWith(USERNAME, PASSWORD);
         setSessionInfo(getSession());
     }
 
@@ -494,7 +488,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         Platform platform = platformAPI.getPlatform();
         logoutPlatform(platformSession);
-        loginWith(JOHN_USERNAME, JOHN_PASSWORD);
+        loginWith(USERNAME, PASSWORD);
         final String platformVersionToTest = getBonitaVersion();
 
         assertNotNull("can't find the platform", platform);

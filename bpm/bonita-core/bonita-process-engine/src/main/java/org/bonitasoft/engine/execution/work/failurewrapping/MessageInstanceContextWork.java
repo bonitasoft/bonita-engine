@@ -40,8 +40,9 @@ public class MessageInstanceContextWork extends TxInHandleFailureWrappingWork {
         this.waitingMessageEvent = waitingMessageEvent;
     }
 
+    @SuppressWarnings("unused")
     @Override
-    protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) throws SBonitaException {
+    protected void setExceptionContext(final SBonitaException sBonitaException, final Map<String, Object> context) {
         sBonitaException.setMessageInstanceNameOnContext(messageInstance.getMessageName());
         sBonitaException.setMessageInstanceTargetProcessOnContext(messageInstance.getTargetProcess());
         sBonitaException.setMessageInstanceTargetFlowNodeOnContext(messageInstance.getTargetFlowNode());

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,12 +13,12 @@
  **/
 package org.bonitasoft.engine.api.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.identity.UpdateUser;
@@ -31,7 +31,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.login.LoginService;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.builder.SUserUpdateBuilder;
@@ -52,6 +52,7 @@ import org.bonitasoft.engine.session.SessionNotFoundException;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Matthieu Chaffotte
@@ -63,18 +64,14 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     @CustomTransactions
     public APISession login(final String userName, final String password) throws LoginException {
         checkUsernameAndPassword(userName, password);
-        try {
-            Map<String, Serializable> credentials = new HashMap<String, Serializable>();
-            credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
-            credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
-            return login(credentials);
-        } catch (final Throwable e) {
-            throw new LoginException(e);
-        }
+        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
+        credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
+        return login(credentials);
     }
 
     @CustomTransactions
-    protected APISession login(final String userName, final String password, final Long tenantId) throws Throwable {
+    protected APISession login(final String userName, final String password, final Long tenantId) throws LoginException {
         checkUsernameAndPassword(userName, password);
 
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
@@ -82,21 +79,43 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
         return login(credentials);
-       
+
     }
 
     @Override
     @CustomTransactions
     public APISession login(final Map<String, Serializable> credentials) throws LoginException {
         checkCredentials(credentials);
+        final Long tenantId = (NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))) ? NumberUtils.toLong(String
+                .valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) : null;
+        final String userName = (credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) ? String.valueOf(credentials
+                .get(AuthenticationConstants.BASIC_USERNAME)) : null;
         try {
-           Long tenantId = (NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)))) ? NumberUtils.toLong(String
-                    .valueOf(credentials.get(
-                            AuthenticationConstants.BASIC_TENANT_ID))) : null;
-             String userName = (credentials.get(AuthenticationConstants.BASIC_USERNAME) != null) ? String.valueOf(credentials
-                    .get(AuthenticationConstants.BASIC_USERNAME)) : null;
-                    
-            return login(userName, password, null);
+            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            final PlatformService platformService = platformServiceAccessor.getPlatformService();
+            final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
+            // first call before create session: put the platform in cache if necessary
+            final TransactionContentWithResult<STenant> getTenant;
+            if (tenantId == null) {
+                getTenant = new GetDefaultTenantInstance(platformService);
+            } else {
+                getTenant = new GetTenantInstance(tenantId, platformService);
+            }
+            platformTransactionExecutor.execute(getTenant);
+            final STenant sTenant = getTenant.getResult();
+            final long localTenantId = sTenant.getId();
+            checkThatWeCanLogin(userName, platformService, sTenant);
+
+            final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(localTenantId);
+            final LoginService loginService = serviceAccessor.getLoginService();
+            final IdentityService identityService = serviceAccessor.getIdentityService();
+            final TransactionService transactionService = platformServiceAccessor.getTransactionService();
+
+            final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<String, Serializable>(credentials);
+            credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, localTenantId);
+            final SSession sSession = transactionService.executeInTransaction(new LoginAndRetrieveUser(loginService, identityService,
+                    credentialsWithResolvedTenantId));
+            return ModelConvertor.toAPISession(sSession, sTenant.getName());
         } catch (final LoginException e) {
             throw e;
         } catch (final BonitaRuntimeException e) {
@@ -104,33 +123,6 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         } catch (final Exception e) {
             throw new LoginException(e);
         }
-    }
-
-    protected APISession login(final String userName, final String password, final Long tenantId) throws Exception {
-        final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        final PlatformService platformService = platformServiceAccessor.getPlatformService();
-        final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
-        // first call before create session: put the platform in cache if necessary
-        final TransactionContentWithResult<STenant> getTenant;
-        if (tenantId == null) {
-            getTenant = new GetDefaultTenantInstance(platformService);
-        } else {
-            getTenant = new GetTenantInstance(tenantId, platformService);
-        }
-        platformTransactionExecutor.execute(getTenant);
-        final STenant sTenant = getTenant.getResult();
-        final long localTenantId = sTenant.getId();
-        checkThatWeCanLogin(userName, platformService, sTenant);
-
-        final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(localTenantId);
-        final LoginService loginService = serviceAccessor.getLoginService();
-        final IdentityService identityService = serviceAccessor.getIdentityService();
-        final TransactionService transactionService = platformServiceAccessor.getTransactionService();
-
-         final Map<String, Serializable> credentialsWithResolvedTenantId = new HashMap<String, Serializable>(credentials);
-            credentialsWithResolvedTenantId.put(AuthenticationConstants.BASIC_TENANT_ID, resolvedTenantId);
-        SSession sSession = transactionService.executeInTransaction(new LoginAndRetrieveUser(loginService, identityService, credentialsWithResolvedTenantId));
-        return ModelConvertor.toAPISession(sSession, sTenant.getName());
     }
 
     protected void checkUsernameAndPassword(final String userName, final String password) throws LoginException {
@@ -145,7 +137,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     protected void checkCredentials(final Map<String, Serializable> credentials) throws LoginException {
         if (CollectionUtils.isEmpty(credentials)) {
             throw new LoginException("credentials are null or empty");
-    	}    
+        }
     }
 
     @SuppressWarnings("unused")

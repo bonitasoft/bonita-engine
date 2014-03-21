@@ -20,14 +20,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.SEvent;
+import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -52,8 +51,8 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
@@ -383,7 +382,6 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
-
     private class PersistedJobCallable implements Callable<JobWrapper> {
 
         private final JobIdentifier jobIdentifier;
@@ -392,37 +390,37 @@ public class SchedulerServiceImpl implements SchedulerService {
             this.jobIdentifier = jobIdentifier;
         }
 
-            @Override
-            public JobWrapper call() throws Exception {
-                final SJobDescriptor sJobDescriptor = jobService
-                        .getJobDescriptor(jobIdentifier.getId());
-                // FIXME do something here if the job does not exist
-                if (sJobDescriptor == null) {
-                    return null;
-                }
-                final String jobClassName = sJobDescriptor.getJobClassName();
-                final Class<?> jobClass = Class.forName(jobClassName);
-                final StatelessJob statelessJob = (StatelessJob) jobClass
-                        .newInstance();
+        @Override
+        public JobWrapper call() throws Exception {
+            final SJobDescriptor sJobDescriptor = jobService
+                    .getJobDescriptor(jobIdentifier.getId());
+            // FIXME do something here if the job does not exist
+            if (sJobDescriptor == null) {
+                return null;
+            }
+            final String jobClassName = sJobDescriptor.getJobClassName();
+            final Class<?> jobClass = Class.forName(jobClassName);
+            final StatelessJob statelessJob = (StatelessJob) jobClass
+                    .newInstance();
 
             final FilterOption filterOption = new FilterOption(SJobParameter.class, "jobDescriptorId", jobIdentifier.getId());
             final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, Collections.singletonList(filterOption), null);
             final List<SJobParameter> parameters = jobService.searchJobParameters(queryOptions);
-                final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
-                for (final SJobParameter sJobParameterImpl : parameters) {
-                    parameterMap.put(sJobParameterImpl.getKey(),
-                            sJobParameterImpl.getValue());
-                }
-                statelessJob.setAttributes(parameterMap);
-                if (servicesResolver != null) {
-                    injectServices(statelessJob);
-                }
-                final JobWrapper jobWrapper = new JobWrapper(
-                        jobIdentifier.getJobName(), statelessJob, logger,
-                        jobIdentifier.getTenantId(), eventService,
-                        sessionAccessor, transactionService);
-                return jobWrapper;
+            final HashMap<String, Serializable> parameterMap = new HashMap<String, Serializable>();
+            for (final SJobParameter sJobParameterImpl : parameters) {
+                parameterMap.put(sJobParameterImpl.getKey(),
+                        sJobParameterImpl.getValue());
             }
+            statelessJob.setAttributes(parameterMap);
+            if (servicesResolver != null) {
+                injectServices(statelessJob);
+            }
+            final JobWrapper jobWrapper = new JobWrapper(
+                    jobIdentifier.getJobName(), statelessJob, logger,
+                    jobIdentifier.getTenantId(), eventService,
+                    sessionAccessor, transactionService);
+            return jobWrapper;
+        }
     }
 
     /**
@@ -450,7 +448,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void pause() throws SBonitaException, TimeoutException {
+    public void pause() throws SBonitaException {
         pauseJobs(getTenantId());
     }
 

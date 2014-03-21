@@ -56,18 +56,23 @@ public final class MemoryLockConditionService implements LockService {
     private final int lockPoolSize;
 
     private static class Pair {
+
         final Condition condition;
+
         final AtomicInteger count = new AtomicInteger(1);
+
         public Pair(Condition condition) {
             super();
             this.condition = condition;
         }
+
         @Override
         public String toString() {
             return "Pair [condition=" + condition + ", count=" + count + "]";
         }
 
     }
+
     /**
      * 
      * @param logger
@@ -75,28 +80,31 @@ public final class MemoryLockConditionService implements LockService {
      * @param lockTimeout
      *            timeout to obtain a lock in seconds
      */
-    public MemoryLockConditionService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout, final int lockPoolSize) {
+    public MemoryLockConditionService(final TechnicalLoggerService logger, final ReadSessionAccessor sessionAccessor, final int lockTimeout,
+            final int lockPoolSize) {
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
         this.lockTimeout = lockTimeout;
         this.debugEnable = logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG);
-        this.traceEnable = true;//logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
+        this.traceEnable = true;// logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         this.waiters = new HashMap<String, Pair>();
         this.lockPoolSize = lockPoolSize;
 
-        //the goal of this map of mutexs is not to solve completely the competition between keys
-        //it is only improving the default "one lock" behavior by partitioning ids among a chosen pool size
-        //this a sharding approach
+        // the goal of this map of mutexs is not to solve completely the competition between keys
+        // it is only improving the default "one lock" behavior by partitioning ids among a chosen pool size
+        // this a sharding approach
         final Map<Integer, ReentrantLock> tmpLocks = new HashMap<Integer, ReentrantLock>();
-        for (int i = 0 ; i < lockPoolSize ; i++) {
+        for (int i = 0; i < lockPoolSize; i++) {
             tmpLocks.put(i, new MemoryLockConditionServiceReentrantLock());
         }
         this.locks = Collections.unmodifiableMap(tmpLocks);
 
     }
-    
+
     private static final class MemoryLockConditionServiceReentrantLock extends ReentrantLock {
-        
+
+        private static final long serialVersionUID = -5057082500079127968L;
+
     }
 
     private Lock getLock(final long objectToLockId) {
@@ -107,7 +115,7 @@ public final class MemoryLockConditionService implements LockService {
         return this.locks.get(poolKeyForThisObjectId);
     }
 
-
+    @SuppressWarnings("unused")
     @Override
     public BonitaLock tryLock(long objectToLockId, String objectType, long timeout, TimeUnit timeUnit, long tenantId) {
         try {
@@ -117,11 +125,11 @@ public final class MemoryLockConditionService implements LockService {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public BonitaLock lock(final long objectToLockId, final String objectType, long tenantId) throws SLockException {
         return innerTryLock(objectToLockId, objectType, lockTimeout, TimeUnit.SECONDS);
     }
-
 
     private BonitaLock innerTryLock(final long objectToLockId, final String objectType, final long timeout, final TimeUnit timeUnit) throws SLockException {
         final String key = buildKey(objectToLockId, objectType);
@@ -143,15 +151,19 @@ public final class MemoryLockConditionService implements LockService {
                 boolean lockObtained = false;
                 try {
                     if (traceEnable) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking (" + key + ") awaiting condition: " + condition, new Exception("Forced exception to get Thread dump stack"));
+                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking (" + key + ") awaiting condition: "
+                                + condition, new Exception("Forced exception to get Thread dump stack"));
                     } else if (debugEnable) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking (" + key + ") awaiting condition: " + condition);
+                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking (" + key + ") awaiting condition: "
+                                + condition);
                     }
                     lockObtained = condition.await(timeout, timeUnit);
                     if (traceEnable) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Lock (" + key + ") obtained: " + lockObtained + " on condition: " + condition, new Exception("Forced exception to get Thread dump stack"));
+                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Lock (" + key + ") obtained: " + lockObtained
+                                + " on condition: " + condition, new Exception("Forced exception to get Thread dump stack"));
                     } else if (debugEnable) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Lock (" + key + ") obtained: " + lockObtained + " on condition: " + condition);
+                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Lock (" + key + ") obtained: " + lockObtained
+                                + " on condition: " + condition);
                     }
 
                 } catch (InterruptedException e) {
@@ -163,7 +175,8 @@ public final class MemoryLockConditionService implements LockService {
             } else {
                 condition = lock.newCondition();
                 if (debugEnable) {
-                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking (" + key + ") no waiter found for key, creating a new waiter on condition: " + condition);
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Locking (" + key
+                            + ") no waiter found for key, creating a new waiter on condition: " + condition);
                 }
                 waiters.put(key, new Pair(condition));
             }
@@ -185,6 +198,7 @@ public final class MemoryLockConditionService implements LockService {
         return new BonitaLock(lock, objectType, objectToLockId);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void unlock(final BonitaLock bonitaLock, long tenantId) throws SLockException {
         final String key = buildKey(bonitaLock.getObjectToLockId(), bonitaLock.getObjectType());
@@ -200,7 +214,7 @@ public final class MemoryLockConditionService implements LockService {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Unlocking (" + key + ") waiter found: " + waiter);
             }
             if (waiter == null) {
-                throw new SLockException("Unable to unlock an unexisting lock for key: " + key); 
+                throw new SLockException("Unable to unlock an unexisting lock for key: " + key);
             }
             waiter.count.getAndDecrement();
             if (waiter.count.get() == 0) {
@@ -210,7 +224,8 @@ public final class MemoryLockConditionService implements LockService {
                 waiters.remove(key);
             }
             if (debugEnable) {
-                logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Unlocking (" + key + ") signaling condition: " + waiter.condition);
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, Thread.currentThread().getName() + " - Unlocking (" + key + ") signaling condition: "
+                        + waiter.condition);
             }
             waiter.condition.signal();
         } finally {

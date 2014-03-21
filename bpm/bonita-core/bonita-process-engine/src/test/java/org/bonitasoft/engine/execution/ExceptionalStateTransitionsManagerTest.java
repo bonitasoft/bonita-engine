@@ -28,14 +28,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
+ * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ExceptionalStateTransitionsManagerTest {
-    
+
     private static int NORMAL_NON_TERMINAL_STATE_ID = 50;
 
     private static int NORMAL_TERMINAL_STATE_ID = 51;
@@ -43,7 +42,7 @@ public class ExceptionalStateTransitionsManagerTest {
     private static int ABORTING_NON_TERMINAL_STATE_ID = 52;
 
     private static int ABORTING_TERMINAL_STATE_ID = 53;
-   
+
     @Mock
     private FlowNodeState normalNonTerminalState;
 
@@ -55,19 +54,19 @@ public class ExceptionalStateTransitionsManagerTest {
 
     @Mock
     private FlowNodeState abortingTerminalState;
-    
+
     private Map<Integer, FlowNodeState> stateTransitions;
-    
+
     @Before
     public void setUp() {
         doReturn(NORMAL_NON_TERMINAL_STATE_ID).when(normalNonTerminalState).getId();
         doReturn(false).when(normalNonTerminalState).isTerminal();
         doReturn(SStateCategory.NORMAL).when(normalNonTerminalState).getStateCategory();
-        
+
         doReturn(NORMAL_TERMINAL_STATE_ID).when(normalTerminalState).getId();
         doReturn(true).when(normalTerminalState).isTerminal();
         doReturn(SStateCategory.NORMAL).when(normalTerminalState).getStateCategory();
-        
+
         doReturn(ABORTING_NON_TERMINAL_STATE_ID).when(abortingNonTerminalState).getId();
         doReturn(false).when(abortingNonTerminalState).isTerminal();
         doReturn(SStateCategory.ABORTING).when(abortingNonTerminalState).getStateCategory();
@@ -75,29 +74,29 @@ public class ExceptionalStateTransitionsManagerTest {
         doReturn(ABORTING_TERMINAL_STATE_ID).when(abortingTerminalState).getId();
         doReturn(true).when(abortingTerminalState).isTerminal();
         doReturn(SStateCategory.ABORTING).when(abortingTerminalState).getStateCategory();
-        
+
         stateTransitions = new HashMap<Integer, FlowNodeState>(2);
         stateTransitions.put(-1, abortingNonTerminalState);
         stateTransitions.put(ABORTING_NON_TERMINAL_STATE_ID, abortingTerminalState);
-        
+
     }
-    
+
     @Test
-    public void getNextState_returns_next_state_from_map_using_current_state_id_key_if_current_state_is_not_in_normal_category() throws Exception {
+    public void getNextState_returns_next_state_from_map_using_current_state_id_key_if_current_state_is_not_in_normal_category() {
         ExceptionalStateTransitionsManager statesManager = new ExceptionalStateTransitionsManager(stateTransitions);
         FlowNodeState nextState = statesManager.getNextState(abortingNonTerminalState);
         assertEquals(abortingTerminalState, nextState);
     }
 
     @Test
-    public void getNextState_returns_next_state_from_map_using_minus_one_if_current_state_is_in_normal_category_and_is_not_terminal() throws Exception {
+    public void getNextState_returns_next_state_from_map_using_minus_one_if_current_state_is_in_normal_category_and_is_not_terminal() {
         ExceptionalStateTransitionsManager statesManager = new ExceptionalStateTransitionsManager(stateTransitions);
         FlowNodeState nextState = statesManager.getNextState(normalNonTerminalState);
         assertEquals(abortingNonTerminalState, nextState);
     }
 
     @Test
-    public void getNextState_returns_null_if_current_is_in_normal_category_and_is_terminal() throws Exception {
+    public void getNextState_returns_null_if_current_is_in_normal_category_and_is_terminal() {
         ExceptionalStateTransitionsManager statesManager = new ExceptionalStateTransitionsManager(stateTransitions);
         FlowNodeState nextState = statesManager.getNextState(normalTerminalState);
         assertNull(nextState);

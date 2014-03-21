@@ -106,7 +106,7 @@ public class QuartzSchedulerExecutorTest {
     }
 
     @Test
-    public void should_getQuartzTrigger_with_restart_ALL_have_a_ignore_misfire_policy() throws Exception {
+    public void should_getQuartzTrigger_with_restart_ALL_have_a_ignore_misfire_policy() {
         // given
         Date triggerEndTime = new Date(System.currentTimeMillis() + 10000);
         UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??", MisfireRestartPolicy.ALL);
@@ -119,7 +119,7 @@ public class QuartzSchedulerExecutorTest {
     }
 
     @Test
-    public void should_getQuartzTrigger_with_restart_NONE_have_a_do_nothing_misfire_policy() throws Exception {
+    public void should_getQuartzTrigger_with_restart_NONE_have_a_do_nothing_misfire_policy() {
         // given
         Date triggerEndTime = new Date(System.currentTimeMillis() + 10000);
         UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??", MisfireRestartPolicy.NONE);
@@ -132,7 +132,7 @@ public class QuartzSchedulerExecutorTest {
     }
 
     @Test
-    public void should_getQuartzTrigger_with_restart_ONE_have_a_fire_once_misfire_policy() throws Exception {
+    public void should_getQuartzTrigger_with_restart_ONE_have_a_fire_once_misfire_policy() {
         // given
         Date triggerEndTime = new Date(System.currentTimeMillis() + 10000);
         UnixCronTrigger unixCronTrigger = new UnixCronTrigger("MyTrigger", triggerEndTime, "0/5 * * * * ??", MisfireRestartPolicy.ONE);

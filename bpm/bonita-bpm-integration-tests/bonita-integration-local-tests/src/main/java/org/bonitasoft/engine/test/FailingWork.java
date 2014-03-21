@@ -31,12 +31,14 @@ final class FailingWork extends BonitaWork {
         return "The recovery procedure";
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void work(final Map<String, Object> context) throws Exception {
         throw new Exception("an unexpected exception");
 
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void handleFailure(final Throwable e, final Map<String, Object> context) throws Exception {
         throw new Exception("unable to handle failure");

@@ -208,24 +208,23 @@ public class CMISDocumentServiceImpl implements DocumentService {
     private byte[] getDocumentContent(final Document doc) throws SDocumentException {
         if (doc.getContentStreamLength() == 0) {
             return new byte[0]; // no contents
-        } else {
-            final ContentStream contentStream = doc.getContentStream();
-            if (contentStream != null) {
-                final InputStream stream = contentStream.getStream();
+        }
+        final ContentStream contentStream = doc.getContentStream();
+        if (contentStream != null) {
+            final InputStream stream = contentStream.getStream();
+            try {
+                return IOUtils.toByteArray(stream);
+            } catch (final IOException e) {
+                throw new SDocumentException("Error accessing session before retrieving document content with ID " + doc.getId(), e);
+            } finally {
                 try {
-                    return IOUtils.toByteArray(stream);
+                    stream.close();
                 } catch (final IOException e) {
-                    throw new SDocumentException("Error accessing session before retrieving document content with ID " + doc.getId(), e);
-                } finally {
-                    try {
-                        stream.close();
-                    } catch (final IOException e) {
-                        // Nothing more can be done here
-                    }
+                    // Nothing more can be done here
                 }
             }
-            return new byte[0];
         }
+        return new byte[0];
     }
 
     /**
@@ -369,7 +368,7 @@ public class CMISDocumentServiceImpl implements DocumentService {
             }
 
             // Delete direct children documents:
-            for (final Document doc : getChildrenDocuments(session, folder)) {
+            for (final Document doc : getChildrenDocuments(folder)) {
                 deleteDocument(session, doc.getId(), true);
             }
 
@@ -389,7 +388,7 @@ public class CMISDocumentServiceImpl implements DocumentService {
         return subFolders;
     }
 
-    private List<Document> getChildrenDocuments(final Session session, final Folder folder) {
+    private List<Document> getChildrenDocuments(final Folder folder) {
         final List<Document> docs = new ArrayList<Document>();
         for (final CmisObject child : folder.getChildren()) {
             if (child instanceof Document) {

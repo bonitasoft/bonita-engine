@@ -55,7 +55,7 @@ public class ConnectorDefinitionAndInstanceContextWorkTest extends AbstractConte
 
     @Override
     @Before
-    public void before() throws Exception {
+    public void before() throws SBonitaException {
         txBonitawork = spy(new ConnectorDefinitionAndInstanceContextWork(wrappedWork, CONNECTOR_DEFINITION_NAME, CONNECTOR_INSTANCE_ID));
         super.before();
     }
