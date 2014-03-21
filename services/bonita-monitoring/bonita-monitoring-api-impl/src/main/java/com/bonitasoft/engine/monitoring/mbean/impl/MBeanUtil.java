@@ -75,7 +75,7 @@ public class MBeanUtil {
             transactionSvc.setRollbackOnly();
             throw e;
         } finally {
-            transactionSvc.complete();;
+            transactionSvc.complete();
         }
         return session.getId();
     }

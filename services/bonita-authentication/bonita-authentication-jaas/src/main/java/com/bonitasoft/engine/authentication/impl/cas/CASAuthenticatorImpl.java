@@ -350,30 +350,28 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      *            the page to transform
      * @return a DOM document object for further process
      */
-    protected Document createDOMDocumentFromResponse(String content) throws UnsupportedEncodingException, ParserConfigurationException, SAXException,
+    protected Document createDOMDocumentFromResponse(final String content) throws UnsupportedEncodingException, ParserConfigurationException, SAXException,
             IOException {
-        Tidy tidy = new Tidy();
+        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        final DocumentBuilder builder = factory.newDocumentBuilder();
+        builder.setEntityResolver(new EntityResolver() {
+
+            @SuppressWarnings("unused")
+            @Override
+            public InputSource resolveEntity(final String publicId, final String systemId) {
+                return new InputSource(new StringReader(""));
+            }
+        });
+
+        final Tidy tidy = new Tidy();
         tidy.setQuiet(true);
         tidy.setTidyMark(false);
         tidy.setMakeClean(true);
         tidy.setXmlOut(true);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         tidy.parse(new ByteArrayInputStream(content.getBytes("UTF8")), byteArrayOutputStream);
-        content = new String(byteArrayOutputStream.toByteArray(), "UTF8");
-
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-
-        builder.setEntityResolver(new EntityResolver() {
-
-            @Override
-            public InputSource resolveEntity(String publicId, String systemId)
-                    throws SAXException, IOException {
-                return new InputSource(new StringReader(""));
-            }
-        });
-        Document document = builder.parse(new ByteArrayInputStream(content.getBytes("UTF8")));
-        return document;
+        final String contentUTF8 = new String(byteArrayOutputStream.toByteArray(), "UTF8");
+        return builder.parse(new ByteArrayInputStream(contentUTF8.getBytes("UTF8")));
     }
 
     /**

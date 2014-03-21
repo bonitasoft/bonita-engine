@@ -53,14 +53,14 @@ public class NodeConfigurationExtTest {
     }
 
     @Test
-    public void testShouldResumeElementsWhenOneNode() throws Exception {
+    public void testShouldResumeElementsWhenOneNode() {
         when(cluster.getMembers()).thenReturn(one_members);
 
         assertTrue("must return true when cluster have one element", nodeConfigurationExt.shouldResumeElements());
     }
 
     @Test
-    public void testShouldResumeElementsWhenSeveralNode() throws Exception {
+    public void testShouldResumeElementsWhenSeveralNode() {
         when(cluster.getMembers()).thenReturn(two_members);
 
         assertFalse("must return false when cluster have one element", nodeConfigurationExt.shouldResumeElements());

@@ -136,7 +136,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());
 
-        final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);;
+        final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);
         assertTrue(checkNbOfProcessInstances.waitUntil());
         final List<ProcessInstance> processInstances = checkNbOfProcessInstances.getResult();
         final ProcessInstance targetProcInstToBeExecuted = processInstances.get(0);
@@ -198,7 +198,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());
 
-        final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);;
+        final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);
         assertTrue(checkNbOfProcessInstances.waitUntil());
         final List<ProcessInstance> processInstances = checkNbOfProcessInstances.getResult();
         final ProcessInstance targetProcInstToBeExecuted = processInstances.get(0);
@@ -261,7 +261,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());
 
-        final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);;
+        final CheckNbOfProcessInstances checkNbOfProcessInstances = checkNbOfProcessInstances(loopCardinality + 1);
         assertTrue(checkNbOfProcessInstances.waitUntil());
         final List<ProcessInstance> processInstances = checkNbOfProcessInstances.getResult();
         final ProcessInstance targetProcInstToBeExecuted = processInstances.get(0);

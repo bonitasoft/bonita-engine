@@ -23,6 +23,7 @@ public class EngineInitializerListenerSP implements ServletContextListener {
 
     private static final Logger LOGGER = Logger.getLogger(EngineInitializerListenerSP.class.getName());
 
+    @SuppressWarnings("unused")
     @Override
     public void contextDestroyed(final ServletContextEvent arg0) {
         try {
@@ -32,6 +33,7 @@ public class EngineInitializerListenerSP implements ServletContextListener {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void contextInitialized(final ServletContextEvent arg0) {
         try {

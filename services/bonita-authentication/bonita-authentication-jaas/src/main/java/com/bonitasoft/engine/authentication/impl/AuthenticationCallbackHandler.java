@@ -16,7 +16,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
@@ -33,7 +32,7 @@ public class AuthenticationCallbackHandler implements CallbackHandler {
     }
 
     @Override
-    public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+    public void handle(final Callback[] callbacks) {
         for (final Callback callback : callbacks) {
             if (callback instanceof NameCallback) {
                 final NameCallback nc = (NameCallback) callback;

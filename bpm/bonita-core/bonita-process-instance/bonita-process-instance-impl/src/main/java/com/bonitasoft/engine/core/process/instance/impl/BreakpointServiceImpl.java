@@ -12,8 +12,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -192,16 +192,16 @@ public class BreakpointServiceImpl implements BreakpointService {
                 active = (Boolean) this.cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE);
             }
             return active == null ? false : active;
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SBonitaReadException("unable to read from cache", e);
         }
     }
 
     /**
-     * @throws CacheException
+     * @throws SCacheException
      * @throws SBonitaReadException
      */
-    private synchronized void synchronizeBreakpoints() throws CacheException, SBonitaReadException {
+    private synchronized void synchronizeBreakpoints() throws SCacheException, SBonitaReadException {
         if (!this.isBreakpointsSynched || this.cacheService.get(BREAKPOINTS, BREAKPOINTS_ACTIVE) == null) {// double synchronization check
             this.cacheService.clear(BREAKPOINTS);
             long nbOfBreakpoints = getNumberOfBreakpoints();
@@ -238,7 +238,7 @@ public class BreakpointServiceImpl implements BreakpointService {
         return this.persistenceRead.selectList(elements);
     }
 
-    private void addBreakpointInCache(final SBreakpoint breakpoint) throws CacheException {
+    private void addBreakpointInCache(final SBreakpoint breakpoint) throws SCacheException {
         final String breakpointKey;
         if (breakpoint.isInstanceScope()) {
             breakpointKey = buildBreakpointKey(INSTANCE_KEY, breakpoint.getInstanceId(), breakpoint.getElementName(), breakpoint.getStateId());
@@ -266,7 +266,7 @@ public class BreakpointServiceImpl implements BreakpointService {
                 breakpoint = (SBreakpoint) this.cacheService.get(BREAKPOINTS, buildBreakpointKey(DEFINITION_KEY, definitionId, elementName, stateId));
             }
             return breakpoint;
-        } catch (final CacheException e) {
+        } catch (final SCacheException e) {
             throw new SBonitaReadException("unable to read ", e);
         }
     }

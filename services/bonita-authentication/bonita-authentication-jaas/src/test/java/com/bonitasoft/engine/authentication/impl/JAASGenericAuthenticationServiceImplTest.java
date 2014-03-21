@@ -1,8 +1,11 @@
 package com.bonitasoft.engine.authentication.impl;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.security.Principal;
@@ -19,7 +22,6 @@ import javax.security.auth.login.LoginException;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,7 +47,7 @@ public class JAASGenericAuthenticationServiceImplTest {
     ReadSessionAccessor sessionAccessor;
 
     @Before
-    public void setup() throws TenantIdNotSetException {
+    public void setup() {
         jaasGenericAuthenticationServiceImpl = new JAASGenericAuthenticationServiceImpl(logger, sessionAccessor);
     }
 
@@ -60,7 +62,7 @@ public class JAASGenericAuthenticationServiceImplTest {
     }
 
     @Test
-    public void testExtractUserFromSubjetWithNoCallPrincipal() throws Exception {
+    public void testExtractUserFromSubjetWithNoCallPrincipal() {
         LoginContext lc = mock(LoginContext.class);
         Subject subject = new Subject();
         when(lc.getSubject()).thenReturn(subject);
@@ -78,7 +80,7 @@ public class JAASGenericAuthenticationServiceImplTest {
     }
 
     @Test
-    public void testExtractUserFromSubjet() throws Exception {
+    public void testExtractUserFromSubjet() {
 
         String username = "install";
         LoginContext lc = mock(LoginContext.class);
@@ -97,7 +99,6 @@ public class JAASGenericAuthenticationServiceImplTest {
         when(enumeration.hasMoreElements()).thenReturn(true, false, false, false);
         when(enumeration.nextElement()).thenReturn(principalUser);
 
-
         when(principalCaller.getName()).thenReturn(JAASGenericAuthenticationServiceImpl.CALLER_PRINCIPAL);
         when(principalCaller.members()).thenReturn(enumeration);
 
@@ -110,17 +111,17 @@ public class JAASGenericAuthenticationServiceImplTest {
     }
 
     @Test
-    public void testIsGroupPrincipalWithPrincipal() throws Exception {
+    public void testIsGroupPrincipalWithPrincipal() {
         assertThat(jaasGenericAuthenticationServiceImpl.isGroupPrincipal(mock(Principal.class))).isFalse();
     }
 
     @Test
-    public void testIsGroupPrincipalWithGroup() throws Exception {
+    public void testIsGroupPrincipalWithGroup() {
         assertThat(jaasGenericAuthenticationServiceImpl.isGroupPrincipal(mock(Group.class))).isTrue();
     }
 
     @Test
-    public void testCreateContextWithWrongTenantId() throws Exception {
+    public void testCreateContextWithWrongTenantId() {
         try {
             jaasGenericAuthenticationServiceImpl.createContext(authenticationCallbackHandler);
         } catch (AuthenticationException e) {
@@ -146,9 +147,9 @@ public class JAASGenericAuthenticationServiceImplTest {
     }
 
     @Test
-    public void testTryToAuthenticate() throws Exception {
+    public void testTryToAuthenticate() {
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
-        Map<String, Serializable> jaascredentials = jaasGenericAuthenticationServiceImpl.tryToAuthenticate(credentials);
+        jaasGenericAuthenticationServiceImpl.tryToAuthenticate(credentials);
     }
 
 }

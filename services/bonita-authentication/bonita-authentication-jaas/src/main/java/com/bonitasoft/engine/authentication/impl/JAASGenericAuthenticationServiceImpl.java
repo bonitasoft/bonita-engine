@@ -18,7 +18,6 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-import javax.security.auth.spi.LoginModule;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.authentication.AuthenticationException;
@@ -26,7 +25,7 @@ import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -150,7 +149,7 @@ public class JAASGenericAuthenticationServiceImpl implements GenericAuthenticati
         return Group.class.isAssignableFrom(principal.getClass());
     }
 
-    private String getLoginContext() throws TenantIdNotSetException {
+    private String getLoginContext() throws STenantIdNotSetException {
         return LOGIN_CONTEXT_PREFIX + "-" + sessionAccessor.getTenantId();
     }
 
