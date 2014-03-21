@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -47,12 +47,13 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class EngineConstantExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
@@ -73,6 +74,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     }
 
+    @SuppressWarnings("unused")
     @Override
     public Serializable evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
@@ -81,30 +83,57 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
             expressionConstant = ExpressionConstants.API_ACCESSOR;// just to make the expressionConstantsResolver load constants
             expressionConstant = ExpressionConstantsResolver.getExpressionConstantsFromName(expression.getContent());
         }
+        final String expressionName = expression.getName();
         if (expressionConstant == null) {
-            throw new SExpressionEvaluationException(expression.getContent() + " is not a valid Engine-provided variable");
+            throw new SExpressionEvaluationException(expression.getContent() + " is not a valid Engine-provided variable", expressionName);
         }
-        switch (expressionConstant) {
-            case API_ACCESSOR:
-                return getApiAccessor();
-            case CONNECTOR_API_ACCESSOR:
-                return getConnectorApiAccessor();
-            case ENGINE_EXECUTION_CONTEXT:
-                return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
-            case ACTIVITY_INSTANCE_ID:
-                return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
-            case PROCESS_INSTANCE_ID:
-                return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
-            case PROCESS_DEFINITION_ID:
-                return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
-            case ROOT_PROCESS_INSTANCE_ID:
-                return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
-            case TASK_ASSIGNEE_ID:
-                return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
-            case LOGGED_USER_ID:
-                return getLoggedUserFromSession();
-            default:
-                return inContext(expressionConstant, dependencyValues);
+        try {
+            switch (expressionConstant) {
+                case API_ACCESSOR:
+                    return getApiAccessor();
+                case CONNECTOR_API_ACCESSOR:
+                    return getConnectorApiAccessor();
+                case ENGINE_EXECUTION_CONTEXT:
+                    return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
+                case ACTIVITY_INSTANCE_ID:
+                    return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
+                case PROCESS_INSTANCE_ID:
+                    return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
+                case PROCESS_DEFINITION_ID:
+                    return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
+                case ROOT_PROCESS_INSTANCE_ID:
+                    return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
+                case TASK_ASSIGNEE_ID:
+                    return getFromContextOrEngineExecutionContext(expressionConstant, dependencyValues);
+                case LOGGED_USER_ID:
+                    return getLoggedUserFromSession();
+                default:
+                    final Object object = dependencyValues.get(expressionConstant.getEngineConstantName());
+                    if (object == null) {
+                        throw new SExpressionEvaluationException("EngineConstantExpression not supported for: " + expressionConstant.getEngineConstantName(),
+                                expressionName);
+                    }
+                    return (Serializable) object;
+            }
+        } catch (final STenantIdNotSetException e) {
+            throw new SExpressionEvaluationException(e, expressionName);
+        } catch (final SSessionNotFoundException e) {
+            throw new SExpressionEvaluationException(e, expressionName);
+        } catch (final SProcessInstanceNotFoundException e) {
+            throw new SExpressionEvaluationException("Error retrieving process instance while building EngineExecutionContext as EngineConstantExpression", e,
+                    expressionName);
+        } catch (final SProcessInstanceReadException e) {
+            throw new SExpressionEvaluationException("Error retrieving process instance while building EngineExecutionContext as EngineConstantExpression", e,
+                    expressionName);
+        } catch (final SFlowNodeReadException e) {
+            throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineExecutionContext as EngineConstantExpression",
+                    e, expressionName);
+        } catch (final SFlowNodeNotFoundException e) {
+            throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineExecutionContext as EngineConstantExpression",
+                    e, expressionName);
+        } catch (final SActivityInstanceNotFoundException e) {
+            throw new SExpressionEvaluationException("Error retrieving activity instance while building EngineExecutionContext as EngineConstantExpression", e,
+                    expressionName);
         }
     }
 
@@ -112,28 +141,22 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         return new APIAccessorImpl();
     }
 
-    protected APIAccessor getConnectorApiAccessor() throws SExpressionEvaluationException {
-        long tenantId;
-        try {
-            tenantId = sessionAccessor.getTenantId();
-        } catch (TenantIdNotSetException e) {
-            throw new SExpressionEvaluationException(e);
-        }
+    protected APIAccessor getConnectorApiAccessor() throws STenantIdNotSetException {
+        long tenantId = sessionAccessor.getTenantId();
         return new ConnectorAPIAccessorImpl(tenantId);
     }
 
-    private long getLoggedUserFromSession() throws SExpressionEvaluationException {
+    private long getLoggedUserFromSession() throws SSessionNotFoundException {
         try {
             return sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
-        } catch (final SSessionNotFoundException e) {
-            throw new SExpressionEvaluationException(e);
         } catch (final SessionIdNotSetException e) {
             return -1;
         }
     }
 
     private Serializable getFromContextOrEngineExecutionContext(final ExpressionConstants expressionConstant, final Map<String, Object> dependencyValues)
-            throws SExpressionEvaluationException {
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SActivityInstanceNotFoundException, SFlowNodeNotFoundException,
+            SFlowNodeReadException {
         final Object object = dependencyValues.get(expressionConstant.getEngineConstantName());
         if (object == null) {
             // try to get it from an already evaluated context
@@ -141,17 +164,16 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
                     .getEngineConstantName());
             if (context != null) {
                 return context.getExpressionConstant(expressionConstant);
-            } else {
-                return evaluate(expressionConstant, dependencyValues);
             }
-        } else {
-            // we have it already evaluated
-            return (Serializable) object;
+            return evaluate(expressionConstant, dependencyValues);
         }
+        // we have it already evaluated
+        return (Serializable) object;
     }
 
     private Serializable evaluate(final ExpressionConstants expressionConstant, final Map<String, Object> dependencyValues)
-            throws SExpressionEvaluationException {
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SActivityInstanceNotFoundException, SFlowNodeNotFoundException,
+            SFlowNodeReadException {
         // guess it
         if (ExpressionConstants.ENGINE_EXECUTION_CONTEXT.equals(expressionConstant)) {
             return createContext(dependencyValues);
@@ -171,7 +193,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     private Serializable evaluateUsingProcessInstanceContainer(final ExpressionConstants expressionConstant, final Map<String, Object> dependencyValues,
-            final long containerId) throws SExpressionEvaluationException {
+            final long containerId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
         if (ExpressionConstants.PROCESS_INSTANCE_ID.equals(expressionConstant)) {
             return containerId;
         } else if (ExpressionConstants.TASK_ASSIGNEE_ID.equals(expressionConstant)) {
@@ -184,14 +206,14 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     private Serializable evaluateUsingActivityInstanceContainer(final ExpressionConstants expressionConstant, final Map<String, Object> dependencyValues,
-            final long containerId) throws SExpressionEvaluationException {
+            final long containerId) throws SActivityInstanceNotFoundException, SFlowNodeNotFoundException,
+            SFlowNodeReadException {
         if (ExpressionConstants.ACTIVITY_INSTANCE_ID.equals(expressionConstant)) {
             return containerId;
-        } else {
-            // get the activity and fill the others elements
-            fillDependenciesFromFlowNodeInstance(dependencyValues, containerId);
-            return getNonNullLong(expressionConstant, dependencyValues);
         }
+        // get the activity and fill the others elements
+        fillDependenciesFromFlowNodeInstance(dependencyValues, containerId);
+        return getNonNullLong(expressionConstant, dependencyValues);
     }
 
     private Serializable getNonNullLong(final ExpressionConstants expressionConstant, final Map<String, Object> dependencyValues) {
@@ -200,43 +222,30 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     private void fillDependenciesFromProcessInstance(final Map<String, Object> dependencyValues, final long processInstanceId)
-            throws SExpressionEvaluationException {
-        try {
-            final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-            dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), processInstance.getId());
-            dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), processInstance.getRootProcessInstanceId());
-        } catch (final SProcessInstanceNotFoundException e) {
-            throw new SExpressionEvaluationException("Error retrieving process instance while building EngineExecutionContext as EngineConstantExpression", e);
-        } catch (final SProcessInstanceReadException e) {
-            throw new SExpressionEvaluationException("Error retrieving process instance while building EngineExecutionContext as EngineConstantExpression", e);
-        }
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
+        final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+        dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), processInstance.getId());
+        dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), processInstance.getRootProcessInstanceId());
     }
 
-    void fillDependenciesFromFlowNodeInstance(final Map<String, Object> dependencyValues, final long flowNodeInstanceId) throws SExpressionEvaluationException {
-        try {
-            if (dependencyValues.get("time") != null) {
-                SAActivityInstance aActivityInstance = activityInstanceService.getMostRecentArchivedActivityInstance(flowNodeInstanceId);
-                dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), aActivityInstance.getLogicalGroup(3));
-                dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), aActivityInstance.getLogicalGroup(1));
-                if (isHumanTask(aActivityInstance)) {
-                    final SAHumanTaskInstance saHumanTask = (SAHumanTaskInstance) aActivityInstance;
-                    dependencyValues.put(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(), saHumanTask.getAssigneeId());
-                }
-            } else {
-                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-                dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), flowNodeInstance.getLogicalGroup(3));
-                dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), flowNodeInstance.getLogicalGroup(1));
-                if (isHumanTask(flowNodeInstance)) {
-                    final SHumanTaskInstance taskInstance = (SHumanTaskInstance) flowNodeInstance;
-                    dependencyValues.put(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(), taskInstance.getAssigneeId());
-                }
+    void fillDependenciesFromFlowNodeInstance(final Map<String, Object> dependencyValues, final long flowNodeInstanceId)
+            throws SActivityInstanceNotFoundException, SFlowNodeNotFoundException, SFlowNodeReadException {
+        if (dependencyValues.get("time") != null) {
+            final SAActivityInstance aActivityInstance = activityInstanceService.getMostRecentArchivedActivityInstance(flowNodeInstanceId);
+            dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), aActivityInstance.getLogicalGroup(3));
+            dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), aActivityInstance.getLogicalGroup(1));
+            if (isHumanTask(aActivityInstance)) {
+                final SAHumanTaskInstance saHumanTask = (SAHumanTaskInstance) aActivityInstance;
+                dependencyValues.put(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(), saHumanTask.getAssigneeId());
             }
-        } catch (final SFlowNodeReadException e) {
-            throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineConstantExpression context", e);
-        } catch (final SFlowNodeNotFoundException e) {
-            throw new SExpressionEvaluationException("Error retrieving flow node instance while building EngineConstantExpression context", e);
-        } catch (SActivityInstanceNotFoundException e) {
-            throw new SExpressionEvaluationException("Error retrieving activity instance while building EngineConstantExpression context", e);
+        } else {
+            final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
+            dependencyValues.put(ExpressionConstants.PROCESS_INSTANCE_ID.getEngineConstantName(), flowNodeInstance.getLogicalGroup(3));
+            dependencyValues.put(ExpressionConstants.ROOT_PROCESS_INSTANCE_ID.getEngineConstantName(), flowNodeInstance.getLogicalGroup(1));
+            if (isHumanTask(flowNodeInstance)) {
+                final SHumanTaskInstance taskInstance = (SHumanTaskInstance) flowNodeInstance;
+                dependencyValues.put(ExpressionConstants.TASK_ASSIGNEE_ID.getEngineConstantName(), taskInstance.getAssigneeId());
+            }
         }
     }
 
@@ -248,17 +257,8 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         return SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType());
     }
 
-    private Serializable inContext(final ExpressionConstants expressionConstant, final Map<String, Object> dependencyValues)
-            throws SExpressionEvaluationException {
-        final Object object = dependencyValues.get(expressionConstant.getEngineConstantName());
-        if (object == null) {
-            throw new SExpressionEvaluationException("EngineConstantExpression not supported for: " + expressionConstant.getEngineConstantName());
-        } else {
-            return (Serializable) object;
-        }
-    }
-
-    private Serializable createContext(final Map<String, Object> dependencyValues) throws SExpressionEvaluationException {
+    private Serializable createContext(final Map<String, Object> dependencyValues) throws SProcessInstanceNotFoundException,
+            SProcessInstanceReadException, SActivityReadException, SActivityInstanceNotFoundException {
         final EngineExecutionContext ctx = new EngineExecutionContext();
         if (dependencyValues.containsKey(SExpressionContext.containerTypeKey) && dependencyValues.containsKey(SExpressionContext.containerIdKey)) {
             final String containerType = (String) dependencyValues.get(SExpressionContext.containerTypeKey);
@@ -275,38 +275,29 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         return ctx;
     }
 
-    private void updateContextFromProcessInstance(final EngineExecutionContext ctx, final long processInstanceId) throws SExpressionEvaluationException {
-        try {
-            final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-            ctx.setProcessInstanceId(processInstance.getId());
-            ctx.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
-        } catch (final SProcessInstanceNotFoundException e) {
-            throw new SExpressionEvaluationException("Error retrieving process instance while building EngineExecutionContext as EngineConstantExpression", e);
-        } catch (final SProcessInstanceReadException e) {
-            throw new SExpressionEvaluationException("Error retrieving process instance while building EngineExecutionContext as EngineConstantExpression", e);
-        }
+    private void updateContextFromProcessInstance(final EngineExecutionContext ctx, final long processInstanceId) throws SProcessInstanceNotFoundException,
+            SProcessInstanceReadException {
+        final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+        ctx.setProcessInstanceId(processInstance.getId());
+        ctx.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
     }
 
-    private void updateContextFromActivityInstance(final EngineExecutionContext ctx, final long activityInstanceId) throws SExpressionEvaluationException {
+    private void updateContextFromActivityInstance(final EngineExecutionContext ctx, final long activityInstanceId) throws SActivityReadException,
+            SActivityInstanceNotFoundException {
         ctx.setActivityInstanceId(activityInstanceId);
-        try {
-            final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-            ctx.setProcessInstanceId(activityInstance.getParentProcessInstanceId());
-            ctx.setRootProcessInstanceId(activityInstance.getRootProcessInstanceId());
-            if (isHumanTask(activityInstance)) {
-                ctx.setTaskAssigneeId(((SHumanTaskInstance) activityInstance).getAssigneeId());
-            }
-        } catch (final SActivityReadException e) {
-            throw new SExpressionEvaluationException("Error retrieving Activity instance while building EngineExecutionContext as EngineConstantExpression", e);
-        } catch (final SActivityInstanceNotFoundException e) {
-            throw new SExpressionEvaluationException("Error retrieving Activity instance while building EngineExecutionContext as EngineConstantExpression", e);
+        final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
+        ctx.setProcessInstanceId(activityInstance.getParentProcessInstanceId());
+        ctx.setRootProcessInstanceId(activityInstance.getRootProcessInstanceId());
+        if (isHumanTask(activityInstance)) {
+            ctx.setTaskAssigneeId(((SHumanTaskInstance) activityInstance).getAssigneeId());
         }
     }
 
     @Override
     public void validate(final SExpression expression) throws SInvalidExpressionException {
         if (ExpressionConstantsResolver.getExpressionConstantsFromName(expression.getContent()) == null) {
-            throw new SInvalidExpressionException("Unable to get Engine Constant '" + expression.getContent() + "' in expression: " + expression);
+            throw new SInvalidExpressionException("Unable to get Engine Constant '" + expression.getContent() + "' in expression: " + expression,
+                    expression.getName());
         }
     }
 

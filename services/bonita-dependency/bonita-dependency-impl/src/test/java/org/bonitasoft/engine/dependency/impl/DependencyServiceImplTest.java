@@ -294,7 +294,7 @@ public class DependencyServiceImplTest {
 
     @Test(expected = SDependencyNotFoundException.class)
     public void deleteDependencyWithReadExceptionShouldThrowSDependencyNotFoundException() throws Exception {
-        doThrow(SBonitaReadException.class).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
         dependencyServiceImpl.deleteDependency("notFound");
     }
 

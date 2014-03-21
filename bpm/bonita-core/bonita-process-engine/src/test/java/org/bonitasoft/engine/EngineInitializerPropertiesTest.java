@@ -58,43 +58,43 @@ public class EngineInitializerPropertiesTest {
     }
 
     @Test
-    public void testShouldCreatePlatform() throws Exception {
+    public void testShouldCreatePlatform() {
         properties.put("platform.create", "true");
         assertTrue(engineInitializerProperties.shouldCreatePlatform());
     }
 
     @Test
-    public void testShouldNotCreatePlatform() throws Exception {
+    public void testShouldNotCreatePlatform() {
         properties.put("platform.create", "false");
         assertFalse(engineInitializerProperties.shouldCreatePlatform());
     }
 
     @Test
-    public void testShouldStartPlatform() throws Exception {
+    public void testShouldStartPlatform() {
         properties.put("node.start", "true");
         assertTrue(engineInitializerProperties.shouldStartPlatform());
     }
 
     @Test
-    public void testShouldNotStartPlatform() throws Exception {
+    public void testShouldNotStartPlatform() {
         properties.put("node.start", "false");
         assertFalse(engineInitializerProperties.shouldStartPlatform());
     }
 
     @Test
-    public void testShouldStopPlatform() throws Exception {
+    public void testShouldStopPlatform() {
         properties.put("node.stop", "true");
         assertTrue(engineInitializerProperties.shouldStopPlatform());
     }
 
     @Test
-    public void testShouldNotStopPlatform() throws Exception {
+    public void testShouldNotStopPlatform() {
         properties.put("node.stop", "false");
         assertFalse(engineInitializerProperties.shouldStopPlatform());
     }
 
     @Test
-    public void testPropertyNotSet() throws Exception {
+    public void testPropertyNotSet() {
         try {
             engineInitializerProperties.shouldStopPlatform();
             fail("should fail with property not set");
@@ -104,7 +104,7 @@ public class EngineInitializerPropertiesTest {
     }
 
     @Test
-    public void testGetPlatformAdminUsername() throws Exception {
+    public void testGetPlatformAdminUsername() {
         properties.put("platformAdminUsername", "theUserNameOfThePlatform");
         assertEquals("theUserNameOfThePlatform", engineInitializerProperties.getPlatformAdminUsername());
     }

@@ -34,6 +34,7 @@ public class ParentProfileEntryBinding extends ElementBinding {
         parentProfileEntryBuilder = new ExportedParentProfileEntryBuilder(attributes.get("name"));
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("description".equals(name)) {

@@ -11,23 +11,30 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.profile.exception.profileentry;
+package org.bonitasoft.engine.execution.work;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import java.util.concurrent.Callable;
 
-/**
- * @author Celine Souchet
- */
-public class SProfileEntryReadException extends SBonitaException {
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 
-    private static final long serialVersionUID = 799472045606191342L;
+public class TransactionServiceForTest implements UserTransactionService {
 
-    public SProfileEntryReadException(final String message, final Throwable cause) {
-        super(message, cause);
+    public TransactionServiceForTest() {
     }
 
-    public SProfileEntryReadException(final Throwable cause) {
-        super(cause);
+    @Override
+    public void registerBonitaSynchronization(final BonitaTransactionSynchronization txSync) {
+    }
+
+    @Override
+    public <T> T executeInTransaction(final Callable<T> callable) throws Exception {
+        return callable.call();
+    }
+
+    @Override
+    public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
     }
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class SDocumentMappingException extends SBonitaException {
 
@@ -33,6 +34,10 @@ public class SDocumentMappingException extends SBonitaException {
 
     public SDocumentMappingException(final Throwable cause) {
         super(cause);
+    }
+
+    public SDocumentMappingException(final long archivedDocumentId, final Throwable cause) {
+        super("Unable to archive the document with id = <" + archivedDocumentId + ">", cause);
     }
 
 }

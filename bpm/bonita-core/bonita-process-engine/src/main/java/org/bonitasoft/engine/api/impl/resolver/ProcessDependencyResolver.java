@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl.resolver;
 
 import java.util.List;
 
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -25,6 +24,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface ProcessDependencyResolver {
 
@@ -33,14 +33,12 @@ public interface ProcessDependencyResolver {
      * e.g. load connectors
      * Must throw an exception is something is not resolved in the process
      * 
-     * @param processApi
      * @param tenantAccessor
      * @param businessArchive
      * @param sDefinition
      * @throws BonitaException
      */
-    boolean resolve(ProcessAPI processApi, TenantServiceAccessor tenantAccessor, BusinessArchive businessArchive, SProcessDefinition sDefinition)
-            throws BonitaException;
+    boolean resolve(TenantServiceAccessor tenantAccessor, BusinessArchive businessArchive, SProcessDefinition sDefinition) throws BonitaException;
 
     /**
      * @param tenantAccessor

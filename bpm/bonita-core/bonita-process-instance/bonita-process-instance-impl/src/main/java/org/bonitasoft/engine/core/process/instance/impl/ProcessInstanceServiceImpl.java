@@ -37,7 +37,7 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadExce
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -94,7 +94,6 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -151,10 +150,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     public ProcessInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final EventService eventService,
             final ActivityInstanceService activityService, final TechnicalLoggerService logger, final EventInstanceService bpmEventInstanceService,
-            final DataInstanceService dataInstanceService, final ArchiveService archiveService, final QueriableLoggerService queriableLoggerService,
-            final TransitionService transitionService, final ProcessDefinitionService processDefinitionService,
-            final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
-            final ProcessDocumentService processDocumentService, final SCommentService commentService, final TokenService tokenService) {
+            final DataInstanceService dataInstanceService, final ArchiveService archiveService, final TransitionService transitionService,
+            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService,
+            final ClassLoaderService classLoaderService, final ProcessDocumentService processDocumentService, final SCommentService commentService,
+            final TokenService tokenService) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
         this.eventService = eventService;
@@ -414,8 +413,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         if (callerId > 0) {
             try {
                 final SFlowNodeInstance flowNodeInstance = activityService.getFlowNodeInstance(callerId);
-                throw new SProcessInstanceHierarchicalDeletionException("Unable to delete the process instance because the parent is still active: activity "
-                        + flowNodeInstance.getName() + " with id " + flowNodeInstance.getId(), flowNodeInstance.getRootProcessInstanceId());
+                final SProcessInstanceHierarchicalDeletionException exception = new SProcessInstanceHierarchicalDeletionException(
+                        "Unable to delete the process instance, because the parent (call activity) is still active.",
+                        flowNodeInstance.getRootProcessInstanceId());
+                setExceptionContext(flowNodeInstance, exception);
+                throw exception;
             } catch (final SFlowNodeNotFoundException e) {
                 // ok the activity that called this process do not exists anymore
             }
@@ -535,6 +537,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 try {
                     activityService.deletePendingMappings(flowNodeInstance.getId());
                 } catch (final SActivityModificationException e) {
+                    setExceptionContext(processDefinition, flowNodeInstance, e);
                     throw new SFlowNodeReadException(e);
                 }
             } else if (SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNodeInstance.getType())) {
@@ -542,20 +545,33 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 try {
                     deleteProcessInstance(getChildOfActivity(flowNodeInstance.getId()));
                 } catch (final SProcessInstanceNotFoundException e) {
-                    final StringBuilder stb = new StringBuilder();
-                    stb.append("Can't find the process instance called by the activity [id: ");
-                    stb.append(flowNodeInstance.getId());
-                    stb.append(", name: ");
-                    stb.append(flowNodeInstance.getName());
-                    stb.append("]. This process may be already finished");
+                    setExceptionContext(processDefinition, flowNodeInstance, e);
+
                     // if the child process is not found, it's because it has already finished and archived or it was not created
                     if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
+                        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                                "Can't find the process instance called by the activity. This process may be already finished.");
                         logger.log(getClass(), TechnicalLogSeverity.DEBUG, e);
                     }
                 }
             }
         }
+    }
+
+    private void setExceptionContext(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+            final SBonitaException e) {
+        e.setProcessDefinitionIdOnContext(processDefinition.getId());
+        e.setProcessDefinitionNameOnContext(processDefinition.getName());
+        e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
+        setExceptionContext(flowNodeInstance, e);
+    }
+
+    private void setExceptionContext(final SFlowNodeInstance flowNodeInstance, final SBonitaException e) {
+        e.setProcessInstanceIdOnContext(flowNodeInstance.getParentProcessInstanceId());
+        e.setRootProcessInstanceIdOnContext(flowNodeInstance.getRootProcessInstanceId());
+        e.setFlowNodeDefinitionIdOnContext(flowNodeInstance.getFlowNodeDefinitionId());
+        e.setFlowNodeInstanceIdOnContext(flowNodeInstance.getId());
+        e.setFlowNodeNameOnContext(flowNodeInstance.getName());
     }
 
     private void deleteDataInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
@@ -589,7 +605,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         descriptor.addField(processInstanceKeyProvider.getMigrationPlanIdKey(), migrationPlanId);
         final long now = System.currentTimeMillis();
         descriptor.addField(processInstanceKeyProvider.getLastUpdateKey(), now);
-        updateProcessInstance(processInstance, "set migration plan", descriptor, MIGRATION_PLAN);
+        updateProcessInstance(processInstance, descriptor, MIGRATION_PLAN);
     }
 
     private void setProcessState(final SProcessInstance processInstance, final ProcessInstanceState state) throws SProcessInstanceModificationException {
@@ -613,11 +629,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 break;
         }
         descriptor.addField(processInstanceKeyProvider.getLastUpdateKey(), now);
-        updateProcessInstance(processInstance, "updating process instance state", descriptor, PROCESSINSTANCE_STATE);
+        updateProcessInstance(processInstance, descriptor, PROCESSINSTANCE_STATE);
     }
 
-    private void updateProcessInstance(final SProcessInstance processInstance, final String message, final EntityUpdateDescriptor descriptor,
-            final String eventType) throws SProcessInstanceModificationException {
+    private void updateProcessInstance(final SProcessInstance processInstance, final EntityUpdateDescriptor descriptor, final String eventType)
+            throws SProcessInstanceModificationException {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(processInstance, descriptor);
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(eventType, EventActionType.UPDATED)) {
@@ -638,8 +654,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } catch (final SRecorderException e) {
             throw new SProcessInstanceModificationException(e);
         } catch (final SDefinitiveArchiveNotFound e) {
+            e.setProcessInstanceIdOnContext(processInstance.getId());
+            e.setRootProcessInstanceIdOnContext(processInstance.getRootProcessInstanceId());
+            e.setProcessDefinitionIdOnContext(processInstance.getProcessDefinitionId());
+            e.setProcessDefinitionNameOnContext(processInstance.getName());
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The process instance was not archived. Id:" + processInstance.getId(), e);
+                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The process instance was not archived.", e);
             }
         }
     }
@@ -648,7 +668,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void setStateCategory(final SProcessInstance processInstance, final SStateCategory stateCatetory) throws SProcessInstanceModificationException {
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(processInstanceKeyProvider.getStateCategoryKey(), stateCatetory);
-        updateProcessInstance(processInstance, "update process instance state category", descriptor, PROCESS_INSTANCE_CATEGORY_STATE);
+        updateProcessInstance(processInstance, descriptor, PROCESS_INSTANCE_CATEGORY_STATE);
     }
 
     @Override
@@ -672,7 +692,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, Collections.singletonList(filterOption), null);
             return searchProcessInstances(queryOptions).get(0);
         } catch (final IndexOutOfBoundsException e) {
-            throw new SProcessInstanceNotFoundException("No process instance was found as child of activity: " + activityInstId);
+            throw new SProcessInstanceNotFoundException("No process instance was found as child of the activity with id = <" + activityInstId + ">");
         }
     }
 

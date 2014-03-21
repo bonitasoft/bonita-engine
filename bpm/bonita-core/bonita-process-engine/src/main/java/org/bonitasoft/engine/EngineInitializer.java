@@ -65,30 +65,40 @@ public class EngineInitializer {
     }
 
     public void initializeEngine() throws Exception {
-        LOGGER.log(Level.INFO, "Initializing Bonita Engine...");
-        long before = System.currentTimeMillis();
-        LOGGER.log(Level.INFO, "Initializing Spring context...");
-        // create a session to call the engine
-        PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-        PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
-        final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-        long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
-        PlatformAPI platformAPI = createPlatformAPI();
-
         try {
-            // initialization of the platform
+            LOGGER.log(Level.INFO, "Initializing Bonita Engine...");
+            long before = System.currentTimeMillis();
+            LOGGER.log(Level.INFO, "Initializing Spring context...");
+            // create a session to call the engine
+            PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
+            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
+            long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
+            PlatformAPI platformAPI = createPlatformAPI();
+
             try {
-                initPlatform(platformAPI);
-            } catch (Exception e) {
-                // platform is already initialized.
+                // initialization of the platform
+                try {
+                    LOGGER.log(Level.INFO, "Initializing platform...");
+                    initPlatform(platformAPI);
+                    LOGGER.log(Level.INFO, "Platform initialized successfully.");
+                } catch (Exception e) {
+                    LOGGER.log(Level.INFO, "Platform is already initialized.", e);
+                    // platform is already initialized.
+                }
+                // start of the platform (separated from previous call as in a cluster deployment, platform may already exist but the second node still has to start
+                LOGGER.log(Level.INFO, "Starting platform...");
+                startPlatform(platformAPI);
+                LOGGER.log(Level.INFO, "Platform started successfully");
+            } finally {
+                deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
             }
-            // start of the platform (separated from previous call as in a cluster deployment, platform may already exist but the second node still has to start
-            startPlatform(platformAPI);
-        } finally {
-            deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
+            long after = System.currentTimeMillis();
+            LOGGER.log(Level.INFO, "Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
+        } catch (Exception e) {
+            LOGGER.log(Level.INFO, "Exception while initializing the engine: " + e);
+            throw e;
         }
-        long after = System.currentTimeMillis();
-        LOGGER.log(Level.INFO, "Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
     }
 
     protected PlatformAPIImpl createPlatformAPI() {

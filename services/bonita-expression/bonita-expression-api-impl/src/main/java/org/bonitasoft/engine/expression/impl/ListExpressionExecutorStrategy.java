@@ -30,6 +30,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
  */
 public class ListExpressionExecutorStrategy implements ExpressionExecutorStrategy {
 
+    @SuppressWarnings("unused")
     @Override
     public void validate(final SExpression expression) {
         // nothing to validate, as Business logic resides in dependencies:
@@ -40,6 +41,7 @@ public class ListExpressionExecutorStrategy implements ExpressionExecutorStrateg
         return KIND_LIST;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public Serializable evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions) {
         final List<Object> result = new ArrayList<Object>(expression.getDependencies().size());

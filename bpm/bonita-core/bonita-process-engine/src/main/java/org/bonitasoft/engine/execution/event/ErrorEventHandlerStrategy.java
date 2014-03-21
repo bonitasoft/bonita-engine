@@ -90,7 +90,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     private final TechnicalLoggerService logger;
 
     public ErrorEventHandlerStrategy(final EventInstanceService eventInstanceService,
-            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, 
+            final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry,
             final ProcessDefinitionService processDefinitionService, final EventsHandler eventsHandler, final TechnicalLoggerService logger) {
         super(eventInstanceService);
         this.processInstanceService = processInstanceService;
@@ -107,7 +107,8 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Error event is thrown, error code = "
                     + ((SErrorEventTriggerDefinition) sEventTriggerDefinition).getErrorCode() + " process instance = " + eventInstance.getRootContainerId());
         }
-        final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(processInstanceService, getEventInstanceService(), containerRegistry, logger);
+        final TransactionContainedProcessInstanceInterruptor processInstanceInterruptor = new TransactionContainedProcessInstanceInterruptor(
+                processInstanceService, getEventInstanceService(), containerRegistry, logger);
         updateInterruptorErrorEvent(eventInstance);
         processInstanceInterruptor.interruptChildrenOnly(eventInstance.getParentContainerId(), SStateCategory.ABORTING, -1, eventInstance.getId());
     }
@@ -314,7 +315,8 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
                 final SBoundaryEventInstance boundary = (SBoundaryEventInstance) eventInstance;
                 final long rootProcessInstanceId = eventInstance.getLogicalGroup(eventInstanceKeyProvider.getRootProcessInstanceIndex());
                 final long parentProcessInstanceId = eventInstance.getLogicalGroup(eventInstanceKeyProvider.getParentProcessInstanceIndex());
-                final SWaitingErrorEventBuilder builder = builderFact.createNewWaitingErrorBoundaryEventInstance(processDefinition.getId(), rootProcessInstanceId, parentProcessInstanceId,
+                final SWaitingErrorEventBuilder builder = builderFact.createNewWaitingErrorBoundaryEventInstance(processDefinition.getId(),
+                        rootProcessInstanceId, parentProcessInstanceId,
                         eventInstance.getId(), errorEventTriggerDefinition.getErrorCode(), processDefinition.getName(),
                         eventInstance.getFlowNodeDefinitionId(), eventInstance.getName(), boundary.getActivityInstanceId());
                 final SWaitingErrorEvent errorEvent = builder.done();
@@ -342,13 +344,13 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             throws SBonitaException {
         final SWaitingErrorEventBuilderFactory builderFact = BuilderFactory.get(SWaitingErrorEventBuilderFactory.class);
         final SErrorEventTriggerDefinition trigger = (SErrorEventTriggerDefinition) sEventTriggerDefinition;
-        final SWaitingErrorEventBuilder builder = builderFact.createNewWaitingErrorEventSubProcInstance(processDefinition.getId(), parentProcessInstance.getId(),
+        final SWaitingErrorEventBuilder builder = builderFact.createNewWaitingErrorEventSubProcInstance(processDefinition.getId(),
+                parentProcessInstance.getId(),
                 parentProcessInstance.getRootProcessInstanceId(), trigger.getErrorCode(), processDefinition.getName(), eventDefinition.getId(),
                 eventDefinition.getName(), subProcessId);
 
         final SWaitingErrorEvent event = builder.done();
         getEventInstanceService().createWaitingEvent(event);
-
     }
 
 }

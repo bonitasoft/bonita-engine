@@ -21,13 +21,12 @@ import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
-import org.bonitasoft.engine.api.impl.transaction.actor.GetActorsOfUserCanStartProcessDefinitions;
-import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.command.TenantCommand;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.IdentityService;
+import org.bonitasoft.engine.identity.SUserNotFoundException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -63,31 +62,32 @@ public class IsAllowedToStartProcesses extends TenantCommand {
             throw new SCommandParameterizationException("Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to Long.");
         }
 
-        final IdentityService identityService = this.serviceAccessor.getIdentityService();
-        final GetSUser getSUser = new GetSUser(identityService, userId);
-        try {
-            getSUser.execute();
-        } catch (SBonitaException e) {
-            throw new SCommandParameterizationException("No such user refer to this userId:" + userId, e);
-        }
-        getSUser.getResult();
+        checkIfUserExists(userId);
 
         if (processDefinitionIds.size() > 0) {
-            for (Long pid : processDefinitionIds) {
-                final GetActorsOfUserCanStartProcessDefinitions checker = new GetActorsOfUserCanStartProcessDefinitions(actorMappingService, pid, userId);
+            for (Long processDefinitionId : processDefinitionIds) {
                 try {
-                    checker.execute();;
-                } catch (SBonitaException e) {
-                    throw new SCommandExecutionException("No actor of user who can start the processDefinition with id:" + pid, e);
-                }
-                List<SActor> ckRes = checker.getResult();
-                if (ckRes != null && ckRes.size() == 1) {
-                    resMap.put(pid, true);
-                } else {
-                    resMap.put(pid, false);
+                    List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId);
+                    if (ckRes != null && ckRes.size() == 1) {
+                        resMap.put(processDefinitionId, true);
+                    } else {
+                        resMap.put(processDefinitionId, false);
+                    }
+                } catch (final SBonitaReadException e) {
+                    e.setProcessDefinitionIdOnContext(processDefinitionId);
+                    throw new SCommandExecutionException("No actor of user who can start the processDefinition.", e);
                 }
             }
         }
         return (Serializable) resMap;
+    }
+
+    private void checkIfUserExists(long userId) throws SCommandParameterizationException {
+        try {
+            final IdentityService identityService = this.serviceAccessor.getIdentityService();
+            identityService.getUser(userId);
+        } catch (final SUserNotFoundException e) {
+            throw new SCommandParameterizationException("No such user refer to this userId :" + userId, e);
+        }
     }
 }

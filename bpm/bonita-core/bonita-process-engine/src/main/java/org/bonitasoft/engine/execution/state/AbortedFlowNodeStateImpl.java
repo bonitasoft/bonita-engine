@@ -24,16 +24,19 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
  */
 public class AbortedFlowNodeStateImpl implements FlowNodeState {
 
+    @SuppressWarnings("unused")
     @Override
     public boolean shouldExecuteState(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) {
         return true;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance instance) {
         return StateCode.DONE;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean hit(final SProcessDefinition processDefinition, final SFlowNodeInstance parentInstance, final SFlowNodeInstance childInstance) {
         return true;
@@ -69,11 +72,13 @@ public class AbortedFlowNodeStateImpl implements FlowNodeState {
         return SStateCategory.ABORTING;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean mustAddSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return false;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "";

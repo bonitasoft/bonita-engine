@@ -16,7 +16,7 @@ package org.bonitasoft.engine.scheduler;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 
@@ -57,10 +57,10 @@ public interface StatelessJob extends Serializable {
      * 
      * @throws SJobExecutionException
      *             if an exception occurs
-     * @throws FireEventException
+     * @throws SFireEventException
      * @since 6.0
      */
-    void execute() throws SJobExecutionException, FireEventException;
+    void execute() throws SJobExecutionException, SFireEventException;
 
     /**
      * This method is called by the scheduler service before the execution of the job

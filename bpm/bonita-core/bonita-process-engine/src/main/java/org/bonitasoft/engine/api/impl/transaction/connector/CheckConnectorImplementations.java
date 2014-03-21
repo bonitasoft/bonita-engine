@@ -57,7 +57,7 @@ public class CheckConnectorImplementations implements TransactionContent {
                             tenantId);
                 } catch (final SConnectorException e) {
                     final Problem problem = new ProblemImpl(Level.ERROR, sConnectorDefinition.getName(), "connector", "The process connector '"
-                            + sConnectorDefinition.getName() + "' has no implementation");
+                            + sConnectorDefinition.getName() + "' has no implementation.");
                     problems.add(problem);
                 }
             }
@@ -73,7 +73,7 @@ public class CheckConnectorImplementations implements TransactionContent {
                                     sConnectorDefinition.getVersion(), tenantId);
                         } catch (final SConnectorException e) {
                             final Problem problem = new ProblemImpl(Level.ERROR, sConnectorDefinition.getId(), "connector", "The connector '"
-                                    + sConnectorDefinition.getName() + "' of flow node '" + sFlowNodeDefinition.getName() + "' has no implementation");
+                                    + sConnectorDefinition.getName() + "' of flow node '" + sFlowNodeDefinition.getName() + "' has no implementation.");
                             problems.add(problem);
                         }
                     }

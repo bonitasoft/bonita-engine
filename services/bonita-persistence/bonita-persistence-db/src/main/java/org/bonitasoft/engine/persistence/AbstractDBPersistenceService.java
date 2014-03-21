@@ -29,7 +29,7 @@ import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.sequence.SequenceManager;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.TenantPersistenceService;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * Common implementation to persistence services relying on a database
@@ -261,9 +261,9 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
 
     /**
      * @return
-     * @throws TenantIdNotSetException
+     * @throws STenantIdNotSetException
      */
-    protected abstract long getTenantId() throws TenantIdNotSetException;
+    protected abstract long getTenantId() throws STenantIdNotSetException;
 
     protected SequenceManager getSequenceManager() {
         return sequenceManager;

@@ -26,17 +26,18 @@ import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.operation.OperationExecutionException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -53,16 +54,16 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
     public static final String ACTIVITY_INSTANCE_ID_KEY = "ACTIVITY_INSTANCE_ID_KEY";
 
     @Override
-    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
+    public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor tenantAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         final List<Operation> operations = getOperations(parameters);
         final Map<String, Serializable> operationsContext = getOperationsContext(parameters);
         final long sActivityInstanceID = getActivityInstanceId(parameters);
 
         try {
-            final TechnicalLoggerService logger = serviceAccessor.getTechnicalLoggerService();
-            final ClassLoaderService classLoaderService = serviceAccessor.getClassLoaderService();
-            final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+            final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+            final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+            final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
             final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(sActivityInstanceID);
             final long processDefinitionID = flowNodeInstance.getProcessDefinitionId();
             final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionID);
@@ -74,11 +75,8 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
             executeActivity(flowNodeInstance, logger);
-        } catch (final BonitaException e) {
-            throw new SCommandExecutionException(
-                    "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminateTask(List<Operation>, Map<String, Serializable>, long activityInstanceId)'",
-                    e);
         } catch (final SBonitaException e) {
+            log(tenantAccessor, e);
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndTerminateTask(List<Operation>, Map<String, Serializable>, long activityInstanceId)'",
                     e);
@@ -88,8 +86,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
 
     protected long getActivityInstanceId(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
         final String message = "Mandatory parameter " + ACTIVITY_INSTANCE_ID_KEY + " is missing or not convertible to long.";
-        final Long instanceId = getMandatoryParameter(parameters, ACTIVITY_INSTANCE_ID_KEY, message);
-        return instanceId;
+        return getMandatoryParameter(parameters, ACTIVITY_INSTANCE_ID_KEY, message);
     }
 
     protected List<Operation> getOperations(final Map<String, Serializable> parameters) throws SCommandParameterizationException {
@@ -103,7 +100,7 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
     }
 
     protected void updateActivityInstanceVariables(final List<Operation> operations, final Map<String, Serializable> operationsContext,
-            final long activityInstanceId, final Long processDefinitionID) throws BonitaException {
+            final long activityInstanceId, final Long processDefinitionID) throws SOperationExecutionException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final OperationService operationService = tenantAccessor.getOperationService();
         final Iterator<Operation> iterator = operations.iterator();
@@ -112,35 +109,25 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         sExpressionContext.setContainerId(activityInstanceId);
         sExpressionContext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
         sExpressionContext.setProcessDefinitionId(processDefinitionID);
-        try {
-            while (iterator.hasNext()) {
-                final Operation entry = iterator.next();
-                operationService.execute(ModelConvertor.constructSOperation(entry), activityInstanceId,
-                        DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
-            }
-        } catch (final SBonitaException e) {
-            throw new OperationExecutionException(e);
+        while (iterator.hasNext()) {
+            final Operation entry = iterator.next();
+            operationService.execute(ModelConvertor.constructSOperation(entry), activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.name(), sExpressionContext);
         }
     }
 
-    protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger) throws BonitaException {
+    protected void executeActivity(final SFlowNodeInstance flowNodeInstance, final TechnicalLoggerService logger) throws SFlowNodeReadException,
+            SFlowNodeExecutionException {
         final TenantServiceAccessor tenantAccessor = TenantServiceSingleton.getInstance(getTenantId());
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        try {
-            SessionInfos sessionInfos = SessionInfos.getSessionInfos();
-            final long userId = sessionInfos.getUserId();
-            final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
-            final boolean isFirstState = flowNodeInstance.getStateId() == 0;
-            // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-            processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, processDefinitionId, userId, userId);
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                final String message = "The user <" + sessionInfos.getUsername() + "> has performed the task"
-                        + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
-                logger.log(getClass(), TechnicalLogSeverity.INFO, message);
-            }
-        } catch (final SBonitaException e) {
-            log(tenantAccessor, e);
-            throw new BonitaException(e.getMessage());
+        final SessionInfos sessionInfos = SessionInfos.getSessionInfos();
+        final long userId = sessionInfos.getUserId();
+        // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
+        processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getProcessDefinitionId(), userId, userId);
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && flowNodeInstance.getStateId() != 0 /* don't log when create subtask */) {
+            final String message = "The user <" + sessionInfos.getUsername() + "> has performed the task"
+                    + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+            logger.log(getClass(), TechnicalLogSeverity.INFO, message);
         }
     }
 }

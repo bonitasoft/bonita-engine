@@ -16,7 +16,6 @@ package org.bonitasoft.engine.userfilter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.filter.FilterResult;
 import org.bonitasoft.engine.core.filter.UserFilterService;
@@ -24,15 +23,13 @@ import org.bonitasoft.engine.core.filter.exception.SUserFilterExecutionException
 import org.bonitasoft.engine.core.filter.exception.SUserFilterLoadingException;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.expression.EngineConstantExpressionBuilder;
-import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.expression.model.builder.SExpressionBuilder;
 
 /**
  * This {@link UserFilterService} implementation injects, in method {@link #executeFilter(long, SUserFilterDefinition, Map, ClassLoader)} a new expression to
  * access the {@link APIAccessor} for User filters.
  * This new expression is referenced under the name 'apiAccessor'.
- *
+ * 
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
  */
@@ -54,7 +51,7 @@ public class UserFilterServiceDecorator implements UserFilterService {
     /**
      * {@inheritDoc}. This implementation injects a new expression to access the {@link APIAccessor} for User filters.
      * This new expression is referenced under the name 'apiAccessor'.
-     *
+     * 
      * @param actors
      */
     @Override
@@ -62,12 +59,8 @@ public class UserFilterServiceDecorator implements UserFilterService {
             final ClassLoader classLoader, final SExpressionContext expressionContext, final String actorName) throws SUserFilterExecutionException {
         SExpression apiAccessorExpression;
         SExpression engineExecutionContext;
-        try {
-            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
-            engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext();
-        } catch (final SInvalidExpressionException e) {
-            throw new SUserFilterExecutionException(e);
-        }
+        apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
+        engineExecutionContext = EngineConstantExpressionBuilder.getEngineExecutionContext();
         final Map<String, SExpression> enrichedInputs = new HashMap<String, SExpression>(inputs);
         enrichedInputs.put("connectorApiAccessor", apiAccessorExpression);
         enrichedInputs.put("engineExecutionContext", engineExecutionContext);

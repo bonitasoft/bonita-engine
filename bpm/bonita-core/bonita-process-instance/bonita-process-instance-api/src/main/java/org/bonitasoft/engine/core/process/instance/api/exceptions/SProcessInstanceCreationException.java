@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.api.exceptions;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 
 /**
  * @author Baptiste Mesta
@@ -35,6 +36,17 @@ public class SProcessInstanceCreationException extends SBonitaException {
      */
     public SProcessInstanceCreationException(final String message) {
         super(message);
+    }
+
+    /**
+     * @param sDefinition
+     *            The process definition to add on context
+     * @since 6.3
+     */
+    public void setProcessDefinitionOnContext(final SProcessDefinition sDefinition) {
+        setProcessDefinitionIdOnContext(sDefinition.getId());
+        setProcessDefinitionNameOnContext(sDefinition.getName());
+        setProcessDefinitionVersionOnContext(sDefinition.getVersion());
     }
 
 }

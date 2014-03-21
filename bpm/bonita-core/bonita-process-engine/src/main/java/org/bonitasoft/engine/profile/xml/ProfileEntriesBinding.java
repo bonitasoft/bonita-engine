@@ -28,11 +28,13 @@ public class ProfileEntriesBinding extends ElementBinding {
 
     private List<ExportedParentProfileEntry> profileEntries;
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         profileEntries = new ArrayList<ExportedParentProfileEntry>(10);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

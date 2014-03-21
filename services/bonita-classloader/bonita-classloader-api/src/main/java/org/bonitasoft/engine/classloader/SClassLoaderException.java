@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,26 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.sessionaccessor;
+package org.bonitasoft.engine.classloader;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
- * @author Feng Hui
+ * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
-public class TenantIdNotSetException extends SBonitaException {
+public class SClassLoaderException extends SBonitaException {
 
-    private static final long serialVersionUID = -1685313313239629361L;
+    private static final long serialVersionUID = 6760479336490227757L;
 
-    public TenantIdNotSetException(final String message) {
+    public SClassLoaderException(final String message) {
         super(message);
     }
 
-    public TenantIdNotSetException(final Throwable e) {
-        super(e);
+    public SClassLoaderException(final Throwable t) {
+        super(t);
     }
 
-    public TenantIdNotSetException(final String message, final Throwable e) {
+    public SClassLoaderException(final String message, final Exception e) {
         super(message, e);
     }
 

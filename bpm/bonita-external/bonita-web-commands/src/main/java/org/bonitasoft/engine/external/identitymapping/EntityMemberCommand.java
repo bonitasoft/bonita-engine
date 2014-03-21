@@ -15,7 +15,6 @@ package org.bonitasoft.engine.external.identitymapping;
 
 import java.util.List;
 
-import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.entitymember.EntityMember;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping;
@@ -32,25 +31,17 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityMemberDescriptor;
 public abstract class EntityMemberCommand extends ExternalIdentityMappingCommand {
 
     protected SearchResult<EntityMember> searchEntityMembersInvolvingUser(final String kind, final long userId, final String externalId,
-            final SearchOptions searchOptions) throws SCommandExecutionException {
+            final SearchOptions searchOptions) throws SBonitaException {
         EntityMemberSearchEntityForUser transactionContent = new EntityMemberSearchEntityForUser(serviceAccessor.getSearchEntitiesDescriptor()
                 .getSearchEntityMemberUserDescriptor(), kind, userId, externalId, searchOptions);
-        try {
-            transactionContent.execute();
-        } catch (SBonitaException e) {
-            throw new SCommandExecutionException(e);
-        }
+        transactionContent.execute();
         return transactionContent.getResult();
     }
 
     protected SearchResult<EntityMember> searchEntityMembers(final SearchEntityMemberDescriptor searchDescriptor, final String kind,
-            final SearchOptions searchOptions, final String querySuffix) throws SCommandExecutionException {
+            final SearchOptions searchOptions, final String querySuffix) throws SBonitaException {
         EntityMemberSearchEntity transactionContent = new EntityMemberSearchEntity(searchDescriptor, kind, searchOptions, querySuffix);
-        try {
-            transactionContent.execute();
-        } catch (SBonitaException e) {
-            throw new SCommandExecutionException(e);
-        }
+        transactionContent.execute();
         return transactionContent.getResult();
     }
 

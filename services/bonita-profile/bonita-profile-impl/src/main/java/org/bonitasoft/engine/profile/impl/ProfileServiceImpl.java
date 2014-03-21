@@ -46,17 +46,14 @@ import org.bonitasoft.engine.profile.builder.impl.SProfileMemberLogBuilderImpl;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileDeletionException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
-import org.bonitasoft.engine.profile.exception.profile.SProfileReadException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryReadException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberCreationException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberNotFoundException;
-import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberReadException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -104,7 +101,6 @@ public class ProfileServiceImpl implements ProfileService {
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
     }
-
 
     @Override
     public SProfile createProfile(final SProfile profile) throws SProfileCreationException {
@@ -200,7 +196,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void deleteProfile(final SProfile profile) throws SProfileDeletionException {
+    public void deleteProfile(final SProfile profile) throws SProfileDeletionException, SProfileEntryDeletionException, SProfileMemberDeletionException {
         logBeforeMethod("deleteProfile");
         final SProfileLogBuilderImpl logBuilder = getSProfileLog(ActionType.DELETED, "Deleting profile");
         final DeleteRecord deleteRecord = new DeleteRecord(profile);
@@ -220,10 +216,10 @@ public class ProfileServiceImpl implements ProfileService {
             throw new SProfileDeletionException(re);
         } catch (final SProfileEntryDeletionException e) {
             logOnExceptionMethod("deleteProfile", e);
-            throw new SProfileDeletionException(e);
+            throw e;
         } catch (final SProfileMemberDeletionException e) {
             logOnExceptionMethod("deleteProfile", e);
-            throw new SProfileDeletionException(e);
+            throw e;
         }
     }
 
@@ -250,13 +246,14 @@ public class ProfileServiceImpl implements ProfileService {
                     deleteProfileEntry(entry);
                 }
             } while (!entries.isEmpty());
-        } catch (final SProfileEntryReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new SProfileEntryDeletionException(e);
         }
     }
 
     @Override
-    public void deleteProfile(final long profileId) throws SProfileNotFoundException, SProfileDeletionException {
+    public void deleteProfile(final long profileId) throws SProfileNotFoundException, SProfileDeletionException, SProfileEntryDeletionException,
+            SProfileMemberDeletionException {
         logBeforeMethod("deleteProfile");
         final SProfile profile = getProfile(profileId);
         deleteProfile(profile);
@@ -282,7 +279,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<SProfileEntry> getEntriesOfProfile(final long profileId, final int fromIndex, final int numberOfProfileEntries, final String field,
-            final OrderByType order) throws SProfileEntryReadException {
+            final OrderByType order) throws SBonitaReadException {
         logBeforeMethod("getEntriesOfProfile");
         try {
             final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, field, order,
@@ -291,13 +288,13 @@ public class ProfileServiceImpl implements ProfileService {
             return listspEntries;
         } catch (final SBonitaReadException bre) {
             logOnExceptionMethod("getEntriesOfProfile", bre);
-            throw new SProfileEntryReadException(bre);
+            throw bre;
         }
     }
 
     @Override
     public List<SProfileEntry> getEntriesOfProfileByParentId(final long profileId, final long parentId, final int fromIndex, final int numberOfProfileEntries,
-            final String field, final OrderByType order) throws SProfileEntryReadException {
+            final String field, final OrderByType order) throws SBonitaReadException {
         logBeforeMethod("getEntriesOfProfileByParentId");
         try {
             final List<SProfileEntry> listspEntries = persistenceService.selectList(SelectDescriptorBuilder.getEntriesOfProfile(profileId, parentId, field,
@@ -306,7 +303,7 @@ public class ProfileServiceImpl implements ProfileService {
             return listspEntries;
         } catch (final SBonitaReadException bre) {
             logOnExceptionMethod("getEntriesOfProfileByParentId", bre);
-            throw new SProfileEntryReadException(bre);
+            throw bre;
         }
     }
 
@@ -498,7 +495,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<SProfileMember> getProfileMembersOfUser(final long userId, final int fromIndex, final int numberOfElements, final String field,
-            final OrderByType order) throws SProfileMemberReadException {
+            final OrderByType order) throws SBonitaReadException {
         logBeforeMethod("getProfileMembersOfUser");
         try {
             final SelectListDescriptor<SProfileMember> descriptor = SelectDescriptorBuilder.getDirectProfileMembersOfUser(userId, field, order, fromIndex,
@@ -508,13 +505,13 @@ public class ProfileServiceImpl implements ProfileService {
             return listspProfileMembers;
         } catch (final SBonitaReadException bre) {
             logOnExceptionMethod("getProfileMembersOfUser", bre);
-            throw new SProfileMemberReadException(bre);
+            throw bre;
         }
     }
 
     @Override
     public List<SProfileMember> getProfileMembersOfGroup(final long groupId, final int fromIndex, final int numberOfElements, final String field,
-            final OrderByType order) throws SProfileMemberReadException {
+            final OrderByType order) throws SBonitaReadException {
         logBeforeMethod("getProfileMembersOfGroup");
         try {
             final SelectListDescriptor<SProfileMember> descriptor = SelectDescriptorBuilder.getDirectProfileMembersOfGroup(groupId, field, order, fromIndex,
@@ -524,13 +521,13 @@ public class ProfileServiceImpl implements ProfileService {
             return listspProfileMembers;
         } catch (final SBonitaReadException bre) {
             logOnExceptionMethod("getProfileMembersOfGroup", bre);
-            throw new SProfileMemberReadException(bre);
+            throw bre;
         }
     }
 
     @Override
     public List<SProfileMember> getProfileMembersOfRole(final long roleId, final int fromIndex, final int numberOfElements, final String field,
-            final OrderByType order) throws SProfileMemberReadException {
+            final OrderByType order) throws SBonitaReadException {
         logBeforeMethod("getProfileMembersOfRole");
         try {
             final SelectListDescriptor<SProfileMember> descriptor = SelectDescriptorBuilder.getDirectProfileMembersOfRole(roleId, field, order, fromIndex,
@@ -540,12 +537,12 @@ public class ProfileServiceImpl implements ProfileService {
             return listspProfileMembers;
         } catch (final SBonitaReadException bre) {
             logOnExceptionMethod("getProfileMembersOfRole", bre);
-            throw new SProfileMemberReadException(bre);
+            throw bre;
         }
     }
 
     @Override
-    public List<SProfile> getProfilesOfUser(final long userId) throws SProfileReadException {
+    public List<SProfile> getProfilesOfUser(final long userId) throws SBonitaReadException {
         logBeforeMethod("getProfilesOfUser");
         final SelectListDescriptor<SProfile> descriptor = SelectDescriptorBuilder.getProfilesOfUser(userId);
         try {
@@ -554,7 +551,7 @@ public class ProfileServiceImpl implements ProfileService {
             return sProfiles;
         } catch (final SBonitaReadException bre) {
             logOnExceptionMethod("getProfilesOfUser", bre);
-            throw new SProfileReadException(bre);
+            throw bre;
         }
     }
 

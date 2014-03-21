@@ -65,7 +65,8 @@ public class SessionServiceImpl implements SessionService {
                 .createNewInstance(id, tenantId, duration, userName, applicationName, userId).technicalUser(isTechnicalUser).done();
         sessionProvider.addSession(session);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "createSession with tenantId=" + tenantId + " username = " + userName + " Id = " + id);
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "CreateSession with tenantId = <" + tenantId + ">, username = <" + userName + ">, id = <"
+                    + id + ">");
         }
         return session;
     }
@@ -74,7 +75,7 @@ public class SessionServiceImpl implements SessionService {
     public void deleteSession(final long sessionId) throws SSessionNotFoundException {
         sessionProvider.removeSession(sessionId);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "deleteSession with sessionId=" + sessionId);
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "DeleteSession with sessionId = <" + sessionId + ">");
         }
     }
 
@@ -88,7 +89,7 @@ public class SessionServiceImpl implements SessionService {
             session = sessionProvider.getSession(sessionId);
         } catch (SSessionNotFoundException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Session with id '" + sessionId + "' is invalid because it does not exist.");
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Session with id = <" + sessionId + "> is invalid, because it does not exist.");
             }
             throw e;
         }

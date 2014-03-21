@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
@@ -38,7 +37,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 
 /**
  * This service wraps the connector service and add engine variables like apiAccessor, engineExecutionContext.
- *
+ * 
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
@@ -57,11 +56,7 @@ public class ConnectorServiceDecorator implements ConnectorService {
             final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
             throws SConnectorException {
         final SExpression apiAccessorExpression;
-        try {
-            apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
-        } catch (final SInvalidExpressionException e) {
-            throw new SConnectorException("Error creation apiAccessor Expression", e);
-        }
+        apiAccessorExpression = EngineConstantExpressionBuilder.getConnectorAPIAccessorExpression();
         final Map<String, SExpression> parameters = new HashMap<String, SExpression>(connectorInputParameters);
         parameters.put("connectorApiAccessor", apiAccessorExpression);
         return connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId, connectorDefinitionVersion, parameters, inputValues,
@@ -107,7 +102,7 @@ public class ConnectorServiceDecorator implements ConnectorService {
 
     @Override
     public void executeOutputOperation(final List<SOperation> outputs, final SExpressionContext expressionContext, final ConnectorResult connectorOutput)
-            throws SBonitaException {
+            throws SConnectorException {
         connectorService.executeOutputOperation(outputs, expressionContext, connectorOutput);
     }
 

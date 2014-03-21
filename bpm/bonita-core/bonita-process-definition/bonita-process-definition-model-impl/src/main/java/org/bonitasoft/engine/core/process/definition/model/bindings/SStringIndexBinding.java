@@ -35,6 +35,7 @@ public class SStringIndexBinding extends ElementBinding {
         label = attributes.get(XMLSProcessDefinition.LABEL);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

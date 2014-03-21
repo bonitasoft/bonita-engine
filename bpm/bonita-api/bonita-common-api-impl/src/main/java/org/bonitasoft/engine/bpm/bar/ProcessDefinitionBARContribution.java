@@ -233,7 +233,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         if (objectFromXML instanceof DesignProcessDefinition) {
             return (DesignProcessDefinition) objectFromXML;
         } else {
-            throw new InvalidBusinessArchiveFormatException("the file did not contain a process but: " + objectFromXML);
+            throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + objectFromXML);
         }
     }
 

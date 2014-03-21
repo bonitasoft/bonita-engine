@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -233,11 +233,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void addProcessDefinitionToCategory(final long categoryId, final long processDefinitionId) throws SCategoryException {
-        getCategory(categoryId);
+        final SCategory category = getCategory(categoryId);
         if (isCategoryExistsInProcess(categoryId, processDefinitionId)) {
-            throw new SCategoryInProcessAlreadyExistsException("The category '" + categoryId + "' is already in process '" + processDefinitionId + "'");
+            throw new SCategoryInProcessAlreadyExistsException("The category '" + category.getName() + "' with the id = " + categoryId
+                    + " is already in process  with the id = " + processDefinitionId);
         }
-        final SProcessCategoryMapping mapping = BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class).createNewInstance(categoryId, processDefinitionId).done();
+        final SProcessCategoryMapping mapping = BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class)
+                .createNewInstance(categoryId, processDefinitionId).done();
         final InsertRecord insertRecord = new InsertRecord(mapping);
         final String logMessage = "Creating a new category mapping {categoryId:" + categoryId + " --> processDefinitionId:" + processDefinitionId + "}";
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, logMessage);
