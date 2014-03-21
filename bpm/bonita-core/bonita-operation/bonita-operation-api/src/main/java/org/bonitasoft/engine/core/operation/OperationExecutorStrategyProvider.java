@@ -13,21 +13,34 @@
  **/
 package org.bonitasoft.engine.core.operation;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
+import org.bonitasoft.engine.core.operation.model.SOperation;
 
 /**
  * @author Zhang Bole
  */
 public class OperationExecutorStrategyProvider {
 
-    private List<OperationExecutorStrategy> operationExecutors;
-
-    public List<OperationExecutorStrategy> getOperationExecutors() {
-        return operationExecutors;
+    private final Map<String, OperationExecutorStrategy> operationStrategies;
+    
+    public OperationExecutorStrategyProvider(final List<OperationExecutorStrategy> operationExecutors) {
+        operationStrategies = new HashMap<String, OperationExecutorStrategy>(operationExecutors.size());
+        for (final OperationExecutorStrategy operationExecutorStrategy : operationExecutors) {
+            operationStrategies.put(operationExecutorStrategy.getOperationType(), operationExecutorStrategy);
+        }
     }
-
-    public void setExpressionExecutors(final List<OperationExecutorStrategy> operationExecutors) {
-        this.operationExecutors = operationExecutors;
+    
+    public OperationExecutorStrategy getOperationExecutorStrategy(final SOperation operation) throws SOperationExecutionException {
+        final String operatorTypeName = operation.getType().name();
+        final OperationExecutorStrategy operationExecutorStrategy = operationStrategies.get(operatorTypeName);
+        if (operationExecutorStrategy == null) {
+            throw new SOperationExecutionException("Unable to find an executor for operation type " + operatorTypeName);
+        }
+        return operationExecutorStrategy;
     }
 
 }
