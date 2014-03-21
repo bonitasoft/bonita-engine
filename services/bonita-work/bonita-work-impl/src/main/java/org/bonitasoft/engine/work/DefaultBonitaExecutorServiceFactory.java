@@ -20,7 +20,6 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -74,14 +73,14 @@ public class DefaultBonitaExecutorServiceFactory implements BonitaExecutorServic
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
             if (executor.isShutdown()) {
-                logger.log(getClass(), TechnicalLogSeverity.WARNING, "Tried to run work " + task
+                logger.log(getClass(), TechnicalLogSeverity.INFO, "Tried to run work " + task
                         + " but the work service is shutdown. work will be restarted with the node");
             } else {
                 throw new RejectedExecutionException(
                         "Unable to run the task "
                                 + task
-                    + "\n your work queue is full you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
-        }
+                                + "\n your work queue is full you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
+            }
         }
 
     }
