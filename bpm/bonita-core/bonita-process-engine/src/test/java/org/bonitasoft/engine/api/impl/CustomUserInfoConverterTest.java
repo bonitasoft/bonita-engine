@@ -17,11 +17,10 @@ public class CustomUserInfoConverterTest {
         CustomUserInfoConverter converter = new CustomUserInfoConverter();
 
         CustomUserInfoDefinitionImpl definition = converter.convert(
-                new DummySCustomUserInfoDefinition(1L, "name", "display name", "description"));
+                new DummySCustomUserInfoDefinition(1L, "name", "description"));
 
         assertThat(definition.getId()).isEqualTo(1L);
         assertThat(definition.getName()).isEqualTo("name");
-        assertThat(definition.getDisplayName()).isEqualTo("display name");
         assertThat(definition.getDescription()).isEqualTo("description");
     }
 

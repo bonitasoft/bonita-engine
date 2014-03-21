@@ -80,7 +80,6 @@ CREATE TABLE custom_usr_inf_def (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   name VARCHAR2(75) NOT NULL,
-  displayName VARCHAR2(75),
   description VARCHAR22(1024),
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)

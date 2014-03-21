@@ -14,7 +14,6 @@ public class CustomUserInfoConverter {
         CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
         definition.setId(sDefinition.getId());
         definition.setName(sDefinition.getName());
-        definition.setDisplayName(sDefinition.getDisplayName());
         definition.setDescription(sDefinition.getDescription());
         return definition;
     }

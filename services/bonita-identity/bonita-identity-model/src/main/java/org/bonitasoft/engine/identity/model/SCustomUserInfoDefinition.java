@@ -17,6 +17,6 @@ package org.bonitasoft.engine.identity.model;
  * @author Anthony Birembaut
  * @author Baptiste Mesta
  */
-public interface SCustomUserInfoDefinition extends SNamedElement {
+public interface SCustomUserInfoDefinition extends SSingleNamedElement {
 
 }

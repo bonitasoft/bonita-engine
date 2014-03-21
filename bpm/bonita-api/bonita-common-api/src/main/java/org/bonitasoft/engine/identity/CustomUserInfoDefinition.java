@@ -34,8 +34,6 @@ public interface CustomUserInfoDefinition extends BonitaObject {
      */
     String getName();
 
-    String getDisplayName();
-
     /**
      * @return the custom user info description
      * @since 6.3

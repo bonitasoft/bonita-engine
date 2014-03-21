@@ -24,8 +24,6 @@ public interface SCustomUserInfoDefinitionBuilder {
 
     SCustomUserInfoDefinitionBuilder setName(final String name);
 
-    SCustomUserInfoDefinitionBuilder setDisplayName(final String displayName);
-
     SCustomUserInfoDefinitionBuilder setDescription(final String description);
 
     SCustomUserInfoDefinition done();

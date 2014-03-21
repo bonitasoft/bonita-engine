@@ -94,7 +94,6 @@
 			<key-property name="id" column="ID" type="long" />
 		</composite-id>
 		<property name="name" type="java.lang.String" column="name" />
-		<property name="displayName" type="java.lang.String" column="displayName" />
 		<property name="description" type="java.lang.String" column="description" />
 		<filter name="tenantFilter" />
 	</class>

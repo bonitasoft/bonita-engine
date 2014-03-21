@@ -26,8 +26,6 @@ public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
 
     private String name;
 
-    private String displayName;
-
     private String description;
 
     @Override
@@ -38,11 +36,6 @@ public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return displayName;
     }
 
     @Override
@@ -58,17 +51,13 @@ public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
         this.name = name;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
     
     @Override
     public String toString() {
-        return "CustomUserInfoDefinitionImpl [id=" + id + ", name=" + name + ", displayName=" + displayName + ", description=" + description + "]";
+        return "CustomUserInfoDefinitionImpl [id=" + id + ", name=" + name + ", description=" + description + "]";
     }
 
     @Override
@@ -76,7 +65,6 @@ public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
         result = prime * result + (int) (id ^ (id >>> 32));
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
@@ -95,11 +83,6 @@ public class CustomUserInfoDefinitionImpl implements CustomUserInfoDefinition {
             if (other.description != null)
                 return false;
         } else if (!description.equals(other.description))
-            return false;
-        if (displayName == null) {
-            if (other.displayName != null)
-                return false;
-        } else if (!displayName.equals(other.displayName))
             return false;
         if (id != other.id)
             return false;

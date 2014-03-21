@@ -51,15 +51,6 @@ public class SCustomUserInfoDefinitionBuilderImplTest {
     }
 
     @Test
-    public void should_build_an_entity_with_the_right_display_name() throws Exception {
-        builder.setDisplayName("display name");
-
-        SCustomUserInfoDefinition entity = builder.done();
-
-        assertEquals("display name", entity.getDisplayName());
-    }
-
-    @Test
     public void should_build_an_entity_with_the_right_description() throws Exception {
         builder.setDescription("description");
 

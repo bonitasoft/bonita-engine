@@ -48,7 +48,6 @@ public class CustomUserInfoDefinitionAPI {
 
         final SCustomUserInfoDefinitionBuilder builder = factory.createNewInstance();
         builder.setName(creator.getName());
-        builder.setDisplayName(creator.getDisplayName());
         builder.setDescription(creator.getDescription());
         try {
             return converter.convert(service.createCustomUserInfoDefinition(builder.done()));

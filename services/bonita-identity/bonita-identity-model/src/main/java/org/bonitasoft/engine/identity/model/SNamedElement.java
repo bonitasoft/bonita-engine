@@ -13,21 +13,12 @@
  **/
 package org.bonitasoft.engine.identity.model;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
-
 /**
  * All elements that have name label and description
  * 
  * @author Baptiste Mesta
  */
-public interface SNamedElement extends PersistentObject {
-
-    /**
-     * Gets the name of the element.
-     * 
-     * @return the element name
-     */
-    String getName();
+public interface SNamedElement extends SSingleNamedElement {
 
     /**
      * Gets the label of the element.
@@ -35,12 +26,4 @@ public interface SNamedElement extends PersistentObject {
      * @return the label name.
      */
     String getDisplayName();
-
-    /**
-     * Obtains the description of the element
-     * 
-     * @return the element description
-     */
-    String getDescription();
-
 }

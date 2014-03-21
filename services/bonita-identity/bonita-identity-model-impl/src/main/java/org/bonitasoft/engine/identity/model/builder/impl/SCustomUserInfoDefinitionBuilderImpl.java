@@ -37,12 +37,6 @@ public class SCustomUserInfoDefinitionBuilderImpl implements SCustomUserInfoDefi
     }
 
     @Override
-    public SCustomUserInfoDefinitionBuilder setDisplayName(final String displayName) {
-        entity.setDisplayName(displayName);
-        return this;
-    }
-
-    @Override
     public SCustomUserInfoDefinitionBuilder setDescription(final String description) {
         entity.setDescription(description);
         return this;

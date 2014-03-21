@@ -61,8 +61,8 @@ public class CustomUserInfoAPITest {
     @Test
     public void list_should_retrieve_values_associated_to_definitions_for_a_given_user() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(Arrays.<SCustomUserInfoDefinition>asList(
-                new DummySCustomUserInfoDefinition(1L, "definition 1", "", ""),
-                new DummySCustomUserInfoDefinition(2L, "definition 2", "", "")));
+                new DummySCustomUserInfoDefinition(1L, "definition 1", ""),
+                new DummySCustomUserInfoDefinition(2L, "definition 2", "")));
         given(service.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(1L, Arrays.asList(1L, 2L)))))
                 .willReturn(Arrays.<SCustomUserInfoValue>asList(
                         new DummySCustomUserInfoValue(1L, 1L, 1L, "value 1"),
@@ -77,7 +77,7 @@ public class CustomUserInfoAPITest {
     @Test
     public void list_should_return_a_null_value_for_a_not_found_definition_matching_value() throws Exception {
         given(service.getCustomUserInfoDefinitions(0, 2)).willReturn(Arrays.<SCustomUserInfoDefinition>asList(
-                new DummySCustomUserInfoDefinition(1L, "definition", "", "")));
+                new DummySCustomUserInfoDefinition(1L, "definition", "")));
         given(service.searchCustomUserInfoValue(argThat(new QueryOptionsMatcher(2L, Arrays.asList(1L)))))
                 .willReturn(Collections.<SCustomUserInfoValue> emptyList());
 
