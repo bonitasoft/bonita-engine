@@ -45,25 +45,21 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class OperationServiceImpl implements OperationService {
 
-    private final Map<String, OperationExecutorStrategy> operationExecutorsMap;
-
     private final ExpressionResolverService expressionResolverService;
 
     private final DataInstanceService dataInstanceService;
 
     private final TechnicalLoggerService logger;
 
+    private final OperationExecutorStrategyProvider operationExecutorStrategyProvider;
+
     public OperationServiceImpl(final OperationExecutorStrategyProvider operationExecutorStrategyProvider,
             final ExpressionResolverService expressionResolverService, final TechnicalLoggerService logger, final DataInstanceService dataInstanceService) {
         super();
+        this.operationExecutorStrategyProvider = operationExecutorStrategyProvider;
         this.expressionResolverService = expressionResolverService;
         this.dataInstanceService = dataInstanceService;
         this.logger = logger;
-        final List<OperationExecutorStrategy> expressionExecutors = operationExecutorStrategyProvider.getOperationExecutors();
-        operationExecutorsMap = new HashMap<String, OperationExecutorStrategy>(expressionExecutors.size());
-        for (final OperationExecutorStrategy operationExecutorStrategy : expressionExecutors) {
-            operationExecutorsMap.put(operationExecutorStrategy.getOperationType(), operationExecutorStrategy);
-        }
     }
 
     @Override
@@ -83,10 +79,10 @@ public class OperationServiceImpl implements OperationService {
 
         retrieveDataInstancesToSetAndPutItInExpressionContextIfNotIn(operations, expressionContext);
 
-        Map<SLeftOperand, OperationExecutorStrategy> operationsToUpdateAtEnd = new HashMap<SLeftOperand, OperationExecutorStrategy>();
+        Map<SLeftOperand, OperationExecutorStrategy> operationsToUpdateAtEnd = new HashMap<SLeftOperand, OperationExecutorStrategy>(operations.size());
         for (SOperation operation : operations) {
             Object operationValue = getOperationValue(operation, expressionContext, operation.getRightOperand());
-            OperationExecutorStrategy operationExecutorStrategy = getOperationExecutorStrategy(operation);
+            OperationExecutorStrategy operationExecutorStrategy = operationExecutorStrategyProvider.getOperationExecutorStrategy(operation);
             Object value = operationExecutorStrategy.getValue(operation, operationValue, containerId, containerType, expressionContext);
             
             if (operationExecutorStrategy.shouldPerformUpdateAtEnd()) {
@@ -98,6 +94,7 @@ public class OperationServiceImpl implements OperationService {
             
             logOperation(TechnicalLogSeverity.DEBUG, containerId, containerType, operation, operationValue);
         }
+        
         for (Entry<SLeftOperand, OperationExecutorStrategy> operationToUpdate : operationsToUpdateAtEnd.entrySet()) {
             OperationExecutorStrategy strategy = operationToUpdate.getValue();
             SLeftOperand leftOperand = operationToUpdate.getKey();
@@ -113,7 +110,7 @@ public class OperationServiceImpl implements OperationService {
             final HashSet<String> names = new HashSet<String>(operations.size());
             for (final SOperation operation : operations) {
                 // this operation will set a data, we retrieve it and put it in context
-                if (getOperationExecutorStrategy(operation).shouldPerformUpdateAtEnd()) {
+                if (operationExecutorStrategyProvider.getOperationExecutorStrategy(operation).shouldPerformUpdateAtEnd()) {
                     names.add(operation.getLeftOperand().getName());
                 }
             }
@@ -143,15 +140,6 @@ public class OperationServiceImpl implements OperationService {
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
-    }
-
-    private OperationExecutorStrategy getOperationExecutorStrategy(final SOperation operation) throws SOperationExecutionException {
-        final String operatorTypeName = operation.getType().name();
-        final OperationExecutorStrategy operationExecutorStrategy = operationExecutorsMap.get(operatorTypeName);
-        if (operationExecutorStrategy == null) {
-            throw new SOperationExecutionException("Unable to find an executor for operation type " + operatorTypeName);
-        }
-        return operationExecutorStrategy;
     }
 
     private void logOperation(TechnicalLogSeverity severity, final long containerId, final String containerType, SOperation operation, Object operationValue) {
