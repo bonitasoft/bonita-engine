@@ -23,7 +23,6 @@ import org.bonitasoft.engine.identity.CustomUserInfo;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
-import org.bonitasoft.engine.identity.CustomUserInfoValueUpdater;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -106,8 +105,10 @@ public interface CustomUserInfoAPI {
     /**
      * Set value of a custom user info described by definitionId/userId.
      *
+     * @param definitionId the {@link CustomUserInfoDefinition} identifier
+     * @param userId the {@link User} identifier
      * @param value
-     *            Custom user info new value
+     *            the new custom user info value
      * @return custom user info value
      * @since 6.3
      */
