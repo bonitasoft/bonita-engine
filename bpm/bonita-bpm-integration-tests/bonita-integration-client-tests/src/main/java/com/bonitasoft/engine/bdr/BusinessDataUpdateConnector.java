@@ -9,7 +9,6 @@ public class BusinessDataUpdateConnector extends AbstractConnector {
 
     @Override
     public void validateInputParameters() {
-
     }
 
     @Override
