@@ -8,20 +8,19 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.EntityType;
 
@@ -38,6 +37,7 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.hibernate.cfg.Configuration;
 
 import com.bonitasoft.engine.bdm.BDMCompiler;
 import com.bonitasoft.engine.bdm.BDMJarBuilder;
@@ -71,12 +71,27 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     public void start() throws SBonitaException {
         if (isDBMDeployed()) {
             entityManagerFactory = Persistence.createEntityManagerFactory(BDR, configuration);
-            try {
-                executeQueries(new SchemaGenerator(entityManagerFactory.createEntityManager()).generate());
-            } catch (final SQLException e) {
-                throw new SBusinessDataRepositoryDeploymentException(e);
-            }
+            updateSchema();
         }
+    }
+
+    private void updateSchema() {
+        final Properties properties = new Properties();
+        properties.putAll(entityManagerFactory.getProperties());
+
+        final Configuration cfg = new Configuration();
+        cfg.setProperties(properties);
+        cfg.getProperties().remove("hibernate.hbm2ddl.auto");
+        cfg.setProperty("hibernate.current_session_context_class", "jta");
+        cfg.setProperty("hibernate.transaction.factory_class", "org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory");
+
+        final Set<EntityType<?>> entities = entityManagerFactory.getMetamodel().getEntities();
+        for (final EntityType<?> entity : entities) {
+            cfg.addAnnotatedClass(entity.getJavaType());
+        }
+
+        final SchemaUpdater updater = new SchemaUpdater(cfg);
+        updater.execute();
     }
 
     @Override
@@ -141,14 +156,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     protected byte[] generateBDMJar(final byte[] bdmZip) throws SBusinessDataRepositoryDeploymentException {
         final BDMJarBuilder builder = new BDMJarBuilder(BDMCompiler.create());
         return builder.build(bdmZip);
-    }
-
-    private void executeQueries(final String... sqlQuerys) {
-        final EntityManager entityManager = getEntityManager();
-        for (final String sqlQuery : sqlQuerys) {
-            final Query query = entityManager.createNativeQuery(sqlQuery);
-            query.executeUpdate();
-        }
     }
 
     @Override

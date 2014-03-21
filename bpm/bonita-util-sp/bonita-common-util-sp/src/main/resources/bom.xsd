@@ -25,7 +25,13 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="uniqueConstraints" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="uniqueConstraint" type="uniqueConstraint" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:sequence>
     <xs:attribute name="qualifiedName" type="xs:string" use="required"/>
   </xs:complexType>
@@ -35,6 +41,19 @@
     <xs:attribute name="length" type="xs:int"/>
     <xs:attribute name="nullable" type="xs:boolean"/>
     <xs:attribute name="type" type="fieldType" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="uniqueConstraint">
+    <xs:sequence>
+      <xs:element name="fieldNames">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="fieldName" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
 
