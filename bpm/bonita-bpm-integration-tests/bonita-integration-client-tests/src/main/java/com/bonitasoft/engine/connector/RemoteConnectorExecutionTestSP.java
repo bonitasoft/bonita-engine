@@ -472,14 +472,15 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertEquals(TestConnectorThatThrowException.BUSINESS_LOGIC_EXCEPTION_MESSAGE, connectorInstanceWithFailureInfo.getExceptionMessage());
         final String stackTrace = connectorInstanceWithFailureInfo.getStackTrace();
         assertTrue(stackTrace
-                .contains("org.bonitasoft.engine.core.connector.exception.SConnectorException: org.bonitasoft.engine.connector.exception.SConnectorException: java.util.concurrent.ExecutionException: org.bonitasoft.engine.connector.exception.SConnectorException: org.bonitasoft.engine.connector.ConnectorException: "
+                .contains("org.bonitasoft.engine.connector.exception.SConnectorException: java.util.concurrent.ExecutionException: org.bonitasoft.engine.connector.exception.SConnectorException: org.bonitasoft.engine.connector.ConnectorException: "
                         + TestConnectorThatThrowException.BUSINESS_LOGIC_EXCEPTION_MESSAGE));
         assertTrue(stackTrace
                 .contains("at org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl.executeConnectorInClassloader(ConnectorServiceImpl.java:"));
         assertTrue(stackTrace.contains("at org.bonitasoft.engine.core.connector.impl.ConnectorServiceImpl.executeConnector(ConnectorServiceImpl.java:"));
         assertTrue(stackTrace.contains("at org.bonitasoft.engine.connector.ConnectorServiceDecorator.executeConnector(ConnectorServiceDecorator.java:"));
         assertTrue(stackTrace.contains("at org.bonitasoft.engine.execution.work.ExecuteConnectorWork.work(ExecuteConnectorWork.java:"));
-        assertTrue(stackTrace.contains("at org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork.work(FailureHandlingBonitaWork.java:"));
+        assertTrue(stackTrace
+                .contains("at org.bonitasoft.engine.execution.work.FailureHandlingBonitaWork.work(FailureHandlingBonitaWork.java:"));
 
         disableAndDeleteProcess(processDefinition);
     }

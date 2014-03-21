@@ -19,7 +19,6 @@ import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationExcepti
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 import com.bonitasoft.engine.bpm.parameter.ImportParameterException;
 import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;

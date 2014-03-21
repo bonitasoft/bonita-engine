@@ -83,6 +83,7 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
         return null;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void shutdown() {
         workQueue.clear();
@@ -102,14 +103,15 @@ public class ClusteredThreadPoolExecutorLocalQueue extends ThreadPoolExecutor im
         executingRunnable.offer(r);
     }
 
+    @SuppressWarnings("unused")
     @Override
     protected void afterExecute(final Runnable r, final Throwable t) {
         executingRunnable.remove(r);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void memberAdded(final MembershipEvent membershipEvent) {
-
     }
 
     @Override

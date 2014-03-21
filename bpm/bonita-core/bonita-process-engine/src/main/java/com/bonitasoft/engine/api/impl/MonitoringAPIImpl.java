@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -12,8 +12,8 @@ import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 import com.bonitasoft.engine.api.MonitoringAPI;
 import com.bonitasoft.engine.monitoring.MonitoringException;
@@ -56,7 +56,7 @@ public class MonitoringAPIImpl implements MonitoringAPI {
         }
         try {
             tenantId = sessionAccessor.getTenantId();
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new BonitaRuntimeException(e);
         }
         return TenantServiceSingleton.getInstance(tenantId);

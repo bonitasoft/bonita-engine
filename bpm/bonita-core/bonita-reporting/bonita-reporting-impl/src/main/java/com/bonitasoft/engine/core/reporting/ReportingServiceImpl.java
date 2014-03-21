@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 - 2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -47,13 +47,14 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ReportingServiceImpl implements ReportingService {
 
     private static final CharSequence COMMA = ",";
 
     private static final CharSequence SEMICOLON = ";";
-    
+
     private static final String NEW_LINE = "\n";
 
     private final DataSource dataSource;
@@ -94,7 +95,7 @@ public class ReportingServiceImpl implements ReportingService {
                     statement.close();
                 }
             }
-            
+
         } finally {
             connection.close();
         }
@@ -165,7 +166,7 @@ public class ReportingServiceImpl implements ReportingService {
     }
 
     @Override
-    public SReport addReport(final SReport report, final byte[] content) throws SReportCreationException, SReportAlreadyExistsException {
+    public SReport addReport(final SReport report, final byte[] content) throws SReportCreationException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "addReport"));
         }
@@ -285,7 +286,7 @@ public class ReportingServiceImpl implements ReportingService {
             final SReport report = getReport(reportId);
             deleteReport(report);
         } catch (final SBonitaReadException sbe) {
-            new SReportDeletionException(sbe);
+            throw new SReportDeletionException(sbe);
         }
     }
 
@@ -322,17 +323,15 @@ public class ReportingServiceImpl implements ReportingService {
     private SInsertEvent getInsertEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.CREATED)) {
             return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private SDeleteEvent getDeleteEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.DELETED)) {
             return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
