@@ -23,7 +23,6 @@ import org.bonitasoft.engine.events.EventServiceTest;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.events.model.SHandlerExecutionException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.After;
@@ -47,7 +46,7 @@ public class ClusteredEventServiceImplTest extends EventServiceTest {
     @BeforeClass
     public static void beforeClass() {
         Config config = new Config();
-        //disable all networking
+        // disable all networking
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
         joinConfig.getMulticastConfig().setEnabled(false);
         joinConfig.getTcpIpConfig().setEnabled(false);
@@ -92,9 +91,8 @@ public class ClusteredEventServiceImplTest extends EventServiceTest {
         return logger;
     }
 
-
     @Test
-    public void constructInstanceWithDefaultHandlers() throws Exception {
+    public void constructInstanceWithDefaultHandlers() {
         SEvent event = new DummyEvent("DUMMY");
         SHandler<SEvent> handler = new DummyHandler(event.getType());
         Map<String, SHandler<SEvent>> defaultHandlers = Collections.singletonMap(event.getType(), handler);
@@ -114,13 +112,13 @@ public class ClusteredEventServiceImplTest extends EventServiceTest {
         // Fire the event on #2
         ClusteredEventServiceImpl eventService2 = (ClusteredEventServiceImpl) instantiateEventServiceImplementation();
         assertTrue(eventService2.containsHandlerFor(event.getType()));
-        //        eventService2.fireEvent(event);
+        // eventService2.fireEvent(event);
         // How to assert the handler was executed correctly ?
         // (-> Write on the filesystem in the handler then read on the assert ?)
     }
 
     @Test
-    public void constructTwoInstancesWithDefaultHandlers() throws Exception {
+    public void constructTwoInstancesWithDefaultHandlers() {
         SEvent event = new DummyEvent("DUMMY");
         SHandler<SEvent> handler = new DummyHandler(event.getType());
         Map<String, SHandler<SEvent>> defaultHandlers = Collections.singletonMap(event.getType(), handler);
@@ -143,7 +141,7 @@ public class ClusteredEventServiceImplTest extends EventServiceTest {
         // Fire the event on #2
         ClusteredEventServiceImpl eventService2 = (ClusteredEventServiceImpl) instantiateEventServiceImplementation();
         assertTrue(eventService2.containsHandlerFor(event.getType()));
-        //        eventService2.fireEvent(event);
+        // eventService2.fireEvent(event);
         // How to assert the handler was executed correctly ?
         // (-> Write on the filesystem in the handler then read on the assert ?)
     }
@@ -159,7 +157,7 @@ public class ClusteredEventServiceImplTest extends EventServiceTest {
         }
 
         @Override
-        public void execute(final SEvent event) throws SHandlerExecutionException {
+        public void execute(final SEvent event) {
             System.out.println("Executing on event type : " + event.getType() + " " + event);
         }
 
@@ -178,6 +176,7 @@ public class ClusteredEventServiceImplTest extends EventServiceTest {
     private static class DummyEvent implements SEvent {
 
         private final String type;
+
         private Object object;
 
         public DummyEvent(final String type) {

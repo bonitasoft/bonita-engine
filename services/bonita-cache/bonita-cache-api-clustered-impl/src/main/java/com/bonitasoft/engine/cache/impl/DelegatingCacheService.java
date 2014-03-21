@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -15,8 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
@@ -24,6 +24,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  * if the cache name is contains in the list localOnlyCaches the call is delegated to local cache, else it is delegated to the distributed cache
  * 
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class DelegatingCacheService implements CacheService {
 
@@ -40,46 +41,45 @@ public class DelegatingCacheService implements CacheService {
     }
 
     @Override
-    public void store(final String cacheName, final Serializable key, final Object value) throws CacheException {
+    public void store(final String cacheName, final Serializable key, final Object value) throws SCacheException {
         getCacheServiceFor(cacheName).store(cacheName, key, value);
     }
 
     private CacheService getCacheServiceFor(final String cacheName) {
         if (localOnlyCaches.contains(cacheName)) {
             return localCache;
-        } else {
-            return distributedCache;
         }
+        return distributedCache;
     }
 
     @Override
-    public boolean remove(final String cacheName, final Object key) throws CacheException {
+    public boolean remove(final String cacheName, final Object key) throws SCacheException {
         return getCacheServiceFor(cacheName).remove(cacheName, key);
     }
 
     @Override
-    public Object get(final String cacheName, final Object key) throws CacheException {
+    public Object get(final String cacheName, final Object key) throws SCacheException {
         return getCacheServiceFor(cacheName).get(cacheName, key);
     }
 
     @Override
-    public List<Object> getKeys(final String cacheName) throws CacheException {
+    public List<Object> getKeys(final String cacheName) throws SCacheException {
         return getCacheServiceFor(cacheName).getKeys(cacheName);
     }
 
     @Override
-    public boolean clear(final String cacheName) throws CacheException {
+    public boolean clear(final String cacheName) throws SCacheException {
         return getCacheServiceFor(cacheName).clear(cacheName);
     }
 
     @Override
-    public void clearAll() throws CacheException {
+    public void clearAll() throws SCacheException {
         localCache.clearAll();
         distributedCache.clearAll();
     }
 
     @Override
-    public int getCacheSize(final String cacheName) throws CacheException {
+    public int getCacheSize(final String cacheName) throws SCacheException {
         return getCacheServiceFor(cacheName).getCacheSize(cacheName);
     }
 
@@ -95,7 +95,7 @@ public class DelegatingCacheService implements CacheService {
     }
 
     @Override
-    public void start() throws SBonitaException {
+    public void start() {
         // do nothing it's done on on each instance using the NodeConfiguration that have all ServiceWithLifeCycle autowired using spring
     }
 
@@ -110,7 +110,7 @@ public class DelegatingCacheService implements CacheService {
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         // nothing to do
     }
 

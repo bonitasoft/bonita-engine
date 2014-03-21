@@ -27,7 +27,6 @@ import java.util.zip.ZipOutputStream;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.SessionInfos;
-import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
 import org.bonitasoft.engine.api.impl.transaction.identity.GetSUser;
 import org.bonitasoft.engine.api.impl.transaction.process.GetArchivedProcessInstanceList;
 import org.bonitasoft.engine.api.impl.transaction.process.GetLastArchivedProcessInstance;
@@ -40,7 +39,6 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
-import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
@@ -69,7 +67,7 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadExce
 import org.bonitasoft.engine.core.connector.exception.SInvalidConnectorImplementationException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -80,7 +78,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -149,6 +146,7 @@ import com.bonitasoft.manager.Features;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
@@ -182,6 +180,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 throw new ImportParameterException(e);
             }
             sDefinition = getProcessDefinition.getResult();
+        } else {
+            throw new ImportParameterException("The identifier of the process definition have to be a positif number.");
         }
 
         final ParameterService parameterService = tenantAccessor.getParameterService();
@@ -225,9 +225,9 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         logger.log(this.getClass(), TechnicalLogSeverity.ERROR, e);
     }
 
-    private SProcessDefinition getServerProcessDefinition(final long processDefinitionUUID, final ProcessDefinitionService processDefinitionService)
+    private SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
             throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionUUID,
+        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionId,
                 processDefinitionService);
         try {
             transactionContentWithResult.execute();
@@ -237,7 +237,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SProcessDefinitionReadException e) {
             throw e;
         } catch (final SBonitaException e) {
-            throw new SProcessDefinitionNotFoundException(e);
+            throw new SProcessDefinitionNotFoundException(e, processDefinitionId);
         }
     }
 
@@ -350,9 +350,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final long userId = getSUser.getResult().getId();
 
             final long humanTaskId = (Long) fields.get(ManualTaskField.PARENT_TASK_ID);
-            final GetActivityInstance getActivityInstance = new GetActivityInstance(activityInstanceService, humanTaskId);
-            getActivityInstance.execute();
-            final SActivityInstance activityInstance = getActivityInstance.getResult();
+            final SActivityInstance activityInstance = getSActivityInstance(humanTaskId);
             if (!(activityInstance instanceof SHumanTaskInstance)) {
                 throw new CreationException("The parent activity is not a Human task");
             }
@@ -480,15 +478,14 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws UpdateException,
-            ConnectorInstanceNotFoundException {
+    public void setConnectorInstanceState(final long connectorInstanceId, final ConnectorStateReset state) throws UpdateException {
         final Map<Long, ConnectorStateReset> connectorsToReset = new HashMap<Long, ConnectorStateReset>(1);
         connectorsToReset.put(connectorInstanceId, state);
         setConnectorInstanceState(connectorsToReset);
     }
 
     @Override
-    public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws ConnectorInstanceNotFoundException, UpdateException {
+    public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws UpdateException {
         LicenseChecker.getInstance().checkLicenceAndFeature(Features.SET_CONNECTOR_STATE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -553,8 +550,6 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final ContainerRegistry containerRegistry = tenantAccessor.getContainerRegistry();
 
-        final String containerType;
-
         try {
             // Reset connectors first:
             if (connectorsToReset != null) {
@@ -580,13 +575,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             activityInstanceService.setState(activityInstance, flowNodeStateManager.getState(activityInstance.getPreviousStateId()));
             activityInstanceService.setExecuting(activityInstance);
 
-            if (activityInstance.getLogicalGroup(2) > 0) {
-                containerType = SFlowElementsContainerType.FLOWNODE.name();
-            } else {
-                containerType = SFlowElementsContainerType.PROCESS.name();
-            }
-
-            containerRegistry.executeFlowNode(activityInstanceId, null, null, containerType, activityInstance.getParentProcessInstanceId());
+            containerRegistry.executeFlowNode(activityInstance.getProcessDefinitionId(), activityInstance.getParentProcessInstanceId(), activityInstanceId,
+                    null, null);
         } catch (final SActivityInstanceNotFoundException e) {
             throw new ActivityInstanceNotFoundException(e);
         } catch (final SBonitaException e) {
@@ -672,7 +662,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException {
+            throws ConnectorExecutionException {
         return executeConnectorAtProcessInstantiationWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -680,7 +670,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
-            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ConnectorExecutionException, ConnectorNotFoundException {
+            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ConnectorExecutionException {
         return executeConnectorAtProcessInstantiationWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, operations, operationsInputValues, processInstanceId);
     }
@@ -716,9 +706,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (operations != null) {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-            } else {
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final SBonitaException e) {
             throw new ConnectorExecutionException(e);
         } catch (final NotSerializableException e) {
@@ -729,7 +718,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException {
+            throws ConnectorExecutionException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -737,8 +726,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
-            final Map<String, Serializable> operationsInputValues, final long activityInstanceId) throws ConnectorExecutionException,
-            ConnectorNotFoundException {
+            final Map<String, Serializable> operationsInputValues, final long activityInstanceId) throws ConnectorExecutionException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, operations, operationsInputValues, activityInstanceId);
     }
@@ -777,9 +765,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (operations != null) {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-            } else {
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         } catch (final SBonitaException e) {
@@ -790,7 +777,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException {
+            throws ConnectorExecutionException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -798,8 +785,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
-            final Map<String, Serializable> operationsInputValues, final long activityInstanceId) throws ConnectorExecutionException,
-            ConnectorNotFoundException {
+            final Map<String, Serializable> operationsInputValues, final long activityInstanceId) throws ConnectorExecutionException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, operations, operationsInputValues, activityInstanceId);
     }
@@ -836,9 +822,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (operations != null) {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-            } else {
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         } catch (final SBonitaException e) {
@@ -849,7 +834,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException {
+            throws ConnectorExecutionException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -857,7 +842,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
-            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ConnectorExecutionException, ConnectorNotFoundException {
+            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ConnectorExecutionException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, operations, operationsInputValues, processInstanceId);
     }
@@ -891,9 +876,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (operations != null) {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-            } else {
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         } catch (final SBonitaException e) {
@@ -904,7 +888,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException {
+            throws ConnectorExecutionException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -912,7 +896,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations,
-            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ConnectorExecutionException, ConnectorNotFoundException {
+            final Map<String, Serializable> operationsInputValues, final long processInstanceId) throws ConnectorExecutionException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, operations, operationsInputValues, processInstanceId);
     }
@@ -948,9 +932,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             if (operations != null) {
                 // execute operations
                 return executeOperations(connectorResult, operations, operationsInputValues, expcontext, classLoader, tenantAccessor);
-            } else {
-                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
+                return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
         } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         } catch (final SBonitaException e) {

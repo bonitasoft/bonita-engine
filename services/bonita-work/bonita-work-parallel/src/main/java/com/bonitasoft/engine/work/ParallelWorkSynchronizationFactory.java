@@ -22,10 +22,11 @@ import org.bonitasoft.engine.work.WorkSynchronizationFactory;
  */
 public class ParallelWorkSynchronizationFactory implements WorkSynchronizationFactory {
 
+    @SuppressWarnings("unused")
     @Override
     public AbstractWorkSynchronization getWorkSynchronization(final ExecutorService executorService, final TechnicalLoggerService loggerService,
             final SessionAccessor sessionAccessor, final ExecutorWorkService threadPoolWorkService) {
-        return new ParallelWorkSynchronization(executorService, loggerService, sessionAccessor, threadPoolWorkService);
+        return new ParallelWorkSynchronization(executorService, sessionAccessor, threadPoolWorkService);
     }
 
 }

@@ -64,9 +64,9 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
             Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
             return businessDataRepository.findById(bizClass, refBusinessDataInstance.getDataId());
         } catch (SBonitaReadException e) {
-            throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + bizDataName);
+            throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + bizDataName, expression.getName());
         } catch (Exception e) {
-            throw new SExpressionEvaluationException(e);
+            throw new SExpressionEvaluationException(e, expression.getName());
         }
     }
 

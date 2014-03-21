@@ -62,9 +62,8 @@ public class SEntityMXBeanTest extends CommonServiceSPTest {
         tenantId = getSessionAccessor().getTenantId();
     }
 
-    public SEntityMXBean getEntityMXBean() throws Exception {
-        final SEntityMXBean entityMbean = new SEntityMXBeanImpl(getTransactionService(), monitoringService, getSessionAccessor(), getSessionService());
-        return entityMbean;
+    public SEntityMXBean getEntityMXBean() {
+        return new SEntityMXBeanImpl(getTransactionService(), monitoringService, getSessionAccessor(), getSessionService());
     }
 
     @Before

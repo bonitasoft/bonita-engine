@@ -37,6 +37,7 @@ public class MockLoginModule implements LoginModule {
     public MockLoginModule() {
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void initialize(final Subject subject, final CallbackHandler callbackHandler, final Map<String, ?> sharedState, final Map<String, ?> options) {
         this.callbackHandler = callbackHandler;
@@ -77,17 +78,17 @@ public class MockLoginModule implements LoginModule {
     }
 
     @Override
-    public boolean commit() throws LoginException {
+    public boolean commit() {
         return true;
     }
 
     @Override
-    public boolean abort() throws LoginException {
+    public boolean abort() {
         return true;
     }
 
     @Override
-    public boolean logout() throws LoginException {
+    public boolean logout() {
         return true;
     }
 

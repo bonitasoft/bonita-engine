@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.impl.resolver.ProcessDependencyResolver;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.process.Problem;
@@ -32,8 +31,8 @@ import com.bonitasoft.engine.business.data.BusinessDataRepository;
 public class BusinessDataProcessDependencyResolver implements ProcessDependencyResolver {
 
     @Override
-    public boolean resolve(final ProcessAPI processApi, final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive,
-            final SProcessDefinition sDefinition) throws BonitaException {
+    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
+            throws BonitaException {
         return checkResolution(tenantAccessor, sDefinition).isEmpty();
     }
 

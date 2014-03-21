@@ -100,7 +100,7 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
     }
 
     @Override
-    public void start() throws SBonitaException {
+    public void start() {
         // Do nothing, spring start hazelcast...
     }
 

@@ -176,8 +176,8 @@ public class TenantTest {
         // login with normal user: not working
         try {
             loginAPI.login(tenantId, "john", "bpm");
-            fail("should not be able to login using other user than technical");
-        } catch (TenantIsPausedException e) {
+            fail("Should not be able to login using other user than technical");
+        } catch (final TenantIsPausedException e) {
             // ok, can't login with user that is not technical
         }
         // login with normal user: not working

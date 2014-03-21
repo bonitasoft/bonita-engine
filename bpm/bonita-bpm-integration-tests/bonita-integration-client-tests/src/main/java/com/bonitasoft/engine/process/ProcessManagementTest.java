@@ -109,7 +109,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertTrue("Expecting 3 assigned task for Jack", new WaitUntil(20, 500) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null).size() == 3;
             }
         }.waitUntil());
@@ -170,7 +170,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertTrue("no new activity found", new WaitUntil(200, 1000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null).size() == 2;
             }
         }.waitUntil());
@@ -193,14 +193,14 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertTrue("no new activity found", new WaitUntil(20, 500) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 10, null).size() == 2;
             }
         }.waitUntil());
         assertTrue("no new activity found", new WaitUntil(20, 500) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null).size() == 1;
             }
         }.waitUntil());
@@ -309,7 +309,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertTrue("Expecting 3 assigned task for Jack", new WaitUntil(20, 500) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null).size() == 3;
             }
         }.waitUntil());
@@ -319,7 +319,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         assertTrue("Expecting no more task assigned to Jack", new WaitUntil(20, 1000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null).size() == 0;
             }
         }.waitUntil());

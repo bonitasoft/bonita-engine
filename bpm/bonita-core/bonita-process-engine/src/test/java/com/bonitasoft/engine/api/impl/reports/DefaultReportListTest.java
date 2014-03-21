@@ -34,7 +34,7 @@ public class DefaultReportListTest {
     private TechnicalLoggerService logger;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         initMocks(this);
     }
 
@@ -46,6 +46,7 @@ public class DefaultReportListTest {
 
         defaultReports.deploy(new ReportDeployer() {
 
+            @SuppressWarnings("unused")
             @Override
             public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) {
                 reports.add(name);
