@@ -30,7 +30,7 @@ public class BPMSPTestsForServers {
 
     public static void afterAll() throws BonitaException {
         System.err.println("=================== BPMSPTestsForServers.afterClass()");
-        SPBPMTestUtil.destroyEnvironmentWithoutTenant();
+        SPBPMTestUtil.destroyPlatformAndTenants();
         apiTestUtil.deletePlatformStructure();
     }
 
