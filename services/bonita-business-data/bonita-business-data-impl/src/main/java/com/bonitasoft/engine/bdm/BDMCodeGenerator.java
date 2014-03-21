@@ -11,16 +11,19 @@ package com.bonitasoft.engine.bdm;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
@@ -59,6 +62,22 @@ public class BDMCodeGenerator extends CodeGenerator {
 
         final JAnnotationUse entityAnnotation = addAnnotation(entityClass, Entity.class);
         entityAnnotation.param("name", entityClass.name());
+
+        final JAnnotationUse tableAnnotation = addAnnotation(entityClass, Table.class);
+        tableAnnotation.param("name", entityClass.name().toUpperCase());
+        final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
+        if (uniqueConstraints != null) {
+            final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
+
+            for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
+                final JAnnotationUse uniqueConstraintAnnotatation = uniqueConstraintsArray.annotate(javax.persistence.UniqueConstraint.class);
+                uniqueConstraintAnnotatation.param("name", uniqueConstraint.getName().toUpperCase());
+                final JAnnotationArrayMember columnNamesParamArray = uniqueConstraintAnnotatation.paramArray("columnNames");
+                for (final String fieldName : uniqueConstraint.getFieldNames()) {
+                    columnNamesParamArray.param(fieldName.toUpperCase());
+                }
+            }
+        }
 
         addPersistenceIdFieldAndAccessors(entityClass);
         addPersistenceVersionFieldAndAccessors(entityClass);

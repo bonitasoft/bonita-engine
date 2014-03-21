@@ -9,6 +9,8 @@
 package com.bonitasoft.engine.bdm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.lang.model.SourceVersion;
@@ -23,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author Matthieu Chaffotte
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "description", "fields" })
+@XmlType(propOrder = { "description", "fields", "uniqueConstraints" })
 public class BusinessObject {
 
     @XmlAttribute(required = true)
@@ -35,6 +37,10 @@ public class BusinessObject {
     @XmlElementWrapper(name = "fields", required = true)
     @XmlElement(name = "field", required = true)
     private final List<Field> fields;
+
+    @XmlElementWrapper(name = "uniqueConstraints")
+    @XmlElement(name = "uniqueConstraint", required = true)
+    private List<UniqueConstraint> uniqueConstraints;
 
     public BusinessObject() {
         fields = new ArrayList<Field>();
@@ -52,7 +58,7 @@ public class BusinessObject {
     }
 
     public List<Field> getFields() {
-        return fields;
+        return Collections.unmodifiableList(fields);
     }
 
     public void addField(final Field field) {
@@ -65,6 +71,42 @@ public class BusinessObject {
 
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    public void addUniqueConstraint(final String name, final String... fieldNames) {
+        if (fieldNames == null || fieldNames.length == 0) {
+            throw new IllegalArgumentException("fieldNames cannot be null or empty");
+        }
+        if (uniqueConstraints == null) {
+            uniqueConstraints = new ArrayList<UniqueConstraint>();
+        }
+        final UniqueConstraint uniqueConstraint = new UniqueConstraint();
+        uniqueConstraint.setName(name);
+        for (final String fieldName : fieldNames) {
+            final Field field = getField(fieldName);
+            if (field == null) {
+                throw new IllegalArgumentException("The field named " + fieldName + " does not exist");
+            }
+        }
+        uniqueConstraint.setFieldNames(Arrays.asList(fieldNames));
+        uniqueConstraints.add(uniqueConstraint);
+    }
+
+    public List<UniqueConstraint> getUniqueConstraints() {
+        return uniqueConstraints == null ? null : Collections.unmodifiableList(uniqueConstraints);
+    }
+
+    private Field getField(final String name) {
+        Field found = null;
+        int index = 0;
+        while (found == null && index < fields.size()) {
+            final Field field = fields.get(index);
+            if (field.getName().equals(name)) {
+                found = field;
+            }
+            index++;
+        }
+        return found;
     }
 
     @Override

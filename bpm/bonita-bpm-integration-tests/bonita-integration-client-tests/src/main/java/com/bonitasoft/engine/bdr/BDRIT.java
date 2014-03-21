@@ -67,6 +67,7 @@ public class BDRIT extends CommonAPISPTest {
         employee.addField(firstName);
         employee.addField(lastName);
         employee.setDescription("Describe a simple employee");
+        // employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
@@ -151,7 +152,7 @@ public class BDRIT extends CommonAPISPTest {
     @Test
     public void deployABDRAndCreateADefaultBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
+                + "; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
         processDefinitionBuilder.addBusinessData("myEmployee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
@@ -293,7 +294,7 @@ public class BDRIT extends CommonAPISPTest {
         final Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
         assertNotNull(businessDataInstance);
 
-        Method method = businessDataInstance.getClass().getMethod("getLastName", null);
+        final Method method = businessDataInstance.getClass().getMethod("getLastName", null);
         final String lastName = (String) method.invoke(businessDataInstance, null);
         assertThat(lastName).isEqualTo("Hakkinen");
 

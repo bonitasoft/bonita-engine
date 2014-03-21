@@ -27,7 +27,6 @@ public class BOMBuilder {
         employee.addField(doubleField);
         employee.addField(integerField);
         employee.addField(textField);
-
         return employee;
     }
 
@@ -53,6 +52,14 @@ public class BOMBuilder {
         businessObject.setQualifiedName("BusinessObject");
         businessObject.addField(new Field());
         bom.addBusinessObject(businessObject);
+        return bom;
+    }
+
+    public BusinessObjectModel buildBOMWithUniqueConstraint() {
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        final BusinessObject employee = buildMyBusinessObject();
+        employee.addUniqueConstraint("UC_string_double", "stringField", "doubleField");
+        bom.addBusinessObject(employee);
         return bom;
     }
 
