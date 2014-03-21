@@ -67,11 +67,6 @@ public class OperationServiceImpl implements OperationService {
     }
 
     @Override
-    public void execute(final SOperation operation, final SExpressionContext expressionContext) throws SOperationExecutionException {
-        execute(operation, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);
-    }
-
-    @Override
     public void execute(final SOperation operation, final long containerId, final String containerType, final SExpressionContext expressionContext)
             throws SOperationExecutionException {
         execute(Arrays.asList(operation), containerId, containerType, expressionContext);
