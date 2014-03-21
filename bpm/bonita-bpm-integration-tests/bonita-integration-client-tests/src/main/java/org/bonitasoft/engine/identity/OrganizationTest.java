@@ -1091,13 +1091,11 @@ public class OrganizationTest extends CommonAPITest {
         final UserMembership membership2 = getIdentityAPI().addUserMembership(persistedUser2.getId(), persistedGroup2.getId(), persistedRole2.getId());
         
         //custom user info definition
-        String skillsDescr = SKILLS_DESCRIPTION;
-        String skillsName = SKILLS_NAME;
-        CustomUserInfoDefinitionCreator skillsCreator = new CustomUserInfoDefinitionCreator(skillsName, skillsDescr);
-        CustomUserInfoDefinition skills = getIdentityAPI().createCustomUserInfoDefinition(skillsCreator);
+        CustomUserInfoDefinition skills = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator(SKILLS_NAME, SKILLS_DESCRIPTION));
+        getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator(LOCATION_NAME));
         
-        String officeLocationName = LOCATION_NAME;
-        CustomUserInfoDefinition officeLocation = getIdentityAPI().createCustomUserInfoDefinition(new CustomUserInfoDefinitionCreator(officeLocationName));
+        //custom user info value
+        getIdentityAPI().setCustomUserInfoValue(skills.getId(), persistedUser1.getId(), SKILLS_VALUE);
         
         // export and check
         final String organizationContent = getIdentityAPI().exportOrganization();
@@ -1108,19 +1106,13 @@ public class OrganizationTest extends CommonAPITest {
         assertThat(organizationContent).contains("engine team");
         assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership1.getId()).getGroupName());
         assertThat(organizationContent).contains(getIdentityAPI().getUserMembership(membership2.getId()).getGroupName());
-        assertThat(organizationContent).contains(skillsName);
-        assertThat(organizationContent).contains(skillsDescr);
-        assertThat(organizationContent).contains(officeLocationName);
+        assertThat(organizationContent).contains(SKILLS_NAME);
+        assertThat(organizationContent).contains(SKILLS_DESCRIPTION);
+        assertThat(organizationContent).contains(LOCATION_NAME);
+        assertThat(organizationContent).contains(SKILLS_VALUE);
 
         // clean-up
-        getIdentityAPI().deleteCustomUserInfoDefinition(skills.getId());
-        getIdentityAPI().deleteCustomUserInfoDefinition(officeLocation.getId());
-        getIdentityAPI().deleteUser(persistedUser1.getId());
-        getIdentityAPI().deleteUser(persistedUser2.getId());
-        getIdentityAPI().deleteRole(persistedRole1.getId());
-        getIdentityAPI().deleteRole(persistedRole2.getId());
-        getIdentityAPI().deleteGroup(persistedGroup1.getId());
-        getIdentityAPI().deleteGroup(persistedGroup2.getId());
+        getIdentityAPI().deleteOrganization();
     }
 
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Export", "Organization", "Special characters" }, jira = "ENGINE-1517")
