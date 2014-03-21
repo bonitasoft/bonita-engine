@@ -36,8 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CustomUserInfoIT extends CommonAPITest {
     
     private static String DEFAULT_NAME = "Skills";
-    private static String DEFAULT_DESCRIPTION = "The user skills.";
-    private static String DEFAULT_DISPLAYNAME = "Skills display name";
 
     private User user;
 
@@ -63,16 +61,14 @@ public class CustomUserInfoIT extends CommonAPITest {
     @Test
     public void createCustomUserInfoDefinition_should_return_the_new_created_object() throws Exception {
         //given
-        CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator(DEFAULT_NAME, DEFAULT_DESCRIPTION);
-        creator.setDisplayName(DEFAULT_DISPLAYNAME);
+        CustomUserInfoDefinitionCreator creator = new CustomUserInfoDefinitionCreator(DEFAULT_NAME, "The user skills.");
 
         //when
         CustomUserInfoDefinition info = getIdentityAPI().createCustomUserInfoDefinition(creator);
 
         //then
         assertThat(info.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(info.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-        assertThat(info.getDisplayName()).isEqualTo(DEFAULT_DISPLAYNAME);
+        assertThat(info.getDescription()).isEqualTo("The user skills.");
     }
     
     @Cover(classes = { CustomUserInfoDefinition.class, CustomUserInfoAPI.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-7150", keywords = { "Custom user info definition", "get list" })
