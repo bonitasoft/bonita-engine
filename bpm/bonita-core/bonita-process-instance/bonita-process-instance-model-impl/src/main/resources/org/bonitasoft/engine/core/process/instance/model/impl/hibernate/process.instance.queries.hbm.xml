@@ -184,6 +184,7 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl AS e
 		WHERE e.activityInstanceId = :activityInstanceId
 		AND e.deleted = FALSE
+		ORDER BY e.id
 	</query>
 
 	<query name="getEventInstancesFromRootContainer">
