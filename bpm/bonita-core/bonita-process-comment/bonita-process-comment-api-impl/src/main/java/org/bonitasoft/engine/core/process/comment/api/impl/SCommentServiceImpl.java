@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.comment.api.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +127,9 @@ public class SCommentServiceImpl implements SCommentService {
     @Override
     public List<SComment> getComments(final long processInstanceId) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
-        final SelectListDescriptor<SComment> selectDescriptor = new SelectListDescriptor<SComment>("getSComments", parameters, SComment.class);
+        OrderByOption orderByOption = new OrderByOption(SComment.class, "id", OrderByType.ASC);
+        final QueryOptions queryOptions = new QueryOptions(Arrays.asList(orderByOption));
+        final SelectListDescriptor<SComment> selectDescriptor = new SelectListDescriptor<SComment>("getSComments", parameters, SComment.class, queryOptions);
         return persistenceService.selectList(selectDescriptor);
     }
 
@@ -317,9 +320,11 @@ public class SCommentServiceImpl implements SCommentService {
 
     @Override
     public void deleteArchivedComments(final long processInstanceId) throws SBonitaException {
-        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class).getProcessInstanceIdKey(),
+        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class)
+                .getProcessInstanceIdKey(),
                 processInstanceId));
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class).getIdKey(),
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, BuilderFactory.get(
+                SACommentBuilderFactory.class).getIdKey(),
                 OrderByType.ASC));
         List<SAComment> searchArchivedComments = null;
         // fromIndex always will be zero because the elements will be deleted

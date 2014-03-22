@@ -44,19 +44,8 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<SActor>("getActorFromNameAndScopeId", parameters, SActor.class);
     }
 
-    public static SelectListDescriptor<SActor> getActors(final Set<Long> scopeIds) {
-        final Map<String, Object> parameters = Collections.singletonMap("scopeIds", (Object) scopeIds);
-        return new SelectListDescriptor<SActor>("getActorsOfScopes", parameters, SActor.class);
-    }
-
     public static SelectByIdDescriptor<SActorMember> getActorMember(final long actorMmeberId) {
         return new SelectByIdDescriptor<SActorMember>("getActorMemberById", SActorMember.class, actorMmeberId);
-    }
-
-    public static SelectListDescriptor<SActorMember> getActorMembers(final long actorId, final int fromIndex, final int numberOfElements) {
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements);
-        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
-        return new SelectListDescriptor<SActorMember>("getActorMembersOfActor", parameters, SActorMember.class, queryOptions);
     }
 
     public static SelectListDescriptor<SActorMember> getActorMembers(final int fromIndex, final int numberOfElements) {
@@ -65,47 +54,10 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SActorMember>("getActorMembers", parameters, SActorMember.class, queryOptions);
     }
 
-    public static SelectListDescriptor<SActor> getFullActorsListOfUser(final Set<Long> scopeIds, final long userId) {
-        final Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("scopeIds", scopeIds);
-        parameters.put("userId", userId);
-        return new SelectListDescriptor<SActor>("getActorsOfUser", parameters, SActor.class);
-    }
-
-    public static SelectOneDescriptor<Long> getNumberOfUsersOfActor(final long actorId) {
+    public static SelectListDescriptor<SActorMember> getActorMembers(final long actorId, final int fromIndex, final int numberOfElements) {
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfElements);
         final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
-        return new SelectOneDescriptor<Long>("getNumberOfUsersOfActor", parameters, SActorMember.class);
-    }
-
-    public static SelectOneDescriptor<Long> getNumberOfRolesOfActor(final long actorId) {
-        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
-        return new SelectOneDescriptor<Long>("getNumberOfRolesOfActor", parameters, SActorMember.class);
-    }
-
-    public static SelectOneDescriptor<Long> getNumberOfGroupsOfActor(final long actorId) {
-        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
-        return new SelectOneDescriptor<Long>("getNumberOfGroupsOfActor", parameters, SActorMember.class);
-    }
-
-    public static SelectOneDescriptor<Long> getNumberOfMembershipsOfActor(final long actorId) {
-        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
-        return new SelectOneDescriptor<Long>("getNumberOfMembershipsOfActor", parameters, SActorMember.class);
-    }
-
-    public static SelectOneDescriptor<Long> getNumberOfActorMembers(final long actorId) {
-        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
-        return new SelectOneDescriptor<Long>("getNumberOfActorMembersOfActor", parameters, SActorMember.class);
-    }
-
-    public static SelectListDescriptor<SActor> getActorsOfScope(final long scopeId) {
-        final Map<String, Object> parameters = Collections.singletonMap("scopeId", (Object) scopeId);
-        return new SelectListDescriptor<SActor>("getActorsOfScope", parameters, SActor.class);
-    }
-
-    public static SelectListDescriptor<SActorMember> getActorMembersOfUser(final long userId) {
-        final Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("userId", userId);
-        return new SelectListDescriptor<SActorMember>("getActorMembersOfUser", parameters, SActorMember.class);
+        return new SelectListDescriptor<SActorMember>("getActorMembersOfActor", parameters, SActorMember.class, queryOptions);
     }
 
     public static SelectListDescriptor<SActorMember> getActorMembersOfGroup(final long groupId) {
@@ -120,11 +72,27 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SActorMember>("getActorMembersOfRole", parameters, SActorMember.class);
     }
 
-    public static SelectOneDescriptor<Long> getNumberOfActorMembersOfGroupWithActor(final long groupId, final long actorId) {
-        final Map<String, Object> parameters = new HashMap<String, Object>(2);
-        parameters.put("groupId", groupId);
-        parameters.put("actorId", actorId);
-        return new SelectOneDescriptor<Long>("getNumberOfActorMembersOfGroupWithActor", parameters, SActorMember.class);
+    public static SelectListDescriptor<SActorMember> getActorMembersOfUser(final long userId) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("userId", userId);
+        return new SelectListDescriptor<SActorMember>("getActorMembersOfUser", parameters, SActorMember.class);
+    }
+
+    public static SelectListDescriptor<SActor> getActors(final Set<Long> scopeIds) {
+        final Map<String, Object> parameters = Collections.singletonMap("scopeIds", (Object) scopeIds);
+        return new SelectListDescriptor<SActor>("getActorsOfScopes", parameters, SActor.class);
+    }
+
+    public static SelectListDescriptor<SActor> getActorsOfScope(final long scopeId) {
+        final Map<String, Object> parameters = Collections.singletonMap("scopeId", (Object) scopeId);
+        return new SelectListDescriptor<SActor>("getActorsOfScope", parameters, SActor.class);
+    }
+
+    public static SelectListDescriptor<SActor> getActorsOfScope(final long processDefinitionId, final int index, final int numberPerPage, final String field,
+            final OrderByType order) {
+        final Map<String, Object> parameters = Collections.singletonMap("scopeId", (Object) processDefinitionId);
+        final QueryOptions queryOptions = new QueryOptions(index, numberPerPage, SActor.class, field, order);
+        return new SelectListDescriptor<SActor>("getActorsOfScope", parameters, SActor.class, queryOptions);
     }
 
     public static SelectListDescriptor<SActor> getActorsOfUserCanStartProcessDefinition(final long userId, final long processDefinitionid) {
@@ -140,11 +108,43 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<T>("get" + elementName + "sByIds", parameters, clazz);
     }
 
-    public static SelectListDescriptor<SActor> getActorsOfScope(final long processDefinitionId, final int index, final int numberPerPage, final String field,
-            final OrderByType order) {
-        final Map<String, Object> parameters = Collections.singletonMap("scopeId", (Object) processDefinitionId);
-        final QueryOptions queryOptions = new QueryOptions(index, numberPerPage, SActor.class, field, order);
-        return new SelectListDescriptor<SActor>("getActorsOfScope", parameters, SActor.class, queryOptions);
+    public static SelectListDescriptor<SActor> getFullActorsListOfUser(final Set<Long> scopeIds, final long userId) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("scopeIds", scopeIds);
+        parameters.put("userId", userId);
+        return new SelectListDescriptor<SActor>("getActorsOfUser", parameters, SActor.class);
+    }
+
+    public static SelectOneDescriptor<Long> getNumberOfActorMembers(final long actorId) {
+        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
+        return new SelectOneDescriptor<Long>("getNumberOfActorMembersOfActor", parameters, SActorMember.class);
+    }
+
+    public static SelectOneDescriptor<Long> getNumberOfActorMembersOfGroupWithActor(final long groupId, final long actorId) {
+        final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put("groupId", groupId);
+        parameters.put("actorId", actorId);
+        return new SelectOneDescriptor<Long>("getNumberOfActorMembersOfGroupWithActor", parameters, SActorMember.class);
+    }
+
+    public static SelectOneDescriptor<Long> getNumberOfGroupsOfActor(final long actorId) {
+        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
+        return new SelectOneDescriptor<Long>("getNumberOfGroupsOfActor", parameters, SActorMember.class);
+    }
+
+    public static SelectOneDescriptor<Long> getNumberOfMembershipsOfActor(final long actorId) {
+        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
+        return new SelectOneDescriptor<Long>("getNumberOfMembershipsOfActor", parameters, SActorMember.class);
+    }
+
+    public static SelectOneDescriptor<Long> getNumberOfRolesOfActor(final long actorId) {
+        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
+        return new SelectOneDescriptor<Long>("getNumberOfRolesOfActor", parameters, SActorMember.class);
+    }
+
+    public static SelectOneDescriptor<Long> getNumberOfUsersOfActor(final long actorId) {
+        final Map<String, Object> parameters = Collections.singletonMap("actorId", (Object) actorId);
+        return new SelectOneDescriptor<Long>("getNumberOfUsersOfActor", parameters, SActorMember.class);
     }
 
 }

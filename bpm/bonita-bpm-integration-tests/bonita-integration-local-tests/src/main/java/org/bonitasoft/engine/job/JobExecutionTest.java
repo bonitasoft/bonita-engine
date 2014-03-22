@@ -17,18 +17,20 @@ import org.junit.Test;
 
 public class JobExecutionTest extends CommonAPITest {
 
-    protected User matti;
+    private static final int ENOUTH_TIME_TO_GET_THE_JOB_DONE = 1000;
 
-    @Before
-    public void before() throws Exception {
-        login();
-        matti = createUser("matti", "keltainen");
-    }
+    protected User matti;
 
     @After
     public void after() throws Exception {
         deleteUser(matti);
         logout();
+    }
+
+    @Before
+    public void before() throws Exception {
+        login();
+        matti = createUser("matti", "keltainen");
     }
 
     @Test
@@ -38,17 +40,35 @@ public class JobExecutionTest extends CommonAPITest {
     }
 
     @Test
+    public void retryAJob() throws Exception {
+        getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        try {
+            getCommandAPI().execute("except", parameters);
+            Thread.sleep(ENOUTH_TIME_TO_GET_THE_JOB_DONE);
+            List<FailedJob> failedJobs = getProcessAPI().getFailedJobs(0, 100);
+            assertEquals(1, failedJobs.size());
+            getProcessAPI().replayFailedJob(failedJobs.get(0).getJobDescriptorId(), Collections.singletonMap("throwException", (Serializable) Boolean.FALSE));
+            Thread.sleep(ENOUTH_TIME_TO_GET_THE_JOB_DONE);
+            failedJobs = getProcessAPI().getFailedJobs(0, 100);
+            assertEquals(0, failedJobs.size());
+        } finally {
+            getCommandAPI().unregister("except");
+        }
+    }
+
+    @Test
     public void retrySeveralTimesAJob() throws Exception {
         getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         try {
             getCommandAPI().execute("except", parameters);
-            Thread.sleep(1000);
+            Thread.sleep(ENOUTH_TIME_TO_GET_THE_JOB_DONE);
             List<FailedJob> failedJobs = getProcessAPI().getFailedJobs(0, 100);
             assertEquals(1, failedJobs.size());
             final FailedJob failedJob = failedJobs.get(0);
             getProcessAPI().replayFailedJob(failedJob.getJobDescriptorId(), Collections.<String, Serializable> emptyMap());
-            Thread.sleep(1000);
+            Thread.sleep(ENOUTH_TIME_TO_GET_THE_JOB_DONE);
             failedJobs = getProcessAPI().getFailedJobs(0, 100);
             assertEquals(1, failedJobs.size());
             final FailedJob failedJob2 = failedJobs.get(0);
@@ -60,25 +80,7 @@ public class JobExecutionTest extends CommonAPITest {
             assertEquals(1, failedJob2.getRetryNumber());
             assertEquals("Throw an exception when 'throwException'=true", failedJob.getDescription());
             getProcessAPI().replayFailedJob(failedJobs.get(0).getJobDescriptorId(), Collections.singletonMap("throwException", (Serializable) Boolean.FALSE));
-            Thread.sleep(1000);
-            failedJobs = getProcessAPI().getFailedJobs(0, 100);
-            assertEquals(0, failedJobs.size());
-        } finally {
-            getCommandAPI().unregister("except");
-        }
-    }
-
-    @Test
-    public void retryAJob() throws Exception {
-        getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        try {
-            getCommandAPI().execute("except", parameters);
-            Thread.sleep(1000);
-            List<FailedJob> failedJobs = getProcessAPI().getFailedJobs(0, 100);
-            assertEquals(1, failedJobs.size());
-            getProcessAPI().replayFailedJob(failedJobs.get(0).getJobDescriptorId(), Collections.singletonMap("throwException", (Serializable) Boolean.FALSE));
-            Thread.sleep(1000);
+            Thread.sleep(ENOUTH_TIME_TO_GET_THE_JOB_DONE);
             failedJobs = getProcessAPI().getFailedJobs(0, 100);
             assertEquals(0, failedJobs.size());
         } finally {

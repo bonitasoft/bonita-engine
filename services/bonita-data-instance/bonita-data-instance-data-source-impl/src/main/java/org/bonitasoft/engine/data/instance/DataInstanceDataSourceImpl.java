@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.data.instance;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -174,11 +177,12 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
         NullCheckingUtil.checkArgsNotNull(containerType);
         final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
         final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getContainerIdKey(), containerId);
+        final OrderByOption orderByOption = new OrderByOption(SDataInstance.class, fact.getIdKey(), OrderByType.ASC);
         paraMap.put(fact.getContainerTypeKey(), containerType);
 
         try {
             return persistenceRead.selectList(new SelectListDescriptor<SDataInstance>("getDataInstancesByContainer", paraMap, SDataInstance.class,
-                    SDataInstance.class, new QueryOptions(fromIndex, numberOfResults)));
+                    SDataInstance.class, new QueryOptions(fromIndex, numberOfResults, Arrays.asList(orderByOption))));
         } catch (final SBonitaReadException e) {
             throw new SDataInstanceException("Unable to check if a data instance already exists for the data container of type " + containerType + " with id "
                     + containerId + " for reason: " + e.getMessage(), e);

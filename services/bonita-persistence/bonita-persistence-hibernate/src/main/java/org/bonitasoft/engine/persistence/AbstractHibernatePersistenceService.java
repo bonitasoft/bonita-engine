@@ -104,7 +104,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             }
         }
         final String className = configuration.getProperty("hibernate.interceptor");
-        if (className != null && !className.isEmpty()) {
+        if ((className != null) && !className.isEmpty()) {
             try {
                 final Interceptor interceptor = (Interceptor) Class.forName(className).newInstance();
                 configuration.setInterceptor(interceptor);
@@ -137,324 +137,14 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         this.logger = logger;
     }
 
-    /**
-     * Log synthetic information about cache every 10.000 sessions, if hibernate.gather_statistics, is enabled.
-     */
-    protected void logStats() {
-        if (!statistics.isStatisticsEnabled()) {
-            return;
+    private void appendClassAlias(final StringBuilder builder, final Class<? extends PersistentObject> clazz) throws SBonitaReadException {
+        final String className = clazz.getName();
+        final String classAlias = getClassAliasMappings().get(className);
+        if ((classAlias == null) || classAlias.trim().isEmpty()) {
+            throw new SBonitaReadException("No class alias found for class " + className);
         }
-        if (stat_display_count == 10 || stat_display_count == 100 || stat_display_count == 1000 || stat_display_count % 10000 == 0) {
-            final long query_cache_hit = statistics.getQueryCacheHitCount();
-            final long query_cache_miss = statistics.getQueryCacheMissCount();
-            final long query_cahe_put = statistics.getQueryCachePutCount();
-            final long level_2_cache_hit = statistics.getSecondLevelCacheHitCount();
-            final long level_2_cache_miss = statistics.getSecondLevelCacheMissCount();
-            final long level_2_put = statistics.getSecondLevelCachePutCount();
-
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Query Cache Ratio "
-                    + (int) ((double) query_cache_hit / (query_cache_hit + query_cache_miss) * 100) + "% " + query_cache_hit + " hits " + query_cache_miss
-                    + " miss " + query_cahe_put + " puts");
-            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "2nd Level Cache Ratio "
-                    + (int) ((double) level_2_cache_hit / (level_2_cache_hit + level_2_cache_miss) * 100) + "% " + level_2_cache_hit + " hits "
-                    + level_2_cache_miss + " miss " + level_2_put + " puts");
-
-        }
-        stat_display_count++;
-    }
-
-    protected Session getSession(final boolean useTenant) throws SPersistenceException {
-        logStats();
-        try {
-            final org.hibernate.classic.Session currentSession = sessionFactory.getCurrentSession();
-            return currentSession;
-        } catch (final HibernateException e) {
-            throw new SPersistenceException(e);
-        }
-    }
-
-    protected void flushStatements(final boolean useTenant) throws SPersistenceException {
-        final Session session = getSession(useTenant);
-        session.flush();
-    }
-
-    @Override
-    public void delete(final PersistentObject entity) throws SPersistenceException {
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                    "Deleting instance of class " + entity.getClass().getSimpleName() + " with id=" + entity.getId());
-        }
-        final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
-        final Session session = getSession(true);
-        try {
-            if (session.contains(entity)) {
-                session.delete(entity);
-            } else {
-                // Deletion must be performed on the session entity and not on a potential transitional entity.
-                final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), 0));
-                session.delete(pe);
-            }
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
-        }
-    }
-
-    @Override
-    public void deleteAll(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
-        final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
-        final Query query = getSession(true).getNamedQuery("deleteAll" + mappedClass.getSimpleName());
-        try {
-            query.executeUpdate();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
-        }
-    }
-
-    @Override
-    public void insert(final PersistentObject entity) throws SPersistenceException {
-        final Class<? extends PersistentObject> entityClass = entity.getClass();
-        checkClassMapping(entityClass);
-        final Session session = getSession(true);
-        setId(entity);
-        try {
-            session.save(entity);
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
-        }
-    }
-
-    @Override
-    public void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException {
-        if (!entities.isEmpty()) {
-            final Session session = getSession(true);
-            for (final PersistentObject entity : entities) {
-                final Class<? extends PersistentObject> entityClass = entity.getClass();
-                checkClassMapping(entityClass);
-                setId(entity);
-                session.save(entity);
-            }
-        }
-    }
-
-    @Override
-    public void purge(final String classToPurge) throws SPersistenceException {
-        final int index = classToPurge.lastIndexOf('.');
-        String suffix = classToPurge;
-        if (index != -1) {
-            suffix = classToPurge.substring(index + 1, classToPurge.length());
-        }
-        final Query query = getSession(true).getNamedQuery("purge" + suffix);
-        try {
-            query.executeUpdate();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
-        }
-    }
-
-    @Override
-    public void update(final UpdateDescriptor updateDescriptor) throws SPersistenceException {
-        // FIXME: deal with disconnected objects:
-        final Class<? extends PersistentObject> entityClass = updateDescriptor.getEntity().getClass();
-        checkClassMapping(entityClass);
-        final PersistentObject entity = updateDescriptor.getEntity();
-        final Session session = getSession(false);
-        if (!session.contains(entity)) {
-            throw new SPersistenceException("The object cannot be updated because it's deconnected " + entity);
-        }
-        for (final Map.Entry<String, Object> field : updateDescriptor.getFields().entrySet()) {
-            setField(entity, field.getKey(), field.getValue());
-        }
-    }
-
-    private void setField(final PersistentObject entity, final String fieldName, final Object parameterValue) throws SPersistenceException {
-        Long id = null;
-        try {
-            id = entity.getId();
-            final String setterName = "set" + StringUtil.firstCharToUpperCase(fieldName);
-            ClassReflector.invokeMethodByName(entity, setterName, parameterValue);
-        } catch (final Exception e) {
-            throw new SPersistenceException("Problem while updating entity: " + entity + " with id: " + id, e);
-        }
-    }
-
-    @Override
-    public <T> T selectOne(final SelectOneDescriptor<T> selectDescriptor) throws SBonitaReadException {
-        try {
-            final Session session = getSession(true);
-            return this.selectOne(session, selectDescriptor, selectDescriptor.getInputParameters());
-        } catch (final SPersistenceException e) {
-            throw new SBonitaReadException(e, selectDescriptor);
-        }
-    }
-
-    protected Class<? extends PersistentObject> getMappedClass(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
-        if (classMapping.contains(entityClass)) {
-            return entityClass;
-        }
-        if (interfaceToClassMapping.containsKey(entityClass.getName())) {
-            return interfaceToClassMapping.get(entityClass.getName());
-        }
-        throw new SPersistenceException("Unable to locate class " + entityClass + " in Hibernate configuration");
-    }
-
-    protected void checkClassMapping(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
-        if (!classMapping.contains(entityClass) && !interfaceToClassMapping.containsKey(entityClass.getName())
-                && !mappingExclusions.contains(entityClass.getName())) {
-            throw new SPersistenceException("Unable to locate class " + entityClass + " in Hibernate configuration");
-        }
-    }
-
-    @Override
-    public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
-        try {
-            return this.selectById(getSession(true), selectDescriptor);
-        } catch (final SPersistenceException e) {
-            throw new SBonitaReadException(e, selectDescriptor);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
-        Class<? extends PersistentObject> mappedClass = null;
-        try {
-            mappedClass = getMappedClass(selectDescriptor.getEntityType());
-        } catch (final SPersistenceException e) {
-            throw new SBonitaReadException(e);
-        }
-        try {
-            return (T) session.get(mappedClass, selectDescriptor.getId());
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SBonitaReadException(he);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> T selectOne(final Session session, final AbstractSelectDescriptor<T> selectDescriptor, final Map<String, Object> parameters)
-            throws SBonitaReadException {
-        try {
-            checkClassMapping(selectDescriptor.getEntityType());
-        } catch (final SPersistenceException e) {
-            throw new SBonitaReadException(e);
-        }
-        final Query query = session.getNamedQuery(selectDescriptor.getQueryName());
-        setQueryCache(query, selectDescriptor.getQueryName());
-        if (parameters != null) {
-            setParameters(query, parameters);
-        }
-        query.setMaxResults(1);
-        try {
-            return (T) query.uniqueResult();
-        } catch (final AssertionFailure af) {
-            throw new SRetryableException(af);
-        } catch (final LockAcquisitionException lae) {
-            throw new SRetryableException(lae);
-        } catch (final StaleStateException sse) {
-            throw new SRetryableException(sse);
-        } catch (final HibernateException he) {
-            throw new SBonitaReadException(he);
-        }
-    }
-
-    protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter) {
-        final StringBuilder builder = new StringBuilder(query);
-        final Set<String> specificFilters = new HashSet<String>(filters.size());
-        FilterOption previousFilter = null;
-        if (!filters.isEmpty()) {
-            if (!query.contains("WHERE")) {
-                builder.append(" WHERE (");
-            } else {
-                builder.append(" AND (");
-            }
-            for (final FilterOption filterOption : filters) {
-                if (previousFilter != null) {
-                    final FilterOperationType prevOp = previousFilter.getFilterOperationType();
-                    final FilterOperationType currOp = filterOption.getFilterOperationType();
-                    // Auto add AND if previous operator was normal op or ')' and that current op is normal op or '(' :
-                    if ((isNormalOperator(prevOp) || prevOp == R_PARENTHESIS) && (isNormalOperator(currOp) || currOp == L_PARENTHESIS)) {
-                        builder.append(" AND ");
-                    }
-                }
-                final StringBuilder aliasBuilder = appendFilterClause(builder, filterOption);
-                // FIXME: is it really filterOption.getFieldName() or is it its formatted value: classAliasMappings.get(.......) ?:
-                // specificFilters.add(filterOption.getFieldName());
-                if (aliasBuilder != null) {
-                    specificFilters.add(aliasBuilder.toString());
-                }
-                previousFilter = filterOption;
-            }
-            builder.append(")");
-        }
-        if (multipleFilter != null && multipleFilter.getTerms() != null && !multipleFilter.getTerms().isEmpty()) {
-            final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
-            final Set<String> fields = new HashSet<String>();
-            for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
-                final String alias = getClassAliasMappings().get(entry.getKey().getName());
-                for (final String field : entry.getValue()) {
-                    final StringBuilder aliasBuilder = new StringBuilder(alias);
-                    aliasBuilder.append('.').append(field);
-                    fields.add(aliasBuilder.toString());
-                }
-            }
-            fields.removeAll(specificFilters);
-            final Iterator<String> fieldIterator = fields.iterator();
-            final List<String> terms = multipleFilter.getTerms();
-            if (!fields.isEmpty()) {
-                if (!builder.toString().contains("WHERE")) {
-                    builder.append(" WHERE (");
-                } else {
-                    builder.append(" AND (");
-                }
-                while (fieldIterator.hasNext()) {
-                    final Iterator<String> termIterator = terms.iterator();
-                    final String currentField = fieldIterator.next();
-                    while (termIterator.hasNext()) {
-                        final String currentTerm = termIterator.next();
-                        builder.append(currentField).append(getLikeEscapeClause(currentTerm));
-                        if (termIterator.hasNext() || fieldIterator.hasNext()) {
-                            builder.append(" OR ");
-                        }
-                    }
-                }
-                builder.append(")");
-            }
-        }
-        return builder.toString();
-    }
-
-    private <T> String getQueryWithOrderByClause(final String query, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
-        final StringBuilder builder = new StringBuilder(query);
-        appendOrderByClause(builder, selectDescriptor);
-        return builder.toString();
+        builder.append(classAlias);
+        builder.append('.');
     }
 
     private StringBuilder appendFilterClause(final StringBuilder clause, final FilterOption filterOption) {
@@ -557,79 +247,120 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         }
     }
 
-    private void appendClassAlias(final StringBuilder builder, final Class<? extends PersistentObject> clazz) throws SBonitaReadException {
-        final String className = clazz.getName();
-        final String classAlias = getClassAliasMappings().get(className);
-        if (classAlias == null || classAlias.trim().isEmpty()) {
-            throw new SBonitaReadException("No class alias found for class " + className);
+    protected void checkClassMapping(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+        if (!classMapping.contains(entityClass) && !interfaceToClassMapping.containsKey(entityClass.getName())
+                && !mappingExclusions.contains(entityClass.getName())) {
+            throw new SPersistenceException("Unable to locate class " + entityClass + " in Hibernate configuration");
         }
-        builder.append(classAlias);
-        builder.append('.');
     }
 
-    protected void setQueryCache(final Query query, final String name) {
-        if (cacheQueries != null && cacheQueries.containsKey(name)) {
-            query.setCacheable(true);
+    private <T> void checkOrderByClause(final SelectListDescriptor<T> selectDescriptor, final Query query) {
+        final boolean needOrderBy = needOrderBy(selectDescriptor, query);
+        if (needOrderBy) {
+            logWarningMessage(selectDescriptor, query);
         }
+    }
+
+    private <T> boolean needOrderBy(final SelectListDescriptor<T> selectDescriptor, final Query query) {
+        boolean needOrderBy = true;
+        if (selectDescriptor.getQueryName().startsWith("getNumberOf")) {
+            needOrderBy = false;
+        }
+
+        if (query.toString().toLowerCase().contains("order by")) {
+            needOrderBy = false;
+        }
+
+        if (selectDescriptor.getPageSize() == QueryOptions.UNLIMITED_NUMBER_OF_RESULTS) {
+            needOrderBy = false;
+        }
+
+        return needOrderBy;
     }
 
     @Override
-    public <T> List<T> selectList(final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
+    public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+        final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
+        final Query query = getSession(true).getNamedQuery("deleteByIds" + mappedClass.getSimpleName());
+        query.setParameterList("ids", ids);
         try {
-            final Class<? extends PersistentObject> entityClass = selectDescriptor.getEntityType();
-            checkClassMapping(entityClass);
-
-            final Session session = getSession(true);
-
-            Query query = session.getNamedQuery(selectDescriptor.getQueryName());
-            String builtQuery = query.getQueryString();
-
-            if (selectDescriptor.hasAFilter()) {
-                final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
-                builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter());
-            }
-            if (selectDescriptor.hasOrderByParameters()) {
-                builtQuery = getQueryWithOrderByClause(builtQuery, selectDescriptor);
-            }
-            if (!builtQuery.equals(query.getQueryString())) {
-                query = session.createQuery(builtQuery);
-            }
-            setQueryCache(query, selectDescriptor.getQueryName());
-
-            if (selectDescriptor != null) {
-                setParameters(query, selectDescriptor.getInputParameters());
-            }
-            query.setFirstResult(selectDescriptor.getStartIndex());
-            query.setMaxResults(selectDescriptor.getPageSize());
-
-            @SuppressWarnings("unchecked")
-            final List<T> list = query.list();
-            if (list != null) {
-                return list;
-            }
-            return Collections.emptyList();
+            query.executeUpdate();
         } catch (final AssertionFailure af) {
             throw new SRetryableException(af);
         } catch (final LockAcquisitionException lae) {
             throw new SRetryableException(lae);
         } catch (final StaleStateException sse) {
             throw new SRetryableException(sse);
-        } catch (final HibernateException e) {
-            throw new SBonitaReadException(e, selectDescriptor);
-        } catch (final SPersistenceException e) {
-            throw new SBonitaReadException(e, selectDescriptor);
+        } catch (final HibernateException he) {
+            throw new SPersistenceException(he);
         }
     }
 
-    protected void setParameters(final Query query, final Map<String, Object> inputParameters) {
-        for (final Map.Entry<String, Object> entry : inputParameters.entrySet()) {
-            final Object value = entry.getValue();
-            if (value instanceof Collection<?>) {
-                query.setParameterList(entry.getKey(), (Collection<?>) value);
-            } else {
-                query.setParameter(entry.getKey(), value);
-            }
+    @Override
+    public void delete(final long id, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+        final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
+        final Query query = getSession(true).getNamedQuery("delete" + mappedClass.getSimpleName());
+        query.setLong("id", id);
+        try {
+            query.executeUpdate();
+        } catch (final AssertionFailure af) {
+            throw new SRetryableException(af);
+        } catch (final LockAcquisitionException lae) {
+            throw new SRetryableException(lae);
+        } catch (final StaleStateException sse) {
+            throw new SRetryableException(sse);
+        } catch (final HibernateException he) {
+            throw new SPersistenceException(he);
         }
+    }
+
+    @Override
+    public void delete(final PersistentObject entity) throws SPersistenceException {
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
+                    "Deleting instance of class " + entity.getClass().getSimpleName() + " with id=" + entity.getId());
+        }
+        final Class<? extends PersistentObject> mappedClass = getMappedClass(entity.getClass());
+        final Session session = getSession(true);
+        try {
+            if (session.contains(entity)) {
+                session.delete(entity);
+            } else {
+                // Deletion must be performed on the session entity and not on a potential transitional entity.
+                final Object pe = session.get(mappedClass, new PersistentObjectId(entity.getId(), 0));
+                session.delete(pe);
+            }
+        } catch (final AssertionFailure af) {
+            throw new SRetryableException(af);
+        } catch (final LockAcquisitionException lae) {
+            throw new SRetryableException(lae);
+        } catch (final StaleStateException sse) {
+            throw new SRetryableException(sse);
+        } catch (final HibernateException he) {
+            throw new SPersistenceException(he);
+        }
+    }
+
+    @Override
+    public void deleteAll(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+        final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
+        final Query query = getSession(true).getNamedQuery("deleteAll" + mappedClass.getSimpleName());
+        try {
+            query.executeUpdate();
+        } catch (final AssertionFailure af) {
+            throw new SRetryableException(af);
+        } catch (final LockAcquisitionException lae) {
+            throw new SRetryableException(lae);
+        } catch (final StaleStateException sse) {
+            throw new SRetryableException(sse);
+        } catch (final HibernateException he) {
+            throw new SPersistenceException(he);
+        }
+    }
+
+    public void destroy() {
+        logger.log(getClass(), TechnicalLogSeverity.INFO, "Closing Hibernate session factory of " + getClass().getName());
+        sessionFactory.close();
     }
 
     @Override
@@ -718,7 +449,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private String fillTemplate(final Map<String, String> replacements, final String command) {
         String trimmedCommand = command.trim();
-        if (trimmedCommand.isEmpty() || replacements == null) {
+        if (trimmedCommand.isEmpty() || (replacements == null)) {
             return trimmedCommand;
         }
 
@@ -730,15 +461,188 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         return trimmedCommand;
     }
 
+    protected void flushStatements(final boolean useTenant) throws SPersistenceException {
+        final Session session = getSession(useTenant);
+        session.flush();
+    }
+
     public Map<String, String> getClassAliasMappings() {
         return classAliasMappings;
     }
 
+    protected Class<? extends PersistentObject> getMappedClass(final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
+        if (classMapping.contains(entityClass)) {
+            return entityClass;
+        }
+        if (interfaceToClassMapping.containsKey(entityClass.getName())) {
+            return interfaceToClassMapping.get(entityClass.getName());
+        }
+        throw new SPersistenceException("Unable to locate class " + entityClass + " in Hibernate configuration");
+    }
+
+    protected String getQueryWithFilters(final String query, final List<FilterOption> filters, final SearchFields multipleFilter) {
+        final StringBuilder builder = new StringBuilder(query);
+        final Set<String> specificFilters = new HashSet<String>(filters.size());
+        FilterOption previousFilter = null;
+        if (!filters.isEmpty()) {
+            if (!query.contains("WHERE")) {
+                builder.append(" WHERE (");
+            } else {
+                builder.append(" AND (");
+            }
+            for (final FilterOption filterOption : filters) {
+                if (previousFilter != null) {
+                    final FilterOperationType prevOp = previousFilter.getFilterOperationType();
+                    final FilterOperationType currOp = filterOption.getFilterOperationType();
+                    // Auto add AND if previous operator was normal op or ')' and that current op is normal op or '(' :
+                    if ((isNormalOperator(prevOp) || (prevOp == R_PARENTHESIS)) && (isNormalOperator(currOp) || (currOp == L_PARENTHESIS))) {
+                        builder.append(" AND ");
+                    }
+                }
+                final StringBuilder aliasBuilder = appendFilterClause(builder, filterOption);
+                // FIXME: is it really filterOption.getFieldName() or is it its formatted value: classAliasMappings.get(.......) ?:
+                // specificFilters.add(filterOption.getFieldName());
+                if (aliasBuilder != null) {
+                    specificFilters.add(aliasBuilder.toString());
+                }
+                previousFilter = filterOption;
+            }
+            builder.append(")");
+        }
+        if ((multipleFilter != null) && (multipleFilter.getTerms() != null) && !multipleFilter.getTerms().isEmpty()) {
+            final Map<Class<? extends PersistentObject>, Set<String>> allTextFields = multipleFilter.getFields();
+            final Set<String> fields = new HashSet<String>();
+            for (final Entry<Class<? extends PersistentObject>, Set<String>> entry : allTextFields.entrySet()) {
+                final String alias = getClassAliasMappings().get(entry.getKey().getName());
+                for (final String field : entry.getValue()) {
+                    final StringBuilder aliasBuilder = new StringBuilder(alias);
+                    aliasBuilder.append('.').append(field);
+                    fields.add(aliasBuilder.toString());
+                }
+            }
+            fields.removeAll(specificFilters);
+            final Iterator<String> fieldIterator = fields.iterator();
+            final List<String> terms = multipleFilter.getTerms();
+            if (!fields.isEmpty()) {
+                if (!builder.toString().contains("WHERE")) {
+                    builder.append(" WHERE (");
+                } else {
+                    builder.append(" AND (");
+                }
+                while (fieldIterator.hasNext()) {
+                    final Iterator<String> termIterator = terms.iterator();
+                    final String currentField = fieldIterator.next();
+                    while (termIterator.hasNext()) {
+                        final String currentTerm = termIterator.next();
+                        builder.append(currentField).append(getLikeEscapeClause(currentTerm));
+                        if (termIterator.hasNext() || fieldIterator.hasNext()) {
+                            builder.append(" OR ");
+                        }
+                    }
+                }
+                builder.append(")");
+            }
+        }
+        return builder.toString();
+    }
+
+    private <T> String getQueryWithOrderByClause(final String query, final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
+        final StringBuilder builder = new StringBuilder(query);
+        appendOrderByClause(builder, selectDescriptor);
+        return builder.toString();
+    }
+
+    protected Session getSession(final boolean useTenant) throws SPersistenceException {
+        logStats();
+        try {
+            final org.hibernate.classic.Session currentSession = sessionFactory.getCurrentSession();
+            return currentSession;
+        } catch (final HibernateException e) {
+            throw new SPersistenceException(e);
+        }
+    }
+
     @Override
-    public void delete(final long id, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
-        final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
-        final Query query = getSession(true).getNamedQuery("delete" + mappedClass.getSimpleName());
-        query.setLong("id", id);
+    public void insert(final PersistentObject entity) throws SPersistenceException {
+        final Class<? extends PersistentObject> entityClass = entity.getClass();
+        checkClassMapping(entityClass);
+        final Session session = getSession(true);
+        setId(entity);
+        try {
+            session.save(entity);
+        } catch (final AssertionFailure af) {
+            throw new SRetryableException(af);
+        } catch (final LockAcquisitionException lae) {
+            throw new SRetryableException(lae);
+        } catch (final StaleStateException sse) {
+            throw new SRetryableException(sse);
+        } catch (final HibernateException he) {
+            throw new SPersistenceException(he);
+        }
+    }
+
+    @Override
+    public void insertInBatch(final List<PersistentObject> entities) throws SPersistenceException {
+        if (!entities.isEmpty()) {
+            final Session session = getSession(true);
+            for (final PersistentObject entity : entities) {
+                final Class<? extends PersistentObject> entityClass = entity.getClass();
+                checkClassMapping(entityClass);
+                setId(entity);
+                session.save(entity);
+            }
+        }
+    }
+
+    /**
+     * Log synthetic information about cache every 10.000 sessions, if hibernate.gather_statistics, is enabled.
+     */
+    protected void logStats() {
+        if (!statistics.isStatisticsEnabled()) {
+            return;
+        }
+        if ((stat_display_count == 10) || (stat_display_count == 100) || (stat_display_count == 1000) || ((stat_display_count % 10000) == 0)) {
+            final long query_cache_hit = statistics.getQueryCacheHitCount();
+            final long query_cache_miss = statistics.getQueryCacheMissCount();
+            final long query_cahe_put = statistics.getQueryCachePutCount();
+            final long level_2_cache_hit = statistics.getSecondLevelCacheHitCount();
+            final long level_2_cache_miss = statistics.getSecondLevelCacheMissCount();
+            final long level_2_put = statistics.getSecondLevelCachePutCount();
+
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "Query Cache Ratio "
+                    + (int) (((double) query_cache_hit / (query_cache_hit + query_cache_miss)) * 100) + "% " + query_cache_hit + " hits " + query_cache_miss
+                    + " miss " + query_cahe_put + " puts");
+            logger.log(this.getClass(), TechnicalLogSeverity.INFO, "2nd Level Cache Ratio "
+                    + (int) (((double) level_2_cache_hit / (level_2_cache_hit + level_2_cache_miss)) * 100) + "% " + level_2_cache_hit + " hits "
+                    + level_2_cache_miss + " miss " + level_2_put + " puts");
+
+        }
+        stat_display_count++;
+    }
+
+    protected <T> void logWarningMessage(final SelectListDescriptor<T> selectDescriptor, final Query query) {
+        final StringBuilder message = new StringBuilder();
+        message.append("selectList call without \"order by\" clause ");
+        message.append("\n");
+        message.append(query.toString());
+        message.append("\n");
+        message.append(String.format("query name:%s\nentity:%s\nstart index:%d\npage size:%d",
+                selectDescriptor.getQueryName(),
+                selectDescriptor.getEntityType().getCanonicalName(),
+                selectDescriptor.getStartIndex(), selectDescriptor.getPageSize()));
+        logger.log(this.getClass(), TechnicalLogSeverity.WARNING, message.toString());
+
+        // throw new IllegalArgumentException("Query " + selectDescriptor.getQueryName());
+    }
+
+    @Override
+    public void purge(final String classToPurge) throws SPersistenceException {
+        final int index = classToPurge.lastIndexOf('.');
+        String suffix = classToPurge;
+        if (index != -1) {
+            suffix = classToPurge.substring(index + 1, classToPurge.length());
+        }
+        final Query query = getSession(true).getNamedQuery("purge" + suffix);
         try {
             query.executeUpdate();
         } catch (final AssertionFailure af) {
@@ -753,12 +657,24 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     @Override
-    public void delete(final List<Long> ids, final Class<? extends PersistentObject> entityClass) throws SPersistenceException {
-        final Class<? extends PersistentObject> mappedClass = getMappedClass(entityClass);
-        final Query query = getSession(true).getNamedQuery("deleteByIds" + mappedClass.getSimpleName());
-        query.setParameterList("ids", ids);
+    public <T extends PersistentObject> T selectById(final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
         try {
-            query.executeUpdate();
+            return this.selectById(getSession(true), selectDescriptor);
+        } catch (final SPersistenceException e) {
+            throw new SBonitaReadException(e, selectDescriptor);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    <T extends PersistentObject> T selectById(final Session session, final SelectByIdDescriptor<T> selectDescriptor) throws SBonitaReadException {
+        Class<? extends PersistentObject> mappedClass = null;
+        try {
+            mappedClass = getMappedClass(selectDescriptor.getEntityType());
+        } catch (final SPersistenceException e) {
+            throw new SBonitaReadException(e);
+        }
+        try {
+            return (T) session.get(mappedClass, selectDescriptor.getId());
         } catch (final AssertionFailure af) {
             throw new SRetryableException(af);
         } catch (final LockAcquisitionException lae) {
@@ -766,12 +682,138 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         } catch (final StaleStateException sse) {
             throw new SRetryableException(sse);
         } catch (final HibernateException he) {
-            throw new SPersistenceException(he);
+            throw new SBonitaReadException(he);
         }
     }
 
-    public void destroy() {
-        logger.log(getClass(), TechnicalLogSeverity.INFO, "Closing Hibernate session factory of " + getClass().getName());
-        sessionFactory.close();
+    @Override
+    public <T> List<T> selectList(final SelectListDescriptor<T> selectDescriptor) throws SBonitaReadException {
+        try {
+            final Class<? extends PersistentObject> entityClass = selectDescriptor.getEntityType();
+            checkClassMapping(entityClass);
+
+            final Session session = getSession(true);
+
+            Query query = session.getNamedQuery(selectDescriptor.getQueryName());
+            String builtQuery = query.getQueryString();
+
+            if (selectDescriptor.hasAFilter()) {
+                final QueryOptions queryOptions = selectDescriptor.getQueryOptions();
+                builtQuery = getQueryWithFilters(builtQuery, queryOptions.getFilters(), queryOptions.getMultipleFilter());
+            }
+            if (selectDescriptor.hasOrderByParameters()) {
+                builtQuery = getQueryWithOrderByClause(builtQuery, selectDescriptor);
+            }
+
+            if (!builtQuery.equals(query.getQueryString())) {
+                query = session.createQuery(builtQuery);
+            }
+            setQueryCache(query, selectDescriptor.getQueryName());
+
+            if (selectDescriptor != null) {
+                setParameters(query, selectDescriptor.getInputParameters());
+            }
+            query.setFirstResult(selectDescriptor.getStartIndex());
+            query.setMaxResults(selectDescriptor.getPageSize());
+
+            checkOrderByClause(selectDescriptor, query);
+
+            @SuppressWarnings("unchecked")
+            final List<T> list = query.list();
+            if (list != null) {
+                return list;
+            }
+            return Collections.emptyList();
+        } catch (final AssertionFailure af) {
+            throw new SRetryableException(af);
+        } catch (final LockAcquisitionException lae) {
+            throw new SRetryableException(lae);
+        } catch (final StaleStateException sse) {
+            throw new SRetryableException(sse);
+        } catch (final HibernateException e) {
+            throw new SBonitaReadException(e, selectDescriptor);
+        } catch (final SPersistenceException e) {
+            throw new SBonitaReadException(e, selectDescriptor);
+        }
+    }
+
+    @Override
+    public <T> T selectOne(final SelectOneDescriptor<T> selectDescriptor) throws SBonitaReadException {
+        try {
+            final Session session = getSession(true);
+            return this.selectOne(session, selectDescriptor, selectDescriptor.getInputParameters());
+        } catch (final SPersistenceException e) {
+            throw new SBonitaReadException(e, selectDescriptor);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T selectOne(final Session session, final AbstractSelectDescriptor<T> selectDescriptor, final Map<String, Object> parameters)
+            throws SBonitaReadException {
+        try {
+            checkClassMapping(selectDescriptor.getEntityType());
+        } catch (final SPersistenceException e) {
+            throw new SBonitaReadException(e);
+        }
+        final Query query = session.getNamedQuery(selectDescriptor.getQueryName());
+        setQueryCache(query, selectDescriptor.getQueryName());
+        if (parameters != null) {
+            setParameters(query, parameters);
+        }
+        query.setMaxResults(1);
+        try {
+            return (T) query.uniqueResult();
+        } catch (final AssertionFailure af) {
+            throw new SRetryableException(af);
+        } catch (final LockAcquisitionException lae) {
+            throw new SRetryableException(lae);
+        } catch (final StaleStateException sse) {
+            throw new SRetryableException(sse);
+        } catch (final HibernateException he) {
+            throw new SBonitaReadException(he);
+        }
+    }
+
+    private void setField(final PersistentObject entity, final String fieldName, final Object parameterValue) throws SPersistenceException {
+        Long id = null;
+        try {
+            id = entity.getId();
+            final String setterName = "set" + StringUtil.firstCharToUpperCase(fieldName);
+            ClassReflector.invokeMethodByName(entity, setterName, parameterValue);
+        } catch (final Exception e) {
+            throw new SPersistenceException("Problem while updating entity: " + entity + " with id: " + id, e);
+        }
+    }
+
+    protected void setParameters(final Query query, final Map<String, Object> inputParameters) {
+        for (final Map.Entry<String, Object> entry : inputParameters.entrySet()) {
+            final Object value = entry.getValue();
+            if (value instanceof Collection<?>) {
+                query.setParameterList(entry.getKey(), (Collection<?>) value);
+            } else {
+                query.setParameter(entry.getKey(), value);
+            }
+        }
+    }
+
+    protected void setQueryCache(final Query query, final String name) {
+        if ((cacheQueries != null) && cacheQueries.containsKey(name)) {
+            query.setCacheable(true);
+        }
+    }
+
+    @Override
+    public void update(final UpdateDescriptor updateDescriptor) throws SPersistenceException {
+        // FIXME: deal with disconnected objects:
+        final Class<? extends PersistentObject> entityClass = updateDescriptor.getEntity().getClass();
+        checkClassMapping(entityClass);
+        final PersistentObject entity = updateDescriptor.getEntity();
+        final Session session = getSession(false);
+        if (!session.contains(entity)) {
+            throw new SPersistenceException("The object cannot be updated because it's deconnected " + entity);
+        }
+        for (final Map.Entry<String, Object> field : updateDescriptor.getFields().entrySet()) {
+            setField(entity, field.getKey(), field.getValue());
+        }
     }
 }
