@@ -23,7 +23,7 @@ public class TenantMonitoringServiceIntegrationTest extends TenantMonitoringServ
     }
 
     @Override
-    protected TenantMonitoringService getMonitoringService() throws Exception {
+    protected TenantMonitoringService getMonitoringService() {
         return monitoringService;
     }
 

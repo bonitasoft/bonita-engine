@@ -16,6 +16,7 @@ import org.bonitasoft.engine.api.impl.LoginAPIImpl;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.LoginException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -54,11 +55,11 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
         checkUsernameAndPassword(userName, password);
         try {
             return login(userName, password, tenantId);
-        } catch (LoginException e) {
+        } catch (final LoginException e) {
             throw e;
-        } catch (TenantIsPausedException e) {
+        } catch (final BonitaRuntimeException e) {
             throw e;
-        } catch (Throwable e) {
+        } catch (final Exception e) {
             throw new LoginException(e);
         }
     }
@@ -69,16 +70,21 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     }
 
     @Override
-    protected void checkThatWeCanLogin(final String userName, final Long tenantId, final PlatformService platformService, final STenant sTenant,
-            final long resolvedTenantId)
-            throws LoginException, BonitaHomeNotSetException, IOException {
-        super.checkThatWeCanLogin(userName, tenantId, platformService, sTenant, resolvedTenantId);
-        if (sTenant.isPaused()) {
-            String technicalUserName = BonitaHomeServer.getInstance().getTenantProperties(resolvedTenantId).getProperty("userName");
-            if (!technicalUserName.equals(userName)) {
-                throw new TenantIsPausedException("Tenant with ID " + tenantId
-                        + " is in maintenance, unable to login with other user than the technical user.");
+    protected void checkThatWeCanLogin(final String userName, final PlatformService platformService, final STenant sTenant) throws LoginException {
+        super.checkThatWeCanLogin(userName, platformService, sTenant);
+        try {
+            if (sTenant.isPaused()) {
+                final String technicalUserName = BonitaHomeServer.getInstance().getTenantProperties(sTenant.getId()).getProperty("userName");
+
+                if (!technicalUserName.equals(userName)) {
+                    throw new TenantIsPausedException("Tenant with ID " + sTenant.getId()
+                            + " is in maintenance, unable to login with other user than the technical user.");
+                }
             }
+        } catch (BonitaHomeNotSetException e) {
+            throw new LoginException(e);
+        } catch (IOException e) {
+            throw new LoginException(e);
         }
     }
 

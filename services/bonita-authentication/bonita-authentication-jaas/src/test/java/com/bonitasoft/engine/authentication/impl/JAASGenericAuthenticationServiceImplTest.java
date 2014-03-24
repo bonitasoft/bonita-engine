@@ -19,7 +19,7 @@ import javax.security.auth.login.LoginException;
 import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,7 +45,7 @@ public class JAASGenericAuthenticationServiceImplTest {
     ReadSessionAccessor sessionAccessor;
 
     @Before
-    public void setup() throws TenantIdNotSetException {
+    public void setup() throws STenantIdNotSetException {
         jaasGenericAuthenticationServiceImpl = new JAASGenericAuthenticationServiceImpl(logger, sessionAccessor);
     }
 

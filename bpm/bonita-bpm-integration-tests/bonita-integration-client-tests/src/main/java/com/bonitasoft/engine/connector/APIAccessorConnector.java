@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.connector;
 
 import org.bonitasoft.engine.connector.ConnectorException;
-import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -24,7 +23,7 @@ import com.bonitasoft.engine.log.LogCriterion;
 public class APIAccessorConnector extends AbstractConnector {
 
     @Override
-    public void validateInputParameters() throws ConnectorValidationException {
+    public void validateInputParameters() {
     }
 
     @Override

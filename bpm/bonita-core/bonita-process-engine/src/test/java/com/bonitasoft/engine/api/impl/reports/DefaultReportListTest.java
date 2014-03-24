@@ -8,11 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.reports;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
@@ -25,7 +21,7 @@ import org.mockito.Mock;
 
 /**
  * @author Vincent Elcrin
- *
+ * 
  */
 public class DefaultReportListTest {
 
@@ -33,7 +29,7 @@ public class DefaultReportListTest {
     private TechnicalLoggerService logger;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         initMocks(this);
     }
 
@@ -45,6 +41,7 @@ public class DefaultReportListTest {
 
         defaultReports.deploy(new ReportDeployer() {
 
+            @SuppressWarnings("unused")
             @Override
             public void deploy(String name, String description, byte[] screenShot, byte[] content) {
                 reports.add(name);

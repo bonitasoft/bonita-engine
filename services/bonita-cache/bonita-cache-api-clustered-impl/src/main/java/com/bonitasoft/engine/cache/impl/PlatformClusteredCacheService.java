@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -27,7 +26,7 @@ public class PlatformClusteredCacheService extends CommonClusteredCacheService i
     }
 
     @Override
-    protected String getKeyFromCacheName(final String cacheName) throws CacheException {
+    protected String getKeyFromCacheName(final String cacheName) {
         return "P_" + cacheName;
     }
 

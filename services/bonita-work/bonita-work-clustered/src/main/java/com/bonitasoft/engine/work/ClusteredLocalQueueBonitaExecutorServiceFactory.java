@@ -62,8 +62,7 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
         final WorkerThreadFactory threadFactory = new WorkerThreadFactory("Bonita-Worker", tenantId, maximumPoolSize);
         BlockingQueue<Runnable> queue = createWorkQueue(hazelcastInstance);
         return Pair.<ExecutorService, Queue<Runnable>> of(new ClusteredThreadPoolExecutorLocalQueue(corePoolSize, maximumPoolSize, keepAliveTimeSeconds,
-                TimeUnit.SECONDS, threadFactory, handler,
-                hazelcastInstance, queue), queue);
+                TimeUnit.SECONDS, threadFactory, handler, hazelcastInstance, queue), queue);
     }
 
     private static BlockingQueue<Runnable> createWorkQueue(final HazelcastInstance hazelcastInstance) {
@@ -76,10 +75,13 @@ public class ClusteredLocalQueueBonitaExecutorServiceFactory implements BonitaEx
         public QueueRejectedExecutionHandler() {
         }
 
+        @SuppressWarnings("unused")
         @Override
         public void rejectedExecution(final Runnable task, final ThreadPoolExecutor executor) {
-            throw new RejectedExecutionException("Unable to run the task " + task
-                    + ".\n Your work queue is full, you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
+            throw new RejectedExecutionException(
+                    "Unable to run the task "
+                            + task
+                            + ".\n Your work queue is full, you might consider changing your configuration to scale more. See parameter 'queueCapacity' in bonita.home configuration files.");
         }
 
     }

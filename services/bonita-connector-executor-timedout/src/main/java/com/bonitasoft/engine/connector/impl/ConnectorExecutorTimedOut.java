@@ -39,6 +39,10 @@ public class ConnectorExecutorTimedOut extends ConnectorExecutorImpl {
         return timeout;
     }
 
+    /**
+     * @param timeout
+     *            Time out in seconds
+     */
     public void setTimeout(final long timeout) {
         this.timeout = timeout;
     }

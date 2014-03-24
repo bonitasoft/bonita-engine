@@ -33,7 +33,7 @@ public class AuthenticationCallbackHandler implements CallbackHandler {
     }
 
     @Override
-    public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+    public void handle(final Callback[] callbacks) {
         for (final Callback callback : callbacks) {
             if (callback instanceof NameCallback) {
                 final NameCallback nc = (NameCallback) callback;

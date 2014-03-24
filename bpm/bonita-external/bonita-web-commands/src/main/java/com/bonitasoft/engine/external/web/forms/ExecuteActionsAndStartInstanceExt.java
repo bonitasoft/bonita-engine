@@ -15,28 +15,24 @@ import java.util.Map;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.process.ActivationState;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotEnabledException;
-import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.CreationException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.execution.FlowNodeSelector;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.StartFlowNodeFilter;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.external.web.forms.ExecuteActionsBaseEntry;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -78,10 +74,6 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             } finally {
                 Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
-        } catch (final BonitaException e) {
-            throw new SCommandExecutionException(
-                    "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstanceExt(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
-                    e);
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(
                     "Error executing command 'Map<String, Serializable> ExecuteActionsAndStartInstanceExt(Map<Operation, Map<String, Serializable>> operationsMap, long processDefinitionID)'",
@@ -91,7 +83,7 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
 
     private ProcessInstance startProcess(final long processDefinitionId, final long userId, final List<Operation> operations,
             final Map<String, Object> context, final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final TechnicalLoggerService logger)
-            throws ProcessDefinitionNotFoundException, CreationException, RetrieveException, ProcessDefinitionNotEnabledException {
+            throws SProcessDefinitionException, SProcessDefinitionReadException, SInvalidExpressionException, SProcessInstanceCreationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
@@ -103,28 +95,22 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             starterId = userId;
         }
         // Retrieval of the process definition:
-        SProcessDefinition sDefinition;
-        try {
-            final GetProcessDeploymentInfo transactionContentWithResult = new GetProcessDeploymentInfo(processDefinitionId, processDefinitionService);
-            transactionContentWithResult.execute();
-            final SProcessDefinitionDeployInfo deployInfo = transactionContentWithResult.getResult();
-            if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
-                throw new ProcessDefinitionNotEnabledException(deployInfo.getName(), deployInfo.getVersion(), deployInfo.getProcessId());
-            }
-            sDefinition = getServerProcessDefinition(processDefinitionId, processDefinitionService);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new ProcessDefinitionNotFoundException(e);
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
+        final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
+        if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
+            throw new SProcessDefinitionException("Process " + deployInfo.getName() + " in version " + deployInfo.getVersion() + " with id "
+                    + deployInfo.getProcessId() + " is not enabled !!");
         }
-        SProcessInstance startedInstance;
+        final SProcessDefinition sDefinition = getProcessDefinition(tenantAccessor, processDefinitionId);
+        SProcessInstance startedInstance = null;
         try {
             final List<SOperation> sOperations = toSOperation(operations);
-            startedInstance = processExecutor.start(starterId, session.getUserId(), sOperations, context, connectorsWithInput, new FlowNodeSelector(sDefinition, new StartFlowNodeFilter()));
-        } catch (final SBonitaException e) {
+            startedInstance = processExecutor.start(starterId, session.getUserId(), sOperations, context, connectorsWithInput, new FlowNodeSelector(
+                    sDefinition, new StartFlowNodeFilter()));
+        } catch (final SProcessInstanceCreationException e) {
             log(tenantAccessor, e);
-            throw new CreationException(e);
-        }// FIXME in case process instance creation exception -> put it in failed
+            e.setProcessDefinitionOnContext(sDefinition);
+            throw e;
+        }
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             final StringBuilder stb = new StringBuilder();
             stb.append("The user <");
@@ -143,35 +129,9 @@ public class ExecuteActionsAndStartInstanceExt extends ExecuteActionsBaseEntry {
             stb.append(sDefinition.getId());
             stb.append(">");
             logger.log(getClass(), TechnicalLogSeverity.INFO, stb.toString());
+
         }
         return ModelConvertor.toProcessInstance(sDefinition, startedInstance);
-    }
-
-    /**
-     * @author Baptiste Mesta
-     */
-    private final class GetProcessDeploymentInfo implements TransactionContentWithResult<SProcessDefinitionDeployInfo> {
-
-        private final Long processDefinitionUUID;
-
-        private final ProcessDefinitionService processDefinitionService;
-
-        private SProcessDefinitionDeployInfo processDefinitionDI;
-
-        private GetProcessDeploymentInfo(final Long processDefinitionUUID, final ProcessDefinitionService processDefinitionService) {
-            this.processDefinitionUUID = processDefinitionUUID;
-            this.processDefinitionService = processDefinitionService;
-        }
-
-        @Override
-        public void execute() throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-            processDefinitionDI = processDefinitionService.getProcessDeploymentInfo(processDefinitionUUID);
-        }
-
-        @Override
-        public SProcessDefinitionDeployInfo getResult() {
-            return processDefinitionDI;
-        }
     }
 
 }

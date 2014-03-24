@@ -61,9 +61,9 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
     @Test
     public void executeConnectorWithExecutionTooLong() throws Exception {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
+        designProcessDefinition.addActor(ACTOR_NAME).addDescription(DESCRIPTION);
         designProcessDefinition.addAutomaticTask("step1").addConnector("myConnector1", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER)
-                .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(2000));
+                .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(5000));
 
         final ProcessDefinition processDefinition = deployProcessWithDefaultTestConnector(ACTOR_NAME, johnUserId, designProcessDefinition);
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -76,13 +76,12 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
             final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
             final ActivityInstance failedTask = waitForTaskToFail(process);
             assertEquals("step1", failedTask.getName());
-            System.out.println("second start");
             sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info cleaned by api call
             connectorExecutor.setTimeout(oldTimeout);
             final ProcessInstance process2 = getProcessAPI().startProcess(processDefinition.getId());
             waitForProcessToFinish(process2);
-            disableAndDeleteProcess(processDefinition);
         } finally {
+            disableAndDeleteProcess(processDefinition);
             sessionAccessor.setSessionInfo(getSession().getId(), getSession().getTenantId()); // set session info cleaned by api call
             connectorExecutor.setTimeout(oldTimeout);
             sessionAccessor.deleteSessionId();
