@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 import com.bonitasoft.manager.Manager;
 import com.hazelcast.core.DistributedObject;
@@ -41,14 +41,14 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
     /**
      * @param cacheName
      * @return
-     * @throws CacheException
+     * @throws SCacheException
      */
     @Override
-    protected String getKeyFromCacheName(final String cacheName) throws CacheException {
+    protected String getKeyFromCacheName(final String cacheName) throws SCacheException {
         try {
             return String.valueOf(sessionAccessor.getTenantId()) + '_' + cacheName;
-        } catch (final TenantIdNotSetException e) {
-            throw new CacheException(e);
+        } catch (final STenantIdNotSetException e) {
+            throw new SCacheException(e);
         }
     }
 
@@ -65,7 +65,7 @@ public class ClusteredCacheService extends CommonClusteredCacheService implement
                 }
             }
 
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new RuntimeException(e);
         }
 

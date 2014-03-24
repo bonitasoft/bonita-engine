@@ -17,7 +17,6 @@ import java.util.Map;
 import javax.management.MalformedObjectNameException;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -44,7 +43,7 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
 
     public PlatformMonitoringServiceImpl(final boolean allowMbeansRegistration, final SJvmMXBean jvmMBean,
             final TransactionService transactionService, final SchedulerService schedulerService, final TechnicalLoggerService technicalLog)
-            throws HandlerRegistrationException, MalformedObjectNameException {
+            throws MalformedObjectNameException {
         super(allowMbeansRegistration, technicalLog);
         this.jvmMBean = jvmMBean;
         this.transactionService = transactionService;

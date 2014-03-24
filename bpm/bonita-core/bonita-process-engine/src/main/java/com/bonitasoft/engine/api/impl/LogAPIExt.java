@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -21,8 +21,8 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.bonitasoft.engine.services.SQueriableLogNotFoundException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetLogInstance;
@@ -41,6 +41,7 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 /**
  * @author Bole Zhang
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class LogAPIExt implements LogAPI {
 
@@ -54,7 +55,7 @@ public class LogAPIExt implements LogAPI {
         try {
             final long tenantId = sessionAccessor.getTenantId();
             return TenantServiceSingleton.getInstance(tenantId);
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new BonitaRuntimeException(e);
         }
     }

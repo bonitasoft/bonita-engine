@@ -31,6 +31,7 @@ public class NoAuthenticationServiceImpl implements AuthenticationService {
         this.logger = logger;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public boolean checkUserCredentials(final String userName, final String password) throws AuthenticationException {
         try {

@@ -73,15 +73,15 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
         return flowNodeState;
     }
 
-    private FlowNodeState handleBreakPoints(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance, FlowNodeState flowNodeState,
-            final FlowNodeState current, int nextState) throws SActivityExecutionException {
+    private FlowNodeState handleBreakPoints(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
+            final FlowNodeState flowNodeState, final FlowNodeState current, int nextState) throws SActivityExecutionException {
         try {
             if (!current.isInterrupting() && breakpointService.isBreakpointActive()) {
                 final SBreakpoint breakPointFor = breakpointService.getBreakPointFor(processDefinition.getId(), flowNodeInstance.getRootContainerId(),
                         flowNodeInstance.getName(), nextState);
                 if (breakPointFor != null) {
                     final int interruptedStateId = breakPointFor.getInterruptedStateId();
-                    flowNodeState = getState(interruptedStateId);
+                    return getState(interruptedStateId);
                 }
             }
         } catch (final SBonitaReadException e) {

@@ -326,7 +326,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         assertTrue("no pending user task instances are found", new WaitUntil(50, 1000) {
 
             @Override
-            protected boolean check() throws Exception {
+            protected boolean check() {
                 return getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 10, null).size() >= 1;
             }
         }.waitUntil());

@@ -39,7 +39,7 @@ public class CommonClusteredCacheServiceTest {
     private Manager manager;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         final HazelcastInstance hazelcastInstance = mock(HazelcastInstance.class);
         clusteredCache = mock(IMap.class);
         manager = mock(Manager.class);
@@ -102,7 +102,7 @@ public class CommonClusteredCacheServiceTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void protectedService() throws Exception {
+    public void protectedService() {
         when(manager.isFeatureActive(Features.ENGINE_CLUSTERING)).thenReturn(false);
         cacheService = new ClusteredCacheServiceExt(manager, null, null, null);
     }

@@ -36,7 +36,7 @@ public class NoAuthenticationServiceImplTest {
     private NoAuthenticationServiceImpl authenticationService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         when(logger.isLoggable(NoAuthenticationServiceImpl.class, TechnicalLogSeverity.TRACE)).thenReturn(true);
     }
@@ -49,7 +49,7 @@ public class NoAuthenticationServiceImplTest {
 
     @Test
     public void authKOWithAnUnknownUser() throws Exception {
-        when(identityService.getUserByUserName("hannu")).thenThrow(SUserNotFoundException.class);
+        when(identityService.getUserByUserName("hannu")).thenThrow(new SUserNotFoundException("plop"));
         assertFalse(authenticationService.checkUserCredentials("hannu", "bpm"));
     }
 
