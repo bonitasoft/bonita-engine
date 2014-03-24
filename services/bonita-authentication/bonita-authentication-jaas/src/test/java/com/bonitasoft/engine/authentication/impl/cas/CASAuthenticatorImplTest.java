@@ -1,9 +1,17 @@
 package com.bonitasoft.engine.authentication.impl.cas;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -55,9 +63,11 @@ import org.w3c.dom.Document;
 @RunWith(MockitoJUnitRunner.class)
 public class CASAuthenticatorImplTest {
 
-    private String casService = "http://bonitasoft.com/bonita";
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-    private String casURLPRefix = "http://cas.bonitasoft.com/cas";
+    private final String casService = "http://bonitasoft.com/bonita";
+
+    private final String casURLPRefix = "http://cas.bonitasoft.com/cas";
 
     private Map<String, Serializable> credentials;
 
@@ -94,11 +104,12 @@ public class CASAuthenticatorImplTest {
     }
 
     @Test
-    public void testAuthenticate() throws Exception {
+    public void testAuthenticate() {
         doAnswer(new Answer<Object>() {
 
+            @SuppressWarnings("unused")
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
+            public Object answer(InvocationOnMock invocation) {
                 return null;
             }
         }).when(casAuthenticatorImpl).loginToServiceViaCAS(credentials);
@@ -115,7 +126,7 @@ public class CASAuthenticatorImplTest {
     }
 
     @Test
-    public void testRetrieveEmptyPasswordFromCredentials() throws Exception {
+    public void testRetrieveEmptyPasswordFromCredentials() {
         try {
             casAuthenticatorImpl.retrievePasswordFromCredentials(credentials);
         } catch (LoginException e) {
@@ -126,7 +137,7 @@ public class CASAuthenticatorImplTest {
     }
 
     @Test
-    public void testRetrieveEmptyUsernameFromCredentials() throws Exception {
+    public void testRetrieveEmptyUsernameFromCredentials() {
         String login = "";
         credentials.put(AuthenticationConstants.BASIC_USERNAME, login);
         try {
@@ -139,7 +150,7 @@ public class CASAuthenticatorImplTest {
     }
 
     @Test
-    public void testRetrieveNullUsernameFromCredentials() throws Exception {
+    public void testRetrieveNullUsernameFromCredentials() {
         try {
             casAuthenticatorImpl.retrieveUsernameFromCredentials(credentials);
         } catch (LoginException e) {
@@ -327,41 +338,44 @@ public class CASAuthenticatorImplTest {
 
     @Test
     public void testCreateDOMDocumentFromResponse() throws Exception {
-        String content = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
+        final String content = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
                 + "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />"
                 + "<title>TEST</title></head><body>Test de formatting!</body></html>";
-        Document doc = casAuthenticatorImpl.createDOMDocumentFromResponse(content);
-        String xmlDoc = transformDocumentToString(doc);
+        final Document doc = casAuthenticatorImpl.createDOMDocumentFromResponse(content);
+        final String xmlDoc = transformDocumentToString(doc).replaceAll(LINE_SEPARATOR, "");
         // uncomment to see diff in eclipse
-        // assertEquals(xmlDoc, "<html>\n  \n<head>\n<META http-equiv=\"Content-Type\" "
-        // + "content=\"text/html; charset=UTF-8\">\n    \n<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\">\n    \n"
-        // + "<title>TEST</title>\n  \n</head>\n  \n<body>Test de formatting!</body>\n\n</html>\n");
-        assertThat(xmlDoc).isEqualToIgnoringCase("<html>\n  \n<head>\n<META http-equiv=\"Content-Type\" "
-                + "content=\"text/html; charset=UTF-8\">\n    \n<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\">\n    \n"
-                + "<title>TEST</title>\n  \n</head>\n  \n<body>Test de formatting!</body>\n\n</html>\n");
+        // assertEquals(xmlDoc, "<html>  <head><META http-equiv=\"Content-Type\" "
+        // + "content=\"text/html; charset=UTF-8\">    <meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\">    "
+        // + "<title>TEST</title>  </head>  <body>Test de formatting!</body></html>");
+
+        assertThat(xmlDoc).isEqualToIgnoringCase("<html>  <head><META http-equiv=\"Content-Type\" "
+                + "content=\"text/html; charset=UTF-8\">    <meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\">    "
+                + "<title>TEST</title>  </head>  <body>Test de formatting!</body></html>");
     }
 
     @Test
     public void testCreateDOMDocumentFromResponseWithLoginForm() throws Exception {
-        String content = FileUtils.readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.html"));
-        Document doc = casAuthenticatorImpl.createDOMDocumentFromResponse(content);
-        String xmlDoc = transformDocumentToString(doc);
+        final String content = FileUtils
+                .readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.html"), "UTF8");
+        final Document doc = casAuthenticatorImpl.createDOMDocumentFromResponse(content);
+        final String xmlDoc = transformDocumentToString(doc).replaceAll(LINE_SEPARATOR, "");
         // uncomment to see diff in eclipse
         // assertEquals(sw.toString(), FileUtils.readFileToString(new
         // File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.xml")));
-        assertThat(xmlDoc).isEqualToIgnoringCase(
-                FileUtils.readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.xml")));
+        final String readFileToString = FileUtils
+                .readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.xml"), "UTF8").replaceAll(
+                        LINE_SEPARATOR, "");
+        assertThat(xmlDoc).isEqualToIgnoringCase(readFileToString);
     }
 
     protected String transformDocumentToString(Document doc) throws TransformerFactoryConfigurationError, TransformerConfigurationException,
             TransformerException {
-        TransformerFactory tFactory =
-                TransformerFactory.newInstance();
-        Transformer transformer = tFactory.newTransformer();
+        final TransformerFactory tFactory = TransformerFactory.newInstance();
+        final Transformer transformer = tFactory.newTransformer();
 
-        DOMSource source = new DOMSource(doc);
-        StringWriter sw = new StringWriter();
-        StreamResult result = new StreamResult(sw);
+        final DOMSource source = new DOMSource(doc);
+        final StringWriter sw = new StringWriter();
+        final StreamResult result = new StreamResult(sw);
         transformer.transform(source, result);
         return sw.toString();
     }
@@ -451,7 +465,7 @@ public class CASAuthenticatorImplTest {
     }
 
     @Test
-    public void testCreateHttpRequestForTicketRetrieval() throws Exception {
+    public void testCreateHttpRequestForTicketRetrieval() {
         String casAction = "cas/login";
         String ticketGrantingCookie = "TGT-sdfkjfgsjfgsfg";
         Header[] headers = new Header[] { header };
@@ -474,7 +488,7 @@ public class CASAuthenticatorImplTest {
     }
 
     @Test
-    public void testRetrieveTicketFromRedirectToSomethingElse() throws Exception {
+    public void testRetrieveTicketFromRedirectToSomethingElse() {
         String location = "http://cas.bonitasoft.com/bonita/portal?";
         Header header = mock(Header.class);
         when(response.getFirstHeader("Location")).thenReturn(header);
@@ -489,7 +503,7 @@ public class CASAuthenticatorImplTest {
     }
 
     @Test
-    public void testCreateEntityContent() throws Exception {
+    public void testCreateEntityContent() {
         String login = "username";
         String password = "password";
         String lt = "LT-sdfmlkjfg";
