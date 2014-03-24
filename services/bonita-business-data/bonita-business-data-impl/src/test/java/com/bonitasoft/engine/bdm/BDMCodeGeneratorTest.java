@@ -3,7 +3,6 @@ package com.bonitasoft.engine.bdm;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -27,7 +26,6 @@ import org.junit.Test;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JAnnotationValue;
 import com.sun.codemodel.JClass;
-import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JFormatter;
@@ -203,8 +201,6 @@ public class BDMCodeGeneratorTest extends CompilableCode {
 
         final JMethod getter = (JMethod) definedClass.methods().toArray()[1];
         assertThat(getter.name()).isEqualTo("isFound");
-
-        assertGenerationAndCompilationWork();
     }
 
     @Test
@@ -303,14 +299,6 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Column.class.getName());
         annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Lob.class.getName());
-    }
-
-    public void assertGenerationAndCompilationWork() throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException {
-        final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
-                + "Employee.java");
-        sourceFileToCompile.delete();
-        bdmCodeGenerator.generate(destDir);
-        assertCompilationSuccessful(sourceFileToCompile);
     }
 
 }

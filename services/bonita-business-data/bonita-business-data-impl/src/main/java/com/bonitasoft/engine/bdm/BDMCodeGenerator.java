@@ -68,7 +68,7 @@ public class BDMCodeGenerator extends CodeGenerator {
         final JAnnotationUse tableAnnotation = addAnnotation(entityClass, Table.class);
         tableAnnotation.param("name", entityClass.name().toUpperCase());
         final List<UniqueConstraint> uniqueConstraints = bo.getUniqueConstraints();
-        if (uniqueConstraints != null) {
+        if (!uniqueConstraints.isEmpty()) {
             final JAnnotationArrayMember uniqueConstraintsArray = tableAnnotation.paramArray("uniqueConstraints");
 
             for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
@@ -147,12 +147,12 @@ public class BDMCodeGenerator extends CodeGenerator {
 
     @Override
     public void generate(final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException {
-    	BusinessObjectModelValidator validator = new BusinessObjectModelValidator();
-    	ValidationStatus validationStatus = validator.validate(bom);
-    	if(!validationStatus.isOk()){
-    		throw new BusinessObjectModelValidationException(validationStatus);
-    	}
-    	buildASTFromBom();
+        final BusinessObjectModelValidator validator = new BusinessObjectModelValidator();
+        final ValidationStatus validationStatus = validator.validate(bom);
+        if (!validationStatus.isOk()) {
+            throw new BusinessObjectModelValidationException(validationStatus);
+        }
+        buildASTFromBom();
         super.generate(destDir);
     }
 

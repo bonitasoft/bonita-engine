@@ -37,11 +37,12 @@ public class BusinessObject {
     private final List<Field> fields;
 
     @XmlElementWrapper(name = "uniqueConstraints")
-    @XmlElement(name = "uniqueConstraint", required = true)
-    private List<UniqueConstraint> uniqueConstraints;
+    @XmlElement(name = "uniqueConstraint")
+    private final List<UniqueConstraint> uniqueConstraints;
 
     public BusinessObject() {
         fields = new ArrayList<Field>();
+        uniqueConstraints = new ArrayList<UniqueConstraint>();
     }
 
     public String getQualifiedName() {
@@ -72,23 +73,19 @@ public class BusinessObject {
         if (fieldNames == null || fieldNames.length == 0) {
             throw new IllegalArgumentException("fieldNames cannot be null or empty");
         }
-        if (uniqueConstraints == null) {
-            uniqueConstraints = new ArrayList<UniqueConstraint>();
-        }
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setName(name);
-       
+
         uniqueConstraint.setFieldNames(Arrays.asList(fieldNames));
-        if(uniqueConstraints.add(uniqueConstraint)){
-        	return uniqueConstraint;
+        if (uniqueConstraints.add(uniqueConstraint)) {
+            return uniqueConstraint;
         }
         return null;
     }
 
     public List<UniqueConstraint> getUniqueConstraints() {
-        return uniqueConstraints == null ? null : uniqueConstraints;
+        return uniqueConstraints;
     }
-
 
     @Override
     public int hashCode() {
