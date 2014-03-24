@@ -11,7 +11,6 @@ package com.bonitasoft.engine.api.impl;
 import java.lang.reflect.Method;
 
 import org.bonitasoft.engine.api.impl.ServerAPIImpl;
-import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.commons.ClassReflector;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.service.APIAccessResolver;
@@ -24,7 +23,7 @@ import com.bonitasoft.engine.api.TenantManagementAPI;
 /**
  * @author Emmanuel Duchastenier
  */
-public class ServerAPIExt extends ServerAPIImpl implements ServerAPI {
+public class ServerAPIExt extends ServerAPIImpl {
 
     private static final long serialVersionUID = 1L;
 

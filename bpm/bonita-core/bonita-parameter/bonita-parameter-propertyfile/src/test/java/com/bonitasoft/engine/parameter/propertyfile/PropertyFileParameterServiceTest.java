@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.junit.After;
@@ -43,7 +43,6 @@ import com.bonitasoft.engine.parameter.OrderBy;
 import com.bonitasoft.engine.parameter.SParameter;
 import com.bonitasoft.engine.parameter.SParameterNameNotFoundException;
 import com.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
-import com.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService;
 
 /**
  * @author Baptiste Mesta
@@ -165,7 +164,7 @@ public class PropertyFileParameterServiceTest {
 
     @Test(expected = SParameterProcessNotFoundException.class)
     public void testCacheThrowException() throws Exception {
-        doThrow(new CacheException("exception")).when(cacheService).store(anyString(), anyString(), Matchers.<Properties> any(Properties.class));
+        doThrow(new SCacheException("exception")).when(cacheService).store(anyString(), anyString(), Matchers.<Properties> any(Properties.class));
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("aParam", "paramValue"));
     }
 

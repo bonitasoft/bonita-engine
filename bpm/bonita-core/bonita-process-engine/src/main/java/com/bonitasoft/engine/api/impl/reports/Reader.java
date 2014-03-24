@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.api.impl.reports;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by Vincent Elcrin
@@ -17,5 +16,6 @@ import java.io.IOException;
  * Time: 08:50
  */
 public interface Reader {
+
     void read(File zip, File unzipped) throws Exception;
 }

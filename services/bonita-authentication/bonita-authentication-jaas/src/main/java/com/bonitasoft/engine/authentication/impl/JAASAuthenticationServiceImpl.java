@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013 - 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -16,10 +16,11 @@ import org.bonitasoft.engine.authentication.AuthenticationService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class JAASAuthenticationServiceImpl implements AuthenticationService {
 
@@ -58,7 +59,7 @@ public class JAASAuthenticationServiceImpl implements AuthenticationService {
         return true;
     }
 
-    private String getLoginContext() throws TenantIdNotSetException {
+    private String getLoginContext() throws STenantIdNotSetException {
         return LOGIN_CONTEXT_PREFIX + "-" + sessionAccessor.getTenantId();
     }
 }

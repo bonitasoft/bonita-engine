@@ -42,7 +42,6 @@ import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
@@ -393,6 +392,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
+
             final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
@@ -402,7 +402,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
             sessionAccessor.setSessionInfo(sessionId, tenantId);
             TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
-
             final WorkService workService = tenantServiceAccessor.getWorkService();
 
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
@@ -670,7 +669,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     }
 
     @Override
-    public SearchResult<Tenant> searchTenants(final SearchOptions searchOptions) throws SearchException {
+    public SearchResult<Tenant> searchTenants(final SearchOptions searchOptions) {
         final PlatformService platformService = getPlatformService();
         final SearchPlatformEntitiesDescriptor searchPlatformEntitiesDescriptor = getPlatformAccessorNoException().getSearchPlatformEntitiesDescriptor();
         final SearchTenants searchTenants = new SearchTenants(platformService, searchPlatformEntitiesDescriptor.getSearchTenantDescriptor(), searchOptions);

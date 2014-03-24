@@ -73,7 +73,7 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
     ClusteredEventServiceImpl(final String eventServiceHandlerMapNameSuffix,
             final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance, final Manager manager)
-                    throws HandlerRegistrationException {
+            throws HandlerRegistrationException {
         super(logger);
         if (!manager.isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
@@ -100,7 +100,7 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
             // but that's not as easy in the tests to setup 2 hazelcast instances.
             // Furthermore, we have other constraints that prevents from starting 2 nodes at the same time
             // so the isEmpty() should be enough to guess we are the first one
-            for(Map.Entry<String, SHandler<SEvent>> entry : handlers.entrySet()) {
+            for (Map.Entry<String, SHandler<SEvent>> entry : handlers.entrySet()) {
                 addHandler(entry.getKey(), entry.getValue());
             }
         } else {
@@ -147,7 +147,8 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
                 // Check if another handler of the same class is already registered
                 for (SHandler<SEvent> tmpHandler : handlers) {
                     if (tmpHandler.getIdentifier().equals(handler.getIdentifier())) {
-                        throw new HandlerRegistrationException("The handler with identifier " + tmpHandler.getIdentifier() + " is already registered for the event " + eventType);
+                        throw new HandlerRegistrationException("The handler with identifier " + tmpHandler.getIdentifier()
+                                + " is already registered for the event " + eventType);
                     }
                 }
                 handlers.add(handler);
@@ -217,7 +218,7 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
         }
 
         @Override
-        public Void call() throws Exception {
+        public Void call() {
             ClusteredEventServiceImpl clusteredEventService = (ClusteredEventServiceImpl) hazelcastInstance.getUserContext().get("ClusteredEventService");
             doWithClusteredEventService(clusteredEventService);
             return null;
@@ -323,9 +324,8 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
             }
             if (!removed) {
                 throw new HandlerUnregistrationException();
-            } else {
-                eventHandlers.replace(eventType, handlers);
             }
+            eventHandlers.replace(eventType, handlers);
         } finally {
             eventHandlers.lock(eventType);
         }

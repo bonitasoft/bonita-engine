@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013-2014 Bonitasoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -13,15 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.model.FireEventException;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.services.SPersistenceException;
 
 /**
  * @author Baptiste Mesta
@@ -49,19 +47,20 @@ public class InsertBatchLogsJob implements StatelessJob {
     }
 
     @Override
-    public void execute() throws SJobExecutionException, FireEventException {
+    public void execute() throws SJobExecutionException {
         final List<SQueriableLog> logs = BatchLogBuffer.getInstance().clearLogs();
         if (logs.size() > 0) {
             try {
                 persistenceService.insertInBatch(new ArrayList<PersistentObject>(logs));
-            } catch (final SBonitaException e) {
+            } catch (final SPersistenceException e) {
                 throw new SJobExecutionException(e);
             }
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
-    public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+    public void setAttributes(final Map<String, Serializable> attributes) {
     }
 
 }
