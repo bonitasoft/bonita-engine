@@ -8,7 +8,7 @@ import java.util.Set;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
@@ -27,10 +27,10 @@ public abstract class AbstractEventServiceImpl implements EventService {
     /**
      * Fire the given Event only to interested handlers
      * 
-     * @throws FireEventException
+     * @throws SFireEventException
      */
     @Override
-    public void fireEvent(final SEvent event) throws FireEventException {
+    public void fireEvent(final SEvent event) throws SFireEventException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "fireEvent"));
         }
@@ -42,9 +42,10 @@ public abstract class AbstractEventServiceImpl implements EventService {
 
                 if (handlers.size() > 0) {
                     if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Found " + handlers.size() + " for event " + event.getType() + " All handlers: " + handlers);
+                        logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Found " + handlers.size() + " for event " + event.getType()
+                                + ". All handlers: " + handlers);
                     }
-                    FireEventException fireEventException = null;
+                    SFireEventException sFireEventException = null;
                     for (final SHandler<SEvent> handler : handlers) {
                         // for each handler, I check if it's interested or not by the given event
                         try {
@@ -52,18 +53,18 @@ public abstract class AbstractEventServiceImpl implements EventService {
                                 handler.execute(event);
                             }
                         } catch (final Exception e) {
-                            if (fireEventException == null) {
-                                fireEventException = new FireEventException("Unable to execute some handler");
+                            if (sFireEventException == null) {
+                                sFireEventException = new SFireEventException("Unable to execute some handler.");
                             }
-                            fireEventException.addHandlerException(e);
+                            sFireEventException.addHandlerException(e);
                             // for now, I just log the Exception into the console
                             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to execute handler", e);
+                                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to execute handler.", e);
                             }
                         }
                     }
-                    if (fireEventException != null) {
-                        throw fireEventException;
+                    if (sFireEventException != null) {
+                        throw sFireEventException;
                     }
                 }
             }
@@ -75,11 +76,11 @@ public abstract class AbstractEventServiceImpl implements EventService {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
                         LogUtil.getLogOnExceptionMethod(this.getClass(), "fireEvent", "Unable to fire a null event"));
             }
-            throw new FireEventException("Unable to fire a null event");
+            throw new SFireEventException("Unable to fire a null event");
         }
     }
 
-    protected abstract  Collection<SHandler<SEvent>> getHandlersFor(final String type);
+    protected abstract Collection<SHandler<SEvent>> getHandlersFor(final String type);
 
     protected abstract boolean containsHandlerFor(final String type);
 
@@ -171,17 +172,17 @@ public abstract class AbstractEventServiceImpl implements EventService {
         String key = eventType;
         if (actionType != null) {
             switch (actionType) {
-            case CREATED:
-                key += SEvent.CREATED;
-                break;
-            case DELETED:
-                key += SEvent.DELETED;
-                break;
-            case UPDATED:
-                key += SEvent.UPDATED;
-                break;
-            default:
-                return false;
+                case CREATED:
+                    key += SEvent.CREATED;
+                    break;
+                case DELETED:
+                    key += SEvent.DELETED;
+                    break;
+                case UPDATED:
+                    key += SEvent.UPDATED;
+                    break;
+                default:
+                    return false;
             }
         }
         return containsHandlerFor(key);

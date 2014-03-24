@@ -17,21 +17,19 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileDeletionException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
-import org.bonitasoft.engine.profile.exception.profile.SProfileReadException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryNotFoundException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryReadException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryUpdateException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberCreationException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberNotFoundException;
-import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberReadException;
 import org.bonitasoft.engine.profile.model.SProfile;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.profile.model.SProfileMember;
@@ -106,7 +104,8 @@ public interface ProfileService {
      *             occurs when an exception is thrown during sProfile deletion
      * @since 6.0
      */
-    void deleteProfile(SProfile profile) throws SProfileNotFoundException, SProfileDeletionException;
+    void deleteProfile(SProfile profile) throws SProfileNotFoundException, SProfileDeletionException, SProfileEntryDeletionException,
+            SProfileMemberDeletionException;
 
     /**
      * Delete profile by its id
@@ -118,17 +117,18 @@ public interface ProfileService {
      *             occurs when an exception is thrown during sProfile deletion
      * @since 6.0
      */
-    void deleteProfile(long profileId) throws SProfileNotFoundException, SProfileDeletionException;
+    void deleteProfile(long profileId) throws SProfileNotFoundException, SProfileDeletionException, SProfileEntryDeletionException,
+            SProfileMemberDeletionException;
 
     /**
      * Get all profiles of the user by userId
      * 
      * @param userId
      * @return a list of sProfile
-     * @throws SProfileReadException
+     * @throws SBonitaReadException
      * @since 6.0
      */
-    List<SProfile> getProfilesOfUser(long userId) throws SProfileReadException;
+    List<SProfile> getProfilesOfUser(long userId) throws SBonitaReadException;
 
     /**
      * Get profile entry by its id
@@ -152,11 +152,11 @@ public interface ProfileService {
      * @param field
      * @param order
      * @return all profile entries having the given value for the given int index by profileId
-     * @throws SProfileEntryReadException
+     * @throws SBonitaReadException
      * @since 6.0
      */
     List<SProfileEntry> getEntriesOfProfile(long profileId, int fromIndex, int numberOfProfileEntry, String field, OrderByType order)
-            throws SProfileEntryReadException;
+            throws SBonitaReadException;
 
     /**
      * Add new profile entry
@@ -283,12 +283,12 @@ public interface ProfileService {
      * @param field
      * @param order
      * @return sProfileMember
-     * @throws SProfileMemberReadException
+     * @throws SBonitaReadException
      *             occurs when an exception is thrown during sProfileMember creation
      * @since 6.0
      */
     List<SProfileMember> getProfileMembersOfUser(final long userId, int fromIndex, int numberOfElements, String field, OrderByType order)
-            throws SProfileMemberReadException;
+            throws SBonitaReadException;
 
     /**
      * Get all sProfileMembers with same group having the given value for the given int index
@@ -302,12 +302,12 @@ public interface ProfileService {
      * @param field
      * @param order
      * @return sProfileMember
-     * @throws SProfileMemberReadException
+     * @throws SBonitaReadException
      *             occurs when an exception is thrown during sProfileMember creation
      * @since 6.0
      */
     List<SProfileMember> getProfileMembersOfGroup(final long groupId, int fromIndex, int numberOfElements, String field, OrderByType order)
-            throws SProfileMemberReadException;
+            throws SBonitaReadException;
 
     /**
      * Get all sProfileMembers with same group having the given value for the given int index
@@ -321,12 +321,12 @@ public interface ProfileService {
      * @param field
      * @param order
      * @return sProfileMember
-     * @throws SProfileMemberReadException
+     * @throws SBonitaReadException
      *             occurs when an exception is thrown during sProfileMember creation
      * @since 6.0
      */
     List<SProfileMember> getProfileMembersOfRole(final long roleId, int fromIndex, int numberOfElements, String field, OrderByType order)
-            throws SProfileMemberReadException;
+            throws SBonitaReadException;
 
     /**
      * Delete a profile member by its id
@@ -416,10 +416,10 @@ public interface ProfileService {
      * @param field
      * @param order
      * @return a list of profileEntries
-     * @throws SProfileEntryReadException
+     * @throws SBonitaReadException
      */
     List<SProfileEntry> getEntriesOfProfileByParentId(long profileId, long parentId, int fromIndex, int numberOfProfileEntries, String field, OrderByType order)
-            throws SProfileEntryReadException;
+            throws SBonitaReadException;
 
     /**
      * Delete all profile members for the connected tenant

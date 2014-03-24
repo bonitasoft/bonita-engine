@@ -27,11 +27,13 @@ public class MembershipsBinding extends ElementBinding {
 
     private List<BEntry<String, String>> memberships;
 
+    @SuppressWarnings("unused")
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         memberships = new ArrayList<BEntry<String, String>>(5);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
     }

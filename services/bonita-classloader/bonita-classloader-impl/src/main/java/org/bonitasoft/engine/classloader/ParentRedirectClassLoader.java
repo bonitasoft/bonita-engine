@@ -21,7 +21,7 @@ public class ParentRedirectClassLoader extends ClassLoader {
 	public Class<?> loadClass(final String name) throws ClassNotFoundException {
 		try {
 			return this.parentClassLoaderResolver.getParent(classLoaderService, childClassLoaderType, childClassLoaderId).loadClass(name);
-		} catch (ClassLoaderException e) {
+		} catch (SClassLoaderException e) {
 			throw new ClassNotFoundException("Unable to find the parent classloader dynamically", e);
 		}
 	}
@@ -30,7 +30,7 @@ public class ParentRedirectClassLoader extends ClassLoader {
 	public InputStream getResourceAsStream(final String name) {
 		try {
 			return this.parentClassLoaderResolver.getParent(classLoaderService, childClassLoaderType, childClassLoaderId).getResourceAsStream(name);
-		} catch (ClassLoaderException e) {
+		} catch (SClassLoaderException e) {
 			throw new RuntimeException("Unable to find the parent classloader dynamically", e);
 		}
 	}

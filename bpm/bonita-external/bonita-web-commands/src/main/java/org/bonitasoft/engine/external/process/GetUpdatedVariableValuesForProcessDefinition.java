@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -26,7 +25,8 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -34,6 +34,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * @author Yanyan Liu
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class GetUpdatedVariableValuesForProcessDefinition extends UpdateVariableValuesThroughOperations {
 
@@ -64,28 +65,20 @@ public class GetUpdatedVariableValuesForProcessDefinition extends UpdateVariable
             throw new SCommandParameterizationException("One mandatory parameter " + OPERATIONS_LIST_KEY + "/" + OPERATIONS_INPUT_KEY + "/"
                     + CURRENT_VARIABLE_VALUES_MAP_KEY + "/" + PROCESS_DEFINITION_ID_KEY + " is not convertible.");
         }
-        // check
         try {
-            checkProcessDef(processDefinitionId);
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw new SCommandExecutionException(e);
-        }
-        try {
+            checkIfProcessDefinitionExists(processDefinitionId);
             updateVariablesThroughOperations(operations, operationsInputValues, currentVariableValues, processDefinitionId);
+        } catch (final SCommandExecutionException e) {
+            throw e;
         } catch (final SBonitaException e) {
             throw new SCommandExecutionException(e);
         }
         return (Serializable) currentVariableValues;
     }
 
-    private void checkProcessDef(final long processDefinitionId) throws SProcessDefinitionNotFoundException {
+    private void checkIfProcessDefinitionExists(final long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
-        final GetProcessDefinition transaction = new GetProcessDefinition(processDefinitionId, processDefinitionService);
-        try {
-            transaction.execute();
-        } catch (final SBonitaException e) {
-            throw new SProcessDefinitionNotFoundException(e);
-        }
+        processDefinitionService.getProcessDefinition(processDefinitionId);
     }
 
     @Override

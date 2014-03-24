@@ -1,18 +1,12 @@
 package org.bonitasoft.engine.transaction;
 
 import java.util.Hashtable;
-import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SEvent;
-import org.bonitasoft.engine.events.model.SHandler;
-import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.AfterClass;
@@ -57,27 +51,24 @@ public class TransactionResourceImplTest extends TransactionResourceTest {
 
         return new TechnicalLoggerService() {
 
+            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message, final Throwable t) {
-                // TODO Auto-generated method stub
-
             }
 
+            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final String message) {
-                // TODO Auto-generated method stub
-
             }
 
+            @SuppressWarnings("unused")
             @Override
             public void log(final Class<?> callerClass, final TechnicalLogSeverity severity, final Throwable t) {
-                // TODO Auto-generated method stub
-
             }
 
+            @SuppressWarnings("unused")
             @Override
             public boolean isLoggable(final Class<?> callerClass, final TechnicalLogSeverity severity) {
-                // TODO Auto-generated method stub
                 return false;
             }
         };

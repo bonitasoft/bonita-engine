@@ -39,9 +39,9 @@ public class CategoryMappingBinding extends ElementBinding {
         this.name = attributes.get(XMLCategoryMapping.NAME);
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
-
         if (XMLCategoryMapping.DESCRIPTION.equals(name)) {
             this.description = value;
         }

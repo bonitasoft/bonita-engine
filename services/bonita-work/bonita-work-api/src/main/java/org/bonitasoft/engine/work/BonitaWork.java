@@ -38,7 +38,7 @@ public abstract class BonitaWork implements Runnable, Serializable {
      *         how to restart the work if it fails
      */
     public String getRecoveryProcedure() {
-        return "No recovery procedure";
+        return "No recovery procedure.";
     }
 
     /**
@@ -54,8 +54,8 @@ public abstract class BonitaWork implements Runnable, Serializable {
     public void run() {
         try {
             work(new HashMap<String, Object>());
-        } catch (Exception e) {
-            throw new IllegalStateException("Exception should be handled by works", e);
+        } catch (Throwable e) {
+            throw new IllegalStateException("Exception should be handled by works.", e);
         }
     }
 
@@ -63,14 +63,14 @@ public abstract class BonitaWork implements Runnable, Serializable {
 
     public long getTenantId() {
         if (tenantId <= 0) {
-            throw new IllegalStateException("tenantid not set");
+            throw new IllegalStateException("TenantId is not set !!");
         }
         return tenantId;
     }
 
     public void setTenantId(final long tenantId) {
         if (tenantId <= 0) {
-            throw new IllegalStateException("invalid tenantid: " + tenantId);
+            throw new IllegalStateException("Invalid tenantId=" + tenantId);
         }
         this.tenantId = tenantId;
     }

@@ -25,10 +25,10 @@ public interface ClassLoaderService {
      * Get the global ClassLoader. If no global ClassLoader already exists, create it.
      * 
      * @return the global ClassLoader
-     * @throws ClassLoaderException
+     * @throws SClassLoaderException
      *             Error thrown if it's impossible to get the global ClassLoader
      */
-    ClassLoader getGlobalClassLoader() throws ClassLoaderException;
+    ClassLoader getGlobalClassLoader() throws SClassLoaderException;
 
     /**
      * Get type of global class loader
@@ -53,10 +53,10 @@ public interface ClassLoaderService {
      * @param id
      *            The local ClassLoader's id
      * @return the local ClassLoader for the given type and id
-     * @throws ClassLoaderException
+     * @throws SClassLoaderException
      *             Error thrown if it's impossible to get a local ClassLoader for the given type and id
      */
-    ClassLoader getLocalClassLoader(final String type, final long id) throws ClassLoaderException;
+    ClassLoader getLocalClassLoader(final String type, final long id) throws SClassLoaderException;
 
     /**
      * Remove the local ClassLoader identified by the given type and id;
@@ -76,7 +76,7 @@ public interface ClassLoaderService {
      */
     void removeAllLocalClassLoaders(final String type);
 
-    void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws ClassLoaderException;
+    void refreshGlobalClassLoader(final Map<String, byte[]> resources) throws SClassLoaderException;
 
-    void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) throws ClassLoaderException;
+    void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) throws SClassLoaderException;
 }

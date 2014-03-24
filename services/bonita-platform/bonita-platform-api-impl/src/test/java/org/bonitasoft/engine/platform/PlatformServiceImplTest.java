@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.PlatformCacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -149,7 +149,7 @@ public class PlatformServiceImplTest {
 
     @Test(expected = SPlatformNotFoundException.class)
     public final void getPlatformThrowException() throws SBonitaException {
-        when(platformCacheService.get(anyString(), anyString())).thenThrow(new CacheException(""));
+        when(platformCacheService.get(anyString(), anyString())).thenThrow(new SCacheException(""));
 
         platformServiceImpl.getPlatform();
     }
@@ -273,7 +273,7 @@ public class PlatformServiceImplTest {
 
     @Test
     public final void isPlatformNotCreatedThrowException() throws SBonitaException {
-        when(platformCacheService.get(anyString(), anyString())).thenThrow(new CacheException(""));
+        when(platformCacheService.get(anyString(), anyString())).thenThrow(new SCacheException(""));
 
         assertFalse(platformServiceImpl.isPlatformCreated());
     }

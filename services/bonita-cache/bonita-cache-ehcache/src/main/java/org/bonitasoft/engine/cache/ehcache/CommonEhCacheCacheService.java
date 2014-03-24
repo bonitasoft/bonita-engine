@@ -14,7 +14,7 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
 import org.bonitasoft.engine.cache.CacheConfigurations;
-import org.bonitasoft.engine.cache.CacheException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -61,9 +61,9 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         return ehCacheConfig;
     }
 
-    protected synchronized Cache createCache(final String cacheName, final String internalCacheName) throws CacheException {
+    protected synchronized Cache createCache(final String cacheName, final String internalCacheName) throws SCacheException {
         if (cacheManager == null) {
-            throw new CacheException("The cache is not stated, call start() on the cache service");
+            throw new SCacheException("The cache is not stated, call start() on the cache service");
         }
         Cache cache = cacheManager.getCache(internalCacheName);
         if (cache == null) {
@@ -74,19 +74,19 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
                 cache = new Cache(newCacheConfig);
                 cacheManager.addCache(cache);
             } else {
-                throw new CacheException("No configuration found for the cache " + cacheName);
+                throw new SCacheException("No configuration found for the cache " + cacheName);
             }
         }
         return cache;
     }
 
     @Override
-    public void store(final String cacheName, final Serializable key, final Object value) throws CacheException {
+    public void store(final String cacheName, final Serializable key, final Object value) throws SCacheException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "store"));
         }
         if (cacheManager == null) {
-            throw new CacheException("The cache is not started, call start() on the cache service");
+            throw new SCacheException("The cache is not started, call start() on the cache service");
         }
         final String cacheNameKey = getKeyFromCacheName(cacheName);
         try {
@@ -109,19 +109,19 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' is not alive");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         } catch (final net.sf.ehcache.CacheException ce) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "store", ce));
             }
-            throw new CacheException(ce);
+            throw new SCacheException(ce);
         }
     }
 
-    protected abstract String getKeyFromCacheName(String cacheName) throws CacheException;
+    protected abstract String getKeyFromCacheName(String cacheName) throws SCacheException;
 
     @Override
-    public Object get(final String cacheName, final Object key) throws CacheException {
+    public Object get(final String cacheName, final Object key) throws SCacheException {
         if (cacheManager == null) {
             return null;
         }
@@ -154,7 +154,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' is not alive");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         } catch (final Exception e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "get", e));
@@ -162,12 +162,12 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' does not exist");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         }
     }
 
     @Override
-    public boolean clear(final String cacheName) throws CacheException {
+    public boolean clear(final String cacheName) throws SCacheException {
         if (cacheManager == null) {
             return true;
         }
@@ -191,7 +191,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' is not alive");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         } catch (final Exception e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "clear", e));
@@ -199,12 +199,12 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' does not exist");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         }
     }
 
     @Override
-    public int getCacheSize(final String cacheName) throws CacheException {
+    public int getCacheSize(final String cacheName) throws SCacheException {
         if (cacheManager == null) {
             return 0;
         }
@@ -216,7 +216,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
     }
 
     @Override
-    public void clearAll() throws CacheException {
+    public void clearAll() throws SCacheException {
         if (cacheManager == null) {
             return;
         }
@@ -235,12 +235,12 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "clearAll", e));
             }
-            throw new CacheException(e);
+            throw new SCacheException(e);
         }
     }
 
     @Override
-    public boolean remove(final String cacheName, final Object key) throws CacheException {
+    public boolean remove(final String cacheName, final Object key) throws SCacheException {
         if (cacheManager == null) {
             return false;
         }
@@ -259,7 +259,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
     }
 
     @Override
-    public List<Object> getKeys(final String cacheName) throws CacheException {
+    public List<Object> getKeys(final String cacheName) throws SCacheException {
         if (cacheManager == null) {
             return Collections.emptyList();
         }
@@ -283,12 +283,12 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
             final StringBuilder stringBuilder = new StringBuilder("The cache '");
             stringBuilder.append(cacheNameKey).append("' is not alive");
             final String msg = stringBuilder.toString();
-            throw new CacheException(msg, e);
+            throw new SCacheException(msg, e);
         } catch (final net.sf.ehcache.CacheException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getKeys", e));
             }
-            throw new CacheException(e);
+            throw new SCacheException(e);
         }
     }
 

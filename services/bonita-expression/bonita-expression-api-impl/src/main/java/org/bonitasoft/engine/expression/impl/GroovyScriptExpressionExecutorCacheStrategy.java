@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.cache.CacheException;
 import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.classloader.ClassLoaderException;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
@@ -38,6 +38,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  * @author Zhao na
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
@@ -60,7 +61,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         this.logger = logger;
     }
 
-    private Script getScriptFromCache(final String expressionContent, final Long definitionId) throws CacheException, ClassLoaderException {
+    private Script getScriptFromCache(final String expressionContent, final Long definitionId) throws SCacheException, SClassLoaderException {
         final GroovyShell shell = getShell(definitionId);
         /*
          * We use the current thread id is the key because Scripts are not thread safe (because of binding)
@@ -82,7 +83,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         return script;
     }
 
-    private GroovyShell getShell(final Long definitionId) throws ClassLoaderException, CacheException {
+    private GroovyShell getShell(final Long definitionId) throws SClassLoaderException, SCacheException {
         String key = null;
         GroovyShell shell = null;
         if (definitionId != null) {
@@ -102,10 +103,12 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         return shell;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
             throws SExpressionEvaluationException {
         final String expressionContent = expression.getContent();
+        final String expressionName = expression.getName();
         try {
             final Script script = getScriptFromCache(expressionContent, (Long) dependencyValues.get(DEFINITION_ID));
             final Binding binding = new Binding(dependencyValues);
@@ -114,17 +117,23 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
         } catch (final MissingPropertyException e) {
             final String property = e.getProperty();
             final StringBuilder builder = new StringBuilder("Expression ");
-            builder.append(expression.getName()).append(" with content: ").append(expressionContent).append(" depends on ").append(property)
-                    .append(" is neither defined in the script nor in dependencies");
-            throw new SExpressionEvaluationException(builder.toString(), e);
+            builder.append(expressionName).append(" with content = <").append(expressionContent).append("> depends on ").append(property)
+                    .append(" is neither defined in the script nor in dependencies.");
+            throw new SExpressionEvaluationException(builder.toString(), e, expressionName);
         } catch (final GroovyRuntimeException e) {
-            throw new SExpressionEvaluationException(e);
-        } catch (final CacheException e) {
-            throw new SExpressionEvaluationException("Problem accessing the Script Cache from GroovyScriptExpressionExecutorCacheStrategy", e);
-        } catch (final ClassLoaderException e) {
-            throw new SExpressionEvaluationException("Unable to retrieve the correct classloader to execute the groovy script: " + expression, e);
+            throw new SExpressionEvaluationException(e, expressionName);
+        } catch (final SCacheException e) {
+            throw new SExpressionEvaluationException("Problem accessing the Script Cache from GroovyScriptExpressionExecutorCacheStrategy.", e, expressionName);
+        } catch (final SClassLoaderException e) {
+            throw new SExpressionEvaluationException("Unable to retrieve the correct classloader to execute the groovy script : " + expression, e,
+                    expressionName);
         } catch (final Throwable e) {
-            throw new SExpressionEvaluationException("Script throws an exception" + expression, e);
+            String message = e.getMessage();
+            if (message == null || message.isEmpty()) {
+                message = "No message";
+            }
+            throw new SExpressionEvaluationException("Groovy script throws an exception of type " + e.getClass() + " with message = " + message
+                    + System.getProperty("line.separator") + "Expression : " + expression, e, expressionName);
         }
     }
 

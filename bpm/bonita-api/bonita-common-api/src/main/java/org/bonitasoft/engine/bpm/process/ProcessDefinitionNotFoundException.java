@@ -32,10 +32,6 @@ public class ProcessDefinitionNotFoundException extends NotFoundException {
         super(cause);
     }
 
-    public ProcessDefinitionNotFoundException(final long processDefinitionId) {
-        super("Process definition does not found, with id=" + processDefinitionId);
-    }
-
     public ProcessDefinitionNotFoundException(final long processDefinitionId, final Throwable cause) {
         super("Process definition does not found, with id=" + processDefinitionId, cause);
     }

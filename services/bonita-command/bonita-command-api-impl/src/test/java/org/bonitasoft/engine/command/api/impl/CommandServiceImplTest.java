@@ -58,7 +58,7 @@ public class CommandServiceImplTest {
     private CommandServiceImpl commandServiceImpl;
 
     @Before
-    public final void setUp() throws Exception {
+    public final void setUp() {
         recorder = mock(Recorder.class);
         persistence = mock(ReadPersistenceService.class);
         eventService = mock(EventService.class);

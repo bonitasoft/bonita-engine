@@ -28,7 +28,7 @@ import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * This service must be configured as a singleton.
@@ -235,7 +235,7 @@ public final class MemoryLockConditionService implements LockService {
     protected String buildKey(final long objectToLockId, final String objectType) {
         try {
             return objectType + SEPARATOR + objectToLockId + SEPARATOR + sessionAccessor.getTenantId();
-        } catch (TenantIdNotSetException e) {
+        } catch (STenantIdNotSetException e) {
             throw new IllegalStateException("Tenant not set");
         }
     }

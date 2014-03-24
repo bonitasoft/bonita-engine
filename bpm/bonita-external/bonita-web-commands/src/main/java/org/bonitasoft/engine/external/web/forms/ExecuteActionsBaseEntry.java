@@ -18,33 +18,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.transaction.activity.GetActivityInstance;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessDefinition;
-import org.bonitasoft.engine.api.impl.transaction.process.GetProcessInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.command.system.CommandWithParameters;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
 import org.bonitasoft.engine.core.operation.model.builder.SLeftOperandBuilderFactory;
 import org.bonitasoft.engine.core.operation.model.builder.SOperationBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
-import org.bonitasoft.engine.exception.ClassLoaderException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -53,12 +50,12 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
-import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
+import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.TenantIdNotSetException;
 
 /**
  * @author Ruiheng Fan
@@ -84,6 +81,8 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
             return TenantServiceSingleton.getInstance(tenantId);
+        } catch (final BonitaRuntimeException e) {
+            throw e;
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
@@ -95,21 +94,19 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
     }
 
     protected long getTenantId() {
-        SessionAccessor sessionAccessor = null;
         try {
-            sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
-        }
-        try {
+            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             return sessionAccessor.getTenantId();
-        } catch (final TenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
+            throw new BonitaRuntimeException(e);
+        } catch (final BonitaRuntimeException e) {
+            throw e;
+        } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
     }
 
-    protected SOperation toSOperation(final Operation operation)
-            throws SInvalidExpressionException {
+    protected SOperation toSOperation(final Operation operation) throws SInvalidExpressionException {
         final SExpression rightOperand = toSExpression(operation.getRightOperand());
         final SOperatorType operatorType = SOperatorType.valueOf(operation.getType().name());
         final SLeftOperand sLeftOperand = toSLeftOperand(operation.getLeftOperand());
@@ -151,70 +148,35 @@ public abstract class ExecuteActionsBaseEntry extends CommandWithParameters {
         return sOperations;
     }
 
-    protected SActivityInstance getActivityInstance(final TenantServiceAccessor tenantAccessor, final long activityInstanceId)
-            throws ActivityInstanceNotFoundException {
+    protected SActivityInstance getSActivityInstance(final TenantServiceAccessor tenantAccessor, final long activityInstanceId) throws SActivityReadException,
+            SActivityInstanceNotFoundException {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final GetActivityInstance getActivityInstance = new GetActivityInstance(activityInstanceService, activityInstanceId);
-        try {
-            getActivityInstance.execute();
-        } catch (final SBonitaException e) {
-            throw new ActivityInstanceNotFoundException(activityInstanceId);
-        }
-        return getActivityInstance.getResult();
+        return activityInstanceService.getActivityInstance(activityInstanceId);
     }
 
     protected ProcessInstance getProcessInstance(final TenantServiceAccessor tenantAccessor, final long processInstanceId)
-            throws ProcessInstanceNotFoundException {
+            throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SearchProcessInstanceDescriptor searchProcessInstanceDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
-                .getSearchProcessInstanceDescriptor();
-
-        final GetProcessInstance getProcessInstance = new GetProcessInstance(processInstanceService, processDefinitionService, searchProcessInstanceDescriptor,
-                processInstanceId);
-        try {
-            getProcessInstance.execute();
-        } catch (final SBonitaException e) {
-            throw new ProcessInstanceNotFoundException(processInstanceId);
-        }
-        return getProcessInstance.getResult();
+        final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+        return ModelConvertor.toProcessInstances(Collections.singletonList(sProcessInstance), processDefinitionService).get(0);
     }
 
-    protected ClassLoader getLocalClassLoader(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) throws ClassLoaderException {
+    protected ClassLoader getLocalClassLoader(final TenantServiceAccessor tenantAccessor, final long processDefinitionId) throws SClassLoaderException {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        try {
-            return classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
-        } catch (final org.bonitasoft.engine.classloader.ClassLoaderException e) {
-            throw new ClassLoaderException(e);
-        }
+        return classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
     }
 
-    protected SProcessDefinition getServerProcessDefinition(final long processDefinitionUUID, final ProcessDefinitionService processDefinitionService)
+    @Deprecated
+    protected SProcessDefinition getServerProcessDefinition(final long processDefinitionId, final ProcessDefinitionService processDefinitionService)
             throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
-        final TransactionContentWithResult<SProcessDefinition> transactionContentWithResult = new GetProcessDefinition(processDefinitionUUID,
-                processDefinitionService);
-        try {
-            transactionContentWithResult.execute();
-            return transactionContentWithResult.getResult();
-        } catch (final SProcessDefinitionNotFoundException e) {
-            throw e;
-        } catch (final SProcessDefinitionReadException e) {
-            throw e;
-        } catch (final SBonitaException e) {
-            throw new SProcessDefinitionNotFoundException(e);
-        }
+        return processDefinitionService.getProcessDefinition(processDefinitionId);
     }
 
     protected SProcessDefinition getProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId)
-            throws InvalidProcessDefinitionException {
+            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processDefinitionId, processDefinitionService);
-        try {
-            getProcessDefinition.execute();
-        } catch (final SBonitaException e) {
-            throw new InvalidProcessDefinitionException("invalid processDefinition with id:" + processDefinitionId);
-        }
-        return getProcessDefinition.getResult();
+        return processDefinitionService.getProcessDefinition(processDefinitionId);
     }
 
 }

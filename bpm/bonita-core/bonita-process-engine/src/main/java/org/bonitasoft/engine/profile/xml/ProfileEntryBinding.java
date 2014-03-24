@@ -32,6 +32,7 @@ public class ProfileEntryBinding extends ElementBinding {
         profileEntryBuilder = new ExportedProfileEntryBuilder(attributes.get("name"));
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) {
         if ("description".equals(name)) {
@@ -47,6 +48,7 @@ public class ProfileEntryBinding extends ElementBinding {
         }
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void setChildObject(final String name, final Object value) {
     }

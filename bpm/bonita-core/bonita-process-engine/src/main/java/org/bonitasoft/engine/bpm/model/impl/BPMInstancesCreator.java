@@ -27,7 +27,6 @@ import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
 import org.bonitasoft.engine.api.impl.transaction.data.CreateSDataInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
-import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpression;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -60,6 +59,8 @@ import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
@@ -105,10 +106,15 @@ import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
+import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
+import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
+import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
+import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -280,7 +286,7 @@ public class BPMInstancesCreator {
                         (SBoundaryEventDefinition) sFlowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, relatedActivityInstanceId);
                 break;
             default:
-                throw new SActivityReadException("Activity type not found: " + sFlowNodeDefinition.getType());
+                throw new SActivityReadException("Activity type not found : " + sFlowNodeDefinition.getType());
         }
         builder.setLoopCounter(loopCounter);
         builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
@@ -294,7 +300,8 @@ public class BPMInstancesCreator {
             final long parentProcessInstanceId) {
         final SCallActivityDefinition callActivityDef = (SCallActivityDefinition) sFlowNodeDefinition;
         final SCallActivityInstanceBuilderFactory builderFact = BuilderFactory.get(SCallActivityInstanceBuilderFactory.class);
-        final SCallActivityInstanceBuilder builder = builderFact.createNewCallActivityInstance(callActivityDef.getName(), callActivityDef.getId(), rootContainerId, parentContainerId, processDefinitionId,
+        final SCallActivityInstanceBuilder builder = builderFact.createNewCallActivityInstance(callActivityDef.getName(), callActivityDef.getId(),
+                rootContainerId, parentContainerId, processDefinitionId,
                 rootProcessInstanceId, parentProcessInstanceId);
         updateActivityInstance(parentContainerId, parentContainerType, sFlowNodeDefinition, builder);
         return builder;
@@ -305,7 +312,8 @@ public class BPMInstancesCreator {
             final long rootProcessInstanceId, final long parentProcessInstanceId) {
         final SSubProcessDefinition subProcessActivityDef = (SSubProcessDefinition) sFlowNodeDefinition;
         final SSubProcessActivityInstanceBuilderFactory builderFact = BuilderFactory.get(SSubProcessActivityInstanceBuilderFactory.class);
-        final SSubProcessActivityInstanceBuilder builder = builderFact.createNewSubProcessActivityInstance(subProcessActivityDef.getName(), subProcessActivityDef.getId(), rootContainerId, parentContainerId,
+        final SSubProcessActivityInstanceBuilder builder = builderFact.createNewSubProcessActivityInstance(subProcessActivityDef.getName(),
+                subProcessActivityDef.getId(), rootContainerId, parentContainerId,
                 processDefinitionId, rootProcessInstanceId, parentProcessInstanceId, subProcessActivityDef.isTriggeredByEvent());
         updateActivityInstance(parentContainerId, parentContainerType, sFlowNodeDefinition, builder);
         return builder;
@@ -324,7 +332,8 @@ public class BPMInstancesCreator {
             final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
             final long parentProcessInstanceId) {
         final SStartEventDefinition startEventDef = (SStartEventDefinition) sFlowNodeDefinition;
-        final SStartEventInstanceBuilder builder = BuilderFactory.get(SStartEventInstanceBuilderFactory.class).createNewStartEventInstance(startEventDef.getName(), startEventDef.getId(),
+        final SStartEventInstanceBuilder builder = BuilderFactory.get(SStartEventInstanceBuilderFactory.class).createNewStartEventInstance(
+                startEventDef.getName(), startEventDef.getId(),
                 rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId, parentProcessInstanceId);
         updateFlowNodeInstance(parentContainerId, parentContainerType, builder);
         return builder;
@@ -343,9 +352,10 @@ public class BPMInstancesCreator {
             final long parentContainerId, final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition,
             final long rootProcessInstanceId, final long parentProcessInstanceId) {
         final SIntermediateThrowEventDefinition intermediateThrowEvent = (SIntermediateThrowEventDefinition) sFlowNodeDefinition;
-        final SIntermediateThrowEventInstanceBuilder builder = BuilderFactory.get(SIntermediateThrowEventInstanceBuilderFactory.class).createNewIntermediateThrowEventInstance(
-                intermediateThrowEvent.getName(), intermediateThrowEvent.getId(), rootContainerId, parentContainerId, processDefinitionId,
-                rootProcessInstanceId, parentProcessInstanceId);
+        final SIntermediateThrowEventInstanceBuilder builder = BuilderFactory.get(SIntermediateThrowEventInstanceBuilderFactory.class)
+                .createNewIntermediateThrowEventInstance(
+                        intermediateThrowEvent.getName(), intermediateThrowEvent.getId(), rootContainerId, parentContainerId, processDefinitionId,
+                        rootProcessInstanceId, parentProcessInstanceId);
         updateFlowNodeInstance(parentContainerId, parentContainerType, builder);
         return builder;
     }
@@ -384,7 +394,8 @@ public class BPMInstancesCreator {
     protected SEndEventInstanceBuilder createEndEventInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
             final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId, final long parentProcessInstanceId) {
         final SEndEventDefinition endEventDef = (SEndEventDefinition) sFlowNodeDefinition;
-        return BuilderFactory.get(SEndEventInstanceBuilderFactory.class).createNewEndEventInstance(endEventDef.getName(), endEventDef.getId(), rootContainerId, parentContainerId,
+        return BuilderFactory.get(SEndEventInstanceBuilderFactory.class).createNewEndEventInstance(endEventDef.getName(), endEventDef.getId(), rootContainerId,
+                parentContainerId,
                 processDefinitionId, rootProcessInstanceId, parentProcessInstanceId);
     }
 
@@ -408,7 +419,8 @@ public class BPMInstancesCreator {
 
     private SFlowNodeInstanceBuilder createSendTaskInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
             final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long parentProcessInstanceId) {
-        final SSendTaskInstanceBuilder builder = BuilderFactory.get(SSendTaskInstanceBuilderFactory.class).createNewSendTaskInstance(sFlowNodeDefinition.getName(),
+        final SSendTaskInstanceBuilder builder = BuilderFactory.get(SSendTaskInstanceBuilderFactory.class).createNewSendTaskInstance(
+                sFlowNodeDefinition.getName(),
                 sFlowNodeDefinition.getId(), rootContainerId, parentContainerId, processDefinitionId, rootContainerId, parentProcessInstanceId);
         updateActivityInstance(parentContainerId, parentContainerType, sFlowNodeDefinition, builder);
         return builder;
@@ -434,9 +446,11 @@ public class BPMInstancesCreator {
     private SMultiInstanceActivityInstanceBuilder createMultiInstanceActivityInstance(final long processDefinitionId, final long rootContainerId,
             final long parentContainerId, final long rootProcessInstanceId, final long parentProcessInstanceId, final SActivityDefinition activityDefinition,
             final SMultiInstanceLoopCharacteristics loopCharacteristics) {
-        final SMultiInstanceActivityInstanceBuilder builder = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class).createNewOuterTaskInstance(
-                activityDefinition.getName(), activityDefinition.getId(), rootContainerId, parentContainerId, processDefinitionId, rootProcessInstanceId,
-                parentProcessInstanceId, loopCharacteristics.isSequential());
+        final SMultiInstanceActivityInstanceBuilder builder = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class)
+                .createNewOuterTaskInstance(
+                        activityDefinition.getName(), activityDefinition.getId(), rootContainerId, parentContainerId, processDefinitionId,
+                        rootProcessInstanceId,
+                        parentProcessInstanceId, loopCharacteristics.isSequential());
         builder.setLoopDataInputRef(loopCharacteristics.getLoopDataInputRef());
         builder.setLoopDataOutputRef(loopCharacteristics.getLoopDataOutputRef());
         builder.setDataInputItemRef(loopCharacteristics.getDataInputItemRef());
@@ -466,11 +480,13 @@ public class BPMInstancesCreator {
         final SActor actor = getSActor.getResult();
         SHumanTaskInstanceBuilder builder;
         if (sFlowNodeDefinition instanceof SUserTaskDefinition) {
-            builder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).createNewUserTaskInstance(humanTaskDefinition.getName(), humanTaskDefinition.getId(), rootContainerId,
+            builder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).createNewUserTaskInstance(humanTaskDefinition.getName(),
+                    humanTaskDefinition.getId(), rootContainerId,
                     parentContainerId, actor.getId(), processDefinitionId, rootProcessInstanceId, parentProcessInstanceId);
         } else {
             // manual task
-            builder = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class).createNewManualTaskInstance(humanTaskDefinition.getName(), humanTaskDefinition.getId(), rootContainerId,
+            builder = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class).createNewManualTaskInstance(humanTaskDefinition.getName(),
+                    humanTaskDefinition.getId(), rootContainerId,
                     parentContainerId, actor.getId(), processDefinitionId, rootProcessInstanceId, parentProcessInstanceId);
         }
         // Creation date:
@@ -493,8 +509,11 @@ public class BPMInstancesCreator {
         final List<SConnectorInstance> connectorInstances = new ArrayList<SConnectorInstance>(connectors.size());
         int executionOrder = 0;
         for (final SConnectorDefinition sConnectorDefinition : connectors) {
-            connectorInstances.add(BuilderFactory.get(SConnectorInstanceBuilderFactory.class).createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
-                    sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(), executionOrder++)
+            connectorInstances.add(BuilderFactory
+                    .get(SConnectorInstanceBuilderFactory.class)
+                    .createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
+                            sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(),
+                            executionOrder++)
                     .done());
         }
         final CreateConnectorInstances transaction = new CreateConnectorInstances(connectorInstances, connectorInstanceService);
@@ -511,7 +530,8 @@ public class BPMInstancesCreator {
 
     public void createDataInstances(final SProcessInstance processInstance, final SFlowElementContainerDefinition processContainer,
             final SProcessDefinition processDefinition, final SExpressionContext expressionContext, final List<SOperation> operations,
-            final Map<String, Object> context) throws SBonitaException {
+            final Map<String, Object> context) throws SDataInstanceNotWellFormedException, SExpressionTypeUnknownException, SExpressionEvaluationException,
+            SExpressionDependencyMissingException, SInvalidExpressionException, SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
         final List<SDataDefinition> sDataDefinitions = processContainer.getDataDefinitions();
         final List<SDataInstance> sDataInstances = new ArrayList<SDataInstance>(sDataDefinitions.size());
         for (final SDataDefinition sDataDefinition : sDataDefinitions) {
@@ -542,9 +562,7 @@ public class BPMInstancesCreator {
                         processInstance.getProcessDefinitionId());
             }
             if (expression != null) {
-                final EvaluateExpression evaluateExpression = new EvaluateExpression(expressionResolverService, currentExpressionContext, expression);
-                evaluateExpression.execute();
-                defaultValue = evaluateExpression.getResult();
+                defaultValue = (Serializable) expressionResolverService.evaluate(expression, currentExpressionContext);
             } else if (sDataDefinition.isTransientData()) {
                 if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
@@ -552,14 +570,13 @@ public class BPMInstancesCreator {
                 }
             }
             try {
-                final SDataInstance dataInstance = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(sDataDefinition).setContainerId(processInstance.getId())
+                final SDataInstance dataInstance = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(sDataDefinition)
+                        .setContainerId(processInstance.getId())
                         .setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name()).setValue(defaultValue).done();
                 sDataInstances.add(dataInstance);
             } catch (final ClassCastException e) {
-                throw new SBonitaException("Trying to set variable \"" + sDataDefinition.getName() + "\" with incompatible type: " + e.getMessage()) {
-
-                    private static final long serialVersionUID = -3864933477546504156L;
-                };
+                throw new SDataInstanceNotWellFormedException("Trying to set variable \"" + sDataDefinition.getName() + "\" with incompatible type: "
+                        + e.getMessage());
             }
         }
         if (hasLocalOrInheritedData(processDefinition, processContainer)) {
@@ -622,11 +639,12 @@ public class BPMInstancesCreator {
                     try {
                         dataValue = (Serializable) ((List<?>) dataInstance.getValue()).get(index);
                     } catch (final ClassCastException e) {
-                        throw new SDataInstanceException("loopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
-                                + " is not a list or the value is not serializable");
+                        throw new SDataInstanceReadException("LoopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
+                                + " is not a list or the value is not serializable.");
                     }
                 } else {
-                    throw new SDataInstanceException("loopDataInput ref named " + loopDataInputRef + " is not visible for " + containerId + " " + containerType);
+                    throw new SDataInstanceReadException("LoopDataInput ref named " + loopDataInputRef + " is not visible for " + containerId + " "
+                            + containerType);
                 }
             } else {
                 final SExpression defaultValueExpression = dataDefinition.getDefaultValueExpression();
@@ -643,7 +661,7 @@ public class BPMInstancesCreator {
             try {
                 dataInstance = buildDataInstance(dataDefinition, containerId, containerType, dataValue);
             } catch (final SDataInstanceNotWellFormedException e) {
-                throw new SDataInstanceException(e);
+                throw new SDataInstanceReadException(e);
             }
             dataInstanceService.createDataInstance(dataInstance);
         }

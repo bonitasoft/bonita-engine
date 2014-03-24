@@ -1,13 +1,14 @@
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.connectors.RemoteConnectorExecutionTest;
+import org.bonitasoft.engine.activity.CallActivityTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+@SuppressWarnings("javadoc")
 @RunWith(Suite.class)
 @SuiteClasses({
-        RemoteConnectorExecutionTest.class
+        CallActivityTest.class
 })
 public class TemporaryTests extends LocalIntegrationTests {
 

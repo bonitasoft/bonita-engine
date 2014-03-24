@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.FireEventException;
+import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
@@ -62,7 +62,7 @@ public class RecorderImpl implements Recorder {
             persistenceService.insert(record.getEntity());
             fireEvent(insertEvent);
             traceAfterMethod(methodName);
-        } catch (final FireEventException e) {
+        } catch (final SFireEventException e) {
             logFireEventExceptionAndThrowSRecorderException(e, methodName);
         } catch (final Exception e) {
             traceException(methodName, e);
@@ -79,7 +79,7 @@ public class RecorderImpl implements Recorder {
             persistenceService.insertInBatch(record.getEntity());
             fireEvent(insertEvent);
             traceAfterMethod(methodName);
-        } catch (final FireEventException e) {
+        } catch (final SFireEventException e) {
             logFireEventExceptionAndThrowSRecorderException(e, methodName);
         } catch (final Exception e) {
             traceException(methodName, e);
@@ -96,7 +96,7 @@ public class RecorderImpl implements Recorder {
             persistenceService.delete(record.getEntity());
             fireEvent(deleteEvent);
             traceAfterMethod(methodName);
-        } catch (final FireEventException e) {
+        } catch (final SFireEventException e) {
             logFireEventExceptionAndThrowSRecorderException(e, methodName);
         } catch (final Exception e) {
             traceException(methodName, e);
@@ -128,7 +128,7 @@ public class RecorderImpl implements Recorder {
             persistenceService.update(desc);
             fireEvent(updateEvent);
             traceAfterMethod(methodName);
-        } catch (final FireEventException e) {
+        } catch (final SFireEventException e) {
             logFireEventExceptionAndThrowSRecorderException(e, methodName);
         } catch (final Exception e) {
             traceException(methodName, e);
@@ -137,7 +137,7 @@ public class RecorderImpl implements Recorder {
         }
     }
 
-    protected void logFireEventExceptionAndThrowSRecorderException(final FireEventException e, String methodName) throws SRecorderException {
+    protected void logFireEventExceptionAndThrowSRecorderException(final SFireEventException e, String methodName) throws SRecorderException {
         final List<Exception> handlerExceptions = e.getHandlerExceptions();
         for (Exception exception : handlerExceptions) {
             traceException(methodName, exception);
@@ -145,7 +145,7 @@ public class RecorderImpl implements Recorder {
         throw new SRecorderException(e);
     }
 
-    private void fireEvent(final SEvent evt) throws FireEventException {
+    private void fireEvent(final SEvent evt) throws SFireEventException {
         if (evt != null) {
             eventService.fireEvent(evt);
         }

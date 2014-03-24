@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,24 +13,37 @@
  **/
 package org.bonitasoft.engine.expression.exception;
 
-
 /**
  * @author Zhao Na
+ * @author Celine Souchet
  */
 public class SInvalidExpressionException extends SExpressionException {
 
     private static final long serialVersionUID = 5287292772348995383L;
 
-    public SInvalidExpressionException(final String message, final Throwable cause) {
+    private final String expressionName;
+
+    public SInvalidExpressionException(final String message, final Throwable cause, final String expressionName) {
         super(message, cause);
+        this.expressionName = expressionName;
     }
 
-    public SInvalidExpressionException(final String message) {
+    public SInvalidExpressionException(final String message, final String expressionName) {
         super(message);
+        this.expressionName = expressionName;
     }
 
-    public SInvalidExpressionException(final Throwable cause) {
+    public SInvalidExpressionException(final Throwable cause, final String expressionName) {
         super(cause);
+        this.expressionName = expressionName;
     }
 
+    /**
+     * Return null or empty string, if the context of evaluation is wrong.
+     * 
+     * @return The expression's name that failed on the evaluation.
+     */
+    public String getExpressionName() {
+        return expressionName;
+    }
 }

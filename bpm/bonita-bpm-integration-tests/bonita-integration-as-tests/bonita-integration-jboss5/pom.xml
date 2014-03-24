@@ -17,6 +17,7 @@
 		<jboss5.version>jboss-5.1.0.GA-jdk6</jboss5.version>
 		<jboss.name>jboss-5.1.0.GA</jboss.name>
 		<jboss.web.port>7080</jboss.web.port>
+		<jboss.ajp.port>8011</jboss.ajp.port>
 		<provider.port>7099</provider.port>
 		<invokerLocatorPort>3873</invokerLocatorPort>
 		<jboss.url>http://sourceforge.net/projects/jboss/files/JBoss/JBoss-5.1.0.GA/jboss-5.1.0.GA-jdk6.zip/download</jboss.url>
@@ -134,6 +135,7 @@
 										<replace file="${jboss.deploy.dir}/ejb3-connectors-jboss-beans.xml" token="&lt;parameter&gt;3873&lt;/parameter&gt;" value="&lt;parameter&gt;${invokerLocatorPort}&lt;/parameter&gt;" />
 		
 										<replace file="${jboss.deploy.dir}/jbossweb.sar/server.xml" token="port=&quot;8080&quot;" value="port=&quot;${jboss.web.port}&quot;" />
+										<replace file="${jboss.deploy.dir}/jbossweb.sar/server.xml" token="port=&quot;8009&quot;" value="port=&quot;${jboss.ajp.port}&quot;" />
 		
 										<replace file="${jboss.home}/bin/run.conf" token="-XX:MaxPermSize=256m" value="-XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError" />
 										
@@ -197,6 +199,7 @@
 										</copy>
 																						
 										<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
+										<replace file="${bonita.home}/client/conf/bonita-client.properties" token="#provider.port#" value="${provider.port}"/>
 		
 										<waitfor maxwait="1" maxwaitunit="minute">
 											<socket server="localhost" port="${provider.port}" />

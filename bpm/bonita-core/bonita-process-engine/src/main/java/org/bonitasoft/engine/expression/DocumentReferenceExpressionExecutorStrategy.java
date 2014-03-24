@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -36,6 +36,7 @@ import org.bonitasoft.engine.service.ModelConvertor;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
@@ -51,7 +52,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
         return evaluate(Collections.singletonList(expression), dependencyValues, resolvedExpressions).get(0);
     }
 
@@ -60,28 +61,32 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         return KIND_DOCUMENT;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues, final Map<Integer, Object> resolvedExpressions)
-            throws SExpressionEvaluationException {
+            throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+        final Long containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
+        final String containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
+        final Long time = (Long) dependencyValues.get("time");
+
         try {
-            Long containerId = (Long) dependencyValues.get(CONTAINER_ID_KEY);
-            String containerType = (String) dependencyValues.get(CONTAINER_TYPE_KEY);
-            Long time = (Long) dependencyValues.get("time");
             final long processInstanceId = getProcessInstance(containerId, containerType);
             final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
             for (final SExpression expression : expressions) {
                 results.add(getDocument(processInstanceId, expression, time));
             }
             return results;
+        } catch (final SExpressionDependencyMissingException e) {
+            throw e;
         } catch (final SBonitaException e) {
-            throw new SExpressionEvaluationException(e);
+            throw new SExpressionEvaluationException(e, null);
         }
     }
 
     private Document getDocument(long processInstanceId, SExpression expression, Long time) {
         try {
             SProcessDocument document;
-            if(time != null) {
+            if (time != null) {
                 document = processDocumentService.getDocument(processInstanceId, expression.getContent(), time);
             } else {
                 document = processDocumentService.getDocument(processInstanceId, expression.getContent());
@@ -92,15 +97,15 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
-    private long getProcessInstance(Long containerId, String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException, SExpressionDependencyMissingException {
+    private long getProcessInstance(Long containerId, String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException,
+            SExpressionDependencyMissingException {
         if (containerId == null || containerType == null) {
-            throw new SExpressionDependencyMissingException("the context to retrieve the document is not set");
+            throw new SExpressionDependencyMissingException("The context to retrieve the document is not set.");
         }
         if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
             return containerId;
-        } else {
-            return flowNodeInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
         }
+        return flowNodeInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
     }
 
     @Override

@@ -27,7 +27,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.SProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
@@ -64,8 +64,8 @@ public class ProcessStarter {
 
     private final Filter<SFlowNodeDefinition> filter;
 
-    private ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations, final Map<String, Serializable> context,
-            final Filter<SFlowNodeDefinition> filter) {
+    private ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
+           final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter) {
         this.userId = userId;
         this.processDefinitionId = processDefinitionId;
         this.operations = operations;
