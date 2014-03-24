@@ -38,6 +38,11 @@ public class SBonitaRuntimeException extends RuntimeException {
         context = new TreeMap<SContext, Serializable>();
     }
 
+    public SBonitaRuntimeException(final String message) {
+        super(message);
+        context = new TreeMap<SContext, Serializable>();
+    }
+
     /**
      * @return The context of the exception
      * @since 6.3

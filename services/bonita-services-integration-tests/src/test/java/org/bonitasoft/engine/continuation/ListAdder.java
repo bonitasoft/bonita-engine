@@ -52,6 +52,6 @@ public class ListAdder extends BonitaWork {
 
     @SuppressWarnings("unused")
     @Override
-    public void handleFailure(final Throwable e, final Map<String, Object> context) {
+    public void handleFailure(final Exception e, final Map<String, Object> context) {
     }
 }

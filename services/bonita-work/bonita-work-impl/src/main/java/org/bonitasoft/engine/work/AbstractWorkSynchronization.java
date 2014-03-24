@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionState;
 
@@ -32,19 +32,16 @@ public abstract class AbstractWorkSynchronization implements BonitaTransactionSy
 
     private long tenantId;
 
-    private final ExecutorWorkService threadPoolWorkService;
-
-    public AbstractWorkSynchronization(final ExecutorWorkService threadPoolWorkService, final ExecutorService executorService,
-            final SessionAccessor sessionAccessor) {
+    public AbstractWorkSynchronization(final ExecutorService executorService, final SessionAccessor sessionAccessor) {
         super();
-        this.threadPoolWorkService = threadPoolWorkService;
         this.executorService = executorService;
         works = new HashSet<BonitaWork>();
         try {
             // instead of doing this which is not so clear using sessionAccessor, we should add the tenantId as a parameter of the class
             tenantId = sessionAccessor.getTenantId();
         } catch (final STenantIdNotSetException e) {
-            tenantId = -1l;// we are not in a tenant
+            // we are not in a tenant
+            tenantId = -1l;
         }
     }
 

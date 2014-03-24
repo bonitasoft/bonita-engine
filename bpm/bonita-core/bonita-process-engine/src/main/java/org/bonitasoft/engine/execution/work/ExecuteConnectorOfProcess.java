@@ -115,13 +115,13 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Throwable throwable)
+    protected void errorEventOnFail(final Map<String, Object> context, final SConnectorDefinition sConnectorDefinition, final Exception exception)
             throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-        setConnectorOnlyToFailed(context, throwable);
+        setConnectorOnlyToFailed(context, exception);
         // create a fake definition
         final String errorCode = sConnectorDefinition.getErrorCode();
         final SThrowErrorEventTriggerDefinition errorEventTriggerDefinition = BuilderFactory.get(SThrowErrorEventTriggerDefinitionBuilderFactory.class)
@@ -136,7 +136,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
         final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
                 throwEventInstance, errorEventTriggerDefinition, null);
         if (!hasActionToExecute) {
-            setConnectorAndContainerToFailed(context, throwable);
+            setConnectorAndContainerToFailed(context, exception);
         }
     }
 
