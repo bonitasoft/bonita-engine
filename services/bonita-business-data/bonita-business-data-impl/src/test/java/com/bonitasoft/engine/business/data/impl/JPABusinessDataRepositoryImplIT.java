@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.UserTransaction;
 
+import org.assertj.core.data.Index;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -177,7 +179,7 @@ public class JPABusinessDataRepositoryImplIT {
             public void run() {
                 try {
                     businessDataRepository.merge(null);
-                    final Long count = businessDataRepository.select(Long.class, "SELECT COUNT(*) FROM Employee e", null);
+                    final Long count = businessDataRepository.find(Long.class, "SELECT COUNT(*) FROM Employee e", null);
                     assertThat(count).isEqualTo(0);
                 } catch (final Exception e) {
                     throw new RuntimeException(e);
@@ -453,6 +455,52 @@ public class JPABusinessDataRepositoryImplIT {
         } finally {
             ut.commit();
             businessDataRepository.stop();
+        }
+    }
+
+    @Test
+    public void findList_should_return_employee_list() throws Exception {
+        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.start();
+            setUpDatabase();
+            final List<Employee> employees = businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e ORDER BY e.lastName, e.firstName", null);
+            assertThat(employees).hasSize(3).has(new EmployeeCondition("Hannu", "Hakkinen"), Index.atIndex(0))
+                    .has(new EmployeeCondition("Matti", "Hakkinen"), Index.atIndex(1)).has(new EmployeeCondition("Petteri", "Salo"), Index.atIndex(2));
+
+        } finally {
+            ut.commit();
+        }
+    }
+
+    @Test
+    public void findList_should_return_an_empty() throws Exception {
+        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.start();
+            setUpDatabase();
+            final Map<String, Object> parameters = Collections.singletonMap("firstName", (Object) "Jaakko");
+            final List<Employee> employees = businessDataRepository.findList(Employee.class,
+                    "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", parameters);
+            assertThat(employees).isEmpty();
+
+        } finally {
+            ut.commit();
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void findList_should_throw_an_exception_if_parameter_is_not_set() throws Exception {
+        final UserTransaction ut = TransactionManagerServices.getTransactionManager();
+        try {
+            ut.begin();
+            businessDataRepository.start();
+            setUpDatabase();
+            businessDataRepository.findList(Employee.class, "SELECT e FROM Employee e WHERE e.firstName=:firstName ORDER BY e.lastName, e.firstName", null);
+        } finally {
+            ut.commit();
         }
     }
 

@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,25 +68,9 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      * @throws NonUniqueResultException
      *             if more than one result was found.
      */
-    <T extends Entity> T find(Class<T> entityClass, String qlString, Map<String, Object> parameters) throws SBusinessDataNotFoundException,
-            NonUniqueResultException;
+    <T> T find(Class<T> entityClass, String qlString, Map<String, Object> parameters) throws SBusinessDataNotFoundException, NonUniqueResultException;
 
-    /**
-     * Executes a JPQL query returning a single result.
-     * 
-     * @param resultClass
-     *            the type of the result of the JPQL query.
-     * @param qlString
-     *            the JPQL query.
-     * @param parameters
-     *            the JPQL query parameters, needed to execute the JPQL query.
-     * @return the typed result.
-     * @throws SBusinessDataNotFoundException
-     *             if no result could be found.
-     * @throws NonUniqueResultException
-     *             if non unique result is returned by the JPQL query.
-     */
-    <T> T select(Class<T> resultClass, String qlString, Map<String, Object> parameters) throws SBusinessDataNotFoundException, NonUniqueResultException;
+    <T> List<T> findList(Class<T> resultClass, String qlString, Map<String, Object> parameters);
 
     /**
      * Saves or updates an entity in the Business Data Repository.
