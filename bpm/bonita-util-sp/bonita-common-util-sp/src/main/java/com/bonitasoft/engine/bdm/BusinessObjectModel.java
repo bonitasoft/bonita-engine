@@ -26,7 +26,7 @@ public class BusinessObjectModel {
 
     @XmlElementWrapper(name = "businessObjects", required = true)
     @XmlElement(name = "businessObject", required = true)
-    private final List<BusinessObject> businessObjects;
+    private List<BusinessObject> businessObjects;
 
     public BusinessObjectModel() {
         businessObjects = new ArrayList<BusinessObject>();
@@ -36,7 +36,11 @@ public class BusinessObjectModel {
         return businessObjects;
     }
 
-    public void addBusinessObject(final BusinessObject businessObject) {
+    public void setBusinessObjects(List<BusinessObject> businessObjects) {
+		this.businessObjects = businessObjects;
+	}
+
+	public void addBusinessObject(final BusinessObject businessObject) {
         businessObjects.add(businessObject);
     }
 

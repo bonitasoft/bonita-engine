@@ -34,11 +34,11 @@ public class BusinessObject {
 
     @XmlElementWrapper(name = "fields", required = true)
     @XmlElement(name = "field", required = true)
-    private final List<Field> fields;
+    private List<Field> fields;
 
     @XmlElementWrapper(name = "uniqueConstraints")
     @XmlElement(name = "uniqueConstraint")
-    private final List<UniqueConstraint> uniqueConstraints;
+    private List<UniqueConstraint> uniqueConstraints;
 
     public BusinessObject() {
         fields = new ArrayList<Field>();
@@ -57,7 +57,11 @@ public class BusinessObject {
         return fields;
     }
 
-    public void addField(final Field field) {
+    public void setFields(List<Field> fields) {
+		this.fields = fields;
+	}
+
+	public void addField(final Field field) {
         fields.add(field);
     }
 
@@ -87,7 +91,11 @@ public class BusinessObject {
         return uniqueConstraints;
     }
 
-    @Override
+    public void setUniqueConstraints(List<UniqueConstraint> uniqueConstraints) {
+		this.uniqueConstraints = uniqueConstraints;
+	}
+
+	@Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
