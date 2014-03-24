@@ -52,7 +52,7 @@ public class CodeGenerator {
         hashCodeBuilder = new HashCodeBuilder();
     }
 
-    public void generate(final File destDir) throws IOException, JClassAlreadyExistsException {
+    public void generate(final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException {
         final PrintStream stream = new PrintStream(new NullStream());
         try {
             model.build(destDir, stream);

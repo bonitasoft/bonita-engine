@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.bdm;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -34,7 +33,7 @@ public class BusinessObjectModel {
     }
 
     public List<BusinessObject> getEntities() {
-        return Collections.unmodifiableList(businessObjects);
+        return businessObjects;
     }
 
     public void addBusinessObject(final BusinessObject businessObject) {

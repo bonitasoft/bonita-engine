@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -39,7 +38,7 @@ public class UniqueConstraint {
     }
 
     public List<String> getFieldNames() {
-        return Collections.unmodifiableList(fieldNames);
+        return fieldNames;
     }
 
     public void setFieldNames(final List<String> fieldNames) {

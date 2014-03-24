@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
-import javax.lang.model.SourceVersion;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -40,14 +39,8 @@ public class Field {
     }
 
     public void setName(final String name) {
-        if (!SourceVersion.isIdentifier(name) || SourceVersion.isKeyword(name) || isForbiddenIdentifier(name)) {
-            throw new IllegalArgumentException(name + " is not a valid field identifier");
-        }
-        this.name = name;
-    }
 
-    private boolean isForbiddenIdentifier(final String name) {
-        return PERSISTENCE_ID.equalsIgnoreCase(name) || PERSISTENCE_VERSION.equalsIgnoreCase(name);
+        this.name = name;
     }
 
     public FieldType getType() {

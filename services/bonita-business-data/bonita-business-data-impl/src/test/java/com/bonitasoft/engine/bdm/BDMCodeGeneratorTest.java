@@ -91,8 +91,6 @@ public class BDMCodeGeneratorTest extends CompilableCode {
 
         assertThat(definedClass.getMethod("equals", new JType[] { definedClass.owner().ref(Object.class) })).isNotNull();
         assertThat(definedClass.getMethod("hashCode", new JType[] {})).isNotNull();
-
-        assertGenerationAndCompilationWork();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -126,8 +124,6 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(nullable).isNotNull().isEqualTo("true");
         final String length = getAnnotationParamValue(annotationUse, "length");
         assertThat(length).isNotNull().isEqualTo("45");
-
-        assertGenerationAndCompilationWork();
     }
 
     private String getAnnotationParamValue(final JAnnotationUse annotationUse, final String paramName) {
@@ -167,8 +163,6 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(annotationUse.getAnnotationMembers()).hasSize(1);
         final String value = getAnnotationParamValue(annotationUse, "value");
         assertThat(value).isNotNull().isEqualTo("javax.persistence.TemporalType.TIMESTAMP");
-
-        assertGenerationAndCompilationWork();
     }
 
     @Test
@@ -189,8 +183,6 @@ public class BDMCodeGeneratorTest extends CompilableCode {
 
         final JMethod getter = (JMethod) definedClass.methods().toArray()[1];
         assertThat(getter.name()).isEqualTo("getName");
-
-        assertGenerationAndCompilationWork();
     }
 
     @Test
@@ -249,8 +241,6 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Id.class.getName());
         annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(GeneratedValue.class.getName());
-
-        assertGenerationAndCompilationWork();
     }
 
     @Test
@@ -267,8 +257,6 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         final Iterator<JAnnotationUse> iterator = versionFieldVar.annotations().iterator();
         final JAnnotationUse annotationUse = iterator.next();
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Version.class.getName());
-
-        assertGenerationAndCompilationWork();
     }
 
     @Test
@@ -283,8 +271,6 @@ public class BDMCodeGeneratorTest extends CompilableCode {
 
         final JFieldVar nameFieldVar = definedClass.fields().get("description");
         assertTextField(nameFieldVar);
-
-        assertGenerationAndCompilationWork();
     }
 
     public void assertTextField(final JFieldVar fieldVar) {
@@ -297,7 +283,7 @@ public class BDMCodeGeneratorTest extends CompilableCode {
         assertThat(annotationUse.getAnnotationClass().fullName()).isEqualTo(Lob.class.getName());
     }
 
-    public void assertGenerationAndCompilationWork() throws IOException, JClassAlreadyExistsException {
+    public void assertGenerationAndCompilationWork() throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException {
         final File sourceFileToCompile = new File(destDir, "org" + File.separatorChar + "bonitasoft" + File.separatorChar + "hr" + File.separatorChar
                 + "Employee.java");
         sourceFileToCompile.delete();

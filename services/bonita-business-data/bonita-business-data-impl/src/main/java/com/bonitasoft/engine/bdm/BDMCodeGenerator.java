@@ -23,6 +23,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import com.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator;
+import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -146,8 +148,13 @@ public class BDMCodeGenerator extends CodeGenerator {
     }
 
     @Override
-    public void generate(final File destDir) throws IOException, JClassAlreadyExistsException {
-        buildASTFromBom();
+    public void generate(final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException {
+    	BusinessObjectModelValidator validator = new BusinessObjectModelValidator();
+    	ValidationStatus validationStatus = validator.validate(bom);
+    	if(!validationStatus.isOk()){
+    		throw new BusinessObjectModelValidationException(validationStatus);
+    	}
+    	buildASTFromBom();
         super.generate(destDir);
     }
 

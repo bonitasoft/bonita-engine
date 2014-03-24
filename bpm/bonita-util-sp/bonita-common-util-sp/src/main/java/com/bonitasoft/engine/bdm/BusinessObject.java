@@ -10,10 +10,8 @@ package com.bonitasoft.engine.bdm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import javax.lang.model.SourceVersion;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -51,14 +49,11 @@ public class BusinessObject {
     }
 
     public void setQualifiedName(final String qualifiedName) {
-        if (!SourceVersion.isName(qualifiedName)) {
-            throw new IllegalArgumentException(qualifiedName + " is not a valid Java qualified name");
-        }
         this.qualifiedName = qualifiedName;
     }
 
     public List<Field> getFields() {
-        return Collections.unmodifiableList(fields);
+        return fields;
     }
 
     public void addField(final Field field) {
@@ -73,7 +68,7 @@ public class BusinessObject {
         this.description = description;
     }
 
-    public void addUniqueConstraint(final String name, final String... fieldNames) {
+    public UniqueConstraint addUniqueConstraint(final String name, final String... fieldNames) {
         if (fieldNames == null || fieldNames.length == 0) {
             throw new IllegalArgumentException("fieldNames cannot be null or empty");
         }
@@ -82,32 +77,18 @@ public class BusinessObject {
         }
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setName(name);
-        for (final String fieldName : fieldNames) {
-            final Field field = getField(fieldName);
-            if (field == null) {
-                throw new IllegalArgumentException("The field named " + fieldName + " does not exist");
-            }
-        }
+       
         uniqueConstraint.setFieldNames(Arrays.asList(fieldNames));
-        uniqueConstraints.add(uniqueConstraint);
+        if(uniqueConstraints.add(uniqueConstraint)){
+        	return uniqueConstraint;
+        }
+        return null;
     }
 
     public List<UniqueConstraint> getUniqueConstraints() {
-        return uniqueConstraints == null ? null : Collections.unmodifiableList(uniqueConstraints);
+        return uniqueConstraints == null ? null : uniqueConstraints;
     }
 
-    private Field getField(final String name) {
-        Field found = null;
-        int index = 0;
-        while (found == null && index < fields.size()) {
-            final Field field = fields.get(index);
-            if (field.getName().equals(name)) {
-                found = field;
-            }
-            index++;
-        }
-        return found;
-    }
 
     @Override
     public int hashCode() {
