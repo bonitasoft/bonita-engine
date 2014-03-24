@@ -51,7 +51,6 @@ import org.apache.http.params.HttpParams;
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -355,9 +354,9 @@ public class CASAuthenticatorImplTest {
     }
 
     @Test
-    @Ignore("BS-8045")
     public void testCreateDOMDocumentFromResponseWithLoginForm() throws Exception {
-        final String content = FileUtils.readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.html"));
+        final String content = FileUtils
+                .readFileToString(new File("src/test/resources/com/bonita/engine/authentification/impl/cas/CAS-loginpage.html"), "UTF8");
         final Document doc = casAuthenticatorImpl.createDOMDocumentFromResponse(content);
         final String xmlDoc = transformDocumentToString(doc).replaceAll(LINE_SEPARATOR, "");
         // uncomment to see diff in eclipse
