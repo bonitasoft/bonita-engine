@@ -1,9 +1,6 @@
 package com.bonitasoft.engine.bdr;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -114,11 +111,11 @@ public class BDRIT extends CommonAPISPTest {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(processDefinitionBuilder.done());
         getProcessAPI().enableProcess(processDefinition.getId());
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessDefinition(processDefinition.getId(), expressions);
-        assertEquals(1, result.size());
+        assertThat(result).hasSize(1);
 
         final Set<Entry<String, Serializable>> entrySet = result.entrySet();
         final Entry<String, Serializable> entry = entrySet.iterator().next();
-        assertEquals("Employee [firstName=John, lastName=Doe]", entry.getValue());
+        assertThat(entry.getValue()).isEqualTo("Employee [firstName=John, lastName=Doe]");
 
         disableAndDeleteProcess(processDefinition.getId());
     }
@@ -139,12 +136,12 @@ public class BDRIT extends CommonAPISPTest {
 
         final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
         Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
-        assertNull(businessDataInstance);
+        assertThat(businessDataInstance).isNull();
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
         getProcessAPI().executeFlowNode(userTask.getId());
 
         businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
-        assertNotNull(businessDataInstance);
+        assertThat(businessDataInstance).isNotNull();
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -164,7 +161,7 @@ public class BDRIT extends CommonAPISPTest {
 
         waitForUserTask("step1", instance.getId());
         final Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
-        assertNotNull(businessDataInstance);
+        assertThat(businessDataInstance).isNotNull();
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -189,7 +186,7 @@ public class BDRIT extends CommonAPISPTest {
 
         waitForUserTask("step1", instance.getId());
         final Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
-        assertNotNull(businessDataInstance);
+        assertThat(businessDataInstance).isNotNull();
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -234,8 +231,8 @@ public class BDRIT extends CommonAPISPTest {
         final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         final String returnedFirstName = (String) evaluatedExpressions.get(expressionFirstName);
         final String returnedLastName = (String) evaluatedExpressions.get(expressionLastName);
-        assertEquals(newEmployeeFirstName, returnedFirstName);
-        assertEquals(newEmployeeLastName, returnedLastName);
+        assertThat(returnedFirstName).isEqualTo(newEmployeeFirstName);
+        assertThat(returnedLastName).isEqualTo(newEmployeeLastName);
 
         disableAndDeleteProcess(definition.getId());
     }
@@ -274,7 +271,7 @@ public class BDRIT extends CommonAPISPTest {
 
     private BarResource getResource(final String path, final String name) throws IOException {
         final InputStream stream = BDRIT.class.getResourceAsStream(path);
-        assertNotNull(stream);
+        assertThat(stream).isNotNull();
         try {
             final byte[] byteArray = IOUtils.toByteArray(stream);
             return new BarResource(name, byteArray);
@@ -292,7 +289,7 @@ public class BDRIT extends CommonAPISPTest {
         waitForUserTask(taskName, instance.getId());
 
         final Object businessDataInstance = getProcessAPI().getBusinessDataInstance("myEmployee", instance.getId());
-        assertNotNull(businessDataInstance);
+        assertThat(businessDataInstance).isNotNull();
 
         final Method method = businessDataInstance.getClass().getMethod("getLastName", null);
         final String lastName = (String) method.invoke(businessDataInstance, null);
